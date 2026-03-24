@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,14 +35,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/department")
-@Tag(name = "department - 部门", description = "department apis")
+@Tag(name = "Department Management", description = "Department management APIs")
 public class DepartmentRestController extends BaseRestController<DepartmentRequest, DepartmentRestService> {
 
     private final DepartmentRestService departmentRestService;
 
-    @ActionAnnotation(title = "部门", action = "组织查询", description = "query department by org")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query department by org")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(DepartmentRequest request) {
 
         Page<DepartmentResponse> departmentPage = departmentRestService.queryByOrg(request);
@@ -49,9 +51,10 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
-    @ActionAnnotation(title = "部门", action = "用户查询", description = "query department by user")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query department by user")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(DepartmentRequest request) {
         
         Page<DepartmentResponse> departmentPage = departmentRestService.queryByUser(request);
@@ -59,9 +62,10 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
-    @ActionAnnotation(title = "部门", action = "查询详情", description = "query department by uid")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query department by uid")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_OR_TICKET_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(DepartmentRequest request) {
 
         DepartmentResponse department = departmentRestService.queryByUid(request);
@@ -70,7 +74,9 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE)
-    @ActionAnnotation(title = "部门", action = "新建", description = "create department")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create department")
+    @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody DepartmentRequest request) {
 
         DepartmentResponse department = departmentRestService.create(request);
@@ -79,7 +85,9 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_UPDATE)
-    @ActionAnnotation(title = "部门", action = "更新", description = "update department")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update department")
+    @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody DepartmentRequest request) {
 
         DepartmentResponse department = departmentRestService.update(request);
@@ -88,7 +96,8 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_DELETE)
-    @ActionAnnotation(title = "部门", action = "删除", description = "delete department")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete department")
+    @Override
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest request) {
 
@@ -98,7 +107,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT)
-    @ActionAnnotation(title = "部门", action = "导出", description = "export department")
+    @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export department")
     @GetMapping("/export")
     @Override
     public Object export(DepartmentRequest request, HttpServletResponse response) {

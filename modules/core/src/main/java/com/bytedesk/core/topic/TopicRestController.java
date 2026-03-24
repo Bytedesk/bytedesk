@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +40,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/topic")
-@Tag(name = "主题管理", description = "主题管理相关接口，包括查询、创建、更新、删除等操作")
+@Tag(name = "Topic Management", description = "Topic management APIs, including query, create, update, delete, and subscription operations")
 public class TopicRestController extends BaseRestController<TopicRequest, TopicRestService> {
 
     private final TopicRestService topicRestService;
@@ -50,8 +51,9 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 查询请求
      * @return 分页主题列表
      */
-    @Operation(summary = "根据组织查询主题", description = "返回当前组织的主题列表")
+    @Operation(summary = "Query Topics by Organization", description = "Return the topic list for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TopicRequest request) {
 
         Page<TopicResponse> topicPage = topicRestService.queryByOrg(request);
@@ -65,8 +67,9 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 查询请求
      * @return 分页主题列表
      */
-    @Operation(summary = "根据用户查询主题", description = "返回当前用户的主题列表")
+    @Operation(summary = "Query Topics by User", description = "Return the topic list for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TopicRequest request) {
 
         Page<TopicResponse> topicPage = topicRestService.queryByUser(request);
@@ -80,8 +83,9 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 查询请求
      * @return 主题信息
      */
-    @Operation(summary = "根据UID查询主题", description = "通过唯一标识符查询主题")
+    @Operation(summary = "Query Topic by UID", description = "Query the topic by unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TopicRequest request) {
 
         TopicResponse topicResponse = topicRestService.queryByUid(request);
@@ -95,9 +99,10 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 创建主题请求
      * @return 创建的主题
      */
-    @Operation(summary = "创建主题", description = "创建新的主题")
-    @ActionAnnotation(title = "主题", action = "新建", description = "create topic")
+    @Operation(summary = "Create Topic", description = "Create a new topic")
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC, action = I18Consts.I18N_ACTION_CREATE, description = "create topic")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody TopicRequest request) {
 
         TopicResponse topic = topicRestService.create(request);
@@ -111,9 +116,10 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 更新主题请求
      * @return 更新后的主题
      */
-    @Operation(summary = "更新主题", description = "更新已存在的主题信息")
-    @ActionAnnotation(title = "主题", action = "更新", description = "update topic")
+    @Operation(summary = "Update Topic", description = "Update existing topic information")
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC, action = I18Consts.I18N_ACTION_UPDATE, description = "update topic")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody TopicRequest request) {
 
         TopicResponse topicResponse = topicRestService.update(request);
@@ -136,7 +142,7 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 订阅请求
      * @return 订阅结果
      */
-    @Operation(summary = "订阅主题", description = "订阅指定主题")
+    @Operation(summary = "Subscribe Topic", description = "Subscribe to the specified topic")
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@RequestBody TopicRequest request) {
 
@@ -151,7 +157,7 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 取消订阅请求
      * @return 取消订阅结果
      */
-    @Operation(summary = "取消订阅主题", description = "取消订阅指定主题")
+    @Operation(summary = "Unsubscribe Topic", description = "Unsubscribe from the specified topic")
     @PostMapping("/unsubscribe")
     public ResponseEntity<?> unsubscribe(@RequestBody TopicRequest request) {
 
@@ -166,9 +172,10 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param request 删除请求
      * @return 删除结果
      */
-    @Operation(summary = "删除主题", description = "删除指定主题")
-    @ActionAnnotation(title = "主题", action = "删除", description = "delete topic")
+    @Operation(summary = "Delete Topic", description = "Delete the specified topic")
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC, action = I18Consts.I18N_ACTION_DELETE, description = "delete topic")
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody TopicRequest request) {
 
         topicRestService.delete(request);
@@ -183,9 +190,10 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
      * @param response HTTP响应
      * @return 导出结果
      */
-    @Operation(summary = "导出主题列表", description = "将主题数据导出为Excel格式")
-    @ActionAnnotation(title = "主题", action = "导出", description = "export topic")
+    @Operation(summary = "Export Topic List", description = "Export topic data to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC, action = I18Consts.I18N_ACTION_EXPORT, description = "export topic")
     @Override
+    @GetMapping("/export")
     public Object export(TopicRequest request, HttpServletResponse response) {
         // 如果没有TopicExcel类，需要创建一个
         return exportTemplate(
@@ -193,7 +201,7 @@ public class TopicRestController extends BaseRestController<TopicRequest, TopicR
             response,
             topicRestService,
             TopicEntity.class, // 如果存在TopicExcel类，应替换为TopicExcel.class
-            "主题列表",
+            "Topic",
             "topic"
         );
     }

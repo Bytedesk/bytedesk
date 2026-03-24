@@ -48,6 +48,8 @@ public class AgentResponse extends BaseResponse {
 
     private String avatar;
 
+    private String country;
+
     private String mobile;
 
     private String email;
@@ -59,6 +61,12 @@ public class AgentResponse extends BaseResponse {
     private Boolean connected;
 
     private Boolean enabled;
+
+    private Boolean forceLogout;
+
+    private String forceLogoutReason;
+
+    private ZonedDateTime forceLogoutAt;
 
     // 坐席有效期，null 表示永久有效
     private ZonedDateTime seatExpireAt;

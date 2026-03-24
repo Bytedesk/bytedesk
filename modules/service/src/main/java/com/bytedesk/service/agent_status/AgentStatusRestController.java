@@ -33,13 +33,13 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/agent/status")
 @AllArgsConstructor
-@Tag(name = "客服状态管理", description = "客服状态管理相关接口")
+@Tag(name = "Agent Status Management", description = "Agent status management APIs")
 public class AgentStatusRestController extends BaseRestController<AgentStatusRequest, AgentStatusRestService> {
 
     private final AgentStatusRestService agentStatusService;
 
     @Override
-    @Operation(summary = "根据组织查询客服状态")
+    @Operation(summary = "Query Agent Status by Organization")
     @GetMapping("/query/org")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByOrg(AgentStatusRequest request) {
@@ -50,7 +50,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "根据用户查询客服状态")
+    @Operation(summary = "Query Agent Status by User")
     @GetMapping({ "/query", "/query/user" })
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUser(AgentStatusRequest request) {
@@ -61,7 +61,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "根据UID查询客服状态")
+    @Operation(summary = "Query Agent Status by UID")
     @GetMapping("/query/uid")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUid(AgentStatusRequest request) {
@@ -72,7 +72,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "创建客服状态")
+    @Operation(summary = "Create Agent Status")
     @PostMapping("/create")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_CREATE)
     public ResponseEntity<?> create(@RequestBody AgentStatusRequest request) {
@@ -83,7 +83,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "更新客服状态")
+    @Operation(summary = "Update Agent Status")
     @PostMapping("/update")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_UPDATE)
     public ResponseEntity<?> update(@RequestBody AgentStatusRequest request) {
@@ -94,7 +94,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "删除客服状态")
+    @Operation(summary = "Delete Agent Status")
     @PostMapping("/delete")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_DELETE)
     public ResponseEntity<?> delete(@RequestBody AgentStatusRequest request) {

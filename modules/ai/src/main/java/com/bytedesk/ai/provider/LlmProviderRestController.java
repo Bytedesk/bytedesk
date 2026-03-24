@@ -33,7 +33,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "LLM提供商管理", description = "LLM提供商管理相关接口")
+@Tag(name = "LLM Provider Management", description = "LLM provider management APIs")
 @RestController
 @RequestMapping("/api/v1/provider")
 @AllArgsConstructor
@@ -42,8 +42,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
 
     private final LlmProviderRestService llmProviderRestService;
 
-    @Operation(summary = "查询组织下的LLM提供商", description = "根据组织ID查询LLM提供商列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Providers by Organization", description = "Retrieve LLM provider list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
     @Override
@@ -54,8 +54,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的LLM提供商", description = "根据用户ID查询LLM提供商列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Providers by User", description = "Retrieve LLM provider list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
     @Override
@@ -66,8 +66,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询指定LLM提供商", description = "根据UID查询LLM提供商详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Provider by UID", description = "Retrieve LLM provider details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
     @Override
@@ -79,8 +79,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
     }
 
 
-    @Operation(summary = "创建LLM提供商", description = "创建新的LLM提供商")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create LLM Provider", description = "Create a new LLM provider")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
     @Override
@@ -91,8 +91,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "更新LLM提供商", description = "更新LLM提供商信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update LLM Provider", description = "Update LLM provider information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderResponse.class)))
     @Override
@@ -103,8 +103,8 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "删除LLM提供商", description = "删除指定的LLM提供商")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete LLM Provider", description = "Delete the specified LLM provider")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
     public ResponseEntity<?> delete(LlmProviderRequest request) {
         
@@ -113,16 +113,16 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出LLM提供商", description = "导出LLM提供商数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export LLM Providers", description = "Export LLM provider data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     public Object export(LlmProviderRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
     
-    @Operation(summary = "获取LLM提供商默认配置", description = "获取LLM提供商的默认配置信息")
-    @ApiResponse(responseCode = "200", description = "获取成功",
+    @Operation(summary = "Get Default LLM Provider Configuration", description = "Retrieve the default configuration for LLM providers")
+    @ApiResponse(responseCode = "200", description = "Retrieved successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderConfigDefault.class)))
     @GetMapping("/config/default")

@@ -5,6 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <#include "./common/macro/i18n.ftl" />
+    <#assign currentLang = 'zh-cn'>
+    <#if lang??>
+        <#assign _lc = lang?lower_case>
+        <#if _lc?index_of('zh-tw') == 0>
+            <#assign currentLang = 'zh-tw'>
+        <#elseif _lc?index_of('en') == 0>
+            <#assign currentLang = 'en'>
+        </#if>
+    </#if>
+    <#assign currentLangLabel = '简体中文'>
+    <#if currentLang == 'zh-tw'>
+        <#assign currentLangLabel = '繁體中文'>
+    <#elseif currentLang == 'en'>
+        <#assign currentLangLabel = 'English'>
+    </#if>
     <title><@t key="default.title">系统入口</@t></title>
     <#--  <title>${(customName?exists && customName != '')?then(customName?html, '系统入口')}</title>  -->
     <#if customLogo?exists && customLogo != ''>
@@ -28,6 +43,7 @@
         }
         
         .container {
+            position: relative;
             max-width: 800px;
             width: 90%;
             padding: 40px;
@@ -35,6 +51,88 @@
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+        }
+
+        .lang-switch details {
+            position: relative;
+        }
+
+        .lang-switch summary {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            padding: 10px 14px;
+            border: 1px solid #d9e2ec;
+            border-radius: 999px;
+            background: #f8fbff;
+            color: #234;
+            cursor: pointer;
+            font-size: 0.95em;
+            box-shadow: 0 8px 20px rgba(17, 38, 146, 0.08);
+        }
+
+        .lang-switch summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .lang-switch summary::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid #5b6b7d;
+            border-bottom: 2px solid #5b6b7d;
+            transform: rotate(45deg) translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+
+        .lang-switch details[open] summary::after {
+            transform: rotate(225deg) translateY(-1px);
+        }
+
+        .lang-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 160px;
+            padding: 8px;
+            border: 1px solid #d9e2ec;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+        }
+
+        .lang-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #243447;
+            cursor: pointer;
+            font-size: 0.95em;
+            text-align: left;
+        }
+
+        .lang-option:hover,
+        .lang-option.is-active {
+            background: #eef6ff;
+            color: #0f5fbf;
+        }
+
+        .lang-option-check {
+            font-size: 0.9em;
+            opacity: 0.85;
         }
         
         h1 {
@@ -108,6 +206,17 @@
             .container {
                 padding: 30px 20px;
             }
+
+            .lang-switch {
+                top: 16px;
+                right: 16px;
+            }
+
+            .lang-switch summary {
+                min-width: 108px;
+                padding: 8px 12px;
+                font-size: 0.9em;
+            }
             
             h1 {
                 font-size: 2em;
@@ -123,6 +232,25 @@
 </head>
 <body>
     <div class="container">
+        <div class="lang-switch">
+            <details>
+                <summary>${currentLangLabel}</summary>
+                <div class="lang-menu">
+                    <button class="lang-option ${(currentLang == 'zh-cn')?string('is-active', '')}" type="button" data-lang="zh-CN">
+                        <span>简体中文</span>
+                        <span class="lang-option-check">${(currentLang == 'zh-cn')?string('✓', '')}</span>
+                    </button>
+                    <button class="lang-option ${(currentLang == 'zh-tw')?string('is-active', '')}" type="button" data-lang="zh-TW">
+                        <span>繁體中文</span>
+                        <span class="lang-option-check">${(currentLang == 'zh-tw')?string('✓', '')}</span>
+                    </button>
+                    <button class="lang-option ${(currentLang == 'en')?string('is-active', '')}" type="button" data-lang="en">
+                        <span>English</span>
+                        <span class="lang-option-check">${(currentLang == 'en')?string('✓', '')}</span>
+                    </button>
+                </div>
+            </details>
+        </div>
         <#--  <#if customLogo?exists && customLogo != ''>
         <img src="${customLogo}" alt="${(customName?exists && customName != '')?then(customName?html, '系统入口')}" class="logo">
         </#if>  -->
@@ -148,5 +276,20 @@
             <p>© 2025 <@t key="default.copyright">版权所有</@t></p>
         </footer>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = document.querySelectorAll('.lang-option');
+
+            options.forEach(function(option) {
+                option.addEventListener('click', function() {
+                    const targetLang = option.getAttribute('data-lang');
+                    const url = new URL(window.location.href);
+
+                    url.searchParams.set('lang', targetLang);
+                    window.location.href = url.toString();
+                });
+            });
+        });
+    </script>
 </body>
 </html>

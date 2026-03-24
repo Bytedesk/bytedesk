@@ -45,7 +45,6 @@ public class PushEntity extends BaseEntity {
 
     private String content;
 
-    // 
     private String country;
     private String receiver; // email or mobile
 

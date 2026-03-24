@@ -68,6 +68,9 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     public WorkflowResponse create(WorkflowRequest request) {
         WorkflowEntity entity = modelMapper.map(request, WorkflowEntity.class);
         entity.setUid(uidUtils.getUid());
+        if (!StringUtils.hasText(entity.getType())) {
+            entity.setType(WorkflowTypeEnum.CHATBOT.name());
+        }
         // 
         WorkflowEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -170,6 +173,9 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 }
                 if (entity.getSchema() != null) {
                     latestEntity.setSchema(entity.getSchema());
+                }
+                if (StringUtils.hasText(entity.getType())) {
+                    latestEntity.setType(entity.getType());
                 }
                 if (entity.getCurrentNodeId() != null) {
                     latestEntity.setCurrentNodeId(entity.getCurrentNodeId());

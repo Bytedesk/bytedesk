@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.core.io.ClassPathResource;
 
@@ -26,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -67,12 +69,7 @@ public class PageRouteController {
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		model.addAttribute("title", "微语");
@@ -99,12 +96,7 @@ public class PageRouteController {
 			Model model) {
 		
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		
@@ -151,12 +143,7 @@ public class PageRouteController {
 			Model model) {
 		
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		
@@ -202,12 +189,7 @@ public class PageRouteController {
 			Model model) {
 		try {
 			if (!showDemo) {
-				// 添加自定义配置到模型
-				if (customEnabled) {
-					model.addAttribute("customName", customName);
-					model.addAttribute("customLogo", customLogo);
-					model.addAttribute("customDescription", customDescription);
-				}
+				prepareDefaultPageModel(model);
 				return "default";
 			}
 			
@@ -358,12 +340,7 @@ public class PageRouteController {
 	@GetMapping("/chat/demo")
 	public String chatDemo(Model model) {
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		return "forward:/chat/index.html"; // 默认路径
@@ -552,12 +529,7 @@ public class PageRouteController {
 			@PathVariable(required = false) String feature, 
 			Model model) {
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		
@@ -576,15 +548,48 @@ public class PageRouteController {
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+			prepareDefaultPageModel(model);
 			return "default";
 		}
 		return "pages/" + page;
+	}
+
+	private void prepareDefaultPageModel(Model model) {
+		if (customEnabled) {
+			model.addAttribute("customName", customName);
+			model.addAttribute("customLogo", customLogo);
+			model.addAttribute("customDescription", customDescription);
+		}
+
+		String resolvedLang = normalizeLang(LocaleContextHolder.getLocale());
+		model.addAttribute("lang", resolvedLang);
+
+		Map<String, String> i18nMap = loadI18nProperties(resolvedLang);
+		model.addAttribute("i18n", i18nMap.isEmpty() ? new HashMap<String, String>() : i18nMap);
+	}
+
+	private String normalizeLang(Locale locale) {
+		if (locale == null) {
+			return "zh-CN";
+		}
+
+		String languageTag = locale.toLanguageTag();
+		if (languageTag == null || languageTag.isBlank()) {
+			return "zh-CN";
+		}
+
+		String normalized = languageTag.replace('_', '-');
+		if (normalized.equalsIgnoreCase("zh") || normalized.equalsIgnoreCase("zh-CN")) {
+			return "zh-CN";
+		}
+		if (normalized.equalsIgnoreCase("zh-TW") || normalized.equalsIgnoreCase("zh-HK") || normalized.equalsIgnoreCase("zh-Hant")) {
+			return "zh-TW";
+		}
+		if (normalized.toLowerCase().startsWith("en")) {
+			return "en";
+		}
+
+		return "zh-CN";
 	}
 
 	/**

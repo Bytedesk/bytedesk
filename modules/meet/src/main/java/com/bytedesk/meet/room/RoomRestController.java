@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +42,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
 
     private final RoomRestService roomRestService;
 
-    @ActionAnnotation(title = "Room", action = "组织查询", description = "query room by org")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query room by org")
     @Operation(summary = "Query Rooms by Organization", description = "Retrieve rooms for the current organization")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
     @GetMapping("/query/org")
@@ -53,7 +54,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(rooms));
     }
 
-    @ActionAnnotation(title = "Room", action = "用户查询", description = "query room by user")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query room by user")
     @Operation(summary = "Query Rooms by User", description = "Retrieve rooms for the current user")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
     @GetMapping({"/query", "/query/user"})
@@ -65,7 +66,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(rooms));
     }
 
-    @ActionAnnotation(title = "Room", action = "查询详情", description = "query room by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query room by uid")
     @Operation(summary = "Query Room by UID", description = "Retrieve a specific room by its unique identifier")
     @PreAuthorize(RoomPermissions.HAS_ROOM_READ)
     @GetMapping("/query/uid")
@@ -77,7 +78,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(room));
     }
 
-    @ActionAnnotation(title = "Room", action = "新建", description = "create room")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_CREATE, description = "create room")
     @Operation(summary = "Create Room", description = "Create a new room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_CREATE)
@@ -89,7 +90,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(room));
     }
 
-    @ActionAnnotation(title = "Room", action = "更新", description = "update room")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_UPDATE, description = "update room")
     @Operation(summary = "Update Room", description = "Update an existing room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_UPDATE)
@@ -101,7 +102,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(room));
     }
 
-    @ActionAnnotation(title = "Room", action = "删除", description = "delete room")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_DELETE, description = "delete room")
     @Operation(summary = "Delete Room", description = "Delete a room")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_DELETE)
@@ -113,7 +114,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Room", action = "导出", description = "export room")
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_EXPORT, description = "export room")
     @Operation(summary = "Export Rooms", description = "Export rooms to Excel format")
     @Override
     @PreAuthorize(RoomPermissions.HAS_ROOM_EXPORT)

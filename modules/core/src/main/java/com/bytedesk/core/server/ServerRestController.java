@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,9 +43,10 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
     private final ServerRestService serverRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query server by org")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query server by org")
     @Operation(summary = "Query Servers by Organization", description = "Retrieve servers for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(ServerRequest request) {
         
         Page<ServerResponse> servers = serverRestService.queryByOrg(request);
@@ -50,9 +54,10 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
         return ResponseEntity.ok(JsonResult.success(servers));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query server by user")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query server by user")
     @Operation(summary = "Query Servers by User", description = "Retrieve servers for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(ServerRequest request) {
         
         Page<ServerResponse> servers = serverRestService.queryByUser(request);
@@ -60,9 +65,10 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
         return ResponseEntity.ok(JsonResult.success(servers));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query server by uid")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server by uid")
     @Operation(summary = "Query Server by UID", description = "Retrieve a specific server by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(ServerRequest request) {
         
         ServerResponse server = serverRestService.queryByUid(request);
@@ -70,40 +76,43 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
         return ResponseEntity.ok(JsonResult.success(server));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create server")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_CREATE, description = "create server")
     @Operation(summary = "Create Server", description = "Create a new server")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(ServerRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ServerRequest request) {
         
         ServerResponse server = serverRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(server));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update server")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_UPDATE, description = "update server")
     @Operation(summary = "Update Server", description = "Update an existing server")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(ServerRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody ServerRequest request) {
         
         ServerResponse server = serverRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(server));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete server")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_DELETE, description = "delete server")
     @Operation(summary = "Delete Server", description = "Delete a server")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(ServerRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody ServerRequest request) {
         
         serverRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export server")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_EXPORT, description = "export server")
     @Operation(summary = "Export Servers", description = "Export servers to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -114,7 +123,7 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
             response,
             serverRestService,
             ServerExcel.class,
-            "标签",
+            "Server",
             "server"
         );
     }

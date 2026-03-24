@@ -82,6 +82,8 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
+    private String country;
+
     private String mobile;
 
     @Email(message = I18Consts.I18N_EMAIL_FORMAT_ERROR)
@@ -131,6 +133,26 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    /**
+     * Whether this agent account should be forced out of desktop and blocked from re-login
+     * until manually restored by an admin.
+     */
+    @Builder.Default
+    @Column(name = "force_logout")
+    private Boolean forceLogout = false;
+
+    /**
+     * Optional admin-facing reason for the forced logout.
+     */
+    @Column(name = "force_logout_reason", length = 512)
+    private String forceLogoutReason;
+
+    /**
+     * Timestamp of the last forced logout action.
+     */
+    @Column(name = "force_logout_at")
+    private ZonedDateTime forceLogoutAt;
 
     // 坐席有效期，null 表示永久有效
     @Column(name = "seat_expire_at")

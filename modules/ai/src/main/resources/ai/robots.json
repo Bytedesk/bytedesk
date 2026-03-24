@@ -302,7 +302,7 @@
     {
       "uid": "32",
       "name": "agent_assistant",
-      "type": "LLM",
+      "type": "ASSISTANT",
       "category": "i18n.module.service",
       "i18n": {
         "en": {

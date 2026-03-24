@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "未回复消息管理", description = "未回复消息管理相关接口")
+@Tag(name = "Unreplied Message Management", description = "Unreplied message management APIs")
 @RestController
 @RequestMapping("/api/v1/message/unreplied")
 @AllArgsConstructor
@@ -42,8 +42,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
 
     private final MessageUnrepliedRestService messageUnrepliedService;
 
-    @Operation(summary = "查询组织下的未回复消息", description = "根据组织ID查询未回复消息列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Unreplied Messages by Organization", description = "Retrieve unreplied message list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
     @GetMapping("/query/org")
@@ -56,8 +56,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplieds));
     }
 
-    @Operation(summary = "查询用户下的未回复消息", description = "根据用户ID查询未回复消息列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Unreplied Messages by User", description = "Retrieve unreplied message list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
     @GetMapping({ "/query", "/query/user" })
@@ -70,8 +70,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplieds));
     }
 
-    @Operation(summary = "创建未回复消息", description = "创建新的未回复消息")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Unreplied Message", description = "Create a new unreplied message")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
     @PostMapping("/create")
@@ -84,8 +84,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplied));
     }
 
-    @Operation(summary = "更新未回复消息", description = "更新未回复消息信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Unreplied Message", description = "Update unreplied message information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
     @PostMapping("/update")
@@ -98,8 +98,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplied));
     }
 
-    @Operation(summary = "删除未回复消息", description = "删除指定的未回复消息")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Unreplied Message", description = "Delete the specified unreplied message")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
     @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_DELETE)
     @Override
@@ -110,8 +110,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出未回复消息", description = "导出未回复消息数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Unreplied Messages", description = "Export unreplied message data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @GetMapping("/export")
     @PreAuthorize(MessageUnrepliedPermissions.HAS_MESSAGE_UNANSWERED_EXPORT)
     @Override
@@ -120,8 +120,8 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    @Operation(summary = "查询指定未回复消息", description = "根据UID查询未回复消息详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Unreplied Message by UID", description = "Retrieve unreplied message details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageUnrepliedResponse.class)))
     @GetMapping("/query/uid")

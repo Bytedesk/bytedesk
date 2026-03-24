@@ -20,7 +20,6 @@
 		<protobuf.version>4.28.2</protobuf.version>
 		<protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
 		<os-maven-plugin.version>1.7.1</os-maven-plugin.version>
-		<!-- gRPC 相关版本 -->
 		<grpc.version>1.74.0</grpc.version>
 		<spring-grpc.version>0.11.0</spring-grpc.version>
 	</properties>

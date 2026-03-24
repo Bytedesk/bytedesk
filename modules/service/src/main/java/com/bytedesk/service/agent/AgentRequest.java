@@ -52,6 +52,8 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultAgentAvatarUrl();
 
+    private String country;
+
     @NotBlank
     private String mobile;
 

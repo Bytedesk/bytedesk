@@ -20,7 +20,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Tag(name = "工作组配置管理", description = "工作组配置相关接口")
+@Tag(name = "Workgroup Settings Management", description = "Workgroup settings management APIs")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -29,8 +29,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
 
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
-    @Operation(summary = "查询组织下的工作组配置", description = "根据组织ID查询工作组配置列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workgroup Settings by Organization", description = "Retrieve workgroup settings list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @GetMapping("/query/org")
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
@@ -40,8 +40,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的工作组配置", description = "根据用户ID查询工作组配置列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workgroup Settings by User", description = "Retrieve workgroup settings list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @GetMapping({ "/query", "/query/user" })
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
@@ -51,8 +51,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "根据UID查询工作组配置", description = "根据UID查询工作组配置详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workgroup Settings by UID", description = "Retrieve workgroup settings details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @GetMapping("/query/uid")
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_READ)
@@ -62,8 +62,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "创建工作组配置", description = "创建新的工作组配置")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Workgroup Settings", description = "Create new workgroup settings")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @PostMapping("/create")
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_CREATE)
@@ -76,8 +76,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "更新工作组配置", description = "更新工作组配置信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Workgroup Settings", description = "Update workgroup settings information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @PostMapping("/update")
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
@@ -87,8 +87,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "删除工作组配置", description = "删除指定的工作组配置")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Workgroup Settings", description = "Delete the specified workgroup settings")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_DELETE)
     @Override
@@ -97,8 +97,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @Operation(summary = "启用工作组配置", description = "启用指定的工作组配置")
-    @ApiResponse(responseCode = "200", description = "启用成功",
+    @Operation(summary = "Enable Workgroup Settings", description = "Enable the specified workgroup settings")
+    @ApiResponse(responseCode = "200", description = "Enabled successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/enable")
@@ -107,8 +107,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "停用工作组配置", description = "停用指定的工作组配置")
-    @ApiResponse(responseCode = "200", description = "停用成功",
+    @Operation(summary = "Disable Workgroup Settings", description = "Disable the specified workgroup settings")
+    @ApiResponse(responseCode = "200", description = "Disabled successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/disable")
@@ -117,8 +117,8 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "发布工作组配置", description = "将草稿版本发布为线上版本")
-    @ApiResponse(responseCode = "200", description = "发布成功",
+    @Operation(summary = "Publish Workgroup Settings", description = "Publish the draft version to production")
+    @ApiResponse(responseCode = "200", description = "Published successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
     @PreAuthorize(WorkgroupSettingsPermissions.HAS_WORKGROUP_SETTINGS_UPDATE)
     @RequestMapping("/publish")

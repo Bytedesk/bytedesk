@@ -672,6 +672,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
         Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
+            syncRobotTypeFromJson(robotOptional.get(), robotJson);
             return;
         }
 
@@ -721,6 +722,26 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     dive.getMessage());
         } catch (Exception ex) {
             log.error("failed to save robot {}: {}", robotUid, ex.getMessage(), ex);
+        }
+    }
+
+    private void syncRobotTypeFromJson(RobotEntity robotEntity, Robot robotJson) {
+        if (robotEntity == null || robotJson == null || !StringUtils.hasText(robotJson.getType())) {
+            return;
+        }
+        if (robotJson.getType().equals(robotEntity.getType())) {
+            return;
+        }
+
+        String oldType = robotEntity.getType();
+        robotEntity.setType(robotJson.getType());
+        try {
+            save(robotEntity);
+            log.info("synced robot type from robots.json, name={}, orgUid={}, oldType={}, newType={}",
+                    robotEntity.getName(), robotEntity.getOrgUid(), oldType, robotJson.getType());
+        } catch (Exception ex) {
+            log.error("failed to sync robot type from robots.json, name={}, orgUid={}, targetType={}, err={}",
+                    robotEntity.getName(), robotEntity.getOrgUid(), robotJson.getType(), ex.getMessage(), ex);
         }
     }
 

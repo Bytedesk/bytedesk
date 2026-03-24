@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,15 +35,16 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/material")
 @AllArgsConstructor
-@Tag(name = "素材管理", description = "素材管理相关接口")
+@Tag(name = "Material Management", description = "Material management APIs")
 public class MaterialRestController extends BaseRestController<MaterialRequest, MaterialRestService> {
 
     private final MaterialRestService materialRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query material by org")
-    @Operation(summary = "根据组织查询素材", description = "查询组织的素材列表")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query material by org")
+    @Operation(summary = "Query Materials by Organization", description = "Retrieve material list for the organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(MaterialRequest request) {
         
         Page<MaterialResponse> materials = materialRestService.queryByOrg(request);
@@ -48,9 +52,10 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
         return ResponseEntity.ok(JsonResult.success(materials));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query material by user")
-    @Operation(summary = "根据用户查询素材", description = "查询用户的素材列表")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query material by user")
+    @Operation(summary = "Query Materials by User", description = "Retrieve material list for the user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(MaterialRequest request) {
         
         Page<MaterialResponse> materials = materialRestService.queryByUser(request);
@@ -58,9 +63,10 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
         return ResponseEntity.ok(JsonResult.success(materials));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query material by uid")
-    @Operation(summary = "根据UID查询素材", description = "通过UID查询具体的素材")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query material by uid")
+    @Operation(summary = "Query Material by UID", description = "Retrieve material details by UID")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(MaterialRequest request) {
         
         MaterialResponse material = materialRestService.queryByUid(request);
@@ -68,41 +74,44 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
         return ResponseEntity.ok(JsonResult.success(material));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create material")
-    @Operation(summary = "创建素材", description = "创建新的素材")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_CREATE, description = "create material")
+    @Operation(summary = "Create Material", description = "Create a new material")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(MaterialRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody MaterialRequest request) {
         
         MaterialResponse material = materialRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(material));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update material")
-    @Operation(summary = "更新素材", description = "更新现有的素材")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_UPDATE, description = "update material")
+    @Operation(summary = "Update Material", description = "Update the existing material")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(MaterialRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody MaterialRequest request) {
         
         MaterialResponse material = materialRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(material));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete material")
-    @Operation(summary = "删除素材", description = "删除指定的素材")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_DELETE, description = "delete material")
+    @Operation(summary = "Delete Material", description = "Delete the specified material")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(MaterialRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody MaterialRequest request) {
         
         materialRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export material")
-    @Operation(summary = "导出素材", description = "导出素材数据")
+    @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_EXPORT, description = "export material")
+    @Operation(summary = "Export Materials", description = "Export material data")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
@@ -112,7 +121,7 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
             response,
             materialRestService,
             MaterialExcel.class,
-            "标签",
+            "素材",
             "material"
         );
     }

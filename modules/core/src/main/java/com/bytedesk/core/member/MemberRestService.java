@@ -15,6 +15,7 @@ package com.bytedesk.core.member;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,12 +37,14 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
@@ -88,6 +91,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     private final DepartmentRestService departmentRestService;
 
     private final OrganizationRestService organizationRestService;
+
+    private final MessageService messageService;
 
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
@@ -181,6 +186,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         // 
         Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
         request.setRoleUids(normalizedRoleUids);
+        member.setAllowedLoginPlatforms(resolveAllowedLoginPlatforms(
+            request.getAllowedLoginPlatforms(),
+            normalizedRoleUids,
+            null));
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(request, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
@@ -257,6 +266,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         member.setTelephone(request.getTelephone());
         Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
         request.setRoleUids(normalizedRoleUids);
+        member.setAllowedLoginPlatforms(resolveAllowedLoginPlatforms(
+            request.getAllowedLoginPlatforms(),
+            normalizedRoleUids,
+            member.getAllowedLoginPlatforms()));
         // 
         UserEntity user = member.getUser();
         userService.ensureCurrentOrganization(user, member.getOrgUid());
@@ -291,6 +304,40 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return normalized;
     }
 
+    private Set<String> resolveAllowedLoginPlatforms(Set<String> requestedPlatforms,
+            Set<String> normalizedRoleUids,
+            Set<String> existingPlatforms) {
+        Set<String> normalizedRequested = normalizeAllowedLoginPlatforms(requestedPlatforms);
+        if (!normalizedRequested.isEmpty()) {
+            return normalizedRequested;
+        }
+
+        Set<String> normalizedExisting = normalizeAllowedLoginPlatforms(existingPlatforms);
+        if (!normalizedExisting.isEmpty()) {
+            return normalizedExisting;
+        }
+
+        return MemberLoginPlatformEnum.defaultForRoleUids(normalizedRoleUids);
+    }
+
+    private Set<String> normalizeAllowedLoginPlatforms(Set<String> allowedLoginPlatforms) {
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        if (allowedLoginPlatforms == null) {
+            return normalized;
+        }
+
+        for (String platform : allowedLoginPlatforms) {
+            if (!StringUtils.hasText(platform)) {
+                continue;
+            }
+            String normalizedPlatform = platform.trim();
+            if (MemberLoginPlatformEnum.isSupported(normalizedPlatform)) {
+                normalized.add(normalizedPlatform);
+            }
+        }
+        return normalized;
+    }
+
     // activate
     @Transactional
     public MemberResponse activate(MemberRequest request) {
@@ -302,6 +349,54 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = memberOptional.get();
         member.setStatus(MemberStatusEnum.ACTIVE.name());
         // 
+        MemberEntity savedEntity = save(member);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+        return convertToResponse(savedEntity);
+    }
+
+    @Transactional
+    public MemberResponse forceLogout(MemberRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("member uid is required");
+        }
+
+        MemberEntity member = findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException("Member not found"));
+        member.setForceLogout(true);
+        member.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
+        member.setForceLogoutAt(java.time.ZonedDateTime.now());
+
+        MemberEntity savedEntity = save(member);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+
+        if (savedEntity.getUser() != null) {
+                messageService.sendForceLogoutMessage(
+                    savedEntity.getUser(),
+                    savedEntity.getOrgUid(),
+                    "MEMBER",
+                    savedEntity.getUid(),
+                    savedEntity.getForceLogoutReason());
+        }
+
+        return convertToResponse(savedEntity);
+    }
+
+    @Transactional
+    public MemberResponse restoreLogin(MemberRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("member uid is required");
+        }
+
+        MemberEntity member = findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException("Member not found"));
+        member.setForceLogout(false);
+        member.setForceLogoutReason(null);
+        member.setForceLogoutAt(null);
+
         MemberEntity savedEntity = save(member);
         if (savedEntity == null) {
             throw new RuntimeException("Failed to save member.");
@@ -470,6 +565,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
+        member.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
         // 
         String deptName = normalizeExcelText(excel.getDepartmentName());
         if (StringUtils.hasText(deptName)) {

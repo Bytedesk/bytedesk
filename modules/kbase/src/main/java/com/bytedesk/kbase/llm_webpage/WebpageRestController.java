@@ -15,6 +15,7 @@ package com.bytedesk.kbase.llm_webpage;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
@@ -46,6 +48,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WebpageRequest request) {
         
@@ -54,6 +57,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpages));
     }
 
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WebpageRequest request) {
         
@@ -68,24 +72,30 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     //     throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     // }
 
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(WebpageRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_CREATE, description = "create webpage")
+    public ResponseEntity<?> create(@RequestBody WebpageRequest request) {
         
         WebpageResponse webpage = webpageRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(WebpageRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update webpage")
+    public ResponseEntity<?> update(@RequestBody WebpageRequest request) {
         
         WebpageResponse webpage = webpageRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(WebpageRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE, description = "delete webpage")
+    public ResponseEntity<?> delete(@RequestBody WebpageRequest request) {
         
         webpageRestService.delete(request);
 
@@ -119,7 +129,9 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @GetMapping("/export")
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_EXPORT, description = "export webpage")
     public Object export(WebpageRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
@@ -132,7 +144,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch index
-    @ActionAnnotation(title = "知识库网页", action = "更新索引", description = "update webpage index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update webpage index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody WebpageRequest request) {
 
@@ -142,7 +154,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete elasticsearch index
-    @ActionAnnotation(title = "知识库网页", action = "删除索引", description = "delete webpage elastic index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete webpage elastic index")
     @PostMapping("/deleteIndex")
     public ResponseEntity<?> deleteIndex(@RequestBody WebpageRequest request) {
         Boolean deleted = webpageElasticService.deleteIndexAndSyncStatus(request);
@@ -150,7 +162,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync elasticsearch index status
-    @ActionAnnotation(title = "知识库网页", action = "同步索引状态", description = "sync webpage elastic status")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync webpage elastic status")
     @PostMapping("/syncIndexStatus")
     public ResponseEntity<?> syncIndexStatus(@RequestBody WebpageRequest request) {
         var webpage = webpageElasticService.syncElasticStatus(request);
@@ -158,7 +170,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync elasticsearch index status by kbUid
-    @ActionAnnotation(title = "知识库网页", action = "批量同步索引状态", description = "sync webpage elastic status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync webpage elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody WebpageRequest request) {
         var result = webpageElasticService.syncElasticStatusByKbUid(request);
@@ -166,7 +178,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete all elasticsearch index by kbUid
-    @ActionAnnotation(title = "知识库网页", action = "知识库删除索引", description = "delete webpage elastic index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete webpage elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody WebpageRequest request) {
         var result = webpageElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
@@ -174,7 +186,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch vector index
-    @ActionAnnotation(title = "知识库网页", action = "更新向量索引", description = "update webpage vector index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update webpage vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody WebpageRequest request) {
 
@@ -186,7 +198,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete vector index
-    @ActionAnnotation(title = "知识库网页", action = "删除向量索引", description = "delete webpage vector index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete webpage vector index")
     @PostMapping("/deleteVectorIndex")
     public ResponseEntity<?> deleteVectorIndex(@RequestBody WebpageRequest request) {
         if (webpageVectorService != null) {
@@ -197,7 +209,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync vector status
-    @ActionAnnotation(title = "知识库网页", action = "同步向量状态", description = "sync webpage vector status")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync webpage vector status")
     @PostMapping("/syncVectorStatus")
     public ResponseEntity<?> syncVectorStatus(@RequestBody WebpageRequest request) {
         if (webpageVectorService != null) {
@@ -207,14 +219,14 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
-    @ActionAnnotation(title = "知识库网页", action = "查询全文索引", description = "query webpage elastic by uid")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query webpage elastic by uid")
     @PostMapping("/queryElasticByUid")
     public ResponseEntity<?> queryElasticByUid(@RequestBody WebpageRequest request) {
         var result = webpageElasticService.queryElasticByUid(request);
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @ActionAnnotation(title = "知识库网页", action = "查询向量索引", description = "query webpage vector by uid")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query webpage vector by uid")
     @PostMapping("/queryVectorByUid")
     public ResponseEntity<?> queryVectorByUid(@RequestBody WebpageRequest request) {
         if (webpageVectorService != null) {
@@ -225,7 +237,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync vector status by kbUid
-    @ActionAnnotation(title = "知识库网页", action = "批量同步向量状态", description = "sync webpage vector status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync webpage vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody WebpageRequest request) {
         if (webpageVectorService != null) {
@@ -236,7 +248,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch all index
-    @ActionAnnotation(title = "知识库网页", action = "更新所有索引", description = "update all webpage index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all webpage index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody WebpageRequest request) {
 
@@ -246,7 +258,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch all vector index
-    @ActionAnnotation(title = "知识库网页", action = "更新所有向量索引", description = "update all webpage vector index")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all webpage vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody WebpageRequest request) {
 
@@ -258,7 +270,7 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete all vector index by kbUid
-    @ActionAnnotation(title = "知识库网页", action = "知识库删除向量索引", description = "delete webpage vector index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete webpage vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody WebpageRequest request) {
         if (webpageVectorService != null) {

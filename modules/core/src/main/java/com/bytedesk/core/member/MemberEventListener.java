@@ -80,8 +80,13 @@ public class MemberEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
         log.info("organization created: {}", organization.getName());
-        if (memberRestService.findByUserAndOrgUid(user, orgUid).isPresent()) {
+        var existingMemberOptional = memberRestService.findByUserAndOrgUid(user, orgUid);
+        if (existingMemberOptional.isPresent()) {
+            MemberEntity existingMember = existingMemberOptional.get();
+            existingMember.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
+            memberRestService.save(existingMember);
             return;
         }
         //
@@ -99,8 +104,7 @@ public class MemberEventListener {
                 });
         //
         if (departmentResponse != null) {
-            // DEFAULT_MEMBER_UID 是 member uid，不是 role uid；这里需要授予默认管理员角色
-            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
+            // DEFAULT_ROLE_ADMIN_UID 是组织管理员角色 uid；组织 owner 默认拥有全平台登录权限
             // 创建团队成员
             MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
             memberRequest.setJobNo("001");

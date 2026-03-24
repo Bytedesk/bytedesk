@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260324-01-add-workflow-type" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_workflow"/>
+                <not>
+                    <columnExists tableName="bytedesk_core_workflow" columnName="workflow_type"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_workflow">
+            <column name="workflow_type" type="varchar(64)" defaultValue="CHATBOT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-02-add-ivr-menu-workflow-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_ivr_menu"/>
+                <not>
+                    <columnExists tableName="bytedesk_call_ivr_menu" columnName="workflow_uid"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_ivr_menu">
+            <column name="workflow_uid" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-03-add-ivr-menu-workflow-uid-index" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_ivr_menu"/>
+                <columnExists tableName="bytedesk_call_ivr_menu" columnName="workflow_uid"/>
+                <not>
+                    <indexExists tableName="bytedesk_call_ivr_menu" indexName="idx_call_ivr_menu_workflow_uid"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_call_ivr_menu" indexName="idx_call_ivr_menu_workflow_uid">
+            <column name="workflow_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

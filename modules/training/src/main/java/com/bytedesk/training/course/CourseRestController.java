@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class CourseRestController extends BaseRestController<CourseRequest, Cour
 
     private final CourseRestService courseRestService;
 
-    @ActionAnnotation(title = "Course", action = "组织查询", description = "query course by org")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query course by org")
     @Operation(summary = "Query Courses by Organization", description = "Retrieve courses for the current organization")
     @PreAuthorize(CoursePermissions.HAS_COURSE_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(CourseRequest request) {
         
         Page<CourseResponse> courses = courseRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class CourseRestController extends BaseRestController<CourseRequest, Cour
         return ResponseEntity.ok(JsonResult.success(courses));
     }
 
-    @ActionAnnotation(title = "Course", action = "用户查询", description = "query course by user")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query course by user")
     @Operation(summary = "Query Courses by User", description = "Retrieve courses for the current user")
     @PreAuthorize(CoursePermissions.HAS_COURSE_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(CourseRequest request) {
         
         Page<CourseResponse> courses = courseRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class CourseRestController extends BaseRestController<CourseRequest, Cour
         return ResponseEntity.ok(JsonResult.success(courses));
     }
 
-    @ActionAnnotation(title = "Course", action = "查询详情", description = "query course by uid")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query course by uid")
     @Operation(summary = "Query Course by UID", description = "Retrieve a specific course by its unique identifier")
     @PreAuthorize(CoursePermissions.HAS_COURSE_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(CourseRequest request) {
         
         CourseResponse course = courseRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class CourseRestController extends BaseRestController<CourseRequest, Cour
         return ResponseEntity.ok(JsonResult.success(course));
     }
 
-    @ActionAnnotation(title = "Course", action = "新建", description = "create course")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_CREATE, description = "create course")
     @Operation(summary = "Create Course", description = "Create a new course")
     @Override
     @PreAuthorize(CoursePermissions.HAS_COURSE_CREATE)
-    public ResponseEntity<?> create(CourseRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody CourseRequest request) {
         
         CourseResponse course = courseRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(course));
     }
 
-    @ActionAnnotation(title = "Course", action = "更新", description = "update course")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_UPDATE, description = "update course")
     @Operation(summary = "Update Course", description = "Update an existing course")
     @Override
     @PreAuthorize(CoursePermissions.HAS_COURSE_UPDATE)
-    public ResponseEntity<?> update(CourseRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody CourseRequest request) {
         
         CourseResponse course = courseRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(course));
     }
 
-    @ActionAnnotation(title = "Course", action = "删除", description = "delete course")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_DELETE, description = "delete course")
     @Operation(summary = "Delete Course", description = "Delete a course")
     @Override
     @PreAuthorize(CoursePermissions.HAS_COURSE_DELETE)
-    public ResponseEntity<?> delete(CourseRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody CourseRequest request) {
         
         courseRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Course", action = "导出", description = "export course")
+    @ActionAnnotation(title = I18Consts.I18N_COURSE, action = I18Consts.I18N_ACTION_EXPORT, description = "export course")
     @Operation(summary = "Export Courses", description = "Export courses to Excel format")
     @Override
     @PreAuthorize(CoursePermissions.HAS_COURSE_EXPORT)

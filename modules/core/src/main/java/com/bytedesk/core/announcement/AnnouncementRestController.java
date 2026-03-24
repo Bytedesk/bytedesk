@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
 
     private final AnnouncementRestService announcementRestService;
 
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query announcement by org")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query announcement by org")
     @Operation(summary = "Query Announcements by Organization", description = "Retrieve announcements for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(AnnouncementRequest request) {
         
         Page<AnnouncementResponse> announcements = announcementRestService.queryByOrg(request);
@@ -49,9 +53,10 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
         return ResponseEntity.ok(JsonResult.success(announcements));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query announcement by user")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query announcement by user")
     @Operation(summary = "Query Announcements by User", description = "Retrieve announcements for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(AnnouncementRequest request) {
         
         Page<AnnouncementResponse> announcements = announcementRestService.queryByUser(request);
@@ -59,9 +64,10 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
         return ResponseEntity.ok(JsonResult.success(announcements));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query announcement by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query announcement by uid")
     @Operation(summary = "Query Announcement by UID", description = "Retrieve a specific announcement by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(AnnouncementRequest request) {
         
         AnnouncementResponse announcement = announcementRestService.queryByUid(request);
@@ -69,40 +75,43 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
         return ResponseEntity.ok(JsonResult.success(announcement));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create announcement")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create announcement")
     @Operation(summary = "Create Announcement", description = "Create a new announcement")
     @Override
     // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_CREATE)
-    public ResponseEntity<?> create(AnnouncementRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody AnnouncementRequest request) {
         
         AnnouncementResponse announcement = announcementRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(announcement));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update announcement")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update announcement")
     @Operation(summary = "Update Announcement", description = "Update an existing announcement")
     @Override
     // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_UPDATE)
-    public ResponseEntity<?> update(AnnouncementRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody AnnouncementRequest request) {
         
         AnnouncementResponse announcement = announcementRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(announcement));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete announcement")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete announcement")
     @Operation(summary = "Delete Announcement", description = "Delete a announcement")
     @Override
     // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_DELETE)
-    public ResponseEntity<?> delete(AnnouncementRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody AnnouncementRequest request) {
         
         announcementRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export announcement")
+    @ActionAnnotation(title = I18Consts.I18N_ANNOUNCEMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export announcement")
     @Operation(summary = "Export Announcements", description = "Export announcements to Excel format")
     @Override
     // @PreAuthorize(AnnouncementPermissions.HAS_ANNOUNCEMENT_EXPORT)
@@ -113,7 +122,7 @@ public class AnnouncementRestController extends BaseRestController<AnnouncementR
             response,
             announcementRestService,
             AnnouncementExcel.class,
-            "标签",
+            "Announcement",
             "announcement"
         );
     }

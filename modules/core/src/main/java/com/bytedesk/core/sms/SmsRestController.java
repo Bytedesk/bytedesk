@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class SmsRestController extends BaseRestController<SmsRequest, SmsRestSer
 
     private final SmsRestService smsRestService;
 
-    @ActionAnnotation(title = "Sms", action = "组织查询", description = "query sms by org")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query sms by org")
     @Operation(summary = "Query Smss by Organization", description = "Retrieve smss for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(SmsRequest request) {
         
         Page<SmsResponse> smss = smsRestService.queryByOrg(request);
@@ -49,9 +53,10 @@ public class SmsRestController extends BaseRestController<SmsRequest, SmsRestSer
         return ResponseEntity.ok(JsonResult.success(smss));
     }
 
-    @ActionAnnotation(title = "Sms", action = "用户查询", description = "query sms by user")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query sms by user")
     @Operation(summary = "Query Smss by User", description = "Retrieve smss for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(SmsRequest request) {
         
         Page<SmsResponse> smss = smsRestService.queryByUser(request);
@@ -59,9 +64,10 @@ public class SmsRestController extends BaseRestController<SmsRequest, SmsRestSer
         return ResponseEntity.ok(JsonResult.success(smss));
     }
 
-    @ActionAnnotation(title = "Sms", action = "查询详情", description = "query sms by uid")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query sms by uid")
     @Operation(summary = "Query Sms by UID", description = "Retrieve a specific sms by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(SmsRequest request) {
         
         SmsResponse sms = smsRestService.queryByUid(request);
@@ -69,40 +75,43 @@ public class SmsRestController extends BaseRestController<SmsRequest, SmsRestSer
         return ResponseEntity.ok(JsonResult.success(sms));
     }
 
-    @ActionAnnotation(title = "Sms", action = "新建", description = "create sms")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_CREATE, description = "create sms")
     @Operation(summary = "Create Sms", description = "Create a new sms")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(SmsRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody SmsRequest request) {
         
         SmsResponse sms = smsRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(sms));
     }
 
-    @ActionAnnotation(title = "Sms", action = "更新", description = "update sms")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_UPDATE, description = "update sms")
     @Operation(summary = "Update Sms", description = "Update an existing sms")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(SmsRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody SmsRequest request) {
         
         SmsResponse sms = smsRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(sms));
     }
 
-    @ActionAnnotation(title = "Sms", action = "删除", description = "delete sms")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_DELETE, description = "delete sms")
     @Operation(summary = "Delete Sms", description = "Delete a sms")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(SmsRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody SmsRequest request) {
         
         smsRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Sms", action = "导出", description = "export sms")
+    @ActionAnnotation(title = I18Consts.I18N_SMS, action = I18Consts.I18N_ACTION_EXPORT, description = "export sms")
     @Operation(summary = "Export Smss", description = "Export smss to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")

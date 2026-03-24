@@ -34,5 +34,8 @@ public enum WorkflowTypeEnum {
      * 适用于各种通用业务流程
      */
     TASK,
+
+    // 
+    IVR,
     
 }

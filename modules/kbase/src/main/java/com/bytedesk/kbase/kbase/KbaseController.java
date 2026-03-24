@@ -28,6 +28,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.ArticleRestService;
@@ -51,7 +52,7 @@ public class KbaseController {
 
 	// kb/${currentKbase?.uid}
 	// http://127.0.0.1:9003/helpcenter/${currentArticle?.uid}
-    @ActionAnnotation(title = "KbaseRouter", action = "kbIndex", description = "show kbase")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_KB_INDEX, description = "show kbase")
 	@GetMapping({"/{kbUid:[^\\.]*}", "/{kbUid:[^\\.]*}/"})
 	public String kbIndex(@PathVariable String kbUid, Model model) {
 		log.info("kbIndex path: {}", kbUid);

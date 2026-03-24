@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -34,8 +37,9 @@ public class EmailRestController extends BaseRestController<EmailRequest, EmailR
     private final EmailRestService emailRestService;
     
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "Email", action = "组织查询", description = "query email by org")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query email by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(EmailRequest request) {
         
         Page<EmailResponse> emails = emailRestService.queryByOrg(request);
@@ -43,8 +47,9 @@ public class EmailRestController extends BaseRestController<EmailRequest, EmailR
         return ResponseEntity.ok(JsonResult.success(emails));
     }
 
-    @ActionAnnotation(title = "Email", action = "用户查询", description = "query email by user")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query email by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(EmailRequest request) {
         
         Page<EmailResponse> emails = emailRestService.queryByUser(request);
@@ -52,8 +57,9 @@ public class EmailRestController extends BaseRestController<EmailRequest, EmailR
         return ResponseEntity.ok(JsonResult.success(emails));
     }
 
-    @ActionAnnotation(title = "Email", action = "查询详情", description = "query email by uid")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query email by uid")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(EmailRequest request) {
         
         EmailResponse email = emailRestService.queryByUid(request);
@@ -61,37 +67,40 @@ public class EmailRestController extends BaseRestController<EmailRequest, EmailR
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
-    @ActionAnnotation(title = "Email", action = "新建", description = "create email")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_CREATE, description = "create email")
     @Override
     // @PreAuthorize("hasAuthority('EMAIL_CREATE')")
-    public ResponseEntity<?> create(EmailRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody EmailRequest request) {
         
         EmailResponse email = emailRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
-    @ActionAnnotation(title = "Email", action = "更新", description = "update email")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_UPDATE, description = "update email")
     @Override
     // @PreAuthorize("hasAuthority('EMAIL_UPDATE')")
-    public ResponseEntity<?> update(EmailRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody EmailRequest request) {
         
         EmailResponse email = emailRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
-    @ActionAnnotation(title = "Email", action = "删除", description = "delete email")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_DELETE, description = "delete email")
     @Override
     // @PreAuthorize("hasAuthority('EMAIL_DELETE')")
-    public ResponseEntity<?> delete(EmailRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody EmailRequest request) {
         
         emailRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Email", action = "导出", description = "export email")
+    @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_EXPORT, description = "export email")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")

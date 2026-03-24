@@ -54,6 +54,8 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Boolean existsByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
 
+    Boolean existsByUserUidAndOrgUidAndUidNotAndDeletedFalse(String userUid, String orgUid, String uid);
+
     
     @Transactional
     @Modifying

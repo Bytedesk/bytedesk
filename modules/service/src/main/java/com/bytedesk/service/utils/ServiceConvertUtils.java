@@ -161,6 +161,9 @@ public class ServiceConvertUtils {
     //
     public static AgentResponse convertToAgentResponse(AgentEntity agent) {
         AgentResponse resp = getModelMapper().map(agent, AgentResponse.class);
+        if (!StringUtils.hasText(resp.getCountry()) && agent.getMember() != null && StringUtils.hasText(agent.getMember().getCountry())) {
+            resp.setCountry(agent.getMember().getCountry());
+        }
         try {
             ConnectionRestService presence = ApplicationContextHolder.getBean(ConnectionRestService.class);
             boolean online = presence.isUserOnline(agent.getUserUid());

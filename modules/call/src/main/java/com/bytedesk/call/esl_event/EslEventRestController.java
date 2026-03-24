@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
 
     private final EslEventRestService audioFileRestService;
 
-    @ActionAnnotation(title = "EslEvent", action = "组织查询", description = "query esl_event by org")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query esl_event by org")
     @Operation(summary = "Query EslEvents by Organization", description = "Retrieve esl_events for the current organization")
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(EslEventRequest request) {
         
         Page<EslEventResponse> esl_events = audioFileRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
         return ResponseEntity.ok(JsonResult.success(esl_events));
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "用户查询", description = "query esl_event by user")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query esl_event by user")
     @Operation(summary = "Query EslEvents by User", description = "Retrieve esl_events for the current user")
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(EslEventRequest request) {
         
         Page<EslEventResponse> esl_events = audioFileRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
         return ResponseEntity.ok(JsonResult.success(esl_events));
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "查询详情", description = "query esl_event by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query esl_event by uid")
     @Operation(summary = "Query EslEvent by UID", description = "Retrieve a specific esl_event by its unique identifier")
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(EslEventRequest request) {
         
         EslEventResponse esl_event = audioFileRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
         return ResponseEntity.ok(JsonResult.success(esl_event));
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "新建", description = "create esl_event")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_CREATE, description = "create esl_event")
     @Operation(summary = "Create EslEvent", description = "Create a new esl_event")
     @Override
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_CREATE)
-    public ResponseEntity<?> create(EslEventRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody EslEventRequest request) {
         
         EslEventResponse esl_event = audioFileRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(esl_event));
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "更新", description = "update esl_event")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update esl_event")
     @Operation(summary = "Update EslEvent", description = "Update an existing esl_event")
     @Override
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_UPDATE)
-    public ResponseEntity<?> update(EslEventRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody EslEventRequest request) {
         
         EslEventResponse esl_event = audioFileRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(esl_event));
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "删除", description = "delete esl_event")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete esl_event")
     @Operation(summary = "Delete EslEvent", description = "Delete a esl_event")
     @Override
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_DELETE)
-    public ResponseEntity<?> delete(EslEventRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody EslEventRequest request) {
         
         audioFileRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "EslEvent", action = "导出", description = "export esl_event")
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export esl_event")
     @Operation(summary = "Export EslEvents", description = "Export esl_events to Excel format")
     @Override
     @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_EXPORT)
@@ -116,8 +125,8 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
             response,
             audioFileRestService,
             EslEventExcel.class,
-            "EslEvent",
-            "esl_event"
+            "ESL事件",
+            "esl-event"
         );
     }
 

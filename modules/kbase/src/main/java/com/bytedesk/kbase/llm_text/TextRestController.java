@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
@@ -50,7 +51,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
-    @ActionAnnotation(title = "知识库文本", action = "组织查询", description = "query text by org")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query text by org")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TextRequest request) {
         
@@ -60,7 +62,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
-    @ActionAnnotation(title = "知识库文本", action = "用户查询", description = "query text by user")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query text by user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(TextRequest request) {
         
@@ -70,9 +73,10 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_CREATE)
-    @ActionAnnotation(title = "知识库文本", action = "新建", description = "create text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_CREATE, description = "create text")
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(TextRequest request) {
+    public ResponseEntity<?> create(@RequestBody TextRequest request) {
         
         TextResponse text = textRestService.create(request);
 
@@ -80,9 +84,10 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "更新", description = "update text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE, description = "update text")
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(TextRequest request) {
+    public ResponseEntity<?> update(@RequestBody TextRequest request) {
         
         TextResponse text = textRestService.update(request);
 
@@ -90,9 +95,10 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_DELETE)
-    @ActionAnnotation(title = "知识库文本", action = "删除", description = "delete text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE, description = "delete text")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(TextRequest request) {
+    public ResponseEntity<?> delete(@RequestBody TextRequest request) {
         
         textRestService.delete(request);
 
@@ -100,7 +106,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_DELETE)
-    @ActionAnnotation(title = "知识库文本", action = "删除所有", description = "delete all text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all text")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody TextRequest request) {
 
@@ -111,7 +117,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // enable/disable text
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "启用", description = "enable text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_ENABLE, description = "enable text")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody TextRequest request) {
 
@@ -121,7 +127,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_EXPORT)
-    @ActionAnnotation(title = "知识库文本", action = "导出", description = "export text")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_EXPORT, description = "export text")
     @GetMapping("/export")
     @Override
     public Object export(TextRequest request, HttpServletResponse response) {
@@ -144,7 +150,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // update elasticsearch index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "更新索引", description = "update text index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update text index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody TextRequest request) {
 
@@ -155,7 +161,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // delete elasticsearch index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "删除索引", description = "delete text elastic index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete text elastic index")
     @PostMapping("/deleteIndex")
     public ResponseEntity<?> deleteIndex(@RequestBody TextRequest request) {
         Boolean deleted = textElasticService.deleteIndexAndSyncStatus(request);
@@ -164,7 +170,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // sync elasticsearch index status
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "同步索引状态", description = "sync text elastic status")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync text elastic status")
     @PostMapping("/syncIndexStatus")
     public ResponseEntity<?> syncIndexStatus(@RequestBody TextRequest request) {
         var text = textElasticService.syncElasticStatus(request);
@@ -173,7 +179,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // sync elasticsearch index status by kbUid
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "批量同步索引状态", description = "sync text elastic status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync text elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody TextRequest request) {
         var result = textElasticService.syncElasticStatusByKbUid(request);
@@ -182,7 +188,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // delete all elasticsearch index by kbUid
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "知识库删除索引", description = "delete text elastic index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete text elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody TextRequest request) {
         var result = textElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
@@ -191,7 +197,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // update elasticsearch vector index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "更新向量索引", description = "update text vector index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update text vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody TextRequest request) {
 
@@ -204,7 +210,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // delete vector index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "删除向量索引", description = "delete text vector index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete text vector index")
     @PostMapping("/deleteVectorIndex")
     public ResponseEntity<?> deleteVectorIndex(@RequestBody TextRequest request) {
         if (textVectorService != null) {
@@ -216,7 +222,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // sync vector status
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "同步向量状态", description = "sync text vector status")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync text vector status")
     @PostMapping("/syncVectorStatus")
     public ResponseEntity<?> syncVectorStatus(@RequestBody TextRequest request) {
         if (textVectorService != null) {
@@ -227,7 +233,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
-    @ActionAnnotation(title = "知识库文本", action = "查询全文索引", description = "query text elastic by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query text elastic by uid")
     @PostMapping("/queryElasticByUid")
     public ResponseEntity<?> queryElasticByUid(@RequestBody TextRequest request) {
         var result = textElasticService.queryElasticByUid(request);
@@ -235,7 +241,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
-    @ActionAnnotation(title = "知识库文本", action = "查询向量索引", description = "query text vector by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query text vector by uid")
     @PostMapping("/queryVectorByUid")
     public ResponseEntity<?> queryVectorByUid(@RequestBody TextRequest request) {
         if (textVectorService != null) {
@@ -247,7 +253,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // sync vector status by kbUid
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "批量同步向量状态", description = "sync text vector status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync text vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody TextRequest request) {
         if (textVectorService != null) {
@@ -259,7 +265,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // update elasticsearch all index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "更新所有索引", description = "update all text index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all text index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody TextRequest request) {
 
@@ -270,7 +276,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // update elasticsearch all vector index
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "更新所有向量索引", description = "update all text vector index")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all text vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody TextRequest request) {
 
@@ -283,7 +289,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     // delete all vector index by kbUid
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
-    @ActionAnnotation(title = "知识库文本", action = "知识库删除向量索引", description = "delete text vector index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete text vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody TextRequest request) {
         if (textVectorService != null) {

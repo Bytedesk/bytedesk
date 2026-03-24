@@ -46,7 +46,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/black")
 @AllArgsConstructor
-@Tag(name = "黑名单管理", description = "黑名单增删改查操作")
+@Tag(name = "Blacklist Management", description = "Blacklist CRUD APIs")
 public class BlackRestController extends BaseRestController<BlackRequest, BlackRestService> {
 
     private final BlackRestService blackRestService;
@@ -57,7 +57,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 分页黑名单列表
      */
-    @Operation(summary = "根据组织查询黑名单", description = "返回当前组织的黑名单列表")
+    @Operation(summary = "Query Blacklist by Organization", description = "Return the blacklist for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(BlackRequest request) {
         
@@ -72,7 +72,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 分页黑名单列表
      */
-    @Operation(summary = "根据用户查询黑名单", description = "返回当前用户的黑名单列表")
+    @Operation(summary = "Query Blacklist by User", description = "Return the blacklist for the current user")
     @Override
     public ResponseEntity<?> queryByUser(BlackRequest request) {
         
@@ -87,7 +87,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 黑名单详情
      */
-    @Operation(summary = "根据UID查询黑名单", description = "根据唯一标识符查询黑名单")
+    @Operation(summary = "Query Blacklist by UID", description = "Query the blacklist entry by unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(BlackRequest request) {
         // TODO Auto-generated method stub
@@ -100,7 +100,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 黑名单详情
      */
-    @Operation(summary = "查询当前blackUid是否存在于黑名单中", description = "查询当前blackUid是否存在于黑名单中")
+    @Operation(summary = "Check Whether blackUid Exists in Blacklist", description = "Check whether the current blackUid exists in the blacklist")
     @GetMapping("/exists/blackUid")
     public ResponseEntity<?> existsByBlackUid(BlackRequest request) {
         // 
@@ -112,7 +112,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
     }
 
     // unblock/BlackUid
-    @Operation(summary = "解除黑名单", description = "解除指定的黑名单")
+    @Operation(summary = "Unblock from Blacklist", description = "Remove the specified blacklist entry")
     @PostMapping("/unblock/blackUid")
     public ResponseEntity<?> unblockByBlackUid(@RequestBody BlackRequest request) {
         //
@@ -127,7 +127,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 创建请求
      * @return 创建的黑名单
      */
-    @Operation(summary = "创建黑名单", description = "创建新的黑名单记录")
+    @Operation(summary = "Create Blacklist Entry", description = "Create a new blacklist record")
     @Override
     public ResponseEntity<?> create(BlackRequest request) {
 
@@ -142,7 +142,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 更新请求
      * @return 更新后的黑名单
      */
-    @Operation(summary = "更新黑名单", description = "更新已存在的黑名单记录")
+    @Operation(summary = "Update Blacklist Entry", description = "Update an existing blacklist record")
     @Override
     public ResponseEntity<?> update(BlackRequest request) {
 
@@ -157,7 +157,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 删除请求
      * @return 删除结果
      */
-    @Operation(summary = "删除黑名单", description = "删除指定的黑名单记录")
+    @Operation(summary = "Delete Blacklist Entry", description = "Delete the specified blacklist record")
     @Override
     public ResponseEntity<?> delete(BlackRequest request) {
 
@@ -173,7 +173,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param response HTTP响应
      * @return 导出结果
      */
-    @Operation(summary = "导出黑名单", description = "导出黑名单数据到Excel")
+    @Operation(summary = "Export Blacklist", description = "Export blacklist data to Excel")
     @Override
     public Object export(BlackRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -186,7 +186,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
         );
     }
 
-    @Operation(summary = "导入黑名单", description = "通过Excel导入黑名单数据")
+    @Operation(summary = "Import Blacklist", description = "Import blacklist data from Excel")
     @PostMapping("/import")
     public ResponseEntity<?> importExcel(@RequestPart("file") MultipartFile file,
             @RequestParam("orgUid") String orgUid) {

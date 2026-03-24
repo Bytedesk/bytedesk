@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260324-call-block-01-add-country" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="country"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="country" type="varchar(32)" defaultValue="86"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-02-add-phone-number" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="phone_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="phone_number" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-03-add-rule-scope" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="rule_scope"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="rule_scope" type="varchar(32)" defaultValue="DOMAIN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-04-add-domain-uuid" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="domain_uuid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="domain_uuid" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-05-add-extension-uid" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="extension_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="extension_uid" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-06-add-extension-number" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="extension_number"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="extension_number" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-07-add-call-block-app" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="call_block_app"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="call_block_app" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-08-add-call-block-data" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="call_block_data"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="call_block_data" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-09-add-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="enabled"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="enabled" type="boolean" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-block-10-add-hit-count" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_block"/>
+            <not>
+                <columnExists tableName="bytedesk_call_block" columnName="call_block_count"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_block">
+            <column name="call_block_count" type="bigint" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

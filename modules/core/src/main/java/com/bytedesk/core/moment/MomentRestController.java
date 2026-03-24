@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,9 +41,10 @@ public class MomentRestController extends BaseRestController<MomentRequest, Mome
     private final MomentRestService momentRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "朋友圈/动态", action = "组织查询", description = "query moment by org")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query moment by org")
     @Operation(summary = "Query Moments by Organization", description = "Retrieve moments for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(MomentRequest request) {
         
         Page<MomentResponse> moments = momentRestService.queryByOrg(request);
@@ -48,9 +52,10 @@ public class MomentRestController extends BaseRestController<MomentRequest, Mome
         return ResponseEntity.ok(JsonResult.success(moments));
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "用户查询", description = "query moment by user")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query moment by user")
     @Operation(summary = "Query Moments by User", description = "Retrieve moments for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(MomentRequest request) {
         
         Page<MomentResponse> moments = momentRestService.queryByUser(request);
@@ -58,9 +63,10 @@ public class MomentRestController extends BaseRestController<MomentRequest, Mome
         return ResponseEntity.ok(JsonResult.success(moments));
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "查询详情", description = "query moment by uid")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query moment by uid")
     @Operation(summary = "Query Moment by UID", description = "Retrieve a specific moment by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(MomentRequest request) {
         
         MomentResponse moment = momentRestService.queryByUid(request);
@@ -68,40 +74,43 @@ public class MomentRestController extends BaseRestController<MomentRequest, Mome
         return ResponseEntity.ok(JsonResult.success(moment));
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "新建", description = "create moment")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create moment")
     @Operation(summary = "Create Moment", description = "Create a new moment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(MomentRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody MomentRequest request) {
         
         MomentResponse moment = momentRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(moment));
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "更新", description = "update moment")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update moment")
     @Operation(summary = "Update Moment", description = "Update an existing moment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(MomentRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody MomentRequest request) {
         
         MomentResponse moment = momentRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(moment));
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "删除", description = "delete moment")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete moment")
     @Operation(summary = "Delete Moment", description = "Delete a moment")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(MomentRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody MomentRequest request) {
         
         momentRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "朋友圈/动态", action = "导出", description = "export moment")
+    @ActionAnnotation(title = I18Consts.I18N_MOMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export moment")
     @Operation(summary = "Export Moments", description = "Export moments to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")
@@ -112,7 +121,7 @@ public class MomentRestController extends BaseRestController<MomentRequest, Mome
             response,
             momentRestService,
             MomentExcel.class,
-            "朋友圈/动态",
+            "Moment",
             "moment"
         );
     }

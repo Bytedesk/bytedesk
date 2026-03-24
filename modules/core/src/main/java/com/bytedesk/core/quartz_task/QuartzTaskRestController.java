@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +41,11 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
 
     private final QuartzTaskRestService quartzTaskRestService;
 
-    @ActionAnnotation(title = "QuartzTask", action = "组织查询", description = "query quartz_task by org")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query quartz_task by org")
     @Operation(summary = "Query QuartzTasks by Organization", description = "Retrieve quartz_tasks for the current organization")
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(QuartzTaskRequest request) {
         
         Page<QuartzTaskResponse> quartz_tasks = quartzTaskRestService.queryByOrg(request);
@@ -51,10 +53,11 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(quartz_tasks));
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "用户查询", description = "query quartz_task by user")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query quartz_task by user")
     @Operation(summary = "Query QuartzTasks by User", description = "Retrieve quartz_tasks for the current user")
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(QuartzTaskRequest request) {
         
         Page<QuartzTaskResponse> quartz_tasks = quartzTaskRestService.queryByUser(request);
@@ -62,10 +65,11 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(quartz_tasks));
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "查询详情", description = "query quartz_task by uid")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query quartz_task by uid")
     @Operation(summary = "Query QuartzTask by UID", description = "Retrieve a specific quartz_task by its unique identifier")
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(QuartzTaskRequest request) {
         
         QuartzTaskResponse quartz_task = quartzTaskRestService.queryByUid(request);
@@ -73,40 +77,43 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(quartz_task));
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "新建", description = "create quartz_task")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_CREATE, description = "create quartz_task")
     @Operation(summary = "Create QuartzTask", description = "Create a new quartz_task")
     @Override
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_CREATE)
-    public ResponseEntity<?> create(QuartzTaskRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody QuartzTaskRequest request) {
         
         QuartzTaskResponse quartz_task = quartzTaskRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(quartz_task));
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "更新", description = "update quartz_task")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_UPDATE, description = "update quartz_task")
     @Operation(summary = "Update QuartzTask", description = "Update an existing quartz_task")
     @Override
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_UPDATE)
-    public ResponseEntity<?> update(QuartzTaskRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody QuartzTaskRequest request) {
         
         QuartzTaskResponse quartz_task = quartzTaskRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(quartz_task));
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "删除", description = "delete quartz_task")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_DELETE, description = "delete quartz_task")
     @Operation(summary = "Delete QuartzTask", description = "Delete a quartz_task")
     @Override
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_DELETE)
-    public ResponseEntity<?> delete(QuartzTaskRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody QuartzTaskRequest request) {
         
         quartzTaskRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "QuartzTask", action = "导出", description = "export quartz_task")
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_EXPORT, description = "export quartz_task")
     @Operation(summary = "Export QuartzTasks", description = "Export quartz_tasks to Excel format")
     @Override
     // @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_EXPORT)

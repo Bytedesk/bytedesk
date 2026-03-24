@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,7 +37,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     private final TicketRestService ticketRestService;
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "组织查询", description = "query ticket by org")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TicketRequest request) {
 
@@ -46,7 +48,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "用户查询", description = "query ticket by user")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query ticket by user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(TicketRequest request) {
 
@@ -56,7 +59,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "查询详情", description = "query ticket by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket by uid")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TicketRequest request) {
         
@@ -66,7 +70,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "按主题查询", description = "query ticket by topic")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_TOPIC, description = "query ticket by topic")
     @GetMapping("/query/thread/topic")
     public ResponseEntity<?> queryByThreadTopic(TicketRequest request) {
 
@@ -76,7 +80,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "按会话查询", description = "query ticket by thread uid")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_THREAD_UID, description = "query ticket by thread uid")
     @GetMapping("/query/thread/uid")
     public ResponseEntity<?> queryByThreadUid(TicketRequest request) {
 
@@ -86,7 +90,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "按访客会话查询", description = "query ticket by visitor thread uid")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_VISITOR_THREAD_UID, description = "query ticket by visitor thread uid")
     @GetMapping("/query/visitor/thread/uid")
     public ResponseEntity<?> queryByVisitorThreadUid(TicketRequest request) {
 
@@ -96,7 +100,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "按访客会话主题查询", description = "query ticket by visitor thread topic")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_VISITOR_THREAD_TOPIC, description = "query ticket by visitor thread topic")
     @GetMapping("/query/visitor/thread/topic")
     public ResponseEntity<?> queryByVisitorThreadTopic(TicketRequest request) {
 
@@ -106,10 +110,11 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE)
-    @ActionAnnotation(title = "工单", action = "新建", description = "create ticket")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_CREATE, description = "create ticket")
+    @PostMapping("/create")
     @Override
     @Idempotent(ttlSeconds = 120)
-    public ResponseEntity<?> create(TicketRequest request) {
+    public ResponseEntity<?> create(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketRestService.create(request);
 
@@ -117,9 +122,10 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
-    @ActionAnnotation(title = "工单", action = "更新", description = "update ticket")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_UPDATE, description = "update ticket")
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(TicketRequest request) {
+    public ResponseEntity<?> update(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketRestService.update(request);
 
@@ -127,9 +133,10 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_DELETE)
-    @ActionAnnotation(title = "工单", action = "删除", description = "delete ticket")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_DELETE, description = "delete ticket")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(TicketRequest request) {
+    public ResponseEntity<?> delete(@RequestBody TicketRequest request) {
 
         ticketRestService.delete(request);
         
@@ -139,7 +146,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
     @PreAuthorize(TicketPermissions.HAS_TICKET_EXPORT)
-    @ActionAnnotation(title = "工单", action = "导出", description = "export ticket")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXPORT, description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -153,7 +160,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
-    @ActionAnnotation(title = "工单", action = "状态统计", description = "count ticket by status")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_COUNT_STATUS, description = "count ticket by status")
     @GetMapping("/count/status")
     public ResponseEntity<?> countStatus(TicketRequest request) {
 

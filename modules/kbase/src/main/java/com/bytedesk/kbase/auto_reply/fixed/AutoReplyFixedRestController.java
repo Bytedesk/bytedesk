@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "固定回复管理", description = "固定回复管理相关接口")
+@Tag(name = "Fixed Auto Reply Management", description = "Fixed auto reply management APIs")
 @RestController
 @RequestMapping("/api/v1/autoreply/fixed")
 @AllArgsConstructor
@@ -42,13 +43,14 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
 
     private final AutoReplyFixedRestService autoReplyService;
 
-    @Operation(summary = "查询组织下的固定回复", description = "根据组织ID查询固定回复列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Fixed Auto Replies by Organization", description = "Query the list of fixed auto replies by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_READ)
-    @ActionAnnotation(title = "固定回复", action = "组织查询", description = "query autoReplyFixed by org")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query autoReplyFixed by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(AutoReplyFixedRequest request) {
         
         Page<AutoReplyFixedResponse> page = autoReplyService.queryByOrg(request);
@@ -56,13 +58,14 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的固定回复", description = "根据用户ID查询固定回复列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Fixed Auto Replies by User", description = "Query the list of fixed auto replies by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_READ)
-    @ActionAnnotation(title = "固定回复", action = "用户查询", description = "query autoReplyFixed by user")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query autoReplyFixed by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(AutoReplyFixedRequest request) {
         
         Page<AutoReplyFixedResponse> page = autoReplyService.queryByUser(request);
@@ -70,52 +73,55 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "创建固定回复", description = "创建新的固定回复")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Fixed Auto Reply", description = "Create a new fixed auto reply")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_CREATE)
-    @ActionAnnotation(title = "固定回复", action = "新建", description = "create autoReplyFixed")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_CREATE, description = "create autoReplyFixed")
     @Override
-    public ResponseEntity<?> create(AutoReplyFixedRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody AutoReplyFixedRequest request) {
         
         AutoReplyFixedResponse response = autoReplyService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "更新固定回复", description = "更新固定回复信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Fixed Auto Reply", description = "Update fixed auto reply information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_UPDATE)
-    @ActionAnnotation(title = "固定回复", action = "更新", description = "update autoReplyFixed")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_UPDATE, description = "update autoReplyFixed")
     @Override
-    public ResponseEntity<?> update(AutoReplyFixedRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody AutoReplyFixedRequest request) {
         
         AutoReplyFixedResponse response = autoReplyService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "删除固定回复", description = "删除指定的固定回复")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Fixed Auto Reply", description = "Delete the specified fixed auto reply")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_DELETE)
-    @ActionAnnotation(title = "固定回复", action = "删除", description = "delete autoReplyFixed")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_DELETE, description = "delete autoReplyFixed")
     @Override
-    public ResponseEntity<?> delete(AutoReplyFixedRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody AutoReplyFixedRequest request) {
         
         autoReplyService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
     
-    @Operation(summary = "启用固定回复", description = "启用或禁用固定回复")
-    @ApiResponse(responseCode = "200", description = "操作成功",
+    @Operation(summary = "Enable Fixed Auto Reply", description = "Enable or disable fixed auto replies")
+    @ApiResponse(responseCode = "200", description = "Operation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyFixedResponse.class)))
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_UPDATE)
-    @ActionAnnotation(title = "固定回复", action = "启用", description = "enable autoReplyFixed")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_ENABLE, description = "enable autoReplyFixed")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody AutoReplyFixedRequest request) {
         
@@ -126,10 +132,10 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
     
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    @Operation(summary = "导出固定回复", description = "导出固定回复数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Fixed Auto Replies", description = "Export fixed auto reply data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(AutoReplyFixedPermissions.HAS_AUTO_REPLY_FIXED_EXPORT)
-    @ActionAnnotation(title = "固定回复", action = "导出", description = "export autoReplyFixed")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_EXPORT, description = "export autoReplyFixed")
     @GetMapping("/export")
     public Object export(AutoReplyFixedRequest request, HttpServletResponse response) {
         return exportTemplate(

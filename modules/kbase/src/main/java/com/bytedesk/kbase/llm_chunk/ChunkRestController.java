@@ -16,6 +16,7 @@ package com.bytedesk.kbase.llm_chunk;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
@@ -47,6 +49,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(ChunkRequest request) {
         
@@ -56,6 +59,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(ChunkRequest request) {
         
@@ -71,30 +75,33 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    @ActionAnnotation(title = "文件分块", action = "新建", description = "create chunk")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_CREATE, description = "create chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_CREATE)
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(ChunkRequest request) {
+    public ResponseEntity<?> create(@RequestBody ChunkRequest request) {
         
         ChunkResponse chunk = chunkRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    @ActionAnnotation(title = "文件分块", action = "更新", description = "update chunk")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE, description = "update chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(ChunkRequest request) {
+    public ResponseEntity<?> update(@RequestBody ChunkRequest request) {
         
         ChunkResponse chunk = chunkRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    @ActionAnnotation(title = "文件分块", action = "删除", description = "delete chunk")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE, description = "delete chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_DELETE)
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(ChunkRequest request) {
+    public ResponseEntity<?> delete(@RequestBody ChunkRequest request) {
         
         chunkRestService.delete(request);
 
@@ -121,8 +128,9 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
-    @ActionAnnotation(title = "文件分块", action = "导出", description = "export chunk")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_EXPORT, description = "export chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_EXPORT)
+    @GetMapping("/export")
     @Override
     public Object export(ChunkRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -136,7 +144,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch index
-    @ActionAnnotation(title = "文件分块", action = "更新索引", description = "update chunk index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update chunk index")
     @PostMapping("/updateIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> updateIndex(@RequestBody ChunkRequest request) {
@@ -147,7 +155,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete elasticsearch index
-    @ActionAnnotation(title = "文件分块", action = "删除索引", description = "delete chunk elastic index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete chunk elastic index")
     @PostMapping("/deleteIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> deleteIndex(@RequestBody ChunkRequest request) {
@@ -156,7 +164,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync elasticsearch index status
-    @ActionAnnotation(title = "文件分块", action = "同步索引状态", description = "sync chunk elastic status")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync chunk elastic status")
     @PostMapping("/syncIndexStatus")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> syncIndexStatus(@RequestBody ChunkRequest request) {
@@ -165,7 +173,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync elasticsearch index status by kbUid
-    @ActionAnnotation(title = "文件分块", action = "批量同步索引状态", description = "sync chunk elastic status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync chunk elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody ChunkRequest request) {
@@ -174,7 +182,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete all elasticsearch index by kbUid
-    @ActionAnnotation(title = "文件分块", action = "知识库删除索引", description = "delete chunk elastic index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete chunk elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody ChunkRequest request) {
@@ -183,7 +191,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch vector index
-    @ActionAnnotation(title = "文件分块", action = "更新向量索引", description = "update chunk vector index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update chunk vector index")
     @PostMapping("/updateVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> updateVectorIndex(@RequestBody ChunkRequest request) {
@@ -196,7 +204,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete vector index
-    @ActionAnnotation(title = "文件分块", action = "删除向量索引", description = "delete chunk vector index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete chunk vector index")
     @PostMapping("/deleteVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> deleteVectorIndex(@RequestBody ChunkRequest request) {
@@ -208,7 +216,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync vector status
-    @ActionAnnotation(title = "文件分块", action = "同步向量状态", description = "sync chunk vector status")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync chunk vector status")
     @PostMapping("/syncVectorStatus")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> syncVectorStatus(@RequestBody ChunkRequest request) {
@@ -220,7 +228,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
-    @ActionAnnotation(title = "知识库拆分", action = "查询全文索引", description = "query chunk elastic by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query chunk elastic by uid")
     @PostMapping("/queryElasticByUid")
     public ResponseEntity<?> queryElasticByUid(@RequestBody ChunkRequest request) {
         var result = chunkElasticService.queryElasticByUid(request);
@@ -228,7 +236,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
-    @ActionAnnotation(title = "知识库拆分", action = "查询向量索引", description = "query chunk vector by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query chunk vector by uid")
     @PostMapping("/queryVectorByUid")
     public ResponseEntity<?> queryVectorByUid(@RequestBody ChunkRequest request) {
         if (chunkVectorService != null) {
@@ -239,7 +247,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync vector status by kbUid
-    @ActionAnnotation(title = "文件分块", action = "批量同步向量状态", description = "sync chunk vector status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync chunk vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody ChunkRequest request) {
@@ -251,7 +259,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch all index
-    @ActionAnnotation(title = "文件分块", action = "更新所有索引", description = "update all chunk index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all chunk index")
     @PostMapping("/updateAllIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> updateAllIndex(@RequestBody ChunkRequest request) {
@@ -262,7 +270,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch all vector index
-    @ActionAnnotation(title = "文件分块", action = "更新所有向量索引", description = "update all chunk vector index")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all chunk vector index")
     @PostMapping("/updateAllVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody ChunkRequest request) {
@@ -276,7 +284,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete all vector index by kbUid
-    @ActionAnnotation(title = "文件分块", action = "知识库删除向量索引", description = "delete chunk vector index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete chunk vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody ChunkRequest request) {

@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -41,10 +42,11 @@ public class CityRestController extends BaseRestController<CityRequest, CityRest
 
     private final CityRestService cityRestService;
 
-    @ActionAnnotation(title = "City", action = "组织查询", description = "query city by org")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query city by org")
     @Operation(summary = "Query Citys by Organization", description = "Retrieve citys for the current organization")
     @PreAuthorize(CityPermissions.HAS_CITY_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(CityRequest request) {
         
         Page<CityResponse> citys = cityRestService.queryByOrg(request);
@@ -52,10 +54,11 @@ public class CityRestController extends BaseRestController<CityRequest, CityRest
         return ResponseEntity.ok(JsonResult.success(citys));
     }
 
-    @ActionAnnotation(title = "City", action = "用户查询", description = "query city by user")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query city by user")
     @Operation(summary = "Query Citys by User", description = "Retrieve citys for the current user")
     @PreAuthorize(CityPermissions.HAS_CITY_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(CityRequest request) {
         
         Page<CityResponse> citys = cityRestService.queryByUser(request);
@@ -63,10 +66,11 @@ public class CityRestController extends BaseRestController<CityRequest, CityRest
         return ResponseEntity.ok(JsonResult.success(citys));
     }
 
-    @ActionAnnotation(title = "City", action = "查询详情", description = "query city by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query city by uid")
     @Operation(summary = "Query City by UID", description = "Retrieve a specific city by its unique identifier")
     @PreAuthorize(CityPermissions.HAS_CITY_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(CityRequest request) {
         
         CityResponse city = cityRestService.queryByUid(request);
@@ -74,40 +78,43 @@ public class CityRestController extends BaseRestController<CityRequest, CityRest
         return ResponseEntity.ok(JsonResult.success(city));
     }
 
-    @ActionAnnotation(title = "City", action = "新建", description = "create city")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_CREATE, description = "create city")
     @Operation(summary = "Create City", description = "Create a new city")
     @Override
     @PreAuthorize(CityPermissions.HAS_CITY_CREATE)
-    public ResponseEntity<?> create(CityRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody CityRequest request) {
         
         CityResponse city = cityRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(city));
     }
 
-    @ActionAnnotation(title = "City", action = "更新", description = "update city")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_UPDATE, description = "update city")
     @Operation(summary = "Update City", description = "Update an existing city")
     @Override
     @PreAuthorize(CityPermissions.HAS_CITY_UPDATE)
-    public ResponseEntity<?> update(CityRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody CityRequest request) {
         
         CityResponse city = cityRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(city));
     }
 
-    @ActionAnnotation(title = "City", action = "删除", description = "delete city")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_DELETE, description = "delete city")
     @Operation(summary = "Delete City", description = "Delete a city")
     @Override
     @PreAuthorize(CityPermissions.HAS_CITY_DELETE)
-    public ResponseEntity<?> delete(CityRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody CityRequest request) {
         
         cityRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "City", action = "导出", description = "export city")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_EXPORT, description = "export city")
     @Operation(summary = "Export Citys", description = "Export citys to Excel format")
     @Override
     @PreAuthorize(CityPermissions.HAS_CITY_EXPORT)
@@ -123,20 +130,20 @@ public class CityRestController extends BaseRestController<CityRequest, CityRest
         );
     }
 
-    @ActionAnnotation(title = "City", action = "一键重置", description = "reset all cities")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_RESET, description = "reset all cities")
     @Operation(summary = "Reset Citys", description = "Delete all city records (admin only).")
     @PreAuthorize(CityPermissions.HAS_CITY_DELETE)
     @PostMapping("/reset")
-    public ResponseEntity<?> reset(CityRequest request) {
+    public ResponseEntity<?> reset(@RequestBody CityRequest request) {
         long deletedCount = cityRestService.resetAll();
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_CITY_RESET_SUCCESS, deletedCount));
     }
 
-    @ActionAnnotation(title = "City", action = "一键初始化", description = "init cities from sql")
+    @ActionAnnotation(title = I18Consts.I18N_CITY, action = I18Consts.I18N_ACTION_INIT, description = "init cities from sql")
     @Operation(summary = "Init Citys", description = "Initialize city data from SQL script in background.")
     @PreAuthorize(CityPermissions.HAS_CITY_CREATE)
     @PostMapping("/init")
-    public ResponseEntity<?> init(CityRequest request) {
+    public ResponseEntity<?> init(@RequestBody CityRequest request) {
         boolean started = cityRestService.initIfEmptyAsync();
         if (!started) {
             return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_CITY_INIT_SKIPPED, false));

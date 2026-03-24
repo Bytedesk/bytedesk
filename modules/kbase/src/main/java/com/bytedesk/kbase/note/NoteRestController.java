@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class NoteRestController extends BaseRestController<NoteRequest, NoteRest
 
     private final NoteRestService noteRestService;
 
-    @ActionAnnotation(title = "Note", action = "组织查询", description = "query note by org")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query note by org")
     @Operation(summary = "Query Notes by Organization", description = "Retrieve notes for the current organization")
     @PreAuthorize(NotePermissions.HAS_NOTE_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(NoteRequest request) {
         
         Page<NoteResponse> notes = noteRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class NoteRestController extends BaseRestController<NoteRequest, NoteRest
         return ResponseEntity.ok(JsonResult.success(notes));
     }
 
-    @ActionAnnotation(title = "Note", action = "用户查询", description = "query note by user")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query note by user")
     @Operation(summary = "Query Notes by User", description = "Retrieve notes for the current user")
     @PreAuthorize(NotePermissions.HAS_NOTE_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(NoteRequest request) {
         
         Page<NoteResponse> notes = noteRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class NoteRestController extends BaseRestController<NoteRequest, NoteRest
         return ResponseEntity.ok(JsonResult.success(notes));
     }
 
-    @ActionAnnotation(title = "Note", action = "查询详情", description = "query note by uid")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query note by uid")
     @Operation(summary = "Query Note by UID", description = "Retrieve a specific note by its unique identifier")
     @PreAuthorize(NotePermissions.HAS_NOTE_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(NoteRequest request) {
         
         NoteResponse note = noteRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class NoteRestController extends BaseRestController<NoteRequest, NoteRest
         return ResponseEntity.ok(JsonResult.success(note));
     }
 
-    @ActionAnnotation(title = "Note", action = "新建", description = "create note")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_CREATE, description = "create note")
     @Operation(summary = "Create Note", description = "Create a new note")
     @Override
     @PreAuthorize(NotePermissions.HAS_NOTE_CREATE)
-    public ResponseEntity<?> create(NoteRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody NoteRequest request) {
         
         NoteResponse note = noteRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(note));
     }
 
-    @ActionAnnotation(title = "Note", action = "更新", description = "update note")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_UPDATE, description = "update note")
     @Operation(summary = "Update Note", description = "Update an existing note")
     @Override
     @PreAuthorize(NotePermissions.HAS_NOTE_UPDATE)
-    public ResponseEntity<?> update(NoteRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody NoteRequest request) {
         
         NoteResponse note = noteRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(note));
     }
 
-    @ActionAnnotation(title = "Note", action = "删除", description = "delete note")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_DELETE, description = "delete note")
     @Operation(summary = "Delete Note", description = "Delete a note")
     @Override
     @PreAuthorize(NotePermissions.HAS_NOTE_DELETE)
-    public ResponseEntity<?> delete(NoteRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody NoteRequest request) {
         
         noteRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Note", action = "导出", description = "export note")
+    @ActionAnnotation(title = I18Consts.I18N_NOTE, action = I18Consts.I18N_ACTION_EXPORT, description = "export note")
     @Operation(summary = "Export Notes", description = "Export notes to Excel format")
     @Override
     @PreAuthorize(NotePermissions.HAS_NOTE_EXPORT)

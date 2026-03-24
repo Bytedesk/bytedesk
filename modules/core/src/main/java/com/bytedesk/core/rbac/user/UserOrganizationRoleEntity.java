@@ -64,7 +64,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
 
     // 可以设置多个角色
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
         name = "bytedesk_core_user_org_role_roles",
         joinColumns = @JoinColumn(name = "user_org_role_id"),

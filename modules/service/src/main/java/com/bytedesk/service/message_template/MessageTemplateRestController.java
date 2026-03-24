@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "模板管理", description = "模板管理相关接口")
+@Tag(name = "Template Management", description = "Template management APIs")
 @RestController
 @RequestMapping("/api/v1/message/template")
 @AllArgsConstructor
@@ -42,8 +43,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     private final MessageTemplateRestService templateRestService;
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
-    @ActionAnnotation(title = "模板管理", action = "查询组织模板", description = "queryByOrg template")
-    @Operation(summary = "根据组织查询模板", description = "查询组织的模板列表")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "queryByOrg template")
+    @Operation(summary = "Query Templates by Organization", description = "Retrieve template list for the organization")
     @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(MessageTemplateRequest request) {
@@ -54,8 +55,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
-    @ActionAnnotation(title = "模板管理", action = "查询用户模板", description = "queryByUser template")
-    @Operation(summary = "根据用户查询模板", description = "查询用户的模板列表")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "queryByUser template")
+    @Operation(summary = "Query Templates by User", description = "Retrieve template list for the user")
     @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(MessageTemplateRequest request) {
@@ -66,8 +67,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_READ)
-    @ActionAnnotation(title = "模板管理", action = "查询模板详情", description = "queryByUid template")
-    @Operation(summary = "根据UID查询模板", description = "通过UID查询具体的模板")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "queryByUid template")
+    @Operation(summary = "Query Template by UID", description = "Retrieve template details by UID")
     @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(MessageTemplateRequest request) {
@@ -78,8 +79,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_CREATE)
-    @ActionAnnotation(title = "模板管理", action = "创建模板", description = "create template")
-    @Operation(summary = "创建模板", description = "创建新的模板")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_CREATE, description = "create template")
+    @Operation(summary = "Create Template", description = "Create a new template")
     @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody MessageTemplateRequest request) {
@@ -90,8 +91,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_UPDATE)
-    @ActionAnnotation(title = "模板管理", action = "更新模板", description = "update template")
-    @Operation(summary = "更新模板", description = "更新现有的模板")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_UPDATE, description = "update template")
+    @Operation(summary = "Update Template", description = "Update the existing template")
     @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody MessageTemplateRequest request) {
@@ -102,8 +103,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
     }
 
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_DELETE)
-    @ActionAnnotation(title = "模板管理", action = "删除模板", description = "delete template")
-    @Operation(summary = "删除模板", description = "删除指定的模板")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_DELETE, description = "delete template")
+    @Operation(summary = "Delete Template", description = "Delete the specified template")
     @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody MessageTemplateRequest request) {
@@ -115,8 +116,8 @@ public class MessageTemplateRestController extends BaseRestController<MessageTem
 
     @GetMapping("/export")
     @PreAuthorize(MessageTemplatePermissions.HAS_MESSAGE_TEMPLATE_EXPORT)
-    @ActionAnnotation(title = "模板管理", action = "导出模板", description = "export template")
-    @Operation(summary = "导出模板", description = "导出模板数据")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_TEMPLATE, action = I18Consts.I18N_ACTION_EXPORT, description = "export template")
+    @Operation(summary = "Export Templates", description = "Export template data")
     @Override
     public Object export(MessageTemplateRequest request, HttpServletResponse response) {
         return exportTemplate(

@@ -16,6 +16,7 @@ package com.bytedesk.ai.robot;
 public enum RobotTypeEnum {
     SERVICE, // 客服机器人
     LLM, // 大模型Agent
+    ASSISTANT // 客服助手
     ;
 
     // 根据整型值查找对应的枚举常量

@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/notice/account")
-// @Tag(name = "notice_account - 通知账号", description = "notice account apis")
+// @Tag(name = "Notice Account Management", description = "Notice account APIs")
 public class NoticeAccountRestController extends BaseRestController<NoticeAccountRequest, NoticeAccountRestService> {
 
     private final NoticeAccountRestService channelService;

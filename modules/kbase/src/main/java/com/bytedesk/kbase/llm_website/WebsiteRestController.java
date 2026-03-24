@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlConfig;
 import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTask;
@@ -36,13 +37,14 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/llm/website")
 @AllArgsConstructor
-@Tag(name = "网站管理", description = "网站管理相关接口")
+@Tag(name = "Website Management", description = "Website management APIs")
 public class WebsiteRestController extends BaseRestController<WebsiteRequest, WebsiteRestService> {
 
     private final WebsiteRestService websiteRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @Operation(summary = "根据组织查询网站", description = "查询组织的网站列表")
+    @Operation(summary = "Query Websites by Organization", description = "Query the list of websites for the organization")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WebsiteRequest request) {
         
@@ -51,7 +53,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
-    @Operation(summary = "根据用户查询网站", description = "查询用户的网站列表")
+    @Operation(summary = "Query Websites by User", description = "Query the list of websites for the user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WebsiteRequest request) {
         
@@ -60,30 +63,33 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
-    @ActionAnnotation(title = "知识库网站", action = "新建", description = "create website")
-    @Operation(summary = "创建网站", description = "创建新的网站")
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_CREATE, description = "create website")
+    @Operation(summary = "Create Website", description = "Create a new website")
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(WebsiteRequest request) {
+    public ResponseEntity<?> create(@RequestBody WebsiteRequest request) {
         
         WebsiteResponse website = websiteRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
-    @ActionAnnotation(title = "知识库网站", action = "更新", description = "update website")
-    @Operation(summary = "更新网站", description = "更新现有的网站")
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_UPDATE, description = "update website")
+    @Operation(summary = "Update Website", description = "Update the existing website")
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(WebsiteRequest request) {
+    public ResponseEntity<?> update(@RequestBody WebsiteRequest request) {
         
         WebsiteResponse website = websiteRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
-    @ActionAnnotation(title = "知识库网站", action = "删除", description = "delete website")
-    @Operation(summary = "删除网站", description = "删除指定的网站")
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_DELETE, description = "delete website")
+    @Operation(summary = "Delete Website", description = "Delete the specified website")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(WebsiteRequest request) {
+    public ResponseEntity<?> delete(@RequestBody WebsiteRequest request) {
         
         websiteRestService.delete(request);
 
@@ -92,7 +98,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
 
     // deleteAll
     @PostMapping("/deleteAll")
-    @Operation(summary = "删除所有网站", description = "删除所有网站")
+    @Operation(summary = "Delete All Websites", description = "Delete all websites")
     public ResponseEntity<?> deleteAll(@RequestBody WebsiteRequest request) {
 
         websiteRestService.deleteAll(request);
@@ -102,7 +108,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
 
     // enable/disable website
     @PostMapping("/enable")
-    @Operation(summary = "启用/禁用网站", description = "启用或禁用网站")
+    @Operation(summary = "Enable or Disable Website", description = "Enable or disable the website")
     public ResponseEntity<?> enable(@RequestBody WebsiteRequest request) {
 
         WebsiteResponse website = websiteRestService.enable(request);
@@ -110,21 +116,22 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
-    @ActionAnnotation(title = "知识库网站", action = "导出", description = "export website")
-    @Operation(summary = "导出网站", description = "导出网站数据")
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_EXPORT, description = "export website")
+    @Operation(summary = "Export Websites", description = "Export website data")
     @Override
+    @GetMapping("/export")
     public Object export(WebsiteRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             websiteRestService,
             WebsiteExcel.class,
-            "知识库网站",
+            "Knowledge Base Website",
             "website"
         );
     }
 
-    @Operation(summary = "根据UID查询网站", description = "通过UID查询具体的网站")
+    @Operation(summary = "Query Website by UID", description = "Query the specific website by UID")
     @Override
     public ResponseEntity<?> queryByUid(WebsiteRequest request) {
         // TODO Auto-generated method stub
@@ -134,7 +141,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     // ==================== 网站抓取相关API ====================
     
     @PostMapping("/crawl/start")
-    @Operation(summary = "开始整站抓取", description = "使用指定配置开始整站抓取")
+    @Operation(summary = "Start Full-Site Crawl", description = "Start a full-site crawl using the specified configuration")
     public ResponseEntity<?> startCrawl(@RequestBody WebsiteCrawlRequest request) {
         try {
             WebsiteCrawlConfig config = request.getConfig() != null ? request.getConfig() : WebsiteCrawlConfig.getDefault();
@@ -146,7 +153,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @PostMapping("/crawl/start/fast")
-    @Operation(summary = "快速抓取", description = "使用快速配置开始抓取（较少页面和深度）")
+    @Operation(summary = "Start Fast Crawl", description = "Start crawling with a fast configuration using fewer pages and lower depth")
     public ResponseEntity<?> startFastCrawl(@RequestBody WebsiteCrawlRequest request) {
         try {
             websiteRestService.startFastCrawl(request.getWebsiteUid());
@@ -157,7 +164,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @PostMapping("/crawl/start/deep")
-    @Operation(summary = "深度抓取", description = "使用深度配置开始抓取（更多页面和深度）")
+    @Operation(summary = "Start Deep Crawl", description = "Start crawling with a deep configuration using more pages and greater depth")
     public ResponseEntity<?> startDeepCrawl(@RequestBody WebsiteCrawlRequest request) {
         try {
             websiteRestService.startDeepCrawl(request.getWebsiteUid());
@@ -168,7 +175,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @PostMapping("/crawl/stop")
-    @Operation(summary = "停止抓取", description = "停止正在运行的抓取任务")
+    @Operation(summary = "Stop Crawl", description = "Stop the running crawl task")
     public ResponseEntity<?> stopCrawl(@RequestBody WebsiteCrawlRequest request) {
         try {
             boolean stopped = websiteRestService.stopCrawl(request.getWebsiteUid());
@@ -183,7 +190,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @GetMapping("/crawl/tasks/{websiteUid}")
-    @Operation(summary = "获取抓取任务列表", description = "获取指定网站的所有抓取任务")
+    @Operation(summary = "Get Crawl Task List", description = "Get all crawl tasks for the specified website")
     public ResponseEntity<?> getCrawlTasks(@PathVariable String websiteUid) {
         try {
             var tasks = websiteRestService.getCrawlTasks(websiteUid);
@@ -194,7 +201,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @GetMapping("/crawl/task/status/{taskId}")
-    @Operation(summary = "获取抓取任务状态", description = "获取指定任务的实时状态")
+    @Operation(summary = "Get Crawl Task Status", description = "Get the real-time status of the specified task")
     public ResponseEntity<?> getCrawlTaskStatus(@PathVariable String taskId) {
         try {
             WebsiteCrawlTask task = websiteRestService.getCrawlTaskStatus(taskId);
@@ -205,7 +212,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @GetMapping("/crawl/sitemap/{websiteUid}")
-    @Operation(summary = "解析站点地图", description = "解析网站的sitemap.xml获取URL列表")
+    @Operation(summary = "Parse Sitemap", description = "Parse the website sitemap.xml and retrieve the URL list")
     public ResponseEntity<?> parseSitemap(@PathVariable String websiteUid) {
         try {
             var urls = websiteRestService.parseSitemap(websiteUid);
@@ -216,7 +223,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @PostMapping("/crawl/config")
-    @Operation(summary = "更新抓取配置", description = "更新网站的抓取配置")
+    @Operation(summary = "Update Crawl Configuration", description = "Update the crawl configuration for the website")
     public ResponseEntity<?> updateCrawlConfig(@RequestBody WebsiteCrawlConfigRequest request) {
         try {
             WebsiteResponse response = websiteRestService.updateCrawlConfig(
@@ -228,7 +235,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
     
     @GetMapping("/crawl/config/{websiteUid}")
-    @Operation(summary = "获取抓取配置", description = "获取网站的抓取配置")
+    @Operation(summary = "Get Crawl Configuration", description = "Get the crawl configuration for the website")
     public ResponseEntity<?> getCrawlConfig(@PathVariable String websiteUid) {
         try {
             WebsiteCrawlConfig config = websiteRestService.getCrawlConfig(websiteUid);

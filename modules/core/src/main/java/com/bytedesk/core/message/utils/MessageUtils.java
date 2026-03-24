@@ -72,6 +72,23 @@ public class MessageUtils {
                 .build();
         return message;
     }
+
+    public static MessageProtobuf createKickoffMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid,
+            String content) {
+        UserProtobuf system = UserUtils.getSystemUser();
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
+        return MessageProtobuf.builder()
+                .uid(messageUid)
+                .type(MessageTypeEnum.KICKOFF)
+                .content(content)
+                .status(MessageStatusEnum.SUCCESS)
+                .createdAt(BdDateUtils.now())
+                .channel(ChannelEnum.SYSTEM)
+                .thread(threadProtobuf)
+                .user(system)
+                .extra(messageExtra.toJson())
+                .build();
+    }
     
     public static MessageProtobuf createThreadMessage(String messageUid, ThreadEntity thread, MessageTypeEnum type, String content) {
         //

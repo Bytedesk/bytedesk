@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.annotation.ActionAnnotation;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,7 +38,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Slf4j
-@Tag(name = "队列成员管理", description = "队列成员管理相关接口")
+@Tag(name = "Queue Member Management", description = "Queue member management APIs")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/queue/member")
@@ -46,9 +47,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     private final QueueMemberRestService queueMemberRestService;
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
-    @ActionAnnotation(title = "队列成员管理", action = "查询组织队列成员", description = "queryByOrg queue member")
-    @Operation(summary = "查询组织下的队列成员", description = "根据组织ID查询队列成员列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "queryByOrg queue member")
+    @Operation(summary = "Query Queue Members by Organization", description = "Retrieve queue member list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @GetMapping("/query/org")
@@ -61,9 +62,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     }
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
-    @ActionAnnotation(title = "队列成员管理", action = "查询用户队列成员", description = "queryByUser queue member")
-    @Operation(summary = "查询用户下的队列成员", description = "根据用户ID查询队列成员列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "queryByUser queue member")
+    @Operation(summary = "Query Queue Members by User", description = "Retrieve queue member list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @GetMapping({ "/query", "/query/user" })
@@ -76,9 +77,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     }
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_READ)
-    @ActionAnnotation(title = "队列成员管理", action = "查询队列成员详情", description = "queryByUid queue member")
-    @Operation(summary = "查询指定队列成员", description = "根据UID查询队列成员详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "queryByUid queue member")
+    @Operation(summary = "Query Queue Member by UID", description = "Retrieve queue member details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @GetMapping("/query/uid")
@@ -90,9 +91,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_CREATE)
-    @ActionAnnotation(title = "队列成员管理", action = "创建队列成员", description = "create queue member")
-    @Operation(summary = "创建队列成员", description = "创建新的队列成员")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_CREATE, description = "create queue member")
+    @Operation(summary = "Create Queue Member", description = "Create a new queue member")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @PostMapping("/create")
@@ -105,9 +106,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     }
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_UPDATE)
-    @ActionAnnotation(title = "队列成员管理", action = "更新队列成员", description = "update queue member")
-    @Operation(summary = "更新队列成员", description = "更新队列成员信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_UPDATE, description = "update queue member")
+    @Operation(summary = "Update Queue Member", description = "Update queue member information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = QueueMemberResponse.class)))
     @PostMapping("/update")
@@ -120,9 +121,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     }
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_DELETE)
-    @ActionAnnotation(title = "队列成员管理", action = "删除队列成员", description = "delete queue member")
-    @Operation(summary = "删除队列成员", description = "删除指定的队列成员")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_DELETE, description = "delete queue member")
+    @Operation(summary = "Delete Queue Member", description = "Delete the specified queue member")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody QueueMemberRequest request) {
@@ -133,9 +134,9 @@ public class QueueMemberRestController extends BaseRestController<QueueMemberReq
     }
 
     @PreAuthorize(QueueMemberPermissions.HAS_QUEUE_MEMBER_EXPORT)
-    @ActionAnnotation(title = "队列成员管理", action = "导出队列成员", description = "export queue member")
-    @Operation(summary = "导出队列成员", description = "导出队列成员数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE_MEMBER, action = I18Consts.I18N_ACTION_EXPORT, description = "export queue member")
+    @Operation(summary = "Export Queue Members", description = "Export queue member data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @GetMapping("/export")
     @Override
     public Object export(QueueMemberRequest request, HttpServletResponse response) {

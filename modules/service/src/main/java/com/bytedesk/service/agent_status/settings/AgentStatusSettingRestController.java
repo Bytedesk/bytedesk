@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,13 +34,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/agent/status/setting")
 @AllArgsConstructor
-@Tag(name = "客服状态设置管理", description = "客服状态设置管理相关接口")
+@Tag(name = "Agent Status Setting Management", description = "Agent status setting management APIs")
 public class AgentStatusSettingRestController extends BaseRestController<AgentStatusSettingRequest, AgentStatusSettingRestService> {
 
     private final AgentStatusSettingRestService tagService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "查询组织", description = "query tag by org")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent status setting by org")
     @GetMapping("/query/org")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
@@ -50,7 +51,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询用户", description = "query tag by user")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent status setting by user")
     @GetMapping({ "/query", "/query/user" })
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
@@ -61,7 +62,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent status setting by uid")
     @GetMapping("/query/uid")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
@@ -72,7 +73,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_CREATE, description = "create agent status setting")
     @Override
     @PostMapping("/create")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_CREATE)
@@ -83,7 +84,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent status setting")
     @Override
     @PostMapping("/update")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_UPDATE)
@@ -94,7 +95,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent status setting")
     @Override
     @PostMapping("/delete")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_DELETE)
@@ -105,7 +106,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status setting")
     @Override
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_EXPORT)
     @GetMapping("/export")
@@ -115,8 +116,8 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
             response,
             tagService,
             AgentStatusSettingExcel.class,
-            "标签",
-            "tag"
+            "客服状态设置",
+            "agent-status-setting"
         );
     }
 

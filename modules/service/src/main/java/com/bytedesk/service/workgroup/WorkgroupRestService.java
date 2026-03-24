@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Map;
@@ -602,6 +603,60 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 .filter(w -> !StringUtils.hasText(orgUid) || orgUid.equals(w.getOrgUid()))
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, List<WorkgroupResponse>> queryAdminWorkgroups(List<String> agentUids, String orgUid) {
+        LinkedHashSet<String> normalizedAgentUids = agentUids == null
+                ? new LinkedHashSet<>()
+                : agentUids.stream()
+                        .filter(StringUtils::hasText)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        Map<String, List<WorkgroupResponse>> workgroupsByAgent = normalizedAgentUids.stream()
+                .collect(Collectors.toMap(
+                        agentUid -> agentUid,
+                        agentUid -> new ArrayList<>(),
+                        (left, right) -> left,
+                        java.util.LinkedHashMap::new));
+
+        if (normalizedAgentUids.isEmpty()) {
+            return workgroupsByAgent;
+        }
+
+        List<WorkgroupEntity> workgroups = workgroupRepository.findByAdminAgentUids(new ArrayList<>(normalizedAgentUids), orgUid);
+        Map<String, WorkgroupResponse> responseCache = new java.util.HashMap<>();
+        Set<String> seenPairs = new HashSet<>();
+
+        for (WorkgroupEntity workgroup : workgroups) {
+            if (workgroup == null || workgroup.isDeleted()) {
+                continue;
+            }
+            if (StringUtils.hasText(orgUid) && !orgUid.equals(workgroup.getOrgUid())) {
+                continue;
+            }
+
+            List<AgentEntity> admins = workgroup.getAdmins();
+            if (admins == null || admins.isEmpty()) {
+                continue;
+            }
+
+            for (AgentEntity admin : admins) {
+                if (admin == null || !StringUtils.hasText(admin.getUid()) || !normalizedAgentUids.contains(admin.getUid())) {
+                    continue;
+                }
+
+                String pairKey = admin.getUid() + ":" + workgroup.getUid();
+                if (!seenPairs.add(pairKey)) {
+                    continue;
+                }
+
+                WorkgroupResponse response = responseCache.computeIfAbsent(workgroup.getUid(), key -> convertToResponse(workgroup));
+                workgroupsByAgent.computeIfAbsent(admin.getUid(), key -> new ArrayList<>()).add(response);
+            }
+        }
+
+        return workgroupsByAgent;
     }
 
     @Transactional(readOnly = true)

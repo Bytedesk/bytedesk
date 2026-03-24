@@ -15,6 +15,7 @@ package com.bytedesk.core.workflow;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,11 +47,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     
     private final WorkflowService workflowService;
 
-    @Operation(summary = "查询组织下的工作流", description = "根据组织ID查询工作流列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workflows by Organization", description = "Retrieve workflow list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
         
         Page<WorkflowResponse> workflow = workflowRestService.queryByOrg(request);
@@ -57,11 +60,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
-    @Operation(summary = "查询用户下的工作流", description = "根据用户ID查询工作流列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workflows by User", description = "Retrieve workflow list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(WorkflowRequest request) {
         
         Page<WorkflowResponse> workflow = workflowRestService.queryByUser(request);
@@ -69,11 +73,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
-    @Operation(summary = "查询指定工作流", description = "根据UID查询工作流详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Workflow by UID", description = "Retrieve workflow details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(WorkflowRequest request) {
         
         WorkflowResponse workflow = workflowRestService.queryByUid(request);
@@ -81,56 +86,60 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
-    @Operation(summary = "创建工作流", description = "创建新的工作流")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Workflow", description = "Create a new workflow")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
-    @ActionAnnotation(title = "工作流", action = "新建", description = "create workflow")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow")
     @Override
-    public ResponseEntity<?> create(WorkflowRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody WorkflowRequest request) {
         
         WorkflowResponse workflow = workflowRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
-    @Operation(summary = "更新工作流", description = "更新工作流信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Workflow", description = "Update workflow information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
-    @ActionAnnotation(title = "工作流", action = "更新", description = "update workflow")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_UPDATE, description = "update workflow")
     @Override
-    public ResponseEntity<?> update(WorkflowRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody WorkflowRequest request) {
         
         WorkflowResponse workflow = workflowRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
-    @Operation(summary = "删除工作流", description = "删除指定的工作流")
-    @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "工作流", action = "删除", description = "delete workflow")
+    @Operation(summary = "Delete Workflow", description = "Delete the specified workflow")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow")
     @Override
-    public ResponseEntity<?> delete(WorkflowRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody WorkflowRequest request) {
         
         workflowRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出工作流", description = "导出工作流数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")        
-    @ActionAnnotation(title = "工作流", action = "导出", description = "export workflow")
+    @Operation(summary = "Export Workflows", description = "Export workflow data")
+    @ApiResponse(responseCode = "200", description = "Export successful")        
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_EXPORT, description = "export workflow")
     @Override
+    @GetMapping("/export")
     public Object export(WorkflowRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
     // 执行工作流
-    @Operation(summary = "执行工作流", description = "执行指定的工作流")
-    @ApiResponse(responseCode = "200", description = "执行成功")
-    @ActionAnnotation(title = "工作流", action = "执行", description = "execute workflow")
+    @Operation(summary = "Execute Workflow", description = "Execute the specified workflow")
+    @ApiResponse(responseCode = "200", description = "Executed successfully")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute workflow")
     @PostMapping("/execute")
     public ResponseEntity<?> execute(@RequestBody WorkflowRequest request) {
         

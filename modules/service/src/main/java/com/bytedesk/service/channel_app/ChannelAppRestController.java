@@ -34,7 +34,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "渠道应用管理", description = "渠道应用管理相关接口")
+@Tag(name = "Channel App Management", description = "Channel app management APIs")
 @RestController
 @RequestMapping("/api/v1/channel/app")
 @AllArgsConstructor
@@ -42,8 +42,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
 
     private final ChannelAppRestService channelRestService;
 
-    @Operation(summary = "查询组织下的渠道应用", description = "根据组织ID查询渠道应用列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Channel Apps by Organization", description = "Retrieve channel app list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
     @GetMapping("/query/org")
@@ -56,8 +56,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
-    @Operation(summary = "查询用户下的渠道应用", description = "根据用户ID查询渠道应用列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Channel Apps by User", description = "Retrieve channel app list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
     @GetMapping({ "/query", "/query/user" })
@@ -70,8 +70,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
-    @Operation(summary = "查询指定渠道应用", description = "根据UID查询渠道应用详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Channel App by UID", description = "Retrieve channel app details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
     @GetMapping("/query/uid")
@@ -84,8 +84,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @Operation(summary = "创建渠道应用", description = "创建新的渠道应用")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Channel App", description = "Create a new channel app")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
     @PostMapping("/create")
@@ -98,8 +98,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @Operation(summary = "更新渠道应用", description = "更新渠道应用信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Channel App", description = "Update channel app information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ChannelAppResponse.class)))
     @PostMapping("/update")
@@ -112,8 +112,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
-    @Operation(summary = "删除渠道应用", description = "删除指定的渠道应用")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Channel App", description = "Delete the specified channel app")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
     @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_DELETE)
     @Override
@@ -124,8 +124,8 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出渠道应用", description = "导出渠道应用数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Channel Apps", description = "Export channel app data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     @GetMapping("/export")
     @PreAuthorize(ChannelAppPermissions.HAS_CHANNEL_APP_EXPORT)

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +36,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "关键词回复管理", description = "关键词回复管理相关接口")
+@Tag(name = "Keyword Auto Reply Management", description = "Keyword auto reply management APIs")
 @RestController
 @RequestMapping("/api/v1/autoreply/keyword")
 @AllArgsConstructor
@@ -43,13 +44,14 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
 
     private final AutoReplyKeywordRestService keywordRestService;
 
-    @Operation(summary = "查询组织下的关键词回复", description = "根据组织ID查询关键词回复列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Keyword Auto Replies by Organization", description = "Query the list of keyword auto replies by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_READ)
-    @ActionAnnotation(title = "关键词回复", action = "组织查询", description = "query autoReplyKeyword by org")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query autoReplyKeyword by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(AutoReplyKeywordRequest request) {
         
         Page<AutoReplyKeywordResponse> page = keywordRestService.queryByOrg(request);
@@ -57,13 +59,14 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的关键词回复", description = "根据用户ID查询关键词回复列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Keyword Auto Replies by User", description = "Query the list of keyword auto replies by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_READ)
-    @ActionAnnotation(title = "关键词回复", action = "用户查询", description = "query autoReplyKeyword by user")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query autoReplyKeyword by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(AutoReplyKeywordRequest request) {
         
         Page<AutoReplyKeywordResponse> page = keywordRestService.queryByUser(request);
@@ -71,13 +74,14 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "创建关键词回复", description = "创建新的关键词回复")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Keyword Auto Reply", description = "Create a new keyword auto reply")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_CREATE)
-    @ActionAnnotation(title = "关键词回复", action = "新建", description = "create autoReplyKeyword")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_CREATE, description = "create autoReplyKeyword")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody AutoReplyKeywordRequest request) {
         
         AutoReplyKeywordResponse response = keywordRestService.create(request);
@@ -85,13 +89,14 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "更新关键词回复", description = "更新关键词回复信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Keyword Auto Reply", description = "Update keyword auto reply information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_UPDATE)
-    @ActionAnnotation(title = "关键词回复", action = "更新", description = "update autoReplyKeyword")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_UPDATE, description = "update autoReplyKeyword")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody AutoReplyKeywordRequest request) {
         
         AutoReplyKeywordResponse response = keywordRestService.update(request);
@@ -99,11 +104,12 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "删除关键词回复", description = "删除指定的关键词回复")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Keyword Auto Reply", description = "Delete the specified keyword auto reply")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_DELETE)
-    @ActionAnnotation(title = "关键词回复", action = "删除", description = "delete autoReplyKeyword")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_DELETE, description = "delete autoReplyKeyword")
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody AutoReplyKeywordRequest request) {
 
         keywordRestService.delete(request);
@@ -111,12 +117,12 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
-    @Operation(summary = "启用关键词回复", description = "启用或禁用关键词回复")
-    @ApiResponse(responseCode = "200", description = "操作成功",
+    @Operation(summary = "Enable Keyword Auto Reply", description = "Enable or disable keyword auto replies")
+    @ApiResponse(responseCode = "200", description = "Operation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AutoReplyKeywordResponse.class)))
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_UPDATE)
-    @ActionAnnotation(title = "关键词回复", action = "启用", description = "enable autoReplyKeyword")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_ENABLE, description = "enable autoReplyKeyword")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody AutoReplyKeywordRequest request) {
         
@@ -125,10 +131,10 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "导出关键词回复", description = "导出关键词回复数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Keyword Auto Replies", description = "Export keyword auto reply data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(AutoReplyKeywordPermissions.HAS_AUTO_REPLY_KEYWORD_EXPORT)
-    @ActionAnnotation(title = "关键词回复", action = "导出", description = "export autoReplyKeyword")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_EXPORT, description = "export autoReplyKeyword")
     @GetMapping("/export")
     public Object export(AutoReplyKeywordRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -136,7 +142,7 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
             response,
             keywordRestService,
             AutoReplyKeywordExcel.class,
-            "关键词",
+            "Keyword",
             "auto_reply-keyword"
         );
     }

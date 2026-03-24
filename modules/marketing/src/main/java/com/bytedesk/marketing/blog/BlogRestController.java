@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Description;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +43,11 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
 
     private final BlogRestService blogRestService;
 
-    @ActionAnnotation(title = "Blog", action = "组织查询", description = "query blog by org")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query blog by org")
     @Operation(summary = "Query Blogs by Organization", description = "Retrieve blogs for the current organization")
     @PreAuthorize(BlogPermissions.HAS_BLOG_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(BlogRequest request) {
         
         Page<BlogResponse> blogs = blogRestService.queryByOrg(request);
@@ -51,10 +55,11 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
         return ResponseEntity.ok(JsonResult.success(blogs));
     }
 
-    @ActionAnnotation(title = "Blog", action = "用户查询", description = "query blog by user")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query blog by user")
     @Operation(summary = "Query Blogs by User", description = "Retrieve blogs for the current user")
     @PreAuthorize(BlogPermissions.HAS_BLOG_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(BlogRequest request) {
         
         Page<BlogResponse> blogs = blogRestService.queryByUser(request);
@@ -62,10 +67,11 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
         return ResponseEntity.ok(JsonResult.success(blogs));
     }
 
-    @ActionAnnotation(title = "Blog", action = "查询详情", description = "query blog by uid")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query blog by uid")
     @Operation(summary = "Query Blog by UID", description = "Retrieve a specific blog by its unique identifier")
     @PreAuthorize(BlogPermissions.HAS_BLOG_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(BlogRequest request) {
         
         BlogResponse blog = blogRestService.queryByUid(request);
@@ -73,41 +79,44 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
         return ResponseEntity.ok(JsonResult.success(blog));
     }
 
-    @ActionAnnotation(title = "Blog", action = "新建", description = "create blog")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_CREATE, description = "create blog")
     @Operation(summary = "Create Blog", description = "Create a new blog")
     @Override
     @PreAuthorize(BlogPermissions.HAS_BLOG_CREATE)
     @Idempotent(ttlSeconds = 120)
-    public ResponseEntity<?> create(BlogRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody BlogRequest request) {
         
         BlogResponse blog = blogRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(blog));
     }
 
-    @ActionAnnotation(title = "Blog", action = "更新", description = "update blog")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_UPDATE, description = "update blog")
     @Operation(summary = "Update Blog", description = "Update an existing blog")
     @Override
     @PreAuthorize(BlogPermissions.HAS_BLOG_UPDATE)
-    public ResponseEntity<?> update(BlogRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody BlogRequest request) {
         
         BlogResponse blog = blogRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(blog));
     }
 
-    @ActionAnnotation(title = "Blog", action = "删除", description = "delete blog")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_DELETE, description = "delete blog")
     @Operation(summary = "Delete Blog", description = "Delete a blog")
     @Override
     @PreAuthorize(BlogPermissions.HAS_BLOG_DELETE)
-    public ResponseEntity<?> delete(BlogRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody BlogRequest request) {
         
         blogRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Blog", action = "导出", description = "export blog")
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_EXPORT, description = "export blog")
     @Operation(summary = "Export Blogs", description = "Export blogs to Excel format")
     @Override
     @PreAuthorize(BlogPermissions.HAS_BLOG_EXPORT)

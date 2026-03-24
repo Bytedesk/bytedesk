@@ -20,12 +20,15 @@ import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,9 +45,10 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
 
     private final ConnectionRestService connectionRestService;
 
-    @ActionAnnotation(title = "Connection", action = "组织查询", description = "query connection by org")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query connection by org")
     @Operation(summary = "Query Connections by Organization", description = "Retrieve connections for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(ConnectionRequest request) {
         
         Page<ConnectionResponse> connections = connectionRestService.queryByOrg(request);
@@ -52,9 +56,10 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
-    @ActionAnnotation(title = "Connection", action = "用户查询", description = "query connection by user")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query connection by user")
     @Operation(summary = "Query Connections by User", description = "Retrieve connections for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(ConnectionRequest request) {
         
         Page<ConnectionResponse> connections = connectionRestService.queryByUser(request);
@@ -62,9 +67,10 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
-    @ActionAnnotation(title = "Connection", action = "查询详情", description = "query connection by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query connection by uid")
     @Operation(summary = "Query Connection by UID", description = "Retrieve a specific connection by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(ConnectionRequest request) {
         
         ConnectionResponse connection = connectionRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "Connection", action = "新建", description = "create connection")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_CREATE, description = "create connection")
     @Operation(summary = "Create Connection", description = "Create a new connection")
     @Override
     // @PreAuthorize("hasAuthority('CONNECTION_CREATE')")
-    public ResponseEntity<?> create(ConnectionRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ConnectionRequest request) {
         
         ConnectionResponse connection = connectionRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "Connection", action = "更新", description = "update connection")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_UPDATE, description = "update connection")
     @Operation(summary = "Update Connection", description = "Update an existing connection")
     @Override
     // @PreAuthorize("hasAuthority('CONNECTION_UPDATE')")
-    public ResponseEntity<?> update(ConnectionRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody ConnectionRequest request) {
         
         ConnectionResponse connection = connectionRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(connection));
     }
 
-    @ActionAnnotation(title = "Connection", action = "删除", description = "delete connection")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_DELETE, description = "delete connection")
     @Operation(summary = "Delete Connection", description = "Delete a connection")
     @Override
     // @PreAuthorize("hasAuthority('CONNECTION_DELETE')")
-    public ResponseEntity<?> delete(ConnectionRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody ConnectionRequest request) {
         
         connectionRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Connection", action = "导出", description = "export connection")
+    @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_EXPORT, description = "export connection")
     @Operation(summary = "Export Connections", description = "Export connections to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('CONNECTION_EXPORT')")
@@ -121,7 +130,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         );
     }
 
-    // @ActionAnnotation(title = "在线", action = "查询", description = "presence by user")
+    // @ActionAnnotation(title = "Connection", action = "Query", description = "presence by user")
     @Operation(summary = "Get Presence", description = "Get user's online presence and active connection count")
     @GetMapping("/presence/{userUid}")
     public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
@@ -131,7 +140,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(presence));
     }
 
-    // @ActionAnnotation(title = "在线", action = "查询", description = "active connections by user")
+    // @ActionAnnotation(title = "Connection", action = "Query", description = "active connections by user")
     @Operation(summary = "List Active Connections", description = "List user's active (non-expired) connections")
     @GetMapping("/presence/{userUid}/list")
     public ResponseEntity<?> listActiveConnections(@PathVariable("userUid") String userUid) {

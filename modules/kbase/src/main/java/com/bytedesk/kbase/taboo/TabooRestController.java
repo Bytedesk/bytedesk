@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +40,10 @@ public class TabooRestController extends BaseRestController<TabooRequest, TabooR
 
     private final TabooRestService tabooRestService;
 
-    @ActionAnnotation(title = "敏感词", action = "组织查询", description = "query taboo by org")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query taboo by org")
     @Operation(summary = "Query Taboo by Organization", description = "Retrieve taboo words for the current organization")
     @PreAuthorize(TabooPermissions.HAS_TABOO_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TabooRequest request) {
         
@@ -50,9 +52,10 @@ public class TabooRestController extends BaseRestController<TabooRequest, TabooR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "敏感词", action = "用户查询", description = "query taboo by user")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query taboo by user")
     @Operation(summary = "Query Taboo by User", description = "Retrieve taboo words for the current user")
     @PreAuthorize(TabooPermissions.HAS_TABOO_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(TabooRequest request) {
         
@@ -61,9 +64,10 @@ public class TabooRestController extends BaseRestController<TabooRequest, TabooR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "敏感词", action = "查询详情", description = "query taboo by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query taboo by uid")
     @Operation(summary = "Query Taboo by UID", description = "Retrieve a specific taboo word by its unique identifier")
     @PreAuthorize(TabooPermissions.HAS_TABOO_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TabooRequest request) {
         
@@ -72,40 +76,43 @@ public class TabooRestController extends BaseRestController<TabooRequest, TabooR
         return ResponseEntity.ok(JsonResult.success(taboo));
     }
 
-    @ActionAnnotation(title = "敏感词", action = "新建", description = "create taboo")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_CREATE, description = "create taboo")
     @Operation(summary = "Create Taboo", description = "Create a new taboo word")
     @PreAuthorize(TabooPermissions.HAS_TABOO_CREATE)
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(TabooRequest request) {
+    public ResponseEntity<?> create(@RequestBody TabooRequest request) {
         
         TabooResponse taboo = tabooRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(taboo));
     }
 
-    @ActionAnnotation(title = "敏感词", action = "更新", description = "update taboo")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_UPDATE, description = "update taboo")
     @Operation(summary = "Update Taboo", description = "Update an existing taboo word")
     @PreAuthorize(TabooPermissions.HAS_TABOO_UPDATE)
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(TabooRequest request) {
+    public ResponseEntity<?> update(@RequestBody TabooRequest request) {
         
         TabooResponse taboo = tabooRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(taboo));
     }
 
-    @ActionAnnotation(title = "敏感词", action = "删除", description = "delete taboo")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_DELETE, description = "delete taboo")
     @Operation(summary = "Delete Taboo", description = "Delete a taboo word")
     @PreAuthorize(TabooPermissions.HAS_TABOO_DELETE)
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(TabooRequest request) {
+    public ResponseEntity<?> delete(@RequestBody TabooRequest request) {
         
         tabooRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
     
-    @ActionAnnotation(title = "敏感词", action = "启用", description = "enable taboo")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_ENABLE, description = "enable taboo")
     @Operation(summary = "Enable Taboo", description = "Enable a taboo word")
     @PreAuthorize(TabooPermissions.HAS_TABOO_UPDATE)
     @PostMapping("/enable")
@@ -116,7 +123,7 @@ public class TabooRestController extends BaseRestController<TabooRequest, TabooR
         return ResponseEntity.ok(JsonResult.success(taboo));
     }
     
-    @ActionAnnotation(title = "敏感词", action = "导出", description = "export taboo")
+    @ActionAnnotation(title = I18Consts.I18N_TABOO, action = I18Consts.I18N_ACTION_EXPORT, description = "export taboo")
     @Operation(summary = "Export Taboo", description = "Export taboo words to Excel format")
     @PreAuthorize(TabooPermissions.HAS_TABOO_EXPORT)
     @Override

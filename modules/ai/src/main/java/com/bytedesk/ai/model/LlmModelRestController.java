@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "LLM模型管理", description = "LLM模型管理相关接口")
+@Tag(name = "LLM Model Management", description = "LLM model management APIs")
 @RestController
 @RequestMapping("/api/v1/model")
 @AllArgsConstructor
@@ -40,8 +40,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
 
     private final LlmModelRestService llmModelRestService;
 
-    @Operation(summary = "查询组织下的LLM模型", description = "根据组织ID查询LLM模型列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Models by Organization", description = "Retrieve LLM model list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmModelResponse.class)))
     @Override
@@ -52,8 +52,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "查询用户下的LLM模型", description = "根据用户ID查询LLM模型列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Models by User", description = "Retrieve LLM model list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmModelResponse.class)))
     @Override
@@ -64,8 +64,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "查询指定LLM模型", description = "根据UID查询LLM模型详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query LLM Model by UID", description = "Retrieve LLM model details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmModelResponse.class)))
     @Override
@@ -76,8 +76,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "创建LLM模型", description = "创建新的LLM模型")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create LLM Model", description = "Create a new LLM model")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmModelResponse.class)))
     @Override
@@ -88,8 +88,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "更新LLM模型", description = "更新LLM模型信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update LLM Model", description = "Update LLM model information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmModelResponse.class)))
     @Override
@@ -100,8 +100,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "删除LLM模型", description = "删除指定的LLM模型")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete LLM Model", description = "Delete the specified LLM model")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
     public ResponseEntity<?> delete(LlmModelRequest request) {
         
@@ -110,8 +110,8 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出LLM模型", description = "导出LLM模型数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export LLM Models", description = "Export LLM model data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     public Object export(LlmModelRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

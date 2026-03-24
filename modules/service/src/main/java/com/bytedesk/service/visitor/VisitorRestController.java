@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +39,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "访客管理", description = "访客管理相关接口")
+@Tag(name = "Visitor Management", description = "Visitor management APIs")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -48,9 +49,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
 
     private final VisitorRestService visitorRestService;
 
-    @ActionAnnotation(title = "访客", action = "组织查询", description = "query visitor by org")
-    @Operation(summary = "查询组织下的访客", description = "根据组织ID查询访客列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query visitor by org")
+    @Operation(summary = "Query Visitors by Organization", description = "Retrieve visitor list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
@@ -63,9 +64,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "访客", action = "用户查询", description = "query visitor by user")
-    @Operation(summary = "查询用户下的访客", description = "根据用户ID查询访客列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query visitor by user")
+    @Operation(summary = "Query Visitors by User", description = "Retrieve visitor list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
@@ -78,9 +79,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @ActionAnnotation(title = "访客", action = "查询详情", description = "query visitor by uid")
-    @Operation(summary = "查询指定访客", description = "根据UID查询访客详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query visitor by uid")
+    @Operation(summary = "Query Visitor by UID", description = "Retrieve visitor details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
@@ -93,9 +94,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @ActionAnnotation(title = "访客", action = "查询详情", description = "query visitor by visitorUid")
-    @Operation(summary = "根据 visitorUid 查询访客", description = "根据 visitorUid + orgUid 查询访客详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_QUERY_VISITOR_UID, description = "query visitor by visitorUid")
+    @Operation(summary = "Query Visitor by visitorUid", description = "Retrieve visitor details by visitorUid and orgUid")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
@@ -107,9 +108,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @ActionAnnotation(title = "访客", action = "新建", description = "create visitor")
-    @Operation(summary = "创建访客", description = "创建新的访客")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_CREATE, description = "create visitor")
+    @Operation(summary = "Create Visitor", description = "Create a new visitor")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_CREATE)
@@ -122,9 +123,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @ActionAnnotation(title = "访客", action = "更新", description = "update visitor")
-    @Operation(summary = "更新访客", description = "更新访客信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_UPDATE, description = "update visitor")
+    @Operation(summary = "Update Visitor", description = "Update visitor information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
@@ -138,9 +139,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     }
 
     // update tagList
-    @ActionAnnotation(title = "访客", action = "更新标签", description = "update visitor tagList")
-    @Operation(summary = "更新访客标签", description = "更新访客的标签列表")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_UPDATE_TAG_LIST, description = "update visitor tagList")
+    @Operation(summary = "Update Visitor Tag List", description = "Update the visitor tag list")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
@@ -152,9 +153,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success(visitorResponse));
     }
 
-    @ActionAnnotation(title = "访客", action = "删除", description = "delete visitor")
-    @Operation(summary = "删除访客", description = "删除指定的访客")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_DELETE, description = "delete visitor")
+    @Operation(summary = "Delete Visitor", description = "Delete the specified visitor")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_DELETE)
     @PostMapping("/delete")
     @Override
@@ -165,9 +166,9 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success("delete success"));
     }
 
-    @ActionAnnotation(title = "访客", action = "导出", description = "export visitor")
-    @Operation(summary = "导出访客", description = "导出访客数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_EXPORT, description = "export visitor")
+    @Operation(summary = "Export Visitors", description = "Export visitor data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_EXPORT)
     @GetMapping("/export")
     @Override

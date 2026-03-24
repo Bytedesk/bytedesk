@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +42,11 @@ public class FeedbackSettingsRestController extends BaseRestController<FeedbackS
 
     private final FeedbackSettingsRestService audioFileRestService;
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "组织查询", description = "query feedback_settings by org")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query feedback_settings by org")
     @Operation(summary = "Query FeedbackSettingss by Organization", description = "Retrieve feedback_settingss for the current organization")
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(FeedbackSettingsRequest request) {
         
         Page<FeedbackSettingsResponse> feedback_settingss = audioFileRestService.queryByOrg(request);
@@ -51,10 +54,11 @@ public class FeedbackSettingsRestController extends BaseRestController<FeedbackS
         return ResponseEntity.ok(JsonResult.success(feedback_settingss));
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "用户查询", description = "query feedback_settings by user")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query feedback_settings by user")
     @Operation(summary = "Query FeedbackSettingss by User", description = "Retrieve feedback_settingss for the current user")
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(FeedbackSettingsRequest request) {
         
         Page<FeedbackSettingsResponse> feedback_settingss = audioFileRestService.queryByUser(request);
@@ -62,10 +66,11 @@ public class FeedbackSettingsRestController extends BaseRestController<FeedbackS
         return ResponseEntity.ok(JsonResult.success(feedback_settingss));
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "查询详情", description = "query feedback_settings by uid")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query feedback_settings by uid")
     @Operation(summary = "Query FeedbackSettings by UID", description = "Retrieve a specific feedback_settings by its unique identifier")
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(FeedbackSettingsRequest request) {
         
         FeedbackSettingsResponse feedback_settings = audioFileRestService.queryByUid(request);
@@ -73,40 +78,43 @@ public class FeedbackSettingsRestController extends BaseRestController<FeedbackS
         return ResponseEntity.ok(JsonResult.success(feedback_settings));
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "新建", description = "create feedback_settings")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create feedback_settings")
     @Operation(summary = "Create FeedbackSettings", description = "Create a new feedback_settings")
     @Override
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_CREATE)
-    public ResponseEntity<?> create(FeedbackSettingsRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody FeedbackSettingsRequest request) {
         
         FeedbackSettingsResponse feedback_settings = audioFileRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(feedback_settings));
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "更新", description = "update feedback_settings")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update feedback_settings")
     @Operation(summary = "Update FeedbackSettings", description = "Update an existing feedback_settings")
     @Override
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_UPDATE)
-    public ResponseEntity<?> update(FeedbackSettingsRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody FeedbackSettingsRequest request) {
         
         FeedbackSettingsResponse feedback_settings = audioFileRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(feedback_settings));
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "删除", description = "delete feedback_settings")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete feedback_settings")
     @Operation(summary = "Delete FeedbackSettings", description = "Delete a feedback_settings")
     @Override
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_DELETE)
-    public ResponseEntity<?> delete(FeedbackSettingsRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody FeedbackSettingsRequest request) {
         
         audioFileRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "导出", description = "export feedback_settings")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_EXPORT, description = "export feedback_settings")
     @Operation(summary = "Export FeedbackSettingss", description = "Export feedback_settingss to Excel format")
     @Override
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_EXPORT)
@@ -122,10 +130,10 @@ public class FeedbackSettingsRestController extends BaseRestController<FeedbackS
         );
     }
 
-    @ActionAnnotation(title = "FeedbackSettings", action = "发布", description = "publish feedback_settings")
+    @ActionAnnotation(title = I18Consts.I18N_FEEDBACK_SETTINGS, action = I18Consts.I18N_ACTION_PUBLISH, description = "publish feedback_settings")
     @Operation(summary = "Publish FeedbackSettings", description = "Enable and publish a feedback settings template")
     @PreAuthorize(FeedbackSettingsPermissions.HAS_FEEDBACK_SETTINGS_UPDATE)
-    @RequestMapping("/publish")
+    @PostMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody FeedbackSettingsRequest request) {
         FeedbackSettingsResponse feedback_settings = audioFileRestService.publish(request.getUid());
         return ResponseEntity.ok(JsonResult.success(feedback_settings));

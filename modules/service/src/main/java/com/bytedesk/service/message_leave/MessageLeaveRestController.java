@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -35,15 +36,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/message/leave")
 @AllArgsConstructor
-@Tag(name = "留言消息管理", description = "留言消息管理相关接口")
+@Tag(name = "Leave Message Management", description = "Leave message management APIs")
 public class MessageLeaveRestController extends BaseRestController<MessageLeaveRequest, MessageLeaveRestService> {
 
     private final MessageLeaveRestService messageLeaveRestService;
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
-    @ActionAnnotation(title = "留言管理", action = "查询组织留言", description = "queryByOrg leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "queryByOrg leave message")
     @Override
-    @Operation(summary = "查询留言消息")
+    @Operation(summary = "Query Leave Messages")
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(MessageLeaveRequest request) {
 
@@ -53,9 +54,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
-    @ActionAnnotation(title = "留言管理", action = "查询用户留言", description = "queryByUser leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "queryByUser leave message")
     @Override
-    @Operation(summary = "查询用户留言消息")
+    @Operation(summary = "Query User Leave Messages")
     @GetMapping({ "/query", "/query/user" })
     public ResponseEntity<?> queryByUser(MessageLeaveRequest request) {
         
@@ -65,9 +66,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
-    @ActionAnnotation(title = "留言管理", action = "查询留言详情", description = "queryByUid leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "queryByUid leave message")
     @Override
-    @Operation(summary = "查询留言消息详情")
+    @Operation(summary = "Query Leave Message Details")
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(MessageLeaveRequest request) {
         
@@ -78,8 +79,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @GetMapping("/query/threads")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
-    @ActionAnnotation(title = "留言管理", action = "查询关联会话", description = "query threads by leave message")
-    @Operation(summary = "查询留言消息关联的会话")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_QUERY_RELATED_THREAD, description = "query threads by leave message")
+    @Operation(summary = "Query Threads Related to Leave Messages")
     public ResponseEntity<?> queryThreadsByLeaveMessage(MessageLeaveRequest request) {
         
         Page<ThreadResponse> page = messageLeaveRestService.queryThreadsByLeaveMessage(request);
@@ -89,8 +90,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @GetMapping("/count/pending")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_READ)
-    @ActionAnnotation(title = "留言管理", action = "查询待处理数量", description = "count pending leave messages")
-    @Operation(summary = "查询当前组织未处理的留言数量")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_COUNT_PENDING, description = "count pending leave messages")
+    @Operation(summary = "Count Pending Leave Messages in Current Organization")
     public ResponseEntity<?> countPendingByOrg(MessageLeaveRequest request) {
         
         long count = messageLeaveRestService.countPendingByOrg(request.getOrgUid());
@@ -99,9 +100,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_CREATE)
-    @ActionAnnotation(title = "留言管理", action = "创建留言", description = "create leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_CREATE, description = "create leave message")
     @Override
-    @Operation(summary = "创建留言消息")
+    @Operation(summary = "Create Leave Message")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
 
@@ -111,9 +112,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "更新留言", description = "update leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_UPDATE, description = "update leave message")
     @Override
-    @Operation(summary = "更新留言消息")
+    @Operation(summary = "Update Leave Message")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody MessageLeaveRequest request) {
 
@@ -124,8 +125,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/reply")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "回复留言", description = "reply leave message")
-    @Operation(summary = "回复留言消息")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_REPLY, description = "reply leave message")
+    @Operation(summary = "Reply to Leave Message")
     public ResponseEntity<?> reply(@RequestBody MessageLeaveRequest request) {
 
         MessageLeaveResponse response = messageLeaveRestService.reply(request);
@@ -135,8 +136,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/status/update")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "更新状态", description = "update leave message status")
-    @Operation(summary = "更新留言消息状态")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_UPDATE_MESSAGE_LEAVE_STATUS, description = "update leave message status")
+    @Operation(summary = "Update Leave Message Status")
     public ResponseEntity<?> updateStatus(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.updateStatus(request);
@@ -146,8 +147,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/read")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "标记已读", description = "mark leave message as read")
-    @Operation(summary = "标记留言消息为已读")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_MARK_AS_READ, description = "mark leave message as read")
+    @Operation(summary = "Mark Leave Message as Read")
     public ResponseEntity<?> markAsRead(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.markAsRead(request);
@@ -157,8 +158,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/transfer")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "转接留言", description = "transfer leave message")
-    @Operation(summary = "转接留言消息")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_TRANSFER, description = "transfer leave message")
+    @Operation(summary = "Transfer Leave Message")
     public ResponseEntity<?> transfer(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.transfer(request);
@@ -168,8 +169,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/close")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "关闭留言", description = "close leave message")
-    @Operation(summary = "关闭留言消息")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_CLOSE, description = "close leave message")
+    @Operation(summary = "Close Leave Message")
     public ResponseEntity<?> close(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.close(request);
@@ -179,8 +180,8 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @PostMapping("/spam")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_UPDATE)
-    @ActionAnnotation(title = "留言管理", action = "标记垃圾", description = "mark leave message as spam")
-    @Operation(summary = "标记留言消息为垃圾")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_MARK_AS_SPAM, description = "mark leave message as spam")
+    @Operation(summary = "Mark Leave Message as Spam")
     public ResponseEntity<?> markAsSpam(@RequestBody MessageLeaveRequest request) {
         
         MessageLeaveResponse response = messageLeaveRestService.markAsSpam(request);
@@ -189,9 +190,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
     }
 
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_DELETE)
-    @ActionAnnotation(title = "留言管理", action = "删除留言", description = "delete leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_DELETE, description = "delete leave message")
     @Override
-    @Operation(summary = "删除留言消息")
+    @Operation(summary = "Delete Leave Message")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody MessageLeaveRequest request) {
         
@@ -202,9 +203,9 @@ public class MessageLeaveRestController extends BaseRestController<MessageLeaveR
 
     @GetMapping("/export")
     @PreAuthorize(MessageLeavePermissions.HAS_MESSAGE_LEAVE_EXPORT)
-    @ActionAnnotation(title = "留言管理", action = "导出留言", description = "export leave message")
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_EXPORT, description = "export leave message")
     @Override
-    @Operation(summary = "导出留言消息")
+    @Operation(summary = "Export Leave Messages")
     public Object export(MessageLeaveRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,

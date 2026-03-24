@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260324-call-statistic-01-add-metric-code" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="metric_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="metric_code" type="varchar(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-02-add-metric-category" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="metric_category"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="metric_category" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-03-add-metric-scene" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="metric_scene"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="metric_scene" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-04-add-metric-unit" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="metric_unit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="metric_unit" type="varchar(32)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-05-add-metric-formula" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="metric_formula"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="metric_formula" type="varchar(1024)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-06-add-is-realtime" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="is_realtime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="is_realtime" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-07-add-is-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="is_enabled"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="is_enabled" type="boolean" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-08-add-sort-order" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic" columnName="sort_order"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic">
+            <column name="sort_order" type="int" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-09-add-agent-metric-code" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="metric_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="metric_code" type="varchar(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-10-add-agent-metric-category" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="metric_category"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="metric_category" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-11-add-agent-metric-scene" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="metric_scene"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="metric_scene" type="varchar(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-12-add-agent-metric-unit" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="metric_unit"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="metric_unit" type="varchar(32)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-13-add-agent-metric-formula" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="metric_formula"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="metric_formula" type="varchar(1024)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-14-add-agent-is-realtime" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="is_realtime"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="is_realtime" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-15-add-agent-is-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="is_enabled"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="is_enabled" type="boolean" defaultValueBoolean="true"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260324-call-statistic-16-add-agent-sort-order" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_statistic_agent"/>
+            <not>
+                <columnExists tableName="bytedesk_call_statistic_agent" columnName="sort_order"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_statistic_agent">
+            <column name="sort_order" type="int" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

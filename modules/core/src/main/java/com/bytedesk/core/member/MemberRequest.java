@@ -84,6 +84,9 @@ public class MemberRequest extends BaseRequest {
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 
 
+    @Builder.Default
+    private Set<String> allowedLoginPlatforms = new HashSet<>();
+
     @NotBlank
     private String deptUid;
 

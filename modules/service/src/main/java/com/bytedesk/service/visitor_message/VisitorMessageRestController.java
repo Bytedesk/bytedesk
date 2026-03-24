@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "访客消息管理", description = "访客消息管理相关接口")
+@Tag(name = "Visitor Message Management", description = "Visitor message management APIs")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor/message")
@@ -45,8 +45,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
     
     private final VisitorMessageRestService messageRestService;
 
-    @Operation(summary = "查询组织下的访客消息", description = "根据组织ID查询访客消息列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Visitor Messages by Organization", description = "Retrieve visitor message list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageResponse.class)))
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
@@ -59,8 +59,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的访客消息", description = "根据用户ID查询访客消息列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Visitor Messages by User", description = "Retrieve visitor message list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageResponse.class)))
     @GetMapping({ "/query", "/query/user" })
@@ -82,8 +82,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "查询指定访客消息", description = "根据UID查询访客消息详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Visitor Message by UID", description = "Retrieve visitor message details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageResponse.class)))
     @GetMapping("/query/uid")
@@ -103,8 +103,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "创建访客消息", description = "创建新的访客消息")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Visitor Message", description = "Create a new visitor message")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageResponse.class)))
     @PostMapping("/create")
@@ -115,8 +115,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
-    @Operation(summary = "更新访客消息", description = "更新访客消息信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Visitor Message", description = "Update visitor message information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MessageResponse.class)))
     @PostMapping("/update")
@@ -127,8 +127,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
-    @Operation(summary = "删除访客消息", description = "删除指定的访客消息")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Visitor Message", description = "Delete the specified visitor message")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
@@ -137,8 +137,8 @@ public class VisitorMessageRestController extends BaseRestController<MessageRequ
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
-    @Operation(summary = "导出访客消息", description = "导出访客消息数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Visitor Messages", description = "Export visitor message data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @GetMapping("/export")
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override

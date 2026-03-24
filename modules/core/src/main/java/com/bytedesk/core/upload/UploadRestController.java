@@ -15,7 +15,9 @@ package com.bytedesk.core.upload;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,11 +53,12 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 
 	private final UploadRestService uploadRestService;
 	
-	@Operation(summary = "查询组织下的文件", description = "根据组织ID查询文件列表")
-	@ApiResponse(responseCode = "200", description = "查询成功",
+	@Operation(summary = "Query Files by Organization", description = "Retrieve file list by organization ID")
+	@ApiResponse(responseCode = "200", description = "Query successful",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
 	@Override
+	@GetMapping("/query/org")
 	public ResponseEntity<?> queryByOrg(UploadRequest request) {
 
 		Page<UploadResponse> page = uploadRestService.queryByOrg(request);
@@ -62,11 +66,12 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 		return ResponseEntity.ok(JsonResult.success(page));
 	}
 
-	@Operation(summary = "查询用户下的文件", description = "根据用户ID查询文件列表")
-	@ApiResponse(responseCode = "200", description = "查询成功",
+	@Operation(summary = "Query Files by User", description = "Retrieve file list by user ID")
+	@ApiResponse(responseCode = "200", description = "Query successful",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
 	@Override
+	@GetMapping({"/query", "/query/user"})
 	public ResponseEntity<?> queryByUser(UploadRequest request) {
 		
 		Page<UploadResponse> page = uploadRestService.queryByUser(request);
@@ -74,11 +79,12 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 		return ResponseEntity.ok(JsonResult.success(page));
 	}
 
-	@Operation(summary = "查询指定文件", description = "根据UID查询文件详情")
-	@ApiResponse(responseCode = "200", description = "查询成功",
+	@Operation(summary = "Query File by UID", description = "Retrieve file details by UID")
+	@ApiResponse(responseCode = "200", description = "Query successful",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
 	@Override
+	@GetMapping("/query/uid")
 	public ResponseEntity<?> queryByUid(UploadRequest request) {
 		
 		UploadResponse response = uploadRestService.queryByUid(request);
@@ -86,35 +92,38 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
-	@Operation(summary = "创建文件记录", description = "创建新的文件记录")
-	@ApiResponse(responseCode = "200", description = "创建成功",
+	@Operation(summary = "Create File Record", description = "Create a new file record")
+	@ApiResponse(responseCode = "200", description = "Created successfully",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
 	@Override
-	public ResponseEntity<?> create(UploadRequest request) {
+	@PostMapping("/create")
+	public ResponseEntity<?> create(@RequestBody UploadRequest request) {
 		
 		UploadResponse response = uploadRestService.create(request);
 
 		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
-	@Operation(summary = "更新文件记录", description = "更新文件记录信息")
-	@ApiResponse(responseCode = "200", description = "更新成功",
+	@Operation(summary = "Update File Record", description = "Update file record information")
+	@ApiResponse(responseCode = "200", description = "Updated successfully",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
 	@Override
-	public ResponseEntity<?> update(UploadRequest request) {
+	@PostMapping("/update")
+	public ResponseEntity<?> update(@RequestBody UploadRequest request) {
 		
 		UploadResponse response = uploadRestService.update(request);
 		
 		return ResponseEntity.ok(JsonResult.success(response));
 	}
 
-	@Operation(summary = "删除文件", description = "删除指定的文件和记录")
-	@ApiResponse(responseCode = "200", description = "删除成功")
-	@ActionAnnotation(title = "上传", action = "删除", description = "delete upload")
+	@Operation(summary = "Delete File", description = "Delete the specified file and record")
+	@ApiResponse(responseCode = "200", description = "Deleted successfully")
+	@ActionAnnotation(title = I18Consts.I18N_UPLOAD, action = I18Consts.I18N_ACTION_DELETE, description = "delete upload")
 	@Override
-	public ResponseEntity<?> delete(UploadRequest request) {
+	@PostMapping("/delete")
+	public ResponseEntity<?> delete(@RequestBody UploadRequest request) {
 		// 更新数据库
 		uploadRestService.delete(request);
 		// 删除文件
@@ -123,9 +132,10 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
 		return ResponseEntity.ok(JsonResult.success("delete success"));
 	}
 
-	@Operation(summary = "导出文件记录", description = "导出文件记录数据")
-	@ApiResponse(responseCode = "200", description = "导出成功")
+	@Operation(summary = "Export File Records", description = "Export file record data")
+	@ApiResponse(responseCode = "200", description = "Export successful")
 	@Override
+	@GetMapping("/export")
 	public Object export(UploadRequest request, HttpServletResponse response) {
 		return exportTemplate(
             request,
@@ -137,14 +147,14 @@ public class UploadRestController extends BaseRestController<UploadRequest, Uplo
         );
 	}
 
-	@Operation(summary = "上传文件", description = "上传文件到服务器")
-	@ApiResponse(responseCode = "200", description = "上传成功",
+	@Operation(summary = "Upload File", description = "Upload a file to the server")
+	@ApiResponse(responseCode = "200", description = "Uploaded successfully",
 		content = @Content(mediaType = "application/json", 
 		schema = @Schema(implementation = UploadResponse.class)))
-	@ActionAnnotation(title = "上传", action = "新建", description = "upload File")
+	@ActionAnnotation(title = I18Consts.I18N_UPLOAD, action = I18Consts.I18N_ACTION_CREATE, description = "upload File")
 	@PostMapping("/file")
 	public ResponseEntity<?> uploadFile(
-		@Parameter(description = "要上传的文件", required = true) 
+		@Parameter(description = "The file to upload", required = true) 
 		@RequestParam("file") MultipartFile file, 
 		UploadRequest request) {
 	

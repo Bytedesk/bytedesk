@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.member;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -59,6 +60,15 @@ public class MemberResponse extends BaseResponse {
     private String telephone;
     
     private String status;
+
+    private Boolean forceLogout;
+
+    private String forceLogoutReason;
+
+    private ZonedDateTime forceLogoutAt;
+
+    @Builder.Default
+    private Set<String> allowedLoginPlatforms = new HashSet<>();
 
     private String deptUid;
 

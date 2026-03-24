@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class DocumentRestController extends BaseRestController<DocumentRequest, 
 
     private final DocumentRestService documentRestService;
 
-    @ActionAnnotation(title = "Document", action = "组织查询", description = "query document by org")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query document by org")
     @Operation(summary = "Query Documents by Organization", description = "Retrieve documents for the current organization")
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(DocumentRequest request) {
         
         Page<DocumentResponse> documents = documentRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class DocumentRestController extends BaseRestController<DocumentRequest, 
         return ResponseEntity.ok(JsonResult.success(documents));
     }
 
-    @ActionAnnotation(title = "Document", action = "用户查询", description = "query document by user")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query document by user")
     @Operation(summary = "Query Documents by User", description = "Retrieve documents for the current user")
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(DocumentRequest request) {
         
         Page<DocumentResponse> documents = documentRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class DocumentRestController extends BaseRestController<DocumentRequest, 
         return ResponseEntity.ok(JsonResult.success(documents));
     }
 
-    @ActionAnnotation(title = "Document", action = "查询详情", description = "query document by uid")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query document by uid")
     @Operation(summary = "Query Document by UID", description = "Retrieve a specific document by its unique identifier")
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(DocumentRequest request) {
         
         DocumentResponse document = documentRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class DocumentRestController extends BaseRestController<DocumentRequest, 
         return ResponseEntity.ok(JsonResult.success(document));
     }
 
-    @ActionAnnotation(title = "Document", action = "新建", description = "create document")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create document")
     @Operation(summary = "Create Document", description = "Create a new document")
     @Override
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_CREATE)
-    public ResponseEntity<?> create(DocumentRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody DocumentRequest request) {
         
         DocumentResponse document = documentRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(document));
     }
 
-    @ActionAnnotation(title = "Document", action = "更新", description = "update document")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update document")
     @Operation(summary = "Update Document", description = "Update an existing document")
     @Override
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_UPDATE)
-    public ResponseEntity<?> update(DocumentRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody DocumentRequest request) {
         
         DocumentResponse document = documentRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(document));
     }
 
-    @ActionAnnotation(title = "Document", action = "删除", description = "delete document")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete document")
     @Operation(summary = "Delete Document", description = "Delete a document")
     @Override
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_DELETE)
-    public ResponseEntity<?> delete(DocumentRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody DocumentRequest request) {
         
         documentRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Document", action = "导出", description = "export document")
+    @ActionAnnotation(title = I18Consts.I18N_DOCUMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export document")
     @Operation(summary = "Export Documents", description = "Export documents to Excel format")
     @Override
     @PreAuthorize(DocumentPermissions.HAS_DOCUMENT_EXPORT)

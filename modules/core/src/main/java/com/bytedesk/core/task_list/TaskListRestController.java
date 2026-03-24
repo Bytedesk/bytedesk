@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
 
     private final TaskListRestService taskListRestService;
 
-    @ActionAnnotation(title = "TaskList", action = "组织查询", description = "query task_list by org")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query task_list by org")
     @Operation(summary = "Query TaskLists by Organization", description = "Retrieve task_lists for the current organization")
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TaskListRequest request) {
         
         Page<TaskListResponse> task_lists = taskListRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
         return ResponseEntity.ok(JsonResult.success(task_lists));
     }
 
-    @ActionAnnotation(title = "TaskList", action = "用户查询", description = "query task_list by user")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query task_list by user")
     @Operation(summary = "Query TaskLists by User", description = "Retrieve task_lists for the current user")
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TaskListRequest request) {
         
         Page<TaskListResponse> task_lists = taskListRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
         return ResponseEntity.ok(JsonResult.success(task_lists));
     }
 
-    @ActionAnnotation(title = "TaskList", action = "查询详情", description = "query task_list by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query task_list by uid")
     @Operation(summary = "Query TaskList by UID", description = "Retrieve a specific task_list by its unique identifier")
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TaskListRequest request) {
         
         TaskListResponse task_list = taskListRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class TaskListRestController extends BaseRestController<TaskListRequest, 
         return ResponseEntity.ok(JsonResult.success(task_list));
     }
 
-    @ActionAnnotation(title = "TaskList", action = "新建", description = "create task_list")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_CREATE, description = "create task_list")
     @Operation(summary = "Create TaskList", description = "Create a new task_list")
     @Override
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_CREATE)
-    public ResponseEntity<?> create(TaskListRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody TaskListRequest request) {
         
         TaskListResponse task_list = taskListRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(task_list));
     }
 
-    @ActionAnnotation(title = "TaskList", action = "更新", description = "update task_list")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_UPDATE, description = "update task_list")
     @Operation(summary = "Update TaskList", description = "Update an existing task_list")
     @Override
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_UPDATE)
-    public ResponseEntity<?> update(TaskListRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody TaskListRequest request) {
         
         TaskListResponse task_list = taskListRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(task_list));
     }
 
-    @ActionAnnotation(title = "TaskList", action = "删除", description = "delete task_list")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_DELETE, description = "delete task_list")
     @Operation(summary = "Delete TaskList", description = "Delete a task_list")
     @Override
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_DELETE)
-    public ResponseEntity<?> delete(TaskListRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody TaskListRequest request) {
         
         taskListRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "TaskList", action = "导出", description = "export task_list")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_LIST, action = I18Consts.I18N_ACTION_EXPORT, description = "export task_list")
     @Operation(summary = "Export TaskLists", description = "Export task_lists to Excel format")
     @Override
     @PreAuthorize(TaskListPermissions.HAS_TASK_LIST_EXPORT)

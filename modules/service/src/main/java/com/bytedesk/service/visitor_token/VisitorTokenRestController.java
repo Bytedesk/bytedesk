@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -102,7 +103,7 @@ public class VisitorTokenRestController extends BaseRestController<VisitorTokenR
 
     @PostMapping("/generate")
     @PreAuthorize(VisitorTokenPermissions.HAS_VISITOR_TOKEN_CREATE)
-    @ActionAnnotation(title = "用户", action = "generate_token", description = "Generate Access VisitorToken")
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Generate Access VisitorToken")
     public ResponseEntity<?> generateAccessVisitorToken(@RequestBody VisitorTokenRequest request) {
 
         String accessVisitorToken = tokenRestService.generateAccessVisitorToken(request);

@@ -89,5 +89,13 @@
     <include file="db/changelog/migration/260319_add_member_country.xml" />
     <include file="db/changelog/migration/260320_add_shop_edition_and_agent_seat_expiry.xml" />
     <include file="db/changelog/migration/260323_drop_meet_room_invite_uid_not_null.xml" />
+    <include file="db/changelog/migration/260323_update_destination_schema.xml" />
+    <include file="db/changelog/migration/260323_add_destination_country.xml" />
+    <include file="db/changelog/migration/260324_add_ivr_workflow_binding.xml" />
+    <include file="db/changelog/migration/260324_add_force_logout_flags.xml" />
+    <include file="db/changelog/migration/260324_add_member_allowed_login_platforms.xml" />
+    <include file="db/changelog/migration/260324_add_agent_country.xml" />
+    <include file="db/changelog/migration/260324_update_call_block_schema.xml" />
+    <include file="db/changelog/migration/260324_update_call_statistic_schema.xml" />
 
 </databaseChangeLog>

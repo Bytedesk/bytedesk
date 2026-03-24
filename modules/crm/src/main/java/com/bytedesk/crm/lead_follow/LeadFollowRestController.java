@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class LeadFollowRestController extends BaseRestController<LeadFollowReque
 
     private final LeadFollowRestService lead_followRestService;
 
-    @ActionAnnotation(title = "LeadFollow", action = "组织查询", description = "query lead_follow by org")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query lead_follow by org")
     @Operation(summary = "Query LeadFollows by Organization", description = "Retrieve lead_follows for the current organization")
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(LeadFollowRequest request) {
         
         Page<LeadFollowResponse> lead_follows = lead_followRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class LeadFollowRestController extends BaseRestController<LeadFollowReque
         return ResponseEntity.ok(JsonResult.success(lead_follows));
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "用户查询", description = "query lead_follow by user")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query lead_follow by user")
     @Operation(summary = "Query LeadFollows by User", description = "Retrieve lead_follows for the current user")
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(LeadFollowRequest request) {
         
         Page<LeadFollowResponse> lead_follows = lead_followRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class LeadFollowRestController extends BaseRestController<LeadFollowReque
         return ResponseEntity.ok(JsonResult.success(lead_follows));
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "查询详情", description = "query lead_follow by uid")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query lead_follow by uid")
     @Operation(summary = "Query LeadFollow by UID", description = "Retrieve a specific lead_follow by its unique identifier")
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(LeadFollowRequest request) {
         
         LeadFollowResponse lead_follow = lead_followRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class LeadFollowRestController extends BaseRestController<LeadFollowReque
         return ResponseEntity.ok(JsonResult.success(lead_follow));
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "新建", description = "create lead_follow")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_CREATE, description = "create lead_follow")
     @Operation(summary = "Create LeadFollow", description = "Create a new lead_follow")
     @Override
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_CREATE)
-    public ResponseEntity<?> create(LeadFollowRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody LeadFollowRequest request) {
         
         LeadFollowResponse lead_follow = lead_followRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(lead_follow));
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "更新", description = "update lead_follow")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_UPDATE, description = "update lead_follow")
     @Operation(summary = "Update LeadFollow", description = "Update an existing lead_follow")
     @Override
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_UPDATE)
-    public ResponseEntity<?> update(LeadFollowRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody LeadFollowRequest request) {
         
         LeadFollowResponse lead_follow = lead_followRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(lead_follow));
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "删除", description = "delete lead_follow")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_DELETE, description = "delete lead_follow")
     @Operation(summary = "Delete LeadFollow", description = "Delete a lead_follow")
     @Override
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_DELETE)
-    public ResponseEntity<?> delete(LeadFollowRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody LeadFollowRequest request) {
         
         lead_followRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "LeadFollow", action = "导出", description = "export lead_follow")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD_FOLLOW, action = I18Consts.I18N_ACTION_EXPORT, description = "export lead_follow")
     @Operation(summary = "Export LeadFollows", description = "Export lead_follows to Excel format")
     @Override
     @PreAuthorize(LeadFollowPermissions.HAS_LEAD_FOLLOW_EXPORT)
@@ -116,8 +125,8 @@ public class LeadFollowRestController extends BaseRestController<LeadFollowReque
             response,
             lead_followRestService,
             LeadFollowExcel.class,
-            "LeadFollow",
-            "lead_follow"
+            "线索跟进",
+            "lead-follow"
         );
     }
 

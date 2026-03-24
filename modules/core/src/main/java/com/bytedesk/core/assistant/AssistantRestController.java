@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/assistant")
-// @Tag(name = "assistant - 助手", description = "assistant apis")
+// @Tag(name = "Assistant Management", description = "Assistant APIs")
 @Description("Assistant Management Controller - AI assistant and chatbot management APIs")
 public class AssistantRestController extends BaseRestController<AssistantRequest, AssistantRestService> {
 

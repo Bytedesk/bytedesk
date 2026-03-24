@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class ScheduleRestController extends BaseRestController<ScheduleRequest, 
 
     private final ScheduleRestService scheduleRestService;
 
-    @ActionAnnotation(title = "Schedule", action = "组织查询", description = "query schedule by org")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query schedule by org")
     @Operation(summary = "Query Schedules by Organization", description = "Retrieve schedules for the current organization")
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(ScheduleRequest request) {
         
         Page<ScheduleResponse> schedules = scheduleRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class ScheduleRestController extends BaseRestController<ScheduleRequest, 
         return ResponseEntity.ok(JsonResult.success(schedules));
     }
 
-    @ActionAnnotation(title = "Schedule", action = "用户查询", description = "query schedule by user")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query schedule by user")
     @Operation(summary = "Query Schedules by User", description = "Retrieve schedules for the current user")
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(ScheduleRequest request) {
         
         Page<ScheduleResponse> schedules = scheduleRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class ScheduleRestController extends BaseRestController<ScheduleRequest, 
         return ResponseEntity.ok(JsonResult.success(schedules));
     }
 
-    @ActionAnnotation(title = "Schedule", action = "查询详情", description = "query schedule by uid")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query schedule by uid")
     @Operation(summary = "Query Schedule by UID", description = "Retrieve a specific schedule by its unique identifier")
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(ScheduleRequest request) {
         
         ScheduleResponse schedule = scheduleRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class ScheduleRestController extends BaseRestController<ScheduleRequest, 
         return ResponseEntity.ok(JsonResult.success(schedule));
     }
 
-    @ActionAnnotation(title = "Schedule", action = "新建", description = "create schedule")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_CREATE, description = "create schedule")
     @Operation(summary = "Create Schedule", description = "Create a new schedule")
     @Override
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_CREATE)
-    public ResponseEntity<?> create(ScheduleRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ScheduleRequest request) {
         
         ScheduleResponse schedule = scheduleRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(schedule));
     }
 
-    @ActionAnnotation(title = "Schedule", action = "更新", description = "update schedule")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_UPDATE, description = "update schedule")
     @Operation(summary = "Update Schedule", description = "Update an existing schedule")
     @Override
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_UPDATE)
-    public ResponseEntity<?> update(ScheduleRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody ScheduleRequest request) {
         
         ScheduleResponse schedule = scheduleRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(schedule));
     }
 
-    @ActionAnnotation(title = "Schedule", action = "删除", description = "delete schedule")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_DELETE, description = "delete schedule")
     @Operation(summary = "Delete Schedule", description = "Delete a schedule")
     @Override
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_DELETE)
-    public ResponseEntity<?> delete(ScheduleRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody ScheduleRequest request) {
         
         scheduleRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Schedule", action = "导出", description = "export schedule")
+    @ActionAnnotation(title = I18Consts.I18N_SCHEDULE, action = I18Consts.I18N_ACTION_EXPORT, description = "export schedule")
     @Operation(summary = "Export Schedules", description = "Export schedules to Excel format")
     @Override
     @PreAuthorize(SchedulePermissions.HAS_SCHEDULE_EXPORT)

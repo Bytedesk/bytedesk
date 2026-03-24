@@ -86,7 +86,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         // Avoid logging sensitive fields (password/passwordHash/passwordSalt)
         log.debug("login request: username={}, platform={}, channel={}, deviceUid={}",
@@ -215,7 +215,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
@@ -295,7 +295,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login email {}", authRequest.toString());
@@ -350,7 +350,7 @@ public class AuthController {
     }
 
     @PostMapping("/login/accessToken")
-    @ActionAnnotation(title = "auth", action = "login_accessToken", description = "Login With Access Token", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_ACCESS_TOKEN, description = "Login With Access Token", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithAccessToken(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("validate accessToken {}", authRequest.getAccessToken());
 

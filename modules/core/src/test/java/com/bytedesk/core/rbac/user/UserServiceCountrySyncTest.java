@@ -1,6 +1,7 @@
 package com.bytedesk.core.rbac.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +28,20 @@ import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.CountryCodeUtils;
 
+import jakarta.persistence.ManyToMany;
+
 class UserServiceCountrySyncTest {
+
+        @Test
+        void userOrganizationRolesShouldNotCascadeRoleRemoval() throws NoSuchFieldException {
+                ManyToMany annotation = UserOrganizationRoleEntity.class
+                                .getDeclaredField("roles")
+                                .getAnnotation(ManyToMany.class);
+
+                assertTrue(annotation != null);
+                assertFalse(java.util.Arrays.asList(annotation.cascade()).contains(jakarta.persistence.CascadeType.REMOVE));
+                assertFalse(java.util.Arrays.asList(annotation.cascade()).contains(jakarta.persistence.CascadeType.ALL));
+        }
 
     @Test
     void updateUserFromMemberShouldCopyCountryBeforeUpdatingRoles() {

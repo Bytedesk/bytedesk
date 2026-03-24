@@ -13,8 +13,21 @@
  */
 package com.bytedesk.core.message;
 
-import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.utils.MessageUtils;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +37,12 @@ import lombok.RequiredArgsConstructor;
 public class MessageService {
 
     private final MessagePersistCache messagePersistCache;
+
+    private final ThreadRestService threadRestService;
+
+    private final IMessageSendService messageSendService;
+
+    private final UidUtils uidUtils;
 
     public String processMessageJson(String messageJson, Boolean isRobot) {
 
@@ -48,6 +67,38 @@ public class MessageService {
         messagePersistCache.pushForPersist(messageJsonResult);
 
         return messageJsonResult;
+    }
+
+    public void sendForceLogoutMessage(UserEntity user, String orgUid, String sourceType, String sourceUid, String reason) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return;
+        }
+
+        ThreadEntity thread = getOrCreateSystemThread(user);
+        String content = JSON.toJSONString(Map.of(
+            "reason", StringUtils.hasText(reason) ? reason : I18Consts.I18N_FORCE_LOGOUT_REASON,
+                "sourceType", StringUtils.hasText(sourceType) ? sourceType : "UNKNOWN",
+                "sourceUid", StringUtils.hasText(sourceUid) ? sourceUid : "",
+                "action", "FORCE_LOGOUT"));
+
+        MessageProtobuf message = MessageUtils.createKickoffMessage(
+                uidUtils.getUid(),
+                thread.toProtobuf(),
+                orgUid,
+                content);
+        messageSendService.sendProtobufMessage(message);
+    }
+
+    private ThreadEntity getOrCreateSystemThread(UserEntity user) {
+        String topic = TopicUtils.getSystemTopic(user.getUid());
+        Optional<ThreadEntity> existing = threadRestService.findFirstByTopicAndOwner(topic, user);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        ThreadResponse created = threadRestService.createSystemNoticeAccountThread(user);
+        return threadRestService.findByUid(created.getUid())
+                .orElseThrow(() -> new RuntimeException("Failed to create system notice thread for user: " + user.getUid()));
     }
 
 

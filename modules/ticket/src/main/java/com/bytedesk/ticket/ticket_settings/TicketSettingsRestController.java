@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBatchBindRequest;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
@@ -49,8 +50,9 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
 
     private final TicketSettingsRestService ticketSettingsRestService;
 
-    @ActionAnnotation(title = "Ticket Settings", action = "组织查询", description = "query ticketSettings by org")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticketSettings by org")
     @Operation(summary = "Query TicketSettings by Organization", description = "Retrieve ticket settings for the current organization")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TicketSettingsRequest request) {
         
@@ -59,8 +61,9 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(ticketSettings));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "用户查询", description = "query ticketSettings by user")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query ticketSettings by user")
     @Operation(summary = "Query ticketSettings by User", description = "Retrieve ticketSettings for the current user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(TicketSettingsRequest request) {
         
@@ -69,8 +72,9 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(ticketSettings));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "查询详情", description = "query ticketSettings by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticketSettings by uid")
     @Operation(summary = "Query TicketSettings by UID", description = "Retrieve a specific ticketSettings by its unique identifier")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TicketSettingsRequest request) {
         
@@ -79,33 +83,36 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(ticketSettings));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "新建", description = "create ticketSettings")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create ticketSettings")
     @Operation(summary = "Create TicketSettings", description = "Create a new ticketSettings")
+    @PostMapping("/create")
     @Override
     // @PreAuthorize("hasAuthority('TICKET_SETTINGS_CREATE')")
-    public ResponseEntity<?> create(TicketSettingsRequest request) {
+    public ResponseEntity<?> create(@RequestBody TicketSettingsRequest request) {
         
         TicketSettingsResponse ticketSettings = ticketSettingsRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(ticketSettings));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "更新", description = "update ticketSettings")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update ticketSettings")
     @Operation(summary = "Update TicketSettings", description = "Update an existing ticketSettings")
+    @PostMapping("/update")
     @Override
     // @PreAuthorize("hasAuthority('TICKET_SETTINGS_UPDATE')")
-    public ResponseEntity<?> update(TicketSettingsRequest request) {
+    public ResponseEntity<?> update(@RequestBody TicketSettingsRequest request) {
         
         TicketSettingsResponse ticketSettings = ticketSettingsRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(ticketSettings));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "删除", description = "delete ticketSettings")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete ticketSettings")
     @Operation(summary = "Delete TicketSettings", description = "Delete a ticketSettings")
+    @PostMapping("/delete")
     @Override
     // @PreAuthorize("hasAuthority('TICKET_SETTINGS_DELETE')")
-    public ResponseEntity<?> delete(TicketSettingsRequest request) {
+    public ResponseEntity<?> delete(@RequestBody TicketSettingsRequest request) {
         if (request == null || request.getUid() == null) {
             return ResponseEntity.badRequest().body(JsonResult.error("uid is required"));
         }
@@ -117,7 +124,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "导出", description = "export ticketSettings")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_EXPORT, description = "export ticketSettings")
     @Operation(summary = "Export ticketSettings", description = "Export ticketSettings to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TICKET_SETTINGS_EXPORT')")
@@ -133,7 +140,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         );
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询", description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_BY_WORKGROUP, description = "通过 orgUid+workgroupUid 获取工单设置，若不存在返回默认模板")
     @Operation(summary = "Get TicketSettings by workgroup", description = "Get settings by orgUid and workgroupUid; returns defaults if missing")
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
     public ResponseEntity<?> getByWorkgroup(
@@ -146,7 +153,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组保存", description = "保存或更新指定工作组的工单设置(草稿)")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_SAVE_BY_WORKGROUP, description = "保存或更新指定工作组的工单设置(草稿)")
     @Operation(summary = "Save TicketSettings by workgroup", description = "Upsert ticket settings draft by orgUid+workgroupUid")
     @PostMapping("/orgs/{orgUid}/workgroups/{workgroupUid}")
         public ResponseEntity<?> saveByWorkgroup(
@@ -159,7 +166,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "发布", description = "发布当前工作组的工单草稿配置")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_PUBLISH, description = "发布当前工作组的工单草稿配置")
     @Operation(summary = "Publish TicketSettings", description = "Publish draft settings to active for given TicketSettings uid")
     @PostMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody TicketSettingsRequest request) {
@@ -170,7 +177,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组发布", description = "通过 orgUid+workgroupUid 发布草稿配置")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_PUBLISH_BY_WORKGROUP, description = "通过 orgUid+workgroupUid 发布草稿配置")
     @Operation(summary = "Publish TicketSettings by workgroup", description = "Publish draft settings for given orgUid+workgroupUid")
     @PostMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/publish")
     public ResponseEntity<?> publishByWorkgroup(
@@ -183,7 +190,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     }
 
     // ===== 新增：批量绑定工作组到指定 TicketSettings =====
-    @ActionAnnotation(title = "Ticket Settings", action = "批量绑定工作组", description = "将多个工作组绑定到同一套工单设置")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_BATCH_BIND_WORKGROUP, description = "将多个工作组绑定到同一套工单设置")
     @Operation(summary = "Bind workgroups to TicketSettings", description = "Bind multiple workgroups to one ticket settings instance")
     @PostMapping("/{uid}/orgs/{orgUid}/bindings")
     public ResponseEntity<?> bindWorkgroups(
@@ -198,7 +205,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     }
 
     // ===== 新增：查询某 TicketSettings 已绑定的工作组列表 =====
-    @ActionAnnotation(title = "Ticket Settings", action = "查询绑定工作组", description = "列出使用该工单设置的所有工作组")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_BIND_WORKGROUP, description = "列出使用该工单设置的所有工作组")
     @Operation(summary = "List bound workgroups", description = "List workgroups bound to the given ticket settings")
     @GetMapping("/bindings")
     public ResponseEntity<?> listBindings(TicketSettingsRequest request) {
@@ -209,7 +216,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
     }
 
     // ===== 新增：按工作组查询工单分类列表（供 admin 前端调用）=====
-    @ActionAnnotation(title = "Ticket Settings", action = "按工作组查询分类", description = "通过 orgUid+workgroupUid 获取工单分类列表")
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_CATEGORIES_BY_WORKGROUP, description = "通过 orgUid+workgroupUid 获取工单分类列表")
     @Operation(summary = "Get ticket categories by workgroup", description = "Get enabled ticket categories for given orgUid+workgroupUid")
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/categories")
     public ResponseEntity<?> getCategoriesByWorkgroup(
