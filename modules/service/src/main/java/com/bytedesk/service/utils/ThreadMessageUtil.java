@@ -132,6 +132,26 @@ public class ThreadMessageUtil {
         return message;
     }
 
+    public static MessageEntity getThreadWorkflowFormMessage(String content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .thread(thread)
+                .type(MessageTypeEnum.FORM.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
     /**
      * 结构化 WelcomeContent 的人工欢迎消息
      */

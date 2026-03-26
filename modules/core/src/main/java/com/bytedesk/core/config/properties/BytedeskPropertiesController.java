@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.config.properties;
 
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Configuration Properties", description = "Configuration properties management APIs for system settings")
 public class BytedeskPropertiesController {
 
+    private final Environment environment;
+
+    public BytedeskPropertiesController(Environment environment) {
+        this.environment = environment;
+    }
+
     // http://127.0.0.1:9003/config/bytedesk/properties
     @ApiRateLimiter(value = 1, timeout = 1)
     @Operation(summary = "Get Bytedesk Properties", description = "Retrieve Bytedesk system configuration properties")
@@ -37,6 +44,11 @@ public class BytedeskPropertiesController {
     public ResponseEntity<JsonResult<?>> getBytedeskProperties() {
 
         BytedeskPropertiesResponse bytedeskPropertiesResponse = ConvertUtils.convertToBytedeskPropertiesResponse(BytedeskProperties.getInstance());
+        if (bytedeskPropertiesResponse.getCustom() == null) {
+            bytedeskPropertiesResponse.setCustom(new BytedeskPropertiesResponse.Custom());
+        }
+        bytedeskPropertiesResponse.getCustom().setBndEnabled(
+                environment.getProperty("bytedesk.custom.bnd.enabled", Boolean.class, false));
         
         return ResponseEntity.ok(JsonResult.success(bytedeskPropertiesResponse));
     }

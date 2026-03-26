@@ -6,7 +6,18 @@
 
     <changeSet id="260324-01-add-member-force-logout-columns" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="bytedesk_team_member"/>
+            <and>
+                <tableExists tableName="bytedesk_team_member"/>
+                <not>
+                    <columnExists tableName="bytedesk_team_member" columnName="force_logout"/>
+                </not>
+                <not>
+                    <columnExists tableName="bytedesk_team_member" columnName="force_logout_reason"/>
+                </not>
+                <not>
+                    <columnExists tableName="bytedesk_team_member" columnName="force_logout_at"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_team_member">
             <column name="force_logout" type="BOOLEAN" defaultValueBoolean="false"/>
@@ -17,7 +28,18 @@
 
     <changeSet id="260324-02-add-agent-force-logout-columns" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <tableExists tableName="bytedesk_service_agent"/>
+            <and>
+                <tableExists tableName="bytedesk_service_agent"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent" columnName="force_logout"/>
+                </not>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent" columnName="force_logout_reason"/>
+                </not>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent" columnName="force_logout_at"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_agent">
             <column name="force_logout" type="BOOLEAN" defaultValueBoolean="false"/>

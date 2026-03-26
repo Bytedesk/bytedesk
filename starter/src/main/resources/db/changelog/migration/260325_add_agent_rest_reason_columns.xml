@@ -6,9 +6,12 @@
 
     <changeSet id="260325-add-agent-rest-reason-column" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_agent" columnName="rest_reason"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_agent"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent" columnName="rest_reason"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_agent">
             <column name="rest_reason" type="varchar(255)"/>
@@ -17,9 +20,12 @@
 
     <changeSet id="260325-add-agent-status-rest-reason-column" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_agent_status" columnName="rest_reason"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_agent_status"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_status" columnName="rest_reason"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_agent_status">
             <column name="rest_reason" type="varchar(255)"/>

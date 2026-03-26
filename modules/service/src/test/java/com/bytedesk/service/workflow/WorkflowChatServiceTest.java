@@ -6,13 +6,19 @@ package com.bytedesk.service.workflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -22,8 +28,16 @@ import org.modelmapper.ModelMapper;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.message.MessageEntity;
@@ -37,8 +51,12 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.core.workflow_variable.WorkflowVariableScopeEnum;
+import com.bytedesk.core.workflow_variable.WorkflowVariableService;
+import com.bytedesk.core.workflow_variable.WorkflowVariableTypeEnum;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class WorkflowChatServiceTest {
 
   @Mock
@@ -46,6 +64,12 @@ class WorkflowChatServiceTest {
 
   @Mock
   private MessageRestService messageRestService;
+
+  @Mock
+  private RestTemplate restTemplate;
+
+  @Mock
+  private WorkflowVariableService workflowVariableService;
 
   private WorkflowChatService workflowChatService;
 
@@ -60,9 +84,16 @@ class WorkflowChatServiceTest {
     setUidUtilsInstance(uidUtils);
     setApplicationContext(applicationContext);
 
-    workflowChatService = new WorkflowChatService(threadRestService, messageRestService);
+    workflowChatService = new WorkflowChatService(
+      threadRestService,
+      messageRestService,
+      restTemplate,
+      workflowVariableService);
     when(threadRestService.save(any(ThreadEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(messageRestService.save(any(MessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(workflowVariableService.getVariables(anyString())).thenReturn(new HashMap<>());
+    lenient().when(restTemplate.exchange(any(URI.class), any(HttpMethod.class), any(), eq(String.class)))
+      .thenReturn(ResponseEntity.ok("{}"));
   }
 
   @Test
@@ -122,6 +153,26 @@ class WorkflowChatServiceTest {
   }
 
   @Test
+  void continueAfterChoiceRoutesByDynamicChoicePort() {
+    WorkflowEntity workflow = buildWorkflow(choiceBranchWorkflowSchema());
+    ThreadEntity thread = buildThread();
+
+    workflowChatService.createStartMessage(workflow, thread);
+    Optional<MessageProtobuf> response = workflowChatService.continueAfterChoice(
+        workflow,
+        thread,
+        "option-agent");
+
+    assertThat(response).isPresent();
+    assertThat(response.get().getContent()).isEqualTo("已切换到人工客服分支");
+
+    ThreadExtra afterContinue = ThreadExtra.fromJson(thread.getExtra());
+    assertThat(afterContinue.getWorkflowCurrentNodeId()).isEqualTo("end-1");
+    assertThat(afterContinue.getWorkflowSelectedOptionValue()).isEqualTo("agent");
+    assertThat(afterContinue.getWorkflowCompleted()).isTrue();
+  }
+
+  @Test
   void messageAndQuestionNodesPauseWorkflowAsSeparateMessages() {
     WorkflowEntity workflow = buildWorkflow(messageQuestionConditionSchema());
     ThreadEntity thread = buildThread();
@@ -165,6 +216,76 @@ class WorkflowChatServiceTest {
     assertThat(extra.getWorkflowCompleted()).isTrue();
   }
 
+  @Test
+  void formNodePausesUntilSubmitThenContinuesWorkflow() {
+    WorkflowEntity workflow = buildWorkflow(formWorkflowSchema());
+    ThreadEntity thread = buildThread();
+
+    MessageProtobuf message = workflowChatService.createStartMessage(workflow, thread);
+
+    assertThat(message).isNotNull();
+    assertThat(String.valueOf(message.getType())).isEqualTo(MessageTypeEnum.FORM.name());
+    JSONObject formPayload = JSON.parseObject(message.getContent());
+    assertThat(formPayload.getString("formUid")).isEqualTo("form-1");
+    JSONArray formFields = JSON.parseArray(formPayload.getString("schema"));
+    assertThat(formFields).isNotNull();
+    assertThat(formFields.toJSONString()).contains("\"type\":\"upload\"");
+
+    ThreadExtra extra = ThreadExtra.fromJson(thread.getExtra());
+    assertThat(extra.getWorkflowWaitingFormNodeId()).isEqualTo("form-1");
+    assertThat(extra.getWorkflowCompleted()).isFalse();
+
+    List<MessageProtobuf> responses = workflowChatService.continueAfterFormMessages(
+        workflow,
+        thread,
+        "{\"name\":\"张三\"}");
+
+    assertThat(responses).hasSize(1);
+    assertThat(responses.get(0).getContent()).isEqualTo("表单已提交，继续后续流程");
+
+    ThreadExtra afterContinue = ThreadExtra.fromJson(thread.getExtra());
+    assertThat(afterContinue.getWorkflowWaitingFormNodeId()).isNull();
+    assertThat(afterContinue.getWorkflowFormResponseData()).isEqualTo("{\"name\":\"张三\"}");
+    assertThat(afterContinue.getWorkflowCurrentNodeId()).isEqualTo("end-1");
+    assertThat(afterContinue.getWorkflowCompleted()).isTrue();
+  }
+
+  @Test
+  void httpNodeExecutesAndWritesResponseMappingsIntoContextVariables() {
+    WorkflowEntity workflow = buildWorkflow(httpWorkflowSchema());
+    ThreadEntity thread = buildThread();
+
+    Map<String, Object> existingVariables = new HashMap<>();
+    existingVariables.put("orderId", "order-1001");
+    existingVariables.put("token", "token-abc");
+    when(workflowVariableService.getVariables("wf-1")).thenReturn(existingVariables);
+    when(restTemplate.exchange(any(URI.class), any(HttpMethod.class), any(), eq(String.class)))
+        .thenReturn(ResponseEntity.ok("{\"data\":{\"status\":\"SHIPPED\"}}"));
+
+    MessageProtobuf message = workflowChatService.createStartMessage(workflow, thread);
+
+    assertThat(message).isNotNull();
+    assertThat(message.getContent()).isEqualTo("订单状态：SHIPPED");
+
+    ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
+    verify(restTemplate).exchange(uriCaptor.capture(), eq(HttpMethod.GET), any(), eq(String.class));
+    assertThat(uriCaptor.getValue().toString())
+        .isEqualTo("https://api.example.com/orders/order-1001?visitorUid=visitor-1");
+
+    verify(workflowVariableService).setLocalVariable(
+        eq("wf-1"),
+        eq("http-1"),
+        eq("response"),
+        any(),
+        eq(WorkflowVariableTypeEnum.OBJECT));
+    verify(workflowVariableService).setVariable(
+        eq("wf-1"),
+        eq("orderStatus"),
+        eq("SHIPPED"),
+        eq(WorkflowVariableTypeEnum.STRING),
+        eq(WorkflowVariableScopeEnum.GLOBAL));
+  }
+
   private WorkflowEntity buildWorkflow(String schema) {
     return WorkflowEntity.builder()
         .uid("wf-1")
@@ -179,6 +300,12 @@ class WorkflowChatServiceTest {
     thread.setUid("thread-1");
     thread.setOrgUid("org-1");
     thread.setExtra(ThreadExtra.builder().build().toJson());
+    thread.setUser(UserProtobuf.builder()
+      .uid("visitor-1")
+      .nickname("访客A")
+      .type(UserTypeEnum.VISITOR.name())
+      .build()
+      .toJson());
     thread.setWorkflow(UserProtobuf.builder()
         .uid("wf-1")
         .nickname("默认流程")
@@ -350,6 +477,226 @@ class WorkflowChatServiceTest {
             },
             {
               "sourceNodeID": "text-handoff",
+              "targetNodeID": "end-1"
+            }
+          ]
+        }
+        """;
+  }
+
+  private String choiceBranchWorkflowSchema() {
+    return """
+        {
+          "nodes": [
+            {
+              "id": "start-1",
+              "type": "start",
+              "name": "开始"
+            },
+            {
+              "id": "choice-1",
+              "type": "choice",
+              "data": {
+                "content": "请选择服务类型",
+                "options": [
+                  {
+                    "id": "option-product",
+                    "label": "产品咨询",
+                    "value": "product"
+                  },
+                  {
+                    "id": "option-agent",
+                    "label": "人工客服",
+                    "value": "agent"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "text-product",
+              "type": "text",
+              "data": {
+                "content": "已切换到产品咨询分支"
+              }
+            },
+            {
+              "id": "text-agent",
+              "type": "text",
+              "data": {
+                "content": "已切换到人工客服分支"
+              }
+            },
+            {
+              "id": "end-1",
+              "type": "end",
+              "name": "结束"
+            }
+          ],
+          "edges": [
+            {
+              "sourceNodeID": "start-1",
+              "targetNodeID": "choice-1"
+            },
+            {
+              "sourceNodeID": "choice-1",
+              "targetNodeID": "text-product",
+              "sourcePortID": "choice-option-option-product"
+            },
+            {
+              "sourceNodeID": "choice-1",
+              "targetNodeID": "text-agent",
+              "sourcePortID": "choice-option-option-agent"
+            },
+            {
+              "sourceNodeID": "text-product",
+              "targetNodeID": "end-1"
+            },
+            {
+              "sourceNodeID": "text-agent",
+              "targetNodeID": "end-1"
+            }
+          ]
+        }
+        """;
+  }
+
+  private String formWorkflowSchema() {
+    return """
+        {
+          "nodes": [
+            {
+              "id": "start-1",
+              "type": "start",
+              "name": "开始"
+            },
+            {
+              "id": "form-1",
+              "type": "form",
+              "data": {
+                "title": "收集信息",
+                "content": "请填写以下内容后继续",
+                "formFields": [
+                  {
+                    "id": "name",
+                    "type": "input",
+                    "label": "姓名",
+                    "required": true
+                  },
+                  {
+                    "id": "need",
+                    "type": "select",
+                    "label": "咨询类型",
+                    "required": true,
+                    "options": ["产品咨询", "售后支持"]
+                  },
+                  {
+                    "id": "attachment",
+                    "type": "upload",
+                    "label": "上传附件",
+                    "required": false,
+                    "props": {
+                      "accept": ".png,.jpg,.pdf"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "text-1",
+              "type": "text",
+              "data": {
+                "content": "表单已提交，继续后续流程"
+              }
+            },
+            {
+              "id": "end-1",
+              "type": "end",
+              "name": "结束"
+            }
+          ],
+          "edges": [
+            {
+              "sourceNodeID": "start-1",
+              "targetNodeID": "form-1"
+            },
+            {
+              "sourceNodeID": "form-1",
+              "targetNodeID": "text-1"
+            },
+            {
+              "sourceNodeID": "text-1",
+              "targetNodeID": "end-1"
+            }
+          ]
+        }
+        """;
+  }
+
+  private String httpWorkflowSchema() {
+    return """
+        {
+          "nodes": [
+            {
+              "id": "start-1",
+              "type": "start",
+              "name": "开始"
+            },
+            {
+              "id": "http-1",
+              "type": "http",
+              "data": {
+                "method": "GET",
+                "url": "https://api.example.com/orders/{{orderId}}",
+                "headers": [
+                  {
+                    "id": "header-1",
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "enabled": true
+                  }
+                ],
+                "queryParams": [
+                  {
+                    "id": "query-1",
+                    "key": "visitorUid",
+                    "value": "{{visitorUid}}",
+                    "enabled": true
+                  }
+                ],
+                "responseType": "json",
+                "responseMappings": [
+                  {
+                    "id": "mapping-1",
+                    "key": "orderStatus",
+                    "path": "data.status"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "text-1",
+              "type": "text",
+              "data": {
+                "content": "订单状态：{{orderStatus}}"
+              }
+            },
+            {
+              "id": "end-1",
+              "type": "end",
+              "name": "结束"
+            }
+          ],
+          "edges": [
+            {
+              "sourceNodeID": "start-1",
+              "targetNodeID": "http-1"
+            },
+            {
+              "sourceNodeID": "http-1",
+              "targetNodeID": "text-1"
+            },
+            {
+              "sourceNodeID": "text-1",
               "targetNodeID": "end-1"
             }
           ]

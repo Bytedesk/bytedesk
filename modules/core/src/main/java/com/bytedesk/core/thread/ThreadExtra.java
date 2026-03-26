@@ -48,9 +48,13 @@ public class ThreadExtra extends BaseExtra {
 
     private String workflowWaitingQuestionNodeId;
 
+    private String workflowWaitingFormNodeId;
+
     private String workflowQuestionVariable;
 
     private String workflowQuestionAnswer;
+
+    private String workflowFormResponseData;
 
     private String workflowSelectedOptionValue;
 

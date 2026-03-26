@@ -65,7 +65,7 @@ public class WorkflowVariableService {
         // 根据类型设置值
         String valueStr = convertValueToString(value);
         variable.setValue(valueStr);
-        // variable.setType(type.name());
+        variable.setType(type != null ? type.name() : WorkflowVariableTypeEnum.STRING.name());
         
         // 保存变量
         return variableRepository.save(variable);
@@ -104,7 +104,7 @@ public class WorkflowVariableService {
         // 根据类型设置值
         String valueStr = convertValueToString(value);
         variable.setValue(valueStr);
-        // variable.setType(type.name());
+        variable.setType(type != null ? type.name() : WorkflowVariableTypeEnum.STRING.name());
         
         // 保存变量
         return variableRepository.save(variable);

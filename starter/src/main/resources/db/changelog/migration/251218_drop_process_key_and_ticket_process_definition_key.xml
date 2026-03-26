@@ -7,7 +7,10 @@
     <!-- 删除 ProcessEntity 中的 process_key 字段 -->
     <changeSet id="251218-drop-process-key" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_ticket_process" columnName="process_key"/>
+            <and>
+                <tableExists tableName="bytedesk_ticket_process"/>
+                <columnExists tableName="bytedesk_ticket_process" columnName="process_key"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_ticket_process" columnName="process_key"/>
     </changeSet>
@@ -15,7 +18,10 @@
     <!-- 删除 TicketEntity 中的 process_definition_key 字段 -->
     <changeSet id="251218-drop-ticket-process-definition-key" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_ticket" columnName="process_definition_key"/>
+            <and>
+                <tableExists tableName="bytedesk_ticket"/>
+                <columnExists tableName="bytedesk_ticket" columnName="process_definition_key"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_ticket" columnName="process_definition_key"/>
     </changeSet>

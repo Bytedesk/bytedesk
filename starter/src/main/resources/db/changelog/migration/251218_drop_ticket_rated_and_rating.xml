@@ -6,14 +6,20 @@
 
     <changeSet id="251218-drop-ticket-is-rated" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_ticket" columnName="is_rated"/>
+            <and>
+                <tableExists tableName="bytedesk_ticket"/>
+                <columnExists tableName="bytedesk_ticket" columnName="is_rated"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_ticket" columnName="is_rated"/>
     </changeSet>
 
     <changeSet id="251218-drop-ticket-rating" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_ticket" columnName="rating"/>
+            <and>
+                <tableExists tableName="bytedesk_ticket"/>
+                <columnExists tableName="bytedesk_ticket" columnName="rating"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_ticket" columnName="rating"/>
     </changeSet>

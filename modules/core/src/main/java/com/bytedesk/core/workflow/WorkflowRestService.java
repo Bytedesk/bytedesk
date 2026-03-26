@@ -16,7 +16,10 @@ package com.bytedesk.core.workflow;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.Cache;
+// import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,11 +42,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkflowRestService extends BaseRestService<WorkflowEntity, WorkflowRequest, WorkflowResponse> {
 
+    private static final String CACHE_WORKFLOW = "workflow";
+
     private final WorkflowRepository workflowRepository;
 
     private final ModelMapper modelMapper;
 
     private final UidUtils uidUtils;
+
+    // private final CacheManager cacheManager;
 
     private static final String DEFAULT_NICKNAME = WorkflowInitData.DEFAULT_WORKFLOW_NAME;
     private static final String DEFAULT_DESCRIPTION = WorkflowInitData.DEFAULT_WORKFLOW_DESCRIPTION;
@@ -58,7 +65,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return workflowRepository.findAll(spec, pageable);
     }
     
-    @Cacheable(value = "workflow", key = "#uid", unless="#result==null")
+    // @Cacheable(value = CACHE_WORKFLOW, key = "#uid", unless = "#result == null || #result.isEmpty()")
     @Override
     public Optional<WorkflowEntity> findByUid(String uid) {
         return workflowRepository.findByUid(uid);
@@ -76,6 +83,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         if (savedEntity == null) {
             throw new RuntimeException("Create workflow failed");
         }
+        refreshWorkflowCache(savedEntity);
         return convertToResponse(savedEntity);
     }
     
@@ -122,6 +130,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             if (savedEntity == null) {
                 throw new RuntimeException("Update workflow failed: saved entity is null");
             }
+            refreshWorkflowCache(savedEntity);
             log.debug("工作流更新成功，ID: {}, 新版本: {}", savedEntity.getId(), savedEntity.getVersion());
             return convertToResponse(savedEntity);
         } else {
@@ -134,6 +143,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return workflowRepository.save(entity);
     }
 
+    @CacheEvict(value = CACHE_WORKFLOW, key = "#uid")
     @Override
     public void deleteByUid(String uid) {
         Optional<WorkflowEntity> optional = findByUid(uid);
@@ -146,6 +156,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         }
     }
 
+    @CacheEvict(value = CACHE_WORKFLOW, key = "#request.uid")
     @Override
     public void delete(WorkflowRequest request) {
         deleteByUid(request.getUid());
@@ -239,8 +250,20 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         if (saved == null) {
             throw new RuntimeException("Initialize default workflow failed");
         }
+        refreshWorkflowCache(saved);
         log.info("Initialized default workflow for org: {}", orgUid);
         return convertToResponse(saved);
+    }
+
+    private void refreshWorkflowCache(WorkflowEntity entity) {
+        // if (entity == null || !StringUtils.hasText(entity.getUid()) || cacheManager == null) {
+        //     return;
+        // }
+        // Cache cache = cacheManager.getCache(CACHE_WORKFLOW);
+        // if (cache == null) {
+        //     return;
+        // }
+        // cache.put(entity.getUid(), entity);
     }
 
 

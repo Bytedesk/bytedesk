@@ -30,9 +30,17 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadExtra;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.core.workflow.WorkflowRestService;
+import com.bytedesk.service.workflow.WorkflowChatService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +58,10 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
     private final AuthService authService;
 
     private final MessageRestService messageRestService;
+
+    private final WorkflowRestService workflowRestService;
+
+    private final WorkflowChatService workflowChatService;
 
     @Override
     protected Specification<FormResultEntity> createSpecification(FormResultRequest request) {
@@ -119,6 +131,7 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
                         contentJson.put("formResultUid", savedEntity.getUid());
                         messageEntity.setContent(contentJson.toJSONString());
                         messageRestService.save(messageEntity);
+                        continueWorkflowIfNeeded(messageEntity, request);
                     }
                 } else {
                     log.warn("Form message not found, messageUid={}", request.getMessageUid());
@@ -130,6 +143,52 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
         }
 
         return convertToResponse(savedEntity);
+    }
+
+    private void continueWorkflowIfNeeded(MessageEntity messageEntity, FormResultRequest request) {
+        if (messageEntity == null || !MessageTypeEnum.FORM.name().equals(messageEntity.getType())) {
+            return;
+        }
+
+        ThreadEntity thread = messageEntity.getThread();
+        if (thread == null || !ThreadTypeEnum.WORKFLOW.name().equals(thread.getType())) {
+            return;
+        }
+
+        ThreadExtra extra = ThreadExtra.fromJson(thread.getExtra());
+        if (!StringUtils.hasText(extra.getWorkflowWaitingFormNodeId())) {
+            return;
+        }
+
+        String workflowUid = resolveWorkflowUid(thread);
+        if (!StringUtils.hasText(workflowUid)) {
+            return;
+        }
+
+        Optional<WorkflowEntity> workflowOptional = workflowRestService.findByUid(workflowUid);
+        if (!workflowOptional.isPresent()) {
+            return;
+        }
+
+        workflowChatService.continueAfterFormMessages(
+                workflowOptional.get(),
+                thread,
+                request.getFormData());
+    }
+
+    private String resolveWorkflowUid(ThreadEntity thread) {
+        if (thread == null) {
+            return null;
+        }
+        if (StringUtils.hasText(thread.getUserUid())) {
+            return thread.getUserUid();
+        }
+
+        UserProtobuf workflow = thread.getWorkflowProtobuf();
+        if (workflow != null && StringUtils.hasText(workflow.getUid())) {
+            return workflow.getUid();
+        }
+        return null;
     }
 
     @Transactional

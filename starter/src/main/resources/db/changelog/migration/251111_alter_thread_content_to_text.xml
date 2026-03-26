@@ -7,7 +7,10 @@
     <!-- 合并为单一变更：在支持 TEXT 的数据库（如 MySQL、MariaDB、PostgreSQL）统一将 content 修改为 TEXT -->
     <changeSet id="251111-alter-thread-content-to-text" author="jackning">
         <preConditions onFail="MARK_RAN" onError="HALT">
-            <columnExists tableName="bytedesk_core_thread" columnName="content" />
+            <and>
+                <tableExists tableName="bytedesk_core_thread" />
+                <columnExists tableName="bytedesk_core_thread" columnName="content" />
+            </and>
         </preConditions>
         <modifyDataType tableName="bytedesk_core_thread" columnName="content" newDataType="TEXT" />
         <rollback>

@@ -32,7 +32,8 @@ import com.bytedesk.core.quartz.job.QuartzOneMinJob;
 import static org.quartz.CronScheduleBuilder.*;
 
 /**
- * Cron使用方法：
+ * Cron expression references:
+ * Cron 表达式参考：
  * https://stackoverflow.com/questions/26147044/spring-cron-expression-for-every-day-101am
  * https://docs.spring.io/spring/docs/3.0.x/javadoc-api/org/springframework/scheduling/support/CronSequenceGenerator.html
  */
@@ -49,179 +50,183 @@ import static org.quartz.CronScheduleBuilder.*;
 // ? ("no specific value")
 
 /**
- * 分布式定时任务配置类
- * Distributed Quartz Job Configuration Class
+ * Quartz configuration for distributed scheduled jobs.
+ * 分布式定时任务的 Quartz 配置类。
  * 
  * <a href=
- * "https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-quartz.html">SpringBoot官方说明</a&gt;
+ * "https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-quartz.html">Spring
+ * Boot reference</a>
  * <a href=
- * "https://www.quartz-scheduler.org/documentation/2.3.1-SNAPSHOT/tutorials/index.html">Quartz官方文档</a&gt;
- * 
- * @Description:
- * @Version: 1.0
+ * "https://www.quartz-scheduler.org/documentation/2.3.1-SNAPSHOT/tutorials/index.html">Quartz
+ * documentation</a>
  */
 @Configuration
 public class QuartzConfig {
 
-    /**
-     * 每5秒钟运行一次
-     */
-    @Bean
-    public JobDetail fiveSecondJobJobDetail() {
-        return JobBuilder.newJob(QuartzFiveSecondJob.class)
-                .withIdentity("FiveSecondJob", "bytedesk")
-                .withDescription("run one 5 seconds")
-                .storeDurably()
-                .build();
-    }
+        /**
+         * Runs once every 5 seconds.
+         * 每 5 秒运行一次。
+         */
+        @Bean
+        public JobDetail fiveSecondJobJobDetail() {
+                return JobBuilder.newJob(QuartzFiveSecondJob.class)
+                                .withIdentity("FiveSecondJob", "bytedesk")
+                                .withDescription("run one 5 seconds")
+                                .storeDurably()
+                                .build();
+        }
 
-    @Bean
-    public Trigger fiveSecondJobTrigger() {
-        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
-                .simpleSchedule()
-                .withIntervalInSeconds(5)
-                .repeatForever();
-        return TriggerBuilder.newTrigger()
-                .forJob(fiveSecondJobJobDetail())
-                .withIdentity("fiveSecondJobTrigger", "bytedesk")
-                .withDescription("run once 5 seconds")
-                .withSchedule(scheduleBuilder)
-                .build();
-    }
+        @Bean
+        public Trigger fiveSecondJobTrigger() {
+                SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                                .simpleSchedule()
+                                .withIntervalInSeconds(5)
+                                .repeatForever();
+                return TriggerBuilder.newTrigger()
+                                .forJob(fiveSecondJobJobDetail())
+                                .withIdentity("fiveSecondJobTrigger", "bytedesk")
+                                .withDescription("run once 5 seconds")
+                                .withSchedule(scheduleBuilder)
+                                .build();
+        }
 
-    /**
-     * 每1分钟运行一次
-     */
-    @Bean
-    public JobDetail oneMinJobJobDetail() {
-            return JobBuilder.newJob(QuartzOneMinJob.class)
-                            .withIdentity("OneMinJob", "bytedesk")
-                            .withDescription("run once 1 minutes")
-                            .storeDurably()
-                            .build();
-    }
+        /**
+         * Runs once every minute.
+         * 每分钟运行一次。
+         */
+        @Bean
+        public JobDetail oneMinJobJobDetail() {
+                return JobBuilder.newJob(QuartzOneMinJob.class)
+                                .withIdentity("OneMinJob", "bytedesk")
+                                .withDescription("run once 1 minutes")
+                                .storeDurably()
+                                .build();
+        }
 
-    @Bean
-    public Trigger oneMinJobTrigger() {
-            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
-                            .simpleSchedule()
-                            .withIntervalInMinutes(1)
-                            .repeatForever();
-            return TriggerBuilder.newTrigger()
-                            .forJob(oneMinJobJobDetail())
-                            .withIdentity("oneMinJobTrigger", "bytedesk")
-                            .withDescription("run once 1")
-                            .withSchedule(scheduleBuilder)
-                            .build();
-    }
+        @Bean
+        public Trigger oneMinJobTrigger() {
+                SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                                .simpleSchedule()
+                                .withIntervalInMinutes(1)
+                                .repeatForever();
+                return TriggerBuilder.newTrigger()
+                                .forJob(oneMinJobJobDetail())
+                                .withIdentity("oneMinJobTrigger", "bytedesk")
+                                .withDescription("run once 1")
+                                .withSchedule(scheduleBuilder)
+                                .build();
+        }
 
-    /**
-     * 每5分钟运行一次
-     */
-    @Bean
-    public JobDetail fiveMinJobJobDetail() {
-        return JobBuilder.newJob(QuartzFiveMinJob.class)
-                .withIdentity("FiveMinJob", "bytedesk")
-                .withDescription("run once 5 minutes")
-                .storeDurably()
-                .build();
-    }
+        /**
+         * Runs once every 5 minutes.
+         * 每 5 分钟运行一次。
+         */
+        @Bean
+        public JobDetail fiveMinJobJobDetail() {
+                return JobBuilder.newJob(QuartzFiveMinJob.class)
+                                .withIdentity("FiveMinJob", "bytedesk")
+                                .withDescription("run once 5 minutes")
+                                .storeDurably()
+                                .build();
+        }
 
-    @Bean
-    public Trigger fiveMinJobTrigger() {
-            SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
-                            .simpleSchedule()
-                            .withIntervalInMinutes(5)
-                            .repeatForever();
-            return TriggerBuilder.newTrigger()
-                            .forJob(fiveMinJobJobDetail())
-                            .withIdentity("fiveMinJobTrigger", "bytedesk")
-                            .withDescription("run once 5 minutes")
-                            .withSchedule(scheduleBuilder)
-                            .build();
-    }
-    
-    
-    /**
-     * 每小时整点运行一次
-     */
-    @Bean
-    public JobDetail hourlyJobDetail() {
-        return JobBuilder.newJob(
-                QuartzHourlyJob.class)
-                .withIdentity("HourlyJob", "bytedesk")
-                .withDescription("run once every hour")
-                .storeDurably()
-                .build();
-    }
+        @Bean
+        public Trigger fiveMinJobTrigger() {
+                SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder
+                                .simpleSchedule()
+                                .withIntervalInMinutes(5)
+                                .repeatForever();
+                return TriggerBuilder.newTrigger()
+                                .forJob(fiveMinJobJobDetail())
+                                .withIdentity("fiveMinJobTrigger", "bytedesk")
+                                .withDescription("run once 5 minutes")
+                                .withSchedule(scheduleBuilder)
+                                .build();
+        }
 
-    @Bean
-    public Trigger hourlyTrigger() {
-        return TriggerBuilder.newTrigger().forJob(hourlyJobDetail())
-                .withIdentity("hourlyTrigger", "bytedesk")
-                .withDescription("run once every hour")
-                .withSchedule(cronSchedule("0 0 * * * ?"))
-                .build();
-    }
+        /**
+         * Runs at the top of every hour.
+         * 每小时整点运行一次。
+         */
+        @Bean
+        public JobDetail hourlyJobDetail() {
+                return JobBuilder.newJob(
+                                QuartzHourlyJob.class)
+                                .withIdentity("HourlyJob", "bytedesk")
+                                .withDescription("run once every hour")
+                                .storeDurably()
+                                .build();
+        }
 
-    /**
-     * 每30分钟运行一次，在整点和半点运行
-     */
-    @Bean
-    public JobDetail halfHourJobDetail() {
-        return JobBuilder.newJob(QuartzHalfHourJob.class)
-                .withIdentity("HalfHourJob", "bytedesk")
-                .withDescription("run once every half hour ").storeDurably().build();
-    }
+        @Bean
+        public Trigger hourlyTrigger() {
+                return TriggerBuilder.newTrigger().forJob(hourlyJobDetail())
+                                .withIdentity("hourlyTrigger", "bytedesk")
+                                .withDescription("run once every hour")
+                                .withSchedule(cronSchedule("0 0 * * * ?"))
+                                .build();
+        }
 
-    @Bean
-    public Trigger halfHourTrigger() {
-        return TriggerBuilder.newTrigger().forJob(
-                halfHourJobDetail())
-                .withIdentity("halfHourTrigger", "bytedesk")
-                .withDescription("run once every half hour")
-                .withSchedule(cronSchedule("0 0/30 * * * ?"))
-                .build();
-    }
+        /**
+         * Runs every 30 minutes, on the hour and half hour.
+         * 每 30 分钟运行一次，在整点和半点触发。
+         */
+        @Bean
+        public JobDetail halfHourJobDetail() {
+                return JobBuilder.newJob(QuartzHalfHourJob.class)
+                                .withIdentity("HalfHourJob", "bytedesk")
+                                .withDescription("run once every half hour ").storeDurably().build();
+        }
 
-    
-    /**
-     * run once at 0 o'clock
-     */
-    @Bean
-    public JobDetail daily0JobDetail() {
-        return JobBuilder.newJob(QuartzDaily0Job.class).withIdentity("Daily0Job", "bytedesk")
-                .withDescription("run once at 0 o'click").storeDurably().build();
-    }
+        @Bean
+        public Trigger halfHourTrigger() {
+                return TriggerBuilder.newTrigger().forJob(
+                                halfHourJobDetail())
+                                .withIdentity("halfHourTrigger", "bytedesk")
+                                .withDescription("run once every half hour")
+                                .withSchedule(cronSchedule("0 0/30 * * * ?"))
+                                .build();
+        }
 
-    @Bean
-    public Trigger daily0Trigger() {
-        return TriggerBuilder.newTrigger().forJob(
-                daily0JobDetail()).withIdentity("daily0Trigger", "bytedesk")
-                .withDescription("run once at 0 o'clock")
-                .withSchedule(cronSchedule("0 0 0 * * ?"))
-                .build();
-    }
+        /**
+         * Runs once a day at 0 o'clock.
+         * 每天 0 点运行一次。
+         */
+        @Bean
+        public JobDetail daily0JobDetail() {
+                return JobBuilder.newJob(QuartzDaily0Job.class).withIdentity("Daily0Job", "bytedesk")
+                                .withDescription("run once at 0 o'click").storeDurably().build();
+        }
 
-    /**
-     * run once at 8 o'clock
-     */
-    @Bean
-    public JobDetail daily8JobDetail() {
-        return JobBuilder.newJob(QuartzDaily8Job.class)
-                .withIdentity("Daily8Job", "bytedesk")
-                .withDescription("run once at 8 o'clock")
-                .storeDurably().build();
-    }
+        @Bean
+        public Trigger daily0Trigger() {
+                return TriggerBuilder.newTrigger().forJob(
+                                daily0JobDetail()).withIdentity("daily0Trigger", "bytedesk")
+                                .withDescription("run once at 0 o'clock")
+                                .withSchedule(cronSchedule("0 0 0 * * ?"))
+                                .build();
+        }
 
-    @Bean
-    public Trigger daily8Trigger() {
-        return TriggerBuilder.newTrigger().forJob(
-                daily8JobDetail())
-                .withIdentity("daily8Trigger", "bytedesk")
-                .withDescription("run once at 8 o'clock")
-                .withSchedule(cronSchedule("0 0 8 * * ?"))
-                .build();
-    }
+        /**
+         * Runs once a day at 8 o'clock.
+         * 每天 8 点运行一次。
+         */
+        @Bean
+        public JobDetail daily8JobDetail() {
+                return JobBuilder.newJob(QuartzDaily8Job.class)
+                                .withIdentity("Daily8Job", "bytedesk")
+                                .withDescription("run once at 8 o'clock")
+                                .storeDurably().build();
+        }
+
+        @Bean
+        public Trigger daily8Trigger() {
+                return TriggerBuilder.newTrigger().forJob(
+                                daily8JobDetail())
+                                .withIdentity("daily8Trigger", "bytedesk")
+                                .withDescription("run once at 8 o'clock")
+                                .withSchedule(cronSchedule("0 0 8 * * ?"))
+                                .build();
+        }
 
 }

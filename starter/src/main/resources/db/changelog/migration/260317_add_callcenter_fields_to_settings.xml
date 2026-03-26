@@ -37,9 +37,12 @@
 
     <changeSet id="260317-02-agent-settings-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_agent_settings" columnName="call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_agent_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_settings" columnName="call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_agent_settings">
             <column name="call_settings_id" type="BIGINT"/>
@@ -54,9 +57,12 @@
 
     <changeSet id="260317-02b-agent-settings-draft-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_agent_settings" columnName="draft_call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_agent_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_settings" columnName="draft_call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_agent_settings">
             <column name="draft_call_settings_id" type="BIGINT"/>
@@ -71,9 +77,12 @@
 
     <changeSet id="260317-03-workgroup-settings-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_workgroup_settings" columnName="call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_workgroup_settings">
             <column name="call_settings_id" type="BIGINT"/>
@@ -88,9 +97,12 @@
 
     <changeSet id="260317-03b-workgroup-settings-draft-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_workgroup_settings">
             <column name="draft_call_settings_id" type="BIGINT"/>
@@ -105,9 +117,12 @@
 
     <changeSet id="260317-04-robot-settings-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_ai_robot_settings" columnName="call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_ai_robot_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_ai_robot_settings" columnName="call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_ai_robot_settings">
             <column name="call_settings_id" type="BIGINT"/>
@@ -122,9 +137,12 @@
 
     <changeSet id="260317-04b-robot-settings-draft-call-settings-fk" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_ai_robot_settings" columnName="draft_call_settings_id"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_ai_robot_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_ai_robot_settings" columnName="draft_call_settings_id"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_ai_robot_settings">
             <column name="draft_call_settings_id" type="BIGINT"/>

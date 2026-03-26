@@ -99,5 +99,8 @@
     <include file="db/changelog/migration/260324_update_call_statistic_schema.xml" />
     <include file="db/changelog/migration/260325_add_agent_status_setting_status_options.xml" />
     <include file="db/changelog/migration/260325_add_agent_rest_reason_columns.xml" />
+    <include file="db/changelog/migration/260326_add_shop_access_token.xml" />
+    <include file="db/changelog/migration/260326_alter_shop_access_token_to_text.xml" />
+    <include file="db/changelog/migration/260326_add_shop_auto_refresh_access_token.xml" />
 
 </databaseChangeLog>

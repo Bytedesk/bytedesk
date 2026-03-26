@@ -11,42 +11,60 @@
 
     <changeSet id="251226-drop-service-settings-enable-proactive-trigger" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="enable_proactive_trigger"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="enable_proactive_trigger"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="enable_proactive_trigger"/>
     </changeSet>
 
     <changeSet id="251226-drop-service-settings-no-response-timeout" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="no_response_timeout"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="no_response_timeout"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="no_response_timeout"/>
     </changeSet>
 
     <changeSet id="251226-drop-service-settings-proactive-message" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_message"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_message"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="proactive_message"/>
     </changeSet>
 
     <changeSet id="251226-drop-service-settings-max-proactive-count" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="max_proactive_count"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="max_proactive_count"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="max_proactive_count"/>
     </changeSet>
 
     <changeSet id="251226-drop-service-settings-proactive-interval" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_interval"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="proactive_interval"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="proactive_interval"/>
     </changeSet>
 
     <changeSet id="251226-drop-service-settings-trigger-conditions" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="trigger_conditions"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="trigger_conditions"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="trigger_conditions"/>
     </changeSet>

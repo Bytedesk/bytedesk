@@ -6,14 +6,20 @@
 
     <changeSet id="251217-drop-show-input-association" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_input_association"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_input_association"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="show_input_association"/>
     </changeSet>
 
     <changeSet id="251217-drop-show-pre-search" author="copilot">
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
-            <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_pre_search"/>
+            <and>
+                <tableExists tableName="bytedesk_kbase_service_settings"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_pre_search"/>
+            </and>
         </preConditions>
         <dropColumn tableName="bytedesk_kbase_service_settings" columnName="show_pre_search"/>
     </changeSet>

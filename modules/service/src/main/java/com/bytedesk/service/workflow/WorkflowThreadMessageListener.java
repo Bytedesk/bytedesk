@@ -72,7 +72,12 @@ public class WorkflowThreadMessageListener {
             return;
         }
 
-        Optional<WorkflowEntity> workflowOptional = workflowRestService.findByUid(thread.getUserUid());
+        String workflowUid = resolveWorkflowUid(thread);
+        if (!StringUtils.hasText(workflowUid)) {
+            return;
+        }
+
+        Optional<WorkflowEntity> workflowOptional = workflowRestService.findByUid(workflowUid);
         if (!workflowOptional.isPresent()) {
             return;
         }
@@ -118,7 +123,7 @@ public class WorkflowThreadMessageListener {
             return null;
         }
 
-        if (MessageTypeEnum.CHOICE_SUBMIT.name().equals(inboundMessage.getType())) {
+        if (MessageTypeEnum.CHOICE_SUBMIT.equals(inboundMessage.getType())) {
             ChoiceContent choiceContent = ChoiceContent.fromJson(inboundMessage.getContent());
             if (choiceContent != null && choiceContent.getSelectedValues() != null && !choiceContent.getSelectedValues().isEmpty()) {
                 return choiceContent.getSelectedValues().get(0);
@@ -148,9 +153,24 @@ public class WorkflowThreadMessageListener {
     }
 
     private String resolveQuestionAnswer(MessageProtobuf inboundMessage) {
-        if (inboundMessage == null || !MessageTypeEnum.TEXT.name().equals(inboundMessage.getType())) {
+        if (inboundMessage == null || !MessageTypeEnum.TEXT.equals(inboundMessage.getType())) {
             return null;
         }
         return StringUtils.hasText(inboundMessage.getContent()) ? inboundMessage.getContent().trim() : null;
+    }
+
+    private String resolveWorkflowUid(ThreadEntity thread) {
+        if (thread == null) {
+            return null;
+        }
+        if (StringUtils.hasText(thread.getUserUid())) {
+            return thread.getUserUid();
+        }
+
+        UserProtobuf workflow = thread.getWorkflowProtobuf();
+        if (workflow != null && StringUtils.hasText(workflow.getUid())) {
+            return workflow.getUid();
+        }
+        return null;
     }
 }

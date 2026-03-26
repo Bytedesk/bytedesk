@@ -18,6 +18,10 @@ import org.springframework.context.ApplicationEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Event published once a day at 8 o'clock.
+ * 每天 8 点发布一次的事件。
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QuartzDay8Event extends ApplicationEvent {
@@ -26,7 +30,6 @@ public class QuartzDay8Event extends ApplicationEvent {
 
     public QuartzDay8Event(Object source) {
         super(source);
-        //TODO Auto-generated constructor stub
     }
 
 }

@@ -38,6 +38,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     @Setter
     public static class Custom {
         private Boolean enabled;
+        private Boolean bndEnabled = false;
         private String name;
         private String logo;
         private String favicon;
