@@ -435,7 +435,7 @@ public class FaqVectorService {
             faqRestService.evictFaqCacheAllEntries();
 
         } catch (Exception e) {
-            log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage(), e);
+            log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage());
 
             // 设置向量索引状态为失败
             try {
