@@ -97,5 +97,7 @@
     <include file="db/changelog/migration/260324_add_agent_country.xml" />
     <include file="db/changelog/migration/260324_update_call_block_schema.xml" />
     <include file="db/changelog/migration/260324_update_call_statistic_schema.xml" />
+    <include file="db/changelog/migration/260325_add_agent_status_setting_status_options.xml" />
+    <include file="db/changelog/migration/260325_add_agent_rest_reason_columns.xml" />
 
 </databaseChangeLog>

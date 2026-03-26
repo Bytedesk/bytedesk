@@ -239,13 +239,13 @@ public class WorkgroupEntity extends BaseEntity {
         return this.agents.stream().filter(agent -> agent.isBusy()).count();
     }
     
-    // agent away count
+    // agent rest count
     @JsonIgnore
-    public long getAwayAgentCount() {
+    public long getRestAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
         }
-        return this.agents.stream().filter(agent -> agent.isAway()).count();
+        return this.agents.stream().filter(agent -> agent.isRest()).count();
     }
 
 }

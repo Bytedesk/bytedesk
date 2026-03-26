@@ -13,6 +13,9 @@
  */
 package com.bytedesk.service.agent_status.settings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.I18Consts;
 import lombok.AllArgsConstructor;
@@ -37,6 +40,26 @@ public class AgentStatusSettingRequest extends BaseRequest {
 
     @Builder.Default
     private String description = I18Consts.I18N_DESCRIPTION;
+
+    // 是否支持音频会话状态
+    @Builder.Default
+    private Boolean availableAudioEnabled = false;
+
+    // 是否支持视频会话状态
+    @Builder.Default
+    private Boolean availableVideoEnabled = false;
+
+    // 是否支持电话会话状态
+    @Builder.Default
+    private Boolean availablePhoneEnabled = false;
+
+    // 是否支持休息状态
+    @Builder.Default
+    private Boolean restEnabled = true;
+
+    // 休息状态可选原因列表
+    @Builder.Default
+    private List<String> restReasons = new ArrayList<>();
 
     // 是否需要开启客服切换状态审核
     @Builder.Default

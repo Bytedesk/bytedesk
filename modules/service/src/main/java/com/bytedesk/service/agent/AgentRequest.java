@@ -67,6 +67,8 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private String status = AgentStatusEnum.OFFLINE.name();
 
+    private String restReason;
+
     @Builder.Default
     private Boolean connected = false;
 

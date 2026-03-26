@@ -1,11 +1,10 @@
 services:
   bytedesk-redis:
-    image: redis/redis-stack-server:latest
+    image: redis:latest
     container_name: redis-bytedesk
     ports:
       - "16379:6379"
-    environment:
-      - REDIS_ARGS=--requirepass ${REDIS_PASSWORD}
+    command: sh -c "chown -R redis:redis /data && exec redis-server --requirepass ${REDIS_PASSWORD}"
     volumes:
       - redis_data:/data
     networks:

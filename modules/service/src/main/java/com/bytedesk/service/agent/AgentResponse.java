@@ -58,6 +58,8 @@ public class AgentResponse extends BaseResponse {
 
     private String status;
 
+    private String restReason;
+
     private Boolean connected;
 
     private Boolean enabled;

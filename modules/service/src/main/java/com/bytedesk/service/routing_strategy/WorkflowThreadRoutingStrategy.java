@@ -16,11 +16,8 @@ import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -33,12 +30,10 @@ import com.bytedesk.service.queue.QueueService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
-import com.bytedesk.service.utils.ThreadMessageUtil;
-import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
+import com.bytedesk.service.workflow.WorkflowChatService;
 
-import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +67,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
     private final QueueService queueService;
     private final QueueMemberRestService queueMemberRestService;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private final MessageRestService messageRestService;
+    // private final MessageRestService messageRestService;
+    private final WorkflowChatService workflowChatService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -125,7 +121,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
     /**
      * 获取或创建工作流会话
      */
-    private ThreadEntity getOrCreateWorkflowThread(VisitorRequest request, WorkflowEntity workflowEntity, String topic) {
+    private ThreadEntity getOrCreateWorkflowThread(VisitorRequest request, WorkflowEntity workflowEntity,
+            String topic) {
         // 当强制新建会话时，直接创建新会话，跳过复用逻辑
         if (Boolean.TRUE.equals(request.getForceNewThread())) {
             log.debug("forceNewThread=true, creating new workflow thread for topic: {}", topic);
@@ -164,7 +161,7 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
      */
     private MessageProtobuf handleExistingWorkflowThread(WorkflowEntity workflowEntity, ThreadEntity thread) {
         log.info("Continuing existing workflow thread: {}", thread.getUid());
-        return getWorkflowContinueMessage(workflowEntity, thread);
+        return workflowChatService.createStartMessage(workflowEntity, thread);
     }
 
     /**
@@ -178,10 +175,9 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         log.info("Workflow enqueued to queue: {}", queueMemberEntity.getUid());
 
         // 2. 配置线程状态
-        String tip = getWorkflowWelcomeMessage(workflowEntity);
-        WelcomeContent welcomeContent = WelcomeContentUtils.buildWorkflowWelcomeContent(workflowEntity, tip);
-        String payload = welcomeContent != null ? welcomeContent.toJson() : null;
-        thread.setRoboting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, tip, payload).toJson());
+        thread.setRoboting()
+                .setContent(ThreadContent.of(MessageTypeEnum.TEXT, getWorkflowWelcomeMessage(workflowEntity),
+                        getWorkflowWelcomeMessage(workflowEntity)).toJson());
 
         // 3. 设置工作流信息 - 使用统一的转换方法
         String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflowEntity);
@@ -196,8 +192,8 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         // 6. 发布事件
         publishWorkflowThreadEvent(savedThread);
 
-        // 7. 创建并保存欢迎消息
-        return createAndSaveWelcomeMessage(welcomeContent, savedThread);
+        // 7. 根据流程节点创建首条工作流消息
+        return workflowChatService.createStartMessage(workflowEntity, savedThread);
     }
 
     /**
@@ -235,34 +231,4 @@ public class WorkflowThreadRoutingStrategy extends AbstractThreadRoutingStrategy
         }
     }
 
-    /**
-     * 创建并保存欢迎消息
-     */
-    private MessageProtobuf createAndSaveWelcomeMessage(WelcomeContent wc, ThreadEntity thread) {
-        try {
-            MessageEntity message = ThreadMessageUtil.getThreadWorkflowWelcomeMessage(wc, thread);
-            messageRestService.save(message);
-
-            MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-            log.debug("Created workflow welcome message for thread: {}", thread.getUid());
-
-            return messageProtobuf;
-        } catch (Exception e) {
-            log.error("Failed to create welcome message for workflow thread {}: {}", thread.getUid(), e.getMessage(), e);
-            throw new RuntimeException("Failed to create welcome message", e);
-        }
-    }
-
-    /**
-     * 获取工作流继续对话消息
-     */
-    private MessageProtobuf getWorkflowContinueMessage(WorkflowEntity workflowEntity, @Nonnull ThreadEntity thread) {
-        validateThread(thread, "get workflow continue message");
-
-        String tip = getWorkflowWelcomeMessage(workflowEntity);
-        WelcomeContent wc = WelcomeContentUtils.buildWorkflowWelcomeContent(workflowEntity, tip);
-        MessageEntity message = ThreadMessageUtil.getThreadWorkflowWelcomeMessage(wc, thread);
-
-        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
-    }
 }

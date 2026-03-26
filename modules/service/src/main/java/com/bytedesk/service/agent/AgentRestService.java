@@ -50,6 +50,7 @@ import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
+import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -434,6 +435,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = agentOptional
                 .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
         agent.setStatus(request.getStatus()); // 更新接待状态
+        agent.setRestReason(resolveRestReason(request, agent));
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
@@ -457,6 +459,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
         agent.setForceLogoutAt(java.time.ZonedDateTime.now());
         agent.setStatus(AgentStatusEnum.OFFLINE.name());
+        agent.setRestReason(null);
 
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
@@ -487,12 +490,45 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setForceLogout(false);
         agent.setForceLogoutReason(null);
         agent.setForceLogoutAt(null);
+        agent.setRestReason(null);
 
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to save agent.");
         }
         return convertToResponse(updatedAgent);
+    }
+
+    private String resolveRestReason(AgentRequest request, AgentEntity agent) {
+        if (!AgentStatusEnum.REST.name().equals(request.getStatus())) {
+            return null;
+        }
+
+        String requestedReason = request.getRestReason() == null ? null : request.getRestReason().strip();
+        if (!StringUtils.hasText(requestedReason)) {
+            return null;
+        }
+
+        AgentStatusSettingEntity statusSettings = null;
+        if (agent.getSettings() != null) {
+            statusSettings = agent.getSettings().getAgentStatusSettings();
+            if (statusSettings == null) {
+                statusSettings = agent.getSettings().getDraftAgentStatusSettings();
+            }
+        }
+
+        if (statusSettings == null || statusSettings.getRestReasons() == null || statusSettings.getRestReasons().isEmpty()) {
+            return requestedReason;
+        }
+
+        for (String configuredReason : statusSettings.getRestReasons()) {
+            String normalizedReason = configuredReason == null ? null : configuredReason.strip();
+            if (StringUtils.hasText(normalizedReason) && normalizedReason.equals(requestedReason)) {
+                return normalizedReason;
+            }
+        }
+
+        throw new RuntimeException("invalid rest reason: " + requestedReason);
     }
 
     @Transactional

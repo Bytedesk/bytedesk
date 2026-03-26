@@ -20,13 +20,12 @@ import java.util.Map;
 
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
 import com.bytedesk.core.workflow.node.WorkflowBaseNode;
-import com.bytedesk.core.workflow.node.WorkflowConditionNode;
+import com.bytedesk.core.workflow.node.WorkflowChoiceNode;
 import com.bytedesk.core.workflow.node.WorkflowEndNode;
-import com.bytedesk.core.workflow.node.WorkflowLLMNode;
-import com.bytedesk.core.workflow.node.WorkflowLoopNode;
 import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
 import com.bytedesk.core.workflow.node.WorkflowNodeTypeEnum;
 import com.bytedesk.core.workflow.node.WorkflowStartNode;
+import com.bytedesk.core.workflow.node.WorkflowTextNode;
 
 /**
  * Workflow initialization data holder.
@@ -59,7 +58,7 @@ public final class WorkflowInitData {
         WorkflowStartNode startNode = WorkflowStartNode.builder()
                 .id(DEFAULT_START_NODE_ID)
                 .type(WorkflowNodeTypeEnum.START.getValue())
-                .name("Start")
+                .name("开始接待")
                 .meta(WorkflowNodeMeta.builder()
                         .position(WorkflowNodeMeta.Position.builder()
                                 .x(100.0)
@@ -67,16 +66,16 @@ public final class WorkflowInitData {
                                 .build())
                         .build())
                 .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Start")
+                        .title("开始接待")
                         .outputs(createOutputs("query", "string", "Hello Flow."))
                         .build())
                 .build();
         nodes.add(startNode);
 
-        WorkflowConditionNode conditionNode = WorkflowConditionNode.builder()
-                .id("condition_0")
-                .type(WorkflowNodeTypeEnum.CONDITION.getValue())
-                .name("Condition")
+        WorkflowTextNode textNode1 = WorkflowTextNode.builder()
+                .id("text_0")
+                .type(WorkflowNodeTypeEnum.TEXT.getValue())
+                .name("文本节点")
                 .meta(WorkflowNodeMeta.builder()
                         .position(WorkflowNodeMeta.Position.builder()
                                 .x(320.0)
@@ -84,60 +83,34 @@ public final class WorkflowInitData {
                                 .build())
                         .build())
                 .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Condition")
-                        .inputsValues(createConditionInputsValues())
-                        .inputs(createConditionInputs())
+                        .title("文本节点")
+                        .content("您好，欢迎进入默认工作流。")
                         .build())
                 .build();
-        nodes.add(conditionNode);
+        nodes.add(textNode1);
 
-        WorkflowLLMNode llmNode = WorkflowLLMNode.builder()
-                .id("llm_0")
-                .type(WorkflowNodeTypeEnum.LLM.getValue())
-                .name("LLM_0")
+        WorkflowChoiceNode choiceNode = WorkflowChoiceNode.builder()
+                .id("choice_0")
+                .type(WorkflowNodeTypeEnum.CHOICE.getValue())
+                .name("选择类型节点")
                 .meta(WorkflowNodeMeta.builder()
                         .position(WorkflowNodeMeta.Position.builder()
                                 .x(560.0)
-                                .y(100.0)
+                                .y(200.0)
                                 .build())
                         .build())
-                .modelType("gpt-3.5-turbo")
-                .temperature(0.5)
-                .systemPrompt("You are an AI assistant.")
-                .prompt("")
                 .data(WorkflowBaseNode.NodeData.builder()
-                        .title("LLM_0")
-                        .inputsValues(createLLMInputsValues())
-                        .inputs(createLLMInputs())
-                        .outputs(createOutputs("result", "string", null))
+                        .title("选择类型节点")
+                        .content("请选择接下来要继续的内容")
+                        .options(createChoiceOptions())
                         .build())
                 .build();
-        nodes.add(llmNode);
+        nodes.add(choiceNode);
 
-        WorkflowLoopNode loopNode = WorkflowLoopNode.builder()
-                .id("loop_H8M3U")
-                .type(WorkflowNodeTypeEnum.LOOP.getValue())
-                .name("Loop_2")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(560.0)
-                                .y(300.0)
-                                .build())
-                        .build())
-                .loopTimes(2)
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Loop_2")
-                        .inputsValues(createLoopInputsValues())
-                        .inputs(createLoopInputs())
-                        .outputs(createOutputs("result", "string", null))
-                        .build())
-                .build();
-        nodes.add(loopNode);
-
-        WorkflowEndNode endNode = WorkflowEndNode.builder()
-                .id("end_0")
-                .type(WorkflowNodeTypeEnum.END.getValue())
-                .name("End")
+        WorkflowTextNode textNode2 = WorkflowTextNode.builder()
+                .id("text_1")
+                .type(WorkflowNodeTypeEnum.TEXT.getValue())
+                .name("文本节点")
                 .meta(WorkflowNodeMeta.builder()
                         .position(WorkflowNodeMeta.Position.builder()
                                 .x(800.0)
@@ -145,55 +118,77 @@ public final class WorkflowInitData {
                                 .build())
                         .build())
                 .data(WorkflowBaseNode.NodeData.builder()
-                        .title("End")
+                        .title("文本节点")
+                        .content("感谢您的选择，默认工作流继续执行到这里。")
+                        .build())
+                .build();
+        nodes.add(textNode2);
+
+        WorkflowEndNode endNode = WorkflowEndNode.builder()
+                .id("end_0")
+                .type(WorkflowNodeTypeEnum.END.getValue())
+                .name("结束")
+                .meta(WorkflowNodeMeta.builder()
+                        .position(WorkflowNodeMeta.Position.builder()
+                                .x(1040.0)
+                                .y(200.0)
+                                .build())
+                        .build())
+                .data(WorkflowBaseNode.NodeData.builder()
+                        .title("结束")
                         .outputs(createOutputs("result", "string", null))
                         .build())
                 .build();
         nodes.add(endNode);
 
         WorkflowEdge edge1 = WorkflowEdge.builder()
-                .id("edge_start_condition_0")
+                .id("edge_start_text_0")
                 .sourceNodeID(DEFAULT_START_NODE_ID)
-                .targetNodeID("condition_0")
+                .targetNodeID("text_0")
                 .build();
         edges.add(edge1);
 
         WorkflowEdge edge2 = WorkflowEdge.builder()
-                .id("edge_condition_llm_0")
-                .sourceNodeID("condition_0")
-                .targetNodeID("llm_0")
-                .sourcePortID("if_0")
+                .id("edge_text_choice_0")
+                .sourceNodeID("text_0")
+                .targetNodeID("choice_0")
                 .build();
         edges.add(edge2);
 
         WorkflowEdge edge3 = WorkflowEdge.builder()
-                .id("edge_llm_end_0")
-                .sourceNodeID("llm_0")
-                .targetNodeID("end_0")
+                .id("edge_choice_text_1")
+                .sourceNodeID("choice_0")
+                .targetNodeID("text_1")
                 .build();
         edges.add(edge3);
 
-        // condition_0 的 else 分支连接到 loop_H8M3U
         WorkflowEdge edge4 = WorkflowEdge.builder()
-                .id("edge_condition_loop")
-                .sourceNodeID("condition_0")
-                .targetNodeID("loop_H8M3U")
-                .sourcePortID("if_f0rOAt")
-                .build();
-        edges.add(edge4);
-
-        // loop_H8M3U 循环完成后连接到 end_0
-        WorkflowEdge edge5 = WorkflowEdge.builder()
-                .id("edge_loop_end_0")
-                .sourceNodeID("loop_H8M3U")
+                .id("edge_text_end_0")
+                .sourceNodeID("text_1")
                 .targetNodeID("end_0")
                 .build();
-        edges.add(edge5);
+        edges.add(edge4);
 
         return WorkflowSchema.builder()
                 .nodes(nodes)
                 .edges(edges)
                 .build();
+    }
+
+    private static List<Map<String, Object>> createChoiceOptions() {
+        List<Map<String, Object>> options = new ArrayList<>();
+
+        Map<String, Object> option1 = new HashMap<>();
+        option1.put("label", "继续了解产品");
+        option1.put("value", "product");
+        options.add(option1);
+
+        Map<String, Object> option2 = new HashMap<>();
+        option2.put("label", "继续了解服务");
+        option2.put("value", "service");
+        options.add(option2);
+
+        return options;
     }
 
     private static Map<String, Object> createOutputs(String propertyName, String type, String defaultValue) {
@@ -213,120 +208,4 @@ public final class WorkflowInitData {
         return outputs;
     }
 
-    private static Map<String, Object> createConditionInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        List<Map<String, Object>> conditions = new ArrayList<>();
-
-        Map<String, Object> condition1 = new HashMap<>();
-        condition1.put("key", "if_0");
-        Map<String, Object> value1 = new HashMap<>();
-        value1.put("type", "expression");
-        value1.put("content", "");
-        condition1.put("value", value1);
-        conditions.add(condition1);
-
-        Map<String, Object> condition2 = new HashMap<>();
-        condition2.put("key", "if_f0rOAt");
-        Map<String, Object> value2 = new HashMap<>();
-        value2.put("type", "expression");
-        value2.put("content", "");
-        condition2.put("value", value2);
-        conditions.add(condition2);
-
-        inputsValues.put("conditions", conditions);
-        return inputsValues;
-    }
-
-    private static Map<String, Object> createConditionInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        Map<String, Object> conditionsProperty = new HashMap<>();
-
-        conditionsProperty.put("type", "array");
-        Map<String, Object> items = new HashMap<>();
-        items.put("type", "object");
-        Map<String, Object> itemProperties = new HashMap<>();
-
-        Map<String, Object> keyProperty = new HashMap<>();
-        keyProperty.put("type", "string");
-        itemProperties.put("key", keyProperty);
-
-        Map<String, Object> valueProperty = new HashMap<>();
-        valueProperty.put("type", "string");
-        itemProperties.put("value", valueProperty);
-
-        items.put("properties", itemProperties);
-        conditionsProperty.put("items", items);
-
-        properties.put("conditions", conditionsProperty);
-        inputs.put("type", "object");
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
-
-    private static Map<String, Object> createLLMInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        inputsValues.put("modelType", "gpt-3.5-turbo");
-        inputsValues.put("temperature", 0.5);
-        inputsValues.put("systemPrompt", "You are an AI assistant.");
-        inputsValues.put("prompt", "");
-        return inputsValues;
-    }
-
-    private static Map<String, Object> createLLMInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        List<String> required = new ArrayList<>();
-
-        required.add("modelType");
-        required.add("temperature");
-        required.add("prompt");
-
-        Map<String, Object> modelTypeProperty = new HashMap<>();
-        modelTypeProperty.put("type", "string");
-        properties.put("modelType", modelTypeProperty);
-
-        Map<String, Object> temperatureProperty = new HashMap<>();
-        temperatureProperty.put("type", "number");
-        properties.put("temperature", temperatureProperty);
-
-        Map<String, Object> systemPromptProperty = new HashMap<>();
-        systemPromptProperty.put("type", "string");
-        properties.put("systemPrompt", systemPromptProperty);
-
-        Map<String, Object> promptProperty = new HashMap<>();
-        promptProperty.put("type", "string");
-        properties.put("prompt", promptProperty);
-
-        inputs.put("type", "object");
-        inputs.put("required", required);
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
-
-    private static Map<String, Object> createLoopInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        inputsValues.put("loopTimes", 2);
-        return inputsValues;
-    }
-
-    private static Map<String, Object> createLoopInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        List<String> required = new ArrayList<>();
-
-        required.add("loopTimes");
-
-        Map<String, Object> loopTimesProperty = new HashMap<>();
-        loopTimesProperty.put("type", "number");
-        properties.put("loopTimes", loopTimesProperty);
-
-        inputs.put("type", "object");
-        inputs.put("required", required);
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
 }

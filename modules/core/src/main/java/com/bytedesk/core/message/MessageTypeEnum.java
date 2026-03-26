@@ -43,7 +43,7 @@ public enum MessageTypeEnum {
     EMAILL_ADDRESS, // 邮箱地址
     WECHAT_NUMBER, // 微信号
     FORWARD, // 转发消息
-    // 
+    
     QUEUE, // 排队消息: 用户进入排队队列
     QUEUE_NOTICE, // 排队通知消息: 通知客服，用户进入排队队列，通知客服人员
     QUEUE_UPDATE, // 排队更新消息: 通知访客，用户排队位置或预计等待时间更新

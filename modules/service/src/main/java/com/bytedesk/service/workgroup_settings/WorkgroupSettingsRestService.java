@@ -1,5 +1,6 @@
 package com.bytedesk.service.workgroup_settings;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -477,6 +478,9 @@ public class WorkgroupSettingsRestService
             } else {
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getRobotToAgentSettings(), draft);
+                draft.setTriggerKeywords(request.getRobotToAgentSettings().getTriggerKeywords() != null
+                        ? new ArrayList<>(request.getRobotToAgentSettings().getTriggerKeywords())
+                        : new ArrayList<>());
                 RobotToAgentSettingsEntity.ensureDefaults(draft);
                 draft.setUid(originalUid);
             }
@@ -902,6 +906,14 @@ public class WorkgroupSettingsRestService
         } else if (source instanceof MessageLeaveSettingsEntity && target instanceof MessageLeaveSettingsEntity) {
             messageLeaveSettingsHelper.copyMessageLeaveSettingsProperties((MessageLeaveSettingsEntity) source,
                     (MessageLeaveSettingsEntity) target);
+        } else if (source instanceof RobotToAgentSettingsEntity && target instanceof RobotToAgentSettingsEntity) {
+            messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
+            RobotToAgentSettingsEntity sourceSettings = (RobotToAgentSettingsEntity) source;
+            RobotToAgentSettingsEntity targetSettings = (RobotToAgentSettingsEntity) target;
+            targetSettings.setTriggerKeywords(sourceSettings.getTriggerKeywords() != null
+                    ? new ArrayList<>(sourceSettings.getTriggerKeywords())
+                    : new ArrayList<>());
+            RobotToAgentSettingsEntity.ensureDefaults(targetSettings);
         } else {
             messageLeaveSettingsHelper.copyPropertiesExcludingIds(source, target);
         }

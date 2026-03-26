@@ -47,6 +47,11 @@ public enum WorkflowNodeTypeEnum {
      * 文本节点
      */
     TEXT("text"),
+
+    /**
+     * 选择节点
+     */
+    CHOICE("choice"),
     
     /**
      * 注释节点

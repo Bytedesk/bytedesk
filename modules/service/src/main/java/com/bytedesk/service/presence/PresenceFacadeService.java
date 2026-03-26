@@ -62,9 +62,9 @@ public class PresenceFacadeService {
             return true;
         }
         return switch (resolvedCallType) {
-            case AUDIO -> status == AgentStatusEnum.AVAILABLE_AUDIO;
-            case VIDEO -> status == AgentStatusEnum.AVAILABLE_VIDEO;
-            case PHONE -> status == AgentStatusEnum.AVAILABLE_PHONE;
+            case AUDIO -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_AUDIO;
+            case VIDEO -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_VIDEO;
+            case PHONE -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_PHONE;
             case TEXT -> false;
         };
     }

@@ -53,6 +53,7 @@ public class CallConfig {
     @Bean
     public Client eslClient() {
         Client inboundClient = new Client();
+        boolean connected = false;
         
         // 连接重试配置
         int maxRetries = Math.max(1, callFreeswitchProperties.getMaxRetries());
@@ -91,6 +92,7 @@ public class CallConfig {
                     
                         log.info(CallI18nConsts.CONFIG_ESL_CONNECTED, 
                             callFreeswitchProperties.getServer(), callFreeswitchProperties.getEslPort());
+                    connected = true;
                     
                     // 连接成功，跳出重试循环
                     break;
@@ -99,7 +101,7 @@ public class CallConfig {
                     throw new InboundConnectionFailure("Connection established but cannot send commands");
                 }
                 
-            } catch (InboundConnectionFailure e) {
+            } catch (InboundConnectionFailure | RuntimeException e) {
                 log.error(CallI18nConsts.CONFIG_ESL_CONNECT_ATTEMPT_FAILED, attempt, e.getMessage());
                 
                 // 检查具体的错误类型
@@ -138,6 +140,10 @@ public class CallConfig {
                     log.error(CallI18nConsts.CONFIG_ESL_FINAL_FAILURE, maxRetries);
                 }
             }
+        }
+
+        if (!connected) {
+            log.warn("Call ESL startup connection unavailable, application startup will continue and reconnect on demand later");
         }
         
         return inboundClient;

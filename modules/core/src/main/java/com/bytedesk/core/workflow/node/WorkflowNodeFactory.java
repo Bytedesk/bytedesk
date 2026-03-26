@@ -40,6 +40,8 @@ public class WorkflowNodeFactory {
                 return WorkflowLLMNode.builder().type(nodeType).build();
             case TEXT:
                 return WorkflowTextNode.builder().type(nodeType).build();
+            case CHOICE:
+                return WorkflowChoiceNode.builder().type(nodeType).build();
             case COMMENT:
                 return WorkflowCommentNode.builder().type(nodeType).build();
             case GROUP:
@@ -90,6 +92,8 @@ public class WorkflowNodeFactory {
                 return WorkflowLLMNode.fromJson(json);
             case TEXT:
                 return WorkflowTextNode.fromJson(json);
+            case CHOICE:
+                return WorkflowChoiceNode.fromJson(json);
             case COMMENT:
                 return WorkflowCommentNode.fromJson(json);
             case GROUP:

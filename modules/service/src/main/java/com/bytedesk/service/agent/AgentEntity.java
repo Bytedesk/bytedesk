@@ -93,6 +93,9 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "agent_status")
     private String status = AgentStatusEnum.OFFLINE.name();
 
+    @Column(name = "rest_reason", length = 255)
+    private String restReason;
+
     /**
      * Configuration settings reference
      * All settings are managed through the settings entity
@@ -182,8 +185,8 @@ public class AgentEntity extends BaseEntity {
         return this.status.equals(AgentStatusEnum.BUSY.name());
     }
 
-    public Boolean isAway() {
-        return this.status.equals(AgentStatusEnum.AWAY.name());
+    public Boolean isRest() {
+        return this.status.equals(AgentStatusEnum.REST.name());
     }
 
     public UserProtobuf toUserProtobuf() {

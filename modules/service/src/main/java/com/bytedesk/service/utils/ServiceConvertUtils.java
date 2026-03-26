@@ -114,6 +114,26 @@ public class ServiceConvertUtils {
         return JSON.toJSONString(userProtobuf);
     }
 
+    /**
+     * 将工作流 JSON 发送者压缩为消息可安全存储的基础字段。
+     */
+    public static String compactWorkflowProtobufString(String workflowJson) {
+        if (!StringUtils.hasText(workflowJson)) {
+            return workflowJson;
+        }
+        UserProtobuf workflowUser = UserProtobuf.fromJson(workflowJson);
+        if (workflowUser == null) {
+            return workflowJson;
+        }
+        UserProtobuf compactUser = UserProtobuf.builder()
+                .uid(workflowUser.getUid())
+                .nickname(workflowUser.getNickname())
+                .avatar(workflowUser.getAvatar())
+                .type(UserTypeEnum.WORKFLOW.name())
+                .build();
+        return compactUser.toJson();
+    }
+
     public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {
         VisitorProtobuf userProtobuf = convertToVisitorProtobuf(visitorRequest);
         return userProtobuf.toJson();
@@ -229,7 +249,7 @@ public class ServiceConvertUtils {
                     if (isAvailable) available++;
                     if (isOnlineAndAvailable) connectedAndAvailable++;
                     if (agent.isBusy()) busy++;
-                    if (agent.isAway()) away++;
+                    // if (agent.isAway()) away++;
                     agentResponses.add(convertToAgentResponse(agent));
                 }
                 resp.setAgents(agentResponses);

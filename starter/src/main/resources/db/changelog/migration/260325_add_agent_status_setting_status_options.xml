@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260325-add-agent-status-setting-available-audio-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_audio_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_agent_status_setting">
+            <column name="available_audio_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status_setting" columnName="available_audio_enabled"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260325-add-agent-status-setting-available-video-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_video_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_agent_status_setting">
+            <column name="available_video_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status_setting" columnName="available_video_enabled"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260325-add-agent-status-setting-available-phone-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_phone_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_agent_status_setting">
+            <column name="available_phone_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status_setting" columnName="available_phone_enabled"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260325-add-agent-status-setting-rest-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status_setting" columnName="rest_enabled"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_agent_status_setting">
+            <column name="rest_enabled" type="BOOLEAN" defaultValueBoolean="true"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status_setting" columnName="rest_enabled"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260325-add-agent-status-setting-rest-reasons" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <not>
+                <columnExists tableName="bytedesk_service_agent_status_setting" columnName="rest_reasons"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_agent_status_setting">
+            <column name="rest_reasons" type="TEXT"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_service_agent_status_setting" columnName="rest_reasons"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260325-backfill-agent-status-setting-status-options" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_agent_status_setting"/>
+            <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_audio_enabled"/>
+            <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_video_enabled"/>
+            <columnExists tableName="bytedesk_service_agent_status_setting" columnName="available_phone_enabled"/>
+            <columnExists tableName="bytedesk_service_agent_status_setting" columnName="rest_enabled"/>
+        </preConditions>
+
+        <sql>
+            UPDATE bytedesk_service_agent_status_setting
+            SET available_audio_enabled = COALESCE(available_audio_enabled, false),
+                available_video_enabled = COALESCE(available_video_enabled, false),
+                available_phone_enabled = COALESCE(available_phone_enabled, false),
+                rest_enabled = COALESCE(rest_enabled, true)
+            WHERE available_audio_enabled IS NULL
+               OR available_video_enabled IS NULL
+               OR available_phone_enabled IS NULL
+               OR rest_enabled IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

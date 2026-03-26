@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadExtra;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -172,7 +173,8 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         //
         String extra = buildWorkgroupExtra(visitorRequest, workgroup);
         thread.setExtra(extra);
@@ -183,7 +185,7 @@ public class VisitorThreadService
         }
         return savedEntity;
     }
-    
+
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 为避免从缓存加载导致 member/user 为空，这里需要保证 owner 永不为 null
@@ -325,7 +327,8 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkflowThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkflowEntity workflow) {
+    public ThreadEntity reInitWorkflowThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkflowEntity workflow) {
         //
         String extra = buildWorkflowExtra(visitorRequest, workflow);
         thread.setExtra(extra);
@@ -346,15 +349,24 @@ public class VisitorThreadService
      * - 工作流暂时不支持 debug 预览
      */
     private String buildWorkflowExtra(VisitorRequest visitorRequest, WorkflowEntity workflow) {
-        // 工作流暂时没有设置实体，返回空的 JSON 对象
-        return BytedeskConsts.EMPTY_JSON_STRING;
+        return ThreadExtra.builder()
+                .showQuickButtons(false)
+                .workflowCurrentNodeId(null)
+                .workflowWaitingChoiceNodeId(null)
+                .workflowWaitingQuestionNodeId(null)
+                .workflowQuestionVariable(null)
+                .workflowQuestionAnswer(null)
+                .workflowSelectedOptionValue(null)
+                .workflowCompleted(false)
+                .build()
+                .toJson();
     }
 
     /**
      * 根据请求与工作组实体构建 thread.extra
      * - 社交渠道：直接使用请求中的 extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildWorkgroupExtra(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
         // 社交渠道直接透传
@@ -379,7 +391,8 @@ public class VisitorThreadService
             }
         }
 
-        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings, preview);
+        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings,
+                preview);
 
         RobotToAgentSettingsEntity robotToAgentSettings = null;
         if (settings != null) {
@@ -407,7 +420,7 @@ public class VisitorThreadService
     /**
      * 根据请求与客服实体构建 thread.extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildAgentExtra(VisitorRequest visitorRequest, AgentEntity agent) {
         AgentSettingsEntity settings = agent.getSettings();
@@ -420,15 +433,16 @@ public class VisitorThreadService
                 log.warn("Debug preview: agent settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
-        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug())
+                || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-            settings, preview);
+                settings, preview);
     }
 
     /**
      * 根据请求与机器人实体构建 thread.extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildRobotExtra(VisitorRequest visitorRequest, RobotEntity robot) {
         RobotSettingsEntity settings = robot.getSettings();
@@ -441,9 +455,10 @@ public class VisitorThreadService
                 log.warn("Debug preview: robot settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
-        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug())
+                || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-            settings, preview);
+                settings, preview);
     }
 
     public VisitorThreadEntity update(ThreadEntity thread) {

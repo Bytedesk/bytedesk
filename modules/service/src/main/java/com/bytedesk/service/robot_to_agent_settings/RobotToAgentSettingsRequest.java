@@ -8,6 +8,7 @@ package com.bytedesk.service.robot_to_agent_settings;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
@@ -54,4 +55,9 @@ public class RobotToAgentSettingsRequest extends BaseRequest {
 
     @Builder.Default
     private List<String> triggerKeywords = new ArrayList<>();
+
+    @Override
+	public Pageable getPageable() {
+		return super.getPageable();
+	}
 }

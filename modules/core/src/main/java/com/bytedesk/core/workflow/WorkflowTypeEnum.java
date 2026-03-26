@@ -35,7 +35,10 @@ public enum WorkflowTypeEnum {
      */
     TASK,
 
-    // 
+    /**
+     * 呼叫中心IVR流程，电话交互流程
+     * 适用于自动语音应答、电话菜单导航等场景
+     */
     IVR,
     
 }

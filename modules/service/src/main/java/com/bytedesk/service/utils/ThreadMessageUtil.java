@@ -20,6 +20,7 @@ import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.ChoiceContent;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.RoutingPoolContent;
@@ -69,6 +70,7 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadWorkflowWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         String json = content != null ? content.toJson() : null;
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
@@ -77,7 +79,51 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
-                .user(thread.getWorkflow())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    /**
+     * 工作流文本消息
+     */
+    public static MessageEntity getThreadWorkflowTextMessage(String content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .thread(thread)
+                .type(MessageTypeEnum.TEXT.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    public static MessageEntity getThreadWorkflowChoiceMessage(ChoiceContent content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+        String json = content != null ? content.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .thread(thread)
+                .type(MessageTypeEnum.CHOICE.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
                 .createdAt(BdDateUtils.now())

@@ -50,6 +50,7 @@ import com.bytedesk.call.esl.client.transport.message.EslMessage;
 public class Client implements IModEslApi {
 	private final List<IEslEventListener> eventListeners = new CopyOnWriteArrayList<>();
 	private final AtomicBoolean authenticatorResponded = new AtomicBoolean(false);
+	private final AtomicBoolean disconnectedDuringHandshake = new AtomicBoolean(false);
     @SuppressWarnings("unused")
     private final ConcurrentHashMap<String, CompletableFuture<EslEvent>> backgroundJobs =
 	    new ConcurrentHashMap<>();
@@ -99,6 +100,12 @@ public class Client implements IModEslApi {
 			close();
 		}
 
+		authenticatorResponded.set(false);
+		disconnectedDuringHandshake.set(false);
+		authenticated = false;
+		authenticationResponse = null;
+		clientContext = Optional.empty();
+
 		log.info("Connecting to {} ...", clientAddress);
 
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -135,17 +142,25 @@ public class Client implements IModEslApi {
 
 		//  Wait for the authentication handshake to call back
 		while (!authenticatorResponded.get()) {
+			if (disconnectedDuringHandshake.get()) {
+				workerGroup.shutdownGracefully();
+				throw new InboundConnectionFailure("Disconnected before FreeSWITCH authentication completed: " + clientAddress);
+			}
 			try {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
-				// ignore
+				Thread.currentThread().interrupt();
+				workerGroup.shutdownGracefully();
+				throw new InboundConnectionFailure("Interrupted while waiting for FreeSWITCH authentication", e);
 			}
 		}
 
 		this.clientContext = Optional.of(new Context(channel, handler));
 
 		if (!authenticated) {
-			throw new InboundConnectionFailure("Authentication failed: " + authenticationResponse.getReplyText());
+			workerGroup.shutdownGracefully();
+			String replyText = authenticationResponse == null ? "authentication response missing" : authenticationResponse.getReplyText();
+			throw new InboundConnectionFailure("Authentication failed: " + replyText);
 		}
 
 		log.info("Authenticated");
@@ -353,6 +368,8 @@ public class Client implements IModEslApi {
 
 		@Override
 		public void disconnected() {
+			disconnectedDuringHandshake.set(true);
+			authenticatorResponded.set(true);
 			log.info("Disconnected ...");
 		}
 	};
