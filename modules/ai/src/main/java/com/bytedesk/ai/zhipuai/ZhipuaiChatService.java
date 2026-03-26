@@ -48,12 +48,23 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ZhipuaiChatService {
 
-    @Autowired
+    private static final String CLIENT_UNAVAILABLE_MESSAGE = "Zhipuai client is not available";
+
+    @Autowired(required = false)
     @Qualifier("zhipuaiChatClient")
     private ClientV4 client;
 
     @Autowired
     private ZhipuaiChatConfig zhipuaiChatConfig;
+
+    private boolean isClientUnavailable(String operation) {
+        if (client != null) {
+            return false;
+        }
+
+        log.warn("Skipping Zhipuai {} because chat client is unavailable. Check spring.ai.zhipuai.api-key configuration", operation);
+        return true;
+    }
 
     /**
      * 角色扮演聊天
@@ -64,6 +75,10 @@ public class ZhipuaiChatService {
                 message.length(), userInfo, botInfo, botName, userName);
         
         long startTime = System.currentTimeMillis();
+
+        if (isClientUnavailable("rolePlayChat")) {
+            return CLIENT_UNAVAILABLE_MESSAGE;
+        }
         
         // 使用默认client进行角色扮演聊天
         ClientV4 chatClient = client;
@@ -136,6 +151,10 @@ public class ZhipuaiChatService {
                 message.length(), model, temperature, functions != null ? functions.size() : 0);
         
         long startTime = System.currentTimeMillis();
+
+        if (isClientUnavailable("functionCallingChat")) {
+            return CLIENT_UNAVAILABLE_MESSAGE;
+        }
         
         // 使用默认client进行函数调用聊天
         ClientV4 chatClient = client;
@@ -205,6 +224,10 @@ public class ZhipuaiChatService {
      * 流式 Function Calling 聊天（带自定义参数）
      */
     public Flux<String> functionCallingChatStream(String message, String model, Double temperature, List<ChatFunction> functions) {
+        if (isClientUnavailable("functionCallingChatStream")) {
+            return Flux.just(CLIENT_UNAVAILABLE_MESSAGE);
+        }
+
         // 使用默认client进行流式函数调用聊天
         ClientV4 chatClient = client;
         
@@ -378,6 +401,10 @@ public class ZhipuaiChatService {
         log.info("Zhipuai API async request - message length: {}", message.length());
         
         long startTime = System.currentTimeMillis();
+
+        if (isClientUnavailable("chatAsync")) {
+            return CLIENT_UNAVAILABLE_MESSAGE;
+        }
         
         // 使用默认client进行异步聊天
         ClientV4 chatClient = client;
@@ -422,6 +449,10 @@ public class ZhipuaiChatService {
      */
     private String pollAsyncResult(String taskId) {
         log.info("Zhipuai API starting async result polling for taskId: {}", taskId);
+
+        if (isClientUnavailable("pollAsyncResult")) {
+            return CLIENT_UNAVAILABLE_MESSAGE;
+        }
         
         try {
             int maxAttempts = 30; // 最多轮询30次
@@ -472,6 +503,10 @@ public class ZhipuaiChatService {
                 message.length(), searchQuery);
         
         long startTime = System.currentTimeMillis();
+
+        if (isClientUnavailable("chatWithWebSearch")) {
+            return CLIENT_UNAVAILABLE_MESSAGE;
+        }
         
         // 使用默认client进行网络搜索聊天
         ClientV4 chatClient = client;
@@ -563,6 +598,10 @@ public class ZhipuaiChatService {
     public void testStreamResponse() {
         // 使用默认client进行测试
         // ClientV4 chatClient = client;
+
+        if (isClientUnavailable("testStreamResponse")) {
+            return;
+        }
         
         try {
             log.info("Zhipuai API testing stream response...");

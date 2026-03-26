@@ -84,22 +84,28 @@ public class ZhipuaiChatConfig {
         }
 
         log.info("Initializing Zhipuai chat client with model: {}", model);
-        
-        return new ClientV4.Builder(apiKey)
-                .enableTokenCache()
-                .networkConfig(
-                    connectionTimeout, 
-                    readTimeout, 
-                    writeTimeout, 
-                    pingInterval, 
-                    TimeUnit.SECONDS
-                )
-                .connectionPool(new ConnectionPool(
-                    maxIdleConnections, 
-                    keepAliveDuration, 
-                    TimeUnit.SECONDS
-                ))
-                .build();
+
+        try {
+            return new ClientV4.Builder(apiKey)
+                    .enableTokenCache()
+                    .networkConfig(
+                        connectionTimeout,
+                        readTimeout,
+                        writeTimeout,
+                        pingInterval,
+                        TimeUnit.SECONDS
+                    )
+                    .connectionPool(new ConnectionPool(
+                        maxIdleConnections,
+                        keepAliveDuration,
+                        TimeUnit.SECONDS
+                    ))
+                    .build();
+        } catch (Exception e) {
+            log.warn("Failed to initialize Zhipuai chat client, ZhipuAI native features will be disabled: {}",
+                    e.getMessage());
+            return null;
+        }
     }
 
 
