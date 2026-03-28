@@ -113,7 +113,6 @@
         },
         {
           "id": "f6onszqys2tx7pw3tshb2vcy",
-          "outgoingEdgeId": "dw9jclv60i040saiikj3a386",
           "type": "audio",
           "content": { "url": "{{Assistant audio message}}" }
         }

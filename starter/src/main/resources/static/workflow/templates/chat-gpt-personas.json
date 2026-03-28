@@ -172,12 +172,10 @@
           "items": [
             {
               "id": "zaylo8bstqx0wp6bpdbd1rak",
-              "outgoingEdgeId": "q6o0cbyzxtvgls3jtz7rpdgw",
               "content": "Continue"
             },
             {
               "id": "d5jv3sjpzobsrnhcp055mxkv",
-              "outgoingEdgeId": "xjv7pkpgpwh169448t8pepg4",
               "content": "Back to menu"
             }
           ]
@@ -237,12 +235,10 @@
           "items": [
             {
               "id": "b6zif4xxe2cuiddc2oqayaxi",
-              "outgoingEdgeId": "jwydpoxngp2gvwanaruphe6s",
               "content": "Continue"
             },
             {
               "id": "ooib3mqlfkazta6iol1ocloe",
-              "outgoingEdgeId": "gfrpgowch879p1qaj9jzsh01",
               "content": "Back to menu"
             }
           ]
@@ -545,7 +541,6 @@
         },
         {
           "id": "b937909x86r3wzbn4mzxmw25",
-          "outgoingEdgeId": "fz77htstfb4jig82k66pl0vt",
           "type": "Set variable",
           "options": {
             "variableId": "vu9adij5penetej2xz89htfe6",

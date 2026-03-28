@@ -25,6 +25,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.utils.ConvertAiUtils;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.IMessageSendService;
@@ -1195,6 +1196,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         String welcomePayload = wc != null ? wc.toJson() : null;
         thread.setUserUid(robotEntity.getUid());
         thread.setRoboting().setContent(ThreadContent.of(MessageTypeEnum.WELCOME, welcomeContent, welcomePayload).toJson());
+
+        // 回切机器人接待时，清理人工接待残留状态，避免 RobotService 误判为“正在转人工”而跳过回复
+        thread.setAgent(BytedeskConsts.EMPTY_JSON_STRING);
+        thread.setTransfer(BytedeskConsts.EMPTY_JSON_STRING);
+        thread.setTransferStatus(ThreadTransferStatusEnum.NONE.name());
 
         // 设置机器人信息（使用精简版，避免 prompt 过长导致字段超限）
         String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);

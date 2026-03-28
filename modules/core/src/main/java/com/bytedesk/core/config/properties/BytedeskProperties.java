@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -36,12 +38,20 @@ import javax.crypto.spec.SecretKeySpec;
 @Setter
 @Component
 @ConfigurationProperties(BytedeskProperties.CONFIG_PREFIX)
-public class BytedeskProperties {
+public class BytedeskProperties implements EnvironmentAware {
 
     public static final String CONFIG_PREFIX = "bytedesk";
+    private static final String APPLICATION_VERSION_KEY = "application.version";
     private static final String ENCRYPTION_KEY = "bytedesk_license"; // 16字节密钥
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
+
+    private Environment environment;
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void init() {
@@ -669,6 +679,13 @@ public class BytedeskProperties {
      */
     public String getOriginalAppkey() {
         return this.licenseKey;
+    }
+
+    public String getVersion() {
+        if (StringUtils.hasText(this.version)) {
+            return this.version;
+        }
+        return environment != null ? environment.getProperty(APPLICATION_VERSION_KEY) : null;
     }
 
 }

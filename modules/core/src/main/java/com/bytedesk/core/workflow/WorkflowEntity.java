@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.workflow_edge.WorkflowEdgeEntity;
 import com.bytedesk.core.workflow_node.WorkflowNodeEntity;
+import com.bytedesk.core.workflow_settings.WorkflowSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.TypeConsts;
@@ -26,6 +27,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -76,6 +78,9 @@ public class WorkflowEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "workflow_status")
     private String status = WorkflowStatusEnum.DRAFT.name();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private WorkflowSettingsEntity settings;
 
     private String currentNodeId;
 

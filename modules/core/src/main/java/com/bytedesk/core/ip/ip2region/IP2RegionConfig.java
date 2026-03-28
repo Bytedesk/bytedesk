@@ -71,7 +71,7 @@ public class IP2RegionConfig {
                     return null;
                 }
                 Searcher loadedSearcher = Searcher.newWithBuffer(cBuff);
-                log.info("Initialized ip2region searcher with classpath resource: {}", dbFile);
+                // log.info("Initialized ip2region searcher with classpath resource: {}", dbFile);
                 return loadedSearcher;
             }
         } catch (Exception e) {

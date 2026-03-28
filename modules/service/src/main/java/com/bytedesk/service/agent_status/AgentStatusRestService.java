@@ -26,14 +26,15 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
+
 import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
-public class AgentStatusRestService extends BaseRestService<AgentStatusEntity, AgentStatusRequest, AgentStatusResponse> {
+public class AgentStatusRestService extends BaseRestServiceWithExport<AgentStatusEntity, AgentStatusRequest, AgentStatusResponse, AgentStatusExcel> {
     
     private final AgentStatusRepository agentStatusRepository;
 
@@ -134,6 +135,20 @@ public class AgentStatusRestService extends BaseRestService<AgentStatusEntity, A
         return response;
     }
 
+    @Override
+    public AgentStatusExcel convertToExcel(AgentStatusEntity entity) {
+        UserProtobuf agent = entity.getAgent();
+
+        AgentStatusExcel excel = new AgentStatusExcel();
+        excel.setNickname(agent != null ? agent.getNickname() : null);
+        excel.setAgentUid(agent != null ? agent.getUid() : null);
+        excel.setStatus(formatStatus(entity.getStatus()));
+        excel.setRestReason(entity.getRestReason());
+        excel.setDuration(formatDuration(entity.getDurationSeconds()));
+        excel.setCreatedAt(entity.getCreatedAt());
+        return excel;
+    }
+
     private void finalizePreviousStatusDuration(AgentStatusEntity currentStatus) {
         if (currentStatus == null) {
             return;
@@ -175,6 +190,45 @@ public class AgentStatusRestService extends BaseRestService<AgentStatusEntity, A
 
         previousStatus.setDurationSeconds(durationSeconds);
         agentStatusRepository.save(previousStatus);
+    }
+
+    private String formatStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return "-";
+        }
+
+        return switch (status) {
+            case "AVAILABLE" -> "接待中";
+            case "REST" -> "小休中";
+            case "BUSY" -> "忙碌中";
+            case "OFFLINE" -> "离线";
+            default -> status;
+        };
+    }
+
+    private String formatDuration(Long seconds) {
+        if (seconds == null) {
+            return "-";
+        }
+
+        long totalSeconds = Math.max(0L, seconds);
+        long days = totalSeconds / 86400;
+        long hours = (totalSeconds % 86400) / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long remainingSeconds = totalSeconds % 60;
+
+        StringBuilder builder = new StringBuilder();
+        if (days > 0) {
+            builder.append(days).append("天");
+        }
+        if (hours > 0 || days > 0) {
+            builder.append(hours).append("小时");
+        }
+        if (minutes > 0 || hours > 0 || days > 0) {
+            builder.append(minutes).append("分钟");
+        }
+        builder.append(remainingSeconds).append("秒");
+        return builder.toString();
     }
 
     

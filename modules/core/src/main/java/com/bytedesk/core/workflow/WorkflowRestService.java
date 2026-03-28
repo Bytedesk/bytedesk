@@ -33,6 +33,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.core.workflow_settings.WorkflowSettingsEntity;
+import com.bytedesk.core.workflow_settings.WorkflowSettingsRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +52,8 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     private final UidUtils uidUtils;
 
+    private final WorkflowSettingsRestService workflowSettingsRestService;
+
     // private final CacheManager cacheManager;
 
     private static final String DEFAULT_NICKNAME = WorkflowInitData.DEFAULT_WORKFLOW_NAME;
@@ -63,6 +67,12 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     @Override
     protected Page<WorkflowEntity> executePageQuery(Specification<WorkflowEntity> spec, Pageable pageable) {
         return workflowRepository.findAll(spec, pageable);
+    }
+
+    public Page<WorkflowEntity> queryByOrgEntity(WorkflowRequest request) {
+        Pageable pageable = request.getPageable();
+        Specification<WorkflowEntity> specs = WorkflowSpecification.search(request, authService);
+        return workflowRepository.findAll(specs, pageable);
     }
     
     // @Cacheable(value = CACHE_WORKFLOW, key = "#uid", unless = "#result == null || #result.isEmpty()")
@@ -78,6 +88,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         if (!StringUtils.hasText(entity.getType())) {
             entity.setType(WorkflowTypeEnum.CHATBOT.name());
         }
+        bindSettings(entity, request.getSettingsUid(), request.getOrgUid(), true);
         // 
         WorkflowEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -115,6 +126,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             if (request.getCurrentNode() != null) {
                 entity.setCurrentNodeId(request.getCurrentNode());
             }
+            bindSettings(entity, request.getSettingsUid(), entity.getOrgUid(), false);
             
             // 恢复关键字段，防止被覆盖
             entity.setUid(originalUid);
@@ -191,6 +203,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 if (entity.getCurrentNodeId() != null) {
                     latestEntity.setCurrentNodeId(entity.getCurrentNodeId());
                 }
+                latestEntity.setSettings(entity.getSettings());
                 if (entity.getCategoryUid() != null) {
                     latestEntity.setCategoryUid(entity.getCategoryUid());
                 }
@@ -214,7 +227,35 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Override
     public WorkflowResponse convertToResponse(WorkflowEntity entity) {
-        return modelMapper.map(entity, WorkflowResponse.class);
+        WorkflowResponse response = modelMapper.map(entity, WorkflowResponse.class);
+        response.setCurrentNode(entity.getCurrentNodeId());
+        WorkflowSettingsEntity settings = entity.getSettings();
+        if (settings != null) {
+            response.setSettingsUid(settings.getUid());
+            response.setSettingsName(settings.getName());
+            response.setSettingsDescription(settings.getDescription());
+        }
+        return response;
+    }
+
+    public WorkflowExcel convertToExcel(WorkflowEntity entity) {
+        WorkflowExcel excel = new WorkflowExcel();
+        excel.setName(entity.getNickname());
+        excel.setType(entity.getType());
+        excel.setContent(entity.getSchema());
+        return excel;
+    }
+
+    private void bindSettings(WorkflowEntity entity, String settingsUid, String orgUid, boolean useDefaultWhenMissing) {
+        if (!StringUtils.hasText(settingsUid)) {
+            if (useDefaultWhenMissing) {
+                entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
+            }
+            return;
+        }
+        WorkflowSettingsEntity settings = workflowSettingsRestService.findByUid(settingsUid)
+                .orElseThrow(() -> new RuntimeException("Workflow settings not found with UID: " + settingsUid));
+        entity.setSettings(settings);
     }
 
     @Transactional
@@ -245,6 +286,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         entity.setType(WorkflowTypeEnum.CHATBOT.name());
         entity.setAvatar(AvatarConsts.getDefaultWorkflowAvatar());
         entity.setOrgUid(orgUid);
+        entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
 
         WorkflowEntity saved = save(entity);
         if (saved == null) {

@@ -1,1 +1,0 @@
-import{I as i}from"./index-DxkxHO1l.js";import o from"./index-XO4GJ5L5.js";async function c(t){const n=t.channel||i;return o("/visitor/api/v1/init",{method:"POST",data:{...t,channel:n,client:n}})}async function e(t){const n=t.channel||i;return o("/visitor/api/v1/browse",{method:"POST",data:{...t,channel:n,client:n}})}export{e as browse,c as initVisitor};

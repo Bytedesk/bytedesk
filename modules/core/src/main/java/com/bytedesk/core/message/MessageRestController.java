@@ -13,8 +13,13 @@
  */
 package com.bytedesk.core.message;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +33,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -51,9 +57,14 @@ import lombok.extern.slf4j.Slf4j;
 @Description("Message Management Controller - Message management APIs for CRUD operations")
 public class MessageRestController extends BaseRestController<MessageRequest, MessageRestService> {
 
+    private static final DateTimeFormatter EXPORT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final int[] EXPORT_COLUMN_WIDTHS = {60, 20, 30, 30};
+
     private final MessageRestService messageRestService;
 
     private final IMessageSendService messageSendService;
+
+    private final MessageSource messageSource;
 
     /**
      * 根据组织查询消息
@@ -234,14 +245,67 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
     @GetMapping("/export")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_EXPORT)
     public Object export(MessageRequest request, HttpServletResponse response) {
-        return exportTemplate(
-            request,
-            response,
-            messageRestService,
-            MessageExcel.class,
-            "消息",
-            "Message"
-        );
+        try {
+            Locale locale = ExcelExportUtils.resolveLocale(request);
+            String sheetName = localize("export.message.sheet", "Message", locale);
+            String filePrefix = localize("export.message.file.prefix", "Message", locale);
+
+            Page<MessageEntity> messagePage = messageRestService.queryByOrgEntity(request);
+            List<List<Object>> rows = messagePage.getContent().stream()
+                    .map(entity -> buildExportRow(entity, locale))
+                    .collect(Collectors.toList());
+
+            ExcelExportUtils.writeCustomExcel(
+                response,
+                sheetName,
+                filePrefix,
+                buildExportHead(locale),
+                rows,
+                EXPORT_COLUMN_WIDTHS);
+        } catch (Exception e) {
+            log.error("export message failed: request={}", request, e);
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            String message = e.getMessage() != null ? e.getMessage() : e.toString();
+            return JsonResult.error(message);
+        }
+        return "";
+    }
+
+    private List<List<String>> buildExportHead(Locale locale) {
+        return List.of(
+                List.of(localize("export.message.column.content", "Content", locale)),
+                List.of(localize("export.message.column.type", "Type", locale)),
+                List.of(localize("export.message.column.sender", "Sender", locale)),
+                List.of(localize("export.message.column.createdAt", "Created At", locale)));
+    }
+
+    private List<Object> buildExportRow(MessageEntity entity, Locale locale) {
+        String content = nullableToEmpty(entity.getContent());
+        String type = nullableToEmpty(localizeMessageType(entity.getType(), locale));
+        String sender = entity.getUserProtobuf() != null ? nullableToEmpty(entity.getUserProtobuf().getNickname()) : "";
+        String createdAt = entity.getCreatedAt() != null ? entity.getCreatedAt().format(EXPORT_DATETIME_FORMATTER) : "";
+        return List.of(content, type, sender, createdAt);
+    }
+
+    private String localizeMessageType(String type, Locale locale) {
+        String messageKey = MessageTypeConverter.convertToChineseType(type);
+        if (messageKey == null || messageKey.isBlank()) {
+            return type;
+        }
+        if (messageKey.startsWith(I18Consts.I18N_PREFIX)) {
+            return localize(messageKey, type, locale);
+        }
+        return messageKey;
+    }
+
+    private String localize(String key, String defaultMessage, Locale locale) {
+        return messageSource.getMessage(key, null, defaultMessage, locale);
+    }
+
+    private String nullableToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     /**

@@ -269,7 +269,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson.annotation.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate5-jakarta -->
         <!-- 用于处理Hibernate懒加载代理对象的序列化 -->
@@ -355,7 +355,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>easyexcel</artifactId>
-            <version>4.0.3</version>
+            <version>${easyexcel.version}</version>
             <scope>provided</scope>
         </dependency>
 

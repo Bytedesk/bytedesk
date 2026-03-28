@@ -114,6 +114,9 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("Failed to create dynamic ZhipuAiClient, using default", e);
             return defaultClient;
+        } catch (LinkageError e) {
+            log.error("Failed to create dynamic ZhipuAiClient due to SDK/runtime incompatibility, using default", e);
+            return defaultClient;
         }
     }
 

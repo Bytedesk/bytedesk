@@ -132,8 +132,14 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @Override
     @GetMapping("/export")
     public Object export(WorkflowRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            workflowRestService,
+            WorkflowExcel.class,
+            "工作流",
+            "workflow"
+        );
     }
 
     // 执行工作流

@@ -118,9 +118,9 @@
                 "children": [
                   { "text": "👉 " },
                   {
-                    "url": "https://app.typebot.io/feedback",
+                    "url": "https://app.weiyuai.cn/feedback",
                     "type": "a",
-                    "children": [{ "text": "https://app.typebot.io/feedback" }]
+                    "children": [{ "text": "https://app.weiyuai.cn/feedback" }]
                   },
                   { "text": "" }
                 ]
@@ -141,11 +141,6 @@
           "id": "cl16lb3b300092e6dh4h01vxw",
           "type": "choice input",
           "items": [{ "id": "cl16lb3b3000a2e6dy8zdhzpz", "content": "Restart" }]
-        },
-        {
-          "id": "j08qxg0h804rngfroedblt5f",
-          "type": "Jump",
-          "options": { "groupId": "vLUAPaxKwPF49iZhg4XZYa" }
         }
       ]
     },
@@ -164,7 +159,7 @@
                 "children": [
                   { "text": "First, don't forget to check out the " },
                   {
-                    "url": "https://docs.typebot.io/",
+                    "url": "https://docs.weiyuai.cn/",
                     "type": "a",
                     "children": [{ "text": "Documentation 🙏" }]
                   }
@@ -242,11 +237,6 @@
           "id": "s4JATFkBxzmcqqEKQB2xFfa",
           "type": "choice input",
           "items": [{ "id": "jqm8wZa5yYb73493n5s3Uc", "content": "Restart" }]
-        },
-        {
-          "id": "igdnc34rcmiyamazghr8s708",
-          "type": "Jump",
-          "options": { "groupId": "vLUAPaxKwPF49iZhg4XZYa" }
         }
       ]
     },

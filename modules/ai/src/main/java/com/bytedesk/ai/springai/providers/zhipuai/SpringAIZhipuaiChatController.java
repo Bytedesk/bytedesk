@@ -55,11 +55,12 @@ import reactor.core.publisher.Flux;
 /**
  * @deprecated 使用ZhipuaiController
  * 智谱AI接口
- * https://open.bigmodel.cn/dev/api#sdk_install
- * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * https://docs.bigmodel.cn/cn/guide/models/chat/glm-4.5-flash
+ * https://github.com/zai-org/z-ai-sdk-java
  * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
  */
 @Slf4j
+@Deprecated
 @RestController
 @RequestMapping("/zhipuai")
 @RequiredArgsConstructor

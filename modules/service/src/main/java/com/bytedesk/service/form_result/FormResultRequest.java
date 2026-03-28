@@ -45,5 +45,10 @@ public class FormResultRequest extends BaseRequest {
 
     private String formData;
 
+    /**
+     * 提交时表单 schema 快照，避免后续表单结构变更导致结果不可回溯
+     */
+    private String formSchema;
+
     private Integer formVersion;
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260327-add-form-result-form_schema" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_form_result" />
+            <not>
+                <columnExists tableName="bytedesk_service_form_result" columnName="form_schema" />
+            </not>
+        </preConditions>
+        <comment>Add form schema snapshot for form results</comment>
+        <addColumn tableName="bytedesk_service_form_result">
+            <column name="form_schema" type="TEXT" />
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_form_result" columnName="form_schema" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

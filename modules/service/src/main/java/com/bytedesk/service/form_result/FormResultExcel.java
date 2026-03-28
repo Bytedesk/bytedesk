@@ -42,6 +42,10 @@ public class FormResultExcel {
     @ColumnWidth(10)
     private Integer formVersion;
 
+    @ExcelProperty(index = 4, value = "表单结构快照")
+    @ColumnWidth(50)
+    private String formSchema;
+
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)

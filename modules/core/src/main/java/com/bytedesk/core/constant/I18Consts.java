@@ -45,6 +45,7 @@ public class I18Consts {
     public static final String I18N_ORGANIZATION = I18N_PREFIX + "organization";
     public static final String I18N_CITY = I18N_PREFIX + "city";
     public static final String I18N_WORKFLOW = I18N_PREFIX + "workflow";
+    public static final String I18N_WORKFLOW_SETTINGS = I18N_PREFIX + "workflow.settings";
     public static final String I18N_DOCUMENT = I18N_PREFIX + "document";
     public static final String I18N_WORKFLOW_EDGE = I18N_PREFIX + "workflow.edge";
     public static final String I18N_TOPIC_SUBSCRIPTION = I18N_PREFIX + "topic.subscription";
@@ -106,6 +107,7 @@ public class I18Consts {
     public static final String I18N_MESSAGE_LEAVE = I18N_PREFIX + "message.leave.management";
     public static final String I18N_TICKET_SETTINGS = I18N_PREFIX + "ticket.settings.management";
     public static final String I18N_FORM_RESULT = I18N_PREFIX + "form.result.management";
+    public static final String I18N_AGENT_STATUS = I18N_PREFIX + "agent.status.management";
     public static final String I18N_AGENT_STATUS_SETTING = I18N_PREFIX + "agent.status.setting.management";
     public static final String I18N_VISITOR_CUSTOM_FIELD_SETTINGS = I18N_PREFIX + "visitor.custom.field.settings.management";
     public static final String I18N_CUSTOMER_CUSTOM_FIELD_SETTINGS = I18N_PREFIX + "customer.custom.field.settings.management";

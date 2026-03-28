@@ -49,6 +49,8 @@ public class WorkflowRequest extends BaseRequest {
 
     private String status;
 
+    private String settingsUid;
+
     private String currentNode;
 
     private String categoryUid;

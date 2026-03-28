@@ -128,6 +128,12 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
                         }
                         // formData 是 JSON 字符串，前端可自行解析；同时保存 formResultUid 便于后续关联
                         contentJson.put("formData", request.getFormData());
+                        if (StringUtils.hasText(request.getFormSchema())) {
+                            contentJson.put("formSchema", request.getFormSchema());
+                        }
+                        if (request.getFormVersion() != null) {
+                            contentJson.put("formVersion", request.getFormVersion());
+                        }
                         contentJson.put("formResultUid", savedEntity.getUid());
                         messageEntity.setContent(contentJson.toJSONString());
                         messageRestService.save(messageEntity);
@@ -226,6 +232,7 @@ public class FormResultRestService extends BaseRestServiceWithExport<FormResultE
                 latestEntity.setType(entity.getType());
                 latestEntity.setUser(entity.getUser());
                 latestEntity.setFormData(entity.getFormData());
+                latestEntity.setFormSchema(entity.getFormSchema());
                 latestEntity.setFormVersion(entity.getFormVersion());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());

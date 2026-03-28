@@ -16,7 +16,6 @@ package com.bytedesk.core.message;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 // import org.springframework.cache.annotation.Cacheable;
@@ -29,7 +28,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -42,15 +41,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageRestService extends BaseRestServiceWithExport<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
+public class MessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
 
-    private final ModelMapper modelMapper;
-
     private final AuthService authService;
 
-    @Override
     public Page<MessageEntity> queryByOrgEntity(MessageRequest request) {
         // 非超级管理员请求如果未传 orgUid，默认使用当前用户的 orgUid，避免抛异常导致 500
         if (!StringUtils.hasText(request.getOrgUid())) {
@@ -200,15 +196,6 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
-    }
-    
-    @Override
-    public MessageExcel convertToExcel(MessageEntity entity) {
-        MessageExcel messageExcel = modelMapper.map(entity, MessageExcel.class);
-        messageExcel.setType(MessageTypeConverter.convertToChineseType(entity.getType()));
-        messageExcel.setContent(entity.getContent());
-        messageExcel.setSender(entity.getUserProtobuf().getNickname());
-        return messageExcel;
     }
 
     /**

@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +41,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     private final AgentStatusRestService agentStatusService;
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent status by org")
     @Operation(summary = "Query Agent Status by Organization")
     @GetMapping("/query/org")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
@@ -50,6 +53,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent status by user")
     @Operation(summary = "Query Agent Status by User")
     @GetMapping({ "/query", "/query/user" })
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
@@ -61,6 +65,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent status by uid")
     @Operation(summary = "Query Agent Status by UID")
     @GetMapping("/query/uid")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
@@ -72,6 +77,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_CREATE, description = "create agent status")
     @Operation(summary = "Create Agent Status")
     @PostMapping("/create")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_CREATE)
@@ -83,6 +89,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent status")
     @Operation(summary = "Update Agent Status")
     @PostMapping("/update")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_UPDATE)
@@ -94,6 +101,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent status")
     @Operation(summary = "Delete Agent Status")
     @PostMapping("/delete")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_DELETE)
@@ -105,11 +113,18 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status")
     @GetMapping("/export")
     @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_EXPORT)
     public Object export(AgentStatusRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            agentStatusService,
+            AgentStatusExcel.class,
+            "客服状态",
+            "agent_status"
+        );
     }
 
     

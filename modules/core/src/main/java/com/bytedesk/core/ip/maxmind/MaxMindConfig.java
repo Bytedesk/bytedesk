@@ -55,7 +55,7 @@ public class MaxMindConfig {
                     builder.locales(locales);
                 }
                 DatabaseReader loadedDatabaseReader = builder.build();
-                log.info("Initialized MaxMind database reader with classpath resource: {}", dbFile);
+                // log.info("Initialized MaxMind database reader with classpath resource: {}", dbFile);
                 return loadedDatabaseReader;
             }
         } catch (Exception e) {

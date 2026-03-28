@@ -135,14 +135,6 @@
           "items": [
             { "id": "cl96o55z3000y3b6idpn54byw", "content": "Sounds good!" }
           ]
-        },
-        {
-          "id": "qrg1xtxxbmyo8a6mztma3dvr",
-          "type": "Jump",
-          "options": {
-            "groupId": "cl96ns9qr00043b6ii07bo25o",
-            "blockId": "cl96nv877000b3b6i7p69ss2o"
-          }
         }
       ]
     },
@@ -180,7 +172,6 @@
           "items": [
             {
               "id": "cl96o6a2700163b6i818ywnqv",
-              "outgoingEdgeId": "n4rgj2fmqrmnkvo9m9ebzak7",
               "content": "Awesome!"
             },
             {
@@ -233,14 +224,6 @@
           "items": [
             { "id": "cl96o9xbd001e3b6i6ag5ooo7", "content": "Ok, got it!" }
           ]
-        },
-        {
-          "id": "bkmgmgxa96k5261su12hv58k",
-          "type": "Jump",
-          "options": {
-            "groupId": "cl96ns9qr00043b6ii07bo25o",
-            "blockId": "cl96nv877000b3b6i7p69ss2o"
-          }
         }
       ]
     },
@@ -295,14 +278,6 @@
           "id": "cl96oftnv001r3b6ixen8g0bv",
           "type": "choice input",
           "items": [{ "id": "cl96oftnv001s3b6i7kjyq7me", "content": "Cool!" }]
-        },
-        {
-          "id": "js5pbqj76g67yvs6wz99rcbm",
-          "type": "Jump",
-          "options": {
-            "groupId": "cl96ns9qr00043b6ii07bo25o",
-            "blockId": "cl96nv877000b3b6i7p69ss2o"
-          }
         }
       ]
     },

@@ -110,6 +110,18 @@ public abstract class BaseRequest implements Serializable, PageableRequest {
     @Builder.Default
     private Boolean exportAll = false;
 
+    // 前端当前语言，用于导出等需要显式本地化的场景
+    private String lang;
+
+    // 前端传入的导出表头映射，JSON 对象格式：{"fieldName":"Localized Title"}
+    private String exportHeaders;
+
+    // 前端传入的导出文件名，用于按当前语言生成下载文件名
+    private String exportFileName;
+
+    // 前端传入的 sheetName，用于按当前语言生成 Excel 工作表名称
+    private String exportSheetName;
+
     // 排序方式，默认按更新时间倒序
     // updatedAt/createdAt: 'ascend', 'descend'
     // 其他字段可以根据需要添加

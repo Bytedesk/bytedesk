@@ -117,8 +117,7 @@
             "variableId": "vabkycu0qqff5d6ar2ama16pf",
             "type": "Append value(s)",
             "item": "{{Assistant Message}}"
-          },
-          "outgoingEdgeId": "at8takz56suqmaul5teazymb"
+          }
         }
       ]
     },

@@ -22,8 +22,7 @@
 		<jsonp.version>1.18.3</jsonp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
-		<zhipuai.oapi-java-sdk.version>release-V4-2.4.3</zhipuai.oapi-java-sdk.version>
-		<zai-sdk.version>0.3.2</zai-sdk.version>
+		<zai-sdk.version>0.3.3</zai-sdk.version>
 	</properties>
 
 	<dependencies>
@@ -196,23 +195,58 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
-		<!-- spring ai 官方无法正常统计 token 使用量，使用这个zhipuai 官方库 -->
-		<!-- https://github.com/MetaGLM/zhipuai-sdk-java-v4 -->
-		<!-- https://bigmodel.cn/dev/api/devguide/sdk-install -->
-		<!-- https://mvnrepository.com/artifact/cn.bigmodel.openapi/oapi-java-sdk -->
-		<dependency>
-			<groupId>cn.bigmodel.openapi</groupId>
-			<artifactId>oapi-java-sdk</artifactId>
-			<version>${zhipuai.oapi-java-sdk.version}</version>
-		</dependency>
-
 		<!-- https://github.com/zai-org/z-ai-sdk-java -->
 		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
 		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
+		<!-- 已将 zai-sdk 源码 vendor 到 modules/ai/src/main/java/ai/z/openapi，
+			为避免与项目内同包源码重复，禁用外部二进制依赖。
 		<dependency>
 			<groupId>ai.z.openapi</groupId>
 			<artifactId>zai-sdk</artifactId>
 			<version>${zai-sdk.version}</version>
+		</dependency>
+		-->
+
+		<!-- vendored zai-sdk 运行/编译所需基础依赖 -->
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>retrofit</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>converter-jackson</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.retrofit2</groupId>
+			<artifactId>adapter-rxjava3</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.reactivex.rxjava3</groupId>
+			<artifactId>rxjava</artifactId>
+			<version>3.1.12</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>3.14.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp-sse</artifactId>
+			<version>3.14.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>logging-interceptor</artifactId>
+			<version>3.14.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>4.4.0</version>
 		</dependency>
 
 		<!-- https://java2ai.com/docs/quick-start -->

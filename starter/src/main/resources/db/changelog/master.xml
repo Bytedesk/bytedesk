@@ -102,5 +102,9 @@
     <include file="db/changelog/migration/260326_add_shop_access_token.xml" />
     <include file="db/changelog/migration/260326_alter_shop_access_token_to_text.xml" />
     <include file="db/changelog/migration/260326_add_shop_auto_refresh_access_token.xml" />
+    <include file="db/changelog/migration/260327_add_form_result_schema_snapshot.xml" />
+    <include file="db/changelog/migration/260327_add_workflow_settings_binding.xml" />
+    <include file="db/changelog/migration/260327_add_workflow_settings_iframe_tabs.xml" />
+    <include file="db/changelog/migration/260327_add_workflow_settings_enabled.xml" />
 
 </databaseChangeLog>

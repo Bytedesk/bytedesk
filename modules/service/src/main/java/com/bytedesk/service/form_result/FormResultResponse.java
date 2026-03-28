@@ -44,6 +44,8 @@ public class FormResultResponse extends BaseResponse {
 
     private String formData;
 
+    private String formSchema;
+
     private Integer formVersion;
 
 }

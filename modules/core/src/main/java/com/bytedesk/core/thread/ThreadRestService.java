@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
@@ -68,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class ThreadRestService
-        extends BaseRestServiceWithExport<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
+    extends BaseRestService<ThreadEntity, ThreadRequest, ThreadResponse> {
 
     private final AuthService authService;
 
@@ -149,7 +149,6 @@ public class ThreadRestService
         return result;
     }
 
-    @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.search(request, authService);
@@ -1020,43 +1019,6 @@ public class ThreadRestService
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {
         return ThreadConvertUtils.convertToThreadResponse(thread);
-    }
-
-    @Override
-    public ThreadExcel convertToExcel(ThreadEntity entity) {
-        ThreadExcel excel = modelMapper.map(entity, ThreadExcel.class);
-        excel.setUid(entity.getUid());
-        //
-        if (entity.getUser() != null) {
-            UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
-            excel.setVisitorNickname(user.getNickname());
-        }
-        // agent
-        if (entity.getAgent() != null) {
-            UserProtobuf agent = UserProtobuf.fromJson(entity.getAgent());
-            excel.setAgentNickname(agent.getNickname());
-        }
-        // robot
-        if (entity.getRobot() != null) {
-            UserProtobuf robot = UserProtobuf.fromJson(entity.getRobot());
-            excel.setRobotNickname(robot.getNickname());
-        }
-        if (entity.getWorkgroup() != null) {
-            UserProtobuf workgroup = UserProtobuf.fromJson(entity.getWorkgroup());
-            excel.setWorkgroupNickname(workgroup.getNickname());
-        }
-
-        // 将client转换为中文
-        if (StringUtils.hasText(entity.getChannel())) {
-            excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
-        }
-
-        // 将status转换为中文
-        if (StringUtils.hasText(entity.getStatus())) {
-            excel.setStatus(ThreadProcessStatusEnum.toChineseDisplay(entity.getStatus()));
-        }
-
-        return excel;
     }
 
     @Override

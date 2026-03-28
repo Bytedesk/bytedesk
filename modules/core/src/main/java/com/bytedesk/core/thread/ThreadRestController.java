@@ -13,6 +13,12 @@
  */
 package com.bytedesk.core.thread;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,14 +31,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 会话管理接口
@@ -40,13 +51,19 @@ import lombok.AllArgsConstructor;
  * @author Jackning
  * @since 2024-01-29
  */
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/thread")
 @Tag(name = "Thread Management", description = "Thread management APIs, including query, create, update, delete, pin, and star operations")
 public class ThreadRestController extends BaseRestController<ThreadRequest, ThreadRestService> {
 
+    private static final DateTimeFormatter EXPORT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final int[] EXPORT_COLUMN_WIDTHS = {25, 20, 20, 20, 20, 20, 28};
+
     private final ThreadRestService threadRestService;
+
+    private final MessageSource messageSource;
 
     /**
      * 根据组织查询会话
@@ -433,14 +450,122 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_EXPORT, description = "export thread")
     @Operation(summary = "Export Thread List", description = "Export thread data to Excel format")
     public Object export(ThreadRequest request, HttpServletResponse response) {
-        return exportTemplate(
-            request,
-            response,
-            threadRestService,
-            ThreadExcel.class,
-            "会话列表",
-            "thread"
-        );
+        try {
+            Locale locale = ExcelExportUtils.resolveLocale(request);
+            String sheetName = localize("export.thread.sheet", "Thread", locale);
+            String filePrefix = localize("export.thread.file.prefix", "Thread", locale);
+
+            Page<ThreadEntity> threadPage = threadRestService.queryByOrgEntity(request);
+            List<List<Object>> rows = threadPage.getContent().stream()
+                    .map(entity -> buildExportRow(entity, locale))
+                    .collect(Collectors.toList());
+
+            ExcelExportUtils.writeCustomExcel(
+                response,
+                sheetName,
+                filePrefix,
+                buildExportHead(locale),
+                rows,
+                EXPORT_COLUMN_WIDTHS);
+        } catch (Exception e) {
+            log.error("export thread failed: request={}", request, e);
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            String message = e.getMessage() != null ? e.getMessage() : e.toString();
+            return JsonResult.error(message);
+        }
+        return "";
+    }
+
+    private List<List<String>> buildExportHead(Locale locale) {
+        return List.of(
+                List.of(localize("export.thread.column.visitorNickname", "Visitor", locale)),
+                List.of(localize("export.thread.column.agentNickname", "Agent", locale)),
+                List.of(localize("export.thread.column.robotNickname", "Robot", locale)),
+                List.of(localize("export.thread.column.workgroupNickname", "Workgroup", locale)),
+                List.of(localize("export.thread.column.status", "Status", locale)),
+                List.of(localize("export.thread.column.channel", "Channel", locale)),
+                List.of(localize("export.thread.column.createdAt", "Created At", locale)));
+    }
+
+    private List<Object> buildExportRow(ThreadEntity entity, Locale locale) {
+        String visitorNickname = extractNickname(entity.getUser());
+        String agentNickname = extractNickname(entity.getAgent());
+        String robotNickname = extractNickname(entity.getRobot());
+        String workgroupNickname = extractNickname(entity.getWorkgroup());
+        String status = nullableToEmpty(localizeThreadStatus(entity.getStatus(), locale));
+        String channel = nullableToEmpty(localizeChannel(entity.getChannel(), locale));
+        String createdAt = entity.getCreatedAt() != null ? entity.getCreatedAt().format(EXPORT_DATETIME_FORMATTER) : "";
+        return List.of(visitorNickname, agentNickname, robotNickname, workgroupNickname, status, channel, createdAt);
+    }
+
+    private String extractNickname(String userJson) {
+        if (!StringUtils.hasText(userJson)) {
+            return "";
+        }
+        try {
+            UserProtobuf user = UserProtobuf.fromJson(userJson);
+            return nullableToEmpty(user.getNickname());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private String localizeThreadStatus(String status, Locale locale) {
+        if (!StringUtils.hasText(status)) {
+            return "";
+        }
+        try {
+            ThreadProcessStatusEnum statusEnum = ThreadProcessStatusEnum.fromValue(status);
+            return switch (statusEnum) {
+                case NEW -> localize("thread.process.status.new", "New", locale);
+                case ROBOTING -> localize("thread.process.status.roboting", "Robot Handling", locale);
+                case OFFLINE -> localize("thread.process.status.offline", "Agent Offline", locale);
+                case QUEUING -> localize("thread.process.status.queuing", "Queuing", locale);
+                case CHATTING -> localize("thread.process.status.chatting", "Chatting", locale);
+                case TIMEOUT -> localize("thread.process.status.timeout", "Timeout", locale);
+                case CLOSED -> localize("thread.process.status.closed", "Closed", locale);
+            };
+        } catch (Exception e) {
+            return status;
+        }
+    }
+
+    private String localizeChannel(String channel, Locale locale) {
+        if (!StringUtils.hasText(channel)) {
+            return "";
+        }
+        if (locale != null && locale.getLanguage() != null && locale.getLanguage().startsWith("zh")) {
+            return ChannelEnum.toChineseDisplay(channel);
+        }
+        return humanizeEnumValue(channel);
+    }
+
+    private String humanizeEnumValue(String value) {
+        if (!StringUtils.hasText(value)) {
+            return "";
+        }
+        String[] parts = value.toLowerCase(Locale.ROOT).split("_");
+        StringBuilder builder = new StringBuilder();
+        for (String part : parts) {
+            if (part.isEmpty()) {
+                continue;
+            }
+            if (builder.length() > 0) {
+                builder.append(' ');
+            }
+            builder.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
+        }
+        return builder.length() > 0 ? builder.toString() : value;
+    }
+
+    private String localize(String key, String defaultMessage, Locale locale) {
+        return messageSource.getMessage(key, null, defaultMessage, locale);
+    }
+
+    private String nullableToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     /**

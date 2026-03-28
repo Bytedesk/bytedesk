@@ -17,7 +17,6 @@ services:
       TZ: Asia/Shanghai
       SERVER_PORT: 9003
       BYTEDESK_DEBUG: "false"
-      BYTEDESK_VERSION: 1.6.0
       BYTEDESK_LICENSE_KEY: ${BYTEDESK_LICENSE_KEY:-}
       # ===============================
       # Custom config
@@ -118,13 +117,16 @@ services:
       # 60 days in milliseconds. 60 天，单位毫秒。
       BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION: 5184000000
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_LIQUIBASE_ENABLED: "true"
+      # Can be turned off during initial installation; recommended to turn on during upgrades to automatically run database migration scripts. 默认初始安装时可关闭，升级时建议开启以自动执行数据库迁移脚本。 
+      # SPRING_LIQUIBASE_ENABLED: "true"
+      # 
       SPRING_DATA_REDIS_DATABASE: 0
       SPRING_DATA_REDIS_HOST: redis-bytedesk
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
       SPRING_DATA_REDIS_TIMEOUT: 10000
       SPRING_DATA_REDIS_REPOSITORIES_ENABLED: "false"
+      # 
       BYTEDESK_CACHE_LEVEL: 2
       BYTEDESK_CACHE_PREFIX: bytedeskim
       BYTEDESK_CACHE_REDIS_STREAM_KEY: bytedeskim:stream
