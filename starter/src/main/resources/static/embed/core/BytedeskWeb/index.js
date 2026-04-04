@@ -1,7 +1,7 @@
 var _ = Object.defineProperty;
 var A = (F, e, t) => e in F ? _(F, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : F[e] = t;
 var u = (F, e, t) => A(F, typeof e != "symbol" ? e + "" : e, t);
-import { BYTEDESK_UID as W, BYTEDESK_VISITOR_UID as U, BYTEDESK_BROWSE_LAST_TIMESTAMP as V, BYTEDESK_BROWSE_FAILED_TIMESTAMP as O, POST_MESSAGE_LOCALSTORAGE_RESPONSE as N, POST_MESSAGE_INVITE_VISITOR_REJECT as Y, POST_MESSAGE_INVITE_VISITOR_ACCEPT as j, POST_MESSAGE_INVITE_VISITOR as q, POST_MESSAGE_RECEIVE_MESSAGE as X, POST_MESSAGE_MINIMIZE_WINDOW as G, POST_MESSAGE_MAXIMIZE_WINDOW as K, POST_MESSAGE_CLOSE_CHAT_WINDOW as J, POST_MESSAGE_RESET_ANONYMOUS_VISITOR as Z } from "../../utils/constants/index.js";
+import { BYTEDESK_UID as W, BYTEDESK_VISITOR_UID as U, BYTEDESK_BROWSE_LAST_TIMESTAMP as V, BYTEDESK_BROWSE_FAILED_TIMESTAMP as L, POST_MESSAGE_LOCALSTORAGE_RESPONSE as N, POST_MESSAGE_INVITE_VISITOR_REJECT as Y, POST_MESSAGE_INVITE_VISITOR_ACCEPT as j, POST_MESSAGE_INVITE_VISITOR as q, POST_MESSAGE_RECEIVE_MESSAGE as X, POST_MESSAGE_MINIMIZE_WINDOW as G, POST_MESSAGE_MAXIMIZE_WINDOW as K, POST_MESSAGE_CLOSE_CHAT_WINDOW as J, POST_MESSAGE_RESET_ANONYMOUS_VISITOR as Z } from "../../utils/constants/index.js";
 import i, { setGlobalConfig as Q } from "../../utils/logger/index.js";
 class se {
   constructor(e) {
@@ -195,7 +195,7 @@ class se {
       visitorUid: t
     }) : (i.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(
       async ({ initVisitor: b }) => {
-        var r, c, g, h, f, w, y, x, p, E, B, D, m, C, T, v, k, S, $, I, L, R, P, z;
+        var r, c, g, h, f, w, y, x, p, E, B, D, m, C, T, v, k, S, $, I, O, R, P, z;
         try {
           const H = {
             uid: String(((r = this.config.chatConfig) == null ? void 0 : r.uid) || e || ""),
@@ -221,7 +221,7 @@ class se {
           ), i.debug(
             "已保存visitorUid到localStorage:",
             M.data.data.visitorUid
-          )), (L = M.data) != null && L.data && (i.debug("触发onVisitorInfo回调"), (P = (R = this.config).onVisitorInfo) == null || P.call(
+          )), (O = M.data) != null && O.data && (i.debug("触发onVisitorInfo回调"), (P = (R = this.config).onVisitorInfo) == null || P.call(
             R,
             M.data.data.uid || "",
             M.data.data.visitorUid || ""
@@ -251,7 +251,7 @@ class se {
           return;
         }
       }
-      const l = localStorage.getItem(O);
+      const l = localStorage.getItem(L);
       if (l) {
         const T = parseInt(l), v = Date.now(), k = 60 * 60 * 1e3;
         if (v - T < k) {
@@ -259,7 +259,7 @@ class se {
           i.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${S} 分钟`);
           return;
         } else
-          localStorage.removeItem(O);
+          localStorage.removeItem(L);
       }
       const d = window.location.href, b = document.title, r = document.referrer, c = navigator.userAgent, g = this.getBrowserInfo(c), h = this.getOSInfo(c), f = this.getDeviceInfo(c), w = `${screen.width}x${screen.height}`, y = new URLSearchParams(window.location.search), x = y.get("utm_source") || void 0, p = y.get("utm_medium") || void 0, E = y.get("utm_campaign") || void 0, B = localStorage.getItem(W), D = {
         url: d,
@@ -287,9 +287,9 @@ class se {
       }
       localStorage.setItem(V, Date.now().toString());
       const { browse: m } = await import("../../apis/visitor/index.js"), C = await m(D);
-      ((o = C.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(O) : (i.error("浏览记录发送失败:", (n = C.data) == null ? void 0 : n.message), localStorage.setItem(O, Date.now().toString()), i.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
+      ((o = C.data) == null ? void 0 : o.code) === 200 ? localStorage.removeItem(L) : (i.error("浏览记录发送失败:", (n = C.data) == null ? void 0 : n.message), localStorage.setItem(L, Date.now().toString()), i.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
     } catch (a) {
-      i.error("发送浏览记录时出错:", a), localStorage.setItem(O, Date.now().toString()), i.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+      i.error("发送浏览记录时出错:", a), localStorage.setItem(L, Date.now().toString()), i.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
     }
   }
   // 获取浏览器信息
@@ -340,7 +340,7 @@ class se {
   }
   // 清除浏览记录发送失败的限制
   clearBrowseFailedLimit() {
-    localStorage.removeItem(O), localStorage.removeItem(V), i.info("已清除浏览记录发送失败的限制");
+    localStorage.removeItem(L), localStorage.removeItem(V), i.info("已清除浏览记录发送失败的限制");
   }
   // 清除本地访客信息，强制重新初始化
   clearVisitorInfo() {
@@ -751,12 +751,12 @@ class se {
       }), document.addEventListener("mousemove", (k) => {
         if (!this.isDragging) return;
         k.preventDefault();
-        const S = k.clientX - m, $ = k.clientY - C, I = T + S, L = v + $, R = window.innerHeight - e.offsetHeight;
+        const S = k.clientX - m, $ = k.clientY - C, I = T + S, O = v + $, R = window.innerHeight - e.offsetHeight;
         I <= window.innerWidth / 2 ? (e.style.left = `${Math.max(0, I)}px`, e.style.right = "auto", e.style.alignItems = "flex-start", this.config.placement = "bottom-left") : (e.style.right = `${Math.max(
           0,
           window.innerWidth - I - e.offsetWidth
         )}px`, e.style.left = "auto", e.style.alignItems = "flex-end", this.config.placement = "bottom-right"), e.style.bottom = `${Math.min(
-          Math.max(0, window.innerHeight - L - e.offsetHeight),
+          Math.max(0, window.innerHeight - O - e.offsetHeight),
           R
         )}px`;
       }), document.addEventListener("mouseup", () => {
@@ -863,8 +863,20 @@ class se {
     return i.debug("chat url: ", o), o;
   }
   getChatPageBaseUrl() {
-    const e = this.config.chatPath, t = e === "/chat/thread" ? "/chat/thread" : e === "/chat" || !e ? "/chat" : e, s = (this.config.htmlUrl || "").trim();
-    return s ? s.match(/\/chat(?:\/thread)?\/?$/) ? s.replace(/\/chat(?:\/thread)?\/?$/, t) : `${s.replace(/\/$/, "")}${t}` : t;
+    const e = this.config.chatPath, t = e === "/chat/thread" ? "/chat/thread" : e === "/chat" || !e ? "/chat" : e, s = (this.config.htmlUrl || "").trim(), o = s.replace(/\/$/, "");
+    if (!s)
+      return t;
+    if (o.match(/\/(chat(?:\/thread)?|webrtc)\/?$/))
+      return o.replace(/\/(chat(?:\/thread)?|webrtc)\/?$/, t);
+    try {
+      const a = new URL(s, window.location.origin);
+      if (a.pathname && a.pathname !== "/")
+        return o;
+    } catch {
+      if (o.startsWith("/"))
+        return o;
+    }
+    return `${o}${t}`;
   }
   setupMessageListener() {
     window.addEventListener("message", (e) => {
