@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentStatusEnum;
-import com.bytedesk.service.visitor.VisitorCallTypeEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.AllArgsConstructor;
@@ -57,16 +57,16 @@ public class PresenceFacadeService {
             return false;
         }
 
-        VisitorCallTypeEnum resolvedCallType = callType == null ? VisitorCallTypeEnum.TEXT : callType;
+        // VisitorCallTypeEnum resolvedCallType = callType == null ? VisitorCallTypeEnum.TEXT : callType;
         if (status == AgentStatusEnum.AVAILABLE) {
             return true;
         }
-        return switch (resolvedCallType) {
-            case AUDIO -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_AUDIO;
-            case VIDEO -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_VIDEO;
-            case PHONE -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_PHONE;
-            case TEXT -> false;
-        };
+        return false;
+        // return switch (resolvedCallType) {
+        //     case WEBRTC -> status == AgentStatusEnum.AVAILABLE;
+        //     case PHONE -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_PHONE;
+        //     case TEXT -> false;
+        // };
     }
 
     /** 计算工作组是否有任意在线坐席 */

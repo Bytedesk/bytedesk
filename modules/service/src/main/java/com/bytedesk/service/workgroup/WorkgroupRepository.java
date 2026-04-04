@@ -17,6 +17,8 @@ package com.bytedesk.service.workgroup;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -32,6 +34,8 @@ public interface WorkgroupRepository extends JpaRepository<WorkgroupEntity, Long
     List<WorkgroupEntity> findByDeletedFalse();
 
     List<WorkgroupEntity> findByOrgUidAndDeletedFalse(String orgUid);
+
+    Page<WorkgroupEntity> findByOrgUidAndDeletedFalse(String orgUid, Pageable pageable);
 
     long countByOrgUidAndDeletedFalse(String orgUid);
 

@@ -13,6 +13,7 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -152,4 +153,16 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private RobotToAgentSettingsEntity draftRobotToAgentSettings;
+
+    /**
+     * WebRTC settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity webrtcSettings;
+
+    /**
+     * Draft WebRTC settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity draftWebrtcSettings;
 }

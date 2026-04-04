@@ -38,6 +38,10 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
+import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotRepository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +86,8 @@ public class AgentSettingsRestService
     private final AuthService authService;
 
     private final AgentRepository agentRepository;
+
+    private final RobotRepository robotRepository;
 
     private final ServiceSettingsHelper serviceSettingsHelper;
 
@@ -286,6 +292,16 @@ public class AgentSettingsRestService
         stDraft.setUid(uidUtils.getUid());
         syncOrgUser(stDraft, orgUid, userUid);
         entity.setDraftAgentStatusSettings(stDraft);
+
+        // 发布与草稿：WebRTC 设置
+        WebrtcSettingsEntity webrtc = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+        webrtc.setUid(uidUtils.getUid());
+        syncOrgUser(webrtc, orgUid, userUid);
+        entity.setWebrtcSettings(webrtc);
+        WebrtcSettingsEntity webrtcDraft = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+        webrtcDraft.setUid(uidUtils.getUid());
+        syncOrgUser(webrtcDraft, orgUid, userUid);
+        entity.setDraftWebrtcSettings(webrtcDraft);
 
         // Desktop right panel dynamic tabs
         entity.setRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
@@ -558,6 +574,24 @@ public class AgentSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        if (request.getWebrtcSettings() != null) {
+            WebrtcSettingsEntity draft = entity.getDraftWebrtcSettings();
+            if (draft == null) {
+                draft = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftWebrtcSettings(draft);
+
+                WebrtcSettingsEntity settings = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+                settings.setUid(uidUtils.getUid());
+                entity.setWebrtcSettings(settings);
+            } else {
+                String originalUid = draft.getUid();
+                applyWebrtcSettingsRequestToEntity(request.getWebrtcSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
         // Desktop right panel dynamic tabs (draft)
         if (request.getRightPanelTabs() != null) {
             entity.setDraftRightPanelTabs(normalizeRightPanelTabs(request.getRightPanelTabs()));
@@ -760,6 +794,16 @@ public class AgentSettingsRestService
             settings.setAgentStatusSettings(st);
             settings.setDraftAgentStatusSettings(stDraft);
 
+            // WebRTC 设置（发布 + 草稿）
+            WebrtcSettingsEntity webrtcPublished = mapWebrtcSettingsFromRequest(null);
+            webrtcPublished.setUid(uidUtils.getUid());
+            syncOrgUser(webrtcPublished, orgUid, userUid);
+            WebrtcSettingsEntity webrtcDraft = mapWebrtcSettingsFromRequest(null);
+            webrtcDraft.setUid(uidUtils.getUid());
+            syncOrgUser(webrtcDraft, orgUid, userUid);
+            settings.setWebrtcSettings(webrtcPublished);
+            settings.setDraftWebrtcSettings(webrtcDraft);
+
             // Desktop quick reply buttons（发布 + 草稿）默认项
             settings.setQuickReplies(defaultQuickReplies());
             settings.setDraftQuickReplies(defaultQuickReplies());
@@ -950,6 +994,18 @@ public class AgentSettingsRestService
             }
         }
 
+        if (entity.getDraftWebrtcSettings() != null) {
+            WebrtcSettingsEntity published = entity.getWebrtcSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftWebrtcSettings(), published);
+            } else {
+                WebrtcSettingsEntity newPublished = new WebrtcSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftWebrtcSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setWebrtcSettings(newPublished);
+            }
+        }
+
         // Publish desktop right panel tabs
         if (entity.getDraftRightPanelTabs() != null) {
             entity.setRightPanelTabs(new ArrayList<>(entity.getDraftRightPanelTabs()));
@@ -1037,6 +1093,31 @@ public class AgentSettingsRestService
                     .build());
         }
         return out.isEmpty() ? defaultQuickReplies() : out;
+    }
+
+    private WebrtcSettingsEntity mapWebrtcSettingsFromRequest(WebrtcSettingsRequest request) {
+        WebrtcSettingsEntity entity = modelMapper.map(
+                request != null ? request : WebrtcSettingsRequest.builder().build(),
+                WebrtcSettingsEntity.class);
+        applyWebrtcSettingsRequestToEntity(request, entity);
+        return entity;
+    }
+
+    private void applyWebrtcSettingsRequestToEntity(WebrtcSettingsRequest request, WebrtcSettingsEntity target) {
+        if (target == null || request == null) {
+            return;
+        }
+        if (request.getDefaultVoiceAgent() != null) {
+            target.setDefaultVoiceAgent(request.getDefaultVoiceAgent());
+        }
+        String robotUid = request.getRobotUid();
+        if (robotUid == null || robotUid.isBlank()) {
+            target.setRobot(null);
+            return;
+        }
+        RobotEntity robot = robotRepository.findByUid(robotUid)
+                .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
+        target.setRobot(robot);
     }
 
     @Override

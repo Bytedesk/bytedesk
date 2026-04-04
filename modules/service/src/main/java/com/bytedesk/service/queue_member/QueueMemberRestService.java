@@ -138,7 +138,16 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         try {
             transactionTemplate.executeWithoutResult(status -> queueMemberRepository.saveAndFlush(entity));
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.warn("QueueMember async update optimistic lock ignored: uid={}, msg={}", entity.getUid(), e.getMessage());
+            log.warn("QueueMember async update optimistic lock detected, retry merge: uid={}, msg={}", entity.getUid(), e.getMessage());
+            try {
+                transactionTemplate.executeWithoutResult(status -> queueMemberRepository.findByUid(entity.getUid())
+                        .ifPresent(latest -> {
+                            mergeBestEffortFields(latest, entity);
+                            queueMemberRepository.saveAndFlush(latest);
+                        }));
+            } catch (Exception ex) {
+                log.error("QueueMember async merge retry failed: uid={}, msg={}", entity.getUid(), ex.getMessage(), ex);
+            }
         } catch (Exception e) {
             log.error("QueueMember async update failed: uid={}, msg={}", entity.getUid(), e.getMessage(), e);
         }
@@ -174,37 +183,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             Optional<QueueMemberEntity> latestEntityOpt = queueMemberRepository.findByUid(entity.getUid());
             if (latestEntityOpt.isPresent()) {
                 QueueMemberEntity latestEntity = latestEntityOpt.get();
-                
-                // 根据业务需求合并变更
-                // 保留当前实体中的重要计数值
-                if (entity.getVisitorMessageCount() > latestEntity.getVisitorMessageCount()) {
-                    latestEntity.setVisitorMessageCount(entity.getVisitorMessageCount());
-                }
-                
-                if (entity.getAgentMessageCount() > latestEntity.getAgentMessageCount()) {
-                    latestEntity.setAgentMessageCount(entity.getAgentMessageCount());
-                }
-                
-                if (entity.getRobotMessageCount() > latestEntity.getRobotMessageCount()) {
-                    latestEntity.setRobotMessageCount(entity.getRobotMessageCount());
-                }
-                
-                if (entity.getSystemMessageCount() > latestEntity.getSystemMessageCount()) {
-                    latestEntity.setSystemMessageCount(entity.getSystemMessageCount());
-                }
-                
-                // 保持最新的时间戳
-                if (entity.getVisitorLastMessageAt() != null && 
-                    (latestEntity.getVisitorLastMessageAt() == null || 
-                     entity.getVisitorLastMessageAt().isAfter(latestEntity.getVisitorLastMessageAt()))) {
-                    latestEntity.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
-                }
-                
-                if (entity.getAgentLastResponseAt() != null && 
-                    (latestEntity.getAgentLastResponseAt() == null || 
-                     entity.getAgentLastResponseAt().isAfter(latestEntity.getAgentLastResponseAt()))) {
-                    latestEntity.setAgentLastResponseAt(entity.getAgentLastResponseAt());
-                }
+                mergeBestEffortFields(latestEntity, entity);
                 
                 // 保存合并后的实体
                 return queueMemberRepository.save(latestEntity);
@@ -216,6 +195,85 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             log.error("在处理乐观锁异常时发生错误: {}", ex.getMessage(), ex);
             // 抛出运行时异常以确保事务一致性，避免静默回滚
             throw new RuntimeException("处理乐观锁异常失败: " + ex.getMessage(), ex);
+        }
+    }
+
+    private void mergeBestEffortFields(QueueMemberEntity target, QueueMemberEntity source) {
+        if (source.getVisitorMessageCount() > target.getVisitorMessageCount()) {
+            target.setVisitorMessageCount(source.getVisitorMessageCount());
+        }
+
+        if (source.getAgentMessageCount() > target.getAgentMessageCount()) {
+            target.setAgentMessageCount(source.getAgentMessageCount());
+        }
+
+        if (source.getRobotMessageCount() > target.getRobotMessageCount()) {
+            target.setRobotMessageCount(source.getRobotMessageCount());
+        }
+
+        if (source.getSystemMessageCount() > target.getSystemMessageCount()) {
+            target.setSystemMessageCount(source.getSystemMessageCount());
+        }
+
+        if (source.getAgentAvgResponseLength() != null && source.getAgentAvgResponseLength() > 0
+                && (target.getAgentAvgResponseLength() == null || target.getAgentAvgResponseLength() <= 0)) {
+            target.setAgentAvgResponseLength(source.getAgentAvgResponseLength());
+        }
+
+        if (source.getAgentMaxResponseLength() != null && source.getAgentMaxResponseLength() > 0
+                && (target.getAgentMaxResponseLength() == null || source.getAgentMaxResponseLength() > target.getAgentMaxResponseLength())) {
+            target.setAgentMaxResponseLength(source.getAgentMaxResponseLength());
+        }
+
+        if (source.getVisitorFirstMessageAt() != null
+                && (target.getVisitorFirstMessageAt() == null || source.getVisitorFirstMessageAt().isBefore(target.getVisitorFirstMessageAt()))) {
+            target.setVisitorFirstMessageAt(source.getVisitorFirstMessageAt());
+        }
+
+        if (source.getVisitorLastMessageAt() != null
+                && (target.getVisitorLastMessageAt() == null || source.getVisitorLastMessageAt().isAfter(target.getVisitorLastMessageAt()))) {
+            target.setVisitorLastMessageAt(source.getVisitorLastMessageAt());
+        }
+
+        if (source.getAgentAcceptedAt() != null
+                && (target.getAgentAcceptedAt() == null || source.getAgentAcceptedAt().isBefore(target.getAgentAcceptedAt()))) {
+            target.setAgentAcceptedAt(source.getAgentAcceptedAt());
+        }
+
+        if (source.getAgentFirstResponseAt() != null
+                && (target.getAgentFirstResponseAt() == null || source.getAgentFirstResponseAt().isBefore(target.getAgentFirstResponseAt()))) {
+            target.setAgentFirstResponseAt(source.getAgentFirstResponseAt());
+        }
+
+        if (Boolean.TRUE.equals(source.getAgentFirstResponse())) {
+            target.setAgentFirstResponse(true);
+        }
+
+        if (source.getAgentLastResponseAt() != null
+                && (target.getAgentLastResponseAt() == null || source.getAgentLastResponseAt().isAfter(target.getAgentLastResponseAt()))) {
+            target.setAgentLastResponseAt(source.getAgentLastResponseAt());
+        }
+
+        if (source.getAgentClosedAt() != null
+                && (target.getAgentClosedAt() == null || source.getAgentClosedAt().isAfter(target.getAgentClosedAt()))) {
+            target.setAgentClosedAt(source.getAgentClosedAt());
+        }
+
+        if (source.getSystemClosedAt() != null
+                && (target.getSystemClosedAt() == null || source.getSystemClosedAt().isAfter(target.getSystemClosedAt()))) {
+            target.setSystemClosedAt(source.getSystemClosedAt());
+        }
+
+        if (Boolean.TRUE.equals(source.getAgentClose())) {
+            target.setAgentClose(true);
+        }
+
+        if (Boolean.TRUE.equals(source.getSystemClose())) {
+            target.setSystemClose(true);
+        }
+
+        if (StringUtils.hasText(source.getAgentAcceptType()) && !StringUtils.hasText(target.getAgentAcceptType())) {
+            target.setAgentAcceptType(source.getAgentAcceptType());
         }
     }
 

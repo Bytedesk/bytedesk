@@ -16,7 +16,19 @@ declare interface BubbleConfig {
     icon?: string;
     title?: string;
     subtitle?: string;
+    messages?: BubbleMessageItem[];
+    autoRotate?: boolean;
+    rotateInterval?: number;
+    switchMode?: BubbleSwitchMode;
 }
+
+declare interface BubbleMessageItem {
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+}
+
+declare type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 declare interface ButtonConfig {
     show?: boolean;
@@ -32,7 +44,7 @@ declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
-    chatPath?: '/chat' | '/chat/thread';
+    chatPath?: '/chat' | '/chat/thread' | '/webrtc';
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;

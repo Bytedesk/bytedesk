@@ -44,12 +44,13 @@ import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
-import com.bytedesk.service.visitor.VisitorCallTypeEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
-import com.bytedesk.video.webrtc.IWebrtcService;
-import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
+import com.bytedesk.webrtc.webrtc.IWebrtcService;
+import com.bytedesk.webrtc.webrtc.WebrtcDirectionEnum;
+import com.bytedesk.webrtc.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
@@ -153,9 +154,9 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private ThreadEntity getOrCreateThread(VisitorRequest visitorRequest, AgentEntity agentEntity, String topic,
             VisitorCallTypeEnum callType) {
         long startTime = System.currentTimeMillis();
-        String visitorUidForTopic = resolveVisitorUidForThreadTopic(visitorRequest);
-        log.debug("开始获取或创建线程 - topic: {}, visitorUid: {}, agentUid: {}",
-                topic, visitorUidForTopic, agentEntity.getUid());
+        // String visitorUidForTopic = resolveVisitorUidForThreadTopic(visitorRequest);
+        log.debug("开始获取或创建线程 - topic: {}, agentUid: {}",
+                topic, agentEntity.getUid());
 
         try {
             // 当强制新建会话时，直接创建新会话，跳过复用逻辑
@@ -204,8 +205,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return newThread;
 
         } catch (Exception e) {
-            log.error("获取或创建线程失败 - topic: {}, visitorUid: {}, agentUid: {}, 错误: {}, 耗时: {}ms",
-                    topic, visitorUidForTopic, agentEntity.getUid(), e.getMessage(),
+            log.error("获取或创建线程失败 - topic: {}, agentUid: {}, 错误: {}, 耗时: {}ms",
+                    topic, agentEntity.getUid(), e.getMessage(),
                     System.currentTimeMillis() - startTime, e);
             throw new RuntimeException("Failed to get or create thread", e);
         }
@@ -293,6 +294,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return handleOfflineAgent(visitorRequest, thread, agentEntity, queueMemberEntity);
         }
 
+        // 队列限制判断：如果队列已满且配置了强制留言，直接进入留言流程（不进入排队）
         QueueSettingsEntity queueSettings = getAgentQueueSettings(visitorRequest, agentEntity);
         if (shouldForceLeaveMessage(agentQueue, queueSettings)) {
             int queuingCount = agentQueue != null ? agentQueue.getQueuingCount() : 0;
@@ -464,10 +466,10 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         if (visitorRequest == null || thread == null || agent == null) {
             return;
         }
-        VisitorCallTypeEnum callType = visitorRequest.formatCallType();
-        if (callType != VisitorCallTypeEnum.AUDIO && callType != VisitorCallTypeEnum.VIDEO) {
+        if (!visitorRequest.shouldTriggerWebrtcInvite()) {
             return;
         }
+        String inviteVideoMode = visitorRequest.resolveWebrtcInviteVideoMode();
 
         String callerUid = resolveVisitorUidForThreadTopic(visitorRequest);
         if (!StringUtils.hasText(callerUid) || !StringUtils.hasText(agent.getUid())) {
@@ -481,13 +483,15 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             inviteRequest.setThreadUid(thread.getUid());
             inviteRequest.setCallerUid(callerUid);
             inviteRequest.setCalleeUid(agent.getUid());
-            inviteRequest.setCallType(callType.name());
+            inviteRequest.setCallType(VisitorCallTypeEnum.WEBRTC);
+            inviteRequest.setVideoMode(inviteVideoMode);
+            inviteRequest.setDirection(WebrtcDirectionEnum.INBOUND);
             webrtcService.invite(inviteRequest);
-            log.info("auto call invite sent, threadUid={}, callType={}, callerUid={}, calleeUid={}",
-                    thread.getUid(), callType.name(), callerUid, agent.getUid());
+            log.info("auto call invite sent, threadUid={}, callType={}, videoMode={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, callerUid, agent.getUid());
         } catch (Exception e) {
-            log.warn("auto call invite failed, threadUid={}, callType={}, reason={}",
-                    thread.getUid(), callType.name(), e.getMessage());
+            log.warn("auto call invite failed, threadUid={}, callType={}, videoMode={}, reason={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, e.getMessage());
         }
     }
 

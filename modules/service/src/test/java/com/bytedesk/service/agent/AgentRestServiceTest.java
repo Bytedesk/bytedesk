@@ -3,7 +3,9 @@ package com.bytedesk.service.agent;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,7 +15,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 
 import com.bytedesk.call.call_settings.CallSettingsEntity;
@@ -22,6 +26,7 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -29,8 +34,11 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
+import com.bytedesk.service.agent_seat.AgentSeatDomainService;
+import com.bytedesk.service.agent_seat.AgentSeatEntity;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class AgentRestServiceTest {
 
     @Mock
@@ -66,11 +74,14 @@ class AgentRestServiceTest {
         @Mock
         private MessageService messageService;
 
+        @Mock
+        private AgentSeatDomainService agentSeatDomainService;
+
     private AgentRestService agentRestService;
 
     @BeforeEach
     void setUp() {
-        agentRestService = new AgentRestService(
+                agentRestService = spy(new AgentRestService(
                 agentRepository,
                 uidUtils,
                 memberRestService,
@@ -81,7 +92,107 @@ class AgentRestServiceTest {
                 agentSettingsRestService,
                 modelMapper,
                 organizationRestService,
-                messageService);
+                messageService,
+                agentSeatDomainService));
+        doAnswer(invocation -> {
+            AgentEntity entity = invocation.getArgument(0);
+            return AgentResponse.builder()
+                    .uid(entity.getUid())
+                    .nickname(entity.getNickname())
+                    .email(entity.getEmail())
+                    .mobile(entity.getMobile())
+                                        .seatExpireAt(agentSeatDomainService.findSeatExpireAtByAgentUid(entity.getUid()).orElse(null))
+                    .enabled(entity.getEnabled())
+                    .build();
+        }).when(agentRestService).convertToResponse(any(AgentEntity.class));
+    }
+
+    @Test
+    void createShouldAssignManagedSeatAndMirrorExpireAt() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+
+        MemberEntity member = new MemberEntity();
+        member.setUid("member-1");
+        member.setUser(user);
+        member.setCountry("CN");
+
+        AgentSeatEntity seat = AgentSeatEntity.builder()
+                .uid("seat-1")
+                .expireAt(java.time.ZonedDateTime.parse("2027-04-10T00:00:00+08:00"))
+                .build();
+
+        AgentRequest request = AgentRequest.builder()
+                .uid("agent-1")
+                .orgUid("org-1")
+                .shopUid("shop-1")
+                .memberUid("member-1")
+                .nickname("Agent A")
+                .mobile("13800138000")
+                .email("agent-a@test.com")
+                .build();
+
+        OrganizationEntity organization = OrganizationEntity.builder()
+                .uid("org-1")
+                .maxAgents(5)
+                .build();
+
+        when(memberRestService.findByUid("member-1")).thenReturn(Optional.of(member));
+        when(organizationRestService.findByUid("org-1")).thenReturn(Optional.of(organization));
+        when(agentRepository.findByUserUidAndOrgUidAndDeletedFalse("user-1", "org-1")).thenReturn(Optional.empty());
+        when(agentRepository.existsByUserUidAndOrgUidAndDeletedFalse("user-1", "org-1")).thenReturn(false);
+        when(agentRepository.countByOrgUidAndDeletedFalse("org-1")).thenReturn(0L);
+        when(agentSeatDomainService.hasManagedSeats("org-1")).thenReturn(true);
+        when(agentSeatDomainService.hasAvailableSeat("org-1")).thenReturn(true);
+        when(userService.ensureCurrentOrganization(user, "org-1")).thenReturn(user);
+        when(userService.addRoleAgent(user)).thenReturn(user);
+        when(agentSeatDomainService.assignSeatForAgent("org-1", "member-1", "agent-1"))
+                .thenReturn(Optional.of(seat));
+        when(agentSeatDomainService.findSeatExpireAtByAgentUid("agent-1")).thenReturn(Optional.of(seat.getExpireAt()));
+        when(agentRepository.save(any(AgentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AgentResponse response = agentRestService.create(request);
+
+        assertThat(response).isNotNull();
+                assertThat(response.getSeatExpireAt()).isEqualTo(seat.getExpireAt());
+        verify(agentRepository).save(any(AgentEntity.class));
+    }
+
+    @Test
+    void createShouldRejectWhenManagedSeatsAreExhausted() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+
+        MemberEntity member = new MemberEntity();
+        member.setUid("member-1");
+        member.setUser(user);
+
+        AgentRequest request = AgentRequest.builder()
+                .uid("agent-1")
+                .orgUid("org-1")
+                .memberUid("member-1")
+                .nickname("Agent A")
+                .mobile("13800138000")
+                .email("agent-a@test.com")
+                .build();
+
+        OrganizationEntity organization = OrganizationEntity.builder()
+                .uid("org-1")
+                .maxAgents(5)
+                .build();
+
+        when(memberRestService.findByUid("member-1")).thenReturn(Optional.of(member));
+        when(organizationRestService.findByUid("org-1")).thenReturn(Optional.of(organization));
+        when(agentRepository.existsByUserUidAndOrgUidAndDeletedFalse("user-1", "org-1")).thenReturn(false);
+        when(agentRepository.countByOrgUidAndDeletedFalse("org-1")).thenReturn(0L);
+        when(agentSeatDomainService.hasManagedSeats("org-1")).thenReturn(true);
+        when(agentSeatDomainService.hasAvailableSeat("org-1")).thenReturn(false);
+
+        assertThatThrownBy(() -> agentRestService.create(request))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Organization agent seat limit exceeded");
+
+        verify(agentRepository, never()).save(any(AgentEntity.class));
     }
 
     @Test

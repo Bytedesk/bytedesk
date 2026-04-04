@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260330-01-add-workgroup-settings-webrtc-settings-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_workgroup_settings" columnName="webrtc_settings_id"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="webrtc_settings_id" type="BIGINT"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_workgroup_settings" columnName="webrtc_settings_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260330-02-add-workgroup-settings-draft-webrtc-settings-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_webrtc_settings_id"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="draft_webrtc_settings_id" type="BIGINT"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bytedesk_service_workgroup_settings" columnName="draft_webrtc_settings_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260330-03-add-workgroup-settings-webrtc-settings-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="webrtc_settings_id"/>
+                <not>
+                    <indexExists tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_webrtc_settings_id"/>
+                </not>
+            </and>
+        </preConditions>
+        <createIndex tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_webrtc_settings_id">
+            <column name="webrtc_settings_id"/>
+        </createIndex>
+        <rollback>
+            <dropIndex tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_webrtc_settings_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260330-04-add-workgroup-settings-draft-webrtc-settings-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_webrtc_settings_id"/>
+                <not>
+                    <indexExists tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_draft_webrtc_settings_id"/>
+                </not>
+            </and>
+        </preConditions>
+        <createIndex tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_draft_webrtc_settings_id">
+            <column name="draft_webrtc_settings_id"/>
+        </createIndex>
+        <rollback>
+            <dropIndex tableName="bytedesk_service_workgroup_settings" indexName="idx_workgroup_settings_draft_webrtc_settings_id"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260330-05-add-workgroup-settings-webrtc-settings-fk" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <tableExists tableName="bytedesk_video_webrtc_settings"/>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="webrtc_settings_id"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_workgroup_settings_webrtc_settings"/>
+                </not>
+            </and>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_settings"
+            baseColumnNames="webrtc_settings_id"
+            referencedTableName="bytedesk_video_webrtc_settings"
+            referencedColumnNames="id"
+            constraintName="fk_workgroup_settings_webrtc_settings"
+            onDelete="SET NULL"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="bytedesk_service_workgroup_settings" constraintName="fk_workgroup_settings_webrtc_settings"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260330-06-add-workgroup-settings-draft-webrtc-settings-fk" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_workgroup_settings"/>
+                <tableExists tableName="bytedesk_video_webrtc_settings"/>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="draft_webrtc_settings_id"/>
+                <not>
+                    <foreignKeyConstraintExists foreignKeyName="fk_workgroup_settings_draft_webrtc_settings"/>
+                </not>
+            </and>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_service_workgroup_settings"
+            baseColumnNames="draft_webrtc_settings_id"
+            referencedTableName="bytedesk_video_webrtc_settings"
+            referencedColumnNames="id"
+            constraintName="fk_workgroup_settings_draft_webrtc_settings"
+            onDelete="SET NULL"/>
+        <rollback>
+            <dropForeignKeyConstraint baseTableName="bytedesk_service_workgroup_settings" constraintName="fk_workgroup_settings_draft_webrtc_settings"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

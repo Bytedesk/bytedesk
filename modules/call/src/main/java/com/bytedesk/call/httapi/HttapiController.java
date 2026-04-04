@@ -31,13 +31,10 @@ public class HttapiController {
 
     // Accept GET and POST and be tolerant about Content-Type so FreeSWITCH requests
     // that don't set exact Content-Type still hit this handler.
-    @RequestMapping(value = "/ai-bot", method = { RequestMethod.POST,
-            RequestMethod.GET }, produces = "text/xml;charset=UTF-8")
-    public @ResponseBody byte[] aiBot(@RequestParam(required = false) MultiValueMap<String, String> form,
-            HttpServletRequest request) {
+    @RequestMapping(value = "/ai-bot", method = { RequestMethod.POST, RequestMethod.GET }, produces = "text/xml;charset=UTF-8")
+    public @ResponseBody byte[] aiBot(@RequestParam(required = false) MultiValueMap<String, String> form, HttpServletRequest request) {
         Map<String, String> vars = (form != null && !form.isEmpty()) ? flatten(form) : new HashMap<>();
-        // If form params were empty, try to read the raw body and parse a query-string
-        // style body
+        // If form params were empty, try to read the raw body and parse a query-string style body
         if (vars.isEmpty()) {
             String body = readRequestBody(request);
             if (body != null && !body.isBlank()) {

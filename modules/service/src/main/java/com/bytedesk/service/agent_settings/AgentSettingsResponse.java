@@ -20,6 +20,7 @@ import com.bytedesk.service.agent_status.settings.AgentStatusSettingResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsResponse;
 
 import java.util.List;
 
@@ -133,4 +134,14 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Desktop quick reply buttons (draft)
      */
     private List<AgentQuickReplyButton> draftQuickReplies;
+
+    /**
+     * WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsResponse webrtcSettings;
+
+    /**
+     * Draft WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsResponse draftWebrtcSettings;
 }

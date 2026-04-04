@@ -21,9 +21,9 @@ case "${DB}" in
 esac
 
 case "${SCENARIO}" in
-  standard|noai|call) ;;
+  standard|noai|call|webrtc) ;;
   *)
-    echo "[ERROR] Unsupported scenario: ${SCENARIO}. Allowed: standard|noai|call"
+    echo "[ERROR] Unsupported scenario: ${SCENARIO}. Allowed: standard|noai|call|webrtc"
     exit 1
     ;;
 esac

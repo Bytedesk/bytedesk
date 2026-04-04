@@ -20,6 +20,7 @@ import com.bytedesk.service.agent_status.settings.AgentStatusSettingRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
 
 import java.util.List;
 
@@ -106,4 +107,9 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
      * Agent uid (used for querying settings by agent)
      */
     private String agentUid;
+
+    /**
+     * WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsRequest webrtcSettings;
 }

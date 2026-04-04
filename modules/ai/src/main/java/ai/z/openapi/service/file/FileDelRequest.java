@@ -1,9 +1,6 @@
 package ai.z.openapi.service.file;
 
 import ai.z.openapi.core.model.ClientRequest;
-import ai.z.openapi.core.model.ClientResponse;
-import ai.z.openapi.service.batches.BatchRequest;
-import ai.z.openapi.service.model.ChatError;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

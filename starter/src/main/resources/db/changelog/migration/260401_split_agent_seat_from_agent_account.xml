@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260401-add-agent-seat-domain-column-shop-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="shop_uid"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="shop_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-seat-no" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="seat_no"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="seat_no" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-seat-source" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="seat_source"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="seat_source" type="VARCHAR(32)" defaultValue="EXTRA"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-seat-status" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="seat_status"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="seat_status" type="VARCHAR(32)" defaultValue="AVAILABLE"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-is-base-seat" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="is_base_seat"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="is_base_seat" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-expire-at" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="expire_at"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="expire_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-assigned-agent-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="assigned_agent_uid"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="assigned_agent_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-assigned-member-uid" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="assigned_member_uid"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="assigned_member_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-assigned-at" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="assigned_at"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="assigned_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-released-at" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="released_at"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="released_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-add-agent-seat-domain-column-agent-seat-type" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_agent_seat" columnName="agent_seat_type"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_agent_seat">
+            <column name="agent_seat_type" type="VARCHAR(64)" defaultValue="CUSTOMER"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-drop-agent-seat-domain-column-name" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <columnExists tableName="bytedesk_service_agent_seat" columnName="name"/>
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_agent_seat" columnName="name"/>
+    </changeSet>
+
+    <changeSet id="260401-drop-agent-seat-domain-column-description" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <columnExists tableName="bytedesk_service_agent_seat" columnName="description"/>
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_agent_seat" columnName="description"/>
+    </changeSet>
+
+</databaseChangeLog>

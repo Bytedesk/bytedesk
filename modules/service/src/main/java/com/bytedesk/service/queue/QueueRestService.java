@@ -319,7 +319,6 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         return queueRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue", key = "#topic+#day", unless = "#result==null")
     public Optional<QueueEntity> findByTopicAndDay(String topic, String day) {
         return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(topic, day);
     }

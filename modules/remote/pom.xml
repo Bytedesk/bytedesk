@@ -35,7 +35,7 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-video</artifactId>
+			<artifactId>bytedesk-module-webrtc</artifactId>
 			<version>${revision}</version>
 			<scope>provided</scope>
 		</dependency>

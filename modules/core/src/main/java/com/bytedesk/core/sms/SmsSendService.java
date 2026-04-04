@@ -14,6 +14,7 @@
 package com.bytedesk.core.sms;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,18 @@ public class SmsSendService {
 
     @Value("${aliyun.sms.templatecode:}")
     private String templateCode;
+
+    /**
+     * 默认关闭，开启后优先使用外部短信发送器。
+     */
+    @Value("${bytedesk.sms.external-enabled:false}")
+    private boolean externalSmsEnabled;
+
+    /**
+     * 外部短信发送器 key，空值表示使用第一个可用发送器。
+     */
+    @Value("${bytedesk.sms.external-sender-key:}")
+    private String externalSenderKey;
     
     /**
      * 初始化时处理配置项编码问题
@@ -84,6 +97,9 @@ public class SmsSendService {
 
     @Autowired
     private BytedeskProperties bytedeskProperties;
+
+    @Autowired(required = false)
+    private ObjectProvider<SmsExternalSender> smsExternalSenderProvider;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -119,11 +135,46 @@ public class SmsSendService {
             return SmsSendResult.success(); // 白名单手机号认为发送成功
         }
 
+        if (externalSmsEnabled) {
+            SmsSendResult externalResult = sendByExternalSenderIfAvailable(normalizedMobile, country, content, request);
+            if (externalResult != null) {
+                return externalResult;
+            }
+            log.warn("bytedesk.sms.external-enabled=true, but no external SMS sender is available, fallback to aliyun sender");
+        }
+
         try {
             return sendValidateCode(normalizedMobile, country, content);
         } catch (Exception e) {
             log.error("发送短信失败", e);
             return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "发送短信异常: " + e.getMessage());
+        }
+    }
+
+    private SmsSendResult sendByExternalSenderIfAvailable(String mobile, String country, String code, HttpServletRequest request) {
+        if (smsExternalSenderProvider == null) {
+            return null;
+        }
+
+        SmsExternalSender sender;
+        if (externalSenderKey == null || externalSenderKey.isBlank()) {
+            sender = smsExternalSenderProvider.orderedStream().findFirst().orElse(null);
+        } else {
+            sender = smsExternalSenderProvider.orderedStream()
+                    .filter(item -> externalSenderKey.equalsIgnoreCase(item.getSenderKey()))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        if (sender == null) {
+            return null;
+        }
+
+        try {
+            return sender.sendValidateCode(mobile, country, code, request);
+        } catch (Exception exception) {
+            log.error("外部短信发送失败", exception);
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_SMS_SERVICE_UNAVAILABLE);
         }
     }
 

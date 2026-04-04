@@ -15,6 +15,7 @@ package com.bytedesk.core.exception;
 
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
@@ -37,6 +39,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.upload.storage.UploadStorageException;
+import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.utils.JsonResult;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
@@ -173,23 +176,66 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        String rawMessage = e.getMessage();
+        String resolvedMessage = resolveRuntimeMessage(rawMessage);
+
         // 统一 not found：避免刷 error 堆栈，返回明确 404 code
-        if (e.getMessage() != null && e.getMessage().startsWith("Entity not found for UID:")) {
-            log.debug("Not found: {}", e.getMessage());
+        if (rawMessage != null && rawMessage.startsWith("Entity not found for UID:")) {
+            log.debug("Not found: {}", rawMessage);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND, 404));
         }
+
+        // 重复创建类业务冲突，返回更明确的错误码和可读文案
+        if (I18Consts.I18N_AGENT_EXISTS.equals(rawMessage)) {
+            log.warn("Business conflict: {}", rawMessage);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
+        }
+
         // 对于已知的业务异常类型，使用debug级别而不是error级别
         if (e instanceof org.springframework.security.access.AccessDeniedException) {
-            log.debug("Access denied: {}", e.getMessage());
-        } else if (e.getMessage() != null && e.getMessage().contains("already exists")) {
-            log.debug("Duplicate entry exception: {}", e.getMessage());
+            log.debug("Access denied: {}", rawMessage);
+        } else if (rawMessage != null && rawMessage.contains("already exists")) {
+            log.debug("Duplicate entry exception: {}", rawMessage);
         } else {
             // 其他未显式处理的运行时异常
             log.error("not handled exception", e);
         }
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        return ResponseEntity.ok().body(JsonResult.error(resolvedMessage));
+    }
+
+    private String resolveRuntimeMessage(String message) {
+        if (message == null || message.isBlank()) {
+            return "error";
+        }
+
+        if (message.startsWith(I18Consts.I18N_PREFIX)) {
+            String translated = tryTranslateI18nKey(message);
+            if (!message.equals(translated)) {
+                return translated;
+            }
+            if (I18Consts.I18N_AGENT_EXISTS.equals(message)) {
+                return "当前组织下该成员已是坐席，无需重复创建";
+            }
+        }
+
+        return message;
+    }
+
+    private String tryTranslateI18nKey(String key) {
+        try {
+            if (!ApplicationContextHolder.isInitialized()) {
+                return key;
+            }
+            MessageSource messageSource = ApplicationContextHolder.getBean(MessageSource.class);
+            return messageSource.getMessage(key, null, key, LocaleContextHolder.getLocale());
+        } catch (Exception ex) {
+            log.debug("Failed to translate i18n key: {}", key);
+            return key;
+        }
     }
 
     /**

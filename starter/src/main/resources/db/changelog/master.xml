@@ -106,5 +106,13 @@
     <include file="db/changelog/migration/260327_add_workflow_settings_binding.xml" />
     <include file="db/changelog/migration/260327_add_workflow_settings_iframe_tabs.xml" />
     <include file="db/changelog/migration/260327_add_workflow_settings_enabled.xml" />
+    <include file="db/changelog/migration/260330_add_agent_settings_webrtc_relations.xml" />
+    <include file="db/changelog/migration/260330_add_workgroup_settings_webrtc_relations.xml" />
+    <include file="db/changelog/migration/260401_split_agent_seat_from_agent_account.xml" />
+    <include file="db/changelog/migration/260401_add_shop_agent_seat_relations.xml" />
+    <include file="db/changelog/migration/260401_migrate_shop_edition_to_vip_level.xml" />
+    <include file="db/changelog/migration/260401_drop_agent_seat_expire_from_agent.xml" />
+    <include file="db/changelog/migration/260401_add_webrtc_call_direction_and_profiles.xml" />
+    <include file="db/changelog/migration/260401_add_menu_vip_level.xml" />
 
 </databaseChangeLog>

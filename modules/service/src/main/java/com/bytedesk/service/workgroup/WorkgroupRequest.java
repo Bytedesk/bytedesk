@@ -66,6 +66,11 @@ public class WorkgroupRequest extends BaseRequest {
      */
     private String settingsUid;
 
+    /**
+     * Business shop uid, used by open shop create APIs to resolve organization.
+     */
+    private String shopUid;
+
     private Boolean enabled;
 
     // 是否统一入口

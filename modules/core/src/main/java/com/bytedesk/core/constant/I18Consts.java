@@ -46,6 +46,9 @@ public class I18Consts {
     public static final String I18N_CITY = I18N_PREFIX + "city";
     public static final String I18N_WORKFLOW = I18N_PREFIX + "workflow";
     public static final String I18N_WORKFLOW_SETTINGS = I18N_PREFIX + "workflow.settings";
+    public static final String I18N_WEBRTC_SETTINGS = I18N_PREFIX + "webrtc.settings.management";
+    public static final String I18N_AUDIO_RECORDINGS = I18N_PREFIX + "audio.recordings.management";
+    public static final String I18N_VIDEO_RECORDINGS = I18N_PREFIX + "video.recordings.management";
     public static final String I18N_DOCUMENT = I18N_PREFIX + "document";
     public static final String I18N_WORKFLOW_EDGE = I18N_PREFIX + "workflow.edge";
     public static final String I18N_TOPIC_SUBSCRIPTION = I18N_PREFIX + "topic.subscription";
@@ -53,6 +56,9 @@ public class I18Consts {
     public static final String I18N_QUARTZ_TASK = I18N_PREFIX + "quartz.task";
     public static final String I18N_OPEN_PLATFORM = I18N_PREFIX + "open.platform";
     public static final String I18N_APP = I18N_PREFIX + "app";
+        public static final String I18N_ASR = I18N_PREFIX + "asr.management";
+        public static final String I18N_TTS = I18N_PREFIX + "tts.management";
+        public static final String I18N_OCR = I18N_PREFIX + "ocr.management";
     public static final String I18N_AI_TOKEN_STATISTIC = I18N_PREFIX + "ai.token.statistic";
     public static final String I18N_META_APP = I18N_PREFIX + "meta.app";
     public static final String I18N_SHOP_APP = I18N_PREFIX + "shop.app";
@@ -101,6 +107,7 @@ public class I18Consts {
     public static final String I18N_KBASE = I18N_PREFIX + "kbase.management";
     public static final String I18N_KBASE_STATISTIC = I18N_PREFIX + "kbase.statistic";
     public static final String I18N_AGENT = I18N_PREFIX + "agent.management";
+    public static final String I18N_AGENT_SEAT = I18N_PREFIX + "agent.seat";
     public static final String I18N_VISITOR = I18N_PREFIX + "visitor.management";
     public static final String I18N_TICKET = I18N_PREFIX + "ticket.management";
     public static final String I18N_TICKET_RATING = I18N_PREFIX + "ticket.rating";
@@ -371,6 +378,7 @@ public class I18Consts {
     // 客服相关
     public static final String I18N_AGENT_NICKNAME = I18N_PREFIX + "agent.nickname"; // 客服昵称
     public static final String I18N_AGENT_DESCRIPTION = I18N_PREFIX + "agent.description"; // 客服描述
+    public static final String I18N_AGENT_EXISTS = I18N_PREFIX + "agent.exists"; // 坐席已存在
     public static final String I18N_AGENT_OFFLINE = I18N_PREFIX + "agent.offline"; // 客服离线
     public static final String I18N_AGENT_UNAVAILABLE = I18N_PREFIX + "agent.unavailable"; // 客服不可用
     public static final String I18N_AGENT_AVAILABLE = I18N_PREFIX + "agent.available"; // 客服可用

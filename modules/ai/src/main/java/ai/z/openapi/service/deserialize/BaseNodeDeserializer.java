@@ -141,7 +141,7 @@ public abstract class BaseNodeDeserializer<T extends JsonNode> extends StdDeseri
 	protected final ObjectNode deserializeObjectAtName(JsonParser p, DeserializationContext ctxt,
 			final JsonNodeFactory nodeFactory) throws IOException {
 		final ObjectNode node = nodeFactory.objectNode();
-		String key = p.getCurrentName();
+		String key = p.currentName();
 		for (; key != null; key = p.nextFieldName()) {
 			JsonNode value;
 			JsonToken t = p.nextToken();
@@ -200,7 +200,7 @@ public abstract class BaseNodeDeserializer<T extends JsonNode> extends StdDeseri
 			if (!p.hasToken(JsonToken.FIELD_NAME)) {
 				return deserialize(p, ctxt);
 			}
-			key = p.getCurrentName();
+			key = p.currentName();
 		}
 		for (; key != null; key = p.nextFieldName()) {
 			// If not, fall through to regular handling

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260401-add-shop-agent-seats-relation" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <tableExists tableName="bytedesk_service_agent_seat"/>
+                <not>
+                    <tableExists tableName="bytedesk_core_shop_agent_seats"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createTable tableName="bytedesk_core_shop_agent_seats">
+            <column name="shop_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="agent_seat_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey
+            tableName="bytedesk_core_shop_agent_seats"
+            columnNames="shop_id,agent_seat_id"
+            constraintName="pk_shop_agent_seats"/>
+
+        <createIndex tableName="bytedesk_core_shop_agent_seats" indexName="idx_shop_agent_seats_shop">
+            <column name="shop_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_core_shop_agent_seats" indexName="idx_shop_agent_seats_seat">
+            <column name="agent_seat_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_agent_seats"
+            baseColumnNames="shop_id"
+            referencedTableName="bytedesk_core_shop"
+            referencedColumnNames="id"
+            constraintName="fk_shop_agent_seats_shop"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_core_shop_agent_seats"
+            baseColumnNames="agent_seat_id"
+            referencedTableName="bytedesk_service_agent_seat"
+            referencedColumnNames="id"
+            constraintName="fk_shop_agent_seats_agent_seat"
+            onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>

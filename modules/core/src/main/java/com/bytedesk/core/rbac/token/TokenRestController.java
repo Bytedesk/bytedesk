@@ -120,6 +120,15 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.badRequest().body(JsonResult.error("uid or accessToken is required", 400));
     }
 
+    @PostMapping("/refresh")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Refresh Access Token")
+    public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
+
+        TokenResponse response = tokenRestService.refreshAccessToken(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     
     
 }

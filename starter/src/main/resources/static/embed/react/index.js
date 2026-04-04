@@ -1,32 +1,30 @@
-import { jsx as l } from "react/jsx-runtime";
-import { useRef as r, useEffect as u } from "react";
-import { IntlProvider as m } from "react-intl";
-import s from "../core/BytedeskWeb/index.js";
-import { messages as c } from "../locales/index/index.js";
-const h = ({ locale: e = "zh-cn", ...o }) => /* @__PURE__ */ l(
-  m,
+import { jsx as c } from "react/jsx-runtime";
+import { useRef as m, useEffect as u } from "react";
+import { IntlProvider as y } from "react-intl";
+import l from "../core/BytedeskWeb/index.js";
+import { messages as g } from "../locales/index/index.js";
+const s = (e) => Array.isArray(e) ? e.map(s) : typeof e == "function" ? e.toString() : e && typeof e == "object" ? Object.keys(e).sort().reduce((n, r) => (n[r] = s(e[r]), n), {}) : e, p = (e) => JSON.stringify(s(e)), C = ({ locale: e = "zh-cn", ...n }) => /* @__PURE__ */ c(
+  y,
   {
-    messages: c[e],
+    messages: g[e],
     locale: e,
     defaultLocale: "zh-cn",
-    children: /* @__PURE__ */ l(f, { ...o, locale: e })
+    children: /* @__PURE__ */ c(b, { ...n, locale: e })
   }
 );
-let t = null, n = 0;
-const f = (e) => {
-  const o = r(null);
-  return u(() => (n++, t && (t.destroy(), t = null, delete window.bytedesk), t = new s(e), o.current = t, window.bytedesk = t, t.init().then(() => {
-    var d;
-    (d = e.onInit) == null || d.call(e);
+let t = null, o = 0;
+const b = (e) => {
+  const n = m(null), { onInit: r, ...i } = e, f = p(i);
+  return u(() => (o++, t && (t.destroy(), t = null, delete window.bytedesk), t = new l(i), n.current = t, window.bytedesk = t, t.init().then(() => {
+    r == null || r();
   }).catch((d) => {
-    var i;
-    console.error("BytedeskWeb 初始化失败:", d), (i = e.onInit) == null || i.call(e);
+    console.error("BytedeskWeb 初始化失败:", d), r == null || r();
   }), () => {
-    n--, o.current = null, n <= 0 && setTimeout(() => {
-      t && n <= 0 && (t.destroy(), t = null, delete window.bytedesk, n = 0);
+    o--, n.current = null, o <= 0 && setTimeout(() => {
+      t && o <= 0 && (t.destroy(), t = null, delete window.bytedesk, o = 0);
     }, 100);
-  }), [e]), null;
+  }), [f]), null;
 };
 export {
-  h as BytedeskReact
+  C as BytedeskReact
 };

@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.Builder;
@@ -81,9 +82,16 @@ public class VisitorRequest extends BaseRequest {
 	// for visitor thread list filter
 	private String topic;
 
-	// 会话接入意图（TEXT/AUDIO/VIDEO/PHONE），不替代 BaseRequest.type 的路由语义
+	// 会话接入意图（TEXT/WEBRTC/PHONE），不替代 BaseRequest.type 的路由语义
 	@Builder.Default
 	private String callType = VisitorCallTypeEnum.TEXT.name();
+
+	// WEBRTC 默认是否启用麦克风/摄像头
+	@Builder.Default
+	private Boolean audio = true;
+
+	@Builder.Default
+	private Boolean video = true;
 
 	// 访客呼叫目标分机/AOR，由呼叫页面显式传入
 	private String target;
@@ -223,16 +231,37 @@ public class VisitorRequest extends BaseRequest {
 		return VisitorCallTypeEnum.fromValue(this.callType);
 	}
 
+	public boolean isRealtimeCallType() {
+		VisitorCallTypeEnum callType = formatCallType();
+		return VisitorCallTypeEnum.WEBRTC == callType
+				|| VisitorCallTypeEnum.PHONE == callType;
+	}
+
+	public boolean isWebrtcType() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType();
+	}
+
 	public boolean isWebrtcAudioType() {
-		return VisitorCallTypeEnum.AUDIO == formatCallType();
+		return VisitorCallTypeEnum.WEBRTC == formatCallType() && !Boolean.FALSE.equals(audio);
 	}
 
 	public boolean isWebrtcVideoType() {
-		return VisitorCallTypeEnum.VIDEO == formatCallType();
+		return VisitorCallTypeEnum.WEBRTC == formatCallType() && !Boolean.FALSE.equals(video);
 	}
 
 	public boolean isWebrtcPhoneType() {
 		return VisitorCallTypeEnum.PHONE == formatCallType();
+	}
+
+	public boolean shouldTriggerWebrtcInvite() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType();
+	}
+
+	public String resolveWebrtcInviteVideoMode() {
+		if (!shouldTriggerWebrtcInvite() || !isWebrtcVideoType()) {
+			return null;
+		}
+		return "TWO_WAY";
 	}
 
 	@Override

@@ -57,12 +57,12 @@ import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueTipTemplateUtils;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
-import com.bytedesk.service.visitor.VisitorCallTypeEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
-import com.bytedesk.video.webrtc.IWebrtcService;
-import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
+import com.bytedesk.webrtc.webrtc.IWebrtcService;
+import com.bytedesk.webrtc.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
@@ -446,8 +446,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             VisitorCallTypeEnum callType) {
         log.debug("开始机器人路由决策判断");
 
-        if (callType == VisitorCallTypeEnum.AUDIO
-                || callType == VisitorCallTypeEnum.VIDEO
+        if (callType == VisitorCallTypeEnum.WEBRTC
                 || callType == VisitorCallTypeEnum.PHONE) {
             return false;
         }
@@ -1104,10 +1103,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (visitorRequest == null || thread == null || agent == null) {
             return;
         }
-        VisitorCallTypeEnum callType = visitorRequest.formatCallType();
-        if (callType != VisitorCallTypeEnum.AUDIO && callType != VisitorCallTypeEnum.VIDEO) {
+        if (!visitorRequest.shouldTriggerWebrtcInvite()) {
             return;
         }
+        String inviteVideoMode = visitorRequest.resolveWebrtcInviteVideoMode();
 
         String callerUid = resolveVisitorUidForThreadTopic(visitorRequest);
         if (!StringUtils.hasText(callerUid) || !StringUtils.hasText(agent.getUid())) {
@@ -1121,13 +1120,14 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             inviteRequest.setThreadUid(thread.getUid());
             inviteRequest.setCallerUid(callerUid);
             inviteRequest.setCalleeUid(agent.getUid());
-            inviteRequest.setCallType(callType.name());
+            inviteRequest.setCallType(VisitorCallTypeEnum.WEBRTC);
+            inviteRequest.setVideoMode(inviteVideoMode);
             webrtcService.invite(inviteRequest);
-            log.info("workgroup auto call invite sent, threadUid={}, callType={}, callerUid={}, calleeUid={}",
-                    thread.getUid(), callType.name(), callerUid, agent.getUid());
+            log.info("workgroup auto call invite sent, threadUid={}, callType={}, videoMode={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, callerUid, agent.getUid());
         } catch (Exception e) {
-            log.warn("workgroup auto call invite failed, threadUid={}, callType={}, reason={}",
-                    thread.getUid(), callType.name(), e.getMessage());
+            log.warn("workgroup auto call invite failed, threadUid={}, callType={}, videoMode={}, reason={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, e.getMessage());
         }
     }
 

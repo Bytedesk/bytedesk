@@ -21,6 +21,7 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -80,4 +81,9 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
      * Robot to agent transition settings (Workgroup-specific)
      */
     private RobotToAgentSettingsRequest robotToAgentSettings;
+
+    /**
+     * WebRTC settings (Workgroup-specific)
+     */
+    private WebrtcSettingsRequest webrtcSettings;
 }

@@ -377,15 +377,15 @@ public class PageRouteController {
 	}
 
 	@GetMapping({
-			"/video",
-			"/video/",
-			"/video/{path:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+			"/webrtc",
+			"/webrtc/",
+			"/webrtc/{path:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
 	public String video() {
-		return "forward:/video/index.html";
+		return "forward:/webrtc/index.html";
 	}
 
 	@GetMapping({

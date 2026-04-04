@@ -194,6 +194,32 @@ services:
       BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
       BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
       # ===============================
+      # WebRTC / Janus config
+      # Use service names on the Docker network instead of 127.0.0.1. 容器内请使用 Docker 网络服务名，而不是 127.0.0.1。
+      # Typically combined with compose-scenario-webrtc.yaml. 通常与 compose-scenario-webrtc.yaml 组合使用。
+      # ===============================
+      BYTEDESK_WEBRTC_JANUS_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_WS_URL: ws://bytedesk-janus:8188/janus
+      BYTEDESK_WEBRTC_JANUS_LOG_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_OPERATION_TIMEOUT_MS: 10000
+      BYTEDESK_WEBRTC_JANUS_HEALTH_TIMEOUT_MS: 3000
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_0_URLS: stun:bytedesk-coturn:3478
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_URLS: turn:bytedesk-coturn:3478?transport=udp
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_USERNAME: ${COTURN_USER:-bytedesk}
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_CREDENTIAL: ${COTURN_PASS:-bytedesk123}
+      # Optional TLS/TCP TURN relay. 可选的 TLS/TCP TURN 中继。
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_URLS: turn:bytedesk-coturn:5349?transport=tcp
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_USERNAME: ${COTURN_USER:-bytedesk}
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_CREDENTIAL: ${COTURN_PASS:-bytedesk123}
+      BYTEDESK_WEBRTC_JANUS_ADMIN_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_ADMIN_WS_URL: ws://bytedesk-janus:7188/janus
+      BYTEDESK_WEBRTC_JANUS_ADMIN_HTTP_URL: http://bytedesk-janus:8088/janus
+      BYTEDESK_WEBRTC_JANUS_ADMIN_SECRET: ${JANUS_ADMIN_SECRET:-janusoverlord}
+      BYTEDESK_WEBRTC_RECORD_DIR: /app/uploads/webrtc-video-recordings
+      BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PUBLISHERS: 6
+      BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PERMANENT: "false"
+      BYTEDESK_WEBRTC_JANUS_AUDIO_BRIDGE_DEFAULT_PERMANENT: "false"
+      # ===============================
       # Management endpoints
       # Current settings disable actuator web exposure by default and keep only the business port active. 当前配置默认关闭 actuator Web 暴露，仅保留业务端口。
       # ===============================

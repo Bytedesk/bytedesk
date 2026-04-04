@@ -4,5 +4,11 @@
     "uploadApiUrl": "http://127.0.0.1:9003",
     "websocketUrl": "ws://127.0.0.1:9885/websocket",
     "stompUrl": "ws://127.0.0.1:9003/stomp",
-    "htmlUrl": "http://127.0.0.1:9003"
+    "htmlUrl": "http://127.0.0.1:9003",
+    "sipHttpUrl": "http://127.0.0.1:7443",
+    "sipWebsocketUrl": "ws://127.0.0.1:7443",
+    "janusHttpUrl": "http://127.0.0.1:18088/janus",
+    "janusWebsocketUrl": "ws://127.0.0.1:18089/janus",
+    "stunUrl": "stun:127.0.0.1:3478",
+    "turnUrl": "turn:127.0.0.1:3478"
 }

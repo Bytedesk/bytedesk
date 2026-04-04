@@ -90,14 +90,15 @@ public class FileParsingServiceImpl implements FileParsingService {
 					throw new IOException("Failed to download parse result");
 				}
 
-				HttpxBinaryResponseContent httpxBinaryResponseContent = new HttpxBinaryResponseContent(execute);
-				String result = httpxBinaryResponseContent.getText();
+				try (HttpxBinaryResponseContent httpxBinaryResponseContent = new HttpxBinaryResponseContent(execute)) {
+					String result = httpxBinaryResponseContent.getText();
 
-				ObjectMapper mapper = new ObjectMapper();
-				FileParsingDownloadResp fileParsingDownloadResp = mapper.readValue(result,
-						FileParsingDownloadResp.class);
+					ObjectMapper mapper = new ObjectMapper();
+					FileParsingDownloadResp fileParsingDownloadResp = mapper.readValue(result,
+							FileParsingDownloadResp.class);
 
-				return Single.just(fileParsingDownloadResp);
+					return Single.just(fileParsingDownloadResp);
+				}
 			}
 			catch (Exception e) {
 				throw new RuntimeException(e);

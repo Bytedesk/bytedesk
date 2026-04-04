@@ -289,6 +289,7 @@ public class UserConvertUtils {
                 .description(organization.getDescription())
                 .verifyStatus(organization.getVerifyStatus())
                 .enabled(organization.getEnabled())
+                .vipLevel(organization.getVipLevel())
             .vipExpireDate(organization.getVipExpireDate())
             .vipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled())
                 .customServerEnabled(organization.getCustomServerEnabled())

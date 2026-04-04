@@ -46,6 +46,8 @@ public class MenuRequest extends BaseRequest {
 
     private String parentUid;
 
+    private Integer vipLevel;
+
     private String icon;
 
     private String link;

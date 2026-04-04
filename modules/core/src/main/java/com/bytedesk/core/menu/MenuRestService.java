@@ -241,6 +241,9 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
             if (!StringUtils.hasText(request.getColor())) {
                 request.setColor(entity.getColor());
             }
+            if (request.getVipLevel() == null) {
+                request.setVipLevel(entity.getVipLevel());
+            }
             // applyRequestDefaults(request, true);
             modelMapper.map(request, entity);
             // ensureEntityDefaults(entity);

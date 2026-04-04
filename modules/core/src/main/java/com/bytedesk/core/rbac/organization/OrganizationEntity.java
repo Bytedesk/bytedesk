@@ -150,17 +150,17 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "custom_server_host")
     private String customServerHost = BytedeskConsts.EMPTY_STRING;
 
-    // 组织成员最大数
+    // 组织成员最大数：控制组织内创建成员的数量，和同时登录的成员数量
     @Builder.Default
     @Column(name = "max_members")
     private Integer maxMembers = 20;
 
-    // 客服坐席最大数
+    // 客服坐席最大数：控制组织内创建客服坐席的数量，和同时在线的客服坐席数量
     @Builder.Default
     @Column(name = "max_agents")
     private Integer maxAgents = 20;
 
-    // 工作组最大数
+    // 工作组最大数：控制组织内创建工作组的数量
     @Builder.Default
     @Column(name = "max_workgroups")
     private Integer maxWorkgroups = 20;

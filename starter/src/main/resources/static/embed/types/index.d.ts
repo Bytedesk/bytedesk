@@ -18,7 +18,19 @@ declare interface BubbleConfig {
     icon?: string;
     title?: string;
     subtitle?: string;
+    messages?: BubbleMessageItem[];
+    autoRotate?: boolean;
+    rotateInterval?: number;
+    switchMode?: BubbleSwitchMode;
 }
+
+declare interface BubbleMessageItem {
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+}
+
+declare type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 declare interface ButtonConfig {
     show?: boolean;
@@ -34,7 +46,7 @@ export declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
-    chatPath?: '/chat' | '/chat/thread';
+    chatPath?: '/chat' | '/chat/thread' | '/webrtc';
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -84,6 +96,18 @@ declare class BytedeskWeb {
     private lastSelectionText;
     private lastMouseEvent;
     private lastSelectionRect;
+    private bubbleMessages;
+    private bubbleMessageIndex;
+    private bubbleMessageTimer;
+    private bubbleMessageTransitionTimer;
+    private bubbleMessageViewportElement;
+    private bubbleMessageContentElement;
+    private bubblePendingMessageElement;
+    private bubbleTickerTrackElement;
+    private bubbleTickerStyleElement;
+    private bubbleIconElement;
+    private bubbleTitleElement;
+    private bubbleSubtitleElement;
     constructor(config: BytedeskConfig);
     private setupApiUrl;
     private getDefaultConfig;
@@ -103,6 +127,20 @@ declare class BytedeskWeb {
     private showUnreadBadge;
     private clearUnreadBadge;
     clearUnreadMessages(): Promise<any>;
+    private getBubbleMessages;
+    private getBubbleSwitchMode;
+    private buildBubbleMessageContentNode;
+    private buildBubbleTickerItemNode;
+    private destroyBubbleTicker;
+    private setBubbleTickerRunning;
+    private initBubbleTicker;
+    private renderBubbleMessage;
+    private syncBubbleViewportHeight;
+    private cleanupPendingBubbleMessage;
+    private stopBubbleMessageTransition;
+    private transitionBubbleMessage;
+    private stopBubbleMessageRotation;
+    private startBubbleMessageRotation;
     private createBubble;
     private createChatWindow;
     private generateChatUrl;

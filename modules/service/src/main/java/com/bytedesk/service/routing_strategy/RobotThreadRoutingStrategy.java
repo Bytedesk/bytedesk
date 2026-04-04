@@ -19,8 +19,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
@@ -41,11 +41,11 @@ import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.utils.WelcomeContentUtils;
-import com.bytedesk.service.visitor.VisitorCallTypeEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor_thread.VisitorThreadService;
-import com.bytedesk.video.webrtc.IWebrtcService;
-import com.bytedesk.video.webrtc.dto.WebrtcInviteRequest;
+import com.bytedesk.webrtc.webrtc.IWebrtcService;
+import com.bytedesk.webrtc.webrtc.dto.WebrtcInviteRequest;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -338,8 +338,7 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
      * 音视频/电话场景要求机器人已配置音频模型能力（作为 ASR/TTS 能力前置约束）
      */
     private void ensureRealtimeAudioCapabilityIfNeeded(RobotEntity robotEntity, VisitorCallTypeEnum callType) {
-        if (callType != VisitorCallTypeEnum.AUDIO
-                && callType != VisitorCallTypeEnum.VIDEO
+        if (callType != VisitorCallTypeEnum.WEBRTC
                 && callType != VisitorCallTypeEnum.PHONE) {
             return;
         }
@@ -365,9 +364,10 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         if (request == null || thread == null || robotEntity == null) {
             return;
         }
-        if (callType != VisitorCallTypeEnum.AUDIO && callType != VisitorCallTypeEnum.VIDEO) {
+        if (!request.shouldTriggerWebrtcInvite()) {
             return;
         }
+        String inviteVideoMode = request.resolveWebrtcInviteVideoMode();
 
         String callerUid = resolveVisitorUidForThreadTopic(request);
         String calleeUid = robotEntity.getUid();
@@ -382,13 +382,14 @@ public class RobotThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             inviteRequest.setThreadUid(thread.getUid());
             inviteRequest.setCallerUid(callerUid);
             inviteRequest.setCalleeUid(calleeUid);
-            inviteRequest.setCallType(callType.name());
+            inviteRequest.setCallType(VisitorCallTypeEnum.WEBRTC);
+            inviteRequest.setVideoMode(inviteVideoMode);
             webrtcService.invite(inviteRequest);
-            log.info("robot auto call invite sent, threadUid={}, callType={}, callerUid={}, calleeUid={}",
-                    thread.getUid(), callType.name(), callerUid, calleeUid);
+            log.info("robot auto call invite sent, threadUid={}, callType={}, videoMode={}, callerUid={}, calleeUid={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, callerUid, calleeUid);
         } catch (Exception e) {
-            log.warn("robot auto call invite failed, threadUid={}, callType={}, reason={}",
-                    thread.getUid(), callType.name(), e.getMessage());
+            log.warn("robot auto call invite failed, threadUid={}, callType={}, videoMode={}, reason={}",
+                    thread.getUid(), VisitorCallTypeEnum.WEBRTC.name(), inviteVideoMode, e.getMessage());
         }
     }
 

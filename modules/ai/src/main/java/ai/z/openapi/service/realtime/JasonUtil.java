@@ -16,7 +16,7 @@ public class JasonUtil {
 	 */
 	private static final ObjectMapper objectMapper = new ObjectMapper() //
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) //
-		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 
 	/**
 	 * Converts JSON string to RealtimeClientEvent object.

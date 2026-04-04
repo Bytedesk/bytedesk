@@ -25,8 +25,6 @@ import retrofit2.Call;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-import java.io.IOException;
-
 /**
  * Abstract base service class that provides common functionality for API client
  * implementations. This class handles request execution, response processing, and error

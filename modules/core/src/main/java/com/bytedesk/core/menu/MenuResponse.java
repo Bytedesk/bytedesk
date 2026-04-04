@@ -47,6 +47,8 @@ public class MenuResponse extends BaseResponse {
 
     private String parentUid;
 
+    private Integer vipLevel;
+
     private String icon;
 
     private String link;

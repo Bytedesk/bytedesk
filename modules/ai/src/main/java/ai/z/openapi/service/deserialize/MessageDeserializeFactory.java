@@ -12,7 +12,7 @@ public class MessageDeserializeFactory {
 
 	public static ObjectMapper defaultObjectMapper() {
 		ObjectMapper mapper = new ObjectMapper();
-		mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 		SimpleModule module = new SimpleModule();

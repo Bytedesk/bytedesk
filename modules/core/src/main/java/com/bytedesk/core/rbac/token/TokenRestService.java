@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.token;
 
 import java.util.Optional;
+import java.util.UUID;
 // import java.time.ZonedDateTime;
 // import java.time.Duration;
 
@@ -34,6 +35,7 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
@@ -55,6 +57,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final UserRepository userRepository;
 
     private final BytedeskProperties bytedeskProperties;
 
@@ -128,6 +132,11 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         // 非永久有效，且未设置过期时间，则根据channel设置默认过期时间
         if (!Boolean.TRUE.equals(entity.getPermanent()) && entity.getExpiresAt() == null) {
             entity.setExpiresAt(JwtUtils.calculateExpirationTime(request.getChannel()));
+        }
+
+        // 若未提供 refreshToken，则自动生成，便于后续使用 refresh 接口。
+        if (!StringUtils.hasText(entity.getRefreshToken())) {
+            entity.setRefreshToken(UUID.randomUUID().toString().replace("-", ""));
         }
         
         TokenEntity savedEntity = save(entity);
@@ -223,6 +232,45 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         
         // 生成访问令牌，传递渠道信息以设置合适的过期时间
         return JwtUtils.generateJwtToken(username, platform, channel);
+    }
+
+    /**
+     * 使用 refreshToken 刷新 accessToken。
+     */
+    @Transactional
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    public TokenResponse refreshAccessToken(TokenRequest request) {
+        if (!StringUtils.hasText(request.getRefreshToken())) {
+            throw new RuntimeException("refreshToken is required");
+        }
+
+        TokenEntity tokenEntity = tokenRepository.findFirstByRefreshTokenAndDeletedFalse(request.getRefreshToken())
+                .orElseThrow(() -> new RuntimeException("token not found by refreshToken"));
+
+        if (Boolean.TRUE.equals(tokenEntity.getRevoked())) {
+            throw new RuntimeException("token already revoked");
+        }
+
+        if (!StringUtils.hasText(tokenEntity.getUserUid())) {
+            throw new RuntimeException("token userUid is required");
+        }
+
+        UserEntity userEntity = userRepository.findByUid(tokenEntity.getUserUid())
+                .orElseThrow(() -> new RuntimeException("user not found by token userUid"));
+
+        String channel = StringUtils.hasText(request.getChannel()) ? request.getChannel() : tokenEntity.getChannel();
+        String platform = userEntity.getPlatform();
+        if (!StringUtils.hasText(platform)) {
+            platform = PlatformEnum.BYTEDESK.name();
+        }
+
+        String newAccessToken = JwtUtils.generateJwtToken(userEntity.getUsername(), platform, channel);
+        tokenEntity.setAccessToken(newAccessToken);
+        tokenEntity.setChannel(channel);
+        tokenEntity.setExpiresAt(JwtUtils.calculateExpirationTime(channel));
+
+        TokenEntity savedEntity = save(tokenEntity);
+        return convertToResponse(savedEntity);
     }
 
     /**

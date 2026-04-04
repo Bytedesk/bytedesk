@@ -7,9 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @EqualsAndHashCode(callSuper = false)
 @SuperBuilder
 @NoArgsConstructor

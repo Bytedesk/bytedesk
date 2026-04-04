@@ -27,7 +27,8 @@
 ├── compose-app-bytedesk.yaml # bytedesk 镜像服务（已从 base 拆分）
 ├── compose-app-mq-artemis.yaml # bytedesk 的 Artemis 配置覆盖
 ├── compose-app-mq-rabbitmq.yaml # bytedesk 的 RabbitMQ 配置覆盖
-├── compose-scenario-call.yaml # 呼叫中心场景扩展（coturn/freeswitch/janus）
+├── compose-scenario-call.yaml # 呼叫中心语音场景扩展（freeswitch）
+├── compose-scenario-webrtc.yaml # 音视频客服 WebRTC 组件（coturn/janus）
 ├── compose-call-db-mysql.yaml # call 场景下 FreeSWITCH 的 MySQL DSN 覆盖
 ├── compose-call-db-postgresql.yaml # call 场景下 FreeSWITCH 的 PostgreSQL DSN 覆盖
 ├── compose-scenario-noai.yaml # 不使用 AI 的场景覆盖
@@ -86,7 +87,7 @@ cp .env.example .env
 ./stop.sh kingbase9 artemis standard stop middleware
 ./stop.sh kingbase9 artemis standard down middleware
 
-# 7) Call-center middleware scenarios
+# 7) Call-center middleware scenarios (FreeSWITCH only)
 ./start.sh mysql artemis call middleware
 ./stop.sh mysql artemis call stop middleware
 ./stop.sh mysql artemis call down middleware
@@ -98,6 +99,15 @@ cp .env.example .env
 ./start.sh postgresql rabbitmq call middleware
 ./stop.sh postgresql rabbitmq call stop middleware
 ./stop.sh postgresql rabbitmq call down middleware
+
+# 8) WebRTC middleware scenarios (coturn + janus)
+./start.sh mysql artemis webrtc middleware
+./stop.sh mysql artemis webrtc stop middleware
+./stop.sh mysql artemis webrtc down middleware
+
+./start.sh postgresql rabbitmq webrtc middleware
+./stop.sh postgresql rabbitmq webrtc stop middleware
+./stop.sh postgresql rabbitmq webrtc down middleware
 
 # production release (all: middleware + bytedesk app image)
 # 1) MySQL + Artemis + standard (default release combination)
@@ -125,11 +135,16 @@ cp .env.example .env
 ./stop.sh kingbase9 artemis standard stop all
 ./stop.sh kingbase9 artemis standard down all
 
+# 6) MySQL + Artemis + webrtc (audio/video customer service release)
+./start.sh mysql artemis webrtc all
+./stop.sh mysql artemis webrtc stop all
+./stop.sh mysql artemis webrtc down all
+
 # quick reference:
 # db: mysql | postgresql | oracle | kingbase9
 # mq: artemis | rabbitmq
-# scenario: standard | noai | call
-# note: call scenario supports mysql and postgresql (oracle/kingbase9 are not verified)
+# scenario: standard | noai | call | webrtc
+# note: call scenario supports mysql and postgresql only; webrtc scenario has no extra DB restriction
 # target: middleware | all
 # action: stop (stop containers) | down (remove containers, keep volumes)
 
@@ -143,6 +158,7 @@ cp .env.example .env
 # for kingbase9: start.sh will auto ensure KINGBASE_DATABASE exists (create if missing)
 # for mysql+call: when FREESWITCH_DATABASE is empty, start.sh auto imports deploy/sql/freeswitch-1.10.12.sql;
 #                 if tables already exist, initialization is skipped to avoid re-running DROP TABLE statements.
+# when you need both FreeSWITCH and WebRTC, combine compose-scenario-call.yaml and compose-scenario-webrtc.yaml manually.
 
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
 # note: ollama is part of compose-base.yaml now
@@ -150,11 +166,15 @@ cp .env.example .env
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-webrtc.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-mysql.yaml -f compose-scenario-webrtc.yaml up -d
 
 # full stack (middleware + bytedesk image)
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 
 # database switch examples
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
@@ -169,8 +189,10 @@ docker exec ollama-bytedesk ollama pull bge-m3:latest
 docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # stop standard stack
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
-# stop call-center stack
+# stop call-center voice stack
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
+# stop call-center voice + webrtc stack
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
 ```
 
 ## Sensitive variables (centralized in `.env`)
@@ -180,7 +202,7 @@ At minimum, set these before startup:
 - DB/MQ: `MYSQL_ROOT_PASSWORD`, `POSTGRES_PASSWORD`, `ORACLE_PASSWORD`, `ORACLE_APP_USER_PASSWORD`, `KINGBASE_DB_PASSWORD`, `KINGBASE_SYSTEM_PWD`, `KINGBASE_LICENSE_FILE`, `ARTEMIS_PASSWORD`, `RABBITMQ_DEFAULT_PASS`
 - Middleware: `REDIS_PASSWORD`, `ELASTIC_PASSWORD`, `MINIO_ROOT_PASSWORD`
 - App auth: `BYTEDESK_ADMIN_PASSWORD`, `BYTEDESK_ADMIN_VALIDATE_CODE`, `BYTEDESK_MEMBER_PASSWORD`, `BYTEDESK_JWT_SECRET_KEY`
-- Call scenario: `COTURN_PASS`, `FREESWITCH_ESL_PASSWORD`
+- Call/WebRTC scenario: `COTURN_PASS`, `FREESWITCH_ESL_PASSWORD`
 - Optional API keys: `SPRING_AI_*_API_KEY`, `BYTEDESK_TRANSLATE_BAIDU_*`, `BYTEDESK_LICENSE_KEY`
 
 ## Secrets & Jasypt (optional)
@@ -193,6 +215,7 @@ echo 'JASYPT_ENCRYPTOR_PASSWORD=please-change-me' >> .env
 
 # 2. Start any full stack as usual. The Bytedesk service will read the env var.
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 ```
 
 - Leave `JASYPT_ENCRYPTOR_PASSWORD` blank (or remove the line) when no encrypted values are in use—startup will fall back to plain text.

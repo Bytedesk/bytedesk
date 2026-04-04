@@ -36,6 +36,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.agent_seat.AgentSeatDomainService;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
@@ -183,6 +184,12 @@ public class ServiceConvertUtils {
         AgentResponse resp = getModelMapper().map(agent, AgentResponse.class);
         if (!StringUtils.hasText(resp.getCountry()) && agent.getMember() != null && StringUtils.hasText(agent.getMember().getCountry())) {
             resp.setCountry(agent.getMember().getCountry());
+        }
+        try {
+            AgentSeatDomainService agentSeatDomainService = ApplicationContextHolder.getBean(AgentSeatDomainService.class);
+            resp.setSeatExpireAt(agentSeatDomainService.findSeatExpireAtByAgentUid(agent.getUid()).orElse(null));
+        } catch (Exception ignore) {
+            resp.setSeatExpireAt(null);
         }
         try {
             ConnectionRestService presence = ApplicationContextHolder.getBean(ConnectionRestService.class);

@@ -4,5 +4,11 @@
     "uploadApiUrl": "https://api.weiyuai.cn",
     "websocketUrl": "wss://api.weiyuai.cn/websocket",
     "stompUrl": "wss://api.weiyuai.cn/stomp",
-    "htmlUrl": "https://www.weiyuai.cn"
+    "htmlUrl": "https://www.weiyuai.cn",
+    "sipHttpUrl": "https://sip.weiyuai.cn:7443",
+    "sipWebsocketUrl": "wss://sip.weiyuai.cn:7443",
+    "janusHttpUrl": "https://janus.weiyuai.cn/janus",
+    "janusWebsocketUrl": "wss://janus.weiyuai.cn/janus",
+    "stunUrl": "stun:stun.weiyuai.cn:3478",
+    "turnUrl": "turn:turn.weiyuai.cn:3478"
 }

@@ -38,6 +38,8 @@ import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -219,6 +221,16 @@ public class WorkgroupSettingsRestService
         rtasDraft.setUid(uidUtils.getUid());
         syncOrgUser(rtasDraft, orgUid, userUid);
         entity.setDraftRobotToAgentSettings(rtasDraft);
+
+        // 发布与草稿：WebRTC 设置
+        WebrtcSettingsEntity webrtc = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+        webrtc.setUid(uidUtils.getUid());
+        syncOrgUser(webrtc, orgUid, userUid);
+        entity.setWebrtcSettings(webrtc);
+        WebrtcSettingsEntity webrtcDraft = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+        webrtcDraft.setUid(uidUtils.getUid());
+        syncOrgUser(webrtcDraft, orgUid, userUid);
+        entity.setDraftWebrtcSettings(webrtcDraft);
 
         // 如果请求或实体标记为默认，则保证同 org 仅一个默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
@@ -487,6 +499,24 @@ public class WorkgroupSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        if (request.getWebrtcSettings() != null) {
+            WebrtcSettingsEntity draft = entity.getDraftWebrtcSettings();
+            if (draft == null) {
+                draft = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftWebrtcSettings(draft);
+
+                WebrtcSettingsEntity settings = mapWebrtcSettingsFromRequest(request.getWebrtcSettings());
+                settings.setUid(uidUtils.getUid());
+                entity.setWebrtcSettings(settings);
+            } else {
+                String originalUid = draft.getUid();
+                applyWebrtcSettingsRequestToEntity(request.getWebrtcSettings(), draft);
+                draft.setUid(originalUid);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
         // 若本次更新将其设为默认，需取消同 org 其他默认
         if (Boolean.TRUE.equals(request.getIsDefault()) || Boolean.TRUE.equals(entity.getIsDefault())) {
             ensureSingleDefault(entity.getOrgUid(), entity);
@@ -716,6 +746,16 @@ public class WorkgroupSettingsRestService
         settings.setRobotToAgentSettings(rtas);
         settings.setDraftRobotToAgentSettings(rtasDraft);
 
+        // WebRTC 设置（发布 + 草稿）
+        WebrtcSettingsEntity webrtcPublished = mapWebrtcSettingsFromRequest(null);
+        webrtcPublished.setUid(uidUtils.getUid());
+        syncOrgUser(webrtcPublished, orgUid, userUid);
+        WebrtcSettingsEntity webrtcDraft = mapWebrtcSettingsFromRequest(null);
+        webrtcDraft.setUid(uidUtils.getUid());
+        syncOrgUser(webrtcDraft, orgUid, userUid);
+        settings.setWebrtcSettings(webrtcPublished);
+        settings.setDraftWebrtcSettings(webrtcDraft);
+
         // 刚创建的即为默认，确保同 org 唯一
         ensureSingleDefault(orgUid, settings);
         return save(settings);
@@ -829,6 +869,18 @@ public class WorkgroupSettingsRestService
             }
         }
 
+        if (entity.getDraftWebrtcSettings() != null) {
+            WebrtcSettingsEntity published = entity.getWebrtcSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftWebrtcSettings(), published);
+            } else {
+                WebrtcSettingsEntity newPublished = new WebrtcSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftWebrtcSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setWebrtcSettings(newPublished);
+            }
+        }
+
         if (entity.getDraftInviteSettings() != null) {
             InviteSettingsEntity published = entity.getInviteSettings();
             if (published != null) {
@@ -933,6 +985,31 @@ public class WorkgroupSettingsRestService
         String robotUid = request.getRobotUid();
         if (robotUid == null || robotUid.isBlank()) {
             // 允许通过传空来移除关联机器人
+            target.setRobot(null);
+            return;
+        }
+        RobotEntity robot = robotRepository.findByUid(robotUid)
+                .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
+        target.setRobot(robot);
+    }
+
+    private WebrtcSettingsEntity mapWebrtcSettingsFromRequest(WebrtcSettingsRequest request) {
+        WebrtcSettingsEntity entity = modelMapper.map(
+                request != null ? request : WebrtcSettingsRequest.builder().build(),
+                WebrtcSettingsEntity.class);
+        applyWebrtcSettingsRequestToEntity(request, entity);
+        return entity;
+    }
+
+    private void applyWebrtcSettingsRequestToEntity(WebrtcSettingsRequest request, WebrtcSettingsEntity target) {
+        if (target == null || request == null) {
+            return;
+        }
+        if (request.getDefaultVoiceAgent() != null) {
+            target.setDefaultVoiceAgent(request.getDefaultVoiceAgent());
+        }
+        String robotUid = request.getRobotUid();
+        if (robotUid == null || robotUid.isBlank()) {
             target.setRobot(null);
             return;
         }

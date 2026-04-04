@@ -13,8 +13,6 @@
  */
 package com.bytedesk.service.agent;
 
-import java.time.ZonedDateTime;
-
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.constant.AvatarConsts;
@@ -75,14 +73,16 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private Boolean enabled = true;
 
-    // 坐席有效期，null 表示永久有效
-    private ZonedDateTime seatExpireAt;
-
     /**
      * Agent settings reference UID
      * If not provided, will use the default settings
      */
     private String settingsUid;
+
+    /**
+     * Business shop uid, used by open shop create APIs to resolve organization.
+     */
+    private String shopUid;
 
     //
     @NotBlank

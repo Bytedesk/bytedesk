@@ -50,6 +50,7 @@ import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
+import com.bytedesk.service.agent_seat.AgentSeatDomainService;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -88,6 +89,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final MessageService messageService;
 
+    private final AgentSeatDomainService agentSeatDomainService;
+
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
             throw new IllegalArgumentException("orgUid is required");
@@ -108,6 +111,15 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxAgents = resolveMaxAgents(organization);
         long current = agentRepository.countByOrgUidAndDeletedFalse(orgUid);
+        if (agentSeatDomainService.hasManagedSeats(orgUid)) {
+            if (current >= maxAgents) {
+                throw new RuntimeException("Organization agent limit exceeded");
+            }
+            if (!agentSeatDomainService.hasAvailableSeat(orgUid)) {
+                throw new RuntimeException("Organization agent seat limit exceeded");
+            }
+            return;
+        }
         if (current >= maxAgents) {
             throw new RuntimeException("Organization agent limit exceeded");
         }
@@ -192,6 +204,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setMember(member);
         agent.setUserUid(user.getUid());
         agent.setAgentNo(agent.getUid()); // 默认工号为uid
+        agentSeatDomainService.assignSeatForAgent(
+            request.getOrgUid(),
+            member.getUid(),
+            agent.getUid());
         //
         // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
         if (StringUtils.hasText(request.getSettingsUid())) {
@@ -674,6 +690,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @CacheEvict(value = "agent", key = "#uid")
     public void deleteByUid(String uid) {
+        agentSeatDomainService.releaseSeatForAgent(uid);
         agentRepository.updateDeletedByUid(true, uid);
     }
 

@@ -32,8 +32,8 @@
         <module>team</module>
         <module>ticket</module>
         <module>training</module>
-        <module>video</module>
         <module>voc</module>
+        <module>webrtc</module>
     </modules>
 
     <properties>

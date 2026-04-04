@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260401-add-shop-vip-level" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <not><columnExists tableName="bytedesk_core_shop" columnName="vip_level"/></not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_shop">
+            <column name="vip_level" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260401-backfill-shop-vip-level-from-edition" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <columnExists tableName="bytedesk_core_shop" columnName="vip_level"/>
+                <columnExists tableName="bytedesk_core_shop" columnName="edition"/>
+            </and>
+        </preConditions>
+        <sql>
+            UPDATE bytedesk_core_shop
+            SET vip_level = CASE
+                WHEN UPPER(COALESCE(edition, 'BASIC')) = 'ADVANCED' THEN 1
+                ELSE 0
+            END;
+        </sql>
+    </changeSet>
+
+    <changeSet id="260401-drop-shop-edition-column" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_shop"/>
+                <columnExists tableName="bytedesk_core_shop" columnName="edition"/>
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_core_shop" columnName="edition"/>
+    </changeSet>
+
+</databaseChangeLog>

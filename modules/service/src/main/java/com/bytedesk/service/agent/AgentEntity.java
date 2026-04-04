@@ -157,10 +157,6 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "force_logout_at")
     private ZonedDateTime forceLogoutAt;
 
-    // 坐席有效期，null 表示永久有效
-    @Column(name = "seat_expire_at")
-    private ZonedDateTime seatExpireAt;
-
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity member;

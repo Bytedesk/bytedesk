@@ -17,6 +17,8 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -106,6 +108,13 @@ public class MenuEntity extends BaseEntity {
     private String parentUid;
 
     /**
+     * Minimum organization VIP level required to display this menu
+     */
+    @Builder.Default
+    @Column(name = "menu_vip_level")
+    private Integer vipLevel = 0;
+
+    /**
      * Whether the menu entry is currently enabled
      */
     @Builder.Default
@@ -118,5 +127,13 @@ public class MenuEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "menu_open_new_window")
     private Boolean openInNewWindow = true;
+
+    @PrePersist
+    @PreUpdate
+    private void normalizeVipLevel() {
+        if (vipLevel == null || vipLevel < 0) {
+            vipLevel = 0;
+        }
+    }
  
 }

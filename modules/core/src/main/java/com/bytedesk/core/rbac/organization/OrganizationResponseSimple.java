@@ -49,6 +49,9 @@ public class OrganizationResponseSimple implements Serializable {
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
+    // 会员等级：0=非会员，1及以上为会员等级
+    private Integer vipLevel;
+
     // 会员截止日期
     private ZonedDateTime vipExpireDate;
 
