@@ -26,7 +26,7 @@ MRCP4J 是一个完整的 Media Resource Control Protocol Version 2 (MRCPv2) Jav
 
 ## 🏗️ 架构概览
 
-```
+```bash
 mrcp4j/
 ├── client/              # 客户端实现
 │   ├── MrcpFactory      # 工厂类,创建客户端实例
@@ -269,6 +269,7 @@ server.setVerboseLogging(true);
 ### Q: 如何处理网络断线重连?
 
 A: 启用自动重连功能:
+
 ```java
 channel.setAutoReconnect(true);
 channel.setReconnectInterval(5000); // 5秒后重试
@@ -277,6 +278,7 @@ channel.setReconnectInterval(5000); // 5秒后重试
 ### Q: 如何设置识别置信度阈值?
 
 A: 在请求中设置 Confidence-Threshold 头:
+
 ```java
 request.setHeader(MrcpHeaderName.CONFIDENCE_THRESHOLD, "0.75");
 ```
@@ -284,6 +286,7 @@ request.setHeader(MrcpHeaderName.CONFIDENCE_THRESHOLD, "0.75");
 ### Q: 如何获取详细的错误信息?
 
 A: 捕获异常并检查响应状态:
+
 ```java
 try {
     MrcpResponse response = channel.sendRequest(request);
@@ -299,12 +302,14 @@ try {
 ### Q: 支持哪些音频格式?
 
 A: 支持以下格式:
+
 - PCM (Linear 16-bit)
 - G.711 (μ-law/A-law)
 - G.729
 - OPUS
 
 通过 `Content-Type` 头指定格式:
+
 ```java
 request.setHeader(MrcpHeaderName.CONTENT_TYPE, "audio/x-wav");
 ```

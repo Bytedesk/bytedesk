@@ -38,6 +38,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
@@ -160,6 +162,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         } else {
             workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
+        applyCallSettings(workgroup, request.getCallSettings());
         //
         if (request.getAgentUids() != null) {
             Iterator<String> agentIterator = request.getAgentUids().iterator();
@@ -260,6 +263,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         if (StringUtils.hasText(request.getSettingsUid())) {
             workgroupSettingsRestService.findByUid(request.getSettingsUid()).ifPresent(workgroup::setSettings);
         }
+        if (request.getCallSettings() != null) {
+            applyCallSettings(workgroup, request.getCallSettings());
+        }
 
         // robust 设置留言处理坐席：
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
@@ -352,8 +358,31 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             if (workgroup.getMessageLeaveAgent() != null) {
                 workgroup.getMessageLeaveAgent().getUid(); // 触发加载
             }
+            if (workgroup.getCallSettings() != null) {
+                workgroup.getCallSettings().getUid();
+            }
         }
         return workgroupOptional;
+    }
+
+    private void applyCallSettings(WorkgroupEntity workgroup, CallSettingsRequest request) {
+        if (request == null) {
+            return;
+        }
+        CallSettingsEntity settings = workgroup.getCallSettings();
+        if (settings == null) {
+            settings = CallSettingsEntity.fromRequest(request, modelMapper);
+            settings.setUid(uidUtils.getUid());
+            settings.setOrgUid(workgroup.getOrgUid());
+            workgroup.setCallSettings(settings);
+            return;
+        }
+        String originalUid = settings.getUid();
+        Long originalId = settings.getId();
+        modelMapper.map(request, settings);
+        settings.setUid(originalUid);
+        settings.setId(originalId);
+        settings.setOrgUid(workgroup.getOrgUid());
     }
 
     @Transactional(readOnly = true)

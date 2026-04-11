@@ -56,6 +56,7 @@ public class AgentSettingsRestService
         List<AgentQuickReplyButton> defaults = new ArrayList<>();
         defaults.add(AgentQuickReplyButton.builder().code("emoji").enabled(Boolean.TRUE).build());
         defaults.add(AgentQuickReplyButton.builder().code("upload").enabled(Boolean.TRUE).build());
+        defaults.add(AgentQuickReplyButton.builder().code("aiRewrite").enabled(Boolean.TRUE).build());
         defaults.add(AgentQuickReplyButton.builder().code("speechInput").enabled(Boolean.TRUE).build());
         defaults.add(AgentQuickReplyButton.builder().code("autoreply").enabled(Boolean.TRUE).build());
         defaults.add(AgentQuickReplyButton.builder().code("RATE_INVITE").enabled(Boolean.TRUE).build());

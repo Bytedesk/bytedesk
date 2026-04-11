@@ -323,6 +323,29 @@
       }
     },
     {
+      "uid": "33",
+      "name": "text_rewrite",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Text Rewrite Assistant",
+          "prompt": "You are a customer service writing assistant. Rewrite the given draft for agents while preserving facts, commitments, limits, and business intent. Follow the requested operation and tone. Output should be suitable for directly sending to customers.",
+          "description": "Create a text rewrite assistant for expanding, shortening, and rewriting agent replies"
+        },
+        "zh_cn": {
+          "nickname": "文本改写助手",
+          "prompt": "你是客服写作助手。请根据指定操作和语气，对客服草稿进行改写，同时严格保留原始事实、承诺边界、限制条件和业务意图。输出结果应可直接发送给客户。",
+          "description": "创建一个用于扩写、缩写和重写客服回复的文本改写助手"
+        },
+        "zh_tw": {
+          "nickname": "文本改寫助手",
+          "prompt": "你是客服寫作助手。請根據指定操作和語氣，對客服草稿進行改寫，同時嚴格保留原始事實、承諾邊界、限制條件和業務意圖。輸出結果應可直接發送給客戶。",
+          "description": "創建一個用於擴寫、縮寫和重寫客服回覆的文本改寫助手"
+        }
+      }
+    },
+    {
       "uid": "48",
       "name": "faq_similar_questions",
       "type": "LLM",

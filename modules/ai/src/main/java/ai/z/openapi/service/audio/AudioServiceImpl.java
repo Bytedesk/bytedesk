@@ -82,30 +82,30 @@ public class AudioServiceImpl implements AudioService {
 		RequestSupplier<AudioCustomizationRequest, java.io.File> supplier = (params) -> {
 			try {
 				java.io.File voiceFile = params.getVoiceData();
-				RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), voiceFile);
+				RequestBody requestFile = RequestBody.create(voiceFile, MediaType.parse("multipart/form-data"));
 				MultipartBody.Part voiceData = MultipartBody.Part.createFormData("voice_data", voiceFile.getName(),
 						requestFile);
 
 				Map<String, RequestBody> requestMap = new HashMap<>();
 				if (params.getInput() != null) {
-					requestMap.put("input", RequestBody.create(MediaType.parse("text/plain"), params.getInput()));
+					requestMap.put("input", RequestBody.create(params.getInput(), MediaType.parse("text/plain")));
 				}
 				if (params.getModel() != null) {
-					requestMap.put("model", RequestBody.create(MediaType.parse("text/plain"), params.getModel()));
+					requestMap.put("model", RequestBody.create(params.getModel(), MediaType.parse("text/plain")));
 				}
 				if (params.getVoiceText() != null) {
 					requestMap.put("voice_text",
-							RequestBody.create(MediaType.parse("text/plain"), params.getVoiceText()));
+							RequestBody.create(params.getVoiceText(), MediaType.parse("text/plain")));
 				}
 				if (params.getResponseFormat() != null) {
 					requestMap.put("response_format",
-							RequestBody.create(MediaType.parse("text/plain"), params.getResponseFormat()));
+							RequestBody.create(params.getResponseFormat(), MediaType.parse("text/plain")));
 				}
 				if (params.getSensitiveWordCheck() != null) {
 					try {
 						String sensitiveWordCheckJson = mapper.writeValueAsString(params.getSensitiveWordCheck());
 						requestMap.put("sensitive_word_check",
-								RequestBody.create(MediaType.parse("application/json"), sensitiveWordCheckJson));
+								RequestBody.create(sensitiveWordCheckJson, MediaType.parse("application/json")));
 					}
 					catch (Exception e) {
 						log.error("Error serializing sensitive_word_check: {}", e.getMessage(), e);
@@ -113,10 +113,10 @@ public class AudioServiceImpl implements AudioService {
 				}
 				if (params.getRequestId() != null) {
 					requestMap.put("request_id",
-							RequestBody.create(MediaType.parse("text/plain"), params.getRequestId()));
+							RequestBody.create(params.getRequestId(), MediaType.parse("text/plain")));
 				}
 				if (params.getUserId() != null) {
-					requestMap.put("user_id", RequestBody.create(MediaType.parse("text/plain"), params.getUserId()));
+					requestMap.put("user_id", RequestBody.create(params.getUserId(), MediaType.parse("text/plain")));
 				}
 
 				Single<ResponseBody> responseBody = audioApi.audioCustomization(requestMap, voiceData);
@@ -148,22 +148,22 @@ public class AudioServiceImpl implements AudioService {
 		FlowableRequestSupplier<AudioTranscriptionRequest, retrofit2.Call<ResponseBody>> supplier = params -> {
 			java.io.File file = params.getFile();
 			String contentType = detectContentType(file);
-			RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+			RequestBody requestFile = RequestBody.create(file, MediaType.parse(contentType));
 			MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
 			Map<String, RequestBody> requestMap = new HashMap<>();
 			if (params.getModel() != null) {
-				requestMap.put("model", RequestBody.create(MediaType.parse("text/plain"), params.getModel()));
+				requestMap.put("model", RequestBody.create(params.getModel(), MediaType.parse("text/plain")));
 			}
 			if (params.getStream() != null) {
 				requestMap.put("stream",
-						RequestBody.create(MediaType.parse("text/plain"), params.getStream().toString()));
+						RequestBody.create(params.getStream().toString(), MediaType.parse("text/plain")));
 			}
 			if (params.getRequestId() != null) {
-				requestMap.put("request_id", RequestBody.create(MediaType.parse("text/plain"), params.getRequestId()));
+				requestMap.put("request_id", RequestBody.create(params.getRequestId(), MediaType.parse("text/plain")));
 			}
 			if (params.getUserId() != null) {
-				requestMap.put("user_id", RequestBody.create(MediaType.parse("text/plain"), params.getUserId()));
+				requestMap.put("user_id", RequestBody.create(params.getUserId(), MediaType.parse("text/plain")));
 			}
 
 			return audioApi.audioTranscriptionStream(requestMap, fileData);
@@ -176,22 +176,22 @@ public class AudioServiceImpl implements AudioService {
 		RequestSupplier<AudioTranscriptionRequest, AudioTranscriptionResult> supplier = (params) -> {
 			java.io.File file = params.getFile();
 			String contentType = detectContentType(file);
-			RequestBody requestFile = RequestBody.create(MediaType.parse(contentType), file);
+			RequestBody requestFile = RequestBody.create(file, MediaType.parse(contentType));
 			MultipartBody.Part fileData = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
 
 			Map<String, RequestBody> requestMap = new HashMap<>();
 			if (params.getModel() != null) {
-				requestMap.put("model", RequestBody.create(MediaType.parse("text/plain"), params.getModel()));
+				requestMap.put("model", RequestBody.create(params.getModel(), MediaType.parse("text/plain")));
 			}
 			if (params.getStream() != null) {
 				requestMap.put("stream",
-						RequestBody.create(MediaType.parse("text/plain"), params.getStream().toString()));
+						RequestBody.create(params.getStream().toString(), MediaType.parse("text/plain")));
 			}
 			if (params.getRequestId() != null) {
-				requestMap.put("request_id", RequestBody.create(MediaType.parse("text/plain"), params.getRequestId()));
+				requestMap.put("request_id", RequestBody.create(params.getRequestId(), MediaType.parse("text/plain")));
 			}
 			if (params.getUserId() != null) {
-				requestMap.put("user_id", RequestBody.create(MediaType.parse("text/plain"), params.getUserId()));
+				requestMap.put("user_id", RequestBody.create(params.getUserId(), MediaType.parse("text/plain")));
 			}
 
 			return audioApi.audioTranscription(requestMap, fileData);

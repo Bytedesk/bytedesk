@@ -22,18 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class SmsEventListener {
-
-    // private final SmsRestService smsRestService;
-
-    // @Order(3)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     String orgUid = organization.getUid();
-    //     log.info("thread - organization created: {}", organization.getName());
-    //     smsRestService.initSmss(orgUid);
-    // }
-
  
 }
 

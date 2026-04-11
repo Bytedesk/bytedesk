@@ -38,6 +38,9 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
     onClick?: () => void;
 }
 
@@ -46,7 +49,10 @@ declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
-    chatPath?: '/chat' | '/chat/thread' | '/webrtc';
+    chatPath?: string;
+    threadPath?: string;
+    webrtcPath?: string;
+    callPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -58,6 +64,7 @@ declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    buttonsConfig?: ButtonConfig[];
     feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;

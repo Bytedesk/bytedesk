@@ -36,13 +36,27 @@ public class CallSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Whether the call settings are enabled.
+     */
     @Builder.Default
     private Boolean enabled = false;
 
+    /**
+     * External phone number shown to users for inbound or outbound calls.
+     * Example: hotline number, DID number, or displayed caller number.
+     */
     private String number;
 
+    /**
+     * Display name shown in call related UI.
+     */
     private String displayName;
 
+    /**
+     * Internal extension or SIP target used by CTI/SIP registration and dialing.
+     * Example: 1000, sip:1000@pbx.local.
+     */
     private String target;
 
     public static CallSettingsEntity fromRequest(CallSettingsRequest request, ModelMapper modelMapper) {

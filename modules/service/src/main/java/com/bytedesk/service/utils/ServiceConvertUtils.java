@@ -36,7 +36,9 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.agent_seat.AgentSeatEntity;
 import com.bytedesk.service.agent_seat.AgentSeatDomainService;
+import com.bytedesk.service.agent_seat.AgentSeatStatusEnum;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
@@ -187,9 +189,17 @@ public class ServiceConvertUtils {
         }
         try {
             AgentSeatDomainService agentSeatDomainService = ApplicationContextHolder.getBean(AgentSeatDomainService.class);
-            resp.setSeatExpireAt(agentSeatDomainService.findSeatExpireAtByAgentUid(agent.getUid()).orElse(null));
+            AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(agent.getUid()).orElse(null);
+            if (seat != null) {
+                if (AgentSeatStatusEnum.EXPIRED.name().equals(seat.getStatus())) {
+                    resp.setEnabled(false);
+                    resp.setForceLogout(true);
+                    if (!StringUtils.hasText(resp.getForceLogoutReason())) {
+                        resp.setForceLogoutReason("Seat expired");
+                    }
+                }
+            }
         } catch (Exception ignore) {
-            resp.setSeatExpireAt(null);
         }
         try {
             ConnectionRestService presence = ApplicationContextHolder.getBean(ConnectionRestService.class);

@@ -42,6 +42,25 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
     @Query("select c from ConnectionEntity c where c.clientId = :clientId")
     Optional<ConnectionEntity> findByClientIdForUpdate(@Param("clientId") String clientId);
 
+    java.util.List<ConnectionEntity> findByStatusAndDeletedFalse(String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update ConnectionEntity c
+        set c.status = :disconnectedStatus,
+            c.disconnectedAt = :now
+        where c.id = :id
+          and c.deleted = false
+          and c.status = :connectedStatus
+          and c.lastHeartbeatAt is not null
+          and c.ttlSeconds is not null
+          and c.lastHeartbeatAt + (c.ttlSeconds * 1000) < :now
+        """)
+    int expireIfStale(@Param("id") Long id,
+            @Param("connectedStatus") String connectedStatus,
+            @Param("disconnectedStatus") String disconnectedStatus,
+            @Param("now") long now);
+
     java.util.List<ConnectionEntity> findByUserUidAndDeletedFalse(String userUid);
 
     java.util.List<ConnectionEntity> findByUserUidInAndStatusAndDeletedFalse(Collection<String> userUids, String status);

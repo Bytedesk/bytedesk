@@ -13,6 +13,9 @@
  */
 package com.bytedesk.service.queue;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,6 +45,9 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.message.MessageRepository;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -81,6 +87,8 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     private final QueueMemberRestService queueMemberRestService;
 
     private final MessageRepository messageRepository;
+
+    private final MessageRestService messageRestService;
 
     private final ThreadRepository threadRepository;
 
@@ -208,6 +216,10 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
      * - 将 waitingMs 写入 ThreadResponse.queueMeta（与排队中 query/queuing 一致的承载方式）。
      */
     public Page<ThreadResponse> queryUnreplied(ThreadRequest request) {
+        return queryUnreplied(request, true);
+    }
+
+    private Page<ThreadResponse> queryUnreplied(ThreadRequest request, boolean allowSelfHeal) {
         UserEntity user = authService.getUser();
         String orgUid = user != null ? user.getOrgUid() : null;
         if (!StringUtils.hasText(orgUid)) {
@@ -223,18 +235,19 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
         AgentEntity agent = agentOptional.get();
         String agentUid = agent.getUid();
+        String agentUidPattern = "%\"uid\":\"" + agentUid + "\"%";
 
         Pageable pageable = request.getPageable();
         int pageNumber = (pageable == null) ? 0 : pageable.getPageNumber();
         int pageSize = (pageable == null) ? 20 : pageable.getPageSize();
         int offset = Math.max(0, pageNumber) * Math.max(1, pageSize);
 
-        long total = messageRepository.countUnrepliedVisitorThreadsByAgentUid(agentUid);
+        long total = messageRepository.countUnrepliedVisitorThreadsByAgentUid(agentUidPattern);
         if (total <= 0) {
             return Page.empty(pageable);
         }
 
-        List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUid, pageSize, offset);
+        List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUidPattern, pageSize, offset);
         if (rows == null || rows.isEmpty()) {
             return new PageImpl<>(List.of(), pageable, total);
         }
@@ -268,13 +281,19 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             return new PageImpl<>(List.of(), pageable, total);
         }
 
-        // 批量加载线程并保持与 rows 相同的顺序
         List<ThreadEntity> threadEntities = threadRepository.findByUidInAndDeletedFalse(threadUids);
         Map<String, ThreadEntity> threadByUid = new HashMap<>();
         for (ThreadEntity t : threadEntities) {
             if (t != null && StringUtils.hasText(t.getUid())) {
                 threadByUid.put(t.getUid(), t);
             }
+        }
+
+        int healedCount = allowSelfHeal ? healStaleUnrepliedThreads(firstUnrepliedAtByThreadUid, threadByUid) : 0;
+        if (healedCount > 0) {
+            log.info("queryUnreplied rerun after self-heal: agentUid={}, pageNumber={}, pageSize={}, healedCount={}",
+                    agentUid, pageNumber, pageSize, healedCount);
+            return queryUnreplied(request, false);
         }
 
         Map<String, QueueMemberEntity> queueMemberByThreadUid = queueMemberRestService.findByThreadUids(threadUids)
@@ -292,7 +311,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
             ThreadResponse resp = threadRestService.convertToResponse(entity);
 
-            Long firstUnrepliedAt = firstUnrepliedAtByThreadUid.get(threadUid);
+            Long firstUnrepliedAt = resolveFirstUnrepliedAt(threadUid, firstUnrepliedAtByThreadUid.get(threadUid));
             Long waitingMs = (firstUnrepliedAt == null) ? null : Math.max(0, now - firstUnrepliedAt);
 
             QueueMemberEntity qm = queueMemberByThreadUid.get(threadUid);
@@ -311,6 +330,146 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         }
 
         return new PageImpl<>(responses, pageable, total);
+    }
+
+    private Long resolveFirstUnrepliedAt(String threadUid, Long fallbackFirstUnrepliedAt) {
+        if (!StringUtils.hasText(threadUid)) {
+            return fallbackFirstUnrepliedAt;
+        }
+
+        List<MessageEntity> messages = messageRestService.findByThreadUid(threadUid);
+        if (messages == null || messages.isEmpty()) {
+            return fallbackFirstUnrepliedAt;
+        }
+
+        for (MessageEntity message : messages) {
+            if (!isVisitorMessageForUnreplied(message)) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(message.getAgentReplied())) {
+                continue;
+            }
+            if (message.getCreatedAt() == null) {
+                continue;
+            }
+            return message.getCreatedAt().toInstant().toEpochMilli();
+        }
+
+        return fallbackFirstUnrepliedAt;
+    }
+
+    private int healStaleUnrepliedThreads(Map<String, Long> firstUnrepliedAtByThreadUid,
+            Map<String, ThreadEntity> threadByUid) {
+        if (firstUnrepliedAtByThreadUid == null || firstUnrepliedAtByThreadUid.isEmpty() || threadByUid == null) {
+            return 0;
+        }
+
+        int healedCount = 0;
+        for (Map.Entry<String, Long> entry : firstUnrepliedAtByThreadUid.entrySet()) {
+            String threadUid = entry.getKey();
+            Long firstUnrepliedAt = entry.getValue();
+            if (!StringUtils.hasText(threadUid) || firstUnrepliedAt == null) {
+                continue;
+            }
+
+            ThreadEntity thread = threadByUid.get(threadUid);
+            if (thread == null) {
+                continue;
+            }
+
+            String threadTopic = thread.getTopic();
+
+            Optional<MessageEntity> latestOptional = StringUtils.hasText(threadTopic)
+                    ? messageRestService.findLatestByThreadTopic(threadTopic)
+                    : messageRestService.findLatestByThreadUid(threadUid);
+            if (latestOptional.isEmpty()) {
+                continue;
+            }
+
+            MessageEntity latestMessage = latestOptional.get();
+            if (!isAgentOrRobotReplyMessage(thread, latestMessage) || latestMessage.getCreatedAt() == null) {
+                continue;
+            }
+
+            ZonedDateTime repliedAt = latestMessage.getCreatedAt();
+            long repliedAtMillis = repliedAt.toInstant().toEpochMilli();
+            if (repliedAtMillis < firstUnrepliedAt) {
+                continue;
+            }
+
+            ZoneId zoneId = repliedAt.getZone() != null ? repliedAt.getZone() : ZoneId.systemDefault();
+            ZonedDateTime windowStart = ZonedDateTime.ofInstant(Instant.ofEpochMilli(firstUnrepliedAt), zoneId);
+            String agentUid = latestMessage.getUserProtobuf() != null ? latestMessage.getUserProtobuf().getUid() : null;
+
+            List<MessageEntity> messages = StringUtils.hasText(threadTopic)
+                    ? messageRestService.findByThreadTopicBetweenCreatedAt(threadTopic, windowStart, repliedAt)
+                    : messageRestService.findByThreadUidBetweenCreatedAt(threadUid, windowStart, repliedAt);
+            if (messages == null || messages.isEmpty()) {
+                continue;
+            }
+
+            int updated = 0;
+            for (MessageEntity message : messages) {
+                if (message == null || !message.isFromVisitor() || message.getCreatedAt() == null) {
+                    continue;
+                }
+                if (message.getCreatedAt().isBefore(windowStart) || message.getCreatedAt().isAfter(repliedAt)) {
+                    continue;
+                }
+                if (Boolean.TRUE.equals(message.getAgentReplied())) {
+                    continue;
+                }
+
+                message.setAgentReplied(true);
+                message.setAgentRepliedAt(repliedAt);
+                message.setAgentRepliedByUid(agentUid);
+                messageRestService.save(message);
+                updated++;
+            }
+
+            if (updated > 0) {
+                healedCount += updated;
+                log.info("queryUnreplied self-healed stale unreplied thread: threadUid={}, topic={}, count={}, agentUid={}",
+                        threadUid, threadTopic, updated, agentUid);
+            }
+        }
+
+        return healedCount;
+    }
+
+    private boolean isHumanReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromRobot() || message.isFromSystem()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isAgentOrRobotReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromSystem()) {
+            return false;
+        }
+        return message.isFromRobot() || isHumanReplyMessage(thread, message);
+    }
+
+    private boolean isVisitorMessageForUnreplied(MessageEntity message) {
+        if (message == null || !message.isFromVisitor()) {
+            return false;
+        }
+
+        MessageTypeEnum messageType = MessageTypeEnum.fromValue(message.getType());
+        return messageType != MessageTypeEnum.SYSTEM && messageType != MessageTypeEnum.NOTICE;
     }
 
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")

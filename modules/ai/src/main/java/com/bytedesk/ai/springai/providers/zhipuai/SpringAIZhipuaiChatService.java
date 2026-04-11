@@ -308,10 +308,11 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Zhipuai API SSE generation metadata {}, textContent {}", 
                                     generation.getMetadata(), textContent);
                                 
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                             }
                             success[0] = true;
                         }

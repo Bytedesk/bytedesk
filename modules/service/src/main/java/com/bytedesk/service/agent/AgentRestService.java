@@ -111,7 +111,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxAgents = resolveMaxAgents(organization);
         long current = agentRepository.countByOrgUidAndDeletedFalse(orgUid);
-        if (agentSeatDomainService.hasManagedSeats(orgUid)) {
+        if (agentSeatDomainService.isSeatEnabled()) {
             if (current >= maxAgents) {
                 throw new RuntimeException("Organization agent limit exceeded");
             }
@@ -204,10 +204,12 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setMember(member);
         agent.setUserUid(user.getUid());
         agent.setAgentNo(agent.getUid()); // 默认工号为uid
-        agentSeatDomainService.assignSeatForAgent(
-            request.getOrgUid(),
-            member.getUid(),
-            agent.getUid());
+        if (agentSeatDomainService.isSeatEnabled()) {
+            agentSeatDomainService.assignSeatForAgent(
+                request.getOrgUid(),
+                member.getUid(),
+                agent.getUid());
+        }
         //
         // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
         if (StringUtils.hasText(request.getSettingsUid())) {

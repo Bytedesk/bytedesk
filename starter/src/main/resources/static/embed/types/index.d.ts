@@ -38,6 +38,9 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
     onClick?: () => void;
 }
 
@@ -46,7 +49,10 @@ export declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
-    chatPath?: '/chat' | '/chat/thread' | '/webrtc';
+    chatPath?: string;
+    threadPath?: string;
+    webrtcPath?: string;
+    callPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -58,6 +64,7 @@ export declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    buttonsConfig?: ButtonConfig[];
     feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
@@ -75,6 +82,10 @@ export declare interface BytedeskConfig {
 declare class BytedeskWeb {
     private config;
     private bubble;
+    private bubbleContainer;
+    private buttonElements;
+    private buttonPreviewElement;
+    private buttonPreviewHideTimer;
     private window;
     private inviteDialog;
     private contextMenu;
@@ -110,7 +121,26 @@ declare class BytedeskWeb {
     private bubbleSubtitleElement;
     constructor(config: BytedeskConfig);
     private setupApiUrl;
+    private mergeConfig;
+    private refreshFloatingUi;
+    private updateChatWindowLayout;
+    private refreshChatIframeUrl;
+    setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>): void;
+    setConfig(nextConfig: Partial<BytedeskConfig>): void;
+    private getPrimaryActionFromConfig;
+    private syncChatPathByAction;
     private getDefaultConfig;
+    private getEffectiveButtonConfigs;
+    private hasVisibleButtons;
+    private isMultiButtonLayout;
+    private applyConfiguredButtonVisibility;
+    private hideBubbleMessageElement;
+    private triggerButtonAction;
+    private hideButtonPreview;
+    private cancelButtonPreviewHide;
+    private scheduleHideButtonPreview;
+    private showButtonPreview;
+    private createButtonElement;
     init(): Promise<void>;
     _initVisitor(): Promise<any>;
     private _browseVisitor;
@@ -144,6 +174,7 @@ declare class BytedeskWeb {
     private createBubble;
     private createChatWindow;
     private generateChatUrl;
+    private normalizePath;
     private getChatPageBaseUrl;
     private setupMessageListener;
     private handleLocalStorageData;
@@ -151,6 +182,9 @@ declare class BytedeskWeb {
     resetAnonymousVisitor(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
     hideChat(): void;
+    showThread(config?: Partial<BytedeskConfig>): void;
+    showWebrtc(config?: Partial<BytedeskConfig>): void;
+    showCall(config?: Partial<BytedeskConfig>): void;
     private minimizeWindow;
     private toggleMaximize;
     private setupResizeListener;

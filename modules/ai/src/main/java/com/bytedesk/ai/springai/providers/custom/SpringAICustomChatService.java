@@ -184,11 +184,12 @@ public class SpringAICustomChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Custom API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
 
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                        textContent, null, sourceReferences);
+                                    textContent, reasonContent, sourceReferences);
                             }
                         }
                     } catch (Exception e) {

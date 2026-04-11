@@ -52,7 +52,7 @@ public class FileParsingServiceImpl implements FileParsingService {
 				String fileType = params.getFileType() == null ? "" : params.getFileType();
 
 				MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(),
-						RequestBody.create(MediaType.parse("application/octet-stream"), file));
+						RequestBody.create(file, MediaType.parse("application/octet-stream")));
 				MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 				formBodyBuilder.addPart(filePart);
 				formBodyBuilder.addFormDataPart("tool_type", toolType);
@@ -132,7 +132,7 @@ public class FileParsingServiceImpl implements FileParsingService {
 
 				// Construct multipart/form-data
 				MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(),
-						RequestBody.create(MediaType.parse("application/octet-stream"), file));
+						RequestBody.create(file, MediaType.parse("application/octet-stream")));
 				MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 				formBodyBuilder.addPart(filePart);
 				formBodyBuilder.addFormDataPart("tool_type", toolType);

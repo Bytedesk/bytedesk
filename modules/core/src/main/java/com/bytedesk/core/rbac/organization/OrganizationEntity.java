@@ -155,7 +155,7 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "max_members")
     private Integer maxMembers = 20;
 
-    // 客服坐席最大数：控制组织内创建客服坐席的数量，和同时在线的客服坐席数量
+    // 客服账号最大数：控制组织内创建客服账号的数量，和同时在线的客服账号数量
     @Builder.Default
     @Column(name = "max_agents")
     private Integer maxAgents = 20;

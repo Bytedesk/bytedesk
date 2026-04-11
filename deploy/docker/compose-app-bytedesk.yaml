@@ -95,6 +95,10 @@ services:
       BYTEDESK_ORGANIZATION_DEFAULT_MAX_AGENTS: 20
       BYTEDESK_ORGANIZATION_DEFAULT_MAX_WORKGROUPS: 20
       # ===============================
+      # service config
+      # ===============================
+      BYTEDESK_SERVICE_AGENT_SEAT_ENABLED: "false"
+      # ===============================
       # IP location config
       # Put classpath database files under starter/src/main/resources/ipdb/. classpath 文件建议放在 starter/src/main/resources/ipdb/。
       # When fallback=true, the app automatically switches to another available provider if the default one is unavailable. fallback=true 时会自动回退到其他可用 provider。

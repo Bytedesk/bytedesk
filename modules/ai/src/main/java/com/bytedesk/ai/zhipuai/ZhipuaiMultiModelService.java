@@ -660,9 +660,26 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                                                     pieceTrim,
                                                     reasoning,
                                                     sourceReferences);
+                                        } else if (reasoning != null && !reasoning.isEmpty()) {
+                                            // 某些 thinking 模型会先只返回推理内容，此时也要把 reasonContent 推到前端。
+                                            sseMessageHelper.sendStreamMessage(
+                                                    messageProtobufQuery,
+                                                    messageProtobufReply,
+                                                    emitter,
+                                                    "",
+                                                    reasoning,
+                                                    sourceReferences);
                                         } else {
                                             log.debug("SSE piece is empty after trim, delta={}", delta);
                                         }
+                                    } else if (reasoning != null && !reasoning.isEmpty()) {
+                                        sseMessageHelper.sendStreamMessage(
+                                                messageProtobufQuery,
+                                                messageProtobufReply,
+                                                emitter,
+                                                "",
+                                                reasoning,
+                                                sourceReferences);
                                     } else {
                                         log.debug("SSE piece is null, delta={}", delta);
                                     }

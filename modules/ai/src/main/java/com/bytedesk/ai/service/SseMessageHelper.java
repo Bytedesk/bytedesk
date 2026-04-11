@@ -105,7 +105,8 @@ public class SseMessageHelper {
         log.info("SseMessageHelper sendStreamMessage(overload) contentIsJson={}, completeAfterSend={}, isUnanswered={}",
                 contentIsStreamContentJson, completeAfterSend, isUnanswered);
         try {
-            if (!StringUtils.hasLength(content) || isEmitterCompleted(emitter)) {
+            if ((!StringUtils.hasLength(content) && !StringUtils.hasLength(reasonContent))
+                    || isEmitterCompleted(emitter)) {
                 return;
             }
 
@@ -134,7 +135,7 @@ public class SseMessageHelper {
             } else {
                 // 与原有实现一致的构建逻辑
                 RobotContent.RobotContentBuilder<?, ?> builder = RobotContent.builder()
-                        .answer(content)
+                        .answer(content != null ? content : "")
                         .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
                         .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null);
                 if (StringUtils.hasLength(reasonContent)) {

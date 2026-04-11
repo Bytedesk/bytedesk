@@ -400,25 +400,21 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /** Cleanup expired (stale) connections by TTL */
     @Transactional
     public int expireStaleSessions() {
-        long start = System.currentTimeMillis();
-        long now = start;
-        List<ConnectionEntity> all = connectionRepository.findAll();
-        // int scanned = 0;
+        long now = System.currentTimeMillis();
+        List<ConnectionEntity> activeConnections = connectionRepository.findByStatusAndDeletedFalse(CONNECTED.name());
         int changed = 0;
         Set<String> changedUsers = new HashSet<>();
-        for (ConnectionEntity c : all) {
-            // scanned++;
-            if (c.isDeleted()) continue;
-            if (CONNECTED.name().equals(c.getStatus())) {
-                Long last = c.getLastHeartbeatAt();
-                if (last != null && c.getTtlSeconds() != null && last + c.getTtlSeconds() * 1000L < now) {
-                    c.setStatus(DISCONNECTED.name())
-                     .setDisconnectedAt(now);
-                    save(c);
-                    changed++;
-                    if (StringUtils.hasText(c.getUserUid())) {
-                        changedUsers.add(c.getUserUid());
-                    }
+        for (ConnectionEntity c : activeConnections) {
+            Long last = c.getLastHeartbeatAt();
+            Integer ttlSeconds = c.getTtlSeconds();
+            if (last == null || ttlSeconds == null || last + ttlSeconds * 1000L >= now) {
+                continue;
+            }
+            int updated = connectionRepository.expireIfStale(c.getId(), CONNECTED.name(), DISCONNECTED.name(), now);
+            if (updated > 0) {
+                changed += updated;
+                if (StringUtils.hasText(c.getUserUid())) {
+                    changedUsers.add(c.getUserUid());
                 }
             }
         }

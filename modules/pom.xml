@@ -18,6 +18,7 @@
         <module>ai</module>
         <module>bi</module>
         <module>call</module>
+        <module>cli</module>
         <module>core</module>
         <module>crm</module>
         <module>forum</module>

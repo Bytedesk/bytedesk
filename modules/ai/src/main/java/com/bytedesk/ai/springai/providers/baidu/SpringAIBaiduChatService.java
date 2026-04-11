@@ -243,6 +243,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Baidu API response metadata: {}, text {}", response.getMetadata(),
                                         textContent);
 
@@ -252,7 +253,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                                 }
 
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                        textContent, null, sourceReferences);
+                                    textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况 - 使用百度专用的提取方法
                             tokenUsage[0] = extractBaiduTokenUsage(response);

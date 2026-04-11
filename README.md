@@ -111,9 +111,11 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 # default startup (MySQL + Artemis + standard, middleware only)
 ./start.sh mysql artemis standard middleware
+# or WebRTC middleware scenarios (coturn + janus, middleware only)
+./start.sh mysql artemis webrtc middleware
 ```
 
-For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, call, full stack), see [docker readme](deploy/docker/readme.md).
+For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, webrtc, call, full stack), see [docker readme](deploy/docker/readme.md).
 
 ```bash
 # Please replace 127.0.0.1 with your server IP

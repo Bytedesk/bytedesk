@@ -101,14 +101,13 @@ class AgentRestServiceTest {
                     .nickname(entity.getNickname())
                     .email(entity.getEmail())
                     .mobile(entity.getMobile())
-                                        .seatExpireAt(agentSeatDomainService.findSeatExpireAtByAgentUid(entity.getUid()).orElse(null))
                     .enabled(entity.getEnabled())
                     .build();
         }).when(agentRestService).convertToResponse(any(AgentEntity.class));
     }
 
     @Test
-    void createShouldAssignManagedSeatAndMirrorExpireAt() {
+        void createShouldAssignManagedSeat() {
         UserEntity user = new UserEntity();
         user.setUid("user-1");
 
@@ -148,13 +147,11 @@ class AgentRestServiceTest {
         when(userService.addRoleAgent(user)).thenReturn(user);
         when(agentSeatDomainService.assignSeatForAgent("org-1", "member-1", "agent-1"))
                 .thenReturn(Optional.of(seat));
-        when(agentSeatDomainService.findSeatExpireAtByAgentUid("agent-1")).thenReturn(Optional.of(seat.getExpireAt()));
         when(agentRepository.save(any(AgentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         AgentResponse response = agentRestService.create(request);
 
         assertThat(response).isNotNull();
-                assertThat(response.getSeatExpireAt()).isEqualTo(seat.getExpireAt());
         verify(agentRepository).save(any(AgentEntity.class));
     }
 

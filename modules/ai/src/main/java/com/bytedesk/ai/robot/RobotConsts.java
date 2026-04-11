@@ -70,6 +70,7 @@ public class RobotConsts {
 //     public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article"; // 生成小红书文章
     public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant"; // 客服助手
     public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary"; // 会话小结
+    public static final String ROBOT_NAME_TEXT_REWRITE = "text_rewrite"; // 文本改写
 
     // prompt tools
     public static final String ROBOT_NAME_PROMPT_SCORE = "prompt_score"; // 提示词评分

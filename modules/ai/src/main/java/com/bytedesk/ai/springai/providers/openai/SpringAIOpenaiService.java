@@ -301,9 +301,10 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                                 for (Generation generation : generations) {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
+                                    String reasonContent = extractReasoningContent(generation, assistantMessage);
                                     log.info("OpenAI API SSE response text: {}", textContent);
 
-                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                    sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);

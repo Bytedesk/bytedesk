@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -47,6 +48,8 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final AgentSeatDomainService agentSeatDomainService;
     
     @Override
     public Page<AgentSeatEntity> queryByOrgEntity(AgentSeatRequest request) {
@@ -66,6 +69,18 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
         UserEntity user = authService.getUser();
         request.setUserUid(user.getUid());
         return queryByOrg(request);
+    }
+
+    @Transactional
+    public AgentSeatResponse queryByAssignedAgentUid(AgentSeatRequest request) {
+        if (!StringUtils.hasText(request.getAssignedAgentUid())) {
+            throw new RuntimeException("assignedAgentUid is required");
+        }
+
+        AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(request.getAssignedAgentUid())
+                .orElseThrow(() -> new RuntimeException("AgentSeat not found"));
+
+        return convertToResponse(seat);
     }
 
     @Cacheable(value = "agent_seat", key = "#uid", unless="#result==null")

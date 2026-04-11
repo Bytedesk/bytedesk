@@ -99,9 +99,11 @@ git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
 # 默认启动（MySQL + Artemis + standard，仅中间件）
 ./start.sh mysql artemis standard middleware
+# or WebRTC 音视频客服中间件场景（coturn + janus，仅中间件）
+./start.sh mysql artemis webrtc middleware
 ```
 
-更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)。
+更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、webrtc、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)。
 
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)

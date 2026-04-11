@@ -24,11 +24,23 @@ public class CallSettingsRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Whether the call settings are enabled.
+     */
     private Boolean enabled;
 
+    /**
+     * External phone number shown to users for inbound or outbound calls.
+     */
     private String number;
 
+    /**
+     * Display name shown in call related UI.
+     */
     private String displayName;
 
+    /**
+     * Internal extension or SIP target used by CTI/SIP registration and dialing.
+     */
     private String target;
 }

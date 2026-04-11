@@ -78,6 +78,17 @@ public class AgentSeatRestController extends BaseRestController<AgentSeatRequest
         return ResponseEntity.ok(JsonResult.success(agent_seat));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SEAT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent_seat by assigned agent uid")
+    @Operation(summary = "Query AgentSeat by Assigned Agent UID", description = "Retrieve the managed agent_seat bound to a specific agent")
+    @PreAuthorize(AgentSeatPermissions.HAS_AGENT_SEAT_READ)
+    @GetMapping("/query/assigned/agent")
+    public ResponseEntity<?> queryByAssignedAgentUid(AgentSeatRequest request) {
+
+        AgentSeatResponse agent_seat = agentSeatRestService.queryByAssignedAgentUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(agent_seat));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_AGENT_SEAT, action = I18Consts.I18N_ACTION_CREATE, description = "create agent_seat")
     @Operation(summary = "Create AgentSeat", description = "Create a new agent_seat")
     @Override

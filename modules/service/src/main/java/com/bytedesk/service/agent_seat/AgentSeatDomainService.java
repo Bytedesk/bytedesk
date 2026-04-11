@@ -12,44 +12,58 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.service.agent.AgentRepository;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AgentSeatDomainService {
+
+    @Value("${bytedesk.service.agent-seat-enabled:false}")
+    private boolean agentSeatEnabled;
 
     private final AgentSeatRepository agentSeatRepository;
     private final AgentRepository agentRepository;
     private final MemberRestService memberRestService;
     // private final UidUtils uidUtils;
 
+    public boolean isSeatEnabled() {
+        return agentSeatEnabled;
+    }
+
     public boolean hasManagedSeats(String orgUid) {
+        if (!isSeatEnabled()) {
+            return false;
+        }
         return agentSeatRepository.countByOrgUidAndDeletedFalse(orgUid) > 0;
     }
 
     public boolean hasAvailableSeat(String orgUid) {
+        if (!isSeatEnabled()) {
+            return false;
+        }
         refreshSeatState(orgUid);
         return findAllocatableSeat(orgUid).isPresent();
     }
 
-    @Transactional(readOnly = true)
-    public Optional<ZonedDateTime> findSeatExpireAtByAgentUid(String agentUid) {
-        if (!StringUtils.hasText(agentUid)) {
+    @Transactional
+    public Optional<AgentSeatEntity> findManagedSeatByAgentUid(String agentUid) {
+        if (!StringUtils.hasText(agentUid) || !isSeatEnabled()) {
             return Optional.empty();
         }
         return agentSeatRepository.findByAssignedAgentUidAndDeletedFalse(agentUid)
-                .map(AgentSeatEntity::getExpireAt);
+                .map(seat -> agentSeatRepository.save(refreshSeatStatus(seat)));
     }
 
     @Transactional(readOnly = true)
     public Map<String, ZonedDateTime> findSeatExpireMapByAgentUids(Collection<String> agentUids) {
         Map<String, ZonedDateTime> expireMap = new HashMap<>();
-        if (agentUids == null || agentUids.isEmpty()) {
+        if (!isSeatEnabled() || agentUids == null || agentUids.isEmpty()) {
             return expireMap;
         }
 
@@ -63,7 +77,7 @@ public class AgentSeatDomainService {
 
     @Transactional
     public int countActiveSeatsForOrg(String orgUid) {
-        if (!StringUtils.hasText(orgUid)) {
+        if (!isSeatEnabled() || !StringUtils.hasText(orgUid)) {
             return 0;
         }
         List<AgentSeatEntity> seats = new ArrayList<>(agentSeatRepository.findByOrgUidAndDeletedFalseOrderByCreatedAtAsc(orgUid));
@@ -76,6 +90,9 @@ public class AgentSeatDomainService {
 
     @Transactional
     public Optional<AgentSeatEntity> assignSeatForAgent(String orgUid, String memberUid, String agentUid) {
+        if (!isSeatEnabled()) {
+            return Optional.empty();
+        }
         refreshSeatState(orgUid);
 
         Optional<AgentSeatEntity> existingSeat = agentSeatRepository.findByAssignedAgentUidAndDeletedFalse(agentUid);
@@ -103,6 +120,9 @@ public class AgentSeatDomainService {
 
     @Transactional
     public void releaseSeatForAgent(String agentUid) {
+        if (!isSeatEnabled()) {
+            return;
+        }
         Optional<AgentSeatEntity> seatOptional = agentSeatRepository.findByAssignedAgentUidAndDeletedFalse(agentUid);
         if (seatOptional.isEmpty()) {
             return;
@@ -119,6 +139,9 @@ public class AgentSeatDomainService {
 
     @Transactional
     public Optional<AgentSeatEntity> updateSeatExpireByAgentUid(String agentUid, ZonedDateTime expireAt) {
+        if (!isSeatEnabled()) {
+            return Optional.empty();
+        }
         Optional<AgentSeatEntity> seatOptional = agentSeatRepository.findByAssignedAgentUidAndDeletedFalse(agentUid);
         if (seatOptional.isEmpty()) {
             return Optional.empty();
@@ -157,7 +180,7 @@ public class AgentSeatDomainService {
 
     @Transactional
     public void refreshSeatState(String orgUid) {
-        if (!StringUtils.hasText(orgUid)) {
+        if (!isSeatEnabled() || !StringUtils.hasText(orgUid)) {
             return;
         }
 

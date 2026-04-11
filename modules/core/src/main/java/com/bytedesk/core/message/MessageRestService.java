@@ -101,6 +101,10 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         return messageRepository.findFirstByThread_UidOrderByCreatedAtDesc(threadUid);
     }
 
+    public Optional<MessageEntity> findLatestByThreadTopic(String threadTopic) {
+        return messageRepository.findFirstByThread_TopicOrderByCreatedAtDesc(threadTopic);
+    }
+
     // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public List<MessageEntity> findByThreadUid(String threadUid) {
         return messageRepository.findByThread_UidOrderByCreatedAtAsc(threadUid);
@@ -112,6 +116,11 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     public List<MessageEntity> findByThreadUidBetweenCreatedAt(String threadUid, ZonedDateTime start,
             ZonedDateTime end) {
         return messageRepository.findByThread_UidAndCreatedAtBetweenOrderByCreatedAtAsc(threadUid, start, end);
+    }
+
+    public List<MessageEntity> findByThreadTopicBetweenCreatedAt(String threadTopic, ZonedDateTime start,
+            ZonedDateTime end) {
+        return messageRepository.findByThread_TopicAndCreatedAtBetweenOrderByCreatedAtAsc(threadTopic, start, end);
     }
     
     // @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")

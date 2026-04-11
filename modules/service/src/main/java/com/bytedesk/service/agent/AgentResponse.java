@@ -70,9 +70,6 @@ public class AgentResponse extends BaseResponse {
 
     private ZonedDateTime forceLogoutAt;
 
-    // 坐席有效期，null 表示永久有效
-    private ZonedDateTime seatExpireAt;
-
     /**
      * Agent settings (loaded from settings entity)
      */

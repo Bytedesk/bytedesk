@@ -17,6 +17,7 @@ package com.bytedesk.service.workgroup;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -48,11 +49,13 @@ import lombok.experimental.SuperBuilder;
  * Manages workgroups that support both robot and human agent services
  * 
  * Database Table: bytedesk_service_workgroup
- * Purpose: Stores workgroup configurations, agent assignments, and service settings
+ * Purpose: Stores workgroup configurations, agent assignments, and service
+ * settings
  * 
  * Key differences:
  * - WorkgroupEntity vs Skills: Organizational structure vs capability labels
- * - WorkgroupEntity vs Agent: Group support (robot + human) vs individual agent only
+ * - WorkgroupEntity vs Agent: Group support (robot + human) vs individual agent
+ * only
  * - WorkgroupEntity vs Robot: Group with routing vs standalone robot
  */
 @Entity
@@ -64,16 +67,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners(value = { WorkgroupEntityListener.class })
 @JsonIgnoreProperties({
-    "hibernateLazyInitializer", 
-    "handler",
+        "hibernateLazyInitializer",
+        "handler",
 })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
-@Table(
-    name = "bytedesk_service_workgroup",
-    indexes = {
+@Table(name = "bytedesk_service_workgroup", indexes = {
         @Index(name = "idx_workgroup_uid", columnList = "uuid")
-    }
-)
+})
 public class WorkgroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -120,6 +120,16 @@ public class WorkgroupEntity extends BaseEntity {
     private WorkgroupSettingsEntity settings;
 
     /**
+     * Per-workgroup call center settings.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+            jakarta.persistence.CascadeType.PERSIST,
+            jakarta.persistence.CascadeType.MERGE,
+            jakarta.persistence.CascadeType.REMOVE })
+    @JoinColumn(name = "call_settings_id", unique = true)
+    private CallSettingsEntity callSettings;
+
+    /**
      * Agents assigned to this workgroup
      */
     @Builder.Default
@@ -134,11 +144,7 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "bytedesk_service_workgroup_admins",
-        joinColumns = @JoinColumn(name = "workgroup_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "agent_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "bytedesk_service_workgroup_admins", joinColumns = @JoinColumn(name = "workgroup_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "agent_id", referencedColumnName = "id"))
     private List<AgentEntity> admins = new ArrayList<>();
 
     /**
@@ -169,8 +175,8 @@ public class WorkgroupEntity extends BaseEntity {
                 return null;
             }
             return this.agents.stream()
-                .findFirst()
-                .orElse(null);
+                    .findFirst()
+                    .orElse(null);
         }
         return this.messageLeaveAgent;
     }
@@ -178,11 +184,11 @@ public class WorkgroupEntity extends BaseEntity {
     @JsonIgnore
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
-            .uid(this.getUid())
-            .nickname(this.getNickname())
-            .avatar(this.getAvatar())
-            .type(UserTypeEnum.WORKGROUP.name())
-            .build();
+                .uid(this.getUid())
+                .nickname(this.getNickname())
+                .avatar(this.getAvatar())
+                .type(UserTypeEnum.WORKGROUP.name())
+                .build();
     }
 
     /**
@@ -206,10 +212,10 @@ public class WorkgroupEntity extends BaseEntity {
     // agent connected count
     // @JsonIgnore
     // public long getConnectedAgentCount() {
-    //     if (this.agents == null || this.agents.isEmpty()) {
-    //         return 0;
-    //     }
-    //     return this.agents.stream().filter(agent -> agent.isConnected()).count();
+    // if (this.agents == null || this.agents.isEmpty()) {
+    // return 0;
+    // }
+    // return this.agents.stream().filter(agent -> agent.isConnected()).count();
     // }
 
     // agent available count
@@ -238,7 +244,7 @@ public class WorkgroupEntity extends BaseEntity {
         }
         return this.agents.stream().filter(agent -> agent.isBusy()).count();
     }
-    
+
     // agent rest count
     @JsonIgnore
     public long getRestAgentCount() {

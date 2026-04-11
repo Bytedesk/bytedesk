@@ -630,8 +630,8 @@ public class RobotSettingsRestService
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
             if (published != null) {
-                log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(),
-                        entity.getDraftServiceSettings().getWelcomeTip());
+                // log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(),
+                        // entity.getDraftServiceSettings().getWelcomeTip());
                 //
                 copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {

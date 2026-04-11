@@ -30,6 +30,16 @@ public class I18Consts {
 
     // 通用操作动作与模块标题
     public static final String I18N_TAG = I18N_PREFIX + "tag";
+    public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
+    public static final String I18N_TOOL = I18N_PREFIX + "tool";
+    public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
+    public static final String I18N_TOOL_AUDIT = I18N_PREFIX + "tool.audit";
+    public static final String I18N_TOOL_GUARD = I18N_PREFIX + "tool.guard";
+    public static final String I18N_TOOL_RULE = I18N_PREFIX + "tool.rule";
+    public static final String I18N_PLAN = I18N_PREFIX + "plan";
+    public static final String I18N_PLAN_SUB = I18N_PREFIX + "plan.sub";
+    public static final String I18N_SKILL = I18N_PREFIX + "skill";
+    public static final String I18N_MCP_SERVER = I18N_PREFIX + "mcp.server";
     public static final String I18N_MEMBER = I18N_PREFIX + "member";
     public static final String I18N_DEPARTMENT = I18N_PREFIX + "department";
     public static final String I18N_RELATION = I18N_PREFIX + "relation";
@@ -111,6 +121,7 @@ public class I18Consts {
     public static final String I18N_VISITOR = I18N_PREFIX + "visitor.management";
     public static final String I18N_TICKET = I18N_PREFIX + "ticket.management";
     public static final String I18N_TICKET_RATING = I18N_PREFIX + "ticket.rating";
+    public static final String I18N_BUG = I18N_PREFIX + "bug.management";
     public static final String I18N_MESSAGE_LEAVE = I18N_PREFIX + "message.leave.management";
     public static final String I18N_TICKET_SETTINGS = I18N_PREFIX + "ticket.settings.management";
     public static final String I18N_FORM_RESULT = I18N_PREFIX + "form.result.management";
@@ -126,6 +137,7 @@ public class I18Consts {
     public static final String I18N_WEBPAGE = I18N_PREFIX + "webpage.management";
     public static final String I18N_CHUNK = I18N_PREFIX + "chunk.management";
     public static final String I18N_ROBOT = I18N_PREFIX + "robot.management";
+    public static final String I18N_ROBOT_WORKSPACE = I18N_PREFIX + "robot.workspace";
     public static final String I18N_COMMENT = I18N_PREFIX + "comment.management";
     public static final String I18N_TRIGGER = I18N_PREFIX + "trigger.management";
     public static final String I18N_LEAD = I18N_PREFIX + "lead.management";

@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.sms;
 
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,7 +88,7 @@ public class SmsSendService {
                 }
                 
                 if (needsConversion) {
-                    signName = new String(signName.getBytes("ISO-8859-1"), "UTF-8");
+                    signName = new String(signName.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                     log.info("短信签名编码转换完成: {}", signName);
                 }
             }

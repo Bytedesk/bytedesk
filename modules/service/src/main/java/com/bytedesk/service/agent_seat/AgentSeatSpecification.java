@@ -59,6 +59,14 @@ public class AgentSeatSpecification extends BaseSpecification<AgentSeatEntity, A
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
+            // assignedAgentUid
+            if (StringUtils.hasText(request.getAssignedAgentUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("assignedAgentUid"), request.getAssignedAgentUid()));
+            }
+            // assignedMemberUid
+            if (StringUtils.hasText(request.getAssignedMemberUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("assignedMemberUid"), request.getAssignedMemberUid()));
+            }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

@@ -51,7 +51,7 @@ public class HandwritingOcrServiceImpl implements HandwritingOcrService {
 
 				// Build multipart/form-data
 				MultipartBody.Part filePart = MultipartBody.Part.createFormData("file", file.getName(),
-						RequestBody.create(MediaType.parse("application/octet-stream"), file));
+						RequestBody.create(file, MediaType.parse("application/octet-stream")));
 				MultipartBody.Builder formBodyBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
 				formBodyBuilder.addPart(filePart);
 				formBodyBuilder.addFormDataPart("tool_type", toolType);

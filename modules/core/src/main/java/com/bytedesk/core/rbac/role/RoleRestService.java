@@ -112,7 +112,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 } else {
                         bindOrgUidForNonSuper(request, user);
                 }
-                // 
+                //
                 Pageable pageable = request.getPageable();
                 Specification<RoleEntity> specification = RoleSpecification.search(request, authService);
                 Page<RoleEntity> rolePage = roleRepository.findAll(specification, pageable);
@@ -195,6 +195,15 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         }
 
         public RoleResponse create(RoleRequest request) {
+                return createInternal(request, false);
+        }
+
+        @Transactional
+        public RoleResponse createSystemRole(RoleRequest request) {
+                return createInternal(request, true);
+        }
+
+        private RoleResponse createInternal(RoleRequest request, boolean systemRole) {
                 UserEntity user = authService.getUser();
                 if (user != null) {
                         request.setUserUid(user.getUid());
@@ -214,15 +223,16 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 // validateDelegableAuthorities(request.getAuthorityUids(), user);
 
                 RoleEntity role = modelMapper.map(request, RoleEntity.class);
+                role.setSystem(systemRole);
 
-                                // expiresAt: null=not provided, blank=clear(permanent), value=parse
-                                if (request.getExpiresAt() != null) {
-                                        if (!StringUtils.hasText(request.getExpiresAt())) {
-                                                role.setExpiresAt(null);
-                                        } else {
-                                                role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
-                                        }
-                                }
+                // expiresAt: null=not provided, blank=clear(permanent), value=parse
+                if (request.getExpiresAt() != null) {
+                        if (!StringUtils.hasText(request.getExpiresAt())) {
+                                role.setExpiresAt(null);
+                        } else {
+                                role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
+                        }
+                }
                 if (StringUtils.hasText(request.getUid())) {
                         role.setUid(request.getUid());
                 } else {
@@ -264,18 +274,23 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         if (request.getDescription() != null) {
                                 role.setDescription(request.getDescription());
                         }
-						// expiresAt: null=not provided (do nothing), blank=clear(permanent), value=parse
-						if (request.getExpiresAt() != null) {
-							if (!StringUtils.hasText(request.getExpiresAt())) {
-								role.setExpiresAt(null);
-							} else {
-								role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
-							}
-						}
+                        if (request.getSystem() != null && !request.getSystem().equals(role.getSystem())) {
+                                throw new IllegalArgumentException("role system flag is immutable");
+                        }
+                        // expiresAt: null=not provided (do nothing), blank=clear(permanent),
+                        // value=parse
+                        if (request.getExpiresAt() != null) {
+                                if (!StringUtils.hasText(request.getExpiresAt())) {
+                                        role.setExpiresAt(null);
+                                } else {
+                                        role.setExpiresAt(parseExpiresAt(request.getExpiresAt()));
+                                }
+                        }
                         // 仅当请求明确携带 authorityUids 时，才重建关联；否则保持原权限不变
                         if (request.getAuthorityUids() != null) {
                                 role.getAuthorities().clear();
-                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(request.getAuthorityUids());
+                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(
+                                                request.getAuthorityUids());
                                 assertAuthoritiesVipAssignable(authoritiesToBind, user);
                                 authoritiesToBind.forEach(role::addAuthority);
                         }
@@ -319,14 +334,17 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 // return ConvertUtils.convertToRoleResponse(entity);
                 RoleResponse roleResponse = modelMapper.map(entity, RoleResponse.class);
                 UserEntity currentUser = authService.getUser();
-                OrganizationEntity currentOrganization = currentUser == null ? null : currentUser.getCurrentOrganization();
+                OrganizationEntity currentOrganization = currentUser == null ? null
+                                : currentUser.getCurrentOrganization();
                 boolean isSuperUser = currentUser != null && currentUser.isSuperUser();
                 // 将Set<AuthorityEntity> authorities转换为Set<AuthorityResponse> authorities
                 roleResponse.setAuthorities(
-                        entity.getAuthorities().stream()
-                                .filter(authorityEntity -> isSuperUser || canUseAuthorityByVip(currentOrganization, authorityEntity))
-                                .map(authorityEntity -> modelMapper.map(authorityEntity, AuthorityResponse.class))
-                                .collect(Collectors.toSet()));
+                                entity.getAuthorities().stream()
+                                                .filter(authorityEntity -> isSuperUser || canUseAuthorityByVip(
+                                                                currentOrganization, authorityEntity))
+                                                .map(authorityEntity -> modelMapper.map(authorityEntity,
+                                                                AuthorityResponse.class))
+                                                .collect(Collectors.toSet()));
                 return roleResponse;
         }
 
@@ -361,10 +379,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         }
 
         @Caching(evict = {
-                // 更新实体后，驱逐相关缓存，确保 queryByUid/findByUid/findByNameAndOrgUid 不会返回旧数据
-                @CacheEvict(value = "role", key = "'resp:' + #role.uid"),
-                @CacheEvict(value = "role", key = "'uid:' + #role.uid"),
-                @CacheEvict(value = "role", key = "'nameOrg:' + #role.name + '-' + #role.orgUid")
+                        // 更新实体后，驱逐相关缓存，确保 queryByUid/findByUid/findByNameAndOrgUid 不会返回旧数据
+                        @CacheEvict(value = "role", key = "'resp:' + #role.uid"),
+                        @CacheEvict(value = "role", key = "'uid:' + #role.uid"),
+                        @CacheEvict(value = "role", key = "'nameOrg:' + #role.name + '-' + #role.orgUid")
         })
         public RoleEntity save(RoleEntity role) {
                 try {
@@ -407,7 +425,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Transactional
         public RoleResponse resetAuthorities(RoleRequest request) {
-                // 
+                //
                 if (request == null || !StringUtils.hasText(request.getUid())) {
                         throw new IllegalArgumentException("role uid is required for reset");
                 }
@@ -588,7 +606,8 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         }
 
                         if (request.getAuthorityUids() != null) {
-                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(request.getAuthorityUids());
+                                Set<AuthorityEntity> authoritiesToBind = resolveAuthoritiesByUids(
+                                                request.getAuthorityUids());
                                 if (!systemContext) {
                                         assertAuthoritiesVipAssignable(authoritiesToBind, user);
                                 }
@@ -681,7 +700,8 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 for (AuthorityEntity authority : authorities) {
                         if (!canUseAuthorityByVip(currentOrganization, authority)) {
                                 String authorityValue = authority == null ? "UNKNOWN" : authority.getValue();
-                                throw new AccessDeniedException("No permission to assign VIP authority: " + authorityValue);
+                                throw new AccessDeniedException(
+                                                "No permission to assign VIP authority: " + authorityValue);
                         }
                 }
         }

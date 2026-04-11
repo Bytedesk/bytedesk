@@ -358,6 +358,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.debug("{} API response metadata: {}, text {}", providerName, response.getMetadata(),
                                         textContent);
 
@@ -367,7 +368,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                                 }
 
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                        textContent, null, sourceReferences);
+                                    textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
