@@ -15,6 +15,8 @@
 
 AI powered Omnichannel customer service With Team Cooperation
 
+> This branch is the bytedesk-2.x development line. The current Maven revision is `2.0.0-SNAPSHOT`.
+
 **Language:** [English](README.md) | [中文](README.zh.md)
 
 ## Admin Dashboard
@@ -113,6 +115,12 @@ cd bytedesk/deploy/docker
 ./start.sh mysql artemis standard middleware
 # or WebRTC middleware scenarios (coturn + janus, middleware only)
 ./start.sh mysql artemis webrtc middleware
+```
+
+For the local 2.x worktree created from `bytedesk-1.x`:
+
+```bash
+cd ../bytedesk-2x/deploy/docker
 ```
 
 For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, webrtc, call, full stack), see [docker readme](deploy/docker/readme.md).
