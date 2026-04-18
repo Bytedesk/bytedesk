@@ -13,12 +13,8 @@
  */
 package com.bytedesk.webrtc.webrtc_settings;
 
-
-import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,7 +33,4 @@ public class WebrtcSettingsResponse extends BaseResponse {
     private static final long serialVersionUID = 1L;
 
     private Boolean defaultVoiceAgent;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private RobotProtobuf robot;
 }

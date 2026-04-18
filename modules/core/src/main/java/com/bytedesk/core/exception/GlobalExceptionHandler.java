@@ -14,6 +14,7 @@
 package com.bytedesk.core.exception;
 
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -174,6 +175,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
     }
 
+    @ExceptionHandler(OrgMaxMembersExceededException.class)
+    public ResponseEntity<?> handleOrgMaxMembersExceededException(OrgMaxMembersExceededException e) {
+        log.warn("Organization member limit exceeded: orgUid={}, orgName={}, current={}, max={}",
+                e.getOrgUid(),
+                e.getOrgName(),
+                e.getCurrentDistinctUsers(),
+                e.getMaxMembers());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(e.getMessage(), HttpStatus.CONFLICT.value()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         String rawMessage = e.getMessage();
@@ -208,21 +221,46 @@ public class GlobalExceptionHandler {
     }
 
     private String resolveRuntimeMessage(String message) {
-        if (message == null || message.isBlank()) {
-            return "error";
+        String normalizedMessage = normalizeBusinessMessageKey(message);
+        if (normalizedMessage == null || normalizedMessage.isBlank()) {
+            return I18Consts.I18N_INTERNAL_SERVER_ERROR;
         }
 
-        if (message.startsWith(I18Consts.I18N_PREFIX)) {
-            String translated = tryTranslateI18nKey(message);
-            if (!message.equals(translated)) {
+        if (normalizedMessage.startsWith(I18Consts.I18N_PREFIX)) {
+            String translated = tryTranslateI18nKey(normalizedMessage);
+            if (!normalizedMessage.equals(translated)) {
                 return translated;
             }
-            if (I18Consts.I18N_AGENT_EXISTS.equals(message)) {
-                return "当前组织下该成员已是坐席，无需重复创建";
-            }
         }
 
+        return normalizedMessage;
+    }
+
+    private String normalizeBusinessMessageKey(String message) {
+        if (message == null || message.isBlank()) {
+            return message;
+        }
+        if (message.startsWith(I18Consts.I18N_PREFIX)) {
+            return message;
+        }
+        if (message.contains("orgUid should not be null")) {
+            return I18Consts.I18N_ORG_UID_REQUIRED;
+        }
+        if (message.contains("No permission to access data of other organizations")) {
+            return I18Consts.I18N_ORGANIZATION_ACCESS_DENIED;
+        }
         return message;
+    }
+
+    private Integer resolveBusinessStatusCode(String message) {
+        String normalizedMessage = normalizeBusinessMessageKey(message);
+        if (I18Consts.I18N_ORGANIZATION_ACCESS_DENIED.equals(normalizedMessage)) {
+            return HttpStatus.FORBIDDEN.value();
+        }
+        if (I18Consts.I18N_ORG_UID_REQUIRED.equals(normalizedMessage)) {
+            return HttpStatus.BAD_REQUEST.value();
+        }
+        return null;
     }
 
     private String tryTranslateI18nKey(String key) {
@@ -230,8 +268,16 @@ public class GlobalExceptionHandler {
             if (!ApplicationContextHolder.isInitialized()) {
                 return key;
             }
+            String messageKey = key;
+            Object[] args = null;
+            int separatorIndex = key.indexOf(I18Consts.I18N_ARG_SEPARATOR);
+            if (separatorIndex >= 0) {
+                messageKey = key.substring(0, separatorIndex);
+                String rawArgs = key.substring(separatorIndex + I18Consts.I18N_ARG_SEPARATOR.length());
+                args = rawArgs.isEmpty() ? new Object[0] : rawArgs.split("\\|", -1);
+            }
             MessageSource messageSource = ApplicationContextHolder.getBean(MessageSource.class);
-            return messageSource.getMessage(key, null, key, LocaleContextHolder.getLocale());
+            return messageSource.getMessage(messageKey, args, key, LocaleContextHolder.getLocale());
         } catch (Exception ex) {
             log.debug("Failed to translate i18n key: {}", key);
             return key;
@@ -246,7 +292,7 @@ public class GlobalExceptionHandler {
         log.warn("Optimistic locking failure: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error("资源已被并发修改，请刷新后重试", 409));
+                .body(JsonResult.error(I18Consts.I18N_RESOURCE_CONCURRENTLY_MODIFIED, 409));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -256,21 +302,73 @@ public class GlobalExceptionHandler {
             log.warn("敏感词异常: {}", e.getMessage());
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_SENSITIVE_CONTENT));
         }
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        String normalizedMessage = normalizeBusinessMessageKey(e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(normalizedMessage);
+        Integer statusCode = resolveBusinessStatusCode(normalizedMessage);
+        if (statusCode != null) {
+            log.warn("IllegalArgumentException: {}", normalizedMessage);
+            return ResponseEntity.status(statusCode)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(resolvedMessage, statusCode));
+        }
+        return ResponseEntity.ok().body(JsonResult.error(resolvedMessage));
+    }
+
+    /**
+     * 数据库约束违反：字段超长、唯一键冲突等，返回可读提示而不是原始 SQL 堆栈。
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        Throwable root = e.getMostSpecificCause();
+        String rootMsg = root != null ? root.getMessage() : e.getMessage();
+        log.warn("DataIntegrityViolation: {}", rootMsg);
+        if (rootMsg != null) {
+            // 字段超长：Data truncation: Data too long for column 'xxx'
+            if (rootMsg.contains("Data too long for column")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INPUT_TOO_LONG, HttpStatus.BAD_REQUEST.value()));
+            }
+            // 唯一键冲突：Duplicate entry 'xxx' for key 'yyy'
+            if (rootMsg.contains("Duplicate entry")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_DATA_ALREADY_EXISTS, HttpStatus.CONFLICT.value()));
+            }
+            // 外键约束：Cannot add or update a child row / Cannot delete or update a parent row
+            if (rootMsg.contains("foreign key constraint") || rootMsg.contains("a foreign key constraint")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_DATA_RELATION_CONSTRAINT_VIOLATED, HttpStatus.BAD_REQUEST.value()));
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+            .body(JsonResult.error(I18Consts.I18N_DATA_SAVE_FAILED, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(InvalidDataAccessApiUsageException.class)
     public ResponseEntity<?> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e) {
         Throwable cause = e.getCause();
-        String message = cause != null ? cause.getMessage() : e.getMessage();
-        if (message != null && message.contains("orgUid should not be null")) {
-            log.warn("InvalidDataAccessApiUsageException: {}", message);
+        String rawMessage = cause != null ? cause.getMessage() : e.getMessage();
+        String normalizedMessage = normalizeBusinessMessageKey(rawMessage);
+        String resolvedMessage = resolveRuntimeMessage(normalizedMessage);
+        Integer statusCode = resolveBusinessStatusCode(normalizedMessage);
+
+        if (statusCode != null) {
+            log.warn("InvalidDataAccessApiUsageException: {}", normalizedMessage);
+            return ResponseEntity.status(statusCode)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(resolvedMessage, statusCode));
+        }
+        if (normalizedMessage != null && normalizedMessage.startsWith(I18Consts.I18N_PREFIX)) {
+            log.warn("InvalidDataAccessApiUsageException: {}", normalizedMessage);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(JsonResult.error(message, HttpStatus.BAD_REQUEST.value()));
+                    .body(JsonResult.error(resolvedMessage, HttpStatus.BAD_REQUEST.value()));
         }
         log.error("InvalidDataAccessApiUsageException", e);
-        return ResponseEntity.badRequest().body(JsonResult.error(e.getMessage()));
+        return ResponseEntity.badRequest().body(JsonResult.error(resolvedMessage));
     }
 
     @ExceptionHandler(ResourceAccessException.class)
@@ -279,7 +377,7 @@ public class GlobalExceptionHandler {
         log.warn("Upstream resource access failed: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error("外部服务暂时不可用，请稍后重试", HttpStatus.SERVICE_UNAVAILABLE.value()));
+                .body(JsonResult.error(I18Consts.I18N_EXTERNAL_SERVICE_TEMPORARILY_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE.value()));
     }
 
     /**
@@ -403,7 +501,7 @@ public class GlobalExceptionHandler {
         
         // 对于其他情况，返回正常的错误响应
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(JsonResult.error("Connection no longer available"));
+            .body(JsonResult.error(I18Consts.I18N_CONNECTION_NO_LONGER_AVAILABLE));
     }
 
     @ExceptionHandler(Exception.class)

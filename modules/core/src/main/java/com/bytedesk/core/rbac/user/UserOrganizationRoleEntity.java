@@ -76,8 +76,5 @@ public class UserOrganizationRoleEntity implements Serializable  {
     // 用户角色有效期
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
-
-    // 可能还有其他字段，如权限等
-
     
 }

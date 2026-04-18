@@ -227,6 +227,7 @@ public class RobotSettingsRestService
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getServiceSettings(), draft);
+            ServiceSettingsEntity.applyRequestAliases(request.getServiceSettings(), draft);
             // 恢复或设置 uid
             if (originalUid != null) {
                 draft.setUid(originalUid);
@@ -759,7 +760,10 @@ public class RobotSettingsRestService
 
     @Override
     public RobotSettingsResponse convertToResponse(RobotSettingsEntity entity) {
-        return modelMapper.map(entity, RobotSettingsResponse.class);
+        RobotSettingsResponse resp = modelMapper.map(entity, RobotSettingsResponse.class);
+        resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
+        resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
+        return resp;
     }
 
     /**

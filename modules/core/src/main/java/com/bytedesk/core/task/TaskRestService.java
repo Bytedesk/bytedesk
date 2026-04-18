@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.relation.RelationEntity;
 import com.bytedesk.core.relation.RelationRepository;
 import com.bytedesk.core.relation.RelationTypeEnum;
@@ -105,7 +106,7 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
     public TaskResponse queryByUid(TaskRequest request) {
         Optional<TaskEntity> optional = findByUid(request.getUid());
         if (optional.isEmpty()) {
-            throw new RuntimeException("Task not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
         TaskEntity entity = optional.get();
 
@@ -161,7 +162,7 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
         // 
         TaskEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create task failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -176,12 +177,12 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
             //
             TaskEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update task failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Task not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -219,7 +220,7 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
             // taskRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Task not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -277,7 +278,7 @@ public class TaskRestService extends BaseRestServiceWithExport<TaskEntity, TaskR
             throw new RuntimeException("Unauthorized");
         }
 
-        TaskEntity task = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException("Task not found"));
+        TaskEntity task = findByUid(request.getUid()).orElseThrow(() -> new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND));
 
         Optional<RelationEntity> existing = relationRepository
                 .findBySubjectUserUidAndObjectContentUidAndTypeAndDeletedFalse(user.getUid(), task.getUid(), relationType);

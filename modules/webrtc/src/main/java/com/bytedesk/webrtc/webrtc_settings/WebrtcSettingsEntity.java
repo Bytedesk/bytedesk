@@ -13,13 +13,10 @@
  */
 package com.bytedesk.webrtc.webrtc_settings;
 
-import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -53,10 +50,6 @@ public class WebrtcSettingsEntity extends BaseEntity {
     // 是否默认启用AI语音助手
     @lombok.Builder.Default
     private Boolean defaultVoiceAgent = false;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    private RobotEntity robot;
 
  
 }

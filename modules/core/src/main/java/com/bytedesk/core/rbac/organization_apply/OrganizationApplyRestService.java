@@ -323,7 +323,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
         // 
         OrganizationApplyEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create organizationApply failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -337,12 +337,12 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
             //
             OrganizationApplyEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update organizationApply failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("OrganizationApply not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -382,7 +382,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
             // tagRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("OrganizationApply not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

@@ -185,6 +185,7 @@ public class ServiceSettingsResponse implements Serializable {
                 .rateMsgCount(settings.getRateMsgCount())
                 .showPreForm(settings.getShowPreForm())
                 .preFormRequired(settings.getPreFormRequired())
+                .preForm(normalizeAdminPreFormValue(settings.getPreFormSchema()))
                 .showHistory(settings.getShowHistory())
                 .showMessageStatus(settings.getShowMessageStatus())
                 .allowVisitorRecall(settings.getAllowVisitorRecall())
@@ -214,6 +215,23 @@ public class ServiceSettingsResponse implements Serializable {
                 .showLogo(settings.getShowLogo())
                 .validateUntil(settings.getValidateUntil())
                 .build();
+    }
+
+    private static String normalizeAdminPreFormValue(String rawValue) {
+        if (rawValue == null) {
+            return null;
+        }
+
+        String trimmedValue = rawValue.trim();
+        if (trimmedValue.isEmpty() || "{}".equals(trimmedValue) || "[]".equals(trimmedValue)) {
+            return null;
+        }
+
+        if (trimmedValue.startsWith("{") || trimmedValue.startsWith("[")) {
+            return null;
+        }
+
+        return trimmedValue;
     }
 
 }

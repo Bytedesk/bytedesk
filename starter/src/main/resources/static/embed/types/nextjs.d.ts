@@ -7,6 +7,7 @@ declare interface Animation_2 {
 }
 
 declare interface BrowseConfig {
+    referer?: string;
     referrer?: string;
     url?: string;
     title?: string;
@@ -89,6 +90,7 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    title?: string;
     uid?: string;
     visitorUid?: string;
     nickname?: string;

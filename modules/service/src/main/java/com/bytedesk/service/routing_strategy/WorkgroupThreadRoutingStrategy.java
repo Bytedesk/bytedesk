@@ -1140,6 +1140,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         // 获取最新线程状态
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
 
         // 设置离线内容
         String offlineContent = getWorkgroupOfflineMessage(visitorRequest, workgroup);

@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.workflow_settings.WorkflowSettingsEntity;
@@ -92,7 +93,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         // 
         WorkflowEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create workflow failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         refreshWorkflowCache(savedEntity);
         return convertToResponse(savedEntity);
@@ -140,13 +141,13 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             
             WorkflowEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update workflow failed: saved entity is null");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             refreshWorkflowCache(savedEntity);
             log.debug("工作流更新成功，ID: {}, 新版本: {}", savedEntity.getId(), savedEntity.getVersion());
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Workflow not found with UID: " + request.getUid());
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_RESOURCE_NOT_FOUND_WITH_UID, request.getUid()));
         }
     }
 
@@ -164,7 +165,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             save(optional.get());
         }
         else {
-            throw new RuntimeException("Workflow not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

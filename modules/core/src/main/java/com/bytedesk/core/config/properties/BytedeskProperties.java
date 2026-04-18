@@ -333,6 +333,7 @@ public class BytedeskProperties implements EnvironmentAware {
         // whitelist ip for performance testing
         private List<String> ipWhitelist = new ArrayList<>();
     }
+    
     @Getter
     @Setter 
     public static class Organization {
@@ -342,6 +343,8 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean allowCreateOrg = true;
         // when user has no organization after login, allow applying to join an existing organization
         private Boolean allowJoinOrg = true;
+        // default vip level for new organizations
+        private Integer defaultVipLevel = 0;
         // default validity period (days) for new organizations
         private Integer defaultVipDays = 365;
         // default limits for new organizations

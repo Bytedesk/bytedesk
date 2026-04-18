@@ -44,6 +44,9 @@ public class MessageLeaveRequest extends BaseRequest {
     // 留言内容
     // private String content;
 
+    // 通用表单数据，JSON 字符串
+    private String formData;
+
     // 留言类型
     // private String type;
 

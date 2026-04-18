@@ -198,7 +198,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         //
         CategoryEntity newCategory = save(category);
         if (newCategory == null) {
-            throw new RuntimeException("category save error");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         //
         return convertToResponse(newCategory);
@@ -208,7 +208,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     public CategoryResponse update(CategoryRequest request) {
         Optional<CategoryEntity> category = findByUid(request.getUid());
         if (!category.isPresent()) {
-            throw new RuntimeException("category not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
         CategoryEntity entity = category.get();
         // modelMapper.map(request, entity);
@@ -249,7 +249,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         //
         CategoryEntity newCategory = save(entity);
         if (newCategory == null) {
-            throw new RuntimeException("category save error");
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
         }
 
         return convertToResponse(newCategory);

@@ -33,6 +33,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Features features;
     private Testing testing;
     private Organization organization;
+    private Ai ai;
 
     @Getter
     @Setter
@@ -104,10 +105,40 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String code;
         private Boolean allowCreateOrg = true;
         private Boolean allowJoinOrg = true;
+        private Integer defaultVipLevel = 0;
         private Integer defaultVipDays = 365;
         private Integer defaultMaxMembers = 20;
         private Integer defaultMaxAgents = 20;
         private Integer defaultMaxWorkgroups = 20;
+    }
+
+    @Getter
+    @Setter
+    public static class Ai {
+        // bytedesk.ai.* 聚合后的应用默认值，供前端表单和执行接口共享。
+        private Tts tts;
+        private Asr asr;
+    }
+
+    @Getter
+    @Setter
+    public static class Tts {
+        private String provider;
+        private String model;
+        private String voice;
+        private String language;
+        private String audioFormat;
+    }
+
+    @Getter
+    @Setter
+    public static class Asr {
+        private String provider;
+        private String model;
+        private String realtimeModel;
+        private String sourceFormat;
+        private Long timeoutMs;
+        private Long pollIntervalMs;
     }
     
 }

@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -56,7 +57,7 @@ public class EmailRestService extends BaseRestServiceWithExport<EmailEntity, Ema
         if (optional.isPresent()) {
             return convertToResponse(optional.get());
         } else {
-            throw new RuntimeException("Email not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -102,7 +103,7 @@ public class EmailRestService extends BaseRestServiceWithExport<EmailEntity, Ema
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Email not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -140,7 +141,7 @@ public class EmailRestService extends BaseRestServiceWithExport<EmailEntity, Ema
             // emailRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Email not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

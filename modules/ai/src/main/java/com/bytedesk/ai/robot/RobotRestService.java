@@ -156,6 +156,9 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
+        if (StringUtils.hasText(request.getLevel())) {
+            robot.setLevel(request.getLevel());
+        }
         // robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
         // robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
 

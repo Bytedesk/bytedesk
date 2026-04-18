@@ -14,7 +14,9 @@
 package com.bytedesk.service.message_leave;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.bytedesk.core.base.BaseExtra;
 import com.bytedesk.core.message.MessageExtra;
@@ -35,6 +37,8 @@ public class MessageLeaveExtra extends MessageExtra {
     private String nickname;
     private String contact;
     private String content;
+    @Builder.Default
+    private Map<String, Object> formData = new LinkedHashMap<>();
     private String type;
 
     @Builder.Default
@@ -49,6 +53,12 @@ public class MessageLeaveExtra extends MessageExtra {
 
     public static MessageLeaveExtra fromJson(String json) {
         MessageLeaveExtra result = BaseExtra.fromJson(json, MessageLeaveExtra.class);
-        return result != null ? result : MessageLeaveExtra.builder().build();
+        if (result == null) {
+            return MessageLeaveExtra.builder().build();
+        }
+        if (result.getFormData() == null) {
+            result.setFormData(new LinkedHashMap<>());
+        }
+        return result;
     }
 }

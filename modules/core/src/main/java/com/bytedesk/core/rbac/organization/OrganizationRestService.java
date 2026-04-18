@@ -40,7 +40,6 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +62,16 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     private final ModelMapper modelMapper;
 
+    private int resolveDefaultVipLevel() {
+        return OrganizationDefaults.resolveDefaultVipLevel(bytedeskProperties);
+    }
+
+    private void applyDefaultVipSettings(OrganizationEntity organization) {
+        int defaultVipLevel = resolveDefaultVipLevel();
+        organization.setVipLevel(defaultVipLevel);
+        organization.setVipExpireDate(OrganizationDefaults.resolveDefaultVipExpireDate(bytedeskProperties, defaultVipLevel));
+    }
+
     private boolean isDefaultOrganization(OrganizationEntity organization) {
         return organization != null && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid());
     }
@@ -83,14 +92,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (organization.getVipLevel() == null) {
             organization.setVipLevel(Boolean.TRUE.equals(organization.getVip()) ? 1 : 0);
         }
-    }
-
-    private int resolveDefaultVipDays() {
-        Integer configured = bytedeskProperties.getOrganization().getDefaultVipDays();
-        if (configured == null || configured <= 0) {
-            return 365;
-        }
-        return configured;
     }
 
     private int resolveDefaultMaxMembers() {
@@ -228,9 +229,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setUid(orgUid);
         organization.setUser(user);
         log.info("Creating organization: {}", organization.toString());
-        int defaultVipDays = resolveDefaultVipDays();
-        organization.setVipLevel(1);
-        organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
+        applyDefaultVipSettings(organization);
         organization.setLevel(LevelEnum.ORGANIZATION.name());
         applyOrganizationLimitsDefaults(organization);
         //
@@ -279,15 +278,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 
         OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
         organization.setUid(uidUtils.getUid());
-        int defaultVipDays = resolveDefaultVipDays();
         if (request.getVip() == null && request.getVipLevel() == null) {
-            organization.setVipLevel(1);
-        }
-        if (Boolean.TRUE.equals(organization.getVip()) && organization.getVipExpireDate() == null) {
-            organization.setVipExpireDate(BdDateUtils.now().plusDays(defaultVipDays));
+            applyDefaultVipSettings(organization);
         }
         if (organization.getVipLevel() == null) {
             organization.setVipLevel(Boolean.TRUE.equals(organization.getVip()) ? 1 : 0);
+        }
+        if (organization.getVipExpireDate() == null && OrganizationDefaults.normalizeVipLevel(organization.getVipLevel()) > 0) {
+            organization.setVipExpireDate(OrganizationDefaults.resolveDefaultVipExpireDate(bytedeskProperties, organization.getVipLevel()));
         }
         applyOrganizationLimitsDefaults(organization);
         // 使用 userUid 查询用户

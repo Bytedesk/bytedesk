@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
@@ -125,7 +126,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         
         // 检查用户是否有权限创建该层级的数据
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TagPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
+            throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
         
         // 
@@ -136,7 +137,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         // 
         TagEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create tag failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -150,19 +151,19 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             
             // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(TagPermissions.MODULE_NAME, "UPDATE", entity)) {
-                throw new RuntimeException("无权限更新该标签数据");
+                throw new RuntimeException(I18Consts.I18N_PERMISSION_UPDATE_DENIED);
             }
             
             modelMapper.map(request, entity);
             //
             TagEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update tag failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Tag not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -199,7 +200,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             
             // 检查用户是否有权限删除该实体
             if (!permissionService.hasEntityPermission(TagPermissions.MODULE_NAME, "DELETE", entity)) {
-                throw new RuntimeException("无权限删除该标签数据");
+                throw new RuntimeException(I18Consts.I18N_PERMISSION_DELETE_DENIED);
             }
             
             entity.setDeleted(true);
@@ -207,7 +208,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             // tagRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Tag not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

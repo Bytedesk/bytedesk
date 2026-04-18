@@ -30,6 +30,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
@@ -132,7 +133,7 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
         
         // 检查用户是否有权限创建该层级的数据
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(WorkflowSettingsPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
+            throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
         
         // 
@@ -145,7 +146,7 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
         // 
         WorkflowSettingsEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create workflow_settings failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -159,7 +160,7 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
             
             // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(WorkflowSettingsPermissions.MODULE_NAME, "UPDATE", entity)) {
-                throw new RuntimeException("无权限更新该标签数据");
+                throw new RuntimeException(I18Consts.I18N_PERMISSION_UPDATE_DENIED);
             }
             
             modelMapper.map(request, entity);
@@ -168,12 +169,12 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
             //
             WorkflowSettingsEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update workflow_settings failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("WorkflowSettings not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -214,7 +215,7 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
             
             // 检查用户是否有权限删除该实体
             if (!permissionService.hasEntityPermission(WorkflowSettingsPermissions.MODULE_NAME, "DELETE", entity)) {
-                throw new RuntimeException("无权限删除该标签数据");
+                throw new RuntimeException(I18Consts.I18N_PERMISSION_DELETE_DENIED);
             }
             
             entity.setDeleted(true);
@@ -222,7 +223,7 @@ public class WorkflowSettingsRestService extends BaseRestServiceWithExport<Workf
             // workflow_settingsRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("WorkflowSettings not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

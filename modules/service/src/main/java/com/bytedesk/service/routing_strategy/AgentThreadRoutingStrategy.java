@@ -713,6 +713,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         // 获取并更新线程状态
         log.debug("获取最新线程状态用于离线处理");
         ThreadEntity thread = getThreadByUid(threadFromRequest.getUid());
+        thread = visitorThreadService.reInitAgentThreadExtra(visitorRequest, thread, agent);
 
         log.debug("生成离线消息内容");
         String offlineContent = getAgentOfflineMessage(visitorRequest, agent);

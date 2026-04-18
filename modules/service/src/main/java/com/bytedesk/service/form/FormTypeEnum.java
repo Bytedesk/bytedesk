@@ -44,7 +44,7 @@ public enum FormTypeEnum {
     /**
      * 询前问卷表单 - 用于客户咨询前的信息收集
      */
-    PRE_SALES_QUESTIONNAIRE,
+    PRE_FORM,
 
     /**
      * 客户留言表单 - 客户留言和咨询

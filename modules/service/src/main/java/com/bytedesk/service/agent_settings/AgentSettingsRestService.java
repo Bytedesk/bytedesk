@@ -40,8 +40,6 @@ import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
-import com.bytedesk.ai.robot.RobotEntity;
-import com.bytedesk.ai.robot.RobotRepository;
 
 import lombok.AllArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,8 +85,6 @@ public class AgentSettingsRestService
     private final AuthService authService;
 
     private final AgentRepository agentRepository;
-
-    private final RobotRepository robotRepository;
 
     private final ServiceSettingsHelper serviceSettingsHelper;
 
@@ -377,6 +373,7 @@ public class AgentSettingsRestService
                 // 保留草稿自身的唯一标识，避免被请求体中的 uid/uuid 覆盖
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getServiceSettings(), draft);
+                ServiceSettingsEntity.applyRequestAliases(request.getServiceSettings(), draft);
                 draft.setUid(originalUid);
             }
             // 根据 request 中的 Faq uids 映射关联
@@ -1111,19 +1108,13 @@ public class AgentSettingsRestService
         if (request.getDefaultVoiceAgent() != null) {
             target.setDefaultVoiceAgent(request.getDefaultVoiceAgent());
         }
-        String robotUid = request.getRobotUid();
-        if (robotUid == null || robotUid.isBlank()) {
-            target.setRobot(null);
-            return;
-        }
-        RobotEntity robot = robotRepository.findByUid(robotUid)
-                .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
-        target.setRobot(robot);
     }
 
     @Override
     public AgentSettingsResponse convertToResponse(AgentSettingsEntity entity) {
         AgentSettingsResponse resp = modelMapper.map(entity, AgentSettingsResponse.class);
+        resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
+        resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
         // Backward compatibility: old rows might be null
         if (resp.getAllowAgentCloseThread() == null) {
             resp.setAllowAgentCloseThread(true);

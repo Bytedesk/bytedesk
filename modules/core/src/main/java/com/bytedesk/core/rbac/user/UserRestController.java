@@ -158,6 +158,16 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
+
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_SWITCH_ORGANIZATION, description = "switch target user current organization by super")
+    @PostMapping("/switch/organization/by/super")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> switchOrganizationBySuper(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userRestService.switchUserOrganization(userRequest.getUid(), userRequest.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
     
     // 用户自己修改密码
     @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_PASSWORD, description = "changePassword")

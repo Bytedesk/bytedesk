@@ -7,6 +7,7 @@ declare interface Animation_2 {
 }
 
 declare interface BrowseConfig {
+    referer?: string;
     referrer?: string;
     url?: string;
     title?: string;
@@ -81,6 +82,8 @@ export declare interface BytedeskConfig {
 
 declare class BytedeskWeb {
     private config;
+    private unreadBadgeMode;
+    private unreadBadgeCount;
     private bubble;
     private bubbleContainer;
     private buttonElements;
@@ -154,8 +157,11 @@ declare class BytedeskWeb {
     clearBrowseFailedLimit(): void;
     clearVisitorInfo(): void;
     forceInitVisitor(): Promise<any>;
-    private showUnreadBadge;
-    private clearUnreadBadge;
+    private removeUnreadBadgeElement;
+    private renderUnreadBadge;
+    setUnreadMessageCount(count: number): number;
+    showUnreadDot(): void;
+    clearUnreadBadge(): void;
     clearUnreadMessages(): Promise<any>;
     private getBubbleMessages;
     private getBubbleSwitchMode;
@@ -328,6 +334,7 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    title?: string;
     uid?: string;
     visitorUid?: string;
     nickname?: string;

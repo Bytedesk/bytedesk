@@ -1,6 +1,7 @@
 package com.bytedesk.call.httapi;
 
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class HttapiController {
 
     private final LlmClient llm;
+    private final VoiceAgentHttpClient voiceAgentHttpClient;
 
     // Accept GET and POST and be tolerant about Content-Type so FreeSWITCH requests
     // that don't set exact Content-Type still hit this handler.
@@ -79,12 +81,16 @@ public class HttapiController {
         }
 
         if ("1".equals(turn)) {
-            return firstTurn(vars /* no longer gate by mrcpReady */);
+            return firstTurn(vars, request);
         }
-        return secondTurn(vars /* no longer gate by mrcpReady */);
+        return secondTurn(vars, request);
     }
 
-    private byte[] firstTurn(Map<String, String> vars) {
+    private byte[] firstTurn(Map<String, String> vars, HttpServletRequest request) {
+        if (useVoiceAgent(vars)) {
+            return firstTurnVoiceAgent(vars, request);
+        }
+
         HttapiXml x = new HttapiXml();
         log.info("HTTAPI firstTurn (no MRCP gating)");
         // 读取可选参数：setup（仅下发变量，不直接播报）、greet/greet_ssml（覆盖默认问候）
@@ -125,7 +131,34 @@ public class HttapiController {
         return x.build().getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] secondTurn(Map<String, String> vars) {
+    private byte[] firstTurnVoiceAgent(Map<String, String> vars, HttpServletRequest request) {
+        HttapiXml x = new HttapiXml();
+        String greetText = Optional.ofNullable(vars.get("greet"))
+                .orElse(vars.getOrDefault("variable_greet", "您好，我是微语智能助手，请问您有什么可以帮您？"));
+        try {
+            VoiceAgentHttpClient.VoiceAgentSpeakResult speakResult = voiceAgentHttpClient
+                    .speak(resolveAppBaseUrl(request), greetText);
+            if (hasText(speakResult.replyAudioUrl())) {
+                x.execute("playback", normalizePlaybackUrl(speakResult.replyAudioUrl(), request));
+            } else {
+                x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+            }
+        } catch (Exception ex) {
+            log.warn("voice-agent firstTurn speak failed: {}", ex.toString());
+            x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+        }
+        x.execute("export", "bot_continue=1");
+        x.breakTag();
+        return x.build().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private byte[] secondTurn(Map<String, String> vars, HttpServletRequest request) {
+        if (useVoiceAgent(vars) || hasText(pickFirstNonEmpty(vars,
+                "file_url", "turn_record_url", "record_url",
+                "variable_file_url", "variable_turn_record_url", "variable_record_url"))) {
+            return secondTurnVoiceAgent(vars, request);
+        }
+
         HttapiXml x = new HttapiXml();
         String userText = pickFirstNonEmpty(vars,
                 "RECOG_RESULT", "detect_speech_result_text", "speech_detection_result",
@@ -181,6 +214,70 @@ public class HttapiController {
         } else {
             x.execute("export", "bot_continue=0");
         }
+        x.breakTag();
+        return x.build().getBytes(StandardCharsets.UTF_8);
+    }
+
+    private byte[] secondTurnVoiceAgent(Map<String, String> vars, HttpServletRequest request) {
+        HttapiXml x = new HttapiXml();
+        String mode = Optional.ofNullable(vars.get("mode"))
+                .orElse(Optional.ofNullable(vars.get("variable_mode")).orElse("single"))
+                .trim().toLowerCase(Locale.ROOT);
+        String fileUrl = pickFirstNonEmpty(vars,
+                "file_url", "turn_record_url", "record_url",
+                "variable_file_url", "variable_turn_record_url", "variable_record_url");
+        String conversationId = pickFirstNonEmpty(vars,
+                "conversation_id", "variable_conversation_id",
+                "uuid", "variable_uuid");
+
+        if (!hasText(fileUrl)) {
+            return buildVoiceAgentRetryReply(x, mode, request, "我还没有收到本轮录音，请您再说一次。", true);
+        }
+
+        try {
+            VoiceAgentHttpClient.VoiceAgentChatResult result = voiceAgentHttpClient.chat(
+                    resolveAppBaseUrl(request), fileUrl, conversationId, null);
+            String transcript = result.transcript();
+            boolean exitRequested = containsExitIntent(transcript) || containsExitIntent(result.replyText());
+            String audioUrl = result.replyAudioUrl();
+
+            if (!hasText(audioUrl) && hasText(result.replyText())) {
+                audioUrl = voiceAgentHttpClient.speak(resolveAppBaseUrl(request), result.replyText()).replyAudioUrl();
+            }
+
+            if (hasText(transcript)) {
+                x.execute("export", "bot_user_text=" + transcript.trim());
+            }
+            if (hasText(result.replyText())) {
+                x.execute("export", "bot_reply_text=" + result.replyText().trim());
+            }
+            if (hasText(audioUrl)) {
+                x.execute("playback", normalizePlaybackUrl(audioUrl, request));
+            } else {
+                x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+            }
+            x.execute("export", "bot_continue=" + resolveBotContinue(mode, exitRequested));
+            x.breakTag();
+            return x.build().getBytes(StandardCharsets.UTF_8);
+        } catch (Exception ex) {
+            log.warn("voice-agent secondTurn failed fileUrl={} : {}", fileUrl, ex.toString());
+            return buildVoiceAgentRetryReply(x, mode, request, "我暂时没有听清，请您再说一次。", false);
+        }
+    }
+
+    private byte[] buildVoiceAgentRetryReply(HttapiXml x, String mode, HttpServletRequest request, String text, boolean missingFile) {
+        try {
+            String audioUrl = voiceAgentHttpClient.speak(resolveAppBaseUrl(request), text).replyAudioUrl();
+            if (hasText(audioUrl)) {
+                x.execute("playback", normalizePlaybackUrl(audioUrl, request));
+            } else {
+                x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+            }
+        } catch (Exception ex) {
+            log.warn("voice-agent fallback speak failed missingFile={} : {}", missingFile, ex.toString());
+            x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+        }
+        x.execute("export", "bot_continue=" + resolveBotContinue(mode, false));
         x.breakTag();
         return x.build().getBytes(StandardCharsets.UTF_8);
     }
@@ -269,6 +366,97 @@ public class HttapiController {
                 return v;
         }
         return null;
+    }
+
+    private boolean useVoiceAgent(Map<String, String> vars) {
+        String explicit = pickFirstNonEmpty(vars, "voice_agent", "variable_voice_agent");
+        if (hasText(explicit)) {
+            return "1".equals(explicit) || "true".equalsIgnoreCase(explicit);
+        }
+        String botDid = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did");
+        return "9201".equals(botDid) || "9203".equals(botDid);
+    }
+
+    private String resolveAppBaseUrl(HttpServletRequest request) {
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        String scheme = hasText(forwardedProto) ? forwardedProto.trim() : request.getScheme();
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (hasText(forwardedHost)) {
+            return scheme + "://" + forwardedHost.trim();
+        }
+
+        int port = request.getServerPort();
+        boolean defaultPort = ("http".equalsIgnoreCase(scheme) && port == 80)
+                || ("https".equalsIgnoreCase(scheme) && port == 443);
+        return defaultPort
+                ? scheme + "://" + request.getServerName()
+                : scheme + "://" + request.getServerName() + ":" + port;
+    }
+
+    private String resolveBotContinue(String mode, boolean exitRequested) {
+        if ("unlimited".equals(mode) || "multi".equals(mode)) {
+            return exitRequested ? "0" : "1";
+        }
+        return "0";
+    }
+
+    private String normalizePlaybackUrl(String audioUrl, HttpServletRequest request) {
+        if (!hasText(audioUrl)) {
+            return audioUrl;
+        }
+        try {
+            URI uri = URI.create(audioUrl);
+            String host = uri.getHost();
+            if (host == null) {
+                return audioUrl;
+            }
+            String normalizedUrl = audioUrl;
+            if (!"127.0.0.1".equals(host) && !"localhost".equalsIgnoreCase(host) && !"0.0.0.0".equals(host)) {
+                normalizedUrl = audioUrl;
+            } else {
+                String publicBaseUrl = resolveAppBaseUrl(request);
+                String path = uri.getRawPath() == null ? "" : uri.getRawPath();
+                String query = uri.getRawQuery();
+                normalizedUrl = publicBaseUrl + path + (hasText(query) ? "?" + query : "");
+            }
+
+            URI normalizedUri = URI.create(normalizedUrl);
+            if (requiresShoutPlayback(normalizedUrl)) {
+                StringBuilder shout = new StringBuilder("shout://");
+                shout.append(normalizedUri.getHost());
+                if (normalizedUri.getPort() > 0) {
+                    shout.append(":").append(normalizedUri.getPort());
+                }
+                if (normalizedUri.getRawPath() != null) {
+                    shout.append(normalizedUri.getRawPath());
+                }
+                if (hasText(normalizedUri.getRawQuery())) {
+                    shout.append("?").append(normalizedUri.getRawQuery());
+                }
+                return shout.toString();
+            }
+            return normalizedUrl;
+        } catch (Exception ex) {
+            log.warn("normalizePlaybackUrl failed for audioUrl={}: {}", audioUrl, ex.toString());
+            return audioUrl;
+        }
+    }
+
+    static boolean requiresShoutPlayback(String audioUrl) {
+        if (audioUrl == null || audioUrl.isBlank()) {
+            return false;
+        }
+        try {
+            URI uri = URI.create(audioUrl);
+            String path = uri.getPath();
+            return path != null && path.toLowerCase(Locale.ROOT).endsWith(".mp3");
+        } catch (Exception ex) {
+            return audioUrl.toLowerCase(Locale.ROOT).endsWith(".mp3");
+        }
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 
     private static String truncate(String s, int max) {

@@ -16,7 +16,23 @@ package com.bytedesk.core.constant;
 // 国际化常量
 public class I18Consts {
 
+    public static final String I18N_ARG_SEPARATOR = "|";
+
     private I18Consts() {
+    }
+
+    public static String withArgs(String key, Object... args) {
+        if (args == null || args.length == 0) {
+            return key;
+        }
+        StringBuilder builder = new StringBuilder(key);
+        for (Object arg : args) {
+            builder.append(I18N_ARG_SEPARATOR);
+            if (arg != null) {
+                builder.append(String.valueOf(arg).replace(I18N_ARG_SEPARATOR, "/"));
+            }
+        }
+        return builder.toString();
     }
 
     // 国际化常量定义
@@ -39,6 +55,8 @@ public class I18Consts {
     public static final String I18N_PLAN = I18N_PREFIX + "plan";
     public static final String I18N_PLAN_SUB = I18N_PREFIX + "plan.sub";
     public static final String I18N_SKILL = I18N_PREFIX + "skill";
+    public static final String I18N_MEMORY = I18N_PREFIX + "memory";
+    public static final String I18N_MULTI_MODAL = I18N_PREFIX + "multi.modal";
     public static final String I18N_MCP_SERVER = I18N_PREFIX + "mcp.server";
     public static final String I18N_MEMBER = I18N_PREFIX + "member";
     public static final String I18N_DEPARTMENT = I18N_PREFIX + "department";
@@ -59,6 +77,8 @@ public class I18Consts {
     public static final String I18N_WEBRTC_SETTINGS = I18N_PREFIX + "webrtc.settings.management";
     public static final String I18N_AUDIO_RECORDINGS = I18N_PREFIX + "audio.recordings.management";
     public static final String I18N_VIDEO_RECORDINGS = I18N_PREFIX + "video.recordings.management";
+    public static final String I18N_DEVICE = I18N_PREFIX + "device";
+    public static final String I18N_EQUIPMENT = I18N_PREFIX + "equipment";
     public static final String I18N_DOCUMENT = I18N_PREFIX + "document";
     public static final String I18N_WORKFLOW_EDGE = I18N_PREFIX + "workflow.edge";
     public static final String I18N_TOPIC_SUBSCRIPTION = I18N_PREFIX + "topic.subscription";
@@ -87,6 +107,9 @@ public class I18Consts {
     public static final String I18N_TASK_COMMENT = I18N_PREFIX + "task.comment";
     public static final String I18N_GROUP = I18N_PREFIX + "group.management";
     public static final String I18N_MESSAGE = I18N_PREFIX + "message";
+    public static final String I18N_TRANSLATE_BAIDU_CONFIGURED = I18N_PREFIX + "translate.baidu.configured";
+    public static final String I18N_TRANSLATE_BAIDU_NOT_CONFIGURED = I18N_PREFIX + "translate.baidu.not.configured";
+    public static final String I18N_TRANSLATE_CONTENT_REQUIRED = I18N_PREFIX + "translate.content.required";
     public static final String I18N_UPLOAD = I18N_PREFIX + "upload";
     public static final String I18N_WORKFLOW_VARIABLE = I18N_PREFIX + "workflow.variable";
     public static final String I18N_WORKFLOW_LOCAL_VARIABLE = I18N_PREFIX + "workflow.local.variable";
@@ -295,6 +318,8 @@ public class I18Consts {
     public static final String I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB = I18N_PREFIX + "action.delete.vector.index.by.kb";
     public static final String I18N_ACTION_CREATE_THREAD = I18N_PREFIX + "action.create.thread";
     public static final String I18N_ACTION_UPDATE_THREAD = I18N_PREFIX + "action.update.thread";
+    public static final String I18N_THREAD_CLOSE_SUCCESS = I18N_PREFIX + "thread.close.success";
+    public static final String I18N_THREAD_CLOSE_ALREADY_CLOSED = I18N_PREFIX + "thread.close.already.closed";
     public static final String I18N_ACTION_CREATE_PROMPT = I18N_PREFIX + "action.create.prompt";
     public static final String I18N_ACTION_UPDATE_PROMPT = I18N_PREFIX + "action.update.prompt";
     public static final String I18N_ACTION_UPDATE_PROMPT_TEXT = I18N_PREFIX + "action.update.prompt.text";
@@ -315,6 +340,24 @@ public class I18Consts {
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect"; // 用户名或密码不正确
     public static final String I18N_MOBILE_ALREADY_EXISTS = I18N_PREFIX + "mobile.already.exists"; // 手机号已存在
     public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists"; // 邮箱已存在
+    public static final String I18N_MEMBER_RESTRICTED_ROLE_UPDATE_NOT_SUPPORTED = I18N_PREFIX + "member.restricted.role.update.not.supported"; // 不支持在成员入口修改管理员/超管角色
+    public static final String I18N_PERMISSION_CREATE_DENIED = I18N_PREFIX + "permission.create.denied"; // 无权限创建当前层级数据
+    public static final String I18N_PERMISSION_UPDATE_DENIED = I18N_PREFIX + "permission.update.denied"; // 无权限更新当前数据
+    public static final String I18N_PERMISSION_DELETE_DENIED = I18N_PREFIX + "permission.delete.denied"; // 无权限删除当前数据
+    public static final String I18N_COMMENT_UPDATE_DENIED = I18N_PREFIX + "comment.update.denied"; // 无权限更新该评论
+    public static final String I18N_COMMENT_DELETE_DENIED = I18N_PREFIX + "comment.delete.denied"; // 无权限删除该评论
+    public static final String I18N_DEPARTMENT_PARENT_SELF_NOT_ALLOWED = I18N_PREFIX + "department.parent.self.not.allowed"; // 不能将当前部门设置为父部门
+    public static final String I18N_WORKFLOW_CONTENT_EMPTY = I18N_PREFIX + "workflow.content.empty"; // 工作流内容为空
+    public static final String I18N_WORKFLOW_START_NODE_NOT_FOUND = I18N_PREFIX + "workflow.start.node.not.found"; // 工作流中未找到开始节点
+    public static final String I18N_ACCESS_DENIED = I18N_PREFIX + "access.denied"; // 无权限访问
+    public static final String I18N_ORG_UID_REQUIRED = I18N_PREFIX + "org.uid.required"; // 非超级管理员必须指定组织
+    public static final String I18N_ORGANIZATION_ACCESS_DENIED = I18N_PREFIX + "organization.access.denied"; // 无权访问其他组织数据
+    public static final String I18N_ORGANIZATION_NOT_FOUND = I18N_PREFIX + "organization.not.found"; // 组织未找到
+    public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空
+    public static final String I18N_MOBILE_REQUIRED = I18N_PREFIX + "mobile.required"; // 手机号不能为空
+    public static final String I18N_EMAIL_OR_MOBILE_REQUIRED = I18N_PREFIX + "email.or.mobile.required"; // 邮箱或手机号不能为空
+    public static final String I18N_PASSWORD_DECRYPT_FAILED = I18N_PREFIX + "password.decrypt.failed"; // 密码解密失败
+    public static final String I18N_PASSWORD_DECRYPT_KEY_INVALID = I18N_PREFIX + "password.decrypt.key.invalid"; // 密钥错误导致密码解密失败
     public static final String I18N_MOBILE_NOT_EXISTS = I18N_PREFIX + "mobile.not.exists"; // 手机号不存在
     public static final String I18N_EMAIL_NOT_EXISTS = I18N_PREFIX + "email.not.exists"; // 邮箱不存在
     public static final String I18N_MOBILE_FORMAT_ERROR = I18N_PREFIX + "mobile.format.error"; // 手机号格式错误
@@ -462,6 +505,13 @@ public class I18Consts {
     public static final String I18N_EMAIL_SIGNUP_FIRST = I18N_PREFIX + "email.signup.first"; // 请先使用邮箱注册
     public static final String I18N_MOBILE_SIGNUP_FIRST = I18N_PREFIX + "mobile.signup.first"; // 请先使用手机号注册
     public static final String I18N_RESOURCE_NOT_FOUND = I18N_PREFIX + "resource.not.found"; // 资源未找到
+    public static final String I18N_RESOURCE_NOT_FOUND_WITH_UID = I18N_PREFIX + "resource.not.found.with.uid"; // 按 uid 未找到资源
+    public static final String I18N_ROLE_NOT_FOUND = I18N_PREFIX + "role.not.found"; // 角色未找到
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID = I18N_PREFIX + "role.not.found.by.id"; // 按 id 未找到角色
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID_AND_UID = I18N_PREFIX + "role.not.found.by.id.and.uid"; // 按 id 和 uid 未找到角色
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME = I18N_PREFIX + "role.not.found.by.id.and.name"; // 按 id 和 name 未找到角色
+    public static final String I18N_TOKEN_NOT_FOUND_FOR_UID = I18N_PREFIX + "token.not.found.for.uid"; // 指定 uid 的 token 未找到
+    public static final String I18N_FILE_NOT_FOUND = I18N_PREFIX + "file.not.found"; // 文件未找到
     // public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
     public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled"; // 用户已被禁用
     public static final String I18N_FORBIDDEN_ACCESS = I18N_PREFIX + "forbidden.access"; // 禁止访问
@@ -476,6 +526,13 @@ public class I18Consts {
     public static final String I18N_REQUEST_REJECTED = I18N_PREFIX + "request.rejected"; // 请求被拒绝
     public static final String I18N_ENTITY_NOT_FOUND = I18N_PREFIX + "entity.not.found"; // 实体未找到
     public static final String I18N_INVALID_REQUEST_BODY = I18N_PREFIX + "invalid.request.body"; // 请求体格式错误（JSON 不合法/不完整）
+    public static final String I18N_CONNECTION_NO_LONGER_AVAILABLE = I18N_PREFIX + "connection.no.longer.available"; // 连接已不可用
+    public static final String I18N_EXTERNAL_SERVICE_TEMPORARILY_UNAVAILABLE = I18N_PREFIX + "external.service.temporarily.unavailable"; // 外部服务暂时不可用
+    public static final String I18N_RESOURCE_CONCURRENTLY_MODIFIED = I18N_PREFIX + "resource.concurrently.modified"; // 资源已被并发修改
+    public static final String I18N_INPUT_TOO_LONG = I18N_PREFIX + "input.too.long"; // 输入内容过长
+    public static final String I18N_DATA_ALREADY_EXISTS = I18N_PREFIX + "data.already.exists"; // 数据已存在
+    public static final String I18N_DATA_RELATION_CONSTRAINT_VIOLATED = I18N_PREFIX + "data.relation.constraint.violated"; // 数据关联约束冲突
+    public static final String I18N_DATA_SAVE_FAILED = I18N_PREFIX + "data.save.failed"; // 数据保存失败
     public static final String I18N_OPERATION_NOT_SUPPORTED = I18N_PREFIX + "operation.not.supported"; // 不支持的操作/功能暂未实现
     public static final String I18N_INTERNAL_SERVER_ERROR = I18N_PREFIX + "internal.server.error"; // 内部服务器错误
 

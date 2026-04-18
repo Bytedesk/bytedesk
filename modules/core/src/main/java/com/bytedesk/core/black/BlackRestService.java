@@ -166,7 +166,7 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
             }
             return convertToResponse(savedBlack);
         } else {
-            throw new RuntimeException("Black not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

@@ -1,13 +1,14 @@
 package com.bytedesk.cli;
 
-// import org.springframework.boot.SpringApplication;
-// import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.bytedesk.cli.core.BytedeskCli;
 
-// @SpringBootApplication
 public class CliApplication {
 
-	// public static void main(String[] args) {
-	// 	SpringApplication.run(BiApplication.class, args);
-	// }
+	public static void main(String[] args) {
+		int exitCode = new BytedeskCli().run(args);
+		if (exitCode != 0) {
+			System.exit(exitCode);
+		}
+	}
 
 }

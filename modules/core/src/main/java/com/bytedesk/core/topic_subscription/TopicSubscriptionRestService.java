@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
@@ -122,7 +123,7 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         
         // 检查用户是否有权限创建该层级的数据
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TopicSubscriptionPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
+            throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
         
         // 
@@ -133,7 +134,7 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         // 
         TopicSubscriptionEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create topic_subscription failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -145,21 +146,18 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (optional.isPresent()) {
             TopicSubscriptionEntity entity = optional.get();
             
-            // 检查用户是否有权限更新该实体
-            // if (!permissionService.hasEntityPermission(TopicSubscriptionPermissions.MODULE_NAME, "UPDATE", entity)) {
-            //     throw new RuntimeException("无权限更新该标签数据");
-            // }
+            // 权限校验当前未启用，保留更新逻辑。
             
             modelMapper.map(request, entity);
             //
             TopicSubscriptionEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic_subscription failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("TopicSubscription not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -194,17 +192,14 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (optional.isPresent()) {
             TopicSubscriptionEntity entity = optional.get();
             
-            // 检查用户是否有权限删除该实体
-            // if (!permissionService.hasEntityPermission(TopicSubscriptionPermissions.MODULE_NAME, "DELETE", entity)) {
-            //     throw new RuntimeException("无权限删除该标签数据");
-            // }
+            // 权限校验当前未启用，保留删除逻辑。
             
             entity.setDeleted(true);
             save(entity);
             // topic_subscriptionRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("TopicSubscription not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

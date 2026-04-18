@@ -44,10 +44,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageLeaveSettingsEntity extends BaseEntity {
 
-    @Builder.Default
-    @Column(name = "is_leave_msg_enabled")
-    private Boolean messageLeaveEnabled = true;
-
     @NotBlank
     @Builder.Default
     private String messageLeaveTip = I18Consts.I18N_MESSAGE_LEAVE_TIP;
@@ -83,7 +79,7 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
      * - false: 访客端使用对话框方式留言
      */
     @Builder.Default
-    private Boolean messageLeaveFormEnabled = false;
+    private Boolean messageLeaveFormEnabled = true;
 
     /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：

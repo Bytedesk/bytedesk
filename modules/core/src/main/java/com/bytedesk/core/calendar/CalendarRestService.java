@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 // import com.bytedesk.core.rbac.permission.PermissionService;
@@ -120,10 +121,7 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
             request.setLevel(level);
         }
         
-        // 检查用户是否有权限创建该层级的数据
-        // if (!skipPermissionCheck && !permissionService.canCreateAtLevel(CalendarPermissions.MODULE_NAME, level)) {
-        //     throw new RuntimeException("无权限创建该层级的日程数据");
-        // }
+        // 权限校验当前未启用，保留创建逻辑。
         
         // 
         CalendarEntity entity = modelMapper.map(request, CalendarEntity.class);
@@ -133,7 +131,7 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
         // 
         CalendarEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create calendar failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -145,21 +143,18 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
         if (optional.isPresent()) {
             CalendarEntity entity = optional.get();
             
-            // 检查用户是否有权限更新该实体
-            // if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "UPDATE", entity)) {
-            //     throw new RuntimeException("无权限更新该标签数据");
-            // }
+            // 权限校验当前未启用，保留更新逻辑。
             
             modelMapper.map(request, entity);
             //
             CalendarEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update calendar failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Calendar not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -194,17 +189,14 @@ public class CalendarRestService extends BaseRestServiceWithExport<CalendarEntit
         if (optional.isPresent()) {
             CalendarEntity entity = optional.get();
             
-            // 检查用户是否有权限删除该实体
-            // if (!permissionService.hasEntityPermission(CalendarPermissions.MODULE_NAME, "DELETE", entity)) {
-            //     throw new RuntimeException("无权限删除该标签数据");
-            // }
+            // 权限校验当前未启用，保留删除逻辑。
             
             entity.setDeleted(true);
             save(entity);
             // calendarRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Calendar not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

@@ -14,6 +14,7 @@
  */
 package com.bytedesk.starter;
 
+import java.util.Arrays;
 import java.util.TimeZone;
 
 import org.springframework.boot.SpringApplication;
@@ -33,6 +34,44 @@ public class StarterApplication {
 
 	public static void main(String[] args) {
 		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+		int cliExitCode = tryRunCli(args);
+		if (cliExitCode >= 0) {
+			if (cliExitCode != 0) {
+				System.exit(cliExitCode);
+			}
+			return;
+		}
 		SpringApplication.run(StarterApplication.class, args);
+	}
+
+	private static int tryRunCli(String[] args) {
+		if (args == null || args.length == 0) {
+			return -1;
+		}
+		String launcher = args[0];
+		String[] cliArgs = Arrays.copyOfRange(args, 1, args.length);
+		if ("cli".equals(launcher)) {
+			return invokeCli("com.bytedesk.cli.core.BytedeskCli", cliArgs, "OSS CLI");
+		}
+		if ("enterprise-cli".equals(launcher)) {
+			return invokeCli("com.bytedesk.cli.EnterpriseCli", cliArgs, "enterprise CLI");
+		}
+		return -1;
+	}
+
+	private static int invokeCli(String className, String[] cliArgs, String displayName) {
+		try {
+			Class<?> cliClass = Class.forName(className);
+			Object cli = cliClass.getDeclaredConstructor().newInstance();
+			Object exitCode = cliClass.getMethod("run", String[].class).invoke(cli, (Object) cliArgs);
+			return ((Integer) exitCode).intValue();
+		} catch (ClassNotFoundException exception) {
+			throw new IllegalStateException(
+				"Failed to launch " + displayName + ". CLI classes are not available on the runtime classpath. "
+					+ "Build and run from the root reactor, or use the packaged bytedesk-starter jar.",
+				exception);
+		} catch (ReflectiveOperationException exception) {
+			throw new IllegalStateException("Failed to invoke " + displayName + ".", exception);
+		}
 	}
 }

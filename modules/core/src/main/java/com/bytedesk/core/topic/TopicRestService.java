@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -188,7 +189,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
             TopicEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
 
             if (request.getTopic() != null) {
@@ -213,7 +214,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
         // 保存实体
         TopicEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create topic failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
 
         if (request.getTopic() != null) {
@@ -247,7 +248,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
 
             TopicEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
 
             if (request.getTopic() != null) {
@@ -258,7 +259,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             }
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Topic not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -295,7 +296,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             entity.setDeleted(true);
             save(entity);
         } else {
-            throw new RuntimeException("Topic not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -397,7 +398,7 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             }
             TopicEntity savedEntity = save(topicEntity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             upsertTopicSubscription(topic, user.getUid());
             return convertToResponse(savedEntity);
@@ -444,12 +445,12 @@ public class TopicRestService extends BaseRestService<TopicEntity, TopicRequest,
             topicElement.getTopics().remove(topic);
             TopicEntity savedEntity = save(topicElement);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             softDeleteTopicSubscription(topic, user.getUid());
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Topic not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

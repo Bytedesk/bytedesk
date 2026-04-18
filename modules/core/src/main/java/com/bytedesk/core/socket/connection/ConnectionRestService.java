@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -115,7 +116,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         // 
         ConnectionEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create connection failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -130,12 +131,12 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             //
             ConnectionEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update connection failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Connection not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -181,7 +182,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             // connectionRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Connection not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

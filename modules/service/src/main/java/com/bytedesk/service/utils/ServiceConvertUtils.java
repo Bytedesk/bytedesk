@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.utils;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.util.StringUtils;
 import lombok.experimental.UtilityClass;
@@ -40,6 +42,8 @@ import com.bytedesk.service.agent_seat.AgentSeatEntity;
 import com.bytedesk.service.agent_seat.AgentSeatDomainService;
 import com.bytedesk.service.agent_seat.AgentSeatStatusEnum;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
+import com.bytedesk.service.form.FormEntity;
+import com.bytedesk.service.form.FormRepository;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
@@ -62,6 +66,10 @@ public class ServiceConvertUtils {
 
     private static ModelMapper getModelMapper() {
         return ApplicationContextHolder.getBean(ModelMapper.class);
+    }
+
+    private static FormRepository getFormRepository() {
+        return ApplicationContextHolder.getBean(FormRepository.class);
     }
 
     public static VisitorResponse convertToVisitorResponse(VisitorEntity visitor) {
@@ -327,6 +335,10 @@ public class ServiceConvertUtils {
             svc = ServiceSettingsEntity.builder().build();
         }
         ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        resp.setShowPreForm(Boolean.TRUE.equals(svc.getShowPreForm()));
+        resp.setPreFormRequired(Boolean.TRUE.equals(svc.getPreFormRequired()));
+        resp.setPreForm(resolvePreFormSchema(svc));
+        resp.setPreFormUid(resolvePreFormUid(svc));
         resp.setQuickButtons(QuickButtonResponseVisitor.fromEntities(svc.getQuickButtons()));
 
         // 留言方式配置下发（用于 visitor ChatBox 决策：表单留言 vs 对话框留言）
@@ -347,9 +359,9 @@ public class ServiceConvertUtils {
 
         if (messageLeaveSettings != null) {
             resp.setMessageLeaveFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveFormEnabled()));
-            resp.setMessageLeaveForm(messageLeaveSettings.getMessageLeaveForm());
             resp.setMessageLeaveCustomFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled()));
             resp.setMessageLeaveFormUid(messageLeaveSettings.getMessageLeaveFormUid());
+            resp.setMessageLeaveForm(resolveMessageLeaveFormSchema(messageLeaveSettings));
         } else {
             resp.setMessageLeaveFormEnabled(false);
             resp.setMessageLeaveForm(null);
@@ -375,6 +387,91 @@ public class ServiceConvertUtils {
         }
 
         return resp;
+    }
+
+    private static String resolveMessageLeaveFormSchema(MessageLeaveSettingsEntity messageLeaveSettings) {
+        if (messageLeaveSettings == null) {
+            return null;
+        }
+
+        String formSchema = messageLeaveSettings.getMessageLeaveForm();
+        boolean hasInlineSchema = StringUtils.hasText(formSchema)
+                && !BytedeskConsts.EMPTY_JSON_STRING.equals(formSchema.trim());
+        if (hasInlineSchema) {
+            return formSchema;
+        }
+
+        if (!Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled())) {
+            return formSchema;
+        }
+
+        String formUid = messageLeaveSettings.getMessageLeaveFormUid();
+        if (!StringUtils.hasText(formUid)) {
+            return formSchema;
+        }
+
+        try {
+            Optional<FormEntity> optional = getFormRepository().findByUid(formUid);
+            if (optional.isPresent() && StringUtils.hasText(optional.get().getSchema())) {
+                return optional.get().getSchema();
+            }
+        } catch (Exception e) {
+            // Keep routing response resilient; visitor falls back to built-in form when schema is unavailable.
+        }
+        return formSchema;
+    }
+
+    private static String resolvePreFormSchema(ServiceSettingsEntity serviceSettings) {
+        if (serviceSettings == null) {
+            return null;
+        }
+
+        String rawValue = serviceSettings.getPreFormSchema();
+        if (!StringUtils.hasText(rawValue)) {
+            return rawValue;
+        }
+
+        String trimmedValue = rawValue.trim();
+        if (BytedeskConsts.EMPTY_JSON_STRING.equals(trimmedValue)) {
+            return trimmedValue;
+        }
+
+        if (trimmedValue.startsWith("{") || trimmedValue.startsWith("[")) {
+            return rawValue;
+        }
+
+        try {
+            Optional<FormEntity> optional = getFormRepository().findByUid(trimmedValue);
+            if (optional.isPresent() && StringUtils.hasText(optional.get().getSchema())) {
+                return optional.get().getSchema();
+            }
+        } catch (Exception e) {
+            // Keep visitor response resilient; frontend will handle missing schema gracefully.
+        }
+
+        return rawValue;
+    }
+
+    private static String resolvePreFormUid(ServiceSettingsEntity serviceSettings) {
+        if (serviceSettings == null) {
+            return null;
+        }
+
+        String rawValue = serviceSettings.getPreFormSchema();
+        if (!StringUtils.hasText(rawValue)) {
+            return null;
+        }
+
+        String trimmedValue = rawValue.trim();
+        if (BytedeskConsts.EMPTY_JSON_STRING.equals(trimmedValue)) {
+            return null;
+        }
+
+        if (trimmedValue.startsWith("{") || trimmedValue.startsWith("[")) {
+            return null;
+        }
+
+        return trimmedValue;
     }
 
     /**

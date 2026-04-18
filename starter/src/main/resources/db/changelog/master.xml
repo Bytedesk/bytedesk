@@ -115,5 +115,7 @@
     <include file="db/changelog/migration/260401_add_webrtc_call_direction_and_profiles.xml" />
     <include file="db/changelog/migration/260401_add_menu_vip_level.xml" />
     <include file="db/changelog/migration/260408_add_workgroup_call_settings_relation.xml" />
+    <include file="db/changelog/migration/260413_drop_message_leave_enabled_column.xml" />
+    <include file="db/changelog/migration/260413_add_message_leave_form_data.xml" />
 
 </databaseChangeLog>

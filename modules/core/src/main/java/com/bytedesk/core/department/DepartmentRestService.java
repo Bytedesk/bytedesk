@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
@@ -136,7 +137,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             DepartmentEntity department = optional.get();
             // modelMapper.map(departmentRequest, DepartmentEntity.class);
             if (request.getUid().equals(request.getParentUid())) {
-                throw new RuntimeException("不能将当前部门设置为父部门");
+                throw new RuntimeException(I18Consts.I18N_DEPARTMENT_PARENT_SELF_NOT_ALLOWED);
             }
             department.setName(request.getName());
             department.setDescription(request.getDescription());
@@ -150,11 +151,11 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             // 
             DepartmentEntity savedEntity = save(department);
             if (savedEntity == null) {
-                throw new RuntimeException("department update failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("department not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -187,7 +188,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             }
         } else {
             log.error("department not found");
-            throw new RuntimeException("department not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

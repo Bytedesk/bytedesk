@@ -57,6 +57,8 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private String preForm;
 
+    private String preFormUid;
+
     private Boolean showHistory;
 
     /**

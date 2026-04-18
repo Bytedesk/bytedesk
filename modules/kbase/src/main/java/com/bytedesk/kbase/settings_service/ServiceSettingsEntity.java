@@ -287,8 +287,20 @@ public class ServiceSettingsEntity extends BaseEntity {
         if (request.getLanguage() != null) {
             settings.setLanguage(request.getLanguage().name());
         }
+
+        applyRequestAliases(request, settings);
         
         return settings;
+    }
+
+    public static void applyRequestAliases(ServiceSettingsRequest request, ServiceSettingsEntity settings) {
+        if (request == null || settings == null) {
+            return;
+        }
+
+        if (request.getPreForm() != null) {
+            settings.setPreFormSchema(request.getPreForm());
+        }
     }
     
 }

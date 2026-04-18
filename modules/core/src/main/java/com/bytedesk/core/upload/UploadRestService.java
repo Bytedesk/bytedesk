@@ -38,6 +38,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.constant.I18Consts;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -375,25 +377,39 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return Resource
 	 */
 	public Resource loadAsResource(String filenameOrPath) {
+		if (filenameOrPath == null || filenameOrPath.trim().isEmpty()) {
+			throw new UploadStorageFileNotFoundException("File path is empty");
+		}
+
+		String normalizedInput = filenameOrPath.trim();
+		// Accept full upload URL input and normalize it to relative storage path.
+		if (normalizedInput.startsWith("http://") || normalizedInput.startsWith("https://")) {
+			String relativePath = extractRelativePathFromUrl(normalizedInput);
+			if (relativePath != null && !relativePath.isEmpty()) {
+				normalizedInput = relativePath;
+				log.info("Normalized file URL to relative path: {} -> {}", filenameOrPath, normalizedInput);
+			}
+		}
+
 		String datePath;
 		String filename;
 		
 		// 判断是否包含路径分隔符
-		if (filenameOrPath.contains("/")) {
+		if (normalizedInput.contains("/")) {
 			// 包含路径分隔符，说明是完整路径格式：2025/09/05/filename.ext
-			int lastSlashIndex = filenameOrPath.lastIndexOf("/");
-			datePath = filenameOrPath.substring(0, lastSlashIndex);
-			filename = filenameOrPath.substring(lastSlashIndex + 1);
-			log.info("Loading file from full path: {}, datePath: {}, filename: {}", filenameOrPath, datePath, filename);
+			int lastSlashIndex = normalizedInput.lastIndexOf("/");
+			datePath = normalizedInput.substring(0, lastSlashIndex);
+			filename = normalizedInput.substring(lastSlashIndex + 1);
+			log.info("Loading file from full path: {}, datePath: {}, filename: {}", normalizedInput, datePath, filename);
 		} else {
 			// 不包含路径分隔符，说明是文件名格式：20240916144702_身份证-背面.jpg
 			// 使用工具类提取日期路径
-			datePath = BdUploadUtils.extractDatePathFromTimestampFileName(filenameOrPath);
+			datePath = BdUploadUtils.extractDatePathFromTimestampFileName(normalizedInput);
 			if (datePath == null) {
-				throw new UploadStorageFileNotFoundException("Invalid filename format: " + filenameOrPath);
+				throw new UploadStorageFileNotFoundException("Invalid filename format: " + normalizedInput);
 			}
-			filename = filenameOrPath;
-			log.info("Loading file from filename: {}, extracted datePath: {}", filenameOrPath, datePath);
+			filename = normalizedInput;
+			log.info("Loading file from filename: {}, extracted datePath: {}", normalizedInput, datePath);
 		}
 		
 		// 构建文件夹路径
@@ -451,7 +467,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				throw new RuntimeException("Failed to delete file: " + filename, e);
 			}
 		} else {
-			throw new RuntimeException("File not found: " + filename);
+			throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_FILE_NOT_FOUND, filename));
 		}
 	}
 

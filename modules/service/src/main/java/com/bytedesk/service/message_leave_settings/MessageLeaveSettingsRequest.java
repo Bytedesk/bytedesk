@@ -35,10 +35,6 @@ import lombok.Builder;
 public class MessageLeaveSettingsRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
-    
-    // 留言开关
-    @Builder.Default
-    private Boolean messageLeaveEnabled = true;
 
     @NotBlank
     @Builder.Default
@@ -70,15 +66,13 @@ public class MessageLeaveSettingsRequest extends BaseRequest {
     // @Builder.Default
     // private String messageLeaveNotifyTime = BytedeskConsts.EMPTY_STRING;
 
-    
-
     /**
      * 是否启用“留言表单”方式：
      * - true: 访客端在会话中发送表单消息进行留言
      * - false: 访客端使用对话框方式留言
      */
     @Builder.Default
-    private Boolean messageLeaveFormEnabled = false;
+    private Boolean messageLeaveFormEnabled = true;
 
     /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：

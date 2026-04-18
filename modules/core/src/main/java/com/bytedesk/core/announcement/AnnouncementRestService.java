@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -96,7 +97,7 @@ public class AnnouncementRestService extends BaseRestServiceWithExport<Announcem
         // 
         AnnouncementEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create announcement failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -111,12 +112,12 @@ public class AnnouncementRestService extends BaseRestServiceWithExport<Announcem
             //
             AnnouncementEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update announcement failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Announcement not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -154,7 +155,7 @@ public class AnnouncementRestService extends BaseRestServiceWithExport<Announcem
             // announcementRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Announcement not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

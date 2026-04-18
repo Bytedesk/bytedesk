@@ -161,6 +161,9 @@ public class VisitorRestControllerVisitor {
     // @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
     @GetMapping("/message/thread/topic")
     public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("orgUid required"));
+        }
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
@@ -175,6 +178,9 @@ public class VisitorRestControllerVisitor {
      */
     @GetMapping("/message/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("orgUid required"));
+        }
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //

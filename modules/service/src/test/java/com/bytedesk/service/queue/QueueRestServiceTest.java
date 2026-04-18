@@ -177,6 +177,103 @@ class QueueRestServiceTest {
     }
 
     @Test
+    void markUnrepliedThreadAsRepliedShouldUpdateSameTopicVisitorMessages() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+        OrganizationEntity organization = new OrganizationEntity();
+        organization.setUid("org-1");
+        user.setCurrentOrganization(organization);
+
+        AgentEntity agent = AgentEntity.builder().uid("agent-1").build();
+
+        ThreadEntity thread = new ThreadEntity();
+        thread.setUid("thread-1");
+        thread.setTopic("topic-1");
+        thread.setAgent(UserProtobuf.builder().uid("agent-1").type(UserTypeEnum.AGENT.name()).build().toJson());
+
+        MessageEntity visitorMessage = new MessageEntity();
+        visitorMessage.setUid("msg-visitor");
+        visitorMessage.setThread(thread);
+        visitorMessage.setCreatedAt(ZonedDateTime.now().minusMinutes(2));
+        visitorMessage.setUser(UserProtobuf.builder().uid("visitor-1").type(UserTypeEnum.VISITOR.name()).build().toJson());
+        visitorMessage.setAgentReplied(false);
+
+        MessageEntity siblingVisitorMessage = new MessageEntity();
+        siblingVisitorMessage.setUid("msg-visitor-2");
+        siblingVisitorMessage.setThread(thread);
+        siblingVisitorMessage.setCreatedAt(ZonedDateTime.now().minusMinutes(1));
+        siblingVisitorMessage.setUser(UserProtobuf.builder().uid("visitor-2").type(UserTypeEnum.VISITOR.name()).build().toJson());
+        siblingVisitorMessage.setAgentReplied(false);
+
+        MessageEntity agentMessage = new MessageEntity();
+        agentMessage.setUid("msg-agent");
+        agentMessage.setThread(thread);
+        agentMessage.setCreatedAt(ZonedDateTime.now().minusSeconds(30));
+        agentMessage.setUser(UserProtobuf.builder().uid("agent-1").type(UserTypeEnum.AGENT.name()).build().toJson());
+        agentMessage.setAgentReplied(true);
+
+        when(authService.getUser()).thenReturn(user);
+        when(agentRestService.findByUserUidAndOrgUid("user-1", "org-1")).thenReturn(Optional.of(agent));
+        when(threadRepository.findByUid("thread-1")).thenReturn(Optional.of(thread));
+        when(messageRestService.findByThreadTopicBetweenCreatedAt(org.mockito.ArgumentMatchers.eq("topic-1"), any(), any()))
+                .thenReturn(List.of(visitorMessage, siblingVisitorMessage, agentMessage));
+        when(messageRestService.save(any(MessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        int updated = queueRestService.markUnrepliedThreadAsReplied(ThreadRequest.builder().uid("thread-1").build());
+
+        assertThat(updated).isEqualTo(2);
+        assertThat(visitorMessage.getAgentReplied()).isTrue();
+        assertThat(visitorMessage.getAgentRepliedByUid()).isEqualTo("agent-1");
+        assertThat(visitorMessage.getAgentRepliedAt()).isNotNull();
+        assertThat(siblingVisitorMessage.getAgentReplied()).isTrue();
+        assertThat(siblingVisitorMessage.getAgentRepliedByUid()).isEqualTo("agent-1");
+
+        verify(messageRestService).save(visitorMessage);
+        verify(messageRestService).save(siblingVisitorMessage);
+    }
+
+    @Test
+    void markAllUnrepliedThreadsAsRepliedShouldDrainCurrentAgentRows() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+        OrganizationEntity organization = new OrganizationEntity();
+        organization.setUid("org-1");
+        user.setCurrentOrganization(organization);
+
+        AgentEntity agent = AgentEntity.builder().uid("agent-1").build();
+
+        ThreadEntity thread = new ThreadEntity();
+        thread.setUid("thread-1");
+        thread.setTopic("topic-1");
+        thread.setAgent(UserProtobuf.builder().uid("agent-1").type(UserTypeEnum.AGENT.name()).build().toJson());
+
+        MessageEntity visitorMessage = new MessageEntity();
+        visitorMessage.setUid("msg-visitor");
+        visitorMessage.setThread(thread);
+        visitorMessage.setCreatedAt(ZonedDateTime.now().minusMinutes(3));
+        visitorMessage.setUser(UserProtobuf.builder().uid("visitor-1").type(UserTypeEnum.VISITOR.name()).build().toJson());
+        visitorMessage.setAgentReplied(false);
+
+        when(authService.getUser()).thenReturn(user);
+        when(agentRestService.findByUserUidAndOrgUid("user-1", "org-1")).thenReturn(Optional.of(agent));
+        when(messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(AGENT_UID_PATTERN, 100, 0))
+                .thenReturn(Collections.singletonList(new Object[] { "thread-1", Timestamp.from(visitorMessage.getCreatedAt().toInstant()) }))
+                .thenReturn(List.of());
+        when(threadRepository.findByUidInAndDeletedFalse(List.of("thread-1"))).thenReturn(List.of(thread));
+        when(messageRestService.findByThreadTopicBetweenCreatedAt(org.mockito.ArgumentMatchers.eq("topic-1"), any(), any()))
+                .thenReturn(List.of(visitorMessage));
+        when(messageRestService.save(any(MessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        int updated = queueRestService.markAllUnrepliedThreadsAsReplied(ThreadRequest.builder().build());
+
+        assertThat(updated).isEqualTo(1);
+        assertThat(visitorMessage.getAgentReplied()).isTrue();
+        assertThat(visitorMessage.getAgentRepliedByUid()).isEqualTo("agent-1");
+
+        verify(messageRestService).save(visitorMessage);
+    }
+
+    @Test
     void queryUnrepliedShouldKeepThreadsWhoseLatestMessageIsStillVisitor() {
         UserEntity user = new UserEntity();
         user.setUid("user-1");

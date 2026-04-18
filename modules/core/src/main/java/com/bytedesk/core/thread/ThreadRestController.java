@@ -401,11 +401,18 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_CLOSE, description = "close thread")
     @Operation(summary = "Close Thread", description = "Close the specified thread")
     public ResponseEntity<?> close(@RequestBody ThreadRequest request) {
-
+        boolean alreadyClosed = false;
+        if (StringUtils.hasText(request.getUid())) {
+            alreadyClosed = threadRestService.findByUid(request.getUid())
+                    .map(ThreadEntity::isClosed)
+                    .orElse(false);
+        }
         request.setCloseType(ThreadCloseTypeEnum.AGENT.name());
         ThreadResponse threadResponse = threadRestService.closeByUid(request);
-        // 
-        return ResponseEntity.ok(JsonResult.success(threadResponse));
+
+        return ResponseEntity.ok(JsonResult.success(
+            alreadyClosed ? I18Consts.I18N_THREAD_CLOSE_ALREADY_CLOSED : I18Consts.I18N_THREAD_CLOSE_SUCCESS,
+                threadResponse));
     }
 
     @PostMapping("/close/topic")
@@ -413,11 +420,20 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_CLOSE_BY_TOPIC, description = "close thread by topic")
     @Operation(summary = "Close Thread by Topic", description = "Close the thread for the specified topic")
     public ResponseEntity<?> closeByTopic(@RequestBody ThreadRequest request) {
-        
+        boolean alreadyClosed = false;
+        if (StringUtils.hasText(request.getTopic())) {
+            List<ThreadEntity> threads = threadRestService.findListByTopic(request.getTopic());
+            alreadyClosed = threads != null
+                    && !threads.isEmpty()
+                    && threads.stream().filter(java.util.Objects::nonNull).allMatch(ThreadEntity::isClosed);
+        }
+
         request.setCloseType(ThreadCloseTypeEnum.AGENT.name());
         ThreadResponse threadResponse = threadRestService.closeByTopic(request);
 
-        return ResponseEntity.ok(JsonResult.success(threadResponse));
+        return ResponseEntity.ok(JsonResult.success(
+                alreadyClosed ? I18Consts.I18N_THREAD_CLOSE_ALREADY_CLOSED : I18Consts.I18N_THREAD_CLOSE_SUCCESS,
+                threadResponse));
     }
     
     /**

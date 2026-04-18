@@ -187,10 +187,6 @@ public class ThreadRestService
             return Page.empty();
         }
 
-        if (!StringUtils.hasText(request.getOrgUid())) {
-            throw new IllegalArgumentException("orgUid is required");
-        }
-
         String uid = request.getUid();
         String visitorUid = request.getVisitorUid();
         if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
@@ -708,8 +704,14 @@ public class ThreadRestService
         }
         //
         ThreadEntity thread = threadOptional.get();
-        if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
-            throw new RuntimeException("thread " + thread.getUid() + " is already closed");
+        if (thread.isClosed()) {
+            if (!StringUtils.hasText(thread.getCloseType()) && StringUtils.hasText(request.getCloseType())) {
+                thread.setCloseType(request.getCloseType());
+                ThreadEntity updatedThread = save(thread);
+                return convertToResponse(updatedThread != null ? updatedThread : thread);
+            }
+            log.info("thread {} is already closed, returning current state", thread.getUid());
+            return convertToResponse(thread);
         }
         // 设置关闭来源
         if (StringUtils.hasText(request.getCloseType())) {

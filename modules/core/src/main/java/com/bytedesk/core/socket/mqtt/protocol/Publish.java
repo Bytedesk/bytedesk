@@ -16,6 +16,8 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
+import java.nio.charset.StandardCharsets;
+
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.utils.MessageConvertUtils;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
@@ -84,20 +86,39 @@ public class Publish {
         // TODO: 发送回执
         // 注意：不能去掉，否则无法解析protobuf
         publishMessage.payload().getBytes(publishMessage.payload().readerIndex(), messageBytes);
+        String topic = publishMessage.variableHeader().topicName();
         // publish message event, developers can listener to new message
         try {
             if (messageBytes.length == 0) {
                 // log.warn("Empty message payload, skipping protobuf parsing");
                 return;
             }
+
+            if (isStatusWillMessage(topic, messageBytes)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Skip protobuf parsing for MQTT status payload, topic: {}, payload: {}",
+                            topic, new String(messageBytes, StandardCharsets.UTF_8));
+                }
+                return;
+            }
+
             MessageProto.Message messageProto = MessageProto.Message.parseFrom(messageBytes);
             String messageJson = MessageConvertUtils.toJson(messageProto);
             // 
             messageSendService.sendJsonMessage(messageJson);
         } catch (Exception e) {
-            log.warn("Failed to parse protobuf message: {}, message length: {}", e.getMessage(), messageBytes.length);
+            log.warn("Failed to parse protobuf message, topic: {}, error: {}, message length: {}",
+                    topic, e.getMessage(), messageBytes.length);
             // 对于无法解析的消息，我们可以记录但不抛出异常，以免影响整个系统
         }
+    }
+
+    private boolean isStatusWillMessage(String topic, byte[] messageBytes) {
+        if (topic == null || !topic.endsWith("/status")) {
+            return false;
+        }
+        String payload = new String(messageBytes, StandardCharsets.UTF_8);
+        return "offline".equalsIgnoreCase(payload) || "online".equalsIgnoreCase(payload);
     }
 
 }

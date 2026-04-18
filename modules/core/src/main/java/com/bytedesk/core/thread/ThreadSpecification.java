@@ -208,7 +208,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
     /**
      * Visitor(匿名) 侧会话查询：
      * - 不依赖 AuthService（无登录态）
-     * - 不做 orgUid/superUser 权限校验
+     * - orgUid 可选；传入时按组织过滤，不传时返回该访客跨组织的全部会话
      * - 通过 thread_user(JSON) 中包含 visitorUid 来过滤
      * - 与历史 native query 行为对齐：updatedAt 倒序
      */
@@ -217,11 +217,10 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
 
-            // 访客侧必须携带 orgUid，并按组织隔离，避免跨组织会话泄露
-            if (!StringUtils.hasText(request.getOrgUid())) {
-                return criteriaBuilder.disjunction();
+            // 传入 orgUid 时按组织过滤；不传则查询该访客跨组织的全部会话
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
-            predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
 
             // uid 与 visitorUid 都为空时不应返回任何数据（避免匿名全量查询）
             if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {

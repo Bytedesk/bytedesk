@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -72,7 +73,7 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
         // 
         NoticeEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create notice failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -123,7 +124,7 @@ public class NoticeRestService extends BaseRestService<NoticeEntity, NoticeReque
             // 
             NoticeEntity savedEntity = save(noticeEntity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update notice failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }

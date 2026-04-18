@@ -59,5 +59,9 @@ public class MemberExcelImport {
     @ExcelProperty(value = "密码")
     @ColumnWidth(20)
     private String password;
+
+    @ExcelProperty(value = "可登录平台")
+    @ColumnWidth(28)
+    private String allowedLoginPlatformsText;
     
 }

@@ -79,7 +79,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
         // 
         AuthorityEntity authorityEntitySaved = save(authorityEntity);
         if (authorityEntitySaved == null) {
-            throw new RuntimeException("save authority failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(authorityEntitySaved);
     }
@@ -99,7 +99,7 @@ public class AuthorityRestService extends BaseRestService<AuthorityEntity, Autho
             // 
             AuthorityEntity authorityEntity = save(optional.get());
             if (authorityEntity == null) {
-                throw new RuntimeException("update authority failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(authorityEntity);
         } else {

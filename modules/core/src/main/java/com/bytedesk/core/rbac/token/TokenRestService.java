@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
@@ -141,7 +142,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         
         TokenEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create token failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
 
         return convertToResponse(savedEntity);
@@ -158,13 +159,13 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             // 保存更新后的实体
             TokenEntity updatedEntity = save(entity);
             if (updatedEntity == null) {
-                throw new RuntimeException("Update token failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             // 手动将更新后的实体放入缓存
             // cacheToken(updatedEntity);
             return convertToResponse(updatedEntity);
         } else {
-            throw new RuntimeException("Token not found for uid: " + request.getUid());
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID, request.getUid()));
         }
     }
 
@@ -201,7 +202,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
                 modelMapper.map(entity, existingEntity);
                 return doSave(existingEntity);
             } else {
-                throw new RuntimeException("Token not found for uid: " + entity.getUid());
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID, entity.getUid()));
             }
         } catch (Exception ex) {
             log.error("Error handling optimistic locking failure: {}", ex.getMessage());

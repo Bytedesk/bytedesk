@@ -1,10 +1,13 @@
 /**
- * Controller package contains REST API endpoints for the AI module.
- * This includes request handling and response generation for AI services.
+ * Controller package for AI-facing REST endpoints and API orchestration.
+ * Handles request validation, service delegation, and response composition.
  *
+ * 控制器包，负责 AI 模块对外 REST 接口编排。
+ * 包含请求校验、服务调用分发与响应结果组装。
+ * 
  * @author bytedesk.com
  */
 @NonNullApi
 package com.bytedesk.ai.controller;
 
-import org.springframework.lang.NonNullApi; 
+import org.springframework.lang.NonNullApi;

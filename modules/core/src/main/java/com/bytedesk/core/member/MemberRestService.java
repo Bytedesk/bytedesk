@@ -44,6 +44,7 @@ import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -115,7 +116,13 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         int maxMembers = resolveMaxMembers(organization);
         long current = memberRepository.countByOrgUidAndDeletedFalse(orgUid);
         if (current >= maxMembers) {
-            throw new RuntimeException("Organization member limit exceeded");
+            String orgName = StringUtils.hasText(organization.getName()) ? organization.getName() : orgUid;
+            String message = String.format(
+                    "组织【%s】成员数已达上限，当前已使用 %d/%d，无法继续新增成员。请先停用或删除未使用成员，或到组织设置中提高“成员最大数”后重试。",
+                    orgName,
+                    current,
+                    maxMembers);
+            throw new OrgMaxMembersExceededException(orgUid, orgName, maxMembers, current, message);
         }
     }
 
@@ -183,6 +190,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         member.setDeptUid(request.getDeptUid());
         member.setOrgUid(request.getOrgUid());
+        member.setAvatar(resolveMemberAvatar(request.getAvatar(), null));
+        member.setDescription(resolveMemberDescription(request.getDescription(), null));
         // 
         Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
         request.setRoleUids(normalizedRoleUids);
@@ -255,8 +264,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         // modelMapper.map(memberRequest, member);
         member.setDeptUid(request.getDeptUid());
         member.setNickname(request.getNickname());
-        member.setAvatar(request.getAvatar());
-        member.setDescription(request.getDescription());
+        member.setAvatar(resolveMemberAvatar(request.getAvatar(), member.getAvatar()));
+        member.setDescription(resolveMemberDescription(request.getDescription(), member.getDescription()));
         member.setEmail(request.getEmail());
         member.setCountry(normalizedCountry);
         member.setMobile(request.getMobile());
@@ -302,6 +311,26 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
 
         return normalized;
+    }
+
+    private String resolveMemberAvatar(String requestedAvatar, String existingAvatar) {
+        if (StringUtils.hasText(requestedAvatar)) {
+            return requestedAvatar;
+        }
+        if (StringUtils.hasText(existingAvatar)) {
+            return existingAvatar;
+        }
+        return AvatarConsts.getDefaultUserAvatarUrl();
+    }
+
+    private String resolveMemberDescription(String requestedDescription, String existingDescription) {
+        if (StringUtils.hasText(requestedDescription)) {
+            return requestedDescription;
+        }
+        if (StringUtils.hasText(existingDescription)) {
+            return existingDescription;
+        }
+        return I18Consts.I18N_USER_DESCRIPTION;
     }
 
     private Set<String> resolveAllowedLoginPlatforms(Set<String> requestedPlatforms,
@@ -565,7 +594,16 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
-        member.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
+        Set<String> importedPlatforms = MemberLoginPlatformEnum.parseImportPlatforms(excel.getAllowedLoginPlatformsText());
+        if (importedPlatforms.isEmpty() && StringUtils.hasText(excel.getAllowedLoginPlatformsText())) {
+            log.warn("Excel导入成员可登录平台无法识别，已回退为全平台: orgUid={}, nickname={}, raw={}",
+                orgUid,
+                excel.getNickname(),
+                excel.getAllowedLoginPlatformsText());
+        }
+        member.setAllowedLoginPlatforms(importedPlatforms.isEmpty()
+            ? MemberLoginPlatformEnum.allCodes()
+            : importedPlatforms);
         // 
         String deptName = normalizeExcelText(excel.getDepartmentName());
         if (StringUtils.hasText(deptName)) {

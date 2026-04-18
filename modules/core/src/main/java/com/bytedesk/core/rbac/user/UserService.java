@@ -63,8 +63,10 @@ import org.modelmapper.ModelMapper;
 @RequiredArgsConstructor
 public class UserService {
 
+    // ROLE_USER is enforced automatically for every user and should not participate
+    // in restricted-role diff checks, otherwise fresh members can fail creation
+    // when the request is normalized to include it.
     private static final Set<String> RESTRICTED_ROLE_UIDS = Set.of(
-            BytedeskConsts.DEFAULT_ROLE_USER_UID,
             BytedeskConsts.DEFAULT_ROLE_ADMIN_UID,
             BytedeskConsts.DEFAULT_ROLE_SUPER_UID);
 
@@ -108,7 +110,7 @@ public class UserService {
 
         if (!StringUtils.hasText(request.getEmail())
                 && !StringUtils.hasText(request.getMobile())) {
-            throw new RuntimeException("email or mobile is required..!!");
+            throw new RuntimeException(I18Consts.I18N_EMAIL_OR_MOBILE_REQUIRED);
         }
 
         String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
@@ -283,7 +285,7 @@ public class UserService {
             return UserConvertUtils.convertToUserResponse(user);
 
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -312,7 +314,7 @@ public class UserService {
                 throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
             }
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -332,7 +334,7 @@ public class UserService {
             //
             return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -354,14 +356,14 @@ public class UserService {
                 }
                 user.setEmail(request.getEmail());
             } else {
-                throw new RuntimeException("Email is required..!!");
+                throw new RuntimeException(I18Consts.I18N_EMAIL_REQUIRED);
             }
             user.setEmailVerified(true);
             user = save(user);
             //
             return UserConvertUtils.convertToUserResponse(user);
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -387,7 +389,7 @@ public class UserService {
                 }
                 user.setMobile(request.getMobile());
             } else {
-                throw new RuntimeException("Mobile is required..!!");
+                throw new RuntimeException(I18Consts.I18N_MOBILE_REQUIRED);
             }
             user.setCountry(normalizedCountry);
             user.setMobileVerified(true);
@@ -395,7 +397,7 @@ public class UserService {
 
             return UserConvertUtils.convertToUserResponse(user);
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -412,7 +414,8 @@ public class UserService {
 
         if (StringUtils.hasText(request.getMobile())
                 && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, request.getPlatform())) {
-            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), normalizedCountry, request.getPlatform());
+            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), normalizedCountry,
+                    request.getPlatform());
             return userOptional.get();
         }
 
@@ -457,7 +460,7 @@ public class UserService {
         //
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
         if (!orgOptional.isPresent()) {
-            throw new RuntimeException("Organization not found..!!");
+            throw new RuntimeException(I18Consts.I18N_ORGANIZATION_NOT_FOUND);
         } else {
             user.setCurrentOrganization(orgOptional.get());
         }
@@ -510,7 +513,7 @@ public class UserService {
 
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
         if (!orgOptional.isPresent()) {
-            throw new RuntimeException("Organization not found..!!");
+            throw new RuntimeException(I18Consts.I18N_ORGANIZATION_NOT_FOUND);
         }
         user.setCurrentOrganization(orgOptional.get());
         return user;
@@ -538,7 +541,8 @@ public class UserService {
         // 兼容历史/脏数据
         if (managedUser.getUserOrganizationRoles() != null) {
             managedUser.getUserOrganizationRoles().removeIf(
-                    u -> u == null || u.getOrganization() == null || !StringUtils.hasText(u.getOrganization().getUid()));
+                    u -> u == null || u.getOrganization() == null
+                            || !StringUtils.hasText(u.getOrganization().getUid()));
         }
 
         boolean removedCurrentOrg = managedUser.getCurrentOrganization() != null
@@ -559,7 +563,8 @@ public class UserService {
             String nextOrgUid = null;
             if (managedUser.getUserOrganizationRoles() != null) {
                 for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
-                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                    if (uor == null || uor.getOrganization() == null
+                            || !StringUtils.hasText(uor.getOrganization().getUid())) {
                         continue;
                     }
                     nextOrgUid = uor.getOrganization().getUid();
@@ -576,11 +581,13 @@ public class UserService {
 
         // 3) 同步 currentRoles
         managedUser.getCurrentRoles().clear();
-        if (managedUser.getCurrentOrganization() != null && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
+        if (managedUser.getCurrentOrganization() != null
+                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
             String currentOrgUid = managedUser.getCurrentOrganization().getUid();
             if (managedUser.getUserOrganizationRoles() != null) {
                 for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
-                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                    if (uor == null || uor.getOrganization() == null
+                            || !StringUtils.hasText(uor.getOrganization().getUid())) {
                         continue;
                     }
                     if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
@@ -601,7 +608,7 @@ public class UserService {
             }
             RoleEntity managedRoleUser = entityManager.find(RoleEntity.class, roleId);
             if (managedRoleUser == null) {
-                throw new RuntimeException("Role not found by id: " + roleId);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID, roleId));
             }
 
             if (managedUser.getCurrentOrganization() == null) {
@@ -681,7 +688,7 @@ public class UserService {
         Set<String> existingRestrictedRoleUids = extractRestrictedRoleUids(managedUser.getRoleUids());
         Set<String> requestedRestrictedRoleUids = extractRestrictedRoleUids(normalizedRoleUids);
         if (!existingRestrictedRoleUids.equals(requestedRestrictedRoleUids)) {
-            throw new RuntimeException("暂不支持在此处添加或删除普通用户、组织管理员或超级管理员角色");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_RESTRICTED_ROLE_UPDATE_NOT_SUPPORTED);
         }
 
         // 首先判断是否有变化，如果无变化则不更新
@@ -706,11 +713,11 @@ public class UserService {
                 }
                 RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
                 if (managedRole == null) {
-                    throw new RuntimeException("Role not found by id: " + roleId + ", uid: " + roleUid);
+                    throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_UID, roleId, roleUid));
                 }
                 managedUser.addOrganizationRole(managedRole);
             } else {
-                throw new RuntimeException("Role not found: " + roleUid);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, roleUid));
             }
         }
 
@@ -808,7 +815,7 @@ public class UserService {
 
         Optional<RoleEntity> roleOptional = roleRestService.findByNamePlatform(roleName);
         if (!roleOptional.isPresent()) {
-            throw new RuntimeException("Role not found: " + roleName);
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, roleName));
         }
 
         RoleEntity role = roleOptional.get();
@@ -821,14 +828,14 @@ public class UserService {
         // and mark the surrounding transaction rollback-only under concurrent access.
         RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
         if (managedRole == null) {
-            throw new RuntimeException("Role not found by id: " + roleId + ", name: " + roleName);
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME, roleId, roleName));
         }
 
         RoleEntity managedRoleUser = null;
         if (managedUser.getCurrentOrganization() != null) {
             Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
             if (!roleUserOptional.isPresent()) {
-                throw new RuntimeException("Role not found: " + RoleConsts.ROLE_USER);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, RoleConsts.ROLE_USER));
             }
             Long roleUserId = roleUserOptional.get().getId();
             if (roleUserId == null) {
@@ -836,7 +843,7 @@ public class UserService {
             }
             managedRoleUser = entityManager.find(RoleEntity.class, roleUserId);
             if (managedRoleUser == null) {
-                throw new RuntimeException("Role not found by id: " + roleUserId + ", name: " + RoleConsts.ROLE_USER);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME, roleUserId, RoleConsts.ROLE_USER));
             }
         }
 
@@ -879,7 +886,7 @@ public class UserService {
                 throw new RuntimeException("User remove role failed..!!", e);
             }
         } else {
-            throw new RuntimeException("Role not found..!!");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

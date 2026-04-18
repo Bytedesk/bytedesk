@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -117,9 +118,13 @@ public class VisitorThreadEventListener {
             }
             return;
         }
+
+        List<ActiveThreadCache> validCachedThreads = cachedThreads.stream()
+            .filter(cache -> StringUtils.hasText(cache.getUid()))
+            .toList();
         
         // 从缓存获取完整的 ThreadEntity 列表用于处理（需要完整的 ThreadEntity 信息）
-        List<ThreadEntity> threads = cachedThreads.stream()
+        List<ThreadEntity> threads = validCachedThreads.stream()
                 .map(cache -> threadRestService.findByUid(cache.getUid()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -130,7 +135,7 @@ public class VisitorThreadEventListener {
         visitorThreadTimeoutService.autoRemindAgentOrCloseThread(threads);
 
         // 处理主动触发逻辑（使用缓存数据进行时间判断，减少数据库查询）
-        cachedThreads.forEach(visitorThreadTriggerService::processProactiveTriggerFromCache);
+        validCachedThreads.forEach(visitorThreadTriggerService::processProactiveTriggerFromCache);
     }
 
     /**

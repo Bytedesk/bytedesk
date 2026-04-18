@@ -286,6 +286,7 @@ public class WorkgroupSettingsRestService
                 // 保留草稿唯一标识，避免被请求体覆盖
                 String originalUid = draft.getUid();
                 modelMapper.map(request.getServiceSettings(), draft);
+                ServiceSettingsEntity.applyRequestAliases(request.getServiceSettings(), draft);
                 draft.setUid(originalUid);
             }
             // 处理 ServiceSettings 关联（FAQ 列表等）
@@ -1008,14 +1009,6 @@ public class WorkgroupSettingsRestService
         if (request.getDefaultVoiceAgent() != null) {
             target.setDefaultVoiceAgent(request.getDefaultVoiceAgent());
         }
-        String robotUid = request.getRobotUid();
-        if (robotUid == null || robotUid.isBlank()) {
-            target.setRobot(null);
-            return;
-        }
-        RobotEntity robot = robotRepository.findByUid(robotUid)
-                .orElseThrow(() -> new RuntimeException("Robot not found by uid: " + robotUid));
-        target.setRobot(robot);
     }
 
     @Override
@@ -1025,6 +1018,8 @@ public class WorkgroupSettingsRestService
         // - Response: robotRoutingSettings / draftRobotRoutingSettings
         // 直接使用 ModelMapper 会导致这两个字段为 null，这里手动补齐映射。
         WorkgroupSettingsResponse resp = modelMapper.map(entity, WorkgroupSettingsResponse.class);
+        resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
+        resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
 
         // 机器人路由（发布）
         if (entity.getRobotSettings() != null) {

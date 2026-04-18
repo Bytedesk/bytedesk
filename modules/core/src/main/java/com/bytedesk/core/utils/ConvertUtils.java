@@ -80,6 +80,7 @@ public class ConvertUtils {
             response.getOrganization().setCode(bytedeskProperties.getOrganization().getCode());
             response.getOrganization().setAllowCreateOrg(bytedeskProperties.getOrganization().getAllowCreateOrg());
             response.getOrganization().setAllowJoinOrg(bytedeskProperties.getOrganization().getAllowJoinOrg());
+            response.getOrganization().setDefaultVipLevel(bytedeskProperties.getOrganization().getDefaultVipLevel());
             response.getOrganization().setDefaultVipDays(bytedeskProperties.getOrganization().getDefaultVipDays());
             response.getOrganization().setDefaultMaxMembers(bytedeskProperties.getOrganization().getDefaultMaxMembers());
             response.getOrganization().setDefaultMaxAgents(bytedeskProperties.getOrganization().getDefaultMaxAgents());

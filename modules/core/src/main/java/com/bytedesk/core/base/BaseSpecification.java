@@ -72,7 +72,7 @@ public abstract class BaseSpecification<T, TRequest> {
                 && !Boolean.TRUE.equals(request.getSuperUser())
                 && !StringUtils.hasText(request.getOrgUid())
                 && !platformLevelRequest) {
-            throw new IllegalArgumentException("orgUid should not be null (org uid must be provided for non-super request)");
+            throw new IllegalArgumentException(I18Consts.I18N_ORG_UID_REQUIRED);
         }
         
         // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
@@ -83,7 +83,7 @@ public abstract class BaseSpecification<T, TRequest> {
                     && !platformLevelRequest) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
-                    throw new IllegalArgumentException("No permission to access data of other organizations");
+                    throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_ACCESS_DENIED);
                 }
             }
         }

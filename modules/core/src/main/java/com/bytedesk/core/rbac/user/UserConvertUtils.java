@@ -290,8 +290,11 @@ public class UserConvertUtils {
                 .verifyStatus(organization.getVerifyStatus())
                 .enabled(organization.getEnabled())
                 .vipLevel(organization.getVipLevel())
-            .vipExpireDate(organization.getVipExpireDate())
-            .vipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled())
+                .maxMembers(organization.getMaxMembers())
+                .maxAgents(organization.getMaxAgents())
+                .maxWorkgroups(organization.getMaxWorkgroups())
+                .vipExpireDate(organization.getVipExpireDate())
+                .vipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled())
                 .customServerEnabled(organization.getCustomServerEnabled())
                 .customServerHost(organization.getCustomServerHost())
                 .build();

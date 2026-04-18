@@ -117,6 +117,29 @@ public class QueueRestController extends BaseRestController<QueueRequest, QueueR
         return ResponseEntity.ok(JsonResult.success(threadPage));
     }
 
+    @PostMapping("/update/unreplied/replied")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE, action = I18Consts.I18N_ACTION_UPDATE, description = "mark unreplied thread as replied")
+    @Operation(summary = "Mark Unreplied Thread As Replied", description = "Mark all unreplied visitor messages in the target thread/topic as replied")
+    public ResponseEntity<?> markUnrepliedThreadAsReplied(@RequestBody ThreadRequest request) {
+
+        int updatedCount = queueRestService.markUnrepliedThreadAsReplied(request);
+
+        return ResponseEntity.ok(JsonResult.success(updatedCount));
+    }
+
+    @PostMapping("/update/unreplied/replied/all")
+    @PreAuthorize(QueuePermissions.HAS_QUEUE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUEUE, action = I18Consts.I18N_ACTION_UPDATE, description = "mark all unreplied threads as replied")
+    @Operation(summary = "Mark All Unreplied Threads As Replied", description = "Mark all current agent unreplied visitor messages as replied")
+    public ResponseEntity<?> markAllUnrepliedThreadsAsReplied(@RequestBody(required = false) ThreadRequest request) {
+
+        ThreadRequest actualRequest = request == null ? ThreadRequest.builder().build() : request;
+        int updatedCount = queueRestService.markAllUnrepliedThreadsAsReplied(actualRequest);
+
+        return ResponseEntity.ok(JsonResult.success(updatedCount));
+    }
+
     // 获取客服完整排队人数统计
     @GetMapping("/agent/queuing/count")
     @PreAuthorize(QueuePermissions.HAS_QUEUE_READ)

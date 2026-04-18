@@ -13,8 +13,10 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -27,6 +29,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
@@ -180,6 +184,7 @@ public class MessageLeaveRestService extends
                     .nickname(request.getNickname())
                     .type(request.getType())
                     .content(request.getContent())
+                    .formData(parseFormData(request.getFormData()))
                     .contact(request.getContact())
                     .images(request.getImages())
                     .status(messageLeave.getStatus())
@@ -515,6 +520,18 @@ public class MessageLeaveRestService extends
     @Override
     public MessageLeaveResponse convertToResponse(MessageLeaveEntity entity) {
         return ServiceConvertUtils.convertToMessageLeaveResponse(entity);
+    }
+
+    private Map<String, Object> parseFormData(String formData) {
+        if (!StringUtils.hasText(formData)) {
+            return new LinkedHashMap<>();
+        }
+        try {
+            return JSON.parseObject(formData, new TypeReference<LinkedHashMap<String, Object>>() {});
+        } catch (Exception ex) {
+            log.warn("Failed to parse leave message formData, storing empty map: {}", ex.getMessage());
+            return new LinkedHashMap<>();
+        }
     }
 
     @Override

@@ -10,10 +10,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.properties.BytedeskProperties;
@@ -22,12 +24,14 @@ import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
+import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.CountryCodeUtils;
 
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.ManyToMany;
 
 class UserServiceCountrySyncTest {
@@ -90,6 +94,60 @@ class UserServiceCountrySyncTest {
 
         assertSame(user, updated);
         assertEquals("1", updated.getCountry());
+        verify(userRepository).findById(1L);
+    }
+
+    @Test
+    void updateUserRolesShouldAllowImplicitRoleUserForNewOrganizationMember() {
+        UserRepository userRepository = mock(UserRepository.class);
+        RoleRestService roleRestService = mock(RoleRestService.class);
+        EntityManager entityManager = mock(EntityManager.class);
+
+        UserService userService = new UserService(
+                userRepository,
+                mock(ModelMapper.class),
+                roleRestService,
+                mock(BytedeskProperties.class),
+                mock(BCryptPasswordEncoder.class),
+                mock(UidUtils.class),
+                mock(OrganizationRepository.class),
+                mock(BytedeskEventPublisher.class),
+                mock(AuthService.class),
+                mock(TokenRestService.class));
+        ReflectionTestUtils.setField(userService, "entityManager", entityManager);
+
+        OrganizationEntity organization = OrganizationEntity.builder()
+                .id(10L)
+                .uid("org-1")
+                .name("Test Org")
+                .build();
+        UserEntity user = UserEntity.builder()
+                .id(1L)
+                .uid("user-1")
+                .currentOrganization(organization)
+                .build();
+
+        RoleEntity defaultUserRole = RoleEntity.builder()
+                .id(100L)
+                .uid(BytedeskConsts.DEFAULT_ROLE_USER_UID)
+                .name(RoleConsts.ROLE_USER)
+                .build();
+        RoleEntity customRole = RoleEntity.builder()
+                .id(101L)
+                .uid("custom-role-uid")
+                .name("ROLE_CUSTOM")
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(roleRestService.findByUid(BytedeskConsts.DEFAULT_ROLE_USER_UID)).thenReturn(Optional.of(defaultUserRole));
+        when(roleRestService.findByUid("custom-role-uid")).thenReturn(Optional.of(customRole));
+        when(entityManager.find(RoleEntity.class, 100L)).thenReturn(defaultUserRole);
+        when(entityManager.find(RoleEntity.class, 101L)).thenReturn(customRole);
+
+        UserEntity updated = userService.updateUserRoles(user, Set.of("custom-role-uid"));
+
+        assertSame(user, updated);
+        assertEquals(Set.of(BytedeskConsts.DEFAULT_ROLE_USER_UID, "custom-role-uid"), updated.getRoleUids());
         verify(userRepository).findById(1L);
     }
 
