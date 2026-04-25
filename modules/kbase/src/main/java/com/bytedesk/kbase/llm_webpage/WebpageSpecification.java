@@ -34,10 +34,11 @@ public class WebpageSpecification extends BaseSpecification<WebpageEntity, Webpa
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
 
-            // categoryUid
-            // if (StringUtils.hasText(request.getCategoryUid())) {
-            //     predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
-            // }
+            if (request.getCategoryUids() != null && !request.getCategoryUids().isEmpty()) {
+                predicates.add(root.get("categoryUid").in(request.getCategoryUids()));
+            } else if (StringUtils.hasText(request.getCategoryUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
+            }
             // kbUid
             if (StringUtils.hasText(request.getKbUid())) {
                 // 修改为通过kbaseEntity关联对象的uid进行查询，而不是直接查询kbUid字段

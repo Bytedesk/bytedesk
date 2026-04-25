@@ -88,6 +88,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
 
     @Override
     protected Specification<FaqEntity> createSpecification(FaqRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return FaqSpecification.search(request, authService);
     }
 

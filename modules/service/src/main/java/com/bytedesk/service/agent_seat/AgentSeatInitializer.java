@@ -16,7 +16,6 @@ package com.bytedesk.service.agent_seat;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -26,16 +25,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AgentSeatInitializer implements SmartInitializingSingleton {
 
-    private final AgentSeatRestService agent_seatRestService;
-
     private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         // create default
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        agent_seatRestService.initAgentSeats(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // agent_seatRestService.initAgentSeats(orgUid);
     }
 
     private void initAuthority() {

@@ -20,8 +20,6 @@ import java.util.HashSet;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -73,12 +71,10 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     // 注意：不要缓存“查不到”的结果，否则会出现“部门刚创建但仍查不到”的负缓存问题
     // Spring Cache 对 Optional 返回值可能会做解包（empty -> null / present -> entity），因此这里只做 null 判断，避免对实体误调用 isEmpty()
-    @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
     public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
         return departmentRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
-    @Cacheable(value = "department", key = "#uid", unless = "#result == null")
     public Optional<DepartmentEntity> findByUid(String uid) {
         return departmentRepository.findByUid(uid);
     }
@@ -159,7 +155,6 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         }
     }
 
-    @CachePut(value = "department", key = "#entity.uid")
     @Override
     protected DepartmentEntity doSave(DepartmentEntity entity) {
         return departmentRepository.save(entity);

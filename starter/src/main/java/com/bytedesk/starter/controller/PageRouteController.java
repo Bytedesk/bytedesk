@@ -52,7 +52,7 @@ public class PageRouteController {
     @Value("${bytedesk.custom.logo:https://www.weiyuai.cn/logo.png}")
     private String customLogo;
     
-    @Value("${bytedesk.custom.description:重复工作自动化}")
+    @Value("${bytedesk.custom.description:解决客户问题}")
     private String customDescription;
 
 	@Value("${bytedesk.custom.doc-url:https://www.weiyuai.cn/docs/zh-CN/}")

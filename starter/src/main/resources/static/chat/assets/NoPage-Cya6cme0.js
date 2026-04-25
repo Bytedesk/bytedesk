@@ -1,0 +1,1 @@
+import{i as e}from"./intl-vendor-8dDWo8Zj.js";var t=e(),n=()=>(0,t.jsx)(`div`,{style:{minHeight:`100vh`,display:`flex`,justifyContent:`center`,alignItems:`center`,overflowY:`auto`,WebkitOverflowScrolling:`touch`,scrollBehavior:`smooth`},children:(0,t.jsx)(`h1`,{children:`404`})});export{n as default};

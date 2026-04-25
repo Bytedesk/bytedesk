@@ -22,7 +22,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -55,6 +58,8 @@ public class MessageUnreadRestService
     private final ThreadRestService threadRestService;
 
     private final RedisService redisService;
+
+    private final PlatformTransactionManager transactionManager;
 
     // Redis 缓存过期时间：24小时
     private static final long MESSAGE_CACHE_TTL = 24 * 60 * 60;
@@ -186,7 +191,7 @@ public class MessageUnreadRestService
             messageUnread.setOrgUid(orgUid);
         }
         try {
-            MessageUnreadEntity savedMessageUnread = save(messageUnread);
+            MessageUnreadEntity savedMessageUnread = saveInNewTransaction(messageUnread);
             if (savedMessageUnread == null) {
                 // 如果保存失败，删除 Redis 标记
                 redisService.removeMessageExists(uid);
@@ -224,6 +229,12 @@ public class MessageUnreadRestService
             log.error("Failed to increase thread unread count for thread {}: {}", threadUid, e.getMessage(), e);
             // 不抛出异常，避免影响未读消息的保存
         }
+    }
+
+    private MessageUnreadEntity saveInNewTransaction(MessageUnreadEntity messageUnread) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return transactionTemplate.execute(status -> messageUnreadRepository.saveAndFlush(messageUnread));
     }
 
     public long getUnreadCount(MessageUnreadRequest request) {

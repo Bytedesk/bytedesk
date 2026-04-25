@@ -22,9 +22,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.topic.TopicRequest;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 
@@ -164,8 +163,8 @@ public abstract class AbstractThreadRoutingStrategy {
      *
      * <p>注意：此方法是同步执行的；调用方可按需自行 try/catch 做 best-effort。
      */
-    protected void subscribeThreadTopics(ThreadEntity thread, TopicRestService topicRestService) {
-        if (thread == null || !StringUtils.hasText(thread.getTopic()) || topicRestService == null) {
+    protected void subscribeThreadTopics(ThreadEntity thread, TopicSubscriptionRestService topicSubscriptionRestService) {
+        if (thread == null || !StringUtils.hasText(thread.getTopic()) || topicSubscriptionRestService == null) {
             return;
         }
 
@@ -185,12 +184,8 @@ public abstract class AbstractThreadRoutingStrategy {
             return;
         }
 
-        TopicRequest request = TopicRequest.builder()
-                .userUid(subscriberUid)
-                .build();
-        request.getTopics().add(thread.getTopic());
-        request.getTopics().add(TopicUtils.formatTopicInternal(thread.getTopic()));
-        topicRestService.create(request);
+        topicSubscriptionRestService.create(thread.getTopic(), subscriberUid);
+        topicSubscriptionRestService.create(TopicUtils.formatTopicInternal(thread.getTopic()), subscriberUid);
     }
     
     /**

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260421-add-topic-subscription-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_topic_subscription"/>
+            <not>
+                <columnExists tableName="bytedesk_core_topic_subscription" columnName="type"/>
+            </not>
+        </preConditions>
+
+        <comment>Add type column to distinguish chat, monitor, insert, takeover topic subscriptions.</comment>
+        <addColumn tableName="bytedesk_core_topic_subscription">
+            <column name="type" type="VARCHAR(32)" defaultValue="CHAT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260421-backfill-topic-subscription-type" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_topic_subscription"/>
+            <columnExists tableName="bytedesk_core_topic_subscription" columnName="type"/>
+        </preConditions>
+
+        <comment>Backfill legacy topic subscriptions to CHAT when type is null or empty.</comment>
+        <sql>
+            UPDATE bytedesk_core_topic_subscription
+            SET type = 'CHAT'
+            WHERE type IS NULL OR TRIM(type) = '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="260421-add-topic-subscription-type-default" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_topic_subscription"/>
+            <columnExists tableName="bytedesk_core_topic_subscription" columnName="type"/>
+        </preConditions>
+
+        <comment>Ensure new topic subscriptions default to CHAT type.</comment>
+        <addDefaultValue tableName="bytedesk_core_topic_subscription" columnName="type" defaultValue="CHAT"/>
+    </changeSet>
+
+    <changeSet id="260421-add-topic-subscription-user-type-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_topic_subscription"/>
+            <columnExists tableName="bytedesk_core_topic_subscription" columnName="type"/>
+            <not>
+                <indexExists tableName="bytedesk_core_topic_subscription" indexName="idx_topic_subscription_user_type"/>
+            </not>
+        </preConditions>
+
+        <comment>Add composite index for user + type subscription lookups. Topic already has a dedicated index.</comment>
+        <createIndex tableName="bytedesk_core_topic_subscription" indexName="idx_topic_subscription_user_type">
+            <column name="user_uid"/>
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

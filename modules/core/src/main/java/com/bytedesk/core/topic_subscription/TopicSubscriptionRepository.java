@@ -28,9 +28,21 @@ public interface TopicSubscriptionRepository
 
     boolean existsByUserUidAndTopicAndDeletedFalse(String userUid, String topic);
 
+    boolean existsByUserUidAndTopicAndTypeAndDeletedFalse(String userUid, String topic, String type);
+
     Optional<TopicSubscriptionEntity> findFirstByUserUidAndTopicAndDeletedFalse(String userUid, String topic);
 
     Optional<TopicSubscriptionEntity> findFirstByUserUidAndTopic(String userUid, String topic);
+
+    Optional<TopicSubscriptionEntity> findFirstByUserUidAndTopicAndTypeAndDeletedFalse(String userUid, String topic, String type);
+
+    Optional<TopicSubscriptionEntity> findFirstByUserUidAndTopicAndType(String userUid, String topic, String type);
+
+    List<TopicSubscriptionEntity> findByUserUidAndDeletedFalse(String userUid);
+
+    List<TopicSubscriptionEntity> findByUserUidAndTypeAndDeletedFalse(String userUid, String type);
+
+    List<TopicSubscriptionEntity> findByUserUidAndTopic(String userUid, String topic);
 
     List<TopicSubscriptionEntity> findByTopicAndDeletedFalse(String topic);
 }

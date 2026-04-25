@@ -42,8 +42,8 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -55,10 +55,9 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
-import com.bytedesk.core.topic.TopicEntity;
-import com.bytedesk.core.topic.TopicRequest;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -80,7 +79,7 @@ public class ThreadRestService
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     private final ActiveThreadCacheService activeThreadCacheService;
 
@@ -167,7 +166,7 @@ public class ThreadRestService
         UserEntity user = authService.getUser();
 
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
 
         request.setUserUid(user.getUid());
@@ -208,15 +207,10 @@ public class ThreadRestService
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
 
-        Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
-        if (!topicOptional.isPresent()) {
-            return Page.empty();
-        }
-
-        Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
+        Set<String> customerServiceTopics = topicSubscriptionRestService.findSubscribedTopicsByUserUid(user.getUid()).stream()
                 .filter(TopicUtils::isCustomerServiceTopic)
                 .collect(Collectors.toSet());
 
@@ -249,13 +243,13 @@ public class ThreadRestService
     public ThreadResponse queryByTopicAndOwner(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new NotLoginException("owner not found");
+            throw CommonI18nExceptions.loginRequired();
         }
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         } else {
-            throw new NotFoundException("thread not found");
+            throw ResourceI18nExceptions.threadNotFound();
         }
     }
 
@@ -265,7 +259,7 @@ public class ThreadRestService
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         } else {
-            throw new NotFoundException("thread " + request.getUid() + " not found");
+            throw ResourceI18nExceptions.threadNotFound(request.getUid());
         }
     }
 
@@ -380,7 +374,7 @@ public class ThreadRestService
     }
 
     // 系统通知会话：system/{user_uid}
-    public ThreadResponse createSystemNoticeAccountThread(UserEntity user) {
+    public ThreadResponse createSystemPublicAccountThread(UserEntity user) {
         //
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
@@ -741,11 +735,11 @@ public class ThreadRestService
         }
         if (Boolean.TRUE.equals(request.getUnsubscribe())
                 || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
-            TopicRequest topicRequest = TopicRequest.builder()
+                TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
-            topicRestService.remove(topicRequest);
+            topicSubscriptionRestService.remove(topicRequest);
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
@@ -757,7 +751,7 @@ public class ThreadRestService
     public ThreadResponse closeByTopic(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         request.setUserUid(user.getUid());
 
@@ -816,11 +810,11 @@ public class ThreadRestService
         }
 
         if (Boolean.TRUE.equals(request.getUnsubscribe())) {
-            TopicRequest topicRequest = TopicRequest.builder()
+                TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
-            topicRestService.remove(topicRequest);
+            topicSubscriptionRestService.remove(topicRequest);
         }
 
         // 返回值：优先返回 thread.uid == request.uid

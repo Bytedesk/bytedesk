@@ -53,6 +53,7 @@ import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentPublicResponse;
 import com.bytedesk.service.agent.AgentRestService;
 
 import java.util.Optional;
@@ -274,6 +275,36 @@ public class VisitorRestControllerVisitor {
     }
 
     /**
+     * 匿名查询访客详情（用于访客端资料面板展示服务端真实数据）
+     */
+    @GetMapping("/visitor/query/uid")
+    public ResponseEntity<?> queryVisitorByUid(
+            @RequestParam(value = "uid") String uid,
+            @RequestParam(value = "orgUid", required = false) String orgUid) {
+        if (!StringUtils.hasText(uid)) {
+            return ResponseEntity.ok(JsonResult.error("uid required"));
+        }
+
+        Optional<VisitorEntity> visitorOptional = Optional.empty();
+        if (StringUtils.hasText(orgUid)) {
+            visitorOptional = visitorRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+        }
+        if (!visitorOptional.isPresent()) {
+            visitorOptional = visitorRestService.findByUid(uid);
+        }
+        if (!visitorOptional.isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("visitor not found"));
+        }
+
+        VisitorEntity visitor = visitorOptional.get();
+        if (StringUtils.hasText(orgUid) && !orgUid.equals(visitor.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("visitor not found"));
+        }
+
+        return ResponseEntity.ok(JsonResult.success(visitorRestService.convertToResponse(visitor)));
+    }
+
+    /**
      * 匿名查询客服信息（用于访客端展示客服工号等公开信息）
      *
      * 说明：
@@ -305,27 +336,9 @@ public class VisitorRestControllerVisitor {
         }
 
         AgentEntity agent = agentOptional.get();
-        AgentPublicResponse response = new AgentPublicResponse(
-                agent.getUid(),
-                agent.getUserUid(),
-                agent.getNickname(),
-                agent.getAgentNo(),
-                agent.getAvatar(),
-                agent.getStatus());
+        AgentPublicResponse response = AgentPublicResponse.from(agent);
 
         return ResponseEntity.ok(JsonResult.success(response));
-    }
-
-    /**
-     * 访客端公开的客服信息（最小字段集）
-     */
-    public record AgentPublicResponse(
-            String uid,
-            String userUid,
-            String nickname,
-            String agentNo,
-            String avatar,
-            String status) {
     }
 
     // 访客发送http消息
@@ -333,8 +346,41 @@ public class VisitorRestControllerVisitor {
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
-        //
         String json = (String) map.get("json");
+        if (!StringUtils.hasText(json)) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        MessageProtobuf messageProtobuf;
+        try {
+            messageProtobuf = MessageProtobuf.fromJson(json);
+        } catch (Exception e) {
+            log.warn("invalid visitor message payload: {}", e.getMessage());
+            return ResponseEntity.ok(JsonResult.error("invalid messageJson"));
+        }
+
+        if (messageProtobuf == null || messageProtobuf.getThread() == null) {
+            return ResponseEntity.ok(JsonResult.error("thread required"));
+        }
+
+        String threadUid = messageProtobuf.getThread().getUid();
+        String threadTopic = messageProtobuf.getThread().getTopic();
+        if (!StringUtils.hasText(threadTopic) && StringUtils.hasText(threadUid)) {
+            Optional<com.bytedesk.core.thread.ThreadEntity> threadOptional = threadRestService.findByUid(threadUid);
+            if (threadOptional.isPresent()) {
+                messageProtobuf.getThread().setTopic(threadOptional.get().getTopic());
+                if (!StringUtils.hasText(messageProtobuf.getThread().getUid())) {
+                    messageProtobuf.getThread().setUid(threadOptional.get().getUid());
+                }
+                json = messageProtobuf.toJson();
+            }
+        }
+
+        if (!StringUtils.hasText(messageProtobuf.getThread().getUid())
+                || !StringUtils.hasText(messageProtobuf.getThread().getTopic())) {
+            return ResponseEntity.ok(JsonResult.error("thread uid and topic required"));
+        }
+
         log.debug("json {}", json);
         messageSendService.sendJsonMessage(json);
 

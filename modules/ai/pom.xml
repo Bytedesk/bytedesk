@@ -118,6 +118,8 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- moonshot 已 vendor 到 modules/ai/src/main/java/org/springaicommunity/moonshot -->
+
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
 		<!-- <dependency>

@@ -23,10 +23,10 @@ import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRequest;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionCacheService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,9 +52,9 @@ public class ThreadEventListener {
             ThreadTypeEnum.TICKET_EXTERNAL.name()
         );
 
-    private final TopicCacheService topicCacheService;
+    private final TopicSubscriptionCacheService topicSubscriptionCacheService;
 
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     private final ActiveThreadCacheService activeThreadCacheService;
 
@@ -81,19 +81,22 @@ public class ThreadEventListener {
             String topic = thread.getTopic();
             // 订阅内部会话
             String topicInternal = TopicUtils.formatTopicInternal(topic);
-            TopicRequest request = TopicRequest.builder()
+                TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                     .userUid(user.getUid())
+                    .topic(topic)
                     .build();
-            request.getTopics().add(topic);
-            request.getTopics().add(topicInternal);
-            topicRestService.create(request);
+            topicSubscriptionRestService.create(request);
+                topicSubscriptionRestService.create(TopicSubscriptionRequest.builder()
+                    .topic(topicInternal)
+                    .userUid(user.getUid())
+                    .build());
         } else {
             // 文件助手、排队助手、系统通知会话延迟订阅topic
-            TopicRequest request = TopicRequest.builder()
+                TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-            topicCacheService.pushRequest(request);
+            topicSubscriptionCacheService.pushRequest(request);
         }
     }
 
@@ -112,16 +115,16 @@ public class ThreadEventListener {
             return;
         }
 
-        TopicRequest request = TopicRequest.builder()
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                 .topic(thread.getTopic())
                 .userUid(user.getUid())
                 .build();
 
         // AGENT/WORKGROUP/MEMBER 立即订阅；其他延迟订阅
         if (ADD_TOPIC_IMMEDIATE_SUBSCRIBE_TYPES.contains(thread.getType())) {
-            topicRestService.create(request);
+            topicSubscriptionRestService.create(request);
         } else {
-            topicCacheService.pushRequest(request);
+            topicSubscriptionCacheService.pushRequest(request);
         }
     }
 
@@ -131,11 +134,11 @@ public class ThreadEventListener {
         UserEntity user = thread.getOwner();
         // UserEntity user = thread.getOwner();
         log.info("thread ThreadRemoveTopicEvent: {}", thread.getUid());
-        TopicRequest request = TopicRequest.builder()
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                     .topic(thread.getTopic())
                     .userUid(user.getUid())
                     .build();
-        topicRestService.remove(request);
+        topicSubscriptionRestService.remove(request);
     }
 
 }

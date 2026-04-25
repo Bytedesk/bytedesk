@@ -342,7 +342,7 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
                 entity.setIcon(seed.getIcon());
                 entity.setLink(seed.getLink());
                 entity.setOrder(seed.getOrder());
-                entity.setEnabled(Boolean.TRUE);
+                entity.setEnabled(seed.getEnabled());
                 entity.setOpenInNewWindow(Boolean.FALSE);
                 entity.setParentUid(parentUid);
                 entity.setOrgUid(null);
@@ -361,7 +361,7 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
                         .icon(seed.getIcon())
                         .link(seed.getLink())
                         .order(seed.getOrder())
-                        .enabled(Boolean.TRUE)
+                        .enabled(seed.getEnabled())
                         .openInNewWindow(Boolean.FALSE)
                         .parentUid(parentUid)
                         .build();

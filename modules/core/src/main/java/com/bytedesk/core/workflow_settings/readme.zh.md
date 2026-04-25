@@ -1,1 +1,10 @@
-# 标签
+# workflow_settings
+
+该包负责工作流设置定义、默认配置数据与设置生命周期接口。
+
+## 实现要点
+
+- 核心文件包括 WorkflowSettingsEntity、WorkflowSettingsRequest、WorkflowSettingsResponse、WorkflowSettingsExcel、WorkflowSettingsTypeEnum、WorkflowIframeTab，用于设置建模及界面相关配置值表达。
+- WorkflowSettingsRepository、WorkflowSettingsSpecification、WorkflowSettingsRestController、WorkflowSettingsRestService 提供持久化、条件过滤和工作流设置管理接口。
+- WorkflowSettingsEntityListener、WorkflowSettingsEventListener 与 event 子包负责设置生命周期回调以及创建、更新、删除事件。
+- WorkflowSettingsInitData、WorkflowSettingsInitializer、WorkflowSettingsPermissions、WorkflowSettingsTools 提供默认配置初始化、权限元数据与通用辅助逻辑。

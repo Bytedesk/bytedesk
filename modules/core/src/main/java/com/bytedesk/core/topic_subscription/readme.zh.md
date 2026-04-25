@@ -1,1 +1,10 @@
-# 标签
+# topic_subscription
+
+该包负责主题订阅记录管理、订阅类型元数据与发布订阅生命周期接口。
+
+## 实现要点
+
+- 核心模型包括 TopicSubscriptionEntity、TopicSubscriptionRequest、TopicSubscriptionResponse、TopicSubscriptionExcel、TopicSubscriptionTypeEnum。
+- TopicSubscriptionRepository、TopicSubscriptionSpecification、TopicSubscriptionRestController、TopicSubscriptionRestService 提供持久化、条件过滤和订阅记录管理接口。
+- TopicSubscriptionCacheService、TopicSubscriptionInitializer、TopicSubscriptionPermissions、TopicSubscriptionTools 提供缓存支持、初始化数据、权限元数据与共享辅助逻辑。
+- TopicSubscriptionEntityListener、TopicSubscriptionEventListener 与 event 子包负责创建、更新、删除生命周期事件。

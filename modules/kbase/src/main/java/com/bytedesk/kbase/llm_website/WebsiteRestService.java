@@ -27,6 +27,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
@@ -50,6 +51,8 @@ public class WebsiteRestService
     private final UidUtils uidUtils;
 
     private final KbaseRestService kbaseRestService;
+
+    private final CategoryRestService categoryRestService;
     
     private final WebsiteCrawlerService websiteCrawlerService;
     
@@ -57,6 +60,7 @@ public class WebsiteRestService
 
     @Override
     protected Specification<WebsiteEntity> createSpecification(WebsiteRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return WebsiteSpecification.search(request, authService);
     }
 

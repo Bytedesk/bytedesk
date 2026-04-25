@@ -2,7 +2,7 @@
 
 ## 系统架构图
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Bytedesk Application                        │
 ├─────────────────────────────────────────────────────────────────┤
@@ -34,6 +34,7 @@
 **位置：** `modules/core/src/main/java/com/bytedesk/core/plugin/`
 
 **组件：**
+
 - `BytedeskPlugin.java` - 插件接口定义
 - `AbstractBytedeskPlugin.java` - 插件抽象基类
 - `PluginRegistry.java` - 插件注册中心
@@ -41,6 +42,7 @@
 - `CorePlugin.java` - 核心模块插件实现
 
 **功能：**
+
 - 定义插件标准接口
 - 提供插件注册和管理
 - 实现插件生命周期管理
@@ -49,6 +51,7 @@
 ### 业务模块插件
 
 #### 1. 在线客服模块（Service）
+
 **位置：** `modules/service/src/main/java/com/bytedesk/service/plugin/ServicePlugin.java`
 
 **功能：** 实时聊天、会话管理、客服分配
@@ -58,6 +61,7 @@
 **依赖：** core
 
 #### 2. AI 模块（AI）
+
 **位置：** `modules/ai/src/main/java/com/bytedesk/ai/plugin/AiPlugin.java`
 
 **功能：** 大模型集成、智能客服、对话生成
@@ -67,6 +71,7 @@
 **依赖：** core, kbase
 
 #### 3. 知识库模块（Kbase）
+
 **位置：** `modules/kbase/src/main/java/com/bytedesk/kbase/plugin/KbasePlugin.java`
 
 **功能：** 文章管理、FAQ、向量检索
@@ -76,6 +81,7 @@
 **依赖：** core
 
 #### 4. 工单系统模块（Ticket）
+
 **位置：** `modules/ticket/src/main/java/com/bytedesk/ticket/plugin/TicketPlugin.java`
 
 **功能：** 工单创建、流转、SLA 管理
@@ -85,6 +91,7 @@
 **依赖：** core
 
 #### 5. 呼叫中心模块（Call）
+
 **位置：** `modules/call/src/main/java/com/bytedesk/call/plugin/CallPlugin.java`
 
 **功能：** 语音通话、FreeSWITCH 集成
@@ -96,6 +103,7 @@
 **注意：** 默认禁用，需要配置 FreeSWITCH 后启用
 
 #### 6. 客户之声模块（VOC）
+
 **位置：** `modules/voc/src/main/java/com/bytedesk/voc/plugin/VocPlugin.java`
 
 **功能：** 客户反馈、满意度调查、数据分析
@@ -106,7 +114,7 @@
 
 ## 文件结构
 
-```
+```bash
 modules/
 ├── core/
 │   └── src/main/java/com/bytedesk/core/
@@ -204,7 +212,7 @@ PluginRegistry.getAllPlugins()
 
 ### 3. 健康检查流程
 
-```
+```bash
 客户端请求
    ↓
 GET /api/v1/plugins/{pluginId}/health
@@ -221,34 +229,40 @@ HealthIndicator.health()
 ## 关键特性
 
 ### 1. 自动发现
+
 - 使用 Spring 的组件扫描自动发现插件
 - 通过 `@Component` 注解标识插件类
 
 ### 2. 依赖管理
+
 - 插件可以声明对其他插件的依赖
 - 注册时自动检查依赖是否满足
 
 ### 3. 优先级控制
+
 - 通过优先级控制插件注册顺序
 - 优先级低的先注册，高的后注册
 
 ### 4. 生命周期管理
+
 - `initialize()` - 插件初始化
 - `destroy()` - 插件销毁
 - 与 Spring 生命周期集成
 
 ### 5. 健康监控
+
 - 每个插件可关联一个 HealthIndicator
 - 通过 API 和 Actuator 端点查询健康状态
 
 ### 6. 动态配置
+
 - 通过配置文件启用/禁用插件
 - 无需修改代码即可控制模块
 
 ## API 端点总览
 
 | 端点 | 方法 | 描述 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `/api/v1/plugins` | GET | 获取所有插件列表 |
 | `/api/v1/plugins/enabled` | GET | 获取已启用的插件 |
 | `/api/v1/plugins/overview` | GET | 获取插件概览 |
@@ -261,7 +275,7 @@ HealthIndicator.health()
 ## Actuator 端点
 
 | 端点 | 描述 |
-|------|------|
+| ------ | ------ |
 | `/actuator/health` | 应用整体健康状态 |
 | `/actuator/health/core` | 核心模块健康状态 |
 | `/actuator/health/service` | 客服模块健康状态 |
@@ -336,6 +350,6 @@ Business Source License 1.1
 
 ## 联系方式
 
-- Email: 270580156@qq.com
-- Website: https://bytedesk.com
-- GitHub: https://github.com/Bytedesk/bytedesk
+- Email: <270580156@qq.com>
+- Website: <https://bytedesk.com>
+- GitHub: <https://github.com/Bytedesk/bytedesk>

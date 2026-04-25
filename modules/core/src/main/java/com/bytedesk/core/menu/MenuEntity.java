@@ -14,6 +14,7 @@
 package com.bytedesk.core.menu;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,8 +50,6 @@ public class MenuEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String DEFAULT_COLOR = "blue";
-
     /**
      * Name of the menu
      */
@@ -80,7 +79,7 @@ public class MenuEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "menu_color", length = 32)
-    private String color = DEFAULT_COLOR;
+    private String color = BytedeskConsts.DEFAULT_COLOR;
 
     /**
      * Icon key (Ant Design icon name, etc.) for the menu entry

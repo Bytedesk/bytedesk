@@ -656,27 +656,57 @@
     ],
     "minimax": [
         {
-            "name": "abab6.5s-chat",
-            "nickname": "abab6.5s",
-            "description": "MiniMax的abab 6.5标准版聊天模型，提供全面对话能力",
+            "name": "MiniMax-M2",
+            "nickname": "MiniMax-M2",
+            "description": "MiniMax M2 通用文本模型，适合基础对话与文本生成场景",
             "type": "TEXT"
         },
         {
-            "name": "abab6.5g-chat",
-            "nickname": "abab6.5g",
-            "description": "MiniMax的abab 6.5高级版聊天模型，提供增强对话能力",
+            "name": "MiniMax-M2.1",
+            "nickname": "MiniMax-M2.1",
+            "description": "MiniMax M2.1 文本模型，提供更稳定的通用理解与生成能力",
             "type": "TEXT"
         },
         {
-            "name": "abab6.5t-chat",
-            "nickname": "abab6.5t",
-            "description": "MiniMax的abab 6.5旗舰版聊天模型，提供最强对话体验",
+            "name": "MiniMax-M2.1-lightning",
+            "nickname": "MiniMax-M2.1-lightning",
+            "description": "MiniMax M2.1 Lightning 文本模型，面向低延迟快速响应场景",
             "type": "TEXT"
         },
         {
-            "name": "abab5.5s-chat",
-            "nickname": "abab5.5s",
-            "description": "MiniMax的abab 5.5标准版聊天模型，经典稳定的对话能力",
+            "name": "MiniMax-M2.1-highspeed",
+            "nickname": "MiniMax-M2.1-highspeed",
+            "description": "MiniMax M2.1 Highspeed 文本模型，强调高速生成与交互体验",
+            "type": "TEXT"
+        },
+        {
+            "name": "MiniMax-M2.5",
+            "nickname": "MiniMax-M2.5",
+            "description": "MiniMax M2.5 文本模型，适合更复杂的对话与内容生成任务",
+            "type": "TEXT"
+        },
+        {
+            "name": "MiniMax-M2.5-lightning",
+            "nickname": "MiniMax-M2.5-lightning",
+            "description": "MiniMax M2.5 Lightning 文本模型，平衡质量与响应速度",
+            "type": "TEXT"
+        },
+        {
+            "name": "MiniMax-M2.5-highspeed",
+            "nickname": "MiniMax-M2.5-highspeed",
+            "description": "MiniMax M2.5 Highspeed 文本模型，适用于高吞吐实时交互场景",
+            "type": "TEXT"
+        },
+        {
+            "name": "MiniMax-M2.7",
+            "nickname": "MiniMax-M2.7",
+            "description": "MiniMax M2.7 文本模型，提供更强的综合理解与生成能力",
+            "type": "TEXT"
+        },
+        {
+            "name": "MiniMax-M2.7-highspeed",
+            "nickname": "MiniMax-M2.7-highspeed",
+            "description": "MiniMax M2.7 Highspeed 文本模型，适合高性能低延迟对话应用",
             "type": "TEXT"
         }
     ],
@@ -818,6 +848,48 @@
     ],
     "moonshot": [
         {
+            "name": "kimi-k2.6",
+            "nickname": "Kimi K2.6",
+            "description": "Kimi 当前主力模型，强调智能体编程、长上下文推理与前端设计场景能力，支持256K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k2.5",
+            "nickname": "Kimi K2.5",
+            "description": "Kimi K2.5 通用旗舰模型，支持文本与视觉输入，适合代码、Agent 与复杂通用任务",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k2-0905-preview",
+            "nickname": "Kimi K2 0905 Preview",
+            "description": "Kimi K2 预览版本，增强 Agentic Coding、前端代码质量与长上下文理解能力，支持256K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k2-0711-preview",
+            "nickname": "Kimi K2 0711 Preview",
+            "description": "Kimi K2 早期预览版本，具备较强代码生成与 Agent 能力，支持128K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k2-turbo-preview",
+            "nickname": "Kimi K2 Turbo Preview",
+            "description": "Kimi K2 高速版本，强调更高输出速度，同时保持256K上下文能力",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k2-thinking",
+            "nickname": "Kimi K2 Thinking",
+            "description": "Kimi K2 长思考模型，支持多步工具调用与更复杂推理任务，支持256K上下文",
+            "type": "REASONING"
+        },
+        {
+            "name": "kimi-k2-thinking-turbo",
+            "nickname": "Kimi K2 Thinking Turbo",
+            "description": "Kimi K2 长思考高速版本，在复杂推理场景中提供更快输出速度，支持256K上下文",
+            "type": "REASONING"
+        },
+        {
             "name": "moonshot-v1-8k",
             "nickname": "Moonshot V1 8k",
             "description": "Moonshot AI的基础模型，支持8K上下文窗口",
@@ -834,6 +906,24 @@
             "nickname": "Moonshot V1 128k",
             "description": "支持128K超长上下文的Moonshot模型，适合大规模文本分析",
             "type": "TEXT"
+        },
+        {
+            "name": "moonshot-v1-8k-vision-preview",
+            "nickname": "Moonshot V1 8k Vision Preview",
+            "description": "Moonshot V1 视觉预览模型，支持图像理解与文本输出，适用于8K上下文场景",
+            "type": "VISION"
+        },
+        {
+            "name": "moonshot-v1-32k-vision-preview",
+            "nickname": "Moonshot V1 32k Vision Preview",
+            "description": "Moonshot V1 视觉预览模型，支持图像理解与文本输出，适用于32K上下文场景",
+            "type": "VISION"
+        },
+        {
+            "name": "moonshot-v1-128k-vision-preview",
+            "nickname": "Moonshot V1 128k Vision Preview",
+            "description": "Moonshot V1 视觉预览模型，支持图像理解与文本输出，适用于128K超长上下文场景",
+            "type": "VISION"
         }
     ],
     "baichuan": [

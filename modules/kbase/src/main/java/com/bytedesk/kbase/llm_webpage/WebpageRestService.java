@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
@@ -47,10 +48,13 @@ public class WebpageRestService
 
     private final KbaseRestService kbaseRestService;
 
+    private final CategoryRestService categoryRestService;
+
     private final WebpageCrawlerService webpageCrawlerService;
 
     @Override
     protected Specification<WebpageEntity> createSpecification(WebpageRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return WebpageSpecification.search(request, authService);
     }
 

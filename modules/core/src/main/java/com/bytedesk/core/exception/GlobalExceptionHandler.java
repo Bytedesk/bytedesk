@@ -21,12 +21,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -39,6 +42,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.upload.UploadSecurityConfig;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.utils.JsonResult;
@@ -84,6 +88,29 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleUploadStorageException(UploadStorageException e) {
         // 上传失败通常属于客户端输入/文件问题（类型/大小/内容校验等），返回可读提示
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), e.getCode() == null ? 400 : e.getCode()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        String message = resolveUploadSizeExceededMessage();
+        log.warn("Upload exceeded max size: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(message, HttpStatus.PAYLOAD_TOO_LARGE.value()));
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<?> handleMultipartException(MultipartException e) {
+        Throwable rootCause = getRootCause(e);
+        if (rootCause instanceof MaxUploadSizeExceededException) {
+            return handleMaxUploadSizeExceededException((MaxUploadSizeExceededException) rootCause);
+        }
+
+        String message = StringUtils.hasText(e.getMessage()) ? e.getMessage() : "文件上传请求无效";
+        log.warn("Multipart request failed: {}", message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(message, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(UsernameExistsException.class)
@@ -147,9 +174,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<?> handleForbiddenException(ForbiddenException e) {
+        String message = StringUtils.hasText(e.getMessage()) ? e.getMessage() : I18Consts.I18N_FORBIDDEN_ACCESS;
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error(I18Consts.I18N_FORBIDDEN_ACCESS, HttpStatus.FORBIDDEN.value()));
+            .body(JsonResult.error(message, HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler(InternalAuthenticationServiceException.class)
@@ -234,6 +262,26 @@ public class GlobalExceptionHandler {
         }
 
         return normalizedMessage;
+    }
+
+    private String resolveUploadSizeExceededMessage() {
+        try {
+            UploadSecurityConfig uploadSecurityConfig = ApplicationContextHolder.getBean(UploadSecurityConfig.class);
+            if (uploadSecurityConfig != null) {
+                return "文件过大，最大支持" + uploadSecurityConfig.getMaxFileSizeDescription();
+            }
+        } catch (Exception ex) {
+            log.debug("Resolve upload max size config failed: {}", ex.getMessage());
+        }
+        return "文件过大，请压缩后重试";
+    }
+
+    private Throwable getRootCause(Throwable throwable) {
+        Throwable current = throwable;
+        while (current.getCause() != null && current.getCause() != current) {
+            current = current.getCause();
+        }
+        return current;
     }
 
     private String normalizeBusinessMessageKey(String message) {

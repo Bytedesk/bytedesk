@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.action.ActionEntity;
 import com.bytedesk.core.action.event.ActionCreateEvent;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.message.MessageNoticeTypeEnum;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.notice.NoticeRequest;
-import com.bytedesk.core.notice.NoticeService;
-import com.bytedesk.core.notice.NoticeTypeEnum;
-import com.bytedesk.core.notice.extra.NoticeExtraLogin;
+import com.bytedesk.core.message.content.NoticeContent;
+import com.bytedesk.core.message.extra.LoginNoticeExtra;
 import com.bytedesk.core.rbac.user.UserEntity;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AuthEventListener {
 
-    private final NoticeService noticeService;
+    private final MessageService messageService;
 
     @EventListener
     public void onActionCreateEvent(ActionCreateEvent event) {
@@ -52,20 +52,20 @@ public class AuthEventListener {
                 || BytedeskConsts.ACTION_LOGIN_MOBILE.equals(actionName)
                 || BytedeskConsts.ACTION_LOGIN_EMAIL.equals(actionName)) {
             //
-            NoticeExtraLogin noticeExtraLogin = NoticeExtraLogin.builder()
+            LoginNoticeExtra loginNoticeExtra = LoginNoticeExtra.builder()
                     .loginIp(action.getIp())
                     .loginLocation(action.getIpLocation())
                     .build();
-            NoticeRequest noticeRequest = NoticeRequest.builder()
+            NoticeContent noticeContent = NoticeContent.builder()
                     .title(action.getTitle())
                     .content(action.getAction())
-                    .type(NoticeTypeEnum.LOGIN.name())
+                    .type(MessageNoticeTypeEnum.LOGIN.name())
                     .status(MessageStatusEnum.READ.name())
-                    .extra(noticeExtraLogin.toJson())
+                    .extra(loginNoticeExtra.toJson())
                     .userUid(user.getUid())
                     .orgUid(user.getOrgUid())
                     .build();
-            noticeService.sendLoginNotice(noticeRequest);
+            messageService.sendSystemLoginNotice(noticeContent);
         }
     }
 

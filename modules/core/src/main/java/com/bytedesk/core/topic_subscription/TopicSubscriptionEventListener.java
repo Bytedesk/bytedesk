@@ -13,13 +13,24 @@
  */
 package com.bytedesk.core.topic_subscription;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
-
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.quartz.event.QuartzDay0Event;
+import com.bytedesk.core.quartz.event.QuartzFiveSecondEvent;
+import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
+import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.event.TopicSubscriptionCreateEvent;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,17 +39,94 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TopicSubscriptionEventListener {
 
-    private final TopicSubscriptionRestService topic_subscriptionRestService;
+	private final TopicSubscriptionRestService topicSubscriptionRestService;
 
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        topic_subscriptionRestService.initTopicSubscriptions(orgUid);
-    }
+	private final TopicSubscriptionCacheService topicSubscriptionCacheService;
 
- 
+	private final ThreadRestService threadRestService;
+
+	private final MqttConnectionService mqttConnectionService;
+
+	@EventListener
+	public void onTopicSubscriptionCreateEvent(TopicSubscriptionCreateEvent event) {
+		TopicSubscriptionEntity topicSubscription = event.getTopicSubscription();
+		if (topicSubscription == null || StringUtils.hasText(topicSubscription.getUid())) {
+			return;
+		}
+
+		log.info("topic subscription onTopicSubscriptionCreateEvent: {}", topicSubscription);
+		TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
+				.topic(topicSubscription.getTopic())
+				.userUid(topicSubscription.getUserUid())
+				.build();
+		topicSubscriptionCacheService.pushRequest(request);
+	}
+
+	@EventListener
+	public void onQuartzFiveSecondEvent(QuartzFiveSecondEvent event) {
+		List<String> topicRequestList = topicSubscriptionCacheService.getTopicRequestList();
+		topicSubscriptionCacheService.getClientIdList();
+		if (topicRequestList == null) {
+			return;
+		}
+
+		List<String> topicRequestsSnapshot = new ArrayList<>(topicRequestList);
+		for (String item : topicRequestsSnapshot) {
+			TopicSubscriptionRequest topicRequest = JSON.parseObject(item, TopicSubscriptionRequest.class);
+			topicSubscriptionRestService.createSystemTopicSubscription(topicRequest);
+		}
+	}
+
+	@EventListener
+	public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
+		Set<String> clientIds = mqttConnectionService.getConnectedClientIds();
+		if (clientIds == null) {
+			return;
+		}
+
+		for (String clientId : clientIds) {
+			topicSubscriptionCacheService.pushClientId(clientId);
+		}
+	}
+
+	@EventListener
+	public void onQuartzDay0Event(QuartzDay0Event event) {
+		log.info("topic subscription onQuartzDay0Event: 开始清理已结束的会话topics");
+		List<TopicSubscriptionEntity> subscriptions = topicSubscriptionRestService.findAllTopicSubscriptions();
+
+		for (TopicSubscriptionEntity subscription : subscriptions) {
+			if (subscription == null || subscription.isDeleted()) {
+				continue;
+			}
+			String topic = subscription.getTopic();
+			String userUid = subscription.getUserUid();
+			if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+				continue;
+			}
+			if (topic.startsWith(TopicUtils.TOPIC_ORG_AGENT_PREFIX) || topic.startsWith(TopicUtils.TOPIC_ORG_WORKGROUP_PREFIX)) {
+				List<ThreadEntity> relatedThreads = threadRestService.findListByTopic(topic);
+				if (relatedThreads.isEmpty()) {
+					continue;
+				}
+
+				boolean allClosed = true;
+				for (ThreadEntity thread : relatedThreads) {
+					if (!ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
+						allClosed = false;
+						break;
+					}
+				}
+
+				if (allClosed) {
+					topicSubscriptionRestService.remove(topic, userUid);
+					log.info("成功删除topic: {} 从 userUid: {}", topic, userUid);
+				}
+			}
+		}
+
+		log.info("topic subscription onQuartzDay0Event: 已完成清理已结束的会话topics");
+	}
+
+
 }
 

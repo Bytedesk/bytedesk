@@ -15,6 +15,8 @@ package com.bytedesk.core.base;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -133,6 +135,9 @@ public abstract class BaseRequest implements Serializable, PageableRequest {
 
     // 
     private String searchText;
+
+    @Builder.Default
+    private List<String> categoryUids = new ArrayList<>();
 
     /**
      * 通用时间范围过滤字段（由各模块 Specification 自行决定过滤哪个时间列）

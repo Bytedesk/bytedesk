@@ -59,6 +59,7 @@ public class I18Consts {
     public static final String I18N_MULTI_MODAL = I18N_PREFIX + "multi.modal";
     public static final String I18N_MCP_SERVER = I18N_PREFIX + "mcp.server";
     public static final String I18N_MEMBER = I18N_PREFIX + "member";
+    public static final String I18N_MEMBER_NOT_FOUND = I18N_PREFIX + "member.not.found"; // 成员未找到
     public static final String I18N_DEPARTMENT = I18N_PREFIX + "department";
     public static final String I18N_RELATION = I18N_PREFIX + "relation";
     public static final String I18N_CATEGORY = I18N_PREFIX + "category";
@@ -79,6 +80,7 @@ public class I18Consts {
     public static final String I18N_VIDEO_RECORDINGS = I18N_PREFIX + "video.recordings.management";
     public static final String I18N_DEVICE = I18N_PREFIX + "device";
     public static final String I18N_EQUIPMENT = I18N_PREFIX + "equipment";
+    public static final String I18N_LOGISTICS = I18N_PREFIX + "logistics";
     public static final String I18N_DOCUMENT = I18N_PREFIX + "document";
     public static final String I18N_WORKFLOW_EDGE = I18N_PREFIX + "workflow.edge";
     public static final String I18N_TOPIC_SUBSCRIPTION = I18N_PREFIX + "topic.subscription";
@@ -107,6 +109,7 @@ public class I18Consts {
     public static final String I18N_TASK_COMMENT = I18N_PREFIX + "task.comment";
     public static final String I18N_GROUP = I18N_PREFIX + "group.management";
     public static final String I18N_MESSAGE = I18N_PREFIX + "message";
+    public static final String I18N_MESSAGE_NOT_FOUND = I18N_PREFIX + "message.not.found"; // 消息未找到
     public static final String I18N_TRANSLATE_BAIDU_CONFIGURED = I18N_PREFIX + "translate.baidu.configured";
     public static final String I18N_TRANSLATE_BAIDU_NOT_CONFIGURED = I18N_PREFIX + "translate.baidu.not.configured";
     public static final String I18N_TRANSLATE_CONTENT_REQUIRED = I18N_PREFIX + "translate.content.required";
@@ -114,6 +117,8 @@ public class I18Consts {
     public static final String I18N_WORKFLOW_VARIABLE = I18N_PREFIX + "workflow.variable";
     public static final String I18N_WORKFLOW_LOCAL_VARIABLE = I18N_PREFIX + "workflow.local.variable";
     public static final String I18N_THREAD = I18N_PREFIX + "thread.management";
+    public static final String I18N_THREAD_NOT_FOUND = I18N_PREFIX + "thread.not.found"; // 会话未找到
+    public static final String I18N_THREAD_NOT_FOUND_WITH_UID = I18N_PREFIX + "thread.not.found.with.uid"; // 指定 uid 的会话未找到
     public static final String I18N_MATERIAL = I18N_PREFIX + "material";
     public static final String I18N_QUICK_BUTTON = I18N_PREFIX + "quick.button.management";
     public static final String I18N_WORKGROUP = I18N_PREFIX + "workgroup.management";
@@ -335,6 +340,7 @@ public class I18Consts {
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
     public static final String I18N_LOGIN_REQUIRED = I18N_PREFIX + "login.required"; // 请先登录
     public static final String I18N_FORCE_LOGOUT_REASON = I18N_PREFIX + "force.logout.reason"; // 账号已被管理员强制下线，请联系管理员恢复后再登录。
+    public static final String I18N_SUPER_ADMIN_REQUIRED = I18N_PREFIX + "super.admin.required"; // 仅超级管理员可操作
 
     // 账号相关
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect"; // 用户名或密码不正确
@@ -353,6 +359,11 @@ public class I18Consts {
     public static final String I18N_ORG_UID_REQUIRED = I18N_PREFIX + "org.uid.required"; // 非超级管理员必须指定组织
     public static final String I18N_ORGANIZATION_ACCESS_DENIED = I18N_PREFIX + "organization.access.denied"; // 无权访问其他组织数据
     public static final String I18N_ORGANIZATION_NOT_FOUND = I18N_PREFIX + "organization.not.found"; // 组织未找到
+    public static final String I18N_ORGANIZATION_NOT_FOUND_WITH_UID = I18N_PREFIX + "organization.not.found.with.uid"; // 指定 uid 的组织未找到
+    public static final String I18N_ORGANIZATION_NAME_EXISTS = I18N_PREFIX + "organization.name.exists"; // 组织名称已存在
+    public static final String I18N_ORGANIZATION_CODE_EXISTS = I18N_PREFIX + "organization.code.exists"; // 组织代码已存在
+    public static final String I18N_ORGANIZATION_CREATE_CONSTRAINT_FAILED = I18N_PREFIX + "organization.create.constraint.failed"; // 创建组织失败，名称或代码冲突
+    public static final String I18N_ORGANIZATION_SUPER_USER_DISABLE_DENIED = I18N_PREFIX + "organization.super.user.disable.denied"; // 超级用户组织不允许禁用
     public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空
     public static final String I18N_MOBILE_REQUIRED = I18N_PREFIX + "mobile.required"; // 手机号不能为空
     public static final String I18N_EMAIL_OR_MOBILE_REQUIRED = I18N_PREFIX + "email.or.mobile.required"; // 邮箱或手机号不能为空
@@ -410,6 +421,7 @@ public class I18Consts {
     public static final String I18N_AGENT_TIMEOUT_TIP = I18N_PREFIX + "agent.timeout.tip"; // 超时未回复
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = I18N_PREFIX + "invite.rate.tip"; // 邀请评价提示
+    public static final String I18N_RATE_SUBMITTED_NOTICE = I18N_PREFIX + "rate.submitted.notice"; // 访客已提交评价
 
     // VOC 评价设置默认文案（FeedbackSettingsEntity 默认值）
     public static final String I18N_FEEDBACK_SETTINGS_TITLE_DEFAULT = I18N_PREFIX + "feedback.settings.title.default";

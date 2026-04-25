@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ai.document.Document;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -56,6 +57,8 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
 
     private final KbaseRestService kbaseRestService;
 
+    private final CategoryRestService categoryRestService;
+
     private final UploadRestService uploadRestService;
     
     private final FileService fileService;
@@ -66,6 +69,7 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
 
     @Override
     protected Specification<FileEntity> createSpecification(FileRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return FileSpecification.search(request, authService);
     }
 

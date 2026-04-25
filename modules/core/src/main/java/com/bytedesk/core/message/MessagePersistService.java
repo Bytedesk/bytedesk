@@ -52,6 +52,14 @@ public class MessagePersistService {
 
     public void persist(String messageJSON) {
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
+        if (messageProtobuf == null) {
+            log.warn("skip persist for invalid message payload: {}", messageJSON);
+            return;
+        }
+        if (messageProtobuf.getThread() == null || !StringUtils.hasText(messageProtobuf.getThread().getUid())) {
+            log.warn("skip persist for message without thread uid, messageUid: {}", messageProtobuf.getUid());
+            return;
+        }
         
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
@@ -144,7 +152,7 @@ public class MessagePersistService {
             thread = updateThreadContent(thread, type, messageProtobuf);
             message.setThread(thread);
         } else {
-            log.info("thread not found, uid: {}", threadUid);
+            log.warn("skip persist because thread not found, uid: {}, messageUid: {}", threadUid, uid);
             return;
         }
         message.setUser(messageProtobuf.getUser().toJson());
@@ -285,6 +293,8 @@ public class MessagePersistService {
                 || MessageTypeEnum.PROCESSING.equals(type)
                 || MessageTypeEnum.PREVIEW.equals(type)
                 || MessageTypeEnum.CONTINUE.equals(type)
+                // 仅用于更新RATE_INVITE消息和通知前端刷新 UI，不作为独立聊天记录入库
+                || MessageTypeEnum.RATE_SUBMIT.equals(type)
                 // REACTION 仅用于通知前端刷新 UI，不作为独立聊天记录入库
                 || MessageTypeEnum.REACTION.equals(type)
                 // PLAYBACK 仅用于通知前端刷新 UI，不作为独立聊天记录入库

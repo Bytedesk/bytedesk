@@ -26,6 +26,7 @@ import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
 import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.springai.providers.minimax.SpringAIMinimaxService;
+import com.bytedesk.ai.springai.providers.moonshot.SpringAIMoonshotService;
 import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
 import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
 import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
@@ -58,6 +59,7 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
     private final Optional<SpringAIBaiduService> springAIBaiduService;
     private final Optional<SpringAIVolcengineService> springAIVolcengineService;
     private final Optional<SpringAIMinimaxService> springAIMinimaxService;
+    private final Optional<SpringAIMoonshotService> springAIMoonshotService;
     
     private final Optional<SpringAICustomService> springAICustomService;
 
@@ -76,6 +78,7 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
         springAIGiteeService.ifPresent(service -> registerService(LlmProviderConstants.GITEE, service));
         springAITencentService.ifPresent(service -> registerService(LlmProviderConstants.TENCENT, service));
         springAIVolcengineService.ifPresent(service -> registerService(LlmProviderConstants.VOLCENGINE, service));
+        springAIMoonshotService.ifPresent(service -> registerService(LlmProviderConstants.MOONSHOT, service));
         
         springAICustomService.ifPresent(service -> registerService(LlmProviderConstants.CUSTOM, service));
         

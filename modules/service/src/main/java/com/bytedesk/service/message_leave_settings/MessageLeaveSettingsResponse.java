@@ -60,6 +60,11 @@ public class MessageLeaveSettingsResponse extends BaseResponse {
     private Boolean messageLeaveFormEnabled;
 
     /**
+     * 客服离线时是否允许访客继续发送消息。
+     */
+    private Boolean messageLeaveAllowVisitorSendWhenOffline;
+
+    /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：
      * - true: 使用 messageLeaveFormUid 指定的自定义表单
      * - false: 使用系统自带表单（由前端内置/写死 schema）
@@ -102,6 +107,7 @@ public class MessageLeaveSettingsResponse extends BaseResponse {
                 .messageLeaveNotifyMobile(settings.getMessageLeaveNotifyMobile())
                 .messageLeaveForm(settings.getMessageLeaveForm())
                 .messageLeaveFormEnabled(settings.getMessageLeaveFormEnabled())
+                .messageLeaveAllowVisitorSendWhenOffline(!Boolean.FALSE.equals(settings.getMessageLeaveAllowVisitorSendWhenOffline()))
                 .messageLeaveCustomFormEnabled(settings.getMessageLeaveCustomFormEnabled())
                 .messageLeaveFormUid(settings.getMessageLeaveFormUid())
                 .messageLeaveBackupAgentEnabled(settings.getMessageLeaveBackupAgentEnabled())

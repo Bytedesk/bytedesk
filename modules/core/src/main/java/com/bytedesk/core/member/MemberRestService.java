@@ -38,13 +38,14 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -100,7 +101,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             throw new IllegalArgumentException("orgUid is required");
         }
         return organizationRestService.findByUid(orgUid)
-                .orElseThrow(() -> new NotFoundException("Organization with UID: " + orgUid + " not found."));
+            .orElseThrow(() -> OrganizationI18nExceptions.organizationNotFound(orgUid));
     }
 
     private int resolveMaxMembers(OrganizationEntity organization) {
@@ -129,7 +130,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("Login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         if (!StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid is required");
@@ -138,7 +139,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
     }
 
@@ -150,7 +151,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
     }
 
@@ -392,7 +393,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
 
         MemberEntity member = findByUid(request.getUid())
-                .orElseThrow(() -> new NotFoundException("Member not found"));
+            .orElseThrow(ResourceI18nExceptions::memberNotFound);
         member.setForceLogout(true);
         member.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
         member.setForceLogoutAt(java.time.ZonedDateTime.now());
@@ -421,7 +422,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
 
         MemberEntity member = findByUid(request.getUid())
-                .orElseThrow(() -> new NotFoundException("Member not found"));
+            .orElseThrow(ResourceI18nExceptions::memberNotFound);
         member.setForceLogout(false);
         member.setForceLogoutReason(null);
         member.setForceLogoutAt(null);
@@ -783,7 +784,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         Optional<MemberEntity> memberOptional = findByUid(request.getUid());
         if (memberOptional.isEmpty() || memberOptional.get().isDeleted()) {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
 
         MemberEntity member = memberOptional.get();

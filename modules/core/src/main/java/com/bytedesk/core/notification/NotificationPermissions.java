@@ -1,0 +1,40 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-11-05 17:07:48
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-11-29 12:00:00
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.notification;
+
+import com.bytedesk.core.base.BasePermissions;
+
+public class NotificationPermissions extends BasePermissions {
+
+    // 模块前缀
+    public static final String NOTIFICATION_PREFIX = "NOTIFICATION_";
+
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "NOTIFICATION";
+
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String NOTIFICATION_READ = "NOTIFICATION_READ";
+    public static final String NOTIFICATION_CREATE = "NOTIFICATION_CREATE";
+    public static final String NOTIFICATION_UPDATE = "NOTIFICATION_UPDATE";
+    public static final String NOTIFICATION_DELETE = "NOTIFICATION_DELETE";
+    public static final String NOTIFICATION_EXPORT = "NOTIFICATION_EXPORT";
+
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_NOTIFICATION_READ = "hasAuthority('" + NOTIFICATION_READ + "')";
+    public static final String HAS_NOTIFICATION_CREATE = "hasAuthority('" + NOTIFICATION_CREATE + "')";
+    public static final String HAS_NOTIFICATION_UPDATE = "hasAuthority('" + NOTIFICATION_UPDATE + "')";
+    public static final String HAS_NOTIFICATION_DELETE = "hasAuthority('" + NOTIFICATION_DELETE + "')";
+    public static final String HAS_NOTIFICATION_EXPORT = "hasAuthority('" + NOTIFICATION_EXPORT + "')";
+
+}

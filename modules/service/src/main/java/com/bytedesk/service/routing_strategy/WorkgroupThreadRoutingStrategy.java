@@ -43,8 +43,8 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.service.agent.AgentCapacityService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
@@ -120,7 +120,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final AgentCapacityService agentCapacityService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final AgentRestService agentRestService;
     private final RoutingPoolRestService routingPoolRestService;
@@ -648,7 +648,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
-        subscribeThreadTopics(savedThread, topicRestService);
+        subscribeThreadTopics(savedThread, topicSubscriptionRestService);
 
         // 发布事件
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
@@ -684,7 +684,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 ThreadEntity agentNoticeThread = queueMemberRestService.createAgentQueueThread(agent);
 
                 try {
-                    subscribeThreadTopics(agentNoticeThread, topicRestService);
+                    subscribeThreadTopics(agentNoticeThread, topicSubscriptionRestService);
                 } catch (Exception e) {
                     log.debug("Failed to subscribe agent notice thread topic - agentUid: {}, error: {}", agent.getUid(), e.getMessage());
                 }
@@ -925,7 +925,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         ThreadEntity savedThread = saveThread(latestThread);
 
         // 同步订阅 topic（含 internal），避免首条排队消息因订阅延迟而丢失
-        subscribeThreadTopics(savedThread, topicRestService);
+        subscribeThreadTopics(savedThread, topicSubscriptionRestService);
 
         // 发布事件
         bytedeskEventPublisher.publishEvent(new ThreadProcessCreateEvent(this, savedThread));
@@ -958,7 +958,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
                 // 确保客服已订阅其排队通知线程 topic，避免通知丢失（同步 best-effort）
                 try {
-                    subscribeThreadTopics(agentQueueThread, topicRestService);
+                    subscribeThreadTopics(agentQueueThread, topicSubscriptionRestService);
                 } catch (Exception e) {
                     log.debug("Failed to subscribe agent queue thread topic - agentUid: {}, error: {}", agent.getUid(), e.getMessage());
                 }
@@ -1058,7 +1058,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         ThreadEntity savedThread = saveThread(thread);
 
         // 同步订阅 topic（含 internal），放在发消息之前，避免首条离线消息丢失
-        subscribeThreadTopics(savedThread, topicRestService);
+        subscribeThreadTopics(savedThread, topicSubscriptionRestService);
 
         // 更新队列状态为自动接受
         updateQueueMemberForAgentAccept(queueMemberEntity);

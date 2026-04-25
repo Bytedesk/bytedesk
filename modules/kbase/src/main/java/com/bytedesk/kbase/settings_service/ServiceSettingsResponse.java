@@ -214,6 +214,7 @@ public class ServiceSettingsResponse implements Serializable {
                 // .showShortcutFaqs(settings.getShowShortcutFaqs())
                 .showLogo(settings.getShowLogo())
                 .validateUntil(settings.getValidateUntil())
+                .toolbar(settings.getToolbar())
                 .build();
     }
 

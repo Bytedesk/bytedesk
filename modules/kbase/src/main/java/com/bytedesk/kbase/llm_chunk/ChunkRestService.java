@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_file.FileEntity;
@@ -54,12 +55,15 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
 
     private final KbaseRestService kbaseRestService;
 
+    private final CategoryRestService categoryRestService;
+
     private final FileRepository fileRepository;
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     protected Specification<ChunkEntity> createSpecification(ChunkRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return ChunkSpecification.search(request, authService);
     }
 

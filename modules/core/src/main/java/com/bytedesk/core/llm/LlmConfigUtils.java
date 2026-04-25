@@ -80,7 +80,7 @@ public class LlmConfigUtils {
             case LlmProviderConstants.OPENROUTER:
                 return environment.getProperty("spring.ai.openrouter.chat.options.model", "");
             case LlmProviderConstants.MOONSHOT:
-                return environment.getProperty("spring.ai.moonshot.chat.options.model", "moonshot-v1-8k");
+                return environment.getProperty("spring.ai.moonshot.chat.options.model", "kimi-k2.6");
             case LlmProviderConstants.MINIMAX:
                 return environment.getProperty("spring.ai.minimax.chat.options.model", "minimax-v1");
             default:

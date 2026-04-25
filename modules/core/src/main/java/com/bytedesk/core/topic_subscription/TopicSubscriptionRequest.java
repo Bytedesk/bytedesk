@@ -31,14 +31,5 @@ public class TopicSubscriptionRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    private String description;
-
-    // @Builder.Default
-    // private String type = TopicSubscriptionTypeEnum.CUSTOMER.name();
-
-    private String color;
-
-    private Integer order;
+    private String topic;
 }

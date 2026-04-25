@@ -41,7 +41,7 @@ public class AgentEntityListener {
         //
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         // 默认订阅客服主题
-        bytedeskEventPublisher.publishTopicCreateEvent(TopicUtils.getOrgAgentTopic(agent.getUid()), user.getUid());
+        bytedeskEventPublisher.publishTopicSubscriptionCreateEvent(TopicUtils.getOrgAgentTopic(agent.getUid()), user.getUid());
         bytedeskEventPublisher.publishEvent(new AgentCreateEvent(this, agent));
     }
 

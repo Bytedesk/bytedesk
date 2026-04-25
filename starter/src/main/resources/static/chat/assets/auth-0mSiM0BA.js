@@ -1,0 +1,1 @@
+import{ni as e,ti as t}from"./configUtils-CPmlildI.js";import{S as n,b as r,x as i,y as a}from"./react-vendor-C5CfbVxg.js";var o=n()(r(i(a((e,n)=>({accessToken:``,setAccessToken(n){localStorage.setItem(t,n),e({accessToken:n})},getAccessToken(){return n().accessToken},removeAccessToken(){localStorage.removeItem(t),e({accessToken:``})}})),{name:e})));export{o as t};

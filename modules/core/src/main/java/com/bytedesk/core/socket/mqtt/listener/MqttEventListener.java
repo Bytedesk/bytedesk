@@ -22,8 +22,8 @@ import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttSubscribeEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttUnsubscribeEvent;
 import com.bytedesk.core.socket.mqtt.service.MqttConnectionService;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRestService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionCacheService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 
 import lombok.AllArgsConstructor;
 // import lombok.extern.slf4j.Slf4j;
@@ -33,9 +33,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class MqttEventListener {
 
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
-    private final TopicCacheService topicCacheService;
+    private final TopicSubscriptionCacheService topicSubscriptionCacheService;
 
     private final MqttConnectionService mqttConnectionService;
 
@@ -45,7 +45,7 @@ public class MqttEventListener {
         // 用户clientId格式: uid/client/deviceUid
         // final String uid = clientId.split("/")[0];
         // log.info("topic onMqttConnectedEvent uid {}, clientId {}", uid, clientId);
-        topicCacheService.pushClientId(clientId);
+        topicSubscriptionCacheService.pushClientId(clientId);
     }
 
     @EventListener
@@ -61,7 +61,7 @@ public class MqttEventListener {
     @EventListener
     public void onMqttSubscribeEvent(MqttSubscribeEvent event) {
         // log.info("topic onMqttSubscribeEvent {}", event);
-        topicRestService.subscribe(event.getTopic(), event.getClientId());
+        topicSubscriptionRestService.subscribe(event.getTopic(), event.getClientId());
     }
 
     @EventListener

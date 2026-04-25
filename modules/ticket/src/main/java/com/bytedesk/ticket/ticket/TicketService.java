@@ -31,9 +31,9 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
@@ -67,7 +67,7 @@ public class TicketService {
     private final HistoryService historyService;
     private final MemberRestService memberRestService;
     private final ThreadRestService threadRestService;
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final TicketRestService ticketRestService;
 
     private TicketEntity getTicketOrThrow(String ticketUid) {
@@ -242,7 +242,7 @@ public class TicketService {
                 threadRestService.save(thread);
                 // 添加订阅
                 String userUid = member.getUser().getUid();
-                topicRestService.create(thread.getTopic(), userUid);
+                topicSubscriptionRestService.create(thread.getTopic(), userUid);
             }
 
             // 6. 发布工单分配消息事件
@@ -1082,7 +1082,7 @@ public class TicketService {
                     // 订阅工单会话 topic，便于收到站内信/IM
                     String userUid = member.getUser() != null ? member.getUser().getUid() : null;
                     if (StringUtils.hasText(userUid)) {
-                        topicRestService.create(thread.getTopic(), userUid);
+                        topicSubscriptionRestService.create(thread.getTopic(), userUid);
                     }
                 }
                 threadRestService.save(thread);

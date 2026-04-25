@@ -19,6 +19,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,16 +34,19 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(
-        name = "bytedesk_core_topic_subscription",
-        indexes = {
+@Table(name = "bytedesk_core_topic_subscription", indexes = {
                 @Index(name = "idx_topic_subscription_topic", columnList = "topic"),
-                @Index(name = "idx_topic_subscription_user_uid", columnList = "user_uid")
-        })
+                @Index(name = "idx_topic_subscription_user_uid", columnList = "user_uid"),
+                @Index(name = "idx_topic_subscription_user_type", columnList = "user_uid, type")
+})
 public class TopicSubscriptionEntity extends BaseEntityNoOrg {
 
-    private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-    @Column(nullable = false, length = 512)
-    private String topic;
+        @Column(nullable = false, length = 512)
+        private String topic;
+
+        @Builder.Default
+        @Column(nullable = false, length = 32)
+        private String type = TopicSubscriptionTypeEnum.CHAT.name();
 }

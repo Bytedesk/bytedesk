@@ -359,12 +359,14 @@ public class ServiceConvertUtils {
 
         if (messageLeaveSettings != null) {
             resp.setMessageLeaveFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveFormEnabled()));
+            resp.setMessageLeaveAllowVisitorSendWhenOffline(!Boolean.FALSE.equals(messageLeaveSettings.getMessageLeaveAllowVisitorSendWhenOffline()));
             resp.setMessageLeaveCustomFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled()));
             resp.setMessageLeaveFormUid(messageLeaveSettings.getMessageLeaveFormUid());
             resp.setMessageLeaveForm(resolveMessageLeaveFormSchema(messageLeaveSettings));
         } else {
             resp.setMessageLeaveFormEnabled(false);
             resp.setMessageLeaveForm(null);
+            resp.setMessageLeaveAllowVisitorSendWhenOffline(true);
             resp.setMessageLeaveCustomFormEnabled(false);
             resp.setMessageLeaveFormUid(null);
         }

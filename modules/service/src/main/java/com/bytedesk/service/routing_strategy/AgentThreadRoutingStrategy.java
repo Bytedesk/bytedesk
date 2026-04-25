@@ -30,8 +30,8 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadProcessCreateEvent;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.presence.PresenceFacadeService;
@@ -90,7 +90,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final MessageRestService messageRestService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
     private final PresenceFacadeService presenceFacadeService;
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final IWebrtcService webrtcService;
 
@@ -666,7 +666,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
             // 确保客服已订阅其排队通知线程 topic，避免通知丢失（同步 best-effort）
             try {
-                subscribeThreadTopics(agentQueueThread, topicRestService);
+                subscribeThreadTopics(agentQueueThread, topicSubscriptionRestService);
             } catch (Exception e) {
                 log.debug("Failed to subscribe agent queue thread topic - agentUid: {}, error: {}", agent.getUid(),
                         e.getMessage());
@@ -978,7 +978,7 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         try {
             // 同步订阅 topic（含 internal），避免首条消息因订阅延迟而丢失
-            subscribeThreadTopics(savedThread, topicRestService);
+            subscribeThreadTopics(savedThread, topicSubscriptionRestService);
 
             // 发布线程处理创建事件
             log.debug("发布ThreadProcessCreateEvent事件 - threadUid: {}", savedThread.getUid());

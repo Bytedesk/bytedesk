@@ -692,7 +692,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("notice-apis")
                 .displayName("Notice Management APIs")
-                .pathsToMatch("/api/v1/notice/**")
+                .pathsToMatch("/api/v1/notification/**")
                 .build();
     }
 
@@ -1304,7 +1304,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("topic-apis")
                 .displayName("Topic Management APIs")
-                .pathsToMatch("/api/v1/topic/**")
+                .pathsToMatch("/api/v1/topic/subscription/**")
                 .build();
     }
 

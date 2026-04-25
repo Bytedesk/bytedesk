@@ -82,6 +82,13 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
     private Boolean messageLeaveFormEnabled = true;
 
     /**
+     * 客服离线时是否允许访客继续在会话中发送消息。
+     * 默认允许，只有显式配置为 false 时才阻断。
+     */
+    @Builder.Default
+    private Boolean messageLeaveAllowVisitorSendWhenOffline = true;
+
+    /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：
      * - true: 使用 messageLeaveFormUid 指定的自定义表单
      * - false: 使用系统自带表单（由前端内置/写死 schema）
@@ -138,8 +145,12 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
         if (request == null || modelMapper == null) {
             return MessageLeaveSettingsEntity.builder().build();
         }
-        
-        return modelMapper.map(request, MessageLeaveSettingsEntity.class);
+
+        MessageLeaveSettingsEntity entity = modelMapper.map(request, MessageLeaveSettingsEntity.class);
+        if (entity.getMessageLeaveAllowVisitorSendWhenOffline() == null) {
+            entity.setMessageLeaveAllowVisitorSendWhenOffline(true);
+        }
+        return entity;
     }
 
 }

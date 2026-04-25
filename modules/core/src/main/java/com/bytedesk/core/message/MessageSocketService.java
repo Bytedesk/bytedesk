@@ -23,8 +23,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.socket.mqtt.MqttSession;
 import com.bytedesk.core.socket.mqtt.service.MqttMessageIdService;
@@ -56,7 +56,7 @@ public class MessageSocketService {
 
     private final MqttSessionService mqttSessionService;
 
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     private final ConnectionRestService connectionRestService;
 
@@ -115,7 +115,7 @@ public class MessageSocketService {
 
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
         // log.debug("doSendToSubscribers: topic={}", topic);
-        Set<String> subscriberUserUids = topicRestService.findSubscriberUserUidsByTopic(topic);
+        Set<String> subscriberUserUids = topicSubscriptionRestService.findSubscriberUserUidsByTopic(topic);
         Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(subscriberUserUids);
 
         String subscriberDetails = subscriberUserUids.stream()

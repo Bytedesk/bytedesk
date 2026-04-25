@@ -243,6 +243,43 @@
             padding: 20px 0;
             border-top: none;
         }
+
+        .stack-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0 24px 0;
+            justify-content: center;
+        }
+        .stack-tab-button {
+            background: #eef4fb;
+            border: 1px solid #cddaea;
+            color: #35506d;
+            border-radius: 999px;
+            padding: 10px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .stack-tab-button:hover {
+            background: #dfeafb;
+        }
+        .stack-tab-button.active {
+            background: linear-gradient(135deg, #2f80ed 0%, #2357c8 100%);
+            border-color: #2357c8;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(47, 128, 237, 0.18);
+        }
+        .stack-tab-content {
+            display: none;
+        }
+        .stack-summary {
+            max-width: 900px;
+            margin: 0 auto 24px auto;
+            text-align: center;
+            color: #5b7087;
+            line-height: 1.7;
+        }
         
         /* 前端技术栈样式 */
         .frontend-stack {
@@ -297,6 +334,26 @@
         .networking-item {
             background-color: #e7d9ff;
             border-color: #9b59b6;
+        }
+        .workspace-item {
+            background-color: #e8f0ff;
+            border-color: #3d7cf4;
+        }
+        .desktop-item {
+            background-color: #fff0d8;
+            border-color: #e67e22;
+        }
+        .realtime-item {
+            background-color: #efe6ff;
+            border-color: #8e44ad;
+        }
+        .engineering-item {
+            background-color: #eceff4;
+            border-color: #64748b;
+        }
+        .ai-item {
+            background-color: #dff7ee;
+            border-color: #16a085;
         }
         
         /* GitHub链接样式 */
@@ -1706,109 +1763,238 @@
         <div id="frontend-view" class="tab-content">
             <div class="frontend-stack">
                 <h2>前端技术栈</h2>
-                <p>基于 React 和 Ant Design Pro 的企业级前端应用</p>
+
+                <div class="stack-tabs">
+                    <button class="stack-tab-button active" onclick="openFrontendStackTab('frontend-stack-v1', this)">1.x 经典栈</button>
+                    <button class="stack-tab-button" onclick="openFrontendStackTab('frontend-stack-v2', this)">2.x 升级栈</button>
+                </div>
+
+                <div id="frontend-stack-v1" class="stack-tab-content" style="display: block;">
+                    <p>基于 React 和 Ant Design Pro 的企业级前端应用</p>
+                    
+                    <!-- 核心框架 -->
+                    <div class="tech-category">
+                        <div class="tech-title">核心框架</div>
+                        <div class="tech-items">
+                            <div class="tech-item core-item">React 18</div>
+                            <div class="tech-item core-item">React DOM 18</div>
+                            <div class="tech-item core-item">React Router 6.18</div>
+                            <div class="tech-item core-item">Umijs Max 4.3.31</div>
+                            <div class="tech-item core-item">TypeScript</div>
+                        </div>
+                    </div>
                 
-                <!-- 核心框架 -->
-                <div class="tech-category">
-                    <div class="tech-title">核心框架</div>
-                    <div class="tech-items">
-                        <div class="tech-item core-item">React 18</div>
-                        <div class="tech-item core-item">React DOM 18</div>
-                        <div class="tech-item core-item">React Router 6.18</div>
-                        <div class="tech-item core-item">Umijs Max 4.3.31</div>
-                        <div class="tech-item core-item">TypeScript</div>
+                    <!-- UI 组件和样式 -->
+                    <div class="tech-category">
+                        <div class="tech-title">UI 组件和样式</div>
+                        <div class="tech-items">
+                            <div class="tech-item ui-item">Ant Design 5.23.2</div>
+                            <div class="tech-item ui-item">Ant Design Pro Components</div>
+                            <div class="tech-item ui-item">Ant Design Pro Form</div>
+                            <div class="tech-item ui-item">Ant Design Icons</div>
+                            <div class="tech-item ui-item">Ant Design Pro Chat</div>
+                            <div class="tech-item ui-item">Emotion</div>
+                            <div class="tech-item ui-item">Antd Style</div>
+                            <div class="tech-item ui-item">ClassNames</div>
+                            <div class="tech-item ui-item">RC Menu</div>
+                            <div class="tech-item ui-item">Antd-img-crop</div>
+                        </div>
+                    </div>
+                
+                    <!-- 图表和可视化 -->
+                    <div class="tech-category">
+                        <div class="tech-title">图表和可视化</div>
+                        <div class="tech-items">
+                            <div class="tech-item chart-item">@ant-design/charts 2.2.7</div>
+                            <div class="tech-item chart-item">@antv/x6 2.18.1</div>
+                            <div class="tech-item chart-item">GIF 组件</div>
+                        </div>
+                    </div>
+                
+                    <!-- 状态管理 -->
+                    <div class="tech-category">
+                        <div class="tech-title">状态管理和钩子</div>
+                        <div class="tech-items">
+                            <div class="tech-item state-item">Zustand 4.4.4</div>
+                            <div class="tech-item state-item">ahooks 3.8.0</div>
+                            <div class="tech-item state-item">@use-gesture/react</div>
+                            <div class="tech-item state-item">@react-spring/web</div>
+                            <div class="tech-item state-item">use-debounce</div>
+                            <div class="tech-item state-item">React Hooks</div>
+                        </div>
+                    </div>
+                
+                    <!-- 网络和通讯 -->
+                    <div class="tech-category">
+                        <div class="tech-title">网络和通讯</div>
+                        <div class="tech-items">
+                            <div class="tech-item networking-item">Axios 1.7.7</div>
+                            <div class="tech-item networking-item">MQTT 5.10.0</div>
+                            <div class="tech-item networking-item">event-source-polyfill</div>
+                            <div class="tech-item networking-item">bytedesk-web</div>
+                            <div class="tech-item networking-item">google-protobuf</div>
+                        </div>
+                    </div>
+                
+                    <!-- 工具和实用程序 -->
+                    <div class="tech-category">
+                        <div class="tech-title">工具和实用程序</div>
+                        <div class="tech-items">
+                            <div class="tech-item util-item">Lodash 4.17.21</div>
+                            <div class="tech-item util-item">Dayjs 1.11.11</div>
+                            <div class="tech-item util-item">Moment 2.29.4</div>
+                            <div class="tech-item util-item">UUID 10.0.0</div>
+                            <div class="tech-item util-item">Mitt 3.0.1</div>
+                            <div class="tech-item util-item">Debug 4.3.7</div>
+                            <div class="tech-item util-item">Color 4.2.3</div>
+                        </div>
+                    </div>
+                
+                    <!-- 特殊功能 -->
+                    <div class="tech-category">
+                        <div class="tech-title">特殊功能组件</div>
+                        <div class="tech-items">
+                            <div class="tech-item ui-item">AIEditor 1.0.13</div>
+                            <div class="tech-item ui-item">React Markdown Editor</div>
+                            <div class="tech-item ui-item">React Email Editor</div>
+                            <div class="tech-item ui-item">React JS Cron</div>
+                            <div class="tech-item ui-item">RC Resize Observer</div>
+                        </div>
+                    </div>
+                
+                    <!-- 开发工具 -->
+                    <div class="tech-category">
+                        <div class="tech-title">开发工具</div>
+                        <div class="tech-items">
+                            <div class="tech-item util-item">ESLint</div>
+                            <div class="tech-item util-item">Prettier</div>
+                            <div class="tech-item util-item">Jest</div>
+                            <div class="tech-item util-item">TypeScript</div>
+                            <div class="tech-item util-item">Lint Staged</div>
+                            <div class="tech-item util-item">Cross Env</div>
+                            <div class="tech-item util-item">MockJS</div>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- UI 组件和样式 -->
-                <div class="tech-category">
-                    <div class="tech-title">UI 组件和样式</div>
-                    <div class="tech-items">
-                        <div class="tech-item ui-item">Ant Design 5.23.2</div>
-                        <div class="tech-item ui-item">Ant Design Pro Components</div>
-                        <div class="tech-item ui-item">Ant Design Pro Form</div>
-                        <div class="tech-item ui-item">Ant Design Icons</div>
-                        <div class="tech-item ui-item">Ant Design Pro Chat</div>
-                        <div class="tech-item ui-item">Emotion</div>
-                        <div class="tech-item ui-item">Antd Style</div>
-                        <div class="tech-item ui-item">ClassNames</div>
-                        <div class="tech-item ui-item">RC Menu</div>
-                        <div class="tech-item ui-item">Antd-img-crop</div>
+
+                <div id="frontend-stack-v2" class="stack-tab-content">
+                    <p>2.x 前端以 Turbo + pnpm workspace 管理多应用，围绕 React 19、Vite 8、Ant Design 6 和 React Router 7 构建，并按场景扩展桌面端、流程设计、实时通讯与 AI 协同能力。</p>
+
+                    <div class="tech-category">
+                        <div class="tech-title">工作区与构建基座</div>
+                        <div class="tech-items">
+                            <div class="tech-item workspace-item">Turbo 2.9.6</div>
+                            <div class="tech-item workspace-item">pnpm 8.15.6 Workspace</div>
+                            <div class="tech-item workspace-item">Node.js 20+</div>
+                            <div class="tech-item workspace-item">Vite 8.0.8</div>
+                            <div class="tech-item workspace-item">@vitejs/plugin-react 6.0.1</div>
+                            <div class="tech-item workspace-item">TypeScript 6.0.3</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 图表和可视化 -->
-                <div class="tech-category">
-                    <div class="tech-title">图表和可视化</div>
-                    <div class="tech-items">
-                        <div class="tech-item chart-item">@ant-design/charts 2.2.7</div>
-                        <div class="tech-item chart-item">@antv/x6 2.18.1</div>
-                        <div class="tech-item chart-item">GIF 组件</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">核心框架与路由</div>
+                        <div class="tech-items">
+                            <div class="tech-item core-item">React 19.2.5</div>
+                            <div class="tech-item core-item">React DOM 19.2.5</div>
+                            <div class="tech-item core-item">React Router 7.14.1</div>
+                            <div class="tech-item core-item">多应用矩阵: admin / desktop / visitor / workflow / meet / datav / remote</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 状态管理 -->
-                <div class="tech-category">
-                    <div class="tech-title">状态管理和钩子</div>
-                    <div class="tech-items">
-                        <div class="tech-item state-item">Zustand 4.4.4</div>
-                        <div class="tech-item state-item">ahooks 3.8.0</div>
-                        <div class="tech-item state-item">@use-gesture/react</div>
-                        <div class="tech-item state-item">@react-spring/web</div>
-                        <div class="tech-item state-item">use-debounce</div>
-                        <div class="tech-item state-item">React Hooks</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">UI 组件与交互层</div>
+                        <div class="tech-items">
+                            <div class="tech-item ui-item">Ant Design 6.3.6</div>
+                            <div class="tech-item ui-item">Ant Design Pro Components 3.1.12</div>
+                            <div class="tech-item ui-item">Ant Design X 2.6.0</div>
+                            <div class="tech-item ui-item">Ant Design Icons 6.1.1</div>
+                            <div class="tech-item ui-item">Antd Style 3.6.2</div>
+                            <div class="tech-item ui-item">Emotion 11.14.x</div>
+                            <div class="tech-item ui-item">Styled Components 6.4.0</div>
+                            <div class="tech-item ui-item">Emoji Mart 5.6.0</div>
+                            <div class="tech-item ui-item">React Photo View 1.2.6</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 网络和通讯 -->
-                <div class="tech-category">
-                    <div class="tech-title">网络和通讯</div>
-                    <div class="tech-items">
-                        <div class="tech-item networking-item">Axios 1.7.7</div>
-                        <div class="tech-item networking-item">MQTT 5.10.0</div>
-                        <div class="tech-item networking-item">event-source-polyfill</div>
-                        <div class="tech-item networking-item">bytedesk-web</div>
-                        <div class="tech-item networking-item">google-protobuf</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">状态、数据与本地存储</div>
+                        <div class="tech-items">
+                            <div class="tech-item state-item">Zustand 5.0.12</div>
+                            <div class="tech-item state-item">Immer 11.1.4</div>
+                            <div class="tech-item state-item">TanStack React Query 5.99.2</div>
+                            <div class="tech-item state-item">Dexie 4.4.2</div>
+                            <div class="tech-item state-item">use-debounce 10.1.1</div>
+                            <div class="tech-item state-item">Mitt 3.0.1</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 工具和实用程序 -->
-                <div class="tech-category">
-                    <div class="tech-title">工具和实用程序</div>
-                    <div class="tech-items">
-                        <div class="tech-item util-item">Lodash 4.17.21</div>
-                        <div class="tech-item util-item">Dayjs 1.11.11</div>
-                        <div class="tech-item util-item">Moment 2.29.4</div>
-                        <div class="tech-item util-item">UUID 10.0.0</div>
-                        <div class="tech-item util-item">Mitt 3.0.1</div>
-                        <div class="tech-item util-item">Debug 4.3.7</div>
-                        <div class="tech-item util-item">Color 4.2.3</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">网络、消息与实时协同</div>
+                        <div class="tech-items">
+                            <div class="tech-item realtime-item">Axios 1.15.0</div>
+                            <div class="tech-item realtime-item">bytedesk-web 1.9.1</div>
+                            <div class="tech-item realtime-item">MQTT 5.15.1</div>
+                            <div class="tech-item realtime-item">Socket.IO 4.7.5</div>
+                            <div class="tech-item realtime-item">STOMP 7.0.0</div>
+                            <div class="tech-item realtime-item">SockJS Client 1.6.1</div>
+                            <div class="tech-item realtime-item">google-protobuf 4.0.2</div>
+                            <div class="tech-item realtime-item">WebSocket/ws</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 特殊功能 -->
-                <div class="tech-category">
-                    <div class="tech-title">特殊功能组件</div>
-                    <div class="tech-items">
-                        <div class="tech-item ui-item">AIEditor 1.0.13</div>
-                        <div class="tech-item ui-item">React Markdown Editor</div>
-                        <div class="tech-item ui-item">React Email Editor</div>
-                        <div class="tech-item ui-item">React JS Cron</div>
-                        <div class="tech-item ui-item">RC Resize Observer</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">图表、流程与可视化设计</div>
+                        <div class="tech-items">
+                            <div class="tech-item chart-item">@ant-design/charts 2.6.7</div>
+                            <div class="tech-item chart-item">@antv/x6 2.18.1</div>
+                            <div class="tech-item chart-item">Flowgram AI Editor 1.0.11</div>
+                            <div class="tech-item chart-item">XYFlow React 12.10.2</div>
+                            <div class="tech-item chart-item">BPMN.js 18.14.0</div>
+                            <div class="tech-item chart-item">BPMN Properties Panel 5.53.0</div>
+                            <div class="tech-item chart-item">Dnd Kit 6.x / 8.x</div>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- 开发工具 -->
-                <div class="tech-category">
-                    <div class="tech-title">开发工具</div>
-                    <div class="tech-items">
-                        <div class="tech-item util-item">ESLint</div>
-                        <div class="tech-item util-item">Prettier</div>
-                        <div class="tech-item util-item">Jest</div>
-                        <div class="tech-item util-item">TypeScript</div>
-                        <div class="tech-item util-item">Lint Staged</div>
-                        <div class="tech-item util-item">Cross Env</div>
-                        <div class="tech-item util-item">MockJS</div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">桌面端与音视频能力</div>
+                        <div class="tech-items">
+                            <div class="tech-item desktop-item">Electron 41.2.1</div>
+                            <div class="tech-item desktop-item">Electron Builder 26.8.1</div>
+                            <div class="tech-item desktop-item">vite-plugin-electron</div>
+                            <div class="tech-item desktop-item">Janus Gateway 1.4.0</div>
+                            <div class="tech-item desktop-item">PeerJS 1.5.2</div>
+                            <div class="tech-item desktop-item">SIP.js / JsSIP</div>
+                            <div class="tech-item desktop-item">WebRTC Adapter 9.0.5</div>
+                            <div class="tech-item desktop-item">XGPlayer 3.0.24</div>
+                        </div>
+                    </div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">文档、AI 与内容处理</div>
+                        <div class="tech-items">
+                            <div class="tech-item ai-item">OpenAI SDK 6.34.0</div>
+                            <div class="tech-item ai-item">AIEditor 1.4.0</div>
+                            <div class="tech-item ai-item">React Markdown 10.1.0</div>
+                            <div class="tech-item ai-item">Remark GFM / Math</div>
+                            <div class="tech-item ai-item">Rehype KaTeX 7.0.1</div>
+                            <div class="tech-item ai-item">React Email Editor 1.8.0</div>
+                            <div class="tech-item ai-item">Docx Preview 0.3.5</div>
+                            <div class="tech-item ai-item">Mammoth / PDF.js / React PDF</div>
+                        </div>
+                    </div>
+
+                    <div class="tech-category">
+                        <div class="tech-title">工程化与测试</div>
+                        <div class="tech-items">
+                            <div class="tech-item engineering-item">ESLint 9.39.4</div>
+                            <div class="tech-item engineering-item">Prettier 3.8.3</div>
+                            <div class="tech-item engineering-item">Jest 30.3.0</div>
+                            <div class="tech-item engineering-item">Testing Library 16.3.2</div>
+                            <div class="tech-item engineering-item">Playwright 1.59.1</div>
+                            <div class="tech-item engineering-item">Cross Env 10.1.0</div>
+                            <div class="tech-item engineering-item">PostCSS / Autoprefixer</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2518,10 +2704,28 @@
             document.getElementById(tabName).style.display = 'block';
             event.currentTarget.classList.add('active');
         }
+
+        function openFrontendStackTab(tabName, button) {
+            const stackContents = document.getElementsByClassName('stack-tab-content');
+            for (let i = 0; i < stackContents.length; i++) {
+                stackContents[i].style.display = 'none';
+            }
+
+            const stackButtons = document.getElementsByClassName('stack-tab-button');
+            for (let i = 0; i < stackButtons.length; i++) {
+                stackButtons[i].classList.remove('active');
+            }
+
+            document.getElementById(tabName).style.display = 'block';
+            if (button) {
+                button.classList.add('active');
+            }
+        }
         
         // Initialize with Chinese by default
         document.addEventListener('DOMContentLoaded', function() {
             switchLanguage('zh');
+            openFrontendStackTab('frontend-stack-v1', document.querySelector('.stack-tab-button'));
         });
     </script>
 </body>

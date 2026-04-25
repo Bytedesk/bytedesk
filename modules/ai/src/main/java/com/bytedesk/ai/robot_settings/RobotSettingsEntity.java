@@ -33,7 +33,8 @@ import lombok.experimental.SuperBuilder;
  * - Simplify robot configuration management
  * 
  * Usage:
- * - Create settings for different robot types (e.g., "FAQ Robot", "Customer Service Robot", "Sales Robot")
+ * - Create settings for different robot types (e.g., "FAQ Robot", "Customer
+ * Service Robot", "Sales Robot")
  * - Assign settings to robots via RobotEntity.settings reference
  * - Multiple robots can share the same settings
  * 
@@ -53,39 +54,40 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(
-    name = "bytedesk_ai_robot_settings",
-    indexes = {
+@Table(name = "bytedesk_ai_robot_settings", indexes = {
         @Index(name = "idx_robot_settings_org", columnList = "org_uid"),
         @Index(name = "idx_robot_settings_default", columnList = "is_default")
-    }
-)
+})
 public class RobotSettingsEntity extends BaseSettingsEntity {
 
     private static final long serialVersionUID = 1L;
 
-        /**
+    /**
      * Rating down settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
     private RatedownSettingsEntity rateDownSettings;
 
     /**
      * Draft Rating down settings
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
     private RatedownSettingsEntity draftRateDownSettings;
 
     /**
      * Spring AI tools orchestration (published)
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
     private RobotToolsSettingsEntity toolsSettings;
 
     /**
      * Spring AI tools orchestration draft
      */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
     private RobotToolsSettingsEntity draftToolsSettings;
-    
+
 }

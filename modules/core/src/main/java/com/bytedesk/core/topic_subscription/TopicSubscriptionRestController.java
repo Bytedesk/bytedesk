@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @Description("TopicSubscription Management Controller - Content topic_subscriptionging and categorization APIs")
 public class TopicSubscriptionRestController extends BaseRestController<TopicSubscriptionRequest, TopicSubscriptionRestService> {
 
-    private final TopicSubscriptionRestService topic_subscriptionRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     @ActionAnnotation(title = I18Consts.I18N_TOPIC_SUBSCRIPTION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query topic_subscription by org")
     @Operation(summary = "Query TopicSubscriptions by Organization", description = "Retrieve topic_subscriptions for the current organization")
@@ -49,7 +49,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TopicSubscriptionRequest request) {
         
-        Page<TopicSubscriptionResponse> topic_subscriptions = topic_subscriptionRestService.queryByOrg(request);
+        Page<TopicSubscriptionResponse> topic_subscriptions = topicSubscriptionRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(topic_subscriptions));
     }
@@ -61,7 +61,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TopicSubscriptionRequest request) {
         
-        Page<TopicSubscriptionResponse> topic_subscriptions = topic_subscriptionRestService.queryByUser(request);
+        Page<TopicSubscriptionResponse> topic_subscriptions = topicSubscriptionRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(topic_subscriptions));
     }
@@ -73,7 +73,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TopicSubscriptionRequest request) {
         
-        TopicSubscriptionResponse topic_subscription = topic_subscriptionRestService.queryByUid(request);
+        TopicSubscriptionResponse topic_subscription = topicSubscriptionRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(topic_subscription));
     }
@@ -85,7 +85,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody TopicSubscriptionRequest request) {
         
-        TopicSubscriptionResponse topic_subscription = topic_subscriptionRestService.create(request);
+        TopicSubscriptionResponse topic_subscription = topicSubscriptionRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(topic_subscription));
     }
@@ -97,9 +97,36 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody TopicSubscriptionRequest request) {
         
-        TopicSubscriptionResponse topic_subscription = topic_subscriptionRestService.update(request);
+        TopicSubscriptionResponse topic_subscription = topicSubscriptionRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(topic_subscription));
+    }
+
+    @Operation(summary = "Check Topic Subscription", description = "Check whether current user subscribed to the specified topic")
+    @GetMapping("/is/subscribed")
+    public ResponseEntity<?> isSubscribed(TopicSubscriptionRequest request) {
+
+        Boolean isSubscribed = topicSubscriptionRestService.isSubscribed(request);
+
+        return ResponseEntity.ok(JsonResult.success(isSubscribed));
+    }
+
+    @Operation(summary = "Subscribe Topic", description = "Subscribe to the specified topic")
+    @PostMapping("/subscribe")
+    public ResponseEntity<?> subscribe(@RequestBody TopicSubscriptionRequest request) {
+
+        topicSubscriptionRestService.subscribe(request);
+
+        return ResponseEntity.ok(JsonResult.success("订阅主题成功"));
+    }
+
+    @Operation(summary = "Unsubscribe Topic", description = "Unsubscribe from the specified topic")
+    @PostMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(@RequestBody TopicSubscriptionRequest request) {
+
+        topicSubscriptionRestService.unsubscribe(request);
+
+        return ResponseEntity.ok(JsonResult.success("取消订阅主题成功"));
     }
 
     @ActionAnnotation(title = I18Consts.I18N_TOPIC_SUBSCRIPTION, action = I18Consts.I18N_ACTION_DELETE, description = "delete topic_subscription")
@@ -109,7 +136,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody TopicSubscriptionRequest request) {
         
-        topic_subscriptionRestService.delete(request);
+        topicSubscriptionRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -123,7 +150,7 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
         return exportTemplate(
             request,
             response,
-            topic_subscriptionRestService,
+            topicSubscriptionRestService,
             TopicSubscriptionExcel.class,
             "TopicSubscription",
             "topic_subscription"

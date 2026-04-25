@@ -15,6 +15,7 @@ package com.bytedesk.core.category;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Objects;
@@ -150,6 +151,41 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     public List<CategoryEntity> findByKbUid(String kbUid) {
         return categoryRepository.findByKbUidAndDeletedFalse(kbUid);
+    }
+
+    public List<String> collectSelfAndDescendantUids(String categoryUid) {
+        if (!StringUtils.hasText(categoryUid)) {
+            return List.of();
+        }
+
+        return findByUid(categoryUid)
+                .map(this::collectSelfAndDescendantUids)
+                .orElse(List.of());
+    }
+
+    public List<String> collectSelfAndDescendantUids(CategoryEntity category) {
+        if (category == null || !StringUtils.hasText(category.getUid()) || category.isDeleted()) {
+            return List.of();
+        }
+
+        Set<String> categoryUids = new LinkedHashSet<>();
+        collectSelfAndDescendantUids(category, categoryUids);
+        return List.copyOf(categoryUids);
+    }
+
+    private void collectSelfAndDescendantUids(CategoryEntity category, Set<String> categoryUids) {
+        if (category == null || !StringUtils.hasText(category.getUid()) || category.isDeleted()) {
+            return;
+        }
+
+        categoryUids.add(category.getUid());
+        if (category.getChildren() == null || category.getChildren().isEmpty()) {
+            return;
+        }
+
+        category.getChildren().stream()
+                .filter(Objects::nonNull)
+                .forEach(child -> collectSelfAndDescendantUids(child, categoryUids));
     }
 
     public Boolean existsByUid(String uid) {

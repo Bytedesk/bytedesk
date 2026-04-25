@@ -76,8 +76,12 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
      */
     public Page<TResponse> queryByUser(TRequest request) {
         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotFoundException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
         
         setUserUidToRequest(request, user.getUid());
+        setOrgUidToRequestIfMissing(request, user.getOrgUid());
         return queryByOrg(request);
     }
 
@@ -116,6 +120,18 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
             setUserUidMethod.invoke(request, userUid);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Method setUserUid not found in request class: " + request.getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * 在用户维度查询中，自动继承当前登录用户所属组织，避免前端遗漏 orgUid 时触发基础组织校验。
+     */
+    protected void setOrgUidToRequestIfMissing(TRequest request, String orgUid) {
+        if (!(request instanceof BaseRequest baseRequest)) {
+            return;
+        }
+        if (baseRequest.getOrgUid() == null || baseRequest.getOrgUid().isBlank()) {
+            baseRequest.setOrgUid(orgUid);
         }
     }
 

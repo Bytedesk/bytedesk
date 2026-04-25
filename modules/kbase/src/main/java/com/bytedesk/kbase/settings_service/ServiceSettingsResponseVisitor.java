@@ -158,6 +158,11 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private String messageLeaveForm;
 
     /**
+     * 客服离线时是否允许访客继续发送消息。
+     */
+    private Boolean messageLeaveAllowVisitorSendWhenOffline;
+
+    /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）
      */
     private Boolean messageLeaveCustomFormEnabled;

@@ -15,6 +15,7 @@ package com.bytedesk.service.visitor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,7 +28,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Description;
@@ -61,6 +65,8 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
+    private final PlatformTransactionManager transactionManager;
+
     @Override
     protected Specification<VisitorEntity> createSpecification(VisitorRequest request) {
         return VisitorSpecification.search(request, authService);
@@ -71,7 +77,6 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.findAll(spec, pageable);
     }
 
-    @Transactional
     @Override
     public VisitorResponse create(VisitorRequest request) {
         String visitorUid = StringUtils.hasText(request.getVisitorUid()) ? request.getVisitorUid().trim() : null;
@@ -82,43 +87,15 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
                 : Optional.empty();
         if (visitorOptional.isPresent()) {
             VisitorEntity visitor = visitorOptional.get();
-            // 如果访客信息已存在，则更新访客信息
-            if (StringUtils.hasText(request.getNickname())) {
-                visitor.setNickname(request.getNickname());
-            }
-            if (StringUtils.hasText(request.getAvatar())) {
-                visitor.setAvatar(request.getAvatar());
-            }
-            if (StringUtils.hasText(request.getMobile())) {
-                visitor.setMobile(request.getMobile());
-            }
-            if (StringUtils.hasText(request.getEmail())) {
-                visitor.setEmail(request.getEmail());
-            }
-            if (StringUtils.hasText(request.getNote())) {
-                visitor.setNote(request.getNote());
-            }
+            applyRequestToVisitor(visitor, request);
 
-            // 用户自定义字段：允许前端按需更新
-            if (request.getCustomFieldList() != null) {
-                visitor.setCustomFieldList(request.getCustomFieldList());
+            VisitorEntity savedVisitor;
+            try {
+                savedVisitor = executeInNewTransaction(() -> visitorRepository.saveAndFlush(visitor));
+            } catch (ObjectOptimisticLockingFailureException e) {
+                log.warn("visitor optimistic lock conflict for visitorUid {}, retrying with latest row", visitorUid);
+                savedVisitor = retrySaveExistingVisitor(visitorUid, orgUid, request, e);
             }
-            // 对比ip是否有变化
-            if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
-                // 更新浏览信息
-                visitor.setIp(request.getIp());
-                visitor.setIpLocation(request.getIpLocation());
-            }
-            visitor.setVipLevel(request.getVipLevel());
-            if (visitor.getDeviceInfo() == null) {
-                visitor.setDeviceInfo(new VisitorDevice());
-            }
-            visitor.getDeviceInfo().setBrowser(request.getBrowser());
-            visitor.getDeviceInfo().setOs(request.getOs());
-            visitor.getDeviceInfo().setDevice(request.getDevice());
-            visitor.setExtra(request.getExtra());
-            // 
-            VisitorEntity savedVisitor = save(visitor);
             if (savedVisitor == null) {
                 throw new RuntimeException("visitor not saved");
             }
@@ -140,13 +117,12 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         VisitorEntity visitor = modelMapper.map(request, VisitorEntity.class);
         VisitorDevice device = modelMapper.map(request, VisitorDevice.class);
         visitor.setDeviceInfo(device);
-        //
         VisitorEntity savedVisitor;
         try {
-            savedVisitor = save(visitor);
+            savedVisitor = executeInNewTransaction(() -> visitorRepository.saveAndFlush(visitor));
         } catch (DataIntegrityViolationException e) {
             // 并发场景：两个请求同时 create，同一个 visitorUid+orgUid，后写会触发唯一键冲突。
-            // 这里回查并返回已有记录，保证 visitor init 幂等。
+            // 在独立事务里回查已有记录，避免复用失败事务中的持久化上下文。
             Optional<VisitorEntity> existing = findByVisitorUidAndOrgUid(request.getVisitorUid(), orgUid);
             if (existing.isPresent()) {
                 return convertToResponse(existing.get());
@@ -158,6 +134,56 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         }
         //
         return convertToResponse(savedVisitor);
+    }
+
+    private void applyRequestToVisitor(VisitorEntity visitor, VisitorRequest request) {
+        if (StringUtils.hasText(request.getNickname())) {
+            visitor.setNickname(request.getNickname());
+        }
+        if (StringUtils.hasText(request.getAvatar())) {
+            visitor.setAvatar(request.getAvatar());
+        }
+        if (StringUtils.hasText(request.getMobile())) {
+            visitor.setMobile(request.getMobile());
+        }
+        if (StringUtils.hasText(request.getEmail())) {
+            visitor.setEmail(request.getEmail());
+        }
+        if (StringUtils.hasText(request.getNote())) {
+            visitor.setNote(request.getNote());
+        }
+
+        if (request.getCustomFieldList() != null) {
+            visitor.setCustomFieldList(request.getCustomFieldList());
+        }
+        if (visitor.getIp() == null || !visitor.getIp().equals(request.getIp())) {
+            visitor.setIp(request.getIp());
+            visitor.setIpLocation(request.getIpLocation());
+        }
+        visitor.setVipLevel(request.getVipLevel());
+        if (visitor.getDeviceInfo() == null) {
+            visitor.setDeviceInfo(new VisitorDevice());
+        }
+        visitor.getDeviceInfo().setBrowser(request.getBrowser());
+        visitor.getDeviceInfo().setOs(request.getOs());
+        visitor.getDeviceInfo().setDevice(request.getDevice());
+        visitor.setExtra(request.getExtra());
+    }
+
+    private VisitorEntity retrySaveExistingVisitor(String visitorUid, String orgUid, VisitorRequest request,
+            ObjectOptimisticLockingFailureException originalException) {
+        return executeInNewTransaction(() -> {
+            VisitorEntity latest = visitorRepository.findByVisitorUidAndOrgUidAndDeleted(visitorUid, orgUid, false)
+                    .orElseThrow(() -> originalException);
+            applyRequestToVisitor(latest, request);
+            return visitorRepository.saveAndFlush(latest);
+        });
+    }
+
+    private VisitorEntity executeInNewTransaction(Supplier<VisitorEntity> action) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return transactionTemplate.execute(status -> action.get());
     }
 
     @Transactional

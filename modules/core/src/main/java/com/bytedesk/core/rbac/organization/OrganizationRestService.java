@@ -30,12 +30,10 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.ExistsException;
-import com.bytedesk.core.exception.ForbiddenException;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -72,10 +70,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setVipExpireDate(OrganizationDefaults.resolveDefaultVipExpireDate(bytedeskProperties, defaultVipLevel));
     }
 
-    private boolean isDefaultOrganization(OrganizationEntity organization) {
-        return organization != null && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid());
-    }
-    
     private void applyOrganizationLimitsDefaults(OrganizationEntity organization) {
         if (organization.getMaxMembers() == null) {
             organization.setMaxMembers(resolveDefaultMaxMembers());
@@ -128,13 +122,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     private void assertOwnerOrPrivileged(OrganizationEntity organization) {
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         if (isPlatformSuper(authUser)) {
             return;
         }
         if (organization.getUser() == null || !authUser.getUid().equals(organization.getUser().getUid())) {
-            throw new ForbiddenException("no permission to access this organization");
+            throw OrganizationI18nExceptions.organizationAccessDenied();
         }
     }
 
@@ -167,7 +161,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public Page<OrganizationResponse> queryByUser(OrganizationRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("请先登录");
+            throw CommonI18nExceptions.loginRequired();
         }
 
         // 防止前端伪造 isSuperUser 标志：只有真正的超级管理员才能生效
@@ -195,7 +189,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public Page<OrganizationResponseSimple> searchForJoin(OrganizationRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("请先登录");
+            throw CommonI18nExceptions.loginRequired();
         }
 
         Pageable pageable = request.getPageable();
@@ -210,19 +204,19 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public OrganizationResponse create(OrganizationRequest request) {
         //
         if (existsByName(request.getName())) {
-            throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
+            throw OrganizationI18nExceptions.organizationNameExists(request.getName());
         }
         if (existsByCode(request.getCode())) {
-            throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
+            throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
         }
         //
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         // 
         UserEntity user = userService.findByUid(authUser.getUid())
-                .orElseThrow(() -> new NotFoundException("用户不存在."));
+                .orElseThrow(ResourceI18nExceptions::userNotFound);
         String orgUid = uidUtils.getUid();
         //
         OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
@@ -241,15 +235,15 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                     request.getName(), request.getCode(), authUser.getUid(), e);
 
             if (StringUtils.hasText(request.getName()) && existsByName(request.getName())) {
-                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称后重试。");
+                throw OrganizationI18nExceptions.organizationNameExists(request.getName());
             }
             if (StringUtils.hasText(request.getCode()) && existsByCode(request.getCode())) {
-                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在，请修改组织代码后重试。");
+                throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
             }
-            throw new ExistsException("创建组织失败：组织名称/代码已存在或不符合约束，请修改后重试。");
+            throw OrganizationI18nExceptions.organizationCreateConstraintFailed();
         }
         if (savedOrganization == null) {
-            throw new RuntimeException("Failed to create organization.");
+            throw CommonI18nExceptions.createFailed();
         }
         user.setCurrentOrganization(savedOrganization);
         userService.addRoleAdmin(user);
@@ -263,17 +257,17 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         if (!authUser.isSuperUser()) {
-            throw new ForbiddenException("super admin required");
+            throw OrganizationI18nExceptions.superAdminRequired();
         }
         //
         if (existsByName(request.getName())) {
-            throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
+            throw OrganizationI18nExceptions.organizationNameExists(request.getName());
         }
         if (existsByCode(request.getCode())) {
-            throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
+            throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
         }
         // 
         OrganizationEntity organization = modelMapper.map(request, OrganizationEntity.class);
@@ -291,7 +285,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 使用 userUid 查询用户
         if (StringUtils.hasText(request.getUserUid())) {
             UserEntity user = userService.findByUid(request.getUserUid())
-                    .orElseThrow(() -> new NotFoundException("用户不存在."));
+                .orElseThrow(ResourceI18nExceptions::userNotFound);
             organization.setUser(user);
             
         }
@@ -304,15 +298,15 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                     request.getName(), request.getCode(), authUser.getUid(), e);
 
             if (StringUtils.hasText(request.getName()) && existsByName(request.getName())) {
-                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称后重试。");
+                throw OrganizationI18nExceptions.organizationNameExists(request.getName());
             }
             if (StringUtils.hasText(request.getCode()) && existsByCode(request.getCode())) {
-                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在，请修改组织代码后重试。");
+                throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
             }
-            throw new ExistsException("创建组织失败：组织名称/代码已存在或不符合约束，请修改后重试。");
+            throw OrganizationI18nExceptions.organizationCreateConstraintFailed();
         }
         if (savedOrganization == null) {
-            throw new RuntimeException("Failed to create organization.");
+            throw CommonI18nExceptions.createFailed();
         }
         if (savedOrganization.getUser() != null) {
             savedOrganization.getUser().setCurrentOrganization(savedOrganization);
@@ -328,7 +322,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {
             // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
-            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
+            throw OrganizationI18nExceptions.organizationNotFound(request.getUid());
         }
 
         // 获取要更新的组织实体
@@ -340,14 +334,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(request.getName())) {
             if (organizationRepository.existsByNameAndDeletedAndUidNot(request.getName(), false, request.getUid())) {
-                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
+                throw OrganizationI18nExceptions.organizationNameExists(request.getName());
             }
         }
         
         // 检查 code 唯一性（排除当前组织）
         if (!organization.getCode().equals(request.getCode())) {
             if (organizationRepository.existsByCodeAndDeletedAndUidNot(request.getCode(), false, request.getUid())) {
-                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
+                throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
             }
         }
         
@@ -367,7 +361,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
         if (updatedOrganization == null) {
-            throw new RuntimeException("Failed to update organization.");
+            throw CommonI18nExceptions.updateFailed();
         }
         
         // 转换为响应对象
@@ -378,7 +372,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     public OrganizationResponse queryByUid(OrganizationRequest request) {
         Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {
-            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
+            throw OrganizationI18nExceptions.organizationNotFound(request.getUid());
         }
         OrganizationEntity organization = organizationOptional.get();
 
@@ -394,41 +388,32 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
         if (!organizationOptional.isPresent()) {
             // 如果组织不存在，可以抛出一个自定义异常，例如OrganizationNotFoundException
-            throw new NotFoundException("Organization with UID: " + request.getUid() + " not found.");
+            throw OrganizationI18nExceptions.organizationNotFound(request.getUid());
         }
 
         // 获取要更新的组织实体
         OrganizationEntity organization = organizationOptional.get();
 
-        // 默认组织：不允许设置“过期/禁用”相关字段（后端兜底）
-        if (isDefaultOrganization(organization)) {
+        // 与前端一致：超级用户组织不允许禁用，但允许更新默认组织的其他设置。
+        boolean superUserOrganization = organization.getUser() != null && organization.getUser().isSuperUser();
+        if (superUserOrganization) {
             boolean enabledChanged = request.getEnabled() != null && !Objects.equals(request.getEnabled(), organization.getEnabled());
-            boolean vipChanged = request.getVip() != null && !Objects.equals(request.getVip(), organization.getVip());
-            boolean vipLevelChanged = request.getVipLevel() != null && !Objects.equals(request.getVipLevel(), organization.getVipLevel());
-            boolean vipExpireDateChanged = request.getVipExpireDate() != null
-                && !Objects.equals(request.getVipExpireDate(), organization.getVipExpireDate());
-            boolean vipExpireLoginCheckEnabledChanged = request.getVipExpireLoginCheckEnabled() != null
-                && !Objects.equals(request.getVipExpireLoginCheckEnabled(), organization.getVipExpireLoginCheckEnabled());
-
-            if (enabledChanged || vipChanged || vipLevelChanged || vipExpireDateChanged || vipExpireLoginCheckEnabledChanged) {
-            throw new ForbiddenException("默认组织不支持设置过期或禁用");
+            if (enabledChanged && Boolean.FALSE.equals(request.getEnabled())) {
+                throw OrganizationI18nExceptions.superUserOrganizationDisableDenied();
             }
-
-            // 历史数据兜底：确保默认组织始终启用
-            organization.setEnabled(true);
         }
         
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(request.getName())) {
             if (organizationRepository.existsByNameAndDeletedAndUidNot(request.getName(), false, request.getUid())) {
-                throw new ExistsException("组织名: " + request.getName() + " 已经存在，请修改组织名称.");
+                throw OrganizationI18nExceptions.organizationNameExists(request.getName());
             }
         }
         
         // 检查 code 唯一性（排除当前组织）
         if (!organization.getCode().equals(request.getCode())) {
             if (organizationRepository.existsByCodeAndDeletedAndUidNot(request.getCode(), false, request.getUid())) {
-                throw new ExistsException("组织代码: " + request.getCode() + " 已经存在。");
+                throw OrganizationI18nExceptions.organizationCodeExists(request.getCode());
             }
         }
         
@@ -453,19 +438,18 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setVerifyStatus(request.getVerifyStatus());
         organization.setRejectReason(request.getRejectReason());
         // 
-        if (!isDefaultOrganization(organization)) {
-            organization.setVip(request.getVip());
-            if (request.getVipLevel() != null) {
-                organization.setVipLevel(Math.max(request.getVipLevel(), 0));
-            }
-            if (Boolean.FALSE.equals(organization.getVip())) {
-                organization.setVipLevel(0);
-            }
-            organization.setVipExpireDate(request.getVipExpireDate());
-            if (request.getVipExpireLoginCheckEnabled() != null) {
-                organization.setVipExpireLoginCheckEnabled(request.getVipExpireLoginCheckEnabled());
-            }
-            // 
+        organization.setVip(request.getVip());
+        if (request.getVipLevel() != null) {
+            organization.setVipLevel(Math.max(request.getVipLevel(), 0));
+        }
+        if (Boolean.FALSE.equals(organization.getVip())) {
+            organization.setVipLevel(0);
+        }
+        organization.setVipExpireDate(request.getVipExpireDate());
+        if (request.getVipExpireLoginCheckEnabled() != null) {
+            organization.setVipExpireLoginCheckEnabled(request.getVipExpireLoginCheckEnabled());
+        }
+        if (request.getEnabled() != null) {
             organization.setEnabled(request.getEnabled());
         }
         if (request.getMaxMembers() != null) {
@@ -484,14 +468,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         UserEntity newUser = null;
         if (StringUtils.hasText(request.getUserUid())) {
             newUser = userService.findByUid(request.getUserUid())
-                    .orElseThrow(() -> new NotFoundException("用户不存在."));
+                    .orElseThrow(ResourceI18nExceptions::userNotFound);
             organization.setUser(newUser);
         }
         
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
         if (updatedOrganization == null) {
-            throw new RuntimeException("Failed to update organization.");
+            throw CommonI18nExceptions.updateFailed();
         }
         
         // 处理用户组织和角色的更新
@@ -578,14 +562,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 // 检查 name 唯一性（排除当前组织）
                 if (!latestEntity.getName().equals(organization.getName())) {
                     if (organizationRepository.existsByNameAndDeletedAndUidNot(organization.getName(), false, organization.getUid())) {
-                        throw new ExistsException("组织名: " + organization.getName() + " 已经存在，请修改组织名称.");
+                        throw OrganizationI18nExceptions.organizationNameExists(organization.getName());
                     }
                 }
                 
                 // 检查 code 唯一性（排除当前组织）
                 if (!latestEntity.getCode().equals(organization.getCode())) {
                     if (organizationRepository.existsByCodeAndDeletedAndUidNot(organization.getCode(), false, organization.getUid())) {
-                        throw new ExistsException("组织代码: " + organization.getCode() + " 已经存在。");
+                        throw OrganizationI18nExceptions.organizationCodeExists(organization.getCode());
                     }
                 }
 
@@ -614,7 +598,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
             organization.setDeleted(true); // 逻辑删除
             save(organization);
         } else {
-            throw new NotFoundException("Organization with UID: " + uid + " not found.");
+            throw OrganizationI18nExceptions.organizationNotFound(uid);
         }
     }
 

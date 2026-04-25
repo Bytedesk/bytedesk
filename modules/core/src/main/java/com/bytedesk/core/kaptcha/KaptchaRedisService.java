@@ -62,6 +62,7 @@ public class KaptchaRedisService {
             if (normalizedChannel.contains(ChannelEnum.FLUTTER.name().toLowerCase(Locale.ROOT))
                     || normalizedChannel.contains(ChannelEnum.IOS.name().toLowerCase(Locale.ROOT))
                     || normalizedChannel.contains(ChannelEnum.ANDROID.name().toLowerCase(Locale.ROOT))
+                    || normalizedChannel.contains(ChannelEnum.WECHAT_MINI.name().toLowerCase(Locale.ROOT))
                     || normalizedChannel.contains(ChannelEnum.UNIAPP.name().toLowerCase(Locale.ROOT))) {
                 return true;
             }

@@ -132,6 +132,13 @@ public final class RoleAuthorityRules {
     public static final String ROOM_UPDATE = "ROOM_UPDATE";
     public static final String ROOM_DELETE = "ROOM_DELETE";
 
+    // notification (modules/notification)
+    public static final String NOTIFICATION_READ = "NOTIFICATION_READ";
+    // public static final String NOTIFICATION_CREATE = "NOTIFICATION_CREATE";
+    public static final String NOTIFICATION_UPDATE = "NOTIFICATION_UPDATE";
+    public static final String NOTIFICATION_DELETE = "NOTIFICATION_DELETE";
+    public static final String NOTIFICATION_EXPORT = "NOTIFICATION_EXPORT";
+
     // message_leave (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String MESSAGE_LEAVE_READ = "MESSAGE_LEAVE_READ";
@@ -146,6 +153,7 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String AGENT_READ = "AGENT_READ";
     public static final String AGENT_UPDATE = "AGENT_UPDATE";
+    public static final String AGENT_SEAT_READ = "AGENT_SEAT_READ";
 
     // agent_status (modules/service)
     // Keep as literals to avoid core -> service module dependency.
@@ -154,6 +162,9 @@ public final class RoleAuthorityRules {
     // 
     public static final String AGENT_SETTINGS_READ = "AGENT_SETTINGS_READ";
     public static final String AGENT_SETTINGS_UPDATE = "AGENT_SETTINGS_UPDATE";
+
+    // enterprise/call
+    public static final String CTI_READ = "CTI_READ";
 
     // queue (modules/service)
     // Keep as literals to avoid core -> service module dependency.
@@ -166,6 +177,9 @@ public final class RoleAuthorityRules {
     // workgroup (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String WORKGROUP_READ = "WORKGROUP_READ";
+
+    // topic_subscription (modules/core)
+    public static final String TOPIC_SUBSCRIPTION_READ = "TOPIC_SUBSCRIPTION_READ";
 
     // kbase (modules/kbase)
     // Keep as literals to avoid core -> kbase module dependency.
@@ -228,6 +242,7 @@ public final class RoleAuthorityRules {
             ORGANIZATION_CREATE,
             ORGANIZATION_READ,
             ORGANIZATION_UPDATE,
+            TOPIC_SUBSCRIPTION_READ,
             // 
             DEPARTMENT_READ,
             //
@@ -238,11 +253,19 @@ public final class RoleAuthorityRules {
             GROUP_CREATE,
             GROUP_UPDATE,
             GROUP_DELETE,
+            //
+            AGENT_SEAT_READ,
             // 
             ROOM_READ,
             ROOM_CREATE,
             ROOM_UPDATE,
-            ROOM_DELETE
+            ROOM_DELETE,
+            // 
+            NOTIFICATION_READ,
+            // NOTIFICATION_CREATE,
+            NOTIFICATION_UPDATE,
+            NOTIFICATION_DELETE,
+            NOTIFICATION_EXPORT
     );
 
     /**
@@ -256,11 +279,13 @@ public final class RoleAuthorityRules {
             // 
             AGENT_READ,
             AGENT_UPDATE,
+            AGENT_SEAT_READ,
             AGENT_STATUS_READ,
             AGENT_STATUS_CREATE,
             AGENT_SETTINGS_READ,
             AGENT_SETTINGS_UPDATE,
             // 
+            CTI_READ,
             QUEUE_READ,
             WORKGROUP_READ,
             ROUTING_POOL_READ,

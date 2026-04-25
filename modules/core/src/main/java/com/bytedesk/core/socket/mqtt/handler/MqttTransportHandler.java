@@ -219,7 +219,8 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
                 String normalized = message.toLowerCase(Locale.ROOT);
                 if (normalized.contains("connection reset")
                         || normalized.contains("broken pipe")
-                        || normalized.contains("forcibly closed")) {
+                        || normalized.contains("forcibly closed")
+                        || normalized.contains("timed out")) {
                     return true;
                 }
             }

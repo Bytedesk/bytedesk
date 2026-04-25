@@ -30,7 +30,11 @@ import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -207,11 +211,19 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
      * Mark (or create) a connection as connected.
      * clientId format recommendation: userUid/client/deviceUid
      */
+    @Retryable(
+        retryFor = {
+            CannotAcquireLockException.class,
+            PessimisticLockingFailureException.class
+        },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     @Transactional
     public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
         long now = System.currentTimeMillis();
         String resolvedOrgUid = resolveOrgUid(userUid, orgUid);
-        ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
+        ConnectionEntity entity = fetchConnection(clientId, () -> ConnectionEntity.builder()
             .uid(uidUtils.getUid())
             .userUid(userUid)
             .orgUid(resolvedOrgUid)
@@ -315,8 +327,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         }
     }
 
-    private ConnectionEntity fetchConnectionForUpdate(String clientId, Supplier<ConnectionEntity> creator) {
-        return connectionRepository.findByClientIdForUpdate(clientId).orElseGet(creator);
+    private ConnectionEntity fetchConnection(String clientId, Supplier<ConnectionEntity> creator) {
+        return connectionRepository.findByClientId(clientId).orElseGet(creator);
     }
 
     private void applyConnectedState(ConnectionEntity entity, String protocol, Integer ttlSeconds, long now) {
@@ -340,14 +352,14 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 return false;
             }
             String resolvedOrgUid = resolveOrgUid(userUid, null);
-            ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
-                    .uid(uidUtils.getUid())
-                    .userUid(userUid)
-                    .orgUid(resolvedOrgUid)
-                    .clientId(clientId)
-                    .deviceUid(deviceUid)
-                    .protocol(ConnectionProtocalEnum.MQTT.name())
-                    .build());
+            ConnectionEntity entity = fetchConnection(clientId, () -> ConnectionEntity.builder()
+                .uid(uidUtils.getUid())
+                .userUid(userUid)
+                .orgUid(resolvedOrgUid)
+                .clientId(clientId)
+                .deviceUid(deviceUid)
+                .protocol(ConnectionProtocalEnum.MQTT.name())
+                .build());
             if (entity.getId() != null) {
                 return false;
             }

@@ -29,8 +29,9 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -69,7 +70,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     public Page<MessageResponse> queryByUser(MessageRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         request.setUserUid(user.getUid());
         //
@@ -80,7 +81,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     public MessageResponse queryByUid(MessageRequest request) {
         Optional<MessageEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
-            throw new NotFoundException("Message not found");
+            throw ResourceI18nExceptions.messageNotFound();
         }
         return convertToResponse(optional.get());
     }
@@ -151,8 +152,26 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
 
     @Override
     public MessageResponse update(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        UserEntity user = authService.getUser();
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+
+        MessageEntity entity = findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::messageNotFound);
+
+        if (request.getContent() != null) {
+            entity.setContent(request.getContent());
+        }
+        if (StringUtils.hasText(request.getType())) {
+            entity.setType(request.getType());
+        }
+
+        MessageEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
+        }
+        return convertToResponse(savedEntity);
     }
 
     @Override

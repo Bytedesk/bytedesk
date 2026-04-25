@@ -36,9 +36,9 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionCacheService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -67,7 +67,7 @@ public class MemberEventListener {
 
     private final UidUtils uidUtils;
 
-    private final TopicCacheService topicCacheService;
+    private final TopicSubscriptionCacheService topicSubscriptionCacheService;
 
     private final UploadRestService uploadRestService;
     
@@ -138,11 +138,11 @@ public class MemberEventListener {
         log.info("member created: {}", member.getUid());
         // 默认订阅成员主题
         String topic = TopicUtils.formatOrgMemberTopic(member.getUid());
-        TopicRequest request = TopicRequest.builder()
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                 .topic(topic)
                 .userUid(user.getUid())
                 .build();
-        topicCacheService.pushRequest(request);
+        topicSubscriptionCacheService.pushRequest(request);
     }
 
     @EventListener

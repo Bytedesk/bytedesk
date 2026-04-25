@@ -1,1 +1,10 @@
-# 
+# organization_apply
+
+该包负责组织申请记录管理、审批状态元数据与申请生命周期接口。
+
+## 实现要点
+
+- 核心模型包括 OrganizationApplyEntity、OrganizationApplyRequest、OrganizationApplyResponse、OrganizationApplyExcel、OrganizationApplyStatusEnum、OrganizationApplyTypeEnum。
+- OrganizationApplyRepository、OrganizationApplySpecification、OrganizationApplyRestController、OrganizationApplyRestService 提供持久化、条件过滤和审批管理接口。
+- OrganizationApplyEntityListener、OrganizationApplyEventListener 与 event 子包负责申请生命周期回调以及创建、更新、删除事件。
+- OrganizationApplyInitializer、OrganizationApplyPermissions、OrganizationApplyTools 提供初始化数据、权限元数据与申请处理辅助逻辑。

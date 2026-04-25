@@ -16,6 +16,8 @@ package com.bytedesk.core.menu;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.core.constant.BytedeskConsts;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -38,6 +40,7 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/team/action", "action", "lock", "/team", "menu.team.action"));
                 seeds.add(MenuSeed.child("/team/auth", "auth", "idcard", "/team", "menu.team.auth"));
                 seeds.add(MenuSeed.child("/team/task", "task", "calendar", "/team", "menu.team.task"));
+                seeds.add(MenuSeed.child("/team/notification", "notification", "notification", "/team", "menu.team.notification"));
                 seeds.add(MenuSeed.child("/team/org", "company", "bank", "/team", "menu.team.company"));
 
                 seeds.add(MenuSeed.root("/service", "service", "customerService", "menu.service"));
@@ -113,6 +116,8 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/user", "user", "user", "/super", "menu.super.user"));
                 seeds.add(MenuSeed.child("/super/role", "role", "safety", "/super", "menu.super.role"));
                 seeds.add(MenuSeed.child("/super/auth", "auth", "idcard", "/super", "menu.super.auth"));
+                seeds.add(MenuSeed.child("/super/notification", "notification", "notification", "/super", "menu.super.notification"));
+                seeds.add(MenuSeed.child("/super/topicsubscription", "topicsubscription", "tags", "/super", "menu.super.topicsubscription"));
                 seeds.add(MenuSeed.child("/super/push", "push", "notification", "/super", "menu.super.push"));
                 seeds.add(MenuSeed.child("/super/thread", "thread", "message", "/super", "menu.super.thread"));
                 seeds.add(MenuSeed.child("/super/message", "message", "mail", "/super", "menu.super.message"));
@@ -155,13 +160,18 @@ public final class MenuInitData {
                 private final String description;
                 private final String color;
                 private final String nickname;
+                private final Boolean enabled;
 
                 public static MenuSeed root(String link, String name, String icon, String nickname) {
-                        return new MenuSeed(link, name, icon, link, 0, null, null, MenuEntity.DEFAULT_COLOR, nickname);
+                        return new MenuSeed(link, name, icon, link, 0, null, null, BytedeskConsts.DEFAULT_COLOR, nickname, Boolean.TRUE);
                 }
 
                 public static MenuSeed child(String link, String name, String icon, String parentKey, String nickname) {
-                        return new MenuSeed(link, name, icon, link, 0, parentKey, null, MenuEntity.DEFAULT_COLOR, nickname);
+                        return new MenuSeed(link, name, icon, link, 0, parentKey, null, BytedeskConsts.DEFAULT_COLOR, nickname, Boolean.TRUE);
+                }
+
+                public static MenuSeed child(String link, String name, String icon, String parentKey, String nickname, Boolean enabled) {
+                        return new MenuSeed(link, name, icon, link, 0, parentKey, null, BytedeskConsts.DEFAULT_COLOR, nickname, enabled);
                 }
         }
 }

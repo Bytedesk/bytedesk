@@ -37,7 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEntity, AgentSeatRequest, AgentSeatResponse, AgentSeatExcel> {
+public class AgentSeatRestService
+        extends BaseRestServiceWithExport<AgentSeatEntity, AgentSeatRequest, AgentSeatResponse, AgentSeatExcel> {
 
     private final AgentSeatRepository agent_seatRepository;
 
@@ -46,11 +47,11 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
     private final UidUtils uidUtils;
 
     private final AuthService authService;
-    
+
     private final PermissionService permissionService;
 
     private final AgentSeatDomainService agentSeatDomainService;
-    
+
     @Override
     public Page<AgentSeatEntity> queryByOrgEntity(AgentSeatRequest request) {
         Pageable pageable = request.getPageable();
@@ -78,20 +79,27 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
         }
 
         AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(request.getAssignedAgentUid())
-                .orElseThrow(() -> new RuntimeException("AgentSeat not found"));
+                .orElse(null);
+
+        if (seat == null) {
+            return null;
+        }
 
         return convertToResponse(seat);
     }
 
-    @Cacheable(value = "agent_seat", key = "#uid", unless="#result==null")
+    @Cacheable(value = "agent_seat", key = "#uid", unless = "#result==null")
     @Override
     public Optional<AgentSeatEntity> findByUid(String uid) {
         return agent_seatRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "agent_seat", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    // public Optional<AgentSeatEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-    //     return agent_seatRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+    // @Cacheable(value = "agent_seat", key = "#name + '_' + #orgUid + '_' + #type",
+    // unless="#result==null")
+    // public Optional<AgentSeatEntity> findByNameAndOrgUidAndType(String name,
+    // String orgUid, String type) {
+    // return agent_seatRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name,
+    // orgUid, type);
     // }
 
     public Boolean existsByUid(String uid) {
@@ -115,37 +123,41 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
-        // if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-        //     Optional<AgentSeatEntity> agent_seat = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-        //     if (agent_seat.isPresent()) {
-        //         return convertToResponse(agent_seat.get());
-        //     }
+        // if (StringUtils.hasText(request.getName()) &&
+        // StringUtils.hasText(request.getOrgUid()) &&
+        // StringUtils.hasText(request.getType())) {
+        // Optional<AgentSeatEntity> agent_seat =
+        // findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(),
+        // request.getType());
+        // if (agent_seat.isPresent()) {
+        // return convertToResponse(agent_seat.get());
         // }
-        
+        // }
+
         // 获取用户信息
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
         }
-        
+
         // 确定数据层级
         String level = request.getLevel();
         if (!StringUtils.hasText(level)) {
             level = LevelEnum.ORGANIZATION.name();
             request.setLevel(level);
         }
-        
+
         // 检查用户是否有权限创建该层级的数据
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(AgentSeatPermissions.MODULE_NAME, level)) {
             throw new RuntimeException("无权限创建该层级的标签数据");
         }
-        
-        // 
+
+        //
         AgentSeatEntity entity = modelMapper.map(request, AgentSeatEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
-        // 
+        //
         AgentSeatEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create agent_seat failed");
@@ -159,12 +171,12 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
         Optional<AgentSeatEntity> optional = agent_seatRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             AgentSeatEntity entity = optional.get();
-            
+
             // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(AgentSeatPermissions.MODULE_NAME, "UPDATE", entity)) {
                 throw new RuntimeException("无权限更新该标签数据");
             }
-            
+
             modelMapper.map(request, entity);
             //
             AgentSeatEntity savedEntity = save(entity);
@@ -172,8 +184,7 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
                 throw new RuntimeException("Update agent_seat failed");
             }
             return convertToResponse(savedEntity);
-        }
-        else {
+        } else {
             throw new RuntimeException("AgentSeat not found");
         }
     }
@@ -184,7 +195,8 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
     }
 
     @Override
-    public AgentSeatEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, AgentSeatEntity entity) {
+    public AgentSeatEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
+            AgentSeatEntity entity) {
         try {
             Optional<AgentSeatEntity> latest = agent_seatRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
@@ -215,17 +227,16 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
         Optional<AgentSeatEntity> optional = agent_seatRepository.findByUid(uid);
         if (optional.isPresent()) {
             AgentSeatEntity entity = optional.get();
-            
+
             // 检查用户是否有权限删除该实体
             if (!permissionService.hasEntityPermission(AgentSeatPermissions.MODULE_NAME, "DELETE", entity)) {
                 throw new RuntimeException("无权限删除该标签数据");
             }
-            
+
             entity.setDeleted(true);
             save(entity);
             // agent_seatRepository.delete(optional.get());
-        }
-        else {
+        } else {
             throw new RuntimeException("AgentSeat not found");
         }
     }
@@ -254,23 +265,21 @@ public class AgentSeatRestService extends BaseRestServiceWithExport<AgentSeatEnt
     protected Page<AgentSeatEntity> executePageQuery(Specification<AgentSeatEntity> spec, Pageable pageable) {
         return agent_seatRepository.findAll(spec, pageable);
     }
-    
+
     public void initAgentSeats(String orgUid) {
         // log.info("initAgentSeatAgentSeat");
         // for (String agent_seat : AgentSeatInitData.getAllAgentSeats()) {
-        //     AgentSeatRequest agent_seatRequest = AgentSeatRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, agent_seat))
-        //             .name(agent_seat)
-        //             .order(0)
-        //             .type(AgentSeatTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     createSystemAgentSeat(agent_seatRequest);
+        // AgentSeatRequest agent_seatRequest = AgentSeatRequest.builder()
+        // .uid(Utils.formatUid(orgUid, agent_seat))
+        // .name(agent_seat)
+        // .order(0)
+        // .type(AgentSeatTypeEnum.THREAD.name())
+        // .level(LevelEnum.ORGANIZATION.name())
+        // .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+        // .orgUid(orgUid)
+        // .build();
+        // createSystemAgentSeat(agent_seatRequest);
         // }
     }
 
-    
-    
 }
