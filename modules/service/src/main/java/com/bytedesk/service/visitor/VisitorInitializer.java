@@ -16,9 +16,9 @@ package com.bytedesk.service.visitor;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.core.rbac.organization.OrganizationRestService;
 
 import lombok.AllArgsConstructor;
 
@@ -27,7 +27,6 @@ import lombok.AllArgsConstructor;
 public class VisitorInitializer implements SmartInitializingSingleton {
 
     private final AuthorityRestService authorityRestService;
-    private final OrganizationRestService organizationRestService;
     private final VisitorRestService visitorRestService;
 
     @Override
@@ -37,8 +36,8 @@ public class VisitorInitializer implements SmartInitializingSingleton {
     }
 
     private void init() {
-        organizationRestService.findAll().forEach(org ->
-                VisitorInitData.getDemoVisitors(org.getUid()).forEach(visitorRestService::create));
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        VisitorInitData.getDemoVisitors(orgUid).forEach(visitorRestService::create);
     }
 
     private void initAuthority() {

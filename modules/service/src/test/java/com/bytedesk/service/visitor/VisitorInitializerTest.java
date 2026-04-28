@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
@@ -19,21 +20,25 @@ import com.bytedesk.core.rbac.organization.OrganizationRestService;
 class VisitorInitializerTest {
 
     @Test
-    void afterSingletonsInstantiatedShouldInitThreeDemoVisitorsForEachOrganization() {
+    void afterSingletonsInstantiatedShouldInitThreeDemoVisitorsForDefaultOrganizationOnly() {
         AuthorityRestService authorityRestService = mock(AuthorityRestService.class);
         OrganizationRestService organizationRestService = mock(OrganizationRestService.class);
         VisitorRestService visitorRestService = mock(VisitorRestService.class);
 
-        OrganizationEntity org = OrganizationEntity.builder()
-                .name("Demo Org")
+        OrganizationEntity defaultOrg = OrganizationEntity.builder()
+                .name("Default Org")
                 .build();
-        org.setUid("org-1");
+        defaultOrg.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
 
-        when(organizationRestService.findAll()).thenReturn(List.of(org));
+        OrganizationEntity anotherOrg = OrganizationEntity.builder()
+                .name("Another Org")
+                .build();
+        anotherOrg.setUid("org-1");
+
+        when(organizationRestService.findAll()).thenReturn(List.of(defaultOrg, anotherOrg));
 
         VisitorInitializer initializer = new VisitorInitializer(
                 authorityRestService,
-                organizationRestService,
                 visitorRestService);
 
         initializer.afterSingletonsInstantiated();
@@ -45,8 +50,8 @@ class VisitorInitializerTest {
         assertThat(requests)
                 .extracting(VisitorRequest::getOrgUid, VisitorRequest::getVisitorUid, VisitorRequest::getAvatar, VisitorRequest::getVipLevel)
                 .containsExactly(
-                        tuple("org-1", "visitor_001", "https://weiyuai.cn/assets/images/avatar/02.jpg", 0),
-                        tuple("org-1", "visitor_002", "https://weiyuai.cn/assets/images/avatar/01.jpg", 1),
-                        tuple("org-1", "visitor_003", "https://weiyuai.cn/assets/images/avatar/03.jpg", 2));
+                        tuple(BytedeskConsts.DEFAULT_ORGANIZATION_UID, "visitor_001", "https://weiyuai.cn/assets/images/avatar/02.jpg", 0),
+                        tuple(BytedeskConsts.DEFAULT_ORGANIZATION_UID, "visitor_002", "https://weiyuai.cn/assets/images/avatar/01.jpg", 1),
+                        tuple(BytedeskConsts.DEFAULT_ORGANIZATION_UID, "visitor_003", "https://weiyuai.cn/assets/images/avatar/03.jpg", 2));
     }
 }
