@@ -2,6 +2,18 @@
     "ollama": [],
     "deepseek": [
         {
+            "name": "deepseek-v4-flash",
+            "nickname": "deepseek-v4-flash",
+            "description": "深度求索推出的通用大语言模型，擅长自然语言理解与生成",
+            "type": "TEXT"
+        },
+        {
+            "name": "deepseek-v4-pro",
+            "nickname": "deepseek-v4-pro",
+            "description": "深度求索推出的通用大语言模型，擅长自然语言理解与生成",
+            "type": "TEXT"
+        },
+        {
             "name": "deepseek-chat",
             "nickname": "DeepSeek-V3",
             "description": "深度求索推出的通用大语言模型，擅长自然语言理解与生成",

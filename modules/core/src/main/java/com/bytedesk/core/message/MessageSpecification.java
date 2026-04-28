@@ -16,6 +16,7 @@ package com.bytedesk.core.message;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -31,6 +32,31 @@ import jakarta.persistence.criteria.Predicate;
 
 public class MessageSpecification extends BaseSpecification<MessageEntity, MessageRequest> {
 
+    static List<String> resolveTopicKeywordsForComponentType(String componentType) {
+        if (!StringUtils.hasText(componentType)) {
+            return List.of();
+        }
+        if (TypeConsts.COMPONENT_TYPE_TEAM.equals(componentType)) {
+            return List.of("group", "member");
+        }
+        if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(componentType)) {
+            return List.of("agent", "workgroup", "robot");
+        }
+        if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(componentType)) {
+            return List.of("robot");
+        }
+        return List.of();
+    }
+
+    private static Predicate buildTopicKeywordPredicate(Join<Object, Object> threadJoin,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            List<String> topicKeywords) {
+        return criteriaBuilder.or(topicKeywords.stream()
+                .map(keyword -> criteriaBuilder.like(threadJoin.get("topic"), "%" + keyword + "%"))
+                .collect(Collectors.toList())
+                .toArray(new Predicate[0]));
+    }
+
     public static Specification<MessageEntity> search(MessageRequest request, AuthService authService) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -42,20 +68,14 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
             if (StringUtils.hasText(request.getComponentType())) {
                 // 
                 if (TypeConsts.COMPONENT_TYPE_TEAM.equals(request.getComponentType())) {
-                    // thread.topic like '%group%' or thread.topic like '%member%'
-                    predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(threadJoin.get("topic"), "%group%"),
-                        criteriaBuilder.like(threadJoin.get("topic"), "%member%")
-                    ));
+                    predicates.add(buildTopicKeywordPredicate(threadJoin, criteriaBuilder,
+                            resolveTopicKeywordsForComponentType(request.getComponentType())));
                 } else if (TypeConsts.COMPONENT_TYPE_SERVICE.equals(request.getComponentType())) {
-                    // thread.topic like '%agent%' or thread.topic like '%workgroup%'
-                    predicates.add(criteriaBuilder.or(
-                        criteriaBuilder.like(threadJoin.get("topic"), "%agent%"),
-                        criteriaBuilder.like(threadJoin.get("topic"), "%workgroup%")
-                    ));
+                    predicates.add(buildTopicKeywordPredicate(threadJoin, criteriaBuilder,
+                            resolveTopicKeywordsForComponentType(request.getComponentType())));
                 } else if (TypeConsts.COMPONENT_TYPE_ROBOT.equals(request.getComponentType())) {
-                    // thread.topic like '%robot%'
-                    predicates.add(criteriaBuilder.like(threadJoin.get("topic"), "%robot%"));
+                    predicates.add(buildTopicKeywordPredicate(threadJoin, criteriaBuilder,
+                            resolveTopicKeywordsForComponentType(request.getComponentType())));
                 } else if (TypeConsts.COMPONENT_TYPE_VISITOR.equals(request.getComponentType())) {
                     predicates.add(criteriaBuilder.notEqual(root.get("type"), MessageTypeEnum.NOTICE.name()));
                     // 访客端查询消息：过滤掉一些消息类型，比如：TRANSFER, TRANSFER_ACCEPT, TRANSFER_REJECT

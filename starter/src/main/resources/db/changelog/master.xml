@@ -10,5 +10,6 @@
     <include file="db/changelog/migration/260423_add_ai_skill_source.xml" />
     <include file="db/changelog/migration/260424_add_ai_ocr_task_fields.xml" />
     <include file="db/changelog/migration/260425_add_message_leave_allow_visitor_send_when_offline.xml" />
+    <include file="db/changelog/migration/260428_drop_order_price_column.xml" />
 
 </databaseChangeLog>

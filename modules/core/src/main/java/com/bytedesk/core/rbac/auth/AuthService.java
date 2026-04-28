@@ -16,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -278,10 +279,8 @@ public class AuthService {
      * 参考 authenticateWithPasswordHash 逻辑，去掉AES解密过程
      */
     public Authentication authenticateWithPlainPassword(AuthRequest authRequest) {
-        // 1. 查询用户，传入平台信息
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsernameAndPlatform(authRequest.getUsername(), authRequest.getPlatform());
+        UserDetailsImpl userDetails = loadUserForLogin(authRequest);
         if (userDetails == null) {
-            log.warn("User not found: {}", authRequest.getUsername());
             return null;
         }
 
@@ -297,10 +296,8 @@ public class AuthService {
      * 前端使用AES加密密码，后端解密后验证
      */
     public Authentication authenticateWithPasswordHash(AuthRequest authRequest) {
-        // 1. 查询用户
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsernameAndPlatform(authRequest.getUsername(), authRequest.getPlatform());
+        UserDetailsImpl userDetails = loadUserForLogin(authRequest);
         if (userDetails == null) {
-            log.warn("User not found: {}", authRequest.getUsername());
             return null;
         }
         
@@ -321,6 +318,18 @@ public class AuthService {
             // Do not log credential material; keep enough context for troubleshooting
             log.warn("Password hash authentication failed (decrypt/verify): username={}, platform={}, channel={}",
                     authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel(), e);
+            return null;
+        }
+    }
+
+    private UserDetailsImpl loadUserForLogin(AuthRequest authRequest) {
+        try {
+            return (UserDetailsImpl) userDetailsService.loadUserByUsernameAndPlatform(
+                    authRequest.getUsername(),
+                    authRequest.getPlatform());
+        } catch (UsernameNotFoundException ex) {
+            log.info("Authentication rejected: username={}, platform={}, reason=user_not_found",
+                    authRequest.getUsername(), authRequest.getPlatform());
             return null;
         }
     }

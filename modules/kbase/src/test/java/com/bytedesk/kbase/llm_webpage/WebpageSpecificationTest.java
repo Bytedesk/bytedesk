@@ -46,7 +46,6 @@ class WebpageSpecificationTest {
         Path<Object> deletedPath = mock(Path.class);
         @SuppressWarnings("unchecked")
         Path<Object> categoryUidPath = mock(Path.class);
-        @SuppressWarnings("unchecked")
         Expression<Object> categoryUidExpression = (Expression<Object>) categoryUidPath;
 
         Predicate deletedPredicate = mock(Predicate.class);

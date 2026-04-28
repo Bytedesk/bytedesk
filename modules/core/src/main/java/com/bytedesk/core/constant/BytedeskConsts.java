@@ -36,6 +36,7 @@ public class BytedeskConsts {
     public static final String EMPTY_ARRAY_STRING = "[]";    
     public static final String DEFAULT_COLOR = "blue";
     // 默认组织uid
+    public static final String DEFAULT_SUPER_UID = "df_super_uid";
     public static final String DEFAULT_ORGANIZATION_UID = "df_org_uid";
     public static final String DEFAULT_UNIFIED_UID = "df_un_uid";
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
