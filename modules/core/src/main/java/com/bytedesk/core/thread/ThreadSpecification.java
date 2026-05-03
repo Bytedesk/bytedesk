@@ -216,6 +216,8 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            String effectiveVisitorUid = StringUtils.hasText(visitorUid) ? visitorUid : null;
+            String effectiveUid = StringUtils.hasText(effectiveVisitorUid) ? null : uid;
 
             // 传入 orgUid 时按组织过滤；不传则查询该访客跨组织的全部会话
             if (StringUtils.hasText(request.getOrgUid())) {
@@ -223,16 +225,16 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             }
 
             // uid 与 visitorUid 都为空时不应返回任何数据（避免匿名全量查询）
-            if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+            if (!StringUtils.hasText(effectiveUid) && !StringUtils.hasText(effectiveVisitorUid)) {
                 return criteriaBuilder.disjunction();
             }
 
             List<Predicate> identityPredicates = new ArrayList<>();
-            if (StringUtils.hasText(uid)) {
-                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + uid + "%"));
+            if (StringUtils.hasText(effectiveUid)) {
+                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + effectiveUid + "%"));
             }
-            if (StringUtils.hasText(visitorUid)) {
-                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + visitorUid + "%"));
+            if (StringUtils.hasText(effectiveVisitorUid)) {
+                identityPredicates.add(criteriaBuilder.like(root.get("user"), "%" + effectiveVisitorUid + "%"));
             }
             predicates.add(criteriaBuilder.or(identityPredicates.toArray(new Predicate[0])));
 

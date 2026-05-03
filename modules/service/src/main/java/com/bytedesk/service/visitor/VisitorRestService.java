@@ -298,6 +298,13 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         deleteByUid(entity.getUid());
     }
 
+    public VisitorResponse restore(VisitorRequest request) {
+        VisitorEntity visitor = visitorRepository.findByUidAndDeleted(request.getUid(), true)
+                .orElseThrow(() -> new NotFoundException("visitor not found"));
+        visitor.setDeleted(false);
+        return convertToResponse(save(visitor));
+    }
+
     @Override
     public VisitorEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             VisitorEntity entity) {

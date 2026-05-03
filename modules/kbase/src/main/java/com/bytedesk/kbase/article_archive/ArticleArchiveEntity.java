@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.article_archive;
 
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.article.AbstractArticleEntity;
 import com.bytedesk.kbase.article.ArticleAuditStatusEnum;
 

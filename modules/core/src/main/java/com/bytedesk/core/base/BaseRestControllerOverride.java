@@ -60,6 +60,14 @@ public abstract class BaseRestControllerOverride<T extends PageableRequest> {
     public abstract ResponseEntity<?> delete(@RequestBody T request);
 
     /**
+     * 恢复
+     */
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody T request) {
+        throw new UnsupportedOperationException("Method restore needs to be implemented in child class");
+    }
+
+    /**
      * 根据组织UID删除
      */
     @PostMapping("/delete/org")

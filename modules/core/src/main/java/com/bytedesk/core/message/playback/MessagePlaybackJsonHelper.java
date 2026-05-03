@@ -2,9 +2,9 @@ package com.bytedesk.core.message.playback;
 
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.AudioContent;
 import com.bytedesk.core.message.content.VoiceContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 public class MessagePlaybackJsonHelper {
 

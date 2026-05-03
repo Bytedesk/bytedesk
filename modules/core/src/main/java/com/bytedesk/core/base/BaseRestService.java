@@ -43,6 +43,10 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
     abstract public T handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, T entity);
     abstract public TResponse convertToResponse(T entity);
 
+    public TResponse restore(TRequest request) {
+        throw new UnsupportedOperationException("Method restore needs to be implemented in child class");
+    }
+
     // === 新增的抽象方法，用于支持通用实现 ===
     
     /**

@@ -16,7 +16,7 @@ package com.bytedesk.kbase.auto_reply.fixed;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 public class AutoReplyFixedInitData {
 

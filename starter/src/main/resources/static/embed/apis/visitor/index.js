@@ -1,28 +1,27 @@
-import { HTTP_CLIENT as i } from "../../utils/constants/index.js";
-import o from "../request/index.js";
-async function c(n) {
-  const t = n.channel || i;
-  return o("/visitor/api/v1/init", {
-    method: "POST",
-    data: {
-      ...n,
-      channel: t,
-      client: t
-    }
-  });
+import "../../utils/constants/index.js";
+import e from "../request/index.js";
+//#region src/apis/visitor.ts
+async function t(t) {
+	let n = t.channel || "WEB_FLOAT";
+	return e("/visitor/api/v1/init", {
+		method: "POST",
+		data: {
+			...t,
+			channel: n,
+			client: n
+		}
+	});
 }
-async function a(n) {
-  const t = n.channel || i;
-  return o("/visitor/api/v1/browse", {
-    method: "POST",
-    data: {
-      ...n,
-      channel: t,
-      client: t
-    }
-  });
+async function n(t) {
+	let n = t.channel || "WEB_FLOAT";
+	return e("/visitor/api/v1/browse", {
+		method: "POST",
+		data: {
+			...t,
+			channel: n,
+			client: n
+		}
+	});
 }
-export {
-  a as browse,
-  c as initVisitor
-};
+//#endregion
+export { n as browse, t as initVisitor };

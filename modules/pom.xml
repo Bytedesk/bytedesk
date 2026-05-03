@@ -21,12 +21,12 @@
         <module>cli</module>
         <module>core</module>
         <module>crm</module>
+        <module>disk</module>
         <module>forum</module>
         <module>kbase</module>
         <module>marketing</module>
         <module>meet</module>
         <module>opinion</module>
-        <module>pan</module>
         <module>service</module>
         <module>remote</module>
         <module>social</module>

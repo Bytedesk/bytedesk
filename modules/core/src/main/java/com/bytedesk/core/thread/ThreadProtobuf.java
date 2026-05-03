@@ -46,6 +46,33 @@ public class ThreadProtobuf implements Serializable {
 
     private UserProtobuf user;
 
+    private String agent;
+
+    public UserProtobuf getAgentProtobuf() {
+        if (agent == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(agent);
+    }
+
+    private String robot;
+
+    public UserProtobuf getRobotProtobuf() {
+        if (robot == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(robot);
+    }
+
+    private String workgroup;
+
+    public UserProtobuf getWorkgroupProtobuf() {
+        if (workgroup == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(workgroup);
+    }
+
     private ChannelEnum channel;
 
     private String extra;

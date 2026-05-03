@@ -14,7 +14,7 @@
 package com.bytedesk.core.clipboard;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

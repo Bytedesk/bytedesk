@@ -21,7 +21,6 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.base.BaseContent;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.ArticleContent;
 import com.bytedesk.core.message.content.AudioContent;
 import com.bytedesk.core.message.content.DocumentContent;
@@ -41,6 +40,7 @@ import com.bytedesk.core.message.content.UrlContent;
 import com.bytedesk.core.message.content.VideoContent;
 import com.bytedesk.core.message.content.VoiceContent;
 import com.bytedesk.core.message.content.WechatNumberContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

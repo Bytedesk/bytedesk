@@ -1,35 +1,29 @@
-import { getApiUrl as U } from "../request/index.js";
-import l from "../../utils/logger/index.js";
-async function h(a, d, m, e) {
-  try {
-    const r = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:T.]/g, "").slice(0, 14), s = d || `${r}_${a.name}`, i = m || a.type || "image/jpeg", t = new FormData();
-    t.append("file", a), t.append("fileName", s), t.append("fileType", i), t.append("isAvatar", (e == null ? void 0 : e.isAvatar) || "false"), t.append("kbType", (e == null ? void 0 : e.kbType) || "feedback");
-    const u = (e == null ? void 0 : e.visitorUid) || localStorage.getItem("bytedesk_uid") || localStorage.getItem("bytedesk_visitor_uid") || "", b = (e == null ? void 0 : e.visitorNickname) || localStorage.getItem("bytedesk_nickname") || "", v = (e == null ? void 0 : e.visitorAvatar) || localStorage.getItem("bytedesk_avatar") || "", k = (e == null ? void 0 : e.orgUid) || "";
-    t.append("visitorUid", u), t.append("visitorNickname", b), t.append("visitorAvatar", v), t.append("orgUid", k), t.append("client", (e == null ? void 0 : e.client) || "web"), e != null && e.isDebug && l.debug("handleUpload formData", t);
-    const y = `${U()}/visitor/api/upload/file`, p = await fetch(y, {
-      method: "POST",
-      headers: {
-        // Authorization: "Bearer ", // + localStorage.getItem(ACCESS_TOKEN),
-      },
-      body: t
-    });
-    if (!p.ok)
-      throw new Error(`上传失败: ${p.status} ${p.statusText}`);
-    const o = await p.json();
-    return e != null && e.isDebug && l.debug("upload data:", o), o;
-  } catch (r) {
-    throw l.error("文件上传失败:", r), r;
-  }
+import e from "../../utils/logger/index.js";
+import { getApiUrl as t } from "../request/index.js";
+//#region src/apis/upload.ts
+async function n(n, r, i, a) {
+	try {
+		let o = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:T.]/g, "").slice(0, 14), s = r || `${o}_${n.name}`, c = i || n.type || "image/jpeg", l = new FormData();
+		l.append("file", n), l.append("fileName", s), l.append("fileType", c), l.append("isAvatar", a?.isAvatar || "false"), l.append("kbType", a?.kbType || "feedback");
+		let u = a?.visitorUid || localStorage.getItem("bytedesk_uid") || localStorage.getItem("bytedesk_visitor_uid") || "", d = a?.visitorNickname || localStorage.getItem("bytedesk_nickname") || "", f = a?.visitorAvatar || localStorage.getItem("bytedesk_avatar") || "", p = a?.orgUid || "";
+		l.append("visitorUid", u), l.append("visitorNickname", d), l.append("visitorAvatar", f), l.append("orgUid", p), l.append("client", a?.client || "web"), a?.isDebug && e.debug("handleUpload formData", l);
+		let m = `${t()}/visitor/api/upload/file`, h = await fetch(m, {
+			method: "POST",
+			headers: {},
+			body: l
+		});
+		if (!h.ok) throw Error(`上传失败: ${h.status} ${h.statusText}`);
+		let g = await h.json();
+		return a?.isDebug && e.debug("upload data:", g), g;
+	} catch (t) {
+		throw e.error("文件上传失败:", t), t;
+	}
 }
-async function T(a, d) {
-  var s;
-  const e = `screenshot_${(/* @__PURE__ */ new Date()).toISOString().replace(/[-:T.]/g, "").slice(0, 14)}.jpg`;
-  return ((s = (await h(a, e, "image/jpeg", {
-    ...d,
-    kbType: "feedback"
-  })).data) == null ? void 0 : s.fileUrl) || "";
+async function r(e, t) {
+	return (await n(e, `screenshot_${(/* @__PURE__ */ new Date()).toISOString().replace(/[-:T.]/g, "").slice(0, 14)}.jpg`, "image/jpeg", {
+		...t,
+		kbType: "feedback"
+	})).data?.fileUrl || "";
 }
-export {
-  h as handleUpload,
-  T as uploadScreenshot
-};
+//#endregion
+export { r as uploadScreenshot };

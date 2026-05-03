@@ -19,12 +19,6 @@ public class DepartmentConsts {
 
     private DepartmentConsts() {}
     
-    /// 部门
-    // 管理部门
-    // public static final String DEPT_ADMIN = I18Consts.I18N_PREFIX + "DEPT_ADMIN";
-    // 客服部门
-    // public static final String DEPT_CUSTOMER_SERVICE = I18Consts.I18N_PREFIX + "DEPT_CS";
-
     // 管理部门
     public static final String DEPT_ADMIN = "管理部";
     // 客服部门

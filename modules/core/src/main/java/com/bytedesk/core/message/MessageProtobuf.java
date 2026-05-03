@@ -21,6 +21,8 @@ import java.time.ZonedDateTime;
 import com.alibaba.fastjson2.JSON;
 // import com.alibaba.fastjson2.annotation.JSONField;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;

@@ -454,6 +454,14 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success("delete thread success"));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_UPDATE, description = "restore thread")
+    @Operation(summary = "Restore Thread", description = "Restore the specified soft-deleted thread")
+    @Override
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody ThreadRequest request) {
+        return super.restore(request);
+    }
+
     /**
      * 导出会话列表
      * 

@@ -20,9 +20,9 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.persistence.Column;

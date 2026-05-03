@@ -20,6 +20,8 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.extra.LoginNoticeExtra;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.message.content.NoticeContent;
+import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.thread.ThreadRestService;

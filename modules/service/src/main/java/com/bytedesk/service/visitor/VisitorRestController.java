@@ -166,6 +166,16 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
         return ResponseEntity.ok(JsonResult.success("delete success"));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_UPDATE, description = "restore visitor")
+    @Operation(summary = "Restore Visitor", description = "Restore the specified soft-deleted visitor")
+    @ApiResponse(responseCode = "200", description = "Restored successfully")
+    @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
+    @Override
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody VisitorRequest visitorRequest) {
+        return super.restore(visitorRequest);
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_VISITOR, action = I18Consts.I18N_ACTION_EXPORT, description = "export visitor")
     @Operation(summary = "Export Visitors", description = "Export visitor data")
     @ApiResponse(responseCode = "200", description = "Export successful")

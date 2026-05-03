@@ -76,6 +76,7 @@ export declare interface BytedeskConfig {
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
     onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
@@ -129,7 +130,7 @@ declare class BytedeskWeb {
     private updateChatWindowLayout;
     private refreshChatIframeUrl;
     setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>): void;
-    setConfig(nextConfig: Partial<BytedeskConfig>): void;
+    setConfig(nextConfig: Partial<BytedeskConfig>, options?: SetConfigOptions): void;
     private getPrimaryActionFromConfig;
     private syncChatPathByAction;
     private getDefaultConfig;
@@ -400,6 +401,19 @@ declare interface InviteConfig {
     onReject?: () => void;
     onClose?: () => void;
     onOpen?: () => void;
+}
+
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    extra?: unknown;
+    position?: string;
+    status?: string;
+}
+
+declare interface SetConfigOptions {
+    replaceChatConfig?: boolean;
 }
 
 declare interface TabsConfig {

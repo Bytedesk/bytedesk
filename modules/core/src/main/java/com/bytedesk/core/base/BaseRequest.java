@@ -112,6 +112,9 @@ public abstract class BaseRequest implements Serializable, PageableRequest {
     @Builder.Default
     private Boolean exportAll = false;
 
+    @Builder.Default
+    private Boolean deleted = false;
+
     // 前端当前语言，用于导出等需要显式本地化的场景
     private String lang;
 

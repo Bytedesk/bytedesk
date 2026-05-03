@@ -1,31 +1,25 @@
-import { onMount as i, onDestroy as a } from "svelte";
-import { addMessages as s, init as m, getLocaleFromNavigator as l } from "svelte-i18n";
-import c from "../core/BytedeskWeb/index.js";
-import { messages as f } from "../locales/index/index.js";
-import u from "../utils/logger/index.js";
-Object.entries(f).forEach(([r, o]) => {
-  s(r, o);
+import e from "../utils/logger/index.js";
+import t from "../index/index.js";
+import { messages as n } from "../locales/index/index.js";
+import { onDestroy as r, onMount as i } from "svelte";
+import { addMessages as a, getLocaleFromNavigator as o, init as s } from "svelte-i18n";
+Object.entries(n).forEach(([e, t]) => {
+	a(e, t);
+}), s({
+	fallbackLocale: "en",
+	initialLocale: o()
 });
-m({
-  fallbackLocale: "en",
-  initialLocale: l()
-});
-let e = null, t = 0;
-const k = (r, o) => (u.debug("config", o, r), i(() => {
-  t++;
-  const n = {
-    ...o,
-    locale: o.locale || l() || "zh-cn"
-  };
-  e || (e = new c(n), e.init());
-}), a(() => {
-  t--, t <= 0 && setTimeout(() => {
-    e && t <= 0 && (e.destroy(), e = null, t = 0);
-  }, 100);
-}), {
-  destroy() {
-  }
-});
-export {
-  k as BytedeskSvelte
-};
+var c = null, l = 0, u = (n, a) => (e.debug("config", a, n), i(() => {
+	l++;
+	let e = {
+		...a,
+		locale: a.locale || o() || "zh-cn"
+	};
+	c || (c = new t(e), c.init());
+}), r(() => {
+	l--, l <= 0 && setTimeout(() => {
+		c && l <= 0 && (c.destroy(), c = null, l = 0);
+	}, 100);
+}), { destroy() {} });
+//#endregion
+export { u as BytedeskSvelte };

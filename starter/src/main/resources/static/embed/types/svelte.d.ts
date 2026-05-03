@@ -74,6 +74,7 @@ declare interface BytedeskConfig {
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
     onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
@@ -154,6 +155,15 @@ declare interface InviteConfig {
     onReject?: () => void;
     onClose?: () => void;
     onOpen?: () => void;
+}
+
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    extra?: unknown;
+    position?: string;
+    status?: string;
 }
 
 declare interface TabsConfig {

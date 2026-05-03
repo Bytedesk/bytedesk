@@ -34,7 +34,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  * https://docs.spring.io/spring-security/reference/
  */
 @Tag(name = "member - 成员")
-// @RepositoryRestResource(path = "mem", itemResourceRel = "mems", collectionResourceRel = "mems")
+// @RepositoryRestResource(path = "mem", itemResourceRel = "mems",
+// collectionResourceRel = "mems")
 // @PreAuthorize("hasRole('ROLE_USER')")
 public interface MemberRepository extends JpaRepository<MemberEntity, Long>, JpaSpecificationExecutor<MemberEntity> {
 
@@ -42,12 +43,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     Optional<MemberEntity> findByUid(String uid);
 
-    Optional<MemberEntity> findByUser_UidAndDeletedFalse(String uid);
+    Optional<MemberEntity> findByUser_UidAndOrgUidAndDeletedFalse(String uid, String orgUid);
 
     Optional<MemberEntity> findByMobileAndOrgUidAndDeletedFalse(String mobile, String orgUid);
 
-        @Query("select m from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
-        Optional<MemberEntity> findByMobileAndCountryAndOrgUidAndDeletedFalse(
+    @Query("select m from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
+    Optional<MemberEntity> findByMobileAndCountryAndOrgUidAndDeletedFalse(
             @Param("mobile") String mobile,
             @Param("country") String country,
             @Param("orgUid") String orgUid);
@@ -62,8 +63,8 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     Boolean existsByMobileAndOrgUidAndDeletedFalse(String email, String orgUid);
 
-        @Query("select case when count(m) > 0 then true else false end from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
-        Boolean existsByMobileAndCountryAndOrgUidAndDeletedFalse(
+    @Query("select case when count(m) > 0 then true else false end from MemberEntity m where m.mobile = :mobile and m.orgUid = :orgUid and m.deleted = false and (m.country = :country or (:country = '86' and (m.country is null or m.country = '')))")
+    Boolean existsByMobileAndCountryAndOrgUidAndDeletedFalse(
             @Param("mobile") String mobile,
             @Param("country") String country,
             @Param("orgUid") String orgUid);

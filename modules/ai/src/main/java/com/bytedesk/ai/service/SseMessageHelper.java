@@ -13,8 +13,8 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import org.springframework.ai.chat.messages.Message;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
 

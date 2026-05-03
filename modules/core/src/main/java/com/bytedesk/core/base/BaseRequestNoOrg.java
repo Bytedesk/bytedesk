@@ -91,6 +91,9 @@ public abstract class BaseRequestNoOrg implements Serializable, PageableRequest 
     @Builder.Default
     private Boolean exportAll = false;
 
+    @Builder.Default
+    private Boolean deleted = false;
+
     // 排序方式，默认按更新时间倒序
     // updatedAt/createdAt: 'ascend', 'descend'
     // 其他字段可以根据需要添加

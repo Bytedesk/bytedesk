@@ -29,6 +29,8 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.message.content.NoticeContent;
+import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;

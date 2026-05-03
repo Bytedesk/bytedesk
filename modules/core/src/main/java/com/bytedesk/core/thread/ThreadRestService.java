@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,6 +45,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
@@ -52,7 +54,6 @@ import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -67,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class ThreadRestService
-    extends BaseRestService<ThreadEntity, ThreadRequest, ThreadResponse> {
+        extends BaseRestService<ThreadEntity, ThreadRequest, ThreadResponse> {
 
     private final AuthService authService;
 
@@ -200,6 +201,37 @@ public class ThreadRestService
                 : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
         Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
+
+        if (Boolean.TRUE.equals(request.getMergeByTopic())) {
+            List<ThreadEntity> mergedThreads = threadRepository.findAll(specs).stream()
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(
+                                    thread -> StringUtils.hasText(thread.getTopic()) ? thread.getTopic()
+                                            : thread.getUid(),
+                                    thread -> thread,
+                                    (existing, ignored) -> existing,
+                                    LinkedHashMap::new),
+                            map -> new ArrayList<>(map.values())));
+
+            if (pageable == null || pageable.isUnpaged()) {
+                return new PageImpl<>(
+                        mergedThreads.stream().map(this::convertToResponse).toList(),
+                        Pageable.unpaged(),
+                        mergedThreads.size());
+            }
+
+            int start = Math.toIntExact(pageable.getOffset());
+            if (start >= mergedThreads.size()) {
+                return new PageImpl<>(List.of(), pageable, mergedThreads.size());
+            }
+
+            int end = Math.min(start + pageable.getPageSize(), mergedThreads.size());
+            List<ThreadResponse> content = mergedThreads.subList(start, end).stream()
+                    .map(this::convertToResponse)
+                    .toList();
+            return new PageImpl<>(content, pageable, mergedThreads.size());
+        }
+
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, effectivePageable);
         return threadPage.map(this::convertToResponse);
     }
@@ -210,7 +242,8 @@ public class ThreadRestService
             throw CommonI18nExceptions.loginRequired();
         }
 
-        Set<String> customerServiceTopics = topicSubscriptionRestService.findSubscribedTopicsByUserUid(user.getUid()).stream()
+        Set<String> customerServiceTopics = topicSubscriptionRestService.findSubscribedTopicsByUserUid(user.getUid())
+                .stream()
                 .filter(TopicUtils::isCustomerServiceTopic)
                 .collect(Collectors.toSet());
 
@@ -735,7 +768,7 @@ public class ThreadRestService
         }
         if (Boolean.TRUE.equals(request.getUnsubscribe())
                 || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
-                TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
+            TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
@@ -810,7 +843,7 @@ public class ThreadRestService
         }
 
         if (Boolean.TRUE.equals(request.getUnsubscribe())) {
-                TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
+            TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
@@ -1011,6 +1044,13 @@ public class ThreadRestService
     })
     public void delete(@NonNull ThreadRequest entity) {
         deleteByUid(entity.getUid());
+    }
+
+    public ThreadResponse restore(@NonNull ThreadRequest request) {
+        ThreadEntity thread = threadRepository.findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::threadNotFound);
+        thread.setDeleted(false);
+        return convertToResponse(save(thread));
     }
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {

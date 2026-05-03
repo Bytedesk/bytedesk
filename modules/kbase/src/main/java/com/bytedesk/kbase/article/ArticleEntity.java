@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.article;
 
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

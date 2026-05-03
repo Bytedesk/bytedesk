@@ -33,6 +33,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Features features;
     private Testing testing;
     private Organization organization;
+    private Service service;
     private Ai ai;
 
     @Getter
@@ -110,6 +111,12 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Integer defaultMaxMembers = 20;
         private Integer defaultMaxAgents = 20;
         private Integer defaultMaxWorkgroups = 20;
+    }
+
+    @Getter
+    @Setter
+    public static class Service {
+        private Boolean agentSeatEnabled = false;
     }
 
     @Getter

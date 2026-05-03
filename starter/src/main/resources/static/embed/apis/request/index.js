@@ -1,92 +1,65 @@
-import "../../node_modules/.pnpm/axios@1.10.0/node_modules/axios/index/index.js";
-import { ACCESS_TOKEN as c, ANONYMOUS as n, EVENT_BUS_HTTP_ERROR as s, EVENT_BUS_SERVER_ERROR_500 as m } from "../../utils/constants/index.js";
-import t from "../../utils/eventsEmitter/index.js";
-import r from "../../utils/logger/index.js";
-import l from "../../node_modules/.pnpm/axios@1.10.0/node_modules/axios/lib/axios/index.js";
-let o = "";
-function u() {
-  return o || "https://api.weiyuai.cn";
+import { ACCESS_TOKEN as e, ANONYMOUS as t, EVENT_BUS_HTTP_ERROR as n, EVENT_BUS_SERVER_ERROR_500 as r } from "../../utils/constants/index.js";
+import i from "../../utils/logger/index.js";
+import a from "../../node_modules/.pnpm/axios@1.15.0/node_modules/axios/lib/axios/index.js";
+import o from "../../utils/eventsEmitter/index.js";
+//#region src/apis/request.ts
+var s = "";
+function c() {
+	return s || "https://api.weiyuai.cn";
 }
-function d(e) {
-  return e && e.trim() !== "" ? (o = e, r.debug("API URL已设置为:", o)) : r.warn("尝试设置无效的API URL"), o;
+function l(e) {
+	return e && e.trim() !== "" ? (s = e, i.debug("API URL已设置为:", s)) : i.warn("尝试设置无效的API URL"), s;
 }
-const p = l.create({
-  timeout: 2e4,
-  // 初始化时设置一个默认值，后续会通过request拦截器动态获取
-  baseURL: u()
+var u = a.create({
+	timeout: 2e4,
+	baseURL: c()
 });
-p.interceptors.request.use(
-  (e) => {
-    e.baseURL = u();
-    const i = localStorage.getItem(c);
-    return i && i.length > 10 && e.url && e.url.startsWith("/api") && (e.headers.Authorization = `Bearer ${i}`), !i && e.url && e.url.startsWith("/api") ? Promise.reject(h) : e;
-  },
-  (e) => (r.error("request error", e), e.response.status === 403 && t.emit(s, "403"), e.response.status === 401 && t.emit(s, "401"), Promise.reject(e))
-);
-p.interceptors.response.use(
-  (e) => e,
-  (e) => {
-    if (r.error("response error", e), e.response)
-      switch (e.response.status) {
-        case 400:
-          r.error("axios interception error 400"), t.emit(s, "400");
-          break;
-        case 401:
-          r.error("axios interception error 401"), t.emit(s, "401");
-          break;
-        case 403:
-          r.error("axios interception error 403"), t.emit(s, "403");
-          break;
-        case 500:
-          r.error("axios interception error 500"), t.emit(m, "500");
-          break;
-      }
-    return "return axios interception error";
-  }
-);
-const a = {
-  data: null,
-  // 通常错误时不会有数据
-  status: 601,
-  // 自定义HTTP状态码，用于表示匿名状态
-  statusText: n,
-  // HTTP 状态文本
-  headers: {},
-  // 响应头
-  config: {
-    headers: {}
-  },
-  // 请求配置
-  request: null
-  // 原始请求对象
-}, h = {
-  message: "匿名用户，无需访问服务器接口",
-  // 错误消息
-  name: n,
-  // 错误名称
-  code: "601",
-  // 自定义的错误代码
-  config: a.config,
-  // 请求配置
-  request: a.request,
-  // 原始请求对象
-  response: a,
-  // 响应对象
-  isAxiosError: !0,
-  // 标记这是一个 AxiosError 对象
-  toJSON: function() {
-    return {
-      message: this.message,
-      name: this.name,
-      code: this.code,
-      config: this.config,
-      request: this.request,
-      response: this.response
-    };
-  }
+u.interceptors.request.use((t) => {
+	t.baseURL = c();
+	let n = localStorage.getItem(e);
+	return n && n.length > 10 && t.url && t.url.startsWith("/api") && (t.headers.Authorization = `Bearer ${n}`), !n && t.url && t.url.startsWith("/api") ? Promise.reject(f) : t;
+}, (e) => (i.error("request error", e), e.response.status === 403 && o.emit(n, "403"), e.response.status === 401 && o.emit(n, "401"), Promise.reject(e))), u.interceptors.response.use((e) => e, (e) => {
+	if (i.error("response error", e), e.response) switch (e.response.status) {
+		case 400:
+			i.error("axios interception error 400"), o.emit(n, "400");
+			break;
+		case 401:
+			i.error("axios interception error 401"), o.emit(n, "401");
+			break;
+		case 403:
+			i.error("axios interception error 403"), o.emit(n, "403");
+			break;
+		case 500:
+			i.error("axios interception error 500"), o.emit(r, "500");
+			break;
+	}
+	return "return axios interception error";
+});
+var d = {
+	data: null,
+	status: 601,
+	statusText: t,
+	headers: {},
+	config: { headers: {} },
+	request: null
+}, f = {
+	message: "匿名用户，无需访问服务器接口",
+	name: t,
+	code: "601",
+	config: d.config,
+	request: d.request,
+	response: d,
+	isAxiosError: !0,
+	toJSON: function() {
+		return {
+			message: this.message,
+			name: this.name,
+			code: this.code,
+			config: this.config,
+			request: this.request,
+			response: this.response
+		};
+	}
 };
-export {
-  p as default,
-  u as getApiUrl,
-  d as setApiUrl
-};
+//#endregion
+export { u as default, c as getApiUrl, l as setApiUrl };

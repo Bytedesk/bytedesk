@@ -177,7 +177,9 @@ public class VisitorThreadService
             WorkgroupEntity workgroup) {
         //
         String extra = buildWorkgroupExtra(visitorRequest, workgroup);
+        String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         thread.setExtra(extra);
+        thread.setWorkgroup(workgroupString);
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {

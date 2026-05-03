@@ -36,7 +36,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 
 import ai.z.openapi.ZhipuAiClient;
 import ai.z.openapi.service.model.ChatCompletionCreateParams;
@@ -55,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.message.content.ImageContent;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.content.VideoContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.content.FileContent;
 import com.bytedesk.core.message.content.AudioContent;
 

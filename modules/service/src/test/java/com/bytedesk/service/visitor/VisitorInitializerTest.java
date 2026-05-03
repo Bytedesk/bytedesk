@@ -5,7 +5,6 @@ import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -14,28 +13,13 @@ import org.mockito.ArgumentCaptor;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.OrganizationRestService;
 
 class VisitorInitializerTest {
 
     @Test
     void afterSingletonsInstantiatedShouldInitThreeDemoVisitorsForDefaultOrganizationOnly() {
         AuthorityRestService authorityRestService = mock(AuthorityRestService.class);
-        OrganizationRestService organizationRestService = mock(OrganizationRestService.class);
         VisitorRestService visitorRestService = mock(VisitorRestService.class);
-
-        OrganizationEntity defaultOrg = OrganizationEntity.builder()
-                .name("Default Org")
-                .build();
-        defaultOrg.setUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
-
-        OrganizationEntity anotherOrg = OrganizationEntity.builder()
-                .name("Another Org")
-                .build();
-        anotherOrg.setUid("org-1");
-
-        when(organizationRestService.findAll()).thenReturn(List.of(defaultOrg, anotherOrg));
 
         VisitorInitializer initializer = new VisitorInitializer(
                 authorityRestService,

@@ -111,6 +111,17 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_UPDATE, description = "restore user info")
+    @Override
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody UserRequest request) {
+
+        UserResponse userResponse = userRestService.restore(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     @GetMapping("/export")
     public Object export(UserRequest request, HttpServletResponse response) {

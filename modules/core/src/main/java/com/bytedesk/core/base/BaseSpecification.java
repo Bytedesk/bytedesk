@@ -89,7 +89,7 @@ public abstract class BaseSpecification<T, TRequest> {
         }
         
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+        predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
         
         // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
         if (!Boolean.TRUE.equals(request.getSuperUser())
@@ -124,7 +124,7 @@ public abstract class BaseSpecification<T, TRequest> {
         validateIsSuperUserPermission(request, authService);
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+        predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
         return predicates;
     }
 

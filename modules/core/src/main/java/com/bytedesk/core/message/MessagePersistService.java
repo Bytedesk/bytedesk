@@ -25,6 +25,8 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -203,7 +205,10 @@ public class MessagePersistService {
                 // REACTION 仅用于通知前端刷新 UI，不作为独立聊天记录入库
                 || MessageTypeEnum.REACTION.equals(type)
                 // PLAYBACK 仅用于通知前端刷新 UI，不作为独立聊天记录入库
-                || MessageTypeEnum.PLAYBACK.equals(type)) {
+                || MessageTypeEnum.PLAYBACK.equals(type)
+                // GOODS_UPDATE / ORDER_UPDATE 仅用于通知前端刷新 UI，不作为独立聊天记录入库
+                || MessageTypeEnum.GOODS_UPDATE.equals(type)
+                || MessageTypeEnum.ORDER_UPDATE.equals(type)) {
             return true;
         }
 

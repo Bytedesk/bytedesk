@@ -72,8 +72,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> queryByOrg(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByOrg", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByOrg", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -89,8 +88,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> queryByUser(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUser", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByUser", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -106,8 +104,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> queryByUid(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUid", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByUid", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -123,8 +120,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> create(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("create", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "create", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -140,8 +136,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> update(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("update", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "update", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -157,9 +152,23 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> delete(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("delete", PageableRequest.class);
-            method.invoke(service, request);
+            invokeRequestMethod(service, "delete", request);
             return ResponseEntity.ok(JsonResult.success());
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 通用的restore实现
+     * 减少子类重复代码
+     */
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody T request) {
+        try {
+            S service = getService();
+            Object result = invokeRequestMethod(service, "restore", request);
+            return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
         }
@@ -234,6 +243,27 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
             return method.invoke(service, args);
         }
         throw new NoSuchMethodException("Method " + methodName + " not found");
+    }
+
+    /**
+     * 调用接收具体请求对象的服务方法
+     */
+    private <SVC> Object invokeRequestMethod(SVC service, String methodName, T request) throws Exception {
+        Method method = null;
+        for (Method candidate : service.getClass().getMethods()) {
+            if (!candidate.getName().equals(methodName) || candidate.getParameterCount() != 1) {
+                continue;
+            }
+            Class<?> parameterType = candidate.getParameterTypes()[0];
+            if (parameterType.isAssignableFrom(request.getClass())) {
+                method = candidate;
+                break;
+            }
+        }
+        if (method == null) {
+            throw new NoSuchMethodException("Method " + methodName + " not found for request type " + request.getClass().getSimpleName());
+        }
+        return method.invoke(service, request);
     }
 
     /**

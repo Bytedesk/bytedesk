@@ -32,9 +32,7 @@ public class UserSpecification extends BaseSpecification<UserEntity, UserRequest
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // load all users, including deleted users
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
             // username - 模糊匹配
             if (StringUtils.hasText(request.getUsername())) {
                 predicates.add(criteriaBuilder.like(root.get("username"), "%" + request.getUsername() + "%"));

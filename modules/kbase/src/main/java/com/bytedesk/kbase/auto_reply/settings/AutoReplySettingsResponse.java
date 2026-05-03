@@ -16,7 +16,7 @@ package com.bytedesk.kbase.auto_reply.settings;
 import java.io.Serializable;
 
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;

@@ -61,6 +61,11 @@ public class BytedeskPropertiesController {
         }
         bytedeskPropertiesResponse.getCustom().setBndEnabled(
                 environment.getProperty("bytedesk.custom.bnd.enabled", Boolean.class, false));
+        if (bytedeskPropertiesResponse.getService() == null) {
+            bytedeskPropertiesResponse.setService(new BytedeskPropertiesResponse.Service());
+        }
+        bytedeskPropertiesResponse.getService().setAgentSeatEnabled(
+            environment.getProperty("bytedesk.service.agent-seat-enabled", Boolean.class, false));
 
         BytedeskPropertiesResponse.Ai ai = new BytedeskPropertiesResponse.Ai();
 

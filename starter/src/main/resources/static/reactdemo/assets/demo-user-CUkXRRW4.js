@@ -1,0 +1,1 @@
+var e=`anonymous`,t={user1:{visitorUid:`visitor_001`,avatar:`https://weiyuai.cn/assets/images/avatar/02.jpg`,vipLevel:0},user2:{visitorUid:`visitor_002`,avatar:`https://weiyuai.cn/assets/images/avatar/01.jpg`,vipLevel:1},user3:{visitorUid:`visitor_003`,avatar:`https://weiyuai.cn/assets/images/avatar/03.jpg`,vipLevel:2}};export{t as n,e as t};

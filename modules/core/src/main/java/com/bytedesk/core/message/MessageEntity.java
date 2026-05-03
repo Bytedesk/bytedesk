@@ -14,6 +14,7 @@
  */
 package com.bytedesk.core.message;
 
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;

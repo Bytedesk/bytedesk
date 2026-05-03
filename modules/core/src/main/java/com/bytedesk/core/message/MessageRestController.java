@@ -214,6 +214,14 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "restore message")
+    @Operation(summary = "Restore Message", description = "Restore the specified soft-deleted message record")
+    @Override
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody MessageRequest request) {
+        return super.restore(request);
+    }
+
     /**
      * 当客户端长连接断开时，启用此rest接口发送消息
      * send offline message

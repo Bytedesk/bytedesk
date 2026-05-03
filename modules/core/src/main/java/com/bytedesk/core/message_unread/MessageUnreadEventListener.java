@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.redis.RedisService;
 import lombok.AllArgsConstructor;

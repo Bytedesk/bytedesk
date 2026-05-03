@@ -190,6 +190,7 @@ public class AgentEntity extends BaseEntity {
                 .uid(this.getUid())
                 .nickname(this.getNickname())
                 .avatar(this.getAvatar())
+                .description(this.getDescription())
                 .type(UserTypeEnum.AGENT.name())
                 .build();
     }

@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.TextContent;
 import com.bytedesk.core.message.content.UrlPreview;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;

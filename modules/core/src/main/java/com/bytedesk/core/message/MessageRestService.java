@@ -199,6 +199,13 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         });
     }
 
+    public MessageResponse restore(@NonNull MessageRequest request) {
+        MessageEntity entity = messageRepository.findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::messageNotFound);
+        entity.setDeleted(false);
+        return convertToResponse(save(entity));
+    }
+
     public Boolean existsByUid(String uid) {
         return messageRepository.existsByUid(uid);
     }

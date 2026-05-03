@@ -20,7 +20,7 @@ import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-import { JSX as JSX_2 } from 'react/jsx-runtime';
+import { JSX } from 'react/jsx-runtime';
 
 declare interface Animation_2 {
     enabled?: boolean;
@@ -76,11 +76,12 @@ declare interface BytedeskConfig {
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
     onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
 
-export declare const BytedeskReact: ({ locale, ...props }: BytedeskReactProps) => JSX_2.Element;
+export declare const BytedeskReact: ({ locale, ...props }: BytedeskReactProps) => JSX.Element;
 
 declare interface BytedeskReactProps extends BytedeskConfig {
     onInit?: () => void;
@@ -156,6 +157,15 @@ declare interface InviteConfig {
     onReject?: () => void;
     onClose?: () => void;
     onOpen?: () => void;
+}
+
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    extra?: unknown;
+    position?: string;
+    status?: string;
 }
 
 declare interface TabsConfig {

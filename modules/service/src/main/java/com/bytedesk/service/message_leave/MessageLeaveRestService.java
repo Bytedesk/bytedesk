@@ -34,7 +34,7 @@ import com.alibaba.fastjson2.TypeReference;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;

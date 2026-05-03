@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.favorite;
 
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 /**
  * 收藏工具类

@@ -268,6 +268,9 @@ public class VisitorRestControllerVisitor {
      */
     @GetMapping("/threads")
     public ResponseEntity<?> queryVisitorThreads(ThreadRequest request) {
+        if (request.getMergeByTopic() == null) {
+            request.setMergeByTopic(true);
+        }
 
         Page<ThreadResponse> threads = threadRestService.queryByVisitor(request);
 

@@ -61,8 +61,8 @@ import com.alibaba.fastjson2.JSONObject;
 
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadContent;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.QueueContent;

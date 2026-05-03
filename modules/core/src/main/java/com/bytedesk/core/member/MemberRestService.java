@@ -109,10 +109,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     }
 
     private void assertMemberCapacityAvailable(String orgUid) {
-        UserEntity authUser = authService.getUser();
-        if (authUser != null && authUser.isSuperUser()) {
-            return;
-        }
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxMembers = resolveMaxMembers(organization);
         long current = memberRepository.countByOrgUidAndDeletedFalse(orgUid);
@@ -147,7 +143,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (!StringUtils.hasText(request.getUserUid())) {
             throw new IllegalArgumentException("userUid is required");
         }
-        Optional<MemberEntity> memberOptional = findByUserUid(request.getUserUid());
+        String orgUid = resolveOrgUid(request.getOrgUid());
+        Optional<MemberEntity> memberOptional = findByUserUidAndOrgUid(request.getUserUid(), orgUid);
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
@@ -455,9 +452,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#uid", unless = "#result == null")
-    public Optional<MemberEntity> findByUserUid(String uid) {
-        Optional<MemberEntity> memberOptional = memberRepository.findByUser_UidAndDeletedFalse(uid);
+    public Optional<MemberEntity> findByUserUidAndOrgUid(String uid, String orgUid) {
+        Optional<MemberEntity> memberOptional = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(uid, orgUid);
         if (memberOptional.isPresent()) {
             MemberEntity member = memberOptional.get();
             // 预加载user，确保user数据被包含在缓存中
@@ -468,7 +464,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #orgUid", unless = "#result == null")
     public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String country, String orgUid) {
         Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndCountryAndOrgUidAndDeletedFalse(
                 mobile,
@@ -488,7 +483,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return findByMobileAndOrgUid(mobile, CountryCodeUtils.DEFAULT_COUNTRY, orgUid);
     }
 
-    @Cacheable(value = "member", key = "#email", unless = "#result == null")
     public Optional<MemberEntity> findByEmailAndOrgUid(String email, String orgUid) {
         Optional<MemberEntity> memberOptional = memberRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
         if (memberOptional.isPresent()) {
@@ -501,7 +495,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#user.uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserAndOrgUid(UserEntity user, String orgUid) {
         Optional<MemberEntity> memberOptional = memberRepository.findByUserAndOrgUidAndDeletedFalse(user, orgUid);
         if (memberOptional.isPresent()) {
@@ -512,6 +505,17 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             }
         }
         return memberOptional;
+    }
+
+    private String resolveOrgUid(String orgUid) {
+        if (StringUtils.hasText(orgUid)) {
+            return orgUid;
+        }
+        UserEntity currentUser = authService.getUser();
+        if (currentUser != null && StringUtils.hasText(currentUser.getOrgUid())) {
+            return currentUser.getOrgUid();
+        }
+        throw new IllegalArgumentException("orgUid is required");
     }
 
     public Boolean existsByEmailAndOrgUid(String email, String orgUid) {

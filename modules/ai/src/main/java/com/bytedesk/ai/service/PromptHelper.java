@@ -18,8 +18,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 
 import lombok.extern.slf4j.Slf4j;

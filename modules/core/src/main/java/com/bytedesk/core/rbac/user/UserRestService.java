@@ -413,6 +413,13 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         deleteByUid(request.getUid());
     }
 
+    public UserResponse restore(UserRequest request) {
+        UserEntity userEntity = userRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND));
+        userEntity.setDeleted(false);
+        return convertToResponse(save(userEntity));
+    }
+
     @Override
     public UserResponse convertToResponse(UserEntity entity) {
         return UserConvertUtils.convertToUserResponse(entity);

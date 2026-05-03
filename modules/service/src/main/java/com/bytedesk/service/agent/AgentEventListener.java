@@ -36,12 +36,12 @@ import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.kbase.quick_reply.QuickReplyRequest;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
