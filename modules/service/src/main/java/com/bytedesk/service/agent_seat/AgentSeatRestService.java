@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AgentSeatRestService
         extends BaseRestServiceWithExport<AgentSeatEntity, AgentSeatRequest, AgentSeatResponse, AgentSeatExcel> {
 
-    private final AgentSeatRepository agent_seatRepository;
+    private final AgentSeatRepository agentSeatRepository;
 
     private final ModelMapper modelMapper;
 
@@ -56,7 +56,7 @@ public class AgentSeatRestService
     public Page<AgentSeatEntity> queryByOrgEntity(AgentSeatRequest request) {
         Pageable pageable = request.getPageable();
         Specification<AgentSeatEntity> specs = AgentSeatSpecification.search(request, authService);
-        return agent_seatRepository.findAll(specs, pageable);
+        return agentSeatRepository.findAll(specs, pageable);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AgentSeatRestService
     @Cacheable(value = "agent_seat", key = "#uid", unless = "#result==null")
     @Override
     public Optional<AgentSeatEntity> findByUid(String uid) {
-        return agent_seatRepository.findByUid(uid);
+        return agentSeatRepository.findByUid(uid);
     }
 
     // @Cacheable(value = "agent_seat", key = "#name + '_' + #orgUid + '_' + #type",
@@ -103,7 +103,7 @@ public class AgentSeatRestService
     // }
 
     public Boolean existsByUid(String uid) {
-        return agent_seatRepository.existsByUid(uid);
+        return agentSeatRepository.existsByUid(uid);
     }
 
     @Transactional
@@ -168,7 +168,7 @@ public class AgentSeatRestService
     @Transactional
     @Override
     public AgentSeatResponse update(AgentSeatRequest request) {
-        Optional<AgentSeatEntity> optional = agent_seatRepository.findByUid(request.getUid());
+        Optional<AgentSeatEntity> optional = agentSeatRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             AgentSeatEntity entity = optional.get();
 
@@ -191,14 +191,14 @@ public class AgentSeatRestService
 
     @Override
     protected AgentSeatEntity doSave(AgentSeatEntity entity) {
-        return agent_seatRepository.save(entity);
+        return agentSeatRepository.save(entity);
     }
 
     @Override
     public AgentSeatEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             AgentSeatEntity entity) {
         try {
-            Optional<AgentSeatEntity> latest = agent_seatRepository.findByUid(entity.getUid());
+            Optional<AgentSeatEntity> latest = agentSeatRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 AgentSeatEntity latestEntity = latest.get();
                 // 合并需要保留的数据
@@ -212,7 +212,7 @@ public class AgentSeatRestService
                 latestEntity.setAssignedAt(entity.getAssignedAt());
                 latestEntity.setReleasedAt(entity.getReleasedAt());
                 latestEntity.setType(entity.getType());
-                return agent_seatRepository.save(latestEntity);
+                return agentSeatRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -224,7 +224,7 @@ public class AgentSeatRestService
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<AgentSeatEntity> optional = agent_seatRepository.findByUid(uid);
+        Optional<AgentSeatEntity> optional = agentSeatRepository.findByUid(uid);
         if (optional.isPresent()) {
             AgentSeatEntity entity = optional.get();
 
@@ -263,7 +263,7 @@ public class AgentSeatRestService
 
     @Override
     protected Page<AgentSeatEntity> executePageQuery(Specification<AgentSeatEntity> spec, Pageable pageable) {
-        return agent_seatRepository.findAll(spec, pageable);
+        return agentSeatRepository.findAll(spec, pageable);
     }
 
     public void initAgentSeats(String orgUid) {

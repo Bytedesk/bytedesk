@@ -28,15 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentSeatEventListener {
 
-    private final AgentSeatRestService agent_seatRestService;
+    private final AgentSeatRestService agentSeatRestService;
 
     @Order(3)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        agent_seatRestService.initAgentSeats(orgUid);
+        log.info("agent seat - organization created: {}", organization.getName());
+        agentSeatRestService.initAgentSeats(orgUid);
     }
 
  

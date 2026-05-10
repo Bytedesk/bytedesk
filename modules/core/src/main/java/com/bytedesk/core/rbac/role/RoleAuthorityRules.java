@@ -203,6 +203,41 @@ public final class RoleAuthorityRules {
     public static final String VISITOR_DELETE = "VISITOR_DELETE";
     public static final String VISITOR_EXPORT = "VISITOR_EXPORT";
 
+    // browse 
+    public static final String BROWSE_READ = "BROWSE_READ";
+    public static final String BROWSE_CREATE = "BROWSE_CREATE";
+    public static final String BROWSE_UPDATE = "BROWSE_UPDATE";
+    public static final String BROWSE_DELETE = "BROWSE_DELETE"; 
+    public static final String BROWSE_EXPORT = "BROWSE_EXPORT";
+
+    // shop
+    public static final String SHOP_READ = "SHOP_READ";
+    public static final String SHOP_CREATE = "SHOP_CREATE";
+    public static final String SHOP_UPDATE = "SHOP_UPDATE";
+    public static final String SHOP_DELETE = "SHOP_DELETE";
+    public static final String SHOP_EXPORT = "SHOP_EXPORT";
+
+    // order
+    public static final String ORDER_READ = "ORDER_READ";
+    public static final String ORDER_CREATE = "ORDER_CREATE";
+    public static final String ORDER_UPDATE = "ORDER_UPDATE";
+    public static final String ORDER_DELETE = "ORDER_DELETE";
+    public static final String ORDER_EXPORT = "ORDER_EXPORT";
+
+    // goods
+    public static final String GOODS_READ = "GOODS_READ";
+    public static final String GOODS_CREATE = "GOODS_CREATE";
+    public static final String GOODS_UPDATE = "GOODS_UPDATE";
+    public static final String GOODS_DELETE = "GOODS_DELETE";
+    public static final String GOODS_EXPORT = "GOODS_EXPORT";
+
+    // robot
+    public static final String ROBOT_READ = "ROBOT_READ";
+    public static final String ROBOT_CREATE = "ROBOT_CREATE";
+    public static final String ROBOT_UPDATE = "ROBOT_UPDATE";
+    public static final String ROBOT_DELETE = "ROBOT_DELETE";
+    public static final String ROBOT_EXPORT = "ROBOT_EXPORT";
+
     public static final Set<String> DEFAULT_ROLE_USER_AUTHORITY_VALUES = Set.of(
             USER_READ,
             USER_UPDATE,
@@ -285,7 +320,13 @@ public final class RoleAuthorityRules {
             TAG_CREATE,
             TAG_READ,
             TAG_UPDATE,
-            TAG_DELETE
+            TAG_DELETE,
+
+            // robot
+            ROBOT_READ,
+            ROBOT_CREATE,
+            ROBOT_UPDATE,
+            ROBOT_DELETE
     );
 
     /**
@@ -321,7 +362,35 @@ public final class RoleAuthorityRules {
             VISITOR_CREATE,
             VISITOR_UPDATE,
             VISITOR_DELETE,
-            VISITOR_EXPORT
+            VISITOR_EXPORT,
+
+            // 
+            BROWSE_READ,
+            BROWSE_CREATE,
+            BROWSE_UPDATE,
+            BROWSE_DELETE,
+            BROWSE_EXPORT,
+
+            // shop
+            SHOP_READ,
+            SHOP_CREATE,
+            SHOP_UPDATE,
+            SHOP_DELETE,
+            SHOP_EXPORT,
+
+            // order
+            ORDER_READ,
+            ORDER_CREATE,
+            ORDER_UPDATE,
+            ORDER_DELETE,   
+            ORDER_EXPORT,
+
+            // goods
+            GOODS_READ,
+            GOODS_CREATE,
+            GOODS_UPDATE,
+            GOODS_DELETE,
+            GOODS_EXPORT
         );
 
     public static boolean isKbaseReadPermission(String permissionValue) {
