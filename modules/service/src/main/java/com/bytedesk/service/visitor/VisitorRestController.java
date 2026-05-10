@@ -84,7 +84,7 @@ public class VisitorRestController extends BaseRestController<VisitorRequest, Vi
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = VisitorResponse.class)))
-    @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
+    // @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
     @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(VisitorRequest request) {

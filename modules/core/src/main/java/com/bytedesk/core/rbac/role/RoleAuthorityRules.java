@@ -189,6 +189,20 @@ public final class RoleAuthorityRules {
     public static final String QUICK_REPLY_UPDATE = "QUICK_REPLY_UPDATE";
     public static final String QUICK_REPLY_DELETE = "QUICK_REPLY_DELETE";
 
+    // tag (modules/core)
+    public static final String TAG_READ = "TAG_READ";
+    public static final String TAG_CREATE = "TAG_CREATE";
+    public static final String TAG_UPDATE = "TAG_UPDATE";
+    public static final String TAG_DELETE = "TAG_DELETE";
+    public static final String TAG_EXPORT = "TAG_EXPORT";
+
+    // visitor (modules/service)
+    public static final String VISITOR_READ = "VISITOR_READ";
+    public static final String VISITOR_CREATE = "VISITOR_CREATE";
+    public static final String VISITOR_UPDATE = "VISITOR_UPDATE";
+    public static final String VISITOR_DELETE = "VISITOR_DELETE";
+    public static final String VISITOR_EXPORT = "VISITOR_EXPORT";
+
     public static final Set<String> DEFAULT_ROLE_USER_AUTHORITY_VALUES = Set.of(
             USER_READ,
             USER_UPDATE,
@@ -265,7 +279,13 @@ public final class RoleAuthorityRules {
             // NOTIFICATION_CREATE,
             NOTIFICATION_UPDATE,
             NOTIFICATION_DELETE,
-            NOTIFICATION_EXPORT
+            NOTIFICATION_EXPORT,
+
+            // 
+            TAG_CREATE,
+            TAG_READ,
+            TAG_UPDATE,
+            TAG_DELETE
     );
 
     /**
@@ -294,7 +314,15 @@ public final class RoleAuthorityRules {
             // 快捷回复：ROLE_AGENT 默认需要增删改
             QUICK_REPLY_CREATE,
             QUICK_REPLY_UPDATE,
-            QUICK_REPLY_DELETE);
+            QUICK_REPLY_DELETE,
+
+            // 
+            VISITOR_READ,
+            VISITOR_CREATE,
+            VISITOR_UPDATE,
+            VISITOR_DELETE,
+            VISITOR_EXPORT
+        );
 
     public static boolean isKbaseReadPermission(String permissionValue) {
         if (!StringUtils.hasText(permissionValue)) {
