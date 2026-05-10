@@ -55,6 +55,7 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -108,7 +109,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         int maxWorkgroups = resolveMaxWorkgroups(organization);
         long current = workgroupRepository.countByOrgUidAndDeletedFalse(orgUid);
         if (current >= maxWorkgroups) {
-            throw new RuntimeException("Organization workgroup limit exceeded");
+            throw new RuntimeException(I18ServiceConsts.I18N_ORGANIZATION_WORKGROUP_LIMIT_EXCEEDED);
         }
     }
 
@@ -555,7 +556,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 latestEntity.setAvatar(entity.getAvatar());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setStatus(entity.getStatus());
-                // TODO: Settings should be managed through WorkgroupSettingsEntity
                 // latestEntity.setMessageLeaveSettings(entity.getMessageLeaveSettings());
                 // latestEntity.setRobotSettings(entity.getRobotSettings());
                 // latestEntity.setServiceSettings(entity.getServiceSettings());

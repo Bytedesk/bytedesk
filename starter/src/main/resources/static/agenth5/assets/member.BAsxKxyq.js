@@ -1,0 +1,1 @@
+import{H as e,P as n,s as r}from"./index-BUTVkaUf.js";function s(s={}){const a=r.getUserInfo()||{};return e.get("/api/v1/member/query/userUid",{userUid:s.userUid||a.uid||a.userUid||"",channel:n.channel})}function a(r={}){return e.post("/api/v1/member/update",{channel:n.channel,...r})}export{s as g,a as u};

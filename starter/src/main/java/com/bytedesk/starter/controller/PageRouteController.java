@@ -332,6 +332,23 @@ public class PageRouteController {
 	}
 
 	/**
+	 * agenth5
+	 * h5 web聊天/客服端
+	 * http://127.0.0.1:9003/agenth5
+	 */
+	@GetMapping({
+			"/agenth5",
+			"/agenth5/",
+			"/agenth5/{path:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String agenth5(@PathVariable(required = false) String path) {
+		return "forward:/agenth5/index.html"; // 默认路径
+	}
+
+	/**
 	 * visitor
 	 * 访客对话窗口
 	 * http://127.0.0.1:9003/chat/demo
@@ -492,15 +509,15 @@ public class PageRouteController {
 	}
 
 	@GetMapping({
-			"/pbx",
-			"/pbx/",
-			"/pbx/{path:[^\\.]*}",
-			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
-			"/pbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+			"/ippbx",
+			"/ippbx/",
+			"/ippbx/{path:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
-	public String pbx() {
-		return "forward:/pbx/index.html";
+	public String ippbx() {
+		return "forward:/ippbx/index.html";
 	}
 
 	@GetMapping({

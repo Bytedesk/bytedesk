@@ -72,6 +72,8 @@ public class I18Consts {
     public static final String I18N_TASK_LIST = I18N_PREFIX + "task.list";
     public static final String I18N_WORKFLOW_NODE = I18N_PREFIX + "workflow.node";
     public static final String I18N_ORGANIZATION = I18N_PREFIX + "organization";
+    public static final String I18N_ORGANIZATION_APPLY = I18N_PREFIX + "organization.apply";
+    public static final String I18N_ORGANIZATION_SETTINGS = I18N_PREFIX + "organization.settings";
     public static final String I18N_CITY = I18N_PREFIX + "city";
     public static final String I18N_WORKFLOW = I18N_PREFIX + "workflow";
     public static final String I18N_WORKFLOW_SETTINGS = I18N_PREFIX + "workflow.settings";
@@ -104,7 +106,6 @@ public class I18Consts {
     public static final String I18N_USER = I18N_PREFIX + "user";
     public static final String I18N_TOKEN = I18N_PREFIX + "token";
     public static final String I18N_EMAIL_MESSAGE = I18N_PREFIX + "email.message";
-    public static final String I18N_ORGANIZATION_APPLY = I18N_PREFIX + "organization.apply";
     public static final String I18N_TASK = I18N_PREFIX + "task";
     public static final String I18N_TASK_COMMENT = I18N_PREFIX + "task.comment";
     public static final String I18N_GROUP = I18N_PREFIX + "group.management";
@@ -356,6 +357,7 @@ public class I18Consts {
     public static final String I18N_WORKFLOW_CONTENT_EMPTY = I18N_PREFIX + "workflow.content.empty"; // 工作流内容为空
     public static final String I18N_WORKFLOW_START_NODE_NOT_FOUND = I18N_PREFIX + "workflow.start.node.not.found"; // 工作流中未找到开始节点
     public static final String I18N_ACCESS_DENIED = I18N_PREFIX + "access.denied"; // 无权限访问
+    public static final String I18N_VISITOR_MESSAGE_RECEIVE_DENIED = I18N_PREFIX + "visitor.message.receive.denied"; // 当前对方无法接收您的消息！
     public static final String I18N_ORG_UID_REQUIRED = I18N_PREFIX + "org.uid.required"; // 非超级管理员必须指定组织
     public static final String I18N_ORGANIZATION_ACCESS_DENIED = I18N_PREFIX + "organization.access.denied"; // 无权访问其他组织数据
     public static final String I18N_ORGANIZATION_NOT_FOUND = I18N_PREFIX + "organization.not.found"; // 组织未找到

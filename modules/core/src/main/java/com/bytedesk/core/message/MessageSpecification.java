@@ -135,6 +135,12 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
                     predicates.add(topicPredicate);
                 }
             }
+            String visitorIdentity = StringUtils.hasText(request.getVisitorUid())
+                    ? request.getVisitorUid()
+                    : request.getUid();
+            if (StringUtils.hasText(visitorIdentity)) {
+                predicates.add(criteriaBuilder.like(threadJoin.get("user"), "%" + visitorIdentity + "%"));
+            }
             // threadUid 替换为 thread.uid
             if (StringUtils.hasText(request.getThreadUid())) {
                 predicates.add(criteriaBuilder.equal(threadJoin.get("uid"), request.getThreadUid()));

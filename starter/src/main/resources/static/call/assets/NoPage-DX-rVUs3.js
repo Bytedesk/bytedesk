@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-D556z_89.js";var t=e(),n=()=>(0,t.jsx)(`div`,{style:{minHeight:`100vh`,display:`flex`,justifyContent:`center`,alignItems:`center`,overflowY:`auto`,WebkitOverflowScrolling:`touch`,scrollBehavior:`smooth`},children:(0,t.jsx)(`h1`,{children:`404`})});export{n as default};

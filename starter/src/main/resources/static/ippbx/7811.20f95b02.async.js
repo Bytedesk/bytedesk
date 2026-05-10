@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcallAdmin=self.webpackChunkcallAdmin||[]).push([[7811],{47811:function(t,n,e){e.r(n),e.d(n,{default:function(){return l}});e(15009);var u=e(69549),c=e(86766);function l(){var t=(0,u.useOutletContext)();return(0,c.jsx)(u.Outlet,{context:t})}}}]);

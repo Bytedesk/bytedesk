@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[9408],{3679:function(e,n,s){s.r(n);s(97421);var i=s(72674),d=s(1972);n.default=function(){return(0,d.jsx)("div",{style:{padding:"10px"},children:(0,d.jsx)(i.Z,{scope:"user",routeBase:"/setting/notification",enableSend:!1,sendMode:"disabled"})})}}}]);

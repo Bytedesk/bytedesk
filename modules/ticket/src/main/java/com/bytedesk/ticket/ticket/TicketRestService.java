@@ -283,14 +283,15 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getUid(), "ticket uid required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
-        normalizeReporterType(request, false);
-        Assert.hasText(request.getReporterJson(), "reporter info required");
 
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
         if (ticketOptional.isEmpty()) {
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        populateUpdateDefaults(request, ticket);
+        normalizeReporterType(request, false);
+        Assert.hasText(request.getReporterJson(), "reporter info required");
 
         // 预先记录旧值，避免后续 setXXX 覆盖导致事件判断失效
         final String oldAssigneeUid = (ticket.getAssignee() != null) ? ticket.getAssignee().getUid() : null;
@@ -354,6 +355,21 @@ public class TicketRestService
         }
 
         return convertToResponse(ticket);
+    }
+
+    private void populateUpdateDefaults(TicketRequest request, TicketEntity ticket) {
+        Assert.notNull(request, "ticket request required");
+        Assert.notNull(ticket, "ticket entity required");
+
+        if (!StringUtils.hasText(request.getType())) {
+            request.setType(ticket.getType());
+        }
+        if (!StringUtils.hasText(request.getStatus())) {
+            request.setStatus(ticket.getStatus());
+        }
+        if (request.getReporter() == null && StringUtils.hasText(ticket.getReporterString())) {
+            request.setReporter(ticket.getReporter());
+        }
     }
 
     public TicketEntity updateAttachments(TicketEntity ticket, Set<String> uploadUids) {

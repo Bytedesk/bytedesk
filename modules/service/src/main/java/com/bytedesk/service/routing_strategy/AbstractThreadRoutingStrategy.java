@@ -82,9 +82,9 @@ public abstract class AbstractThreadRoutingStrategy {
         if (visitorRequest == null) {
             return null;
         }
-        // if (StringUtils.hasText(visitorRequest.getVisitorUid())) {
-        //     return visitorRequest.getVisitorUid();
-        // }
+        if (StringUtils.hasText(visitorRequest.getVisitorUid())) {
+            return visitorRequest.getVisitorUid();
+        }
         return visitorRequest.getUid();
     }
 

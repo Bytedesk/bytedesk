@@ -68,6 +68,7 @@ public class I18ServiceConsts {
 
     // 机器人转人工默认值
     public static final String I18N_DEFAULT_MANUAL_TRANSFER_LABEL = I18Consts.I18N_PREFIX + "default.manual.transfer.label";
+    public static final String I18N_ORGANIZATION_WORKGROUP_LIMIT_EXCEEDED = I18Consts.I18N_PREFIX + "organization.workgroup.limit.exceeded";
     public static final int I18N_DEFAULT_MIN_CONFIDENCE = 65;
     public static final int I18N_DEFAULT_MAX_ROBOT_REPLIES = 3;
     public static final int I18N_DEFAULT_AUTO_TRANSFER_DELAY_SECONDS = 0;

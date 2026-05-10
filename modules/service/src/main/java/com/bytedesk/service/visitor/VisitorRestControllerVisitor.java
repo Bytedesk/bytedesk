@@ -165,6 +165,9 @@ public class VisitorRestControllerVisitor {
         if (!StringUtils.hasText(request.getOrgUid())) {
             return ResponseEntity.ok(JsonResult.error("orgUid required"));
         }
+        if (!StringUtils.hasText(request.getVisitorUid()) && !StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.ok(JsonResult.error("visitorUid or uid required"));
+        }
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //

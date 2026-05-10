@@ -1,1 +1,0 @@
-import e from"./request-DY-7vvZ0.js";function t(t){return e({url:`/visitor/api/feedback/submit`,method:`post`,data:t})}export{t as submitFeedback};

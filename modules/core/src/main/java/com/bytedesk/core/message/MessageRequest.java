@@ -34,6 +34,8 @@ public class MessageRequest extends BaseRequest {
 
     private String threadUid;
 
+    private String visitorUid;
+
     private String threadType;
     
     private String nickname;

@@ -1,1 +1,0 @@
-import{p as e}from"./configUtils-DX2exxHn.js";async function t(t){return e(`/api/v1/asr/transcribe/message`,{method:`POST`,params:t})}async function n(){return e(`/api/v1/asr/realtime/ws-url`,{method:`GET`})}async function r(t){let{stream:n,...r}=t;return e(n?`/api/v1/tts/stream`:`/api/v1/tts`,{method:`GET`,params:r,responseType:`arraybuffer`})}export{r as n,t as r,n as t};

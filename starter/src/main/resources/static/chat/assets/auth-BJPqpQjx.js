@@ -1,0 +1,1 @@
+import{ci as e,si as t}from"./configUtils-zFgAUXwL.js";import{S as n,b as r,x as i,y as a}from"./react-vendor-D_jGpKEm.js";var o=n()(r(i(a((e,n)=>({accessToken:``,setAccessToken(n){localStorage.setItem(t,n),e({accessToken:n})},getAccessToken(){return n().accessToken},removeAccessToken(){localStorage.removeItem(t),e({accessToken:``})}})),{name:e})));export{o as t};
