@@ -63,14 +63,14 @@ public class AgentSeatEntity extends BaseEntity {
     @Column(name = "is_base_seat")
     private Boolean baseSeat = false;
 
+    /**
+     * expireAt = null 表示永不过期
+     */
     @Column(name = "expire_at")
     private ZonedDateTime expireAt;
 
     @Column(name = "assigned_agent_uid", length = 64)
     private String assignedAgentUid;
-
-    @Column(name = "assigned_member_uid", length = 64)
-    private String assignedMemberUid;
 
     @Column(name = "assigned_at")
     private ZonedDateTime assignedAt;

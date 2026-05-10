@@ -207,7 +207,6 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         if (agentSeatDomainService.isSeatEnabled()) {
             agentSeatDomainService.assignSeatForAgent(
                 request.getOrgUid(),
-                member.getUid(),
                 agent.getUid());
         }
         //

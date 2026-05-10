@@ -34,8 +34,10 @@ public class AgentSpecification extends BaseSpecification<AgentEntity, AgentRequ
             List<Predicate> predicates = new ArrayList<>();
             // predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            // 使用基类方法处理超级管理员权限和组织过滤
-            // addOrgFilterIfNotSuperUser(root, criteriaBuilder, predicates, request, authService);
+            // 某些下拉场景需要在 superUser 模式下仍精确限定到单个组织。
+            if (Boolean.TRUE.equals(request.getExactOrgFilter()) && StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
             
             if (StringUtils.hasText(request.getNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("nickname"), "%" + request.getNickname() + "%"));

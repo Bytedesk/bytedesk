@@ -46,8 +46,6 @@ public class AgentSeatResponse extends BaseResponse {
 
     private String assignedAgentUid;
 
-    private String assignedMemberUid;
-
     private ZonedDateTime assignedAt;
 
     private ZonedDateTime releasedAt;

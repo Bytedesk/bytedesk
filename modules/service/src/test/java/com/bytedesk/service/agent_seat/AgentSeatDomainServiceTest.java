@@ -123,7 +123,6 @@ package com.bytedesk.service.agent_seat;
 //                 .baseSeat(false)
 //                 .status(AgentSeatStatusEnum.OCCUPIED.name())
 //                 .assignedAgentUid("agent-1")
-//                 .assignedMemberUid("member-1")
 //                 .build();
 //         extraSeat.setCreatedAt(ZonedDateTime.parse("2026-04-11T00:00:00+08:00"));
 
@@ -342,7 +341,6 @@ package com.bytedesk.service.agent_seat;
 //                 .uid("seat-1")
 //                 .orgUid("org-1")
 //                 .assignedAgentUid("agent-1")
-//                 .assignedMemberUid("member-1")
 //                 .status(AgentSeatStatusEnum.OCCUPIED.name())
 //                 .build();
 //         AgentEntity agent = AgentEntity.builder().uid("agent-1").enabled(true).build();

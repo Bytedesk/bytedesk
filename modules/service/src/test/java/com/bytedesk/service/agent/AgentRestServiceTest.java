@@ -145,7 +145,7 @@ class AgentRestServiceTest {
         when(agentSeatDomainService.hasAvailableSeat("org-1")).thenReturn(true);
         when(userService.ensureCurrentOrganization(user, "org-1")).thenReturn(user);
         when(userService.addRoleAgent(user)).thenReturn(user);
-        when(agentSeatDomainService.assignSeatForAgent("org-1", "member-1", "agent-1"))
+        when(agentSeatDomainService.assignSeatForAgent("org-1", "agent-1"))
                 .thenReturn(Optional.of(seat));
         when(agentRepository.save(any(AgentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 

@@ -208,7 +208,6 @@ public class AgentSeatRestService
                 latestEntity.setBaseSeat(entity.getBaseSeat());
                 latestEntity.setExpireAt(entity.getExpireAt());
                 latestEntity.setAssignedAgentUid(entity.getAssignedAgentUid());
-                latestEntity.setAssignedMemberUid(entity.getAssignedMemberUid());
                 latestEntity.setAssignedAt(entity.getAssignedAt());
                 latestEntity.setReleasedAt(entity.getReleasedAt());
                 latestEntity.setType(entity.getType());

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.member.MemberRestService;
+import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -89,7 +90,7 @@ public class AgentSeatDomainService {
     }
 
     @Transactional
-    public Optional<AgentSeatEntity> assignSeatForAgent(String orgUid, String memberUid, String agentUid) {
+    public Optional<AgentSeatEntity> assignSeatForAgent(String orgUid, String agentUid) {
         if (!isSeatEnabled()) {
             return Optional.empty();
         }
@@ -111,7 +112,6 @@ public class AgentSeatDomainService {
 
         AgentSeatEntity seat = seatOptional.get();
         seat.setAssignedAgentUid(agentUid);
-        seat.setAssignedMemberUid(memberUid);
         seat.setAssignedAt(ZonedDateTime.now());
         seat.setReleasedAt(null);
         seat.setStatus(AgentSeatStatusEnum.OCCUPIED.name());
@@ -130,7 +130,6 @@ public class AgentSeatDomainService {
 
         AgentSeatEntity seat = seatOptional.get();
         seat.setAssignedAgentUid(null);
-        seat.setAssignedMemberUid(null);
         seat.setAssignedAt(null);
         seat.setReleasedAt(ZonedDateTime.now());
         seat.setStatus(resolveSeatStatusAfterRelease(seat));
@@ -326,11 +325,14 @@ public class AgentSeatDomainService {
     }
 
     private void removeAssignedMemberFromOrg(AgentSeatEntity seat) {
-        if (!StringUtils.hasText(seat.getAssignedMemberUid())) {
+        if (!StringUtils.hasText(seat.getAssignedAgentUid())) {
             return;
         }
 
-        memberRestService.findByUid(seat.getAssignedMemberUid())
+        agentRepository.findByUid(seat.getAssignedAgentUid())
+            .map(AgentEntity::getMember)
+            .filter(member -> member != null && StringUtils.hasText(member.getUid()))
+            .flatMap(member -> memberRestService.findByUid(member.getUid()))
                 .filter(member -> !member.isDeleted())
                 .ifPresent(member -> memberRestService.removeUserFromOrg(MemberRequest.builder()
                         .uid(member.getUid())

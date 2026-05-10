@@ -46,8 +46,6 @@ public class AgentSeatRequest extends BaseRequest {
 
     private String assignedAgentUid;
 
-    private String assignedMemberUid;
-
     private ZonedDateTime assignedAt;
 
     private ZonedDateTime releasedAt;

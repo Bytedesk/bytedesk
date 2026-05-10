@@ -87,6 +87,13 @@ public class AgentRequest extends BaseRequest {
     //
     @NotBlank
     private String memberUid;
+
+    /**
+     * 当为 true 时，即使 superUser 查询也要严格按 orgUid 过滤。
+     * 用于 AgentSeat 等需要精确限定组织范围的下拉选择场景。
+     */
+    @Builder.Default
+    private Boolean exactOrgFilter = false;
     
     // used for client query
     private String componentType;
