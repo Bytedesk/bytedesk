@@ -14,5 +14,6 @@
     <include file="db/changelog/migration/260509_add_goods_order_type.xml" />
     <include file="db/changelog/migration/260509_add_goods_order_navigate_to_path.xml" />
     <include file="db/changelog/migration/260510_drop_agent_seat_assigned_member_uid.xml" />
+    <include file="db/changelog/migration/260510_add_goods_status.xml" />
 
 </databaseChangeLog>

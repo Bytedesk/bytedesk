@@ -16,12 +16,18 @@ package com.bytedesk.core.upload;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
+import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,29 +74,91 @@ public class UploadFilePreview {
 			@PathVariable(name = "MM") String month,
 			@PathVariable(name = "dd") String day,
 			@PathVariable String filename,
+			HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		log.info("year {}, month {}, day {}, filename: {}", year, month, day, filename);
 		// 拼接完整路径
 		String fullPath = year + "/" + month + "/" + day + "/" + filename;
 		Resource fileResource = uploadRestService.loadAsResource(fullPath);
 
-		// 文件预览
 		File file = fileResource.getFile();
-		FileInputStream fileInputStream = new FileInputStream(file);
-		// 清空response
+		long fileLength = file.length();
+		String contentType = resolveContentType(file, request);
+		String rangeHeader = request.getHeader(HttpHeaders.RANGE);
+
 		response.reset();
-		// 2、设置文件下载方式
 		response.setCharacterEncoding("utf-8");
-		// response.setContentType("application/pdf");
-		OutputStream outputStream = response.getOutputStream();
-		int count = 0;
-		byte[] buffer = new byte[1024 * 1024];
-		while ((count = fileInputStream.read(buffer)) != -1) {
-			outputStream.write(buffer, 0, count);
+		response.setContentType(contentType);
+		response.setHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+		response.setHeader("X-Content-Type-Options", "nosniff");
+
+		long start = 0L;
+		long end = fileLength - 1;
+
+		if (rangeHeader != null && !rangeHeader.isBlank()) {
+			try {
+				List<HttpRange> ranges = HttpRange.parseRanges(rangeHeader);
+				if (!ranges.isEmpty()) {
+					HttpRange range = ranges.get(0);
+					start = range.getRangeStart(fileLength);
+					end = range.getRangeEnd(fileLength);
+					if (start >= fileLength || end >= fileLength || start > end) {
+						response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+						response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes */" + fileLength);
+						return;
+					}
+					response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+					response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes " + start + "-" + end + "/" + fileLength);
+				}
+			} catch (IllegalArgumentException ex) {
+				log.warn("invalid range header for file preview filename={} range={}", filename, rangeHeader);
+				response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+				response.setHeader(HttpHeaders.CONTENT_RANGE, "bytes */" + fileLength);
+				return;
+			}
 		}
-		outputStream.flush();
-		outputStream.close();
-		fileInputStream.close();
+
+		long contentLength = end - start + 1;
+		response.setContentLengthLong(contentLength);
+
+		try (InputStream inputStream = new FileInputStream(file); OutputStream outputStream = response.getOutputStream()) {
+			skipFully(inputStream, start);
+			copyRange(inputStream, outputStream, contentLength);
+			outputStream.flush();
+		}
+	}
+
+	private String resolveContentType(File file, HttpServletRequest request) {
+		return Optional.ofNullable(request.getServletContext().getMimeType(file.getName()))
+			.or(() -> MediaTypeFactory.getMediaType(file.getName()).map(MediaType::toString))
+			.orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+	}
+
+	private void skipFully(InputStream inputStream, long bytesToSkip) throws IOException {
+		long remaining = bytesToSkip;
+		while (remaining > 0) {
+			long skipped = inputStream.skip(remaining);
+			if (skipped <= 0) {
+				if (inputStream.read() == -1) {
+					break;
+				}
+				skipped = 1;
+			}
+			remaining -= skipped;
+		}
+	}
+
+	private void copyRange(InputStream inputStream, OutputStream outputStream, long bytesToCopy) throws IOException {
+		byte[] buffer = new byte[1024 * 1024];
+		long remaining = bytesToCopy;
+		while (remaining > 0) {
+			int bytesRead = inputStream.read(buffer, 0, (int) Math.min(buffer.length, remaining));
+			if (bytesRead == -1) {
+				break;
+			}
+			outputStream.write(buffer, 0, bytesRead);
+			remaining -= bytesRead;
+		}
 	}
 
 	/**
