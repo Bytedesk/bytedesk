@@ -70,6 +70,12 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (cause == null) {
+            log.warn("TextWebSocketFrameHandler received null cause, closing channel");
+            ctx.close();
+            return;
+        }
+
         if (isExpectedDisconnect(cause)) {
             log.debug("TextWebSocketFrameHandler remote peer disconnected: {}", cause.toString());
         } else {
@@ -79,15 +85,24 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     }
 
     private boolean isExpectedDisconnect(Throwable cause) {
-        if (cause instanceof SocketException || cause instanceof IOException) {
-            String message = cause.getMessage();
-            if (message == null) {
-                return true;
+        Throwable current = cause;
+        while (current != null) {
+            if (current instanceof SocketException || current instanceof IOException) {
+                String message = current.getMessage();
+                if (message == null) {
+                    return true;
+                }
+                String normalized = message.toLowerCase(Locale.ROOT);
+                if (normalized.contains("connection reset")
+                        || normalized.contains("broken pipe")
+                        || normalized.contains("forcibly closed")
+                        || normalized.contains("timed out")
+                        || normalized.contains("can't assign requested address")
+                        || normalized.contains("cannot assign requested address")) {
+                    return true;
+                }
             }
-            String normalized = message.toLowerCase(Locale.ROOT);
-            return normalized.contains("connection reset")
-                    || normalized.contains("broken pipe")
-                    || normalized.contains("forcibly closed");
+            current = current.getCause();
         }
         return false;
     }

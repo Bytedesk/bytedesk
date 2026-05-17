@@ -31,7 +31,7 @@ public class XmlCurlProperties {
     private List<String> ipWhitelist = Collections.emptyList();
 
     /**
-     * 路径前缀，仅用于过滤器匹配；控制器映射为固定路径 /freeswitch/api/v1/xmlcurl。
+     * 路径前缀，仅用于过滤器匹配；控制器映射为固定路径 /visitor/api/v1/xmlcurl。
      */
-    private String pathPrefix = "/freeswitch/api/v1/xmlcurl";
+    private String pathPrefix = "/visitor/api/v1/xmlcurl";
 }

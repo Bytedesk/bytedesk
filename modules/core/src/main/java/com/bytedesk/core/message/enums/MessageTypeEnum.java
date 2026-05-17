@@ -56,6 +56,7 @@ public enum MessageTypeEnum {
     POLL, // 投票
     POLL_SUBMIT, // 投票提交
     // 
+    PREFORM, // 询前问卷
     FORM, // 表单：询前表单
     FORM_SUBMIT, // 表单提交
     // 选择消息

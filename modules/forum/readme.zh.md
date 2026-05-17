@@ -15,7 +15,7 @@
 
 ## 1. 系统概述
 
-ByteDesk用户社区是一个面向开发者和用户的交流平台，旨在提供优质的技术讨论、问答和知识分享环境。参考[腾讯云-开发者社区](https://cloud.tencent.com/developer)实现。
+ByteDesk用户社区是一个面向开发者和用户的交流平台，旨在提供优质的技术讨论、问答和知识分享环境。参考[腾讯云-开发者社区](https://cloud.tencent.com/developer)、[Leamon](https://support.qq.com/products/36664)实现。
 
 ## 2. 核心功能模块
 

@@ -35,6 +35,7 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Organization organization;
     private Service service;
     private Ai ai;
+    private Call call;
 
     @Getter
     @Setter
@@ -125,6 +126,18 @@ public class BytedeskPropertiesResponse implements Serializable {
         // bytedesk.ai.* 聚合后的应用默认值，供前端表单和执行接口共享。
         private Tts tts;
         private Asr asr;
+    }
+
+    @Getter
+    @Setter
+    public static class Call {
+        private Freeswitch freeswitch;
+    }
+
+    @Getter
+    @Setter
+    public static class Freeswitch {
+        private String recordingsBaseUrl;
     }
 
     @Getter

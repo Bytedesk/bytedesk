@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.uid.worker;
 
+import java.util.Optional;
+
 import com.bytedesk.core.uid.UidGeneratorEntity;
 import com.bytedesk.core.uid.UidGereratorRepository;
 // import com.bytedesk.core.uid.utils.DockerUtils;
@@ -56,10 +58,10 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         // build worker node entity
         UidGeneratorEntity workerNodeEntity = buildWorkerNode();
 
-        UidGeneratorEntity oldWorkerNode = workerNodeDAO
+        Optional<UidGeneratorEntity> oldWorkerNode = workerNodeDAO
                 .findByHostAndPort(workerNodeEntity.getHost(), workerNodeEntity.getPort());
-        if (null != oldWorkerNode) {
-            return oldWorkerNode.getId();
+        if (oldWorkerNode.isPresent()) {
+            return oldWorkerNode.get().getId();
         }
 
         // add worker node for new (ignore the same IP + PORT)

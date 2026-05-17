@@ -3,6 +3,7 @@ package com.bytedesk.call.xml_curl;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -22,10 +23,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class XmlCurlService {
 
-    private final ObjectProvider<XmlCurlDirectoryProvider> directoryProvider;
+    private final ObjectProvider<XmlCurlDialplanProvider> dialplanProviders;
+    private final ObjectProvider<XmlCurlDirectoryProvider> directoryProviders;
+    private final ObjectProvider<XmlCurlConfigurationProvider> configurationProviders;
 
-    public XmlCurlService(ObjectProvider<XmlCurlDirectoryProvider> directoryProvider) {
-        this.directoryProvider = directoryProvider;
+    public XmlCurlService(ObjectProvider<XmlCurlDialplanProvider> dialplanProviders,
+            ObjectProvider<XmlCurlDirectoryProvider> directoryProviders,
+            ObjectProvider<XmlCurlConfigurationProvider> configurationProviders) {
+        this.dialplanProviders = dialplanProviders;
+        this.directoryProviders = directoryProviders;
+        this.configurationProviders = configurationProviders;
     }
 
     // 开关：默认全部关闭，仅在联调或按需开启对应 section 的动态返回
@@ -42,10 +49,6 @@ public class XmlCurlService {
     private static final Set<String> CONFIG_WHITELIST = csvEnv("XMLCURL_CONFIG_WHITELIST", "");
 
     public byte[] handleDialplan(Map<String, String> p) {
-        if (!ENABLE_DIALPLAN) {
-            logDisabled("dialplan", "XMLCURL_ENABLE_DIALPLAN");
-            return resultNotFound();
-        }
         String context = pick(p, "Caller-Context", "context", "variable_context");
         if (context == null || context.isBlank()) context = CallConstants.USER_CONTEXT_DEFAULT;
         String dest = pick(p, "Caller-Destination-Number", "destination_number", "variable_destination_number");
@@ -56,6 +59,20 @@ public class XmlCurlService {
         if (log.isDebugEnabled()) {
             log.debug("xmlcurl.dialplan context='{}' dest='{}'", context, dest);
         }
+
+        List<XmlCurlDialplanProvider> providers = dialplanProviders.orderedStream().toList();
+        for (XmlCurlDialplanProvider provider : providers) {
+            Optional<String> xml = provider.provideDialplanXml(context, dest, p);
+            if (xml.isPresent()) {
+                return xml.get().getBytes(StandardCharsets.UTF_8);
+            }
+        }
+
+        if (!ENABLE_DIALPLAN) {
+            logDisabled("dialplan", "XMLCURL_ENABLE_DIALPLAN");
+            return resultNotFound();
+        }
+
         // 示例：仅对 9297 返回一个最小拨号计划片段（长音播放），其余走本地
         if (!dest.equals("9297")) {
             logNotFound("dialplan", "dest not match demo: " + dest);
@@ -87,13 +104,15 @@ public class XmlCurlService {
             return resultNotFound();
         }
 
-        XmlCurlDirectoryProvider provider = directoryProvider.getIfAvailable();
-        if (provider != null) {
+        List<XmlCurlDirectoryProvider> providers = directoryProviders.orderedStream().toList();
+        for (XmlCurlDirectoryProvider provider : providers) {
             Optional<String> xml = provider.provideDirectoryXml(user.trim(), domain.trim(), p);
             if (xml.isPresent()) {
                 return xml.get().getBytes(StandardCharsets.UTF_8);
             }
-            logNotFound("directory", "provider returned empty for user=" + user + " domain=" + domain);
+        }
+        if (!providers.isEmpty()) {
+            logNotFound("directory", "all providers returned empty for user=" + user + " domain=" + domain);
             return resultNotFound();
         }
 
@@ -144,6 +163,15 @@ public class XmlCurlService {
             return resultNotFound();
         }
         cfgName = cfgName.trim();
+
+        List<XmlCurlConfigurationProvider> providers = configurationProviders.orderedStream().toList();
+        for (XmlCurlConfigurationProvider provider : providers) {
+            Optional<String> xml = provider.provideConfigurationXml(cfgName, p);
+            if (xml.isPresent()) {
+                return xml.get().getBytes(StandardCharsets.UTF_8);
+            }
+        }
+
         if (!CONFIG_WHITELIST.contains(cfgName)) {
             logNotFound("configuration", "name not whitelisted: " + cfgName);
             return resultNotFound();

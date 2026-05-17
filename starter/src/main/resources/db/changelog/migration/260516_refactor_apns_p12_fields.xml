@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260516-add-apns-p12-config-columns" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_apns_p12">
+            <column name="bundle_id" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="bytedesk_core_apns_p12">
+            <column name="p12_url" type="VARCHAR(512)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="bytedesk_core_apns_p12">
+            <column name="p12_password" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="bytedesk_core_apns_p12">
+            <column name="is_sandbox" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <addColumn tableName="bytedesk_core_apns_p12">
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260516-backfill-apns-p12-config-columns" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <columnExists tableName="bytedesk_core_apns_p12" columnName="is_sandbox"/>
+            <columnExists tableName="bytedesk_core_apns_p12" columnName="is_enabled"/>
+        </preConditions>
+
+        <sql>
+            UPDATE bytedesk_core_apns_p12
+            SET is_sandbox = false
+            WHERE is_sandbox IS NULL;
+        </sql>
+
+        <sql>
+            UPDATE bytedesk_core_apns_p12
+            SET is_enabled = true
+            WHERE is_enabled IS NULL;
+        </sql>
+    </changeSet>
+
+    <changeSet id="260516-drop-apns-p12-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <columnExists tableName="bytedesk_core_apns_p12" columnName="apns_p12_type"/>
+        </preConditions>
+
+        <dropColumn tableName="bytedesk_core_apns_p12" columnName="apns_p12_type"/>
+    </changeSet>
+
+</databaseChangeLog>

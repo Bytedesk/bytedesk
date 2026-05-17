@@ -20,6 +20,12 @@ public class MqttPipelineExceptionHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (cause == null) {
+            log.warn("MqttPipelineExceptionHandler received null cause, closing channel");
+            ctx.close();
+            return;
+        }
+
         if (isExpectedDisconnect(cause)) {
             log.debug("MqttPipelineExceptionHandler remote peer disconnected: {}", cause.toString());
         } else {
@@ -40,7 +46,9 @@ public class MqttPipelineExceptionHandler extends ChannelInboundHandlerAdapter {
                 if (normalized.contains("connection reset")
                         || normalized.contains("broken pipe")
                         || normalized.contains("forcibly closed")
-                        || normalized.contains("timed out")) {
+                        || normalized.contains("timed out")
+                        || normalized.contains("can't assign requested address")
+                        || normalized.contains("cannot assign requested address")) {
                     return true;
                 }
             }

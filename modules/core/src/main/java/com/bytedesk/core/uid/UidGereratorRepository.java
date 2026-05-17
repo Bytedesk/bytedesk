@@ -28,6 +28,8 @@
  */
 package com.bytedesk.core.uid;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -46,6 +48,6 @@ public interface UidGereratorRepository extends JpaRepository<UidGeneratorEntity
      * @param port
      * @return
      */
-    UidGeneratorEntity findByHostAndPort(String host, String port);
+    Optional<UidGeneratorEntity> findByHostAndPort(String host, String port);
 
 }

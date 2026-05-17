@@ -31,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
@@ -59,6 +60,8 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     private static final String DEFAULT_NICKNAME = WorkflowInitData.DEFAULT_WORKFLOW_NAME;
     private static final String DEFAULT_DESCRIPTION = WorkflowInitData.DEFAULT_WORKFLOW_DESCRIPTION;
+    private static final String DEFAULT_IVR_NICKNAME = WorkflowInitData.DEFAULT_IVR_WORKFLOW_NAME;
+    private static final String DEFAULT_IVR_DESCRIPTION = WorkflowInitData.DEFAULT_IVR_WORKFLOW_DESCRIPTION;
 
     @Override
     protected Specification<WorkflowEntity> createSpecification(WorkflowRequest request) {
@@ -261,6 +264,46 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
 
     @Transactional
     public WorkflowResponse initDefaultWorkflow(String orgUid) {
+        WorkflowResponse defaultWorkflow = initDefaultChatbotWorkflow(orgUid);
+        initDefaultIvrWorkflow(orgUid);
+        return defaultWorkflow;
+    }
+
+    @Transactional
+    public WorkflowResponse initDefaultIvrWorkflow(String orgUid) {
+        Assert.hasText(orgUid, "Organization UID must not be empty");
+        String workflowUid = resolveDefaultIvrWorkflowUid(orgUid);
+
+        Optional<WorkflowEntity> existing = workflowRepository.findByUid(workflowUid);
+        if (existing.isPresent() && !existing.get().isDeleted()) {
+            log.debug("Default IVR workflow already initialized for org: {}", orgUid);
+            return convertToResponse(existing.get());
+        }
+
+        WorkflowEntity entity = existing.orElseGet(() -> WorkflowEntity.builder()
+                .uid(workflowUid)
+                .orgUid(orgUid)
+                .build());
+        entity.setDeleted(false);
+        entity.setNickname(DEFAULT_IVR_NICKNAME);
+        entity.setDescription(DEFAULT_IVR_DESCRIPTION);
+        entity.setSchema(WorkflowInitData.buildDefaultIvrWorkflowSchemaJson());
+        entity.setCurrentNodeId(WorkflowInitData.DEFAULT_IVR_START_NODE_ID);
+        entity.setType(WorkflowTypeEnum.IVR.name());
+        entity.setAvatar(AvatarConsts.getDefaultWorkflowAvatar());
+        entity.setOrgUid(orgUid);
+        entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
+
+        WorkflowEntity saved = save(entity);
+        if (saved == null) {
+            throw new RuntimeException("Initialize default IVR workflow failed");
+        }
+        refreshWorkflowCache(saved);
+        log.info("Initialized default IVR workflow for org: {}", orgUid);
+        return convertToResponse(saved);
+    }
+
+    private WorkflowResponse initDefaultChatbotWorkflow(String orgUid) {
         Assert.hasText(orgUid, "Organization UID must not be empty");
         String workflowUid = Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX);
 
@@ -296,6 +339,13 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         refreshWorkflowCache(saved);
         log.info("Initialized default workflow for org: {}", orgUid);
         return convertToResponse(saved);
+    }
+
+    private String resolveDefaultIvrWorkflowUid(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return BytedeskConsts.DEFAULT_IVR_WORKFLOW_UID;
+        }
+        return Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX);
     }
 
     private void refreshWorkflowCache(WorkflowEntity entity) {

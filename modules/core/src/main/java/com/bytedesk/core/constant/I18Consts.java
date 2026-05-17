@@ -46,6 +46,9 @@ public class I18Consts {
 
     // 通用操作动作与模块标题
     public static final String I18N_TAG = I18N_PREFIX + "tag";
+    public static final String I18N_APNS_P12 = I18N_PREFIX + "apns.p12";
+    public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";
+    public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
     public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
     public static final String I18N_TOOL = I18N_PREFIX + "tool";
     public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
@@ -199,6 +202,10 @@ public class I18Consts {
     public static final String I18N_ACTION_RESET = I18N_PREFIX + "action.reset";
     public static final String I18N_ACTION_INIT = I18N_PREFIX + "action.init";
     public static final String I18N_ACTION_EXECUTE = I18N_PREFIX + "action.execute";
+    public static final String I18N_ACTION_LOGIN_USERNAME = I18N_PREFIX + "action.login.username";
+    public static final String I18N_ACTION_LOGIN_MOBILE = I18N_PREFIX + "action.login.mobile";
+    public static final String I18N_ACTION_LOGIN_EMAIL = I18N_PREFIX + "action.login.email";
+    public static final String I18N_ACTION_LOGIN_SCAN = I18N_PREFIX + "action.login.scan";
     public static final String I18N_ACTION_LOGOUT = I18N_PREFIX + "action.logout";
     public static final String I18N_ACTION_SWITCH_ORGANIZATION = I18N_PREFIX + "action.switch.organization";
     public static final String I18N_ACTION_CHANGE_PASSWORD = I18N_PREFIX + "action.change.password";

@@ -48,6 +48,9 @@ public class BytedeskConsts {
     public static final String DEFAULT_DEPARTMENT_UID = "df_dp_uid";
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid"; // 默认团队成员uid
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid"; // 默认机器人uid
+    public static final String DEFAULT_IVR_WORKFLOW_UID = "df_ivr_wf_uid"; // 默认 IVR 工作流 uid
+    public static final String DEFAULT_IVR_MENU_UID = "df_ivr_menu_uid"; // 默认 IVR 菜单 uid
+    public static final String DEFAULT_IVR_EXTENSION_NUMBER = "5002"; // 默认 IVR 测试号码
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid"; // 默认文件助手uid
     public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid"; // 默认排队助手uid
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid"; // 默认剪贴板助手uid
@@ -81,12 +84,6 @@ public class BytedeskConsts {
     // Legacy / deprecated role uid kept for backward compatibility.
     // Older members may still carry this role uid in persisted roleUids.
     public static final String DEPRECATED_ROLE_MEMBER_UID = "df_role_member_uid";
-    // 
-    public static final String ACTION_LOGIN_USERNAME = "密码登录";
-    public static final String ACTION_LOGIN_MOBILE = "手机号登录";
-    public static final String ACTION_LOGIN_EMAIL = "邮箱登录";
-    public static final String ACTION_LOGIN_SCAN = "扫码登录";
-    public static final String ACTION_LOGOUT = "退出登录";
     // 
     public static final int COLUMN_EXTRA_LENGTH = 2048;
     // 

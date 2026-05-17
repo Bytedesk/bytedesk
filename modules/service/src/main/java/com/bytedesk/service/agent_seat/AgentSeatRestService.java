@@ -27,10 +27,12 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.constant.I18ServiceConsts;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -191,7 +193,31 @@ public class AgentSeatRestService
 
     @Override
     protected AgentSeatEntity doSave(AgentSeatEntity entity) {
+        validateAssignedAgentUniqueness(entity);
         return agentSeatRepository.save(entity);
+    }
+
+    private void validateAssignedAgentUniqueness(AgentSeatEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getAssignedAgentUid())) {
+            return;
+        }
+
+        Optional<AgentSeatEntity> existingSeat = agentSeatRepository
+                .findByAssignedAgentUidAndDeletedFalse(entity.getAssignedAgentUid());
+
+        if (existingSeat.isEmpty()) {
+            return;
+        }
+
+        AgentSeatEntity boundSeat = existingSeat.get();
+        if (StringUtils.hasText(entity.getUid()) && entity.getUid().equals(boundSeat.getUid())) {
+            return;
+        }
+
+        String conflictSeatNo = StringUtils.hasText(boundSeat.getSeatNo()) ? boundSeat.getSeatNo() : boundSeat.getUid();
+        throw new RuntimeException(I18Consts.withArgs(
+                I18ServiceConsts.I18N_AGENT_SEAT_ASSIGNED_AGENT_ALREADY_BOUND,
+                conflictSeatNo));
     }
 
     @Override

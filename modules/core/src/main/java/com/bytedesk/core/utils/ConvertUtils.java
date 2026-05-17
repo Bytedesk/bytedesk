@@ -87,6 +87,17 @@ public class ConvertUtils {
             response.getOrganization().setDefaultMaxWorkgroups(bytedeskProperties.getOrganization().getDefaultMaxWorkgroups());
         }
 
+        if (bytedeskProperties.getCall() != null && bytedeskProperties.getCall().getFreeswitch() != null) {
+            if (response.getCall() == null) {
+                response.setCall(new BytedeskPropertiesResponse.Call());
+            }
+            if (response.getCall().getFreeswitch() == null) {
+                response.getCall().setFreeswitch(new BytedeskPropertiesResponse.Freeswitch());
+            }
+            response.getCall().getFreeswitch()
+                    .setRecordingsBaseUrl(bytedeskProperties.getCall().getFreeswitch().getRecordingsBaseUrl());
+        }
+
         return response;
     }
 

@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
@@ -86,7 +85,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         // Avoid logging sensitive fields (password/passwordHash/passwordSalt)
         log.debug("login request: username={}, platform={}, channel={}, deviceUid={}",
@@ -215,7 +214,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
@@ -295,7 +294,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login email {}", authRequest.toString());

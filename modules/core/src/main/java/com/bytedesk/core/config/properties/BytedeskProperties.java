@@ -209,6 +209,9 @@ public class BytedeskProperties implements EnvironmentAware {
     // MinIO 配置
     private Minio minio = new Minio();
 
+    // 呼叫中心配置
+    private Call call = new Call();
+
     // 微信支付配置
     private WechatPay wechatPay = new WechatPay();
 
@@ -437,6 +440,18 @@ public class BytedeskProperties implements EnvironmentAware {
         private String bucketName = "bytedesk";
         private String region = "us-east-1";
         private Boolean secure = false;
+    }
+
+    @Getter
+    @Setter
+    public static class Call {
+        private Freeswitch freeswitch = new Freeswitch();
+
+        @Getter
+        @Setter
+        public static class Freeswitch {
+            private String recordingsBaseUrl;
+        }
     }
 
     // 为了保持向后兼容,添加getter方法

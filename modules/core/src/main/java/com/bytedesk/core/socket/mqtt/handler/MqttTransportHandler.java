@@ -172,6 +172,12 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
 
     @Override
     public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable cause) throws Exception {
+        if (cause == null) {
+            log.warn("MqttTransportHandler received null cause in exceptionCaught, closing channel");
+            channelHandlerContext.close();
+            return;
+        }
+
         // FIXME: 异常断开，发送will topic消息 java.io.IOException: Connection reset by peer
         // FIXME: 异常断开，发送will topic消息 java.lang.ArrayIndexOutOfBoundsException
         
@@ -220,7 +226,9 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
                 if (normalized.contains("connection reset")
                         || normalized.contains("broken pipe")
                         || normalized.contains("forcibly closed")
-                        || normalized.contains("timed out")) {
+                        || normalized.contains("timed out")
+                        || normalized.contains("can't assign requested address")
+                        || normalized.contains("cannot assign requested address")) {
                     return true;
                 }
             }

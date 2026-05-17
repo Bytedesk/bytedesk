@@ -38,7 +38,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/freeswitch/api/v1/xmlcurl")
+@RequestMapping("/visitor/api/v1/xmlcurl")
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch.xmlcurl", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class XmlCurlController {
 

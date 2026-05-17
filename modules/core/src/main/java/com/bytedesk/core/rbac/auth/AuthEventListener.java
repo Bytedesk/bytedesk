@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.action.ActionEntity;
 import com.bytedesk.core.action.event.ActionCreateEvent;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.message.content.NoticeContent;
 import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
@@ -48,9 +48,10 @@ public class AuthEventListener {
         }
         final String actionName = action.getAction();
         // 监听登录action，发送登录系统消息，提醒相关用户
-        if (BytedeskConsts.ACTION_LOGIN_USERNAME.equals(actionName)
-                || BytedeskConsts.ACTION_LOGIN_MOBILE.equals(actionName)
-                || BytedeskConsts.ACTION_LOGIN_EMAIL.equals(actionName)) {
+        if (I18Consts.I18N_ACTION_LOGIN_USERNAME.equals(actionName)
+            || I18Consts.I18N_ACTION_LOGIN_MOBILE.equals(actionName)
+            || I18Consts.I18N_ACTION_LOGIN_EMAIL.equals(actionName)
+            || I18Consts.I18N_ACTION_LOGIN_SCAN.equals(actionName)) {
             //
             LoginNoticeExtra loginNoticeExtra = LoginNoticeExtra.builder()
                     .loginIp(action.getIp())

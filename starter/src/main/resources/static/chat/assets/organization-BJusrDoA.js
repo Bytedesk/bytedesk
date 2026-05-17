@@ -1,0 +1,1 @@
+import{ui as e}from"./configUtils-CPscH5T8.js";import{S as t,b as n,x as r,y as i}from"./react-vendor-3bW4XQVk.js";var a=t()(n(r(i(e=>({orgTree:[],currentOrg:{uid:``,name:``,logo:``,description:``},setCurrentOrg(t){e({currentOrg:t})},deleteOrg:()=>e({currentOrg:{uid:``,name:``,logo:``,description:``}})})),{name:e})));export{a as t};

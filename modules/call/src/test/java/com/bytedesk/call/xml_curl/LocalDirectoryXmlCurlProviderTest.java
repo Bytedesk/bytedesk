@@ -50,6 +50,9 @@ class LocalDirectoryXmlCurlProviderTest {
         assertTrue(result.get().contains("<user id=\"1003\">"));
         assertTrue(result.get().contains("value=\"12345679\""));
         assertTrue(result.get().contains("value=\"FreeSWITCH\""));
+        assertTrue(result.get().contains("name=\"toll_allow\" value=\"domestic,international,local\""));
+        assertTrue(result.get().contains("name=\"default_areacode\" value=\"$${default_areacode}\""));
+        assertTrue(result.get().contains("name=\"default_gateway\" value=\"$${default_provider}\""));
     }
 
     @Test
