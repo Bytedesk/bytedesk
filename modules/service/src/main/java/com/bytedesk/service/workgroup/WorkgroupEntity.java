@@ -17,7 +17,6 @@ package com.bytedesk.service.workgroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -118,16 +117,6 @@ public class WorkgroupEntity extends BaseEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private WorkgroupSettingsEntity settings;
-
-    /**
-     * Per-workgroup call center settings.
-     */
-    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
-            jakarta.persistence.CascadeType.PERSIST,
-            jakarta.persistence.CascadeType.MERGE,
-            jakarta.persistence.CascadeType.REMOVE })
-    @JoinColumn(name = "call_settings_id", unique = true)
-    private CallSettingsEntity callSettings;
 
     /**
      * Agents assigned to this workgroup

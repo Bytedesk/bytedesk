@@ -16,7 +16,6 @@ package com.bytedesk.ai.robot;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 // import com.bytedesk.core.constant.I18Consts;
 
@@ -87,11 +86,6 @@ public class RobotRequest extends BaseRequest {
      * Embedded LLM configuration for the robot
      */
     private RobotLlm llm;
-
-    /**
-     * Per-robot call center settings payload.
-     */
-    private CallSettingsRequest callSettings;
 
     // kbEnabled/kbUid 已迁移到 RobotSettings
 

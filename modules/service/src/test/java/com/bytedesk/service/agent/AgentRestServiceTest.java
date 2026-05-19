@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 
-import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
@@ -208,9 +207,6 @@ class AgentRestServiceTest {
         newMember.setUid("member-new");
         newMember.setUser(newUser);
 
-        CallSettingsEntity callSettings = new CallSettingsEntity();
-        callSettings.setUserUid("user-old");
-
         AutoReplySettingsEntity autoReplySettings = new AutoReplySettingsEntity();
         autoReplySettings.setUserUid("user-old");
 
@@ -222,7 +218,6 @@ class AgentRestServiceTest {
                 .email("agent-a@test.com")
                 .member(oldMember)
                 .userUid("user-old")
-                .callSettings(callSettings)
                 .autoReplySettings(autoReplySettings)
                 .build();
 
@@ -251,7 +246,6 @@ class AgentRestServiceTest {
         assertThat(response).isNotNull();
         assertThat(agent.getMember()).isSameAs(newMember);
         assertThat(agent.getUserUid()).isEqualTo("user-new");
-        assertThat(agent.getCallSettings().getUserUid()).isEqualTo("user-new");
         assertThat(agent.getAutoReplySettings().getUserUid()).isEqualTo("user-new");
         verify(userService).addRoleAgent(newUser);
         verify(userService).removeRoleAgent(oldUser);

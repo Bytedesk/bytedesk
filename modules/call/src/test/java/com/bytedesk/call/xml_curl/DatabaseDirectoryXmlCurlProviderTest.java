@@ -35,6 +35,11 @@ class DatabaseDirectoryXmlCurlProviderTest {
         assertTrue(result.isPresent());
         assertTrue(result.get().contains("<domain name=\"pbx.local\">"));
         assertTrue(result.get().contains("<user id=\"1008\">"));
+        assertTrue(result.get().contains("<param name=\"vm-password\" value=\"1008\"/>"));
+        assertTrue(result.get().contains("<param name=\"max-registrations-per-extension\" value=\"5\"/>"));
+        assertTrue(result.get().contains("<param name=\"dial-string\""));
+        assertTrue(result.get().contains("${sofia_contact(*/${dialed_user}@${dialed_domain})}"));
+        assertTrue(result.get().contains("${verto_contact(${dialed_user}@${dialed_domain})}"));
         assertTrue(result.get().contains("effective_caller_id_name"));
         assertTrue(result.get().contains("value=\"Alice\""));
         assertTrue(result.get().contains("value=\"4008001234\""));

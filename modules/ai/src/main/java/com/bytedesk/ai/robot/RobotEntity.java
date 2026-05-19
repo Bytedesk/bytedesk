@@ -14,7 +14,6 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
-import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -32,8 +31,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -99,16 +96,6 @@ public class RobotEntity extends BaseEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY)
     private RobotSettingsEntity settings;
-
-    /**
-     * Per-robot call center settings.
-     */
-    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
-            jakarta.persistence.CascadeType.PERSIST,
-            jakarta.persistence.CascadeType.MERGE,
-            jakarta.persistence.CascadeType.REMOVE })
-    @JoinColumn(name = "call_settings_id", unique = true)
-    private CallSettingsEntity callSettings;
 
     /**
      * Type of robot service (SERVICE, ASK, CHAT)

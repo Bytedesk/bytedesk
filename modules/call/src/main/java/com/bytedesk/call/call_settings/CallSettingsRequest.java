@@ -25,6 +25,11 @@ public class CallSettingsRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
 
     /**
+     * String-based reference to AgentEntity.uid.
+     */
+    private String agentUid;
+
+    /**
      * Whether the call settings are enabled.
      */
     private Boolean enabled;

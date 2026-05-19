@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 
 import com.bytedesk.core.base.BaseEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -29,7 +30,9 @@ import lombok.experimental.Accessors;
 @Table(
     name = "bytedesk_call_settings",
     indexes = {
-        @Index(name = "idx_call_settings_uid", columnList = "uuid")
+        @Index(name = "idx_call_settings_uid", columnList = "uuid"),
+        @Index(name = "idx_call_settings_agent_uid", columnList = "agent_uid"),
+        @Index(name = "idx_call_settings_org_uid", columnList = "org_uid")
     }
 )
 public class CallSettingsEntity extends BaseEntity {
@@ -37,15 +40,24 @@ public class CallSettingsEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
+     * String-based reference to AgentEntity.uid.
+     * Kept as a plain UID to avoid call -> service module entity dependency.
+     */
+    @Column(name = "agent_uid", length = 64)
+    private String agentUid;
+
+    /**
      * Whether the call settings are enabled.
      */
     @Builder.Default
+    @Column(name = "is_enabled")
     private Boolean enabled = false;
 
     /**
      * External phone number shown to users for inbound or outbound calls.
      * Example: hotline number, DID number, or displayed caller number.
      */
+    @Column(name = "phone_number")
     private String number;
 
     /**

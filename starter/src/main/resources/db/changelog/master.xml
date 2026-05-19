@@ -19,5 +19,8 @@
     <include file="db/changelog/migration/260514_add_ivr_record_runtime_fields.xml" />
     <include file="db/changelog/migration/260516_refactor_apns_p12_fields.xml" />
     <include file="db/changelog/migration/260516_refactor_apns_token_schema.xml" />
+    <include file="db/changelog/migration/260518_refactor_agent_call_settings.xml" />
+    <include file="db/changelog/migration/260518_rename_call_settings_enabled_column.xml" />
+    <include file="db/changelog/migration/260519_rename_call_settings_number_column.xml" />
 
 </databaseChangeLog>

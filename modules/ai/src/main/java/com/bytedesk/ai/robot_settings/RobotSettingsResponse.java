@@ -14,7 +14,6 @@
 package com.bytedesk.ai.robot_settings;
 
 import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsResponse;
-import com.bytedesk.call.call_settings.CallSettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 
@@ -35,10 +34,6 @@ public class RobotSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private CallSettingsResponse callSettings;
-
-    private CallSettingsResponse draftCallSettings;
-    
     /**
      * Rating down settings (Robot-specific)
      */

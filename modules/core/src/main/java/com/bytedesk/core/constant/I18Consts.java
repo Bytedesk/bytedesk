@@ -140,6 +140,7 @@ public class I18Consts {
     public static final String I18N_QUEUE_MEMBER = I18N_PREFIX + "queue.member.management";
     public static final String I18N_CALL_STATISTIC = I18N_PREFIX + "call.statistic";
     public static final String I18N_CALL_STATISTIC_AGENT = I18N_PREFIX + "call.statistic.agent";
+    public static final String I18N_CALL_SETTINGS = I18N_PREFIX + "call.settings.management";
     public static final String I18N_FORM = I18N_PREFIX + "form.management";
     public static final String I18N_HOLIDAY = I18N_PREFIX + "holiday.management";
     public static final String I18N_BLOG = I18N_PREFIX + "blog.management";
@@ -657,6 +658,7 @@ public class I18Consts {
     public static final String I18N_MESSAGE_TYPE_ORDER = I18N_PREFIX + "message.type.order";
     public static final String I18N_MESSAGE_TYPE_POLL = I18N_PREFIX + "message.type.poll";
     public static final String I18N_MESSAGE_TYPE_POLL_SUBMIT = I18N_PREFIX + "message.type.poll.submit";
+    public static final String I18N_MESSAGE_TYPE_PREFORM = I18N_PREFIX + "message.type.preform";
     public static final String I18N_MESSAGE_TYPE_FORM = I18N_PREFIX + "message.type.form";
     public static final String I18N_MESSAGE_TYPE_FORM_SUBMIT = I18N_PREFIX + "message.type.form.submit";
     public static final String I18N_MESSAGE_TYPE_CHOICE = I18N_PREFIX + "message.type.choice";

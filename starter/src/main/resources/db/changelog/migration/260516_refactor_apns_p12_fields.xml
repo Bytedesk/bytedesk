@@ -5,8 +5,12 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <changeSet id="260516-add-apns-p12-config-columns" author="githubcopilot">
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
             <tableExists tableName="bytedesk_core_apns_p12"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_p12" columnName="bundle_id"/>
+            </not>
         </preConditions>
 
         <addColumn tableName="bytedesk_core_apns_p12">
@@ -14,24 +18,60 @@
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="260516-add-apns-p12-p12-url-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_p12" columnName="p12_url"/>
+            </not>
+        </preConditions>
 
         <addColumn tableName="bytedesk_core_apns_p12">
             <column name="p12_url" type="VARCHAR(512)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="260516-add-apns-p12-password-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_p12" columnName="p12_password"/>
+            </not>
+        </preConditions>
 
         <addColumn tableName="bytedesk_core_apns_p12">
             <column name="p12_password" type="VARCHAR(255)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="260516-add-apns-p12-is-sandbox-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_p12" columnName="is_sandbox"/>
+            </not>
+        </preConditions>
 
         <addColumn tableName="bytedesk_core_apns_p12">
             <column name="is_sandbox" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="260516-add-apns-p12-is-enabled-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_p12"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_p12" columnName="is_enabled"/>
+            </not>
+        </preConditions>
 
         <addColumn tableName="bytedesk_core_apns_p12">
             <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">

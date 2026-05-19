@@ -16,7 +16,6 @@ package com.bytedesk.service.workgroup;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -71,11 +70,6 @@ public class WorkgroupRequest extends BaseRequest {
      * Business shop uid, used by open shop create APIs to resolve organization.
      */
     private String shopUid;
-
-    /**
-     * Per-workgroup call center settings payload.
-     */
-    private CallSettingsRequest callSettings;
 
     private Boolean enabled;
 

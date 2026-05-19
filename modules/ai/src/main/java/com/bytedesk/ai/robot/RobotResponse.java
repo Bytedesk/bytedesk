@@ -14,7 +14,6 @@
 package com.bytedesk.ai.robot;
 
 import com.bytedesk.ai.robot_settings.RobotSettingsResponse;
-import com.bytedesk.call.call_settings.CallSettingsResponse;
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -76,11 +75,6 @@ public class RobotResponse extends BaseResponse {
      * Embedded LLM configuration for the robot
      */
     private RobotLlm llm;
-
-    /**
-     * Per-robot call center settings.
-     */
-    private CallSettingsResponse callSettings;
 
     // private Boolean published;
 

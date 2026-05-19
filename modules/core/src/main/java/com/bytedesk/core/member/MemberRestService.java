@@ -217,8 +217,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             throw new RuntimeException("mobile and email should not be both null.");
         }
 
-        // 确保 user 处于当前组织上下文，并按请求写入角色
-        userService.ensureCurrentOrganization(user, request.getOrgUid());
         if (!StringUtils.hasText(member.getCountry()) && StringUtils.hasText(user.getCountry())) {
             member.setCountry(user.getCountry());
         }
@@ -271,15 +269,17 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         member.setJobNo(request.getJobNo());
         member.setSeatNo(request.getSeatNo());
         member.setTelephone(request.getTelephone());
-        Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
+
+        UserEntity user = member.getUser();
+        Set<String> normalizedRoleUids = request.getRoleUids() == null
+            ? normalizeRoleUids(user != null ? user.getRoleUids() : null)
+            : normalizeRoleUids(request.getRoleUids());
         request.setRoleUids(normalizedRoleUids);
         member.setAllowedLoginPlatforms(resolveAllowedLoginPlatforms(
             request.getAllowedLoginPlatforms(),
             normalizedRoleUids,
             member.getAllowedLoginPlatforms()));
-        // 
-        UserEntity user = member.getUser();
-        userService.ensureCurrentOrganization(user, member.getOrgUid());
+
         user = userService.updateUserFromMember(user, request);
         member.setUser(user);
         //
@@ -685,9 +685,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 user = userService.createUserFromMember(userRequest);
             }
 
-            // 确保 user 处于当前组织上下文，并写入默认导入角色
-            userService.ensureCurrentOrganization(user, orgUid);
-            user = userService.updateUserRoles(user, roleUids);
+            user = userService.updateUserRoles(user, roleUids, orgUid, true);
             
             // 设置用户到成员对象中
             member.setUser(user);

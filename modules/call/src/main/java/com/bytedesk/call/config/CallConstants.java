@@ -43,6 +43,10 @@ public class CallConstants {
 
 	public static final String FREESWITCH_VAR_DEFAULT_AREACODE = "$${default_areacode}";
 
+	public static final String DEFAULT_DIRECTORY_DIAL_STRING = "{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})},${verto_contact(${dialed_user}@${dialed_domain})}";
+
+	public static final int DEFAULT_MAX_REGISTRATIONS_PER_EXTENSION = 5;
+
 	public static final String DEFAULT_GROUP_NAME = "default";
 
 	public static final String ENV_FREESWITCH_DEFAULT_PASSWORD = "FREESWITCH_DEFAULT_PASSWORD";

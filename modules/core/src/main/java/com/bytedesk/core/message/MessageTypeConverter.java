@@ -49,6 +49,7 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.ORDER.name(), I18Consts.I18N_MESSAGE_TYPE_ORDER);
         typeToChineseMap.put(MessageTypeEnum.POLL.name(), I18Consts.I18N_MESSAGE_TYPE_POLL);
         typeToChineseMap.put(MessageTypeEnum.POLL_SUBMIT.name(), I18Consts.I18N_MESSAGE_TYPE_POLL_SUBMIT);
+        typeToChineseMap.put(MessageTypeEnum.PREFORM.name(), I18Consts.I18N_MESSAGE_TYPE_PREFORM);
         typeToChineseMap.put(MessageTypeEnum.FORM.name(), I18Consts.I18N_MESSAGE_TYPE_FORM);
         typeToChineseMap.put(MessageTypeEnum.FORM_SUBMIT.name(), I18Consts.I18N_MESSAGE_TYPE_FORM_SUBMIT);
         typeToChineseMap.put(MessageTypeEnum.CHOICE.name(), I18Consts.I18N_MESSAGE_TYPE_CHOICE);

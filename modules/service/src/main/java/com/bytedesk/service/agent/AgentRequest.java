@@ -14,7 +14,6 @@
 package com.bytedesk.service.agent;
 
 import com.bytedesk.core.base.BaseRequest;
-import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
@@ -103,8 +102,4 @@ public class AgentRequest extends BaseRequest {
      */
     private AutoReplySettingsRequest autoReplySettings;
 
-    /**
-     * Per-agent call center settings payload.
-     */
-    private CallSettingsRequest callSettings;
 }

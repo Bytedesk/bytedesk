@@ -15,7 +15,6 @@ package com.bytedesk.service.workgroup;
 
 import java.util.List;
 
-import com.bytedesk.call.call_settings.CallSettingsResponse;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsResponse;
@@ -54,11 +53,6 @@ public class WorkgroupResponse extends BaseResponse {
      * Workgroup settings (loaded from settings entity)
      */
     private WorkgroupSettingsResponse settings;
-
-    /**
-     * Per-workgroup call center settings.
-     */
-    private CallSettingsResponse callSettings;
 
     // 
     private List<AgentResponse> agents;

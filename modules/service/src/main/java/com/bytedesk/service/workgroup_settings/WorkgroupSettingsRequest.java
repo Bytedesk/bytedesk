@@ -14,7 +14,6 @@
 package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsRequest;
-import com.bytedesk.call.call_settings.CallSettingsRequest;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
@@ -49,8 +48,6 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
      * Manual routing waiting tip for visitors (used when routingMode=MANUAL)
      */
     private String manualRoutingTip;
-
-    private CallSettingsRequest callSettings;
 
     /**
      * Message leave settings (Workgroup-specific)

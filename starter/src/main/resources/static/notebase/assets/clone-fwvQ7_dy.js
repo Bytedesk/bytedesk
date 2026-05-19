@@ -1,0 +1,1 @@
+import{h as e}from"./index-Dpi15227.js";var t=4;function n(n){return e(n,t)}export{n as t};

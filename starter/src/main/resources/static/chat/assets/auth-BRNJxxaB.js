@@ -1,0 +1,1 @@
+import{ci as e,li as t}from"./configUtils-BfyPDHAS.js";import{S as n,b as r,x as i,y as a}from"./react-vendor-BlrekbrI.js";var o=n()(r(i(a((t,n)=>({accessToken:``,setAccessToken(n){localStorage.setItem(e,n),t({accessToken:n})},getAccessToken(){return n().accessToken},removeAccessToken(){localStorage.removeItem(e),t({accessToken:``})}})),{name:t})));export{o as t};

@@ -580,23 +580,7 @@ public class UserService {
         }
 
         // 3) 同步 currentRoles
-        managedUser.getCurrentRoles().clear();
-        if (managedUser.getCurrentOrganization() != null
-                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
-            String currentOrgUid = managedUser.getCurrentOrganization().getUid();
-            if (managedUser.getUserOrganizationRoles() != null) {
-                for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
-                    if (uor == null || uor.getOrganization() == null
-                            || !StringUtils.hasText(uor.getOrganization().getUid())) {
-                        continue;
-                    }
-                    if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
-                        managedUser.getCurrentRoles().addAll(uor.getRoles());
-                        break;
-                    }
-                }
-            }
-        }
+        syncCurrentRolesForCurrentOrganization(managedUser);
 
         // 4) 强制确保 ROLE_USER（避免调用 addRoleUser 触发额外 save）
         Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
@@ -633,7 +617,32 @@ public class UserService {
         if (StringUtils.hasText(request.getCountry())) {
             user.setCountry(CountryCodeUtils.normalize(request.getCountry()));
         }
-        return updateUserRoles(user, request.getRoleUids());
+        // Profile updates may omit roleUids; in that case keep existing roles unchanged.
+        if (request.getRoleUids() == null) {
+            return user;
+        }
+        return updateUserRoles(user, request.getRoleUids(), request.getOrgUid(), true);
+    }
+
+    private void syncCurrentRolesForCurrentOrganization(UserEntity user) {
+        user.getCurrentRoles().clear();
+        if (user.getCurrentOrganization() == null
+                || !StringUtils.hasText(user.getCurrentOrganization().getUid())
+                || user.getUserOrganizationRoles() == null) {
+            return;
+        }
+
+        String currentOrgUid = user.getCurrentOrganization().getUid();
+        for (UserOrganizationRoleEntity uor : user.getUserOrganizationRoles()) {
+            if (uor == null || uor.getOrganization() == null
+                    || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                continue;
+            }
+            if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
+                user.getCurrentRoles().addAll(uor.getRoles());
+                break;
+            }
+        }
     }
 
     /**
@@ -644,6 +653,12 @@ public class UserService {
      */
     @Transactional
     public UserEntity updateUserRoles(UserEntity user, Set<String> roleUids) {
+        return updateUserRoles(user, roleUids, null, false);
+    }
+
+    @Transactional
+    public UserEntity updateUserRoles(UserEntity user, Set<String> roleUids, String targetOrgUid,
+            boolean preserveCurrentOrganization) {
         if (user == null) {
             return null;
         }
@@ -655,9 +670,17 @@ public class UserService {
         UserEntity managedUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + user.getUid()));
 
+        String originalCurrentOrgUid = null;
+        if (managedUser.getCurrentOrganization() != null
+                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
+            originalCurrentOrgUid = managedUser.getCurrentOrganization().getUid();
+        }
+
         // Ensure currentOrganization is set on the managed instance
-        String orgUid = null;
-        if (user.getCurrentOrganization() != null && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
+        String orgUid = targetOrgUid;
+        if (!StringUtils.hasText(orgUid)
+                && user.getCurrentOrganization() != null
+                && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
             orgUid = user.getCurrentOrganization().getUid();
         }
         ensureCurrentOrganization(managedUser, orgUid);
@@ -719,6 +742,14 @@ public class UserService {
             } else {
                 throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, roleUid));
             }
+        }
+
+        if (preserveCurrentOrganization
+                && StringUtils.hasText(originalCurrentOrgUid)
+                && StringUtils.hasText(orgUid)
+                && !originalCurrentOrgUid.equals(orgUid)) {
+            ensureCurrentOrganization(managedUser, originalCurrentOrgUid);
+            syncCurrentRolesForCurrentOrganization(managedUser);
         }
 
         // managedUser is tracked by JPA; changes will flush on transaction commit

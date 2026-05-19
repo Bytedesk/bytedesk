@@ -129,6 +129,7 @@ public class EslEventIngestService {
                 throw ex;
             }
 
+            entity.setApiArgument(truncateForCurrentSchema(entity.getApiArgument()));
             entity.setHeadersJson(truncateForCurrentSchema(entity.getHeadersJson()));
             entity.setBodyJson(truncateForCurrentSchema(entity.getBodyJson()));
             log.warn("ESL事件载荷超过当前数据库列宽，截断到 {} 字符后重试保存", DATABASE_SAFE_PAYLOAD_LENGTH);
