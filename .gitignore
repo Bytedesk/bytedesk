@@ -67,6 +67,7 @@ back/
 uploads/
 *.tmp
 h2db/
+kamailio/
 .DS_Store
 modules/local/target/*
 .flattened-pom.xml
