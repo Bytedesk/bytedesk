@@ -49,6 +49,8 @@ public class EslEventResponse extends BaseResponse {
 
     private String contact;
 
+    private String sourceIp;
+
     private String status;
 
     private String apiCommand;

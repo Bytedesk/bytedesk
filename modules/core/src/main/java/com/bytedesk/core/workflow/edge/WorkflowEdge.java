@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.annotation.JSONField;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,22 +62,26 @@ public class WorkflowEdge implements Serializable {
     /**
      * 源节点ID
      */
-    private String sourceNodeID;
+    @JSONField(name = "sourceNodeId", alternateNames = { "sourceNodeID" })
+    private String sourceNodeId;
     
     /**
      * 目标节点ID
      */
-    private String targetNodeID;
+    @JSONField(name = "targetNodeId", alternateNames = { "targetNodeID" })
+    private String targetNodeId;
     
     /**
      * 源端口ID（可选，用于多端口节点）
      */
-    private String sourcePortID;
+    @JSONField(name = "sourcePortId", alternateNames = { "sourcePortID" })
+    private String sourcePortId;
     
     /**
      * 目标端口ID（可选，用于多端口节点）
      */
-    private String targetPortID;
+    @JSONField(name = "targetPortId", alternateNames = { "targetPortID" })
+    private String targetPortId;
 
     /**
      * 边的权重或优先级（可选）
@@ -122,26 +127,26 @@ public class WorkflowEdge implements Serializable {
      * 检查是否连接指定的两个节点
      */
     public boolean connectsNodes(String sourceNodeId, String targetNodeId) {
-        return this.sourceNodeID != null && this.sourceNodeID.equals(sourceNodeId) &&
-               this.targetNodeID != null && this.targetNodeID.equals(targetNodeId);
+        return this.sourceNodeId != null && this.sourceNodeId.equals(sourceNodeId) &&
+               this.targetNodeId != null && this.targetNodeId.equals(targetNodeId);
     }
 
     /**
      * 检查是否连接指定的节点（作为源或目标）
      */
     public boolean connectsNode(String nodeId) {
-        return (this.sourceNodeID != null && this.sourceNodeID.equals(nodeId)) ||
-               (this.targetNodeID != null && this.targetNodeID.equals(nodeId));
+        return (this.sourceNodeId != null && this.sourceNodeId.equals(nodeId)) ||
+               (this.targetNodeId != null && this.targetNodeId.equals(nodeId));
     }
 
     /**
      * 获取连接的另一个节点ID
      */
     public String getOtherNodeId(String nodeId) {
-        if (this.sourceNodeID != null && this.sourceNodeID.equals(nodeId)) {
-            return this.targetNodeID;
-        } else if (this.targetNodeID != null && this.targetNodeID.equals(nodeId)) {
-            return this.sourceNodeID;
+        if (this.sourceNodeId != null && this.sourceNodeId.equals(nodeId)) {
+            return this.targetNodeId;
+        } else if (this.targetNodeId != null && this.targetNodeId.equals(nodeId)) {
+            return this.sourceNodeId;
         }
         return null;
     }

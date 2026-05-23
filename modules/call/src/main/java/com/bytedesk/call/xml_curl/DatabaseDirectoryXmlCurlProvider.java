@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.call.call_settings.CallSettingsRepository;
 import com.bytedesk.call.config.CallConstants;
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class DatabaseDirectoryXmlCurlProvider implements XmlCurlDirectoryProvide
         CallConstants.DEFAULT_OUTBOUND_CALLER_NAME);
 
     private final CallSettingsRepository callSettingsRepository;
+    private final CallIpBlacklistService callIpBlacklistService;
 
     @Override
     public Optional<String> provideDirectoryXml(String user, String domain, Map<String, String> params) {
@@ -49,6 +51,28 @@ public class DatabaseDirectoryXmlCurlProvider implements XmlCurlDirectoryProvide
         }
 
         CallSettingsEntity matched = settings.get(0);
+        String sourceIp = firstNonBlank(params,
+            "sip_auth_network_ip",
+            "variable_sip_auth_network_ip",
+            "Caller-Network-Addr",
+            "network_addr",
+            "network_ip",
+            "variable_network_addr",
+            "variable_sip_network_ip",
+            "sip_network_ip",
+            "variable_sip_received_ip",
+            "sip_received_ip",
+            "variable_sip_via_host",
+            "sip_via_host");
+        if (callIpBlacklistService.isBlacklisted(matched.getOrgUid(), sourceIp)) {
+            log.warn("xmlcurl.directory blocked blacklisted sourceIp='{}' user='{}' domain='{}' orgUid='{}' callSettingsUid='{}'",
+                sourceIp,
+                normalizedUser,
+                normalizedDomain,
+                matched.getOrgUid(),
+                matched.getUid());
+            return Optional.empty();
+        }
         if (log.isDebugEnabled()) {
             log.debug("xmlcurl.directory db hit user='{}' domain='{}' callSettingsUid='{}' target='{}'",
                 normalizedUser, normalizedDomain, matched.getUid(), matched.getTarget());
@@ -101,6 +125,19 @@ public class DatabaseDirectoryXmlCurlProvider implements XmlCurlDirectoryProvide
 
     private static String normalize(String value) {
         return StringUtils.hasText(value) ? value.trim() : "";
+    }
+
+    private static String firstNonBlank(Map<String, String> params, String... keys) {
+        if (params == null || params.isEmpty()) {
+            return null;
+        }
+        for (String key : keys) {
+            String value = params.get(key);
+            if (StringUtils.hasText(value)) {
+                return value.trim();
+            }
+        }
+        return null;
     }
 
     private static String xmlEscape(String s) {

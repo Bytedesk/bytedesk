@@ -1,13 +1,22 @@
 package com.bytedesk.call.xml_curl;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.ObjectProvider;
+
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRepository;
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
 
 class XmlCurlServiceTest {
 
@@ -16,10 +25,17 @@ class XmlCurlServiceTest {
         XmlCurlDialplanProvider provider = (context, destinationNumber, params) -> Optional.of(
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><document type=\"freeswitch/xml\"><section name=\"dialplan\"/></document>");
 
+        CallSettingsRepository repository = Mockito.mock(CallSettingsRepository.class);
+        CallIpBlacklistService blacklistService = Mockito.mock(CallIpBlacklistService.class);
+        when(repository.findAllByTargetInAndEnabledTrueAndDeletedFalse(anyCollection())).thenReturn(List.of());
+        when(blacklistService.isBlacklisted(anyString(), anyString())).thenReturn(false);
+
         XmlCurlService service = new XmlCurlService(
             staticProvider(provider),
             emptyProvider(),
-            emptyProvider());
+            emptyProvider(),
+            repository,
+            blacklistService);
 
         byte[] result = service.handleDialplan(Map.of(
             "Caller-Context", "default",
@@ -31,14 +47,53 @@ class XmlCurlServiceTest {
 
     @Test
     void handleDialplanShouldReturnNotFoundWhenNoProviderMatchesAndDemoDialplanDisabled() {
+        CallSettingsRepository repository = Mockito.mock(CallSettingsRepository.class);
+        CallIpBlacklistService blacklistService = Mockito.mock(CallIpBlacklistService.class);
+        when(repository.findAllByTargetInAndEnabledTrueAndDeletedFalse(anyCollection())).thenReturn(List.of());
+        when(blacklistService.isBlacklisted(anyString(), anyString())).thenReturn(false);
+
         XmlCurlService service = new XmlCurlService(
             emptyProvider(),
             emptyProvider(),
-            emptyProvider());
+            emptyProvider(),
+            repository,
+            blacklistService);
 
         byte[] result = service.handleDialplan(Map.of(
             "Caller-Context", "default",
             "Caller-Destination-Number", "5003"));
+
+        String xml = new String(result, StandardCharsets.UTF_8);
+        assertTrue(xml.contains("status=\"not found\""));
+    }
+
+    @Test
+    void handleDialplanShouldReturnNotFoundWhenSourceIpIsBlacklisted() {
+        CallSettingsRepository repository = Mockito.mock(CallSettingsRepository.class);
+        CallIpBlacklistService blacklistService = Mockito.mock(CallIpBlacklistService.class);
+        CallSettingsEntity entity = CallSettingsEntity.builder()
+            .enabled(true)
+            .target("1008")
+            .build();
+        entity.setOrgUid("org_001");
+        when(repository.findAllByTargetInAndEnabledTrueAndDeletedFalse(anyCollection())).thenReturn(List.of(entity));
+        when(blacklistService.isBlacklisted("org_001", "87.106.78.3")).thenReturn(true);
+
+        XmlCurlDialplanProvider provider = (context, destinationNumber, params) -> Optional.of(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?><document type=\"freeswitch/xml\"><section name=\"dialplan\"/></document>");
+
+        XmlCurlService service = new XmlCurlService(
+            staticProvider(provider),
+            emptyProvider(),
+            emptyProvider(),
+            repository,
+            blacklistService);
+
+        byte[] result = service.handleDialplan(Map.of(
+            "Caller-Context", "default",
+            "Caller-Destination-Number", "5003",
+            "Caller-Username", "1008",
+            "sip_auth_network_ip", "87.106.78.3"));
 
         String xml = new String(result, StandardCharsets.UTF_8);
         assertTrue(xml.contains("status=\"not found\""));

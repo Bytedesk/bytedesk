@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260522-add-call-settings-hold-media-url" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <not>
+                    <columnExists tableName="bytedesk_call_settings" columnName="hold_media_url" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_settings">
+            <column name="hold_media_url" type="varchar(1024)" defaultValue="https://www.weiyuai.cn/tts-quering.mp3" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260522-backfill-call-settings-hold-media-url" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <columnExists tableName="bytedesk_call_settings" columnName="hold_media_url" />
+            </and>
+        </preConditions>
+
+        <update tableName="bytedesk_call_settings">
+            <column name="hold_media_url" value="https://www.weiyuai.cn/tts-quering.mp3" />
+            <where>hold_media_url IS NULL OR hold_media_url = ''</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

@@ -48,7 +48,7 @@ public class WorkflowEdgeService {
         }
 
         // 验证连接的节点是否存在
-        validateEdgeConnection(workflow, edge.getSourceNodeID(), edge.getTargetNodeID());
+        validateEdgeConnection(workflow, edge.getSourceNodeId(), edge.getTargetNodeId());
 
         WorkflowEdgeEntity entity = WorkflowEdgeEntity.of(workflow, edge);
         
@@ -208,8 +208,8 @@ public class WorkflowEdgeService {
         // 转换为WorkflowEdge后修改ID和连接
         WorkflowEdge workflowEdge = sourceEdge.toWorkflowEdge();
         workflowEdge.setId(newEdgeUid);
-        workflowEdge.setSourceNodeID(newSourceNodeId);
-        workflowEdge.setTargetNodeID(newTargetNodeId);
+        workflowEdge.setSourceNodeId(newSourceNodeId);
+        workflowEdge.setTargetNodeId(newTargetNodeId);
 
         // 创建新的边实体
         return createEdge(targetWorkflow, workflowEdge);

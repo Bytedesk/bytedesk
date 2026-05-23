@@ -63,6 +63,26 @@ public class CallConstants {
 
 	public static final String DEFAULT_OUTBOUND_CALLER_ID = "0000000000";
 
+	public static final String LEGACY_DEFAULT_HOLD_MEDIA_URL = "https://www.weiyuai.cn/tts-quering.mp3";
+
+	public static final String LEGACY_LOCAL_STREAM_DEFAULT_HOLD_MEDIA_URL = "local_stream://default";
+
+	public static final String LEGACY_LOCAL_STREAM_HOLD_MEDIA_URL = "local_stream://moh";
+
+	public static final String LEGACY_LOCAL_STREAM_HOLD_MEDIA_8000_URL = "local_stream://moh/8000";
+
+	public static final String LEGACY_TONE_STREAM_HOLD_MEDIA_URL = "tone_stream://%(1000,0,425,475)";
+
+	public static final String DEFAULT_HOLD_MEDIA_URL = "local_stream://moh/8000";
+
+	public static final String DEFAULT_CONSULT_EXTENSION_NUMBERS = "1006,1007,1008";
+
+	public static final String DEFAULT_TRANSFER_TARGET_NUMBERS = "1006,1007,1008";
+
+	public static final String DEFAULT_CONFERENCE_TARGET_NUMBERS = "1006,1007,1008";
+
+	public static final String DEFAULT_IVR_TARGET_NUMBERS = "5004,5005";
+
 	public static final String ENV_HTTAPI_MRCP_PROBE = "HTTAPI_MRCP_PROBE";
 
 	public static final String ENV_HTTAPI_MRCP_HOST = "HTTAPI_MRCP_HOST";

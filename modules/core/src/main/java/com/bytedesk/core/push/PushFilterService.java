@@ -23,6 +23,9 @@ import com.bytedesk.core.constant.RedisConsts;
 
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class PushFilterService {
     
@@ -37,11 +40,18 @@ public class PushFilterService {
 
     // 检查是否可以发送验证码
     public Boolean canSendCode(String ip) {
-        if (Boolean.TRUE.equals(bytedeskProperties.getDebug())) {
+        Boolean debugEnabled = bytedeskProperties.getDebug();
+        if (Boolean.TRUE.equals(debugEnabled)) {
+            log.info("PushFilterService bypass rate limit because bytedesk.debug=true, ip={}", ip);
             return true;
         }
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
         Boolean exists = stringRedisTemplate.hasKey(key);
+        log.info("PushFilterService rate limit check, debug={}, ip={}, redisKey={}, exists={}",
+                debugEnabled,
+                ip,
+                key,
+                exists);
         return exists == null || !exists;
     }
 

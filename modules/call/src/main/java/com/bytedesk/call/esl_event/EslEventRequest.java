@@ -47,6 +47,8 @@ public class EslEventRequest extends BaseRequest {
 
     private String contact;
 
+    private String sourceIp;
+
     private String status;
 
     private String apiCommand;

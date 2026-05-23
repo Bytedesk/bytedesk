@@ -55,6 +55,9 @@ public class PageRouteController {
     @Value("${bytedesk.custom.description:解决客户问题}")
     private String customDescription;
 
+	@Value("${bytedesk.call.freeswitch.enabled:false}")
+	private Boolean callFreeswitchEnabled;
+
 	@Value("${bytedesk.custom.doc-url:https://www.weiyuai.cn/docs/zh-CN/}")
 	private String docUrl;
 
@@ -577,6 +580,8 @@ public class PageRouteController {
 			model.addAttribute("customLogo", customLogo);
 			model.addAttribute("customDescription", customDescription);
 		}
+
+		model.addAttribute("callFreeswitchEnabled", Boolean.TRUE.equals(callFreeswitchEnabled));
 
 		String resolvedLang = normalizeLang(LocaleContextHolder.getLocale());
 		model.addAttribute("lang", resolvedLang);

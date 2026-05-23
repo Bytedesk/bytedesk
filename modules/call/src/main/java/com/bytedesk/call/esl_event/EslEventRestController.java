@@ -102,6 +102,15 @@ public class EslEventRestController extends BaseRestController<EslEventRequest, 
         return ResponseEntity.ok(JsonResult.success(esl_event));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_UPDATE, description = "blacklist esl_event source ip")
+    @Operation(summary = "Blacklist EslEvent Source IP", description = "Add the source IP extracted from an ESL event to the call IP blacklist")
+    @PreAuthorize(EslEventPermissions.HAS_ESL_EVENTS_UPDATE)
+    @PostMapping("/blacklist/source-ip")
+    public ResponseEntity<?> blacklistSourceIp(@RequestBody EslEventRequest request) {
+
+        return ResponseEntity.ok(JsonResult.success(audioFileRestService.blacklistSourceIp(request)));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_ESL_EVENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete esl_event")
     @Operation(summary = "Delete EslEvent", description = "Delete a esl_event")
     @Override

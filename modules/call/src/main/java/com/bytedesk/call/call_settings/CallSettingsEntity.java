@@ -7,6 +7,7 @@ package com.bytedesk.call.call_settings;
 
 import org.modelmapper.ModelMapper;
 
+import com.bytedesk.call.config.CallConstants;
 import com.bytedesk.core.base.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -70,6 +71,29 @@ public class CallSettingsEntity extends BaseEntity {
      * Example: 1000, sip:1000@pbx.local.
      */
     private String target;
+
+    /**
+     * Hold media URL played to the customer side while the agent puts the call on hold.
+     */
+    @Builder.Default
+    @Column(name = "hold_media_url", length = 1024)
+    private String holdMediaUrl = CallConstants.DEFAULT_HOLD_MEDIA_URL;
+
+    @Builder.Default
+    @Column(name = "consult_extension_numbers", length = 512)
+    private String consultExtensionNumbers = CallConstants.DEFAULT_CONSULT_EXTENSION_NUMBERS;
+
+    @Builder.Default
+    @Column(name = "transfer_target_numbers", length = 512)
+    private String transferTargetNumbers = CallConstants.DEFAULT_TRANSFER_TARGET_NUMBERS;
+
+    @Builder.Default
+    @Column(name = "conference_target_numbers", length = 512)
+    private String conferenceTargetNumbers = CallConstants.DEFAULT_CONFERENCE_TARGET_NUMBERS;
+
+    @Builder.Default
+    @Column(name = "ivr_target_numbers", length = 512)
+    private String ivrTargetNumbers = CallConstants.DEFAULT_IVR_TARGET_NUMBERS;
 
     public static CallSettingsEntity fromRequest(CallSettingsRequest request, ModelMapper modelMapper) {
         if (request == null || modelMapper == null) {

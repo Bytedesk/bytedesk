@@ -14,6 +14,8 @@
 package com.bytedesk.call.esl_event;
 
 import java.util.Optional;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistEntity;
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -48,6 +52,8 @@ public class EslEventRestService extends BaseRestServiceWithExport<EslEventEntit
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final CallIpBlacklistService callIpBlacklistService;
     
     @Override
     public Page<EslEventEntity> queryByOrgEntity(EslEventRequest request) {
@@ -212,6 +218,28 @@ public class EslEventRestService extends BaseRestServiceWithExport<EslEventEntit
     @Override
     public void delete(EslEventRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    public Map<String, Object> blacklistSourceIp(EslEventRequest request) {
+        Optional<EslEventEntity> optional = findByUid(request.getUid());
+        if (optional.isEmpty()) {
+            throw new RuntimeException("EslEvent not found");
+        }
+
+        EslEventEntity entity = optional.get();
+        if (!StringUtils.hasText(entity.getSourceIp())) {
+            throw new RuntimeException("EslEvent source IP is empty");
+        }
+
+        CallIpBlacklistEntity blacklistEntity = callIpBlacklistService.blacklistSourceIp(entity);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("uid", blacklistEntity.getUid());
+        result.put("orgUid", blacklistEntity.getOrgUid());
+        result.put("sourceIp", blacklistEntity.getIpAddress());
+        result.put("reason", blacklistEntity.getReason());
+        result.put("sourceEslEventUid", blacklistEntity.getSourceEslEventUid());
+        return result;
     }
 
     @Override

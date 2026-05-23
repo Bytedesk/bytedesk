@@ -56,9 +56,9 @@ public class WorkflowExecutionContext {
         }
         for (int i = 0; i < edges.size(); i++) {
             JSONObject edge = edges.getJSONObject(i);
-            if (nodeId.equals(edge.getString("sourceNodeId"))) {
-                if (!StringUtils.hasText(sourcePortId) || sourcePortId.equals(edge.getString("sourcePortId"))) {
-                    return edge.getString("targetNodeId");
+            if (nodeId.equals(getEdgeValue(edge, "sourceNodeId", "sourceNodeID"))) {
+                if (!StringUtils.hasText(sourcePortId) || sourcePortId.equals(getEdgeValue(edge, "sourcePortId", "sourcePortID"))) {
+                    return getEdgeValue(edge, "targetNodeId", "targetNodeID");
                 }
             }
         }
@@ -72,9 +72,17 @@ public class WorkflowExecutionContext {
         for (int i = 0; i < edges.size(); i++) {
             JSONObject edge = edges.getJSONObject(i);
             if (edgeId.equals(edge.getString("id"))) {
-                return edge.getString("targetNodeId");
+                return getEdgeValue(edge, "targetNodeId", "targetNodeID");
             }
         }
         return null;
+    }
+
+    private String getEdgeValue(JSONObject edge, String primaryKey, String fallbackKey) {
+        String primaryValue = edge.getString(primaryKey);
+        if (StringUtils.hasText(primaryValue)) {
+            return primaryValue;
+        }
+        return edge.getString(fallbackKey);
     }
 }

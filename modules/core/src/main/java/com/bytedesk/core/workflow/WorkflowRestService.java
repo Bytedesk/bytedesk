@@ -14,6 +14,7 @@
 package com.bytedesk.core.workflow;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 // import org.springframework.cache.Cache;
@@ -62,6 +63,12 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     private static final String DEFAULT_DESCRIPTION = WorkflowInitData.DEFAULT_WORKFLOW_DESCRIPTION;
     private static final String DEFAULT_IVR_NICKNAME = WorkflowInitData.DEFAULT_IVR_WORKFLOW_NAME;
     private static final String DEFAULT_IVR_DESCRIPTION = WorkflowInitData.DEFAULT_IVR_WORKFLOW_DESCRIPTION;
+    private static final String DEFAULT_IVR_SATISFACTION_NICKNAME = WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME;
+    private static final String DEFAULT_IVR_SATISFACTION_DESCRIPTION = WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_DESCRIPTION;
+    private static final String DEFAULT_IVR_PASSWORD_VERIFICATION_NICKNAME = WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_NAME;
+    private static final String DEFAULT_IVR_PASSWORD_VERIFICATION_DESCRIPTION = WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_DESCRIPTION;
+    private static final String DEFAULT_IVR_BOT_NICKNAME = WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_NAME;
+    private static final String DEFAULT_IVR_BOT_DESCRIPTION = WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_DESCRIPTION;
 
     @Override
     protected Specification<WorkflowEntity> createSpecification(WorkflowRequest request) {
@@ -78,11 +85,41 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         Specification<WorkflowEntity> specs = WorkflowSpecification.search(request, authService);
         return workflowRepository.findAll(specs, pageable);
     }
+
+        public List<WorkflowTemplateOptionResponse> queryIvrDemoTemplateOptions() {
+        return List.of(
+            createTemplateOption(
+                "demo-default",
+                WorkflowInitData.DEFAULT_IVR_WORKFLOW_NAME,
+                WorkflowInitData.DEFAULT_IVR_WORKFLOW_DESCRIPTION,
+                WorkflowInitData.buildDefaultIvrWorkflowSchemaJson()),
+            createTemplateOption(
+                "demo-satisfaction",
+                WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME,
+                WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_DESCRIPTION,
+                WorkflowInitData.buildDefaultSatisfactionIvrWorkflowSchemaJson()),
+            createTemplateOption(
+                "demo-password-verification",
+                WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_NAME,
+                WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_DESCRIPTION,
+                WorkflowInitData.buildDefaultPasswordVerificationIvrWorkflowSchemaJson()),
+            createTemplateOption(
+                "demo-bot",
+                WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_NAME,
+                WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_DESCRIPTION,
+                WorkflowInitData.buildDefaultBotIvrWorkflowSchemaJson()));
+        }
     
     // @Cacheable(value = CACHE_WORKFLOW, key = "#uid", unless = "#result == null || #result.isEmpty()")
     @Override
     public Optional<WorkflowEntity> findByUid(String uid) {
-        return workflowRepository.findByUid(uid);
+        Optional<WorkflowEntity> optional = workflowRepository.findByUid(uid);
+        if (optional.isEmpty()) {
+            return optional;
+        }
+
+        WorkflowEntity entity = optional.get();
+        return Optional.of(refreshManagedDefaultIvrWorkflowIfNeeded(entity));
     }
 
     @Override
@@ -152,6 +189,31 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         } else {
             throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_RESOURCE_NOT_FOUND_WITH_UID, request.getUid()));
         }
+    }
+
+    @Transactional
+    public WorkflowResponse reset(WorkflowRequest request) {
+        Assert.hasText(request.getUid(), "Workflow UID must not be empty");
+
+        WorkflowEntity entity = workflowRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException(I18Consts.withArgs(I18Consts.I18N_RESOURCE_NOT_FOUND_WITH_UID,
+                        request.getUid())));
+
+        String resetSchema = resolveResetSchema(entity);
+        String resetStartNodeId = resolveResetStartNodeId(entity);
+
+        entity.setSchema(resetSchema);
+        entity.setCurrentNodeId(resetStartNodeId);
+        if (!StringUtils.hasText(entity.getType())) {
+            entity.setType(WorkflowTypeEnum.IVR.name());
+        }
+
+        WorkflowEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
+        }
+        refreshWorkflowCache(savedEntity);
+        return convertToResponse(savedEntity);
     }
 
     @Override
@@ -272,35 +334,177 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
     @Transactional
     public WorkflowResponse initDefaultIvrWorkflow(String orgUid) {
         Assert.hasText(orgUid, "Organization UID must not be empty");
-        String workflowUid = resolveDefaultIvrWorkflowUid(orgUid);
+        WorkflowResponse defaultResponse = initDefaultIvrWorkflowDefinition(
+                orgUid,
+                resolveDefaultIvrWorkflowUid(orgUid),
+                DEFAULT_IVR_NICKNAME,
+                DEFAULT_IVR_DESCRIPTION,
+                WorkflowInitData.buildDefaultIvrWorkflowSchemaJson(),
+                WorkflowInitData.DEFAULT_IVR_START_NODE_ID);
 
+        initDefaultIvrWorkflowDefinition(
+                orgUid,
+                resolveDefaultIvrSatisfactionWorkflowUid(orgUid),
+                DEFAULT_IVR_SATISFACTION_NICKNAME,
+                DEFAULT_IVR_SATISFACTION_DESCRIPTION,
+                WorkflowInitData.buildDefaultSatisfactionIvrWorkflowSchemaJson(),
+                WorkflowInitData.DEFAULT_IVR_SATISFACTION_START_NODE_ID);
+
+        initDefaultIvrWorkflowDefinition(
+                orgUid,
+                resolveDefaultIvrPasswordVerificationWorkflowUid(orgUid),
+                DEFAULT_IVR_PASSWORD_VERIFICATION_NICKNAME,
+                DEFAULT_IVR_PASSWORD_VERIFICATION_DESCRIPTION,
+                WorkflowInitData.buildDefaultPasswordVerificationIvrWorkflowSchemaJson(),
+                WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID);
+
+        initDefaultIvrWorkflowDefinition(
+            orgUid,
+            resolveDefaultIvrBotWorkflowUid(orgUid),
+            DEFAULT_IVR_BOT_NICKNAME,
+            DEFAULT_IVR_BOT_DESCRIPTION,
+            WorkflowInitData.buildDefaultBotIvrWorkflowSchemaJson(),
+            WorkflowInitData.DEFAULT_IVR_BOT_START_NODE_ID);
+
+        return defaultResponse;
+    }
+
+    private WorkflowResponse initDefaultIvrWorkflowDefinition(String orgUid, String workflowUid,
+            String nickname, String description, String schema, String startNodeId) {
         Optional<WorkflowEntity> existing = workflowRepository.findByUid(workflowUid);
         if (existing.isPresent() && !existing.get().isDeleted()) {
-            log.debug("Default IVR workflow already initialized for org: {}", orgUid);
-            return convertToResponse(existing.get());
+            WorkflowEntity existingEntity = existing.get();
+            if (!requiresDefaultIvrWorkflowRefresh(existingEntity, orgUid, nickname, description, schema,
+                    startNodeId)) {
+                log.debug("Default IVR workflow already initialized, org: {}, workflowUid: {}", orgUid, workflowUid);
+                return convertToResponse(existingEntity);
+            }
+
+            applyDefaultIvrWorkflowDefinition(existingEntity, orgUid, nickname, description, schema, startNodeId);
+
+            WorkflowEntity saved = save(existingEntity);
+            if (saved == null) {
+                throw new RuntimeException("Refresh default IVR workflow failed: " + workflowUid);
+            }
+            refreshWorkflowCache(saved);
+            log.info("Refreshed default IVR workflow for org: {}, workflowUid: {}", orgUid, workflowUid);
+            return convertToResponse(saved);
         }
 
         WorkflowEntity entity = existing.orElseGet(() -> WorkflowEntity.builder()
                 .uid(workflowUid)
                 .orgUid(orgUid)
                 .build());
+        applyDefaultIvrWorkflowDefinition(entity, orgUid, nickname, description, schema, startNodeId);
+
+        WorkflowEntity saved = save(entity);
+        if (saved == null) {
+            throw new RuntimeException("Initialize default IVR workflow failed: " + workflowUid);
+        }
+        refreshWorkflowCache(saved);
+        log.info("Initialized default IVR workflow for org: {}, workflowUid: {}", orgUid, workflowUid);
+        return convertToResponse(saved);
+    }
+
+    private WorkflowEntity refreshManagedDefaultIvrWorkflowIfNeeded(WorkflowEntity entity) {
+        DefaultIvrWorkflowDefinition definition = resolveManagedDefaultIvrDefinition(entity);
+        if (definition == null || !requiresDefaultIvrWorkflowRefresh(entity,
+                definition.orgUid(),
+                definition.nickname(),
+                definition.description(),
+                definition.schema(),
+                definition.startNodeId())) {
+            return entity;
+        }
+
+        applyDefaultIvrWorkflowDefinition(entity,
+                definition.orgUid(),
+                definition.nickname(),
+                definition.description(),
+                definition.schema(),
+                definition.startNodeId());
+
+        WorkflowEntity saved = save(entity);
+        if (saved == null) {
+            throw new RuntimeException("Refresh managed default IVR workflow failed: " + entity.getUid());
+        }
+        refreshWorkflowCache(saved);
+        log.info("Auto-refreshed managed default IVR workflow on read, org: {}, workflowUid: {}",
+                definition.orgUid(),
+                entity.getUid());
+        return saved;
+    }
+
+    private void applyDefaultIvrWorkflowDefinition(WorkflowEntity entity, String orgUid, String nickname,
+            String description, String schema, String startNodeId) {
         entity.setDeleted(false);
-        entity.setNickname(DEFAULT_IVR_NICKNAME);
-        entity.setDescription(DEFAULT_IVR_DESCRIPTION);
-        entity.setSchema(WorkflowInitData.buildDefaultIvrWorkflowSchemaJson());
-        entity.setCurrentNodeId(WorkflowInitData.DEFAULT_IVR_START_NODE_ID);
+        entity.setNickname(nickname);
+        entity.setDescription(description);
+        entity.setSchema(schema);
+        entity.setCurrentNodeId(startNodeId);
         entity.setType(WorkflowTypeEnum.IVR.name());
         entity.setAvatar(AvatarConsts.getDefaultWorkflowAvatar());
         entity.setOrgUid(orgUid);
         entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
+    }
 
-        WorkflowEntity saved = save(entity);
-        if (saved == null) {
-            throw new RuntimeException("Initialize default IVR workflow failed");
+    private boolean requiresDefaultIvrWorkflowRefresh(WorkflowEntity entity, String orgUid, String nickname,
+            String description, String schema, String startNodeId) {
+        return !StringUtils.pathEquals(orgUid, entity.getOrgUid())
+                || !StringUtils.pathEquals(nickname, entity.getNickname())
+                || !StringUtils.pathEquals(description, entity.getDescription())
+                || !StringUtils.pathEquals(schema, entity.getSchema())
+                || !StringUtils.pathEquals(startNodeId, entity.getCurrentNodeId())
+                || !WorkflowTypeEnum.IVR.name().equals(entity.getType())
+                || !StringUtils.pathEquals(AvatarConsts.getDefaultWorkflowAvatar(), entity.getAvatar())
+                || entity.getSettings() == null;
+    }
+
+    private DefaultIvrWorkflowDefinition resolveManagedDefaultIvrDefinition(WorkflowEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getUid()) || !StringUtils.hasText(entity.getOrgUid())) {
+            return null;
         }
-        refreshWorkflowCache(saved);
-        log.info("Initialized default IVR workflow for org: {}", orgUid);
-        return convertToResponse(saved);
+
+        String uid = entity.getUid();
+        String orgUid = entity.getOrgUid();
+
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
+            return new DefaultIvrWorkflowDefinition(
+                    orgUid,
+                    DEFAULT_IVR_NICKNAME,
+                    DEFAULT_IVR_DESCRIPTION,
+                    WorkflowInitData.buildDefaultIvrWorkflowSchemaJson(),
+                    WorkflowInitData.DEFAULT_IVR_START_NODE_ID);
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX)) {
+            return new DefaultIvrWorkflowDefinition(
+                    orgUid,
+                    DEFAULT_IVR_SATISFACTION_NICKNAME,
+                    DEFAULT_IVR_SATISFACTION_DESCRIPTION,
+                    WorkflowInitData.buildDefaultSatisfactionIvrWorkflowSchemaJson(),
+                    WorkflowInitData.DEFAULT_IVR_SATISFACTION_START_NODE_ID);
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX)) {
+            return new DefaultIvrWorkflowDefinition(
+                    orgUid,
+                    DEFAULT_IVR_PASSWORD_VERIFICATION_NICKNAME,
+                    DEFAULT_IVR_PASSWORD_VERIFICATION_DESCRIPTION,
+                    WorkflowInitData.buildDefaultPasswordVerificationIvrWorkflowSchemaJson(),
+                    WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID);
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX)) {
+            return new DefaultIvrWorkflowDefinition(
+                    orgUid,
+                    DEFAULT_IVR_BOT_NICKNAME,
+                    DEFAULT_IVR_BOT_DESCRIPTION,
+                    WorkflowInitData.buildDefaultBotIvrWorkflowSchemaJson(),
+                    WorkflowInitData.DEFAULT_IVR_BOT_START_NODE_ID);
+        }
+        return null;
+    }
+
+    private record DefaultIvrWorkflowDefinition(String orgUid, String nickname, String description, String schema,
+            String startNodeId) {
     }
 
     private WorkflowResponse initDefaultChatbotWorkflow(String orgUid) {
@@ -348,6 +552,87 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX);
     }
 
+    private String resolveDefaultIvrSatisfactionWorkflowUid(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return BytedeskConsts.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID;
+        }
+        return Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX);
+    }
+
+    private String resolveDefaultIvrPasswordVerificationWorkflowUid(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return BytedeskConsts.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID;
+        }
+        return Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX);
+    }
+
+    private String resolveDefaultIvrBotWorkflowUid(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return BytedeskConsts.DEFAULT_IVR_BOT_WORKFLOW_UID;
+        }
+        return Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX);
+    }
+
+    private String resolveResetSchema(WorkflowEntity entity) {
+        String uid = entity.getUid();
+        String orgUid = entity.getOrgUid();
+
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.buildDefaultIvrWorkflowSchemaJson();
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.buildDefaultSatisfactionIvrWorkflowSchemaJson();
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.buildDefaultPasswordVerificationIvrWorkflowSchemaJson();
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.buildDefaultBotIvrWorkflowSchemaJson();
+        }
+        throw new IllegalArgumentException("Workflow does not support demo reset: " + uid);
+    }
+
+    private String resolveResetStartNodeId(WorkflowEntity entity) {
+        String uid = entity.getUid();
+        String orgUid = entity.getOrgUid();
+
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.DEFAULT_IVR_START_NODE_ID;
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.DEFAULT_IVR_SATISFACTION_START_NODE_ID;
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID;
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.DEFAULT_IVR_BOT_START_NODE_ID;
+        }
+        throw new IllegalArgumentException("Workflow does not support demo reset: " + uid);
+    }
+
+    private boolean matchesResetUid(String workflowUid, String orgUid, String suffix) {
+        if (!StringUtils.hasText(workflowUid)) {
+            return false;
+        }
+        if (BytedeskConsts.DEFAULT_IVR_WORKFLOW_UID.equals(workflowUid)) {
+            return WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX.equals(suffix);
+        }
+        if (BytedeskConsts.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID.equals(workflowUid)) {
+            return WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX.equals(suffix);
+        }
+        if (BytedeskConsts.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID.equals(workflowUid)) {
+            return WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX.equals(suffix);
+        }
+        if (BytedeskConsts.DEFAULT_IVR_BOT_WORKFLOW_UID.equals(workflowUid)) {
+            return WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX.equals(suffix);
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            return false;
+        }
+        return workflowUid.equals(Utils.formatUid(orgUid, suffix));
+    }
+
     private void refreshWorkflowCache(WorkflowEntity entity) {
         // if (entity == null || !StringUtils.hasText(entity.getUid()) || cacheManager == null) {
         //     return;
@@ -357,6 +642,16 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         //     return;
         // }
         // cache.put(entity.getUid(), entity);
+    }
+
+    private WorkflowTemplateOptionResponse createTemplateOption(String value, String label, String description,
+            String schema) {
+        return WorkflowTemplateOptionResponse.builder()
+                .value(value)
+                .label(label)
+                .description(description)
+                .schema(schema)
+                .build();
     }
 
 

@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260523-rename-goods-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="type" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_type" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="type"
+            newColumnName="goods_type"
+            columnDataType="VARCHAR(64)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-status-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="status" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_status" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="status"
+            newColumnName="goods_status"
+            columnDataType="VARCHAR(64)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-title-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="title" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_title" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="title"
+            newColumnName="goods_title"
+            columnDataType="VARCHAR(255)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-image-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="image" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_image" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="image"
+            newColumnName="goods_image"
+            columnDataType="VARCHAR(512)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-description-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="description" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_description" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="description"
+            newColumnName="goods_description"
+            columnDataType="TEXT" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-price-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="price" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_price" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="price"
+            newColumnName="goods_price"
+            columnDataType="DOUBLE" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-url-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="url" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_url" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="url"
+            newColumnName="goods_url"
+            columnDataType="VARCHAR(512)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-tag-list-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="tag_list" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_tag_list" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="tag_list"
+            newColumnName="goods_tag_list"
+            columnDataType="TEXT" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-extra-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="extra" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_extra" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="extra"
+            newColumnName="goods_extra"
+            columnDataType="TEXT" />
+    </changeSet>
+
+    <changeSet id="260523-rename-goods-quantity-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_goods" />
+                <columnExists tableName="bytedesk_core_goods" columnName="quantity" />
+                <not>
+                    <columnExists tableName="bytedesk_core_goods" columnName="goods_quantity" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_goods"
+            oldColumnName="quantity"
+            newColumnName="goods_quantity"
+            columnDataType="INT" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="type" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="order_type" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="type"
+            newColumnName="order_type"
+            columnDataType="VARCHAR(64)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-time-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="time" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="order_time" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="time"
+            newColumnName="order_time"
+            columnDataType="VARCHAR(64)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-status-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="status" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="order_status" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="status"
+            newColumnName="order_status"
+            columnDataType="VARCHAR(64)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-status-text-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="status_text" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="order_status_text" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="status_text"
+            newColumnName="order_status_text"
+            columnDataType="VARCHAR(128)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-summary-title-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="title" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="summary_title" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="title"
+            newColumnName="summary_title"
+            columnDataType="VARCHAR(255)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-summary-description-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="description" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="summary_description" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="description"
+            newColumnName="summary_description"
+            columnDataType="VARCHAR(255)" />
+    </changeSet>
+
+    <changeSet id="260523-rename-order-summary-extra-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_order" />
+                <columnExists tableName="bytedesk_core_order" columnName="extra" />
+                <not>
+                    <columnExists tableName="bytedesk_core_order" columnName="summary_extra" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_core_order"
+            oldColumnName="extra"
+            newColumnName="summary_extra"
+            columnDataType="TEXT" />
+    </changeSet>
+
+</databaseChangeLog>

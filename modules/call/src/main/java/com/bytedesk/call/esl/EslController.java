@@ -206,6 +206,12 @@ public class EslController {
         return ResponseEntity.ok(JsonResult.success("uuid_kill", eslService.uuidKill(uuid, cause)));
     }
 
+    /** 停止通道当前播放的媒体应用 */
+    @PostMapping("/uuid/break/{uuid}")
+    public ResponseEntity<JsonResult<?>> uuidBreak(@PathVariable String uuid, @RequestParam(defaultValue = "true") boolean stopAll) {
+        return ResponseEntity.ok(JsonResult.success("uuid_break", eslService.uuidBreak(uuid, stopAll)));
+    }
+
     /** 转接通道 */
     @PostMapping("/uuid/transfer")
     public ResponseEntity<JsonResult<?>> uuidTransfer(@RequestBody @Valid UuidTransferRequest req) {

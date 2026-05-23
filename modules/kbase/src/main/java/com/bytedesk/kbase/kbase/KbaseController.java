@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,10 +92,11 @@ public class KbaseController {
     // http://127.0.0.1:9003/helpcenter/{kbUid}/article/${currentArticle?.uid}.html
 	// kb/article/${currentArticle?.uid}
 	@GetMapping("/{kbUid}/article/{articleUid}")
-	public String kbArticle(@PathVariable(value = "articleUid") String articleUid, Model model) {
+    public String kbArticle(@PathVariable(value = "kbUid") String kbUid,
+            @PathVariable(value = "articleUid") String articleUid, Model model) {
         articleUid = articleUid.replaceAll(".html", "");
 		log.info("kbArticle path: {}", articleUid);
-        return routeArticle(articleUid, model);
+        return routeArticle(kbUid, articleUid, model);
 	}
 
     @GetMapping("/{kbUid}/search.html")
@@ -134,12 +136,18 @@ public class KbaseController {
 		return "redirect:/404";
     }
 
-    private String routeArticle(String articleUid, Model model) {
+    private String routeArticle(String kbUid, String articleUid, Model model) {
         Optional<ArticleEntity> articleOptional = articleRestService.findByUid(articleUid);
         if (articleOptional.isPresent()) {
             model.addAttribute("article", articleRestService.convertToResponse(articleOptional.get()));
-            // 
-            Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(articleOptional.get().getKbase().getUid());
+            String resolvedKbUid = articleOptional.get().getKbase() != null
+                    ? articleOptional.get().getKbase().getUid()
+                    : kbUid;
+            if (!StringUtils.hasText(resolvedKbUid)) {
+                log.warn("routeArticle missing kbase relation and kbUid fallback, articleUid={}", articleUid);
+                return "redirect:/404";
+            }
+            Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(resolvedKbUid);
             if (kbaseOptional.isPresent()) {
                 model.addAttribute("kbase", kbaseOptional.get());
                 // 
@@ -149,6 +157,7 @@ public class KbaseController {
                 // 
                 return "kbase/themes/" + kbaseOptional.get().getTheme() + "/article";
             }
+            log.warn("routeArticle unable to resolve kbase, articleUid={}, kbUid={}", articleUid, resolvedKbUid);
         }
         // error
 		return "redirect:/404";

@@ -1,0 +1,1 @@
+import"./index-BV2gMZcV.js";import e from"./request-BvvVzsz4.js";async function t(t){let n=t.channel||`WEB_FLOAT`;return e(`/visitor/api/v1/init`,{method:`POST`,data:{...t,channel:n,client:n}})}async function n(t){let n=t.channel||`WEB_FLOAT`;return e(`/visitor/api/v1/browse`,{method:`POST`,data:{...t,channel:n,client:n}})}export{n as browse,t as initVisitor};

@@ -3,6 +3,7 @@ package com.bytedesk.call.xml_curl;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -10,10 +11,14 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.bytedesk.call.config.CallConstants;
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRepository;
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * 最小可用的 mod_xml_curl XML 生成服务。
@@ -26,13 +31,19 @@ public class XmlCurlService {
     private final ObjectProvider<XmlCurlDialplanProvider> dialplanProviders;
     private final ObjectProvider<XmlCurlDirectoryProvider> directoryProviders;
     private final ObjectProvider<XmlCurlConfigurationProvider> configurationProviders;
+    private final CallSettingsRepository callSettingsRepository;
+    private final CallIpBlacklistService callIpBlacklistService;
 
     public XmlCurlService(ObjectProvider<XmlCurlDialplanProvider> dialplanProviders,
             ObjectProvider<XmlCurlDirectoryProvider> directoryProviders,
-            ObjectProvider<XmlCurlConfigurationProvider> configurationProviders) {
+            ObjectProvider<XmlCurlConfigurationProvider> configurationProviders,
+            CallSettingsRepository callSettingsRepository,
+            CallIpBlacklistService callIpBlacklistService) {
         this.dialplanProviders = dialplanProviders;
         this.directoryProviders = directoryProviders;
         this.configurationProviders = configurationProviders;
+        this.callSettingsRepository = callSettingsRepository;
+        this.callIpBlacklistService = callIpBlacklistService;
     }
 
     // 开关：默认全部关闭，仅在联调或按需开启对应 section 的动态返回
@@ -54,6 +65,25 @@ public class XmlCurlService {
         String dest = pick(p, "Caller-Destination-Number", "destination_number", "variable_destination_number");
         if (dest == null) {
             logNotFound("dialplan", "missing destination_number");
+            return resultNotFound();
+        }
+        String sourceIp = pick(p,
+                "sip_auth_network_ip",
+                "variable_sip_auth_network_ip",
+                "Caller-Network-Addr",
+                "network_addr",
+                "network_ip",
+                "variable_network_addr",
+                "variable_sip_network_ip",
+                "sip_network_ip",
+                "variable_sip_received_ip",
+                "sip_received_ip",
+                "variable_sip_via_host",
+                "sip_via_host");
+        String orgUid = resolveOrgUid(p);
+        if (callIpBlacklistService.isBlacklisted(orgUid, sourceIp)) {
+            log.warn("xmlcurl.dialplan blocked blacklisted sourceIp='{}' context='{}' dest='{}' orgUid='{}'",
+                    sourceIp, context, dest, orgUid);
             return resultNotFound();
         }
         if (log.isDebugEnabled()) {
@@ -245,6 +275,46 @@ public class XmlCurlService {
             if (v != null && !v.isBlank()) return v;
         }
         return null;
+    }
+
+    private String resolveOrgUid(Map<String, String> params) {
+        String caller = pick(params,
+                "Caller-Username",
+                "caller_username",
+                "variable_user_name",
+                "sip_auth_username",
+                "Caller-Caller-ID-Number",
+                "caller_id_number",
+                "from-user",
+                "from_user");
+        if (!StringUtils.hasText(caller)) {
+            return null;
+        }
+
+        String domain = pick(params,
+                "domain",
+                "Domain",
+                "domain_name",
+                "variable_domain_name",
+                "sip_from_host");
+        if (!StringUtils.hasText(domain)) {
+            domain = CallConstants.DIRECTORY_DOMAIN_DEFAULT;
+        }
+
+        Set<String> candidates = new LinkedHashSet<>();
+        String normalizedCaller = caller.trim();
+        String normalizedDomain = domain.trim();
+        candidates.add(normalizedCaller);
+        candidates.add(normalizedCaller + "@" + normalizedDomain);
+        candidates.add("sip:" + normalizedCaller + "@" + normalizedDomain);
+        candidates.add("sip:" + normalizedCaller + "@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT);
+
+        return callSettingsRepository.findAllByTargetInAndEnabledTrueAndDeletedFalse(candidates).stream()
+                .map(CallSettingsEntity::getOrgUid)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .findFirst()
+                .orElse(null);
     }
 
     private static String xmlEscape(String s) {

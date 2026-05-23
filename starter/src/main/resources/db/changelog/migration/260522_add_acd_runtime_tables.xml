@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260522-add-acd-runtime-tables" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_acd_queue_entry"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_call_acd_queue_entry">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_call_acd_queue_entry" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_call_acd_queue_entry_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="customer_uuid" type="VARCHAR(64)"/>
+            <column name="caller_id_number" type="VARCHAR(64)"/>
+            <column name="queue_name" type="VARCHAR(128)"/>
+            <column name="skill_name" type="VARCHAR(128)"/>
+            <column name="domain_name" type="VARCHAR(128)"/>
+            <column name="acd_strategy" type="VARCHAR(64)"/>
+            <column name="moh_sound" type="VARCHAR(512)"/>
+            <column name="ring_timeout_seconds" type="INT"/>
+            <column name="max_attempts" type="INT"/>
+            <column name="attempt_count" type="INT"/>
+            <column name="acd_status" type="VARCHAR(64)"/>
+            <column name="agent_extension" type="VARCHAR(64)"/>
+            <column name="agent_leg_uuid" type="VARCHAR(64)"/>
+            <column name="attempted_agents" type="VARCHAR(2000)"/>
+            <column name="queued_at" type="TIMESTAMP"/>
+            <column name="ringing_at" type="TIMESTAMP"/>
+            <column name="bridged_at" type="TIMESTAMP"/>
+            <column name="completed_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="bytedesk_call_acd_queue_entry" indexName="idx_call_acd_queue_entry_customer_uuid">
+            <column name="customer_uuid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_acd_queue_entry" indexName="idx_call_acd_queue_entry_org_uid">
+            <column name="org_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_acd_queue_entry" indexName="idx_call_acd_queue_entry_status">
+            <column name="acd_status"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260522-add-acd-agent-state-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_acd_agent_state"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_call_acd_agent_state">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_call_acd_agent_state" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_call_acd_agent_state_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="extension_number" type="VARCHAR(64)"/>
+            <column name="acd_status" type="VARCHAR(64)"/>
+            <column name="current_queue_entry_uid" type="VARCHAR(64)"/>
+            <column name="current_customer_uuid" type="VARCHAR(64)"/>
+            <column name="current_agent_leg_uuid" type="VARCHAR(64)"/>
+            <column name="last_idle_at" type="TIMESTAMP"/>
+            <column name="runtime_updated_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <createIndex tableName="bytedesk_call_acd_agent_state" indexName="idx_call_acd_agent_state_extension_org">
+            <column name="extension_number"/>
+            <column name="org_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_acd_agent_state" indexName="idx_call_acd_agent_state_status">
+            <column name="acd_status"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

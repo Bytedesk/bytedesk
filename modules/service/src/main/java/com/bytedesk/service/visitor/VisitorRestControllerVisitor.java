@@ -496,7 +496,25 @@ public class VisitorRestControllerVisitor {
     @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
+    public SseEmitter sendSseVisitorMessageGet(@RequestParam(value = "message") String message) {
+
+        return sendSseVisitorMessageInternal(message);
+    }
+
+    @BlackIpFilter(title = "black", action = "sendSseVisitorMessage")
+    @BlackUserFilter(title = "black", action = "sendSseVisitorMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
+    @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
+    @PostMapping(value = "/message/sse", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseVisitorMessagePost(@RequestBody String message) {
+
+        return sendSseVisitorMessageInternal(message);
+    }
+
+    private SseEmitter sendSseVisitorMessageInternal(String message) {
+        if (!StringUtils.hasText(message)) {
+            return createInvalidSseEmitter("message required");
+        }
 
         visitorRestService.publishVisitorMessageEvent(message);
 
@@ -545,6 +563,16 @@ public class VisitorRestControllerVisitor {
             }
         });
 
+        return emitter;
+    }
+
+    private SseEmitter createInvalidSseEmitter(String message) {
+        SseEmitter emitter = new SseEmitter(1L);
+        try {
+            emitter.completeWithError(new IllegalArgumentException(message));
+        } catch (Exception exception) {
+            log.debug("Failed to complete invalid SSE emitter: {}", exception.getMessage());
+        }
         return emitter;
     }
 

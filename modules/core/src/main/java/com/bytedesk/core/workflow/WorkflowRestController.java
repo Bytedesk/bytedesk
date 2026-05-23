@@ -86,6 +86,16 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @Operation(summary = "Query IVR Demo Template Options", description = "Retrieve IVR demo template names and descriptions from server-side defaults")
+    @ApiResponse(responseCode = "200", description = "Query successful",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = WorkflowTemplateOptionResponse.class)))
+    @GetMapping("/template/ivr/demo")
+    public ResponseEntity<?> queryIvrDemoTemplateOptions() {
+
+        return ResponseEntity.ok(JsonResult.success(workflowRestService.queryIvrDemoTemplateOptions()));
+    }
+
     @Operation(summary = "Create Workflow", description = "Create a new workflow")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -124,6 +134,19 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         workflowRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @Operation(summary = "Reset Workflow", description = "Reset the specified demo workflow to server-side built-in schema")
+    @ApiResponse(responseCode = "200", description = "Reset successfully",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = WorkflowResponse.class)))
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_RESET, description = "reset workflow")
+    @PostMapping("/reset")
+    public ResponseEntity<?> reset(@RequestBody WorkflowRequest request) {
+
+        WorkflowResponse workflow = workflowRestService.reset(request);
+
+        return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
     @Operation(summary = "Export Workflows", description = "Export workflow data")

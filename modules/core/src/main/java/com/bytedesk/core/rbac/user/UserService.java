@@ -487,12 +487,12 @@ public class UserService {
 
         if (StringUtils.hasText(email) && StringUtils.hasText(superUser.getEmail())
                 && email.trim().equalsIgnoreCase(superUser.getEmail().trim())) {
-            throw new EmailExistsException("邮箱为系统超级管理员保留，禁止使用");
+            throw new EmailExistsException(I18Consts.I18N_EMAIL_RESERVED_BY_SUPER_ADMIN);
         }
 
         if (StringUtils.hasText(mobile) && StringUtils.hasText(superUser.getMobile())
                 && mobile.trim().equals(superUser.getMobile().trim())) {
-            throw new MobileExistsException("手机号为系统超级管理员保留，禁止使用");
+            throw new MobileExistsException(I18Consts.I18N_MOBILE_RESERVED_BY_SUPER_ADMIN);
         }
     }
 

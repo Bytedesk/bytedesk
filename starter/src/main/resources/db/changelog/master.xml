@@ -22,5 +22,10 @@
     <include file="db/changelog/migration/260518_refactor_agent_call_settings.xml" />
     <include file="db/changelog/migration/260518_rename_call_settings_enabled_column.xml" />
     <include file="db/changelog/migration/260519_rename_call_settings_number_column.xml" />
+    <include file="db/changelog/migration/260520_add_esl_event_source_ip.xml" />
+    <include file="db/changelog/migration/260522_add_call_settings_hold_media_url.xml" />
+    <include file="db/changelog/migration/260522_add_acd_runtime_tables.xml" />
+    <include file="db/changelog/migration/260523_add_call_settings_control_targets.xml" />
+    <include file="db/changelog/migration/260523_rename_goods_order_keyword_columns.xml" />
 
 </databaseChangeLog>

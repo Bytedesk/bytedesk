@@ -29,12 +29,12 @@ import com.bytedesk.core.push.PushRequest;
 import com.bytedesk.core.push.PushResponse;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
+import com.bytedesk.core.push.sms_push.SmsSendResult;
+import com.bytedesk.core.push.sms_push.SmsSendService;
 import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
-import com.bytedesk.core.sms.SmsSendResult;
-import com.bytedesk.core.sms.SmsSendService;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.push.PushFilterService;
 

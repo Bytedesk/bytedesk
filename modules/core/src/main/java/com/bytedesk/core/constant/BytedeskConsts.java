@@ -49,8 +49,17 @@ public class BytedeskConsts {
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid"; // 默认团队成员uid
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid"; // 默认机器人uid
     public static final String DEFAULT_IVR_WORKFLOW_UID = "df_ivr_wf_uid"; // 默认 IVR 工作流 uid
+    public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_UID = "df_ivr_satisfaction_wf_uid"; // 默认满意度 IVR 工作流 uid
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID = "df_ivr_password_verification_wf_uid"; // 默认密码验证 IVR 工作流 uid
+    public static final String DEFAULT_IVR_BOT_WORKFLOW_UID = "df_ivr_bot_wf_uid"; // 默认机器人对话 IVR 工作流 uid
     public static final String DEFAULT_IVR_MENU_UID = "df_ivr_menu_uid"; // 默认 IVR 菜单 uid
+    public static final String DEFAULT_IVR_SATISFACTION_MENU_UID = "df_ivr_satisfaction_menu_uid"; // 默认满意度 IVR 菜单 uid
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_MENU_UID = "df_ivr_password_verification_menu_uid"; // 默认密码验证 IVR 菜单 uid
+    public static final String DEFAULT_IVR_BOT_MENU_UID = "df_ivr_bot_menu_uid"; // 默认机器人对话 IVR 菜单 uid
     public static final String DEFAULT_IVR_EXTENSION_NUMBER = "5002"; // 默认 IVR 测试号码
+    public static final String DEFAULT_IVR_SATISFACTION_EXTENSION_NUMBER = "5004"; // 默认满意度 IVR 测试号码
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_EXTENSION_NUMBER = "5005"; // 默认密码验证 IVR 测试号码
+    public static final String DEFAULT_IVR_BOT_EXTENSION_NUMBER = "5006"; // 默认机器人对话 IVR 测试号码
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid"; // 默认文件助手uid
     public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid"; // 默认排队助手uid
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid"; // 默认剪贴板助手uid

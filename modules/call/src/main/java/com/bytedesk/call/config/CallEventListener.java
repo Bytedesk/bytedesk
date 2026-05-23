@@ -1,14 +1,23 @@
 package com.bytedesk.call.config;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRepository;
 import com.bytedesk.call.esl.EslEventNames;
 import com.bytedesk.call.esl.client.inbound.IEslEventListener;
 import com.bytedesk.call.esl.client.internal.Context;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl_event.EslEventIngestService;
+import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +33,8 @@ public class CallEventListener implements IEslEventListener {
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final EslEventIngestService eslEventIngestService;
+    private final CallIpBlacklistService callIpBlacklistService;
+    private final CallSettingsRepository callSettingsRepository;
 
     // 实现 IEslEventListener 的回调
     @Override
@@ -199,7 +210,7 @@ public class CallEventListener implements IEslEventListener {
      * 处理自定义事件
      */
     private void handleCustomEvent(EslEvent eslEvent) {
-        var headers = eslEvent.getEventHeaders();
+        Map<String, String> headers = eslEvent.getEventHeaders() == null ? Collections.emptyMap() : eslEvent.getEventHeaders();
         String eventSubclass = eslEvent.getEventSubclass();
 
         // sofia::register 是高频注册心跳类事件，默认降到 DEBUG，避免刷屏。
@@ -213,7 +224,111 @@ public class CallEventListener implements IEslEventListener {
             return;
         }
 
+        if ("sofia::wrong_call_state".equals(eventSubclass)) {
+            String sourceIp = firstNonBlank(headers,
+                    "Caller-Network-Addr",
+                    "network_addr",
+                    "network_ip",
+                    "variable_network_addr",
+                    "variable_sip_network_ip",
+                    "sip_network_ip",
+                    "variable_sip_received_ip",
+                    "sip_received_ip",
+                    "variable_sip_via_host",
+                    "sip_via_host");
+            String sourcePort = firstNonBlank(headers,
+                    "Caller-Network-Port",
+                    "network_port",
+                    "variable_sip_received_port",
+                    "sip_received_port");
+                String callerNumber = firstNonBlank(headers,
+                    "from-user",
+                    "from_user",
+                    "Caller-Caller-ID-Number");
+                String orgUid = resolveOrgUid(headers, callerNumber);
+                if (StringUtils.hasText(sourceIp)) {
+                try {
+                    var blacklistEntity = callIpBlacklistService.blacklistSourceIp(
+                        orgUid,
+                        sourceIp,
+                        eslEvent.getEventName(),
+                        callerNumber,
+                        null,
+                        "Auto-blocked from CUSTOM sofia::wrong_call_state");
+                    log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp={} sourcePort={} orgUid={} blacklistUid={} function={} file={} line={}",
+                        eventSubclass,
+                        callerNumber,
+                        sourceIp,
+                        sourcePort,
+                        blacklistEntity.getOrgUid(),
+                        blacklistEntity.getUid(),
+                        headers.get("Event-Calling-Function"),
+                        headers.get("Event-Calling-File"),
+                        headers.get("Event-Calling-Line-Number"));
+                } catch (Exception ex) {
+                    log.warn("自定义事件(异常状态)自动拉黑失败: subclass={} fromUser={} sourceIp={} reason={}",
+                        eventSubclass,
+                        callerNumber,
+                        sourceIp,
+                        ex.getMessage());
+                }
+                } else {
+                log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp=<empty> sourcePort={} function={} file={} line={}",
+                    eventSubclass,
+                    callerNumber,
+                    sourcePort,
+                    headers.get("Event-Calling-Function"),
+                    headers.get("Event-Calling-File"),
+                    headers.get("Event-Calling-Line-Number"));
+                }
+            log.debug("自定义事件(异常状态)详情: headers={}", headers);
+            return;
+        }
+
         log.info("自定义事件: subclass={} headers={}", eventSubclass, headers);
+    }
+
+    private String firstNonBlank(Map<String, String> headers, String... keys) {
+        if (headers == null) {
+            return null;
+        }
+        for (String key : keys) {
+            String value = headers.get(key);
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private String resolveOrgUid(Map<String, String> headers, String callerNumber) {
+        if (!StringUtils.hasText(callerNumber)) {
+            return null;
+        }
+
+        String domain = firstNonBlank(headers,
+                "domain",
+                "Domain",
+                "domain_name",
+                "variable_domain_name",
+                "sip_from_host");
+        if (!StringUtils.hasText(domain)) {
+            domain = CallConstants.DIRECTORY_DOMAIN_DEFAULT;
+        }
+
+        Set<String> candidates = new LinkedHashSet<>();
+        String normalizedCallerNumber = callerNumber.trim();
+        candidates.add(normalizedCallerNumber);
+        candidates.add(normalizedCallerNumber + "@" + domain.trim());
+        candidates.add("sip:" + normalizedCallerNumber + "@" + domain.trim());
+        candidates.add("sip:" + normalizedCallerNumber + "@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT);
+
+        return callSettingsRepository.findAllByTargetInAndEnabledTrueAndDeletedFalse(candidates).stream()
+                .map(CallSettingsEntity::getOrgUid)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .findFirst()
+                .orElse(null);
     }
 
     /**

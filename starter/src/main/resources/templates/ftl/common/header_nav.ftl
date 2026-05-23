@@ -34,7 +34,7 @@
 			<#assign aiAgentDemoUrl = 'https://www.weiyuai.cn/demos/'>
 			<#assign visitorDemoUrl = 'https://www.weiyuai.cn/reactdemo/'>
 			<#assign githubUrl = 'https://github.com/Bytedesk/bytedesk'>
-			<#assign giteeUrl = 'https://gitee.com/270580156/weiyu'>
+			<#assign giteeUrl = 'https://gitee.com/bytedesk/weiyu'>
 
 			<!-- Logo START -->
 			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 开源AI工作平台'}">

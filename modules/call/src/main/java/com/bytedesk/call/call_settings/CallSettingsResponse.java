@@ -48,4 +48,29 @@ public class CallSettingsResponse extends BaseResponse {
      * Internal extension or SIP target used by CTI/SIP registration and dialing.
      */
     private String target;
+
+    /**
+     * Hold media URL played to the customer side while the call is on hold.
+     */
+    private String holdMediaUrl;
+
+    /**
+     * Internal extension numbers available for consultation, separated by comma/semicolon/space.
+     */
+    private String consultExtensionNumbers;
+
+    /**
+     * Target numbers available for transfer, separated by comma/semicolon/space.
+     */
+    private String transferTargetNumbers;
+
+    /**
+     * Target numbers available for conference invite, separated by comma/semicolon/space.
+     */
+    private String conferenceTargetNumbers;
+
+    /**
+     * IVR extension numbers available for transfer, separated by comma/semicolon/space.
+     */
+    private String ivrTargetNumbers;
 }

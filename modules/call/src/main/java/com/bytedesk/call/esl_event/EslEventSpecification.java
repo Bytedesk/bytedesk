@@ -63,6 +63,10 @@ public class EslEventSpecification extends BaseSpecification<EslEventEntity, Esl
             if (StringUtils.hasText(request.getStatus())) {
                 predicates.add(criteriaBuilder.like(root.get("status"), "%" + request.getStatus() + "%"));
             }
+            // sourceIp
+            if (StringUtils.hasText(request.getSourceIp())) {
+                predicates.add(criteriaBuilder.like(root.get("sourceIp"), "%" + request.getSourceIp() + "%"));
+            }
             // description
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));

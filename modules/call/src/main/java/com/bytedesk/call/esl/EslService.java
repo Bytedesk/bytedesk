@@ -411,6 +411,11 @@ public class EslService {
         return api("uuid_kill", args);
     }
 
+    /** 停止通道当前播放的媒体应用 */
+    public Map<String, Object> uuidBreak(String uuid, boolean stopAll) {
+        return api("uuid_break", stopAll ? (uuid + " all") : uuid);
+    }
+
     /**
      * 转接通道
      * @param uuid     通道 UUID

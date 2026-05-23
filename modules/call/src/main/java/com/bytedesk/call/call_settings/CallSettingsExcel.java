@@ -31,6 +31,22 @@ public class CallSettingsExcel {
     @ColumnWidth(24)
     private String target;
 
+    @ExcelProperty(index = 5, value = "内线咨询号码")
+    @ColumnWidth(24)
+    private String consultExtensionNumbers;
+
+    @ExcelProperty(index = 6, value = "转接号码")
+    @ColumnWidth(24)
+    private String transferTargetNumbers;
+
+    @ExcelProperty(index = 7, value = "会议号码")
+    @ColumnWidth(24)
+    private String conferenceTargetNumbers;
+
+    @ExcelProperty(index = 8, value = "转IVR号码")
+    @ColumnWidth(24)
+    private String ivrTargetNumbers;
+
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)

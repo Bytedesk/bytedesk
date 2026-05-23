@@ -38,19 +38,48 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService)); // 基础查询条件
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request,
+            // authService)); // 基础查询条件
 
             // 组织隔离：按 orgUid 限定查询范围，避免跨组织数据泄露
             if (StringUtils.hasText(request.getOrgUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
             }
-            
+
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
             // description
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText().trim().toLowerCase();
+                String searchPattern = "%" + escapeLike(searchText) + "%";
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("ticketNumber")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contactName")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("wechat")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("threadTopic")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("visitorThreadTopic")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("reporter")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("assignee")), searchPattern,
+                                LIKE_ESCAPE_CHAR)));
             }
 
             // ticket number
@@ -103,9 +132,12 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     // 未分配：assignee 为空/null/{} 或不包含 uid 字段
                     Predicate assigneeIsNull = criteriaBuilder.isNull(root.get("assignee"));
                     Predicate assigneeIsEmptyString = criteriaBuilder.equal(root.get("assignee"), "");
-                    Predicate assigneeIsEmptyJson = criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING);
-                    Predicate assigneeUidEmpty = criteriaBuilder.like(root.get("assignee"), "%\"uid\":\"\"%", LIKE_ESCAPE_CHAR);
-                    Predicate assigneeHasNoUidField = criteriaBuilder.notLike(root.get("assignee"), "%\"uid\":\"%", LIKE_ESCAPE_CHAR);
+                    Predicate assigneeIsEmptyJson = criteriaBuilder.equal(root.get("assignee"),
+                            BytedeskConsts.EMPTY_JSON_STRING);
+                    Predicate assigneeUidEmpty = criteriaBuilder.like(root.get("assignee"), "%\"uid\":\"\"%",
+                            LIKE_ESCAPE_CHAR);
+                    Predicate assigneeHasNoUidField = criteriaBuilder.notLike(root.get("assignee"), "%\"uid\":\"%",
+                            LIKE_ESCAPE_CHAR);
                     predicates.add(criteriaBuilder.or(
                             assigneeIsNull,
                             assigneeIsEmptyString,
@@ -149,7 +181,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     log.warn("Invalid createdAtEnd format: {}", request.getCreatedAtEnd());
                 }
             }
-            // 
+            //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

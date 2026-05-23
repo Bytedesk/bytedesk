@@ -39,6 +39,15 @@ public final class WorkflowInitData {
         /** 默认 IVR 流程 UID 后缀（非默认组织使用） */
         public static final String DEFAULT_IVR_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_builder";
 
+        /** 默认满意度 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_satisfaction_builder";
+
+        /** 默认密码验证 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_password_verification_builder";
+
+        /** 默认机器人对话 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_bot_builder";
+
         /** 默认流程名称 */
         public static final String DEFAULT_WORKFLOW_NAME = "默认智能流程";
 
@@ -51,11 +60,38 @@ public final class WorkflowInitData {
         /** 默认 IVR 流程描述 */
         public static final String DEFAULT_IVR_WORKFLOW_DESCRIPTION = "IVRBuilder 示例流程，包含积分/余额查询、订单取消、服务政策播报";
 
+        /** 默认满意度 IVR 流程名称 */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME = "默认满意度回访 IVR 流程";
+
+        /** 默认满意度 IVR 流程描述 */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_DESCRIPTION = "IVRBuilder 满意度回访示例流程，包含评分收集和留言补充";
+
+        /** 默认密码验证 IVR 流程名称 */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_NAME = "默认密码验证 IVR 流程";
+
+        /** 默认密码验证 IVR 流程描述 */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_DESCRIPTION = "IVRBuilder 验密示例流程，包含身份校验和失败转人工";
+
+        /** 默认机器人对话 IVR 流程名称 */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_NAME = "默认机器人对话 IVR 流程";
+
+        /** 默认机器人对话 IVR 流程描述 */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_DESCRIPTION = "IVRBuilder 机器人对话示例流程，支持转入多轮或不限轮语音机器人";
+
         /** 默认开始节点 ID */
         public static final String DEFAULT_START_NODE_ID = "start_0";
 
         /** 默认 IVR 开始节点 ID */
         public static final String DEFAULT_IVR_START_NODE_ID = "ivr-start-0";
+
+        /** 默认满意度 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_SATISFACTION_START_NODE_ID = "ivr-satisfaction-start-0";
+
+        /** 默认密码验证 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID = "ivr-password-start-0";
+
+        /** 默认机器人对话 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_BOT_START_NODE_ID = "ivr-bot-start-0";
 
         private WorkflowInitData() {
         }
@@ -155,29 +191,29 @@ public final class WorkflowInitData {
 
                 WorkflowEdge edge1 = WorkflowEdge.builder()
                                 .id("edge_start_text_0")
-                                .sourceNodeID(DEFAULT_START_NODE_ID)
-                                .targetNodeID("text_0")
+                                .sourceNodeId(DEFAULT_START_NODE_ID)
+                                .targetNodeId("text_0")
                                 .build();
                 edges.add(edge1);
 
                 WorkflowEdge edge2 = WorkflowEdge.builder()
                                 .id("edge_text_choice_0")
-                                .sourceNodeID("text_0")
-                                .targetNodeID("choice_0")
+                                .sourceNodeId("text_0")
+                                .targetNodeId("choice_0")
                                 .build();
                 edges.add(edge2);
 
                 WorkflowEdge edge3 = WorkflowEdge.builder()
                                 .id("edge_choice_text_1")
-                                .sourceNodeID("choice_0")
-                                .targetNodeID("text_1")
+                                .sourceNodeId("choice_0")
+                                .targetNodeId("text_1")
                                 .build();
                 edges.add(edge3);
 
                 WorkflowEdge edge4 = WorkflowEdge.builder()
                                 .id("edge_text_end_0")
-                                .sourceNodeID("text_1")
-                                .targetNodeID("end_0")
+                                .sourceNodeId("text_1")
+                                .targetNodeId("end_0")
                                 .build();
                 edges.add(edge4);
 
@@ -228,7 +264,7 @@ public final class WorkflowInitData {
                                                         "id": "%s",
                                                         "type": "start",
                                                         "meta": {
-                                                                "position": { "x": 80, "y": 180 }
+                                                                "position": { "x": 120, "y": 180 }
                                                         },
                                                         "data": {
                                                                 "title": "来电进入",
@@ -239,11 +275,11 @@ public final class WorkflowInitData {
                                                         "id": "ivr-text-welcome",
                                                         "type": "text",
                                                         "meta": {
-                                                                "position": { "x": 360, "y": 160 }
+                                                                "position": { "x": 460, "y": 140 }
                                                         },
                                                         "data": {
                                                                 "title": "欢迎语",
-                                                                "content": "您好，欢迎致电微语智能语音服务。按 1 可进行积分余额查询，按 2 可查询订单信息，按 3 可收听服务政策播报，按 0 可转人工服务。",
+                                                                "content": "您好，欢迎致电微语智能语音服务。按 1 可进行积分余额查询，按 2 可查询订单信息，按 3 可收听服务政策播报，按 4 可体验机器人对话，按 0 可转人工服务。",
                                                                 "description": "默认 IVR 欢迎播报"
                                                         }
                                                 },
@@ -275,6 +311,12 @@ public final class WorkflowInitData {
                                                                                 "key": "3",
                                                                                 "label": "按 3 收听服务政策",
                                                                                 "outgoingEdgeId": "ivr-text-policy"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-option-bot",
+                                                                                "key": "4",
+                                                                                "label": "按 4 体验机器人对话",
+                                                                                "outgoingEdgeId": "ivr-text-bot-menu"
                                                                         },
                                                                         {
                                                                                 "id": "ivr-option-human",
@@ -327,10 +369,82 @@ public final class WorkflowInitData {
                                                         }
                                                 },
                                                 {
+                                                        "id": "ivr-text-bot-menu",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1060, "y": 560 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人模式说明",
+                                                                "content": "您已进入机器人对话演示。按 1 体验多轮语音机器人，按 2 体验不限轮语音机器人，按 0 转人工服务。",
+                                                                "description": "机器人子菜单欢迎语"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-keyboard-bot-menu",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 1360, "y": 560 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人模式导航",
+                                                                "content": "请输入机器人模式按键。",
+                                                                "description": "机器人子菜单按键导航",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-bot-option-multi",
+                                                                                "key": "1",
+                                                                                "label": "按 1 体验多轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-multi"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-unlimited",
+                                                                                "key": "2",
+                                                                                "label": "按 2 体验不限轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-unlimited"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-human",
+                                                                                "key": "0",
+                                                                                "label": "按 0 转人工服务",
+                                                                                "outgoingEdgeId": "ivr-transfer-human"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-multi",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1720, "y": 420 }
+                                                        },
+                                                        "data": {
+                                                                "title": "多轮语音机器人",
+                                                                "content": "正在为您接入多轮语音机器人，请稍候。",
+                                                                "description": "在默认 IVR 内直接接入 9201 多轮语音机器人",
+                                                                "transferDestination": "9201",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-unlimited",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1720, "y": 620 }
+                                                        },
+                                                        "data": {
+                                                                "title": "不限轮语音机器人",
+                                                                "content": "正在为您接入不限轮语音机器人，请稍候。",
+                                                                "description": "在默认 IVR 内直接接入 9203 不限轮语音机器人",
+                                                                "transferDestination": "9203",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
                                                         "id": "ivr-transfer-human",
                                                         "type": "transfer",
                                                         "meta": {
-                                                                "position": { "x": 1060, "y": 610 }
+                                                                "position": { "x": 1720, "y": 820 }
                                                         },
                                                         "data": {
                                                                 "title": "转人工服务",
@@ -344,7 +458,7 @@ public final class WorkflowInitData {
                                                         "id": "ivr-end-0",
                                                         "type": "end",
                                                         "meta": {
-                                                                "position": { "x": 1420, "y": 220 }
+                                                                "position": { "x": 2080, "y": 220 }
                                                         },
                                                         "data": {
                                                                 "title": "结束",
@@ -354,63 +468,588 @@ public final class WorkflowInitData {
                                         ],
                                         "edges": [
                                                 {
-                                                        "sourceNodeID": "%s",
-                                                        "targetNodeID": "ivr-text-welcome",
-                                                        "sourcePortID": "defaultOutput",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-text-welcome",
-                                                        "targetNodeID": "ivr-keyboard-main",
-                                                        "sourcePortID": "defaultOutput",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-text-welcome",
+                                                        "targetNodeId": "ivr-keyboard-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-keyboard-main",
-                                                        "targetNodeID": "ivr-text-balance",
-                                                        "sourcePortID": "keyboard-option-ivr-option-balance",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-keyboard-main",
+                                                        "targetNodeId": "ivr-text-balance",
+                                                        "sourcePortId": "keyboard-option-ivr-option-balance",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-keyboard-main",
-                                                        "targetNodeID": "ivr-http-order-query",
-                                                        "sourcePortID": "keyboard-option-ivr-option-order-cancel",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-keyboard-main",
+                                                        "targetNodeId": "ivr-http-order-query",
+                                                        "sourcePortId": "keyboard-option-ivr-option-order-cancel",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-keyboard-main",
-                                                        "targetNodeID": "ivr-text-policy",
-                                                        "sourcePortID": "keyboard-option-ivr-option-policy",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-keyboard-main",
+                                                        "targetNodeId": "ivr-text-policy",
+                                                        "sourcePortId": "keyboard-option-ivr-option-policy",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-keyboard-main",
-                                                        "targetNodeID": "ivr-transfer-human",
-                                                        "sourcePortID": "keyboard-option-ivr-option-human",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-keyboard-main",
+                                                        "targetNodeId": "ivr-text-bot-menu",
+                                                        "sourcePortId": "keyboard-option-ivr-option-bot",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-text-balance",
-                                                        "targetNodeID": "ivr-end-0",
-                                                        "sourcePortID": "defaultOutput",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-keyboard-main",
+                                                        "targetNodeId": "ivr-transfer-human",
+                                                        "sourcePortId": "keyboard-option-ivr-option-human",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-http-order-query",
-                                                        "targetNodeID": "ivr-end-0",
-                                                        "sourcePortID": "defaultOutput",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-text-balance",
+                                                        "targetNodeId": "ivr-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeID": "ivr-text-policy",
-                                                        "targetNodeID": "ivr-end-0",
-                                                        "sourcePortID": "defaultOutput",
-                                                        "targetPortID": "defaultInput"
+                                                        "sourceNodeId": "ivr-http-order-query",
+                                                        "targetNodeId": "ivr-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-text-policy",
+                                                        "targetNodeId": "ivr-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-text-bot-menu",
+                                                        "targetNodeId": "ivr-keyboard-bot-menu",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-keyboard-bot-menu",
+                                                        "targetNodeId": "ivr-bot-node-multi",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-multi",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-keyboard-bot-menu",
+                                                        "targetNodeId": "ivr-bot-node-unlimited",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-unlimited",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-keyboard-bot-menu",
+                                                        "targetNodeId": "ivr-transfer-human",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-human",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-multi",
+                                                        "targetNodeId": "ivr-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-unlimited",
+                                                        "targetNodeId": "ivr-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
                                                 }
                                         ]
                                 }
                                 """
                                 .formatted(DEFAULT_IVR_START_NODE_ID, DEFAULT_IVR_START_NODE_ID);
+        }
+
+        public static String buildDefaultSatisfactionIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度回访开始",
+                                                                "description": "默认满意度回访 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度邀请",
+                                                                "content": "您好，本次通话即将结束。请对本次服务进行评价，按 1 表示非常满意，按 2 表示满意，按 3 表示一般，按 4 表示不满意，按 5 表示非常不满意。",
+                                                                "description": "满意度评分播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度评分",
+                                                                "content": "请输入满意度评分。",
+                                                                "description": "收集 1 到 5 的满意度评分",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-5",
+                                                                                "key": "1",
+                                                                                "label": "按 1 表示非常满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-positive"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-4",
+                                                                                "key": "2",
+                                                                                "label": "按 2 表示满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-positive"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-3",
+                                                                                "key": "3",
+                                                                                "label": "按 3 表示一般",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-neutral"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-2",
+                                                                                "key": "4",
+                                                                                "label": "按 4 表示不满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-negative"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-1",
+                                                                                "key": "5",
+                                                                                "label": "按 5 表示非常不满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-negative"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-positive",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 40 }
+                                                        },
+                                                        "data": {
+                                                                "title": "高分反馈",
+                                                                "content": "感谢您的好评，祝您生活愉快，再见。",
+                                                                "description": "高分评价结束语"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-neutral",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "中立反馈",
+                                                                "content": "感谢您的评价，我们会持续优化服务体验。",
+                                                                "description": "中立评价结束语"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-negative",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 400 }
+                                                        },
+                                                        "data": {
+                                                                "title": "低分反馈",
+                                                                "content": "很抱歉本次服务未达预期。请在滴声后留下您的建议，我们将安排专人回访。",
+                                                                "description": "低分评价与留言提示"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1430, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认满意度回访流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-satisfaction-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-welcome",
+                                                        "targetNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-positive",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-5",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-positive",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-4",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-neutral",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-3",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-negative",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-2",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-negative",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-1",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-positive",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-neutral",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-negative",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_SATISFACTION_START_NODE_ID, DEFAULT_IVR_SATISFACTION_START_NODE_ID);
+        }
+
+        public static String buildDefaultPasswordVerificationIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "密码验证开始",
+                                                                "description": "默认密码验证 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证提示",
+                                                                "content": "您好，为保障账户安全，请输入 6 位服务密码并按井号键结束。",
+                                                                "description": "密码验证前置播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-collect-main",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "输入服务密码",
+                                                                "content": "请输入 6 位服务密码。",
+                                                                "description": "收集密码并分流到验证结果",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-password-option-success",
+                                                                                "key": "1",
+                                                                                "label": "演示验证成功",
+                                                                                "outgoingEdgeId": "ivr-password-text-success"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-password-option-failure",
+                                                                                "key": "2",
+                                                                                "label": "演示验证失败",
+                                                                                "outgoingEdgeId": "ivr-password-transfer-human"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-text-success",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 100 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证成功",
+                                                                "content": "验证成功，您的身份已确认，稍后将继续原有服务流程。",
+                                                                "description": "密码验证成功播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-transfer-human",
+                                                        "type": "transfer",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 340 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证失败转人工",
+                                                                "content": "验证未通过，正在为您转接人工坐席，请稍候。",
+                                                                "description": "密码验证失败时转人工",
+                                                                "transferDestination": "5003",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1430, "y": 180 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认密码验证流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-password-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-text-welcome",
+                                                        "targetNodeId": "ivr-password-collect-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-collect-main",
+                                                        "targetNodeId": "ivr-password-text-success",
+                                                        "sourcePortId": "keyboard-option-ivr-password-option-success",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-collect-main",
+                                                        "targetNodeId": "ivr-password-transfer-human",
+                                                        "sourcePortId": "keyboard-option-ivr-password-option-failure",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-text-success",
+                                                        "targetNodeId": "ivr-password-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID,
+                                                DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID);
+        }
+
+        public static String buildDefaultBotIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人对话开始",
+                                                                "description": "默认机器人对话 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人欢迎语",
+                                                                "content": "您好，欢迎进入机器人语音服务演示。按 1 体验多轮语音机器人，按 2 体验不限轮语音机器人，按 0 转人工服务。",
+                                                                "description": "引导用户选择机器人通话模式"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 720, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人模式选择",
+                                                                "content": "请输入业务按键，选择机器人对话模式。",
+                                                                "description": "按键进入多轮、无限轮或人工服务",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-bot-option-multi",
+                                                                                "key": "1",
+                                                                                "label": "按 1 体验多轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-multi"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-unlimited",
+                                                                                "key": "2",
+                                                                                "label": "按 2 体验不限轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-unlimited"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-human",
+                                                                                "key": "0",
+                                                                                "label": "按 0 转人工服务",
+                                                                                "outgoingEdgeId": "ivr-bot-transfer-human"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-multi",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 40 }
+                                                        },
+                                                        "data": {
+                                                                "title": "多轮语音机器人",
+                                                                "content": "正在为您接入多轮语音机器人，请稍候。",
+                                                                "description": "接入 9201 多轮语音机器人演示分机",
+                                                                "transferDestination": "9201",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-unlimited",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "不限轮语音机器人",
+                                                                "content": "正在为您接入不限轮语音机器人，请稍候。",
+                                                                "description": "接入 9203 不限轮语音机器人演示分机",
+                                                                "transferDestination": "9203",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-transfer-human",
+                                                        "type": "transfer",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 400 }
+                                                        },
+                                                        "data": {
+                                                                "title": "转人工服务",
+                                                                "content": "正在为您转接人工坐席，请稍候。",
+                                                                "description": "机器人演示流程中的人工兜底节点",
+                                                                "transferDestination": "5003",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1450, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认机器人对话流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-bot-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-text-welcome",
+                                                        "targetNodeId": "ivr-bot-keyboard-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-node-multi",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-multi",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-node-unlimited",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-unlimited",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-transfer-human",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-human",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-multi",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-unlimited",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-transfer-human",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_BOT_START_NODE_ID, DEFAULT_IVR_BOT_START_NODE_ID);
         }
 
 }

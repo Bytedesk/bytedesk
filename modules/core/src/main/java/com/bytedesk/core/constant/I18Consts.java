@@ -49,6 +49,7 @@ public class I18Consts {
     public static final String I18N_APNS_P12 = I18N_PREFIX + "apns.p12";
     public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";
     public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
+    public static final String I18N_EMAIL_PUSH = I18N_PREFIX + "email.push";
     public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
     public static final String I18N_TOOL = I18N_PREFIX + "tool";
     public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
@@ -141,6 +142,7 @@ public class I18Consts {
     public static final String I18N_CALL_STATISTIC = I18N_PREFIX + "call.statistic";
     public static final String I18N_CALL_STATISTIC_AGENT = I18N_PREFIX + "call.statistic.agent";
     public static final String I18N_CALL_SETTINGS = I18N_PREFIX + "call.settings.management";
+    public static final String I18N_CALL_IP_BLACKLIST = I18N_PREFIX + "call.ip.blacklist.management";
     public static final String I18N_FORM = I18N_PREFIX + "form.management";
     public static final String I18N_HOLIDAY = I18N_PREFIX + "holiday.management";
     public static final String I18N_BLOG = I18N_PREFIX + "blog.management";
@@ -377,6 +379,8 @@ public class I18Consts {
     public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空
     public static final String I18N_MOBILE_REQUIRED = I18N_PREFIX + "mobile.required"; // 手机号不能为空
     public static final String I18N_EMAIL_OR_MOBILE_REQUIRED = I18N_PREFIX + "email.or.mobile.required"; // 邮箱或手机号不能为空
+    public static final String I18N_EMAIL_RESERVED_BY_SUPER_ADMIN = I18N_PREFIX + "email.reserved.by.super.admin"; // 邮箱为系统超级管理员保留，禁止使用
+    public static final String I18N_MOBILE_RESERVED_BY_SUPER_ADMIN = I18N_PREFIX + "mobile.reserved.by.super.admin"; // 手机号为系统超级管理员保留，禁止使用
     public static final String I18N_PASSWORD_DECRYPT_FAILED = I18N_PREFIX + "password.decrypt.failed"; // 密码解密失败
     public static final String I18N_PASSWORD_DECRYPT_KEY_INVALID = I18N_PREFIX + "password.decrypt.key.invalid"; // 密钥错误导致密码解密失败
     public static final String I18N_MOBILE_NOT_EXISTS = I18N_PREFIX + "mobile.not.exists"; // 手机号不存在

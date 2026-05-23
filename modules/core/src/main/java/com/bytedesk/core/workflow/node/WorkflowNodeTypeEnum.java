@@ -52,6 +52,16 @@ public enum WorkflowNodeTypeEnum {
      * 选择节点
      */
     CHOICE("choice"),
+
+    /**
+     * 转接节点
+     */
+    TRANSFER("transfer"),
+
+    /**
+     * 机器人节点
+     */
+    BOT("bot"),
     
     /**
      * 注释节点

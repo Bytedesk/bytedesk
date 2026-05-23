@@ -55,6 +55,17 @@ public class EslEventIngestService {
                             "Hangup-Cause",
                             "hangup_cause"))
                     .contact(headers.get("contact"))
+                        .sourceIp(firstNonBlank(headers,
+                            "Caller-Network-Addr",
+                            "network_addr",
+                            "network_ip",
+                            "variable_network_addr",
+                            "variable_sip_network_ip",
+                            "sip_network_ip",
+                            "variable_sip_received_ip",
+                            "sip_received_ip",
+                            "variable_sip_via_host",
+                            "sip_via_host"))
                     .status(headers.get("status"))
                     .apiCommand(headers.get("API-Command"))
                     .apiArgument(headers.get("API-Command-Argument"))

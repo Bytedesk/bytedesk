@@ -96,6 +96,12 @@ public class EslEventEntity extends BaseEntity {
     private String contact;
 
     /**
+     * Source IP address extracted from the ESL event headers
+     */
+    @Column(name = "source_ip")
+    private String sourceIp;
+
+    /**
      * Current event status when available
      */
     @Column(name = "event_status")
