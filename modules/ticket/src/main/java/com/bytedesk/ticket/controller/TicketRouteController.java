@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Description("Ticket Route Controller - Ticket module route controller for handling ticket-related page requests")
 public class TicketRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -43,15 +43,15 @@ public class TicketRouteController {
     // http://127.0.0.1:9003/module/ticket/
     @GetMapping({"", "/"})
     public String index(Model model) {
-        if (!showDemo) {
-            // 添加自定义配置到模型
-            if (customEnabled) {
-                model.addAttribute("customName", customName);
-                model.addAttribute("customLogo", customLogo);
-                model.addAttribute("customDescription", customDescription);
-            }
-			return "default";
-		}
+        // if (!showDemo) {
+        //     // 添加自定义配置到模型
+        //     if (customEnabled) {
+        //         model.addAttribute("customName", customName);
+        //         model.addAttribute("customLogo", customLogo);
+        //         model.addAttribute("customDescription", customDescription);
+        //     }
+		// 	return "default";
+		// }
         return "ticket/index";
     }
     

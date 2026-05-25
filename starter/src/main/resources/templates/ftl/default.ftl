@@ -273,7 +273,7 @@
             <a href="/notebase" target="_blank" class="button">
                 <i class="fas fa-book"></i>
                 <div class="button-title"><@t key="section.suite.item.kbase.title">企业知识库</@t></div>
-                <div class="button-description"><@t key="section.suite.item.kbase.desc">知识库、帮助文档、内容公告</@t></div>
+                <div class="button-description"><@t key="section.suite.item.kbase.desc">知识库、帮助文档</@t></div>
             </a>
             <a href="/workflow" target="_blank" class="button">
                 <i class="fas fa-diagram-project"></i>

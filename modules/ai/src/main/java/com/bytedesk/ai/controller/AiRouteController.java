@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Description("AI Route Controller - AI module route controller for handling AI-related page requests")
 public class AiRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -43,16 +43,15 @@ public class AiRouteController {
     // http://127.0.0.1:9003/ai/
     @GetMapping({"", "/"})
     public String index(Model model) {
-        if (!showDemo) {
-            // 添加自定义配置到模型
-            if (customEnabled) {
-                model.addAttribute("customName", customName);
-                model.addAttribute("customLogo", customLogo);
-                model.addAttribute("customDescription", customDescription);
-            }
-            return "default";
-        }
-
+        // if (!showDemo) {
+        //     // 添加自定义配置到模型
+        //     if (customEnabled) {
+        //         model.addAttribute("customName", customName);
+        //         model.addAttribute("customLogo", customLogo);
+        //         model.addAttribute("customDescription", customDescription);
+        //     }
+        //     return "default";
+        // }
         return "ai/index";
     }
     

@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/module/remote")
 public class RemoteRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -41,15 +41,15 @@ public class RemoteRouteController {
     // http://127.0.0.1:9003/module/team/
     @GetMapping({"", "/"})
     public String index(Model model) {
-        if (!showDemo) {
-            // 添加自定义配置到模型
-            if (customEnabled) {
-                model.addAttribute("customName", customName);
-                model.addAttribute("customLogo", customLogo);
-                model.addAttribute("customDescription", customDescription);
-            }
-			return "default";
-		}
+        // if (!showDemo) {
+        //     // 添加自定义配置到模型
+        //     if (customEnabled) {
+        //         model.addAttribute("customName", customName);
+        //         model.addAttribute("customLogo", customLogo);
+        //         model.addAttribute("customDescription", customDescription);
+        //     }
+		// 	return "default";
+		// }
         return "team/index";
     }
     

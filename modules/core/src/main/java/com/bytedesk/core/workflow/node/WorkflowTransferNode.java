@@ -22,7 +22,6 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.workflow.WorkflowExecutionContext;
 import com.bytedesk.core.workflow.WorkflowNodeExecutionResult;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

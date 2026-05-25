@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Description("Core Route Controller - Core module route controller for handling core-related page requests")
 public class CoreRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -43,15 +43,15 @@ public class CoreRouteController {
     // http://127.0.0.1:9003/module/core/
     @GetMapping({"", "/"})
     public String index(Model model) {
-        if (!showDemo) {
-            // 添加自定义配置到模型
-            if (customEnabled) {
-                model.addAttribute("customName", customName);
-                model.addAttribute("customLogo", customLogo);
-                model.addAttribute("customDescription", customDescription);
-            }
-			return "default";
-		}
+        // if (!showDemo) {
+        //     // 添加自定义配置到模型
+        //     if (customEnabled) {
+        //         model.addAttribute("customName", customName);
+        //         model.addAttribute("customLogo", customLogo);
+        //         model.addAttribute("customDescription", customDescription);
+        //     }
+		// 	return "default";
+		// }
         return "core/index";
     }
 

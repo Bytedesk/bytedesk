@@ -34,7 +34,7 @@ services:
       BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "false"
       # Floating chat placement: bottom-right / bottom-left. Only applies when the corner chat is enabled. 浮窗位置，仅在启用右下角对话框时生效。
       # BYTEDESK_CUSTOM_RIGHT_CORNER_CHAT_PLACEMENT: bottom-left
-      BYTEDESK_CUSTOM_SHOW_DEMO: "false"
+      # BYTEDESK_CUSTOM_SHOW_DEMO: "false"
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
       # Public MQTT WebSocket URL, typically used behind nginx or another reverse proxy. 外网可访问的 MQTT WebSocket 完整地址。

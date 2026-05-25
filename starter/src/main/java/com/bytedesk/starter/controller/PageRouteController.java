@@ -40,8 +40,8 @@ import java.util.Properties;
 @Controller
 public class PageRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -71,13 +71,13 @@ public class PageRouteController {
 	 */
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
-		if (!showDemo) {
+		// if (!showDemo) {
 			prepareDefaultPageModel(model);
 			return "default";
-		}
-		model.addAttribute("title", "微语");
-		model.addAttribute("chatUrl", "/chat/home");
-		return "home";
+		// }
+		// model.addAttribute("title", "微语");
+		// model.addAttribute("chatUrl", "/chat/home");
+		// return "home";
 	}
 
 	/**
@@ -98,10 +98,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
-		if (!showDemo) {
-			prepareDefaultPageModel(model);
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		// Add lang to model for template processing
 		model.addAttribute("lang", lang);
@@ -145,10 +145,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
-		if (!showDemo) {
-			prepareDefaultPageModel(model);
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		// Default language is zh-CN
 		model.addAttribute("lang", "zh-CN");
@@ -191,10 +191,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String lang,
 			Model model) {
 		try {
-			if (!showDemo) {
-				prepareDefaultPageModel(model);
-				return "default";
-			}
+			// if (!showDemo) {
+			// 	prepareDefaultPageModel(model);
+			// 	return "default";
+			// }
 			
 			// Set default language if not specified
 			if (lang == null || lang.isEmpty()) {
@@ -359,10 +359,10 @@ public class PageRouteController {
 	// 特定的chat/demo路径，放在通用chat路径之前
 	@GetMapping("/chat/demo")
 	public String chatDemo(Model model) {
-		if (!showDemo) {
-			prepareDefaultPageModel(model);
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		return "forward:/chat/index.html"; // 默认路径
 	}
 
@@ -548,10 +548,10 @@ public class PageRouteController {
 	public String handleFeatureRoutes(
 			@PathVariable(required = false) String feature, 
 			Model model) {
-		if (!showDemo) {
-			prepareDefaultPageModel(model);
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		return "features/" + feature;
 	}
@@ -567,10 +567,10 @@ public class PageRouteController {
 		"/pages/{page:download|contact|about|privacy|terms}"
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
-		if (!showDemo) {
-			prepareDefaultPageModel(model);
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		return "pages/" + page;
 	}
 
