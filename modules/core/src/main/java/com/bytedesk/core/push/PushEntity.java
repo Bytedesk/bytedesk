@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 
 /**
  * 
@@ -48,8 +49,9 @@ public class PushEntity extends BaseEntity {
     private String country;
     private String receiver; // email or mobile
 
+    @Builder.Default
     @Column(name = "push_type")
-    private String type;
+    private String type = AuthTypeEnum.MOBILE_LOGIN.name(); // 推送类型，默认手机号登录
 
     private String ip;
 

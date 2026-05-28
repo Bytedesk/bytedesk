@@ -1,1 +1,0 @@
-import{p as e}from"./configUtils-BfyPDHAS.js";async function t(t){return e(`/visitor/api/v1/threads`,{method:`GET`,params:{...t}})}async function n(t){return e(`/api/v1/thread/query`,{method:`GET`,params:{...t}})}export{t as n,n as t};

@@ -1,5 +1,7 @@
 package com.bytedesk.core.base;
 
+import java.util.function.Supplier;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -11,7 +13,7 @@ public abstract class BaseTools<TRequest extends BaseRequest, TResponse> {
 
     private final String entityName;
     private final Class<TRequest> requestClass;
-    private final BaseRestService<?, TRequest, TResponse> restService;
+    private final Supplier<? extends BaseRestService<?, TRequest, TResponse>> restServiceSupplier;
     private final ObjectMapper objectMapper;
 
     protected BaseTools(
@@ -19,9 +21,17 @@ public abstract class BaseTools<TRequest extends BaseRequest, TResponse> {
             Class<TRequest> requestClass,
             BaseRestService<?, TRequest, TResponse> restService,
             ObjectMapper objectMapper) {
+        this(entityName, requestClass, () -> restService, objectMapper);
+    }
+
+    protected BaseTools(
+            String entityName,
+            Class<TRequest> requestClass,
+            Supplier<? extends BaseRestService<?, TRequest, TResponse>> restServiceSupplier,
+            ObjectMapper objectMapper) {
         this.entityName = entityName;
         this.requestClass = requestClass;
-        this.restService = restService;
+        this.restServiceSupplier = restServiceSupplier;
         this.objectMapper = objectMapper;
     }
 
@@ -29,38 +39,42 @@ public abstract class BaseTools<TRequest extends BaseRequest, TResponse> {
         TRequest request = newRequest();
         request.setUid(uid);
         request.setOrgUid(orgUid);
-        return restService.queryByUid(request);
+        return restService().queryByUid(request);
     }
 
     protected Object doQueryByOrg(String requestJson) {
         TRequest request = parseRequest(requestJson);
-        return restService.queryByOrg(request);
+        return restService().queryByOrg(request);
     }
 
     protected Object doQueryByUser(String requestJson) {
         TRequest request = parseRequest(requestJson);
-        return restService.queryByUser(request);
+        return restService().queryByUser(request);
     }
 
     protected Object doCreate(String requestJson) {
         TRequest request = parseRequest(requestJson);
-        return restService.create(request);
+        return restService().create(request);
     }
 
     protected Object doUpdate(String requestJson) {
         TRequest request = parseRequest(requestJson);
-        return restService.update(request);
+        return restService().update(request);
     }
 
     protected Object doDelete(String requestJson) {
         TRequest request = parseRequest(requestJson);
-        restService.delete(request);
+        restService().delete(request);
         return entityName + " deleted";
     }
 
     protected Object doDeleteByUid(String uid) {
-        restService.deleteByUid(uid);
+        restService().deleteByUid(uid);
         return entityName + " deleted by uid";
+    }
+
+    protected BaseRestService<?, TRequest, TResponse> restService() {
+        return restServiceSupplier.get();
     }
 
     private TRequest parseRequest(String requestJson) {

@@ -205,7 +205,6 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             
             entity.setDeleted(true);
             save(entity);
-            // tagRepository.delete(optional.get());
         }
         else {
             throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);

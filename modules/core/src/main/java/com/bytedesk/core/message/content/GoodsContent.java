@@ -25,6 +25,18 @@ public class GoodsContent extends BaseContent {
     /** 商品唯一标识 */
     private String uid;
 
+    /** 业务商品唯一标识 */
+    private String goodsUid;
+
+    /** 商品类型 */
+    private String type;
+
+    /** 商品状态 */
+    private String status;
+
+    /** 商品详情跳转路径 */
+    private String navigateToPath;
+
     /** 商品标题 */
     private String title;
 
@@ -48,4 +60,7 @@ public class GoodsContent extends BaseContent {
 
     /** 商品数量（订单场景可选） */
     private Integer quantity;
+
+    /** 业务店铺uid */
+    private String shopUid;
 }

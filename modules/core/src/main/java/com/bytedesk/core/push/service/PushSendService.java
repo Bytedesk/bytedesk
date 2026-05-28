@@ -30,7 +30,7 @@ import com.bytedesk.core.push.PushResponse;
 import com.bytedesk.core.push.PushRestService;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.push.sms_push.SmsSendResult;
-import com.bytedesk.core.push.sms_push.SmsSendService;
+import com.bytedesk.core.push.sms_push.SmsPushSendService;
 import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
@@ -52,7 +52,7 @@ public class PushSendService {
     
     private final AuthValidationStrategyFactory strategyFactory;
     private final EmailSendService emailSendService;
-    private final SmsSendService smsSendService;
+    private final SmsPushSendService smsPushSendService;
     private final BytedeskProperties bytedeskProperties;
     private final IpService ipService;
     private final PushFilterService pushFilterService;
@@ -114,7 +114,7 @@ public class PushSendService {
             EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, code, request);
             return convertEmailResult(emailResult);
         } else if (authRequest.isMobile()) {
-            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, code, request);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, code, request);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_CAPTCHA_UNSUPPORTED_TYPE);
@@ -131,7 +131,7 @@ public class PushSendService {
     }
     
     /**
-     * 将SmsSendResult转换为PushSendResult
+     * 将SmsPushSendResult转换为PushSendResult
      */
     private PushSendResult convertSmsResult(SmsSendResult smsResult) {
         if (smsResult.isSuccess()) {
@@ -225,7 +225,7 @@ public class PushSendService {
             EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, content, null);
             return convertEmailResult(emailResult);
         } else if (isMobileType(type)) {
-            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, content, null);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, content, null);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的推送类型");

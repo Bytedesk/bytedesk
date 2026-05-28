@@ -90,6 +90,16 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = WorkflowTemplateOptionResponse.class)))
+    @GetMapping("/template/chat/demo")
+    public ResponseEntity<?> queryChatDemoTemplateOptions() {
+
+        return ResponseEntity.ok(JsonResult.success(workflowRestService.queryChatDemoTemplateOptions()));
+    }
+
+    @Operation(summary = "Query IVR Demo Template Options", description = "Retrieve IVR demo template names and descriptions from server-side defaults")
+    @ApiResponse(responseCode = "200", description = "Query successful",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = WorkflowTemplateOptionResponse.class)))
     @GetMapping("/template/ivr/demo")
     public ResponseEntity<?> queryIvrDemoTemplateOptions() {
 

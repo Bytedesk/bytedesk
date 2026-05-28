@@ -1,0 +1,1 @@
+import{Z as e,f as t}from"./configUtils-BBYvu47b.js";async function n(n,r){return t(`/visitor/api/v1/agent/query/uid`,{method:`GET`,params:{uid:n,orgUid:r,channel:e},silentErrorNotification:!0})}export{n as t};

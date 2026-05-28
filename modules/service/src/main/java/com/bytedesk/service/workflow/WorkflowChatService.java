@@ -38,6 +38,10 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.workflow_variable.WorkflowVariableScopeEnum;
 import com.bytedesk.core.workflow_variable.WorkflowVariableService;
 import com.bytedesk.core.workflow_variable.WorkflowVariableTypeEnum;
+import com.bytedesk.core.workflow_log.WorkflowLogEntity;
+import com.bytedesk.core.workflow_log.WorkflowLogRepository;
+import com.bytedesk.core.workflow_log.WorkflowLogTypeEnum;
+import com.bytedesk.core.workflow.node.WorkflowNodeStatusEnum;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
@@ -59,6 +63,7 @@ public class WorkflowChatService {
     private final MessageRestService messageRestService;
     private final RestTemplate restTemplate;
     private final WorkflowVariableService workflowVariableService;
+    private final WorkflowLogRepository workflowLogRepository;
 
     public MessageProtobuf createStartMessage(WorkflowEntity workflow, ThreadEntity thread) {
         List<MessageProtobuf> messages = createWorkflowMessages(workflow, thread, null, false);
@@ -93,6 +98,11 @@ public class WorkflowChatService {
             return new ArrayList<>();
         }
 
+        JSONObject choiceNode = findNodeById(workflowJson, extra.getWorkflowWaitingChoiceNodeId());
+        String choiceValue = resolveChoiceValue(option, selectedOptionKey);
+        persistChoiceContextVariable(workflow, choiceNode, option, selectedOptionKey, choiceValue);
+        persistWorkflowInteractionLog(workflow, thread, choiceNode, "choice", selectedOptionKey, choiceValue, option);
+
         String nextNodeId = resolveChoiceNextNodeId(
                 workflowJson,
                 extra.getWorkflowWaitingChoiceNodeId(),
@@ -108,7 +118,7 @@ public class WorkflowChatService {
                 .workflowQuestionVariable(null)
                 .workflowQuestionAnswer(null)
                 .workflowFormResponseData(null)
-                .workflowSelectedOptionValue(resolveChoiceValue(option, selectedOptionKey))
+                .workflowSelectedOptionValue(choiceValue)
                 .workflowCompleted(false)
                 .build();
         thread.setExtra(preparedExtra.toJson());
@@ -125,7 +135,11 @@ public class WorkflowChatService {
         }
 
         JSONObject workflowJson = parseWorkflowJson(workflow);
+        JSONObject questionNode = findNodeById(workflowJson, extra.getWorkflowWaitingQuestionNodeId());
         String nextNodeId = findNextNodeId(workflowJson, extra.getWorkflowWaitingQuestionNodeId());
+
+        persistWorkflowInteractionLog(workflow, thread, questionNode, "question", normalizedAnswer,
+            normalizedAnswer, null);
 
         ThreadExtra preparedExtra = extra.toBuilder()
                 .showQuickButtons(false)
@@ -150,7 +164,12 @@ public class WorkflowChatService {
         }
 
         JSONObject workflowJson = parseWorkflowJson(workflow);
+        JSONObject formNode = findNodeById(workflowJson, extra.getWorkflowWaitingFormNodeId());
         String nextNodeId = findNextNodeId(workflowJson, extra.getWorkflowWaitingFormNodeId());
+        String normalizedFormData = StringUtils.hasText(formResponseData) ? formResponseData.trim() : null;
+
+        persistWorkflowInteractionLog(workflow, thread, formNode, "form", normalizedFormData,
+            normalizedFormData, null);
 
         ThreadExtra preparedExtra = extra.toBuilder()
                 .showQuickButtons(false)
@@ -160,7 +179,7 @@ public class WorkflowChatService {
                 .workflowWaitingFormNodeId(null)
                 .workflowQuestionVariable(null)
                 .workflowQuestionAnswer(null)
-                .workflowFormResponseData(StringUtils.hasText(formResponseData) ? formResponseData.trim() : null)
+                .workflowFormResponseData(normalizedFormData)
                 .workflowCompleted(false)
                 .build();
         thread.setExtra(preparedExtra.toJson());
@@ -584,6 +603,124 @@ public class WorkflowChatService {
         }
         String variable = data.getString("variable");
         return StringUtils.hasText(variable) ? variable.trim() : null;
+    }
+
+    private void persistChoiceContextVariable(WorkflowEntity workflow, JSONObject node, JSONObject option,
+            String selectedOptionKey, String choiceValue) {
+        if (workflow == null || !StringUtils.hasText(workflow.getUid()) || node == null) {
+            return;
+        }
+
+        String variable = resolveQuestionVariable(node);
+        if (!StringUtils.hasText(variable)) {
+            return;
+        }
+
+        workflowVariableService.setVariable(
+                workflow.getUid(),
+                variable,
+                choiceValue,
+                inferWorkflowVariableType(choiceValue),
+                WorkflowVariableScopeEnum.GLOBAL);
+    }
+
+    private void persistWorkflowInteractionLog(WorkflowEntity workflow, ThreadEntity thread, JSONObject node,
+            String nodeType, String inputValue, Object outputValue, JSONObject option) {
+        if (workflow == null || thread == null || node == null) {
+            return;
+        }
+
+        try {
+            JSONObject inputPayload = new JSONObject();
+            inputPayload.put("threadUid", thread.getUid());
+            inputPayload.put("workflowUid", workflow.getUid());
+            inputPayload.put("nodeUid", node.getString("id"));
+            inputPayload.put("nodeType", nodeType);
+            inputPayload.put("input", inputValue);
+
+            JSONObject outputPayload = new JSONObject();
+            outputPayload.put("value", outputValue);
+            if (option != null) {
+                outputPayload.put("option", option);
+            }
+
+            WorkflowLogEntity logEntity = WorkflowLogEntity.builder()
+                    .uid(buildWorkflowInteractionLogUid(thread, node, nodeType))
+                    .name(resolveWorkflowLogName(workflow))
+                    .description(resolveWorkflowLogDescription(node, nodeType, outputValue))
+                    .type(WorkflowLogTypeEnum.WORKFLOW.name())
+                    .workflowUid(workflow.getUid())
+                    .executionUid(thread.getUid())
+                    .sequence(resolveWorkflowLogSequence())
+                    .nodeUid(node.getString("id"))
+                    .nodeName(resolveWorkflowNodeName(node))
+                    .nodeType(nodeType)
+                    .nodeStatus(WorkflowNodeStatusEnum.SUCCESS.name())
+                    .durationMs(0L)
+                    .inputPayload(inputPayload.toJSONString())
+                    .outputPayload(outputPayload.toJSONString())
+                    .orgUid(thread.getOrgUid())
+                    .userUid(resolveThreadUserUid(thread))
+                    .build();
+            workflowLogRepository.save(logEntity);
+        } catch (Exception exception) {
+            log.warn("Persist workflow interaction log failed, workflowUid={}, threadUid={}, nodeId={}, error={}",
+                    workflow.getUid(),
+                    thread.getUid(),
+                    node.getString("id"),
+                    exception.getMessage());
+        }
+    }
+
+    private String buildWorkflowInteractionLogUid(ThreadEntity thread, JSONObject node, String nodeType) {
+        return "wf-log-" + thread.getUid() + "-" + node.getString("id") + "-" + nodeType + "-"
+                + System.currentTimeMillis();
+    }
+
+    private Integer resolveWorkflowLogSequence() {
+        return (int) Math.min(Integer.MAX_VALUE, System.currentTimeMillis() / 1000);
+    }
+
+    private String resolveWorkflowLogName(WorkflowEntity workflow) {
+        if (workflow != null && StringUtils.hasText(workflow.getNickname())) {
+            return workflow.getNickname();
+        }
+        return "Workflow Chat";
+    }
+
+    private String resolveWorkflowLogDescription(JSONObject node, String nodeType, Object outputValue) {
+        String nodeName = resolveWorkflowNodeName(node);
+        String value = outputValue == null ? "" : String.valueOf(outputValue);
+        return nodeName + " " + nodeType + " result" + (StringUtils.hasText(value) ? ": " + value : "");
+    }
+
+    private String resolveWorkflowNodeName(JSONObject node) {
+        if (node == null) {
+            return "Workflow Node";
+        }
+        if (StringUtils.hasText(node.getString("name"))) {
+            return node.getString("name");
+        }
+        JSONObject data = node.getJSONObject("data");
+        if (data != null && StringUtils.hasText(data.getString("title"))) {
+            return data.getString("title");
+        }
+        if (StringUtils.hasText(node.getString("id"))) {
+            return node.getString("id");
+        }
+        return "Workflow Node";
+    }
+
+    private String resolveThreadUserUid(ThreadEntity thread) {
+        try {
+            if (thread.getUserProtobuf() != null && StringUtils.hasText(thread.getUserProtobuf().getUid())) {
+                return thread.getUserProtobuf().getUid();
+            }
+        } catch (Exception exception) {
+            log.debug("Resolve workflow log user uid failed, threadUid={}, error={}",
+                    thread.getUid(), exception.getMessage());
+        }
+        return thread.getUserUid();
     }
 
     private JSONObject buildFormContent(JSONObject node, Map<String, Object> contextVariables) {

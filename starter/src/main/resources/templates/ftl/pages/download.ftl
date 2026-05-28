@@ -114,7 +114,7 @@ Listed course START -->
 						<img src="/assets/images/element/contact.svg" alt="<@t key='alt.download.softphoneIcon'>微语软电话下载图标</@t>">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-softphone.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话</@t></a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/siphone-android.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话</@t></a></h5>
 					<a href="/assets/qr/qr_softphone.png" target="_blank">
 						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
 					</a>

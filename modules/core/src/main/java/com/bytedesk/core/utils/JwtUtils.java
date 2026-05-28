@@ -37,6 +37,8 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 @UtilityClass
 public class JwtUtils {
 
+    private static final long PERMANENT_TOKEN_EXPIRATION_DAYS = 36500L;
+
     private BytedeskProperties getBytedeskProperties() {
         return ApplicationContextHolder.getBean(BytedeskProperties.class);
     }
@@ -51,10 +53,23 @@ public class JwtUtils {
      * @return JWT token字符串
      */
     public String generateJwtToken(String username, String platform, String channel) {
+        return generateJwtToken(username, platform, channel, false);
+    }
+
+    /**
+     * 根据渠道类型生成JWT token，支持永久有效 token 使用更长的 JWT exp。
+     *
+     * @param username 用户名
+     * @param platform 平台
+     * @param channel 渠道类型（web/mobile等）
+     * @param permanent 是否永久有效
+     * @return JWT token字符串
+     */
+    public String generateJwtToken(String username, String platform, String channel, Boolean permanent) {
         JwtSubject jwtSubject = new JwtSubject(username.toLowerCase(), platform.toLowerCase());
 
         // 根据渠道类型计算过期时间
-        long expirationMs = calculateExpirationMs(channel);
+        long expirationMs = calculateExpirationMs(channel, permanent);
 
         return Jwts.builder()
                 .subject(jwtSubject.toJson())
@@ -64,13 +79,11 @@ public class JwtUtils {
                 .compact();
     }
 
-    /**
-     * 根据渠道类型计算过期时间（毫秒）
-     * 
-     * @param channel 渠道类型
-     * @return 过期时间（毫秒）
-     */
-    private long calculateExpirationMs(String channel) {
+    private long calculateExpirationMs(String channel, Boolean permanent) {
+        if (Boolean.TRUE.equals(permanent)) {
+            return PERMANENT_TOKEN_EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
+        }
+
         // 获取JWT配置的过期时间（毫秒）
         long jwtExpirationMs = Long.parseLong(getBytedeskProperties().getJwt().getExpiration());
 

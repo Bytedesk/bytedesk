@@ -1,10 +1,10 @@
-# sms
+# sms_push
 
-This package manages SMS records, send-service coordination, and SMS lifecycle APIs.
+This package manages SMS_PUSH records, send-service coordination, and SMS_PUSH lifecycle APIs.
 
 ## Implementation Notes
 
-- Core models include SmsEntity, SmsRequest, SmsResponse, SmsExcel, SmsSendResult, and SmsTypeEnum.
-- SmsRepository, SmsSpecification, SmsRestController, and SmsRestService provide persistence, filtering, and management endpoints for SMS records.
-- SmsSendService and SmsExternalSender handle SMS delivery orchestration and external sender integration.
-- SmsInitializer, SmsPermissions, SmsTools, SmsEntityListener, SmsEventListener, and the event subpackage provide bootstrap data, permission metadata, helper logic, and create, update, delete lifecycle events.
+- Core models include SmsPushEntity, SmsPushRequest, SmsPushResponse, SmsPushExcel, SmsPushSendResult, and SmsPushTypeEnum.
+- SmsPushRepository, SmsPushSpecification, SmsPushRestController, and SmsPushRestService provide persistence, filtering, and management endpoints for SMS_PUSH records.
+- SmsPushSendService and SmsPushExternalSender handle SMS_PUSH delivery orchestration and external sender integration.
+- SmsPushInitializer, SmsPushPermissions, SmsPushTools, SmsPushEntityListener, SmsPushEventListener, and the event subpackage provide bootstrap data, permission metadata, helper logic, and create, update, delete lifecycle events.

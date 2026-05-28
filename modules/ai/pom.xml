@@ -253,7 +253,11 @@
 
 		<!-- https://java2ai.com/docs/quick-start -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba -->
+		<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
+		<!-- https://github.com/dashscope/dashscope-sdk-java -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-dashscope -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
@@ -357,6 +361,14 @@
 				<groupId>com.alibaba.cloud.ai</groupId>
 				<artifactId>spring-ai-alibaba-bom</artifactId>
 				<version>${spring-ai-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
+			<dependency>
+				<groupId>com.alibaba.cloud.ai</groupId>
+				<artifactId>spring-ai-alibaba-extensions-bom</artifactId>
+				<version>${spring-ai-alibaba-extensions.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

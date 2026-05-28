@@ -349,6 +349,7 @@ public class VisitorRestControllerVisitor {
 
     // 访客发送http消息
     @BlackIpFilter(title = "black", action = "sendRestMessage")
+    @BlackUserFilter(title = "black", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {

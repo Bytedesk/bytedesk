@@ -40,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import org.springframework.util.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -236,7 +237,7 @@ public class AuthController {
                 return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -3, false));
             }
             UserRequest userRequest = new UserRequest();
-            userRequest.setUsername(authRequest.getMobile());
+            userRequest.setUsername(CountryCodeUtils.buildMobileUsername(authRequest.getCountry(), authRequest.getMobile()));
             userRequest.setCountry(authRequest.getCountry());
             userRequest.setNum(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());

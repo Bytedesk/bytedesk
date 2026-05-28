@@ -12,4 +12,11 @@ public final class CountryCodeUtils {
     public static String normalize(String country) {
         return StringUtils.hasText(country) ? country.trim() : DEFAULT_COUNTRY;
     }
+
+    public static String buildMobileUsername(String country, String mobile) {
+        if (!StringUtils.hasText(mobile)) {
+            return mobile;
+        }
+        return normalize(country) + mobile.trim();
+    }
 }

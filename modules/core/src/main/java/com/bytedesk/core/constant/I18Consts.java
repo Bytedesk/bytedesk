@@ -70,7 +70,7 @@ public class I18Consts {
     public static final String I18N_ASSET = I18N_PREFIX + "asset";
     public static final String I18N_CALENDAR = I18N_PREFIX + "calendar";
     public static final String I18N_EMAIL = I18N_PREFIX + "email";
-    public static final String I18N_SMS = I18N_PREFIX + "sms";
+    public static final String I18N_SMS_PUSH = I18N_PREFIX + "sms.push";
     public static final String I18N_SCHEDULE = I18N_PREFIX + "schedule";
     public static final String I18N_ROLE = I18N_PREFIX + "role";
     public static final String I18N_TASK_LIST = I18N_PREFIX + "task.list";
@@ -103,6 +103,7 @@ public class I18Consts {
     public static final String I18N_SERVER_METRICS = I18N_PREFIX + "server.metrics";
     public static final String I18N_ANNOUNCEMENT = I18N_PREFIX + "announcement";
     public static final String I18N_SERVER = I18N_PREFIX + "server";
+    public static final String I18N_REPORT = I18N_PREFIX + "report";
     public static final String I18N_WORKFLOW_LOG = I18N_PREFIX + "workflow.log";
     public static final String I18N_MOMENT = I18N_PREFIX + "moment";
     public static final String I18N_CONNECTION = I18N_PREFIX + "connection";
@@ -620,7 +621,7 @@ public class I18Consts {
     // public static final String I18N_SMS_SERVICE_CONFIG_ERROR = "短信服务配置异常，请联系管理员"; // 短信服务配置异常，请联系管理员
 
     // "短信服务暂时不可用，请稍后重试"
-    public static final String I18N_SMS_SERVICE_UNAVAILABLE = I18N_PREFIX + "sms.service.unavailable"; // 短信服务暂时不可用，请稍后重试
+    public static final String I18N_SMS_PUSH_SERVICE_UNAVAILABLE = I18N_PREFIX + "sms.push.service.unavailable"; // 短信服务暂时不可用，请稍后重试
 
     // "邮件服务配置异常，请联系管理员"
     public static final String I18N_EMAIL_SERVICE_CONFIG_ERROR = I18N_PREFIX + "email.service.config.error"; // 邮件服务配置异常，请联系管理员

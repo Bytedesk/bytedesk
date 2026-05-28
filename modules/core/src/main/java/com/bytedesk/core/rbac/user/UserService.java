@@ -190,7 +190,7 @@ public class UserService {
         if (StringUtils.hasText(request.getMobile())) {
             if (!StringUtils.hasText(request.getUsername())
                     && !StringUtils.hasText(request.getEmail())) {
-                user.setUsername(request.getMobile());
+                user.setUsername(CountryCodeUtils.buildMobileUsername(normalizedCountry, request.getMobile()));
             } else {
                 user.setUsername(request.getUsername());
             }
@@ -447,7 +447,7 @@ public class UserService {
         if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
-            user.setUsername(request.getMobile());
+            user.setUsername(CountryCodeUtils.buildMobileUsername(normalizedCountry, request.getMobile()));
         }
         //
         if (StringUtils.hasText(request.getPassword())) {

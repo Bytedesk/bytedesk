@@ -27,5 +27,6 @@
     <include file="db/changelog/migration/260522_add_acd_runtime_tables.xml" />
     <include file="db/changelog/migration/260523_add_call_settings_control_targets.xml" />
     <include file="db/changelog/migration/260523_rename_goods_order_keyword_columns.xml" />
+    <include file="db/changelog/migration/260526_add_call_cdr_call_type.xml" />
 
 </databaseChangeLog>

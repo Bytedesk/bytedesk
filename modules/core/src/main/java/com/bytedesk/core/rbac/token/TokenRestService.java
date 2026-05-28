@@ -48,9 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest, TokenResponse> {
 
-    // 触发 lastActiveAt 写库的最小间隔（避免每次请求都更新）
-    // private static final Duration LAST_ACTIVE_UPDATE_MIN_INTERVAL = Duration.ofMinutes(5);
-
     private final TokenRepository tokenRepository;
 
     private final ModelMapper modelMapper;
@@ -231,8 +228,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
         String channel = request.getChannel();
         
-        // 生成访问令牌，传递渠道信息以设置合适的过期时间
-        return JwtUtils.generateJwtToken(username, platform, channel);
+        // 永久有效 token 仍然写入 JWT exp，但使用足够长的 100 年有效期避免数据库永久、JWT先过期。
+        return JwtUtils.generateJwtToken(username, platform, channel, request.getPermanent());
     }
 
     /**
@@ -265,10 +262,11 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             platform = PlatformEnum.BYTEDESK.name();
         }
 
-        String newAccessToken = JwtUtils.generateJwtToken(userEntity.getUsername(), platform, channel);
+        boolean permanent = Boolean.TRUE.equals(tokenEntity.getPermanent());
+        String newAccessToken = JwtUtils.generateJwtToken(userEntity.getUsername(), platform, channel, permanent);
         tokenEntity.setAccessToken(newAccessToken);
         tokenEntity.setChannel(channel);
-        tokenEntity.setExpiresAt(JwtUtils.calculateExpirationTime(channel));
+        tokenEntity.setExpiresAt(permanent ? null : JwtUtils.calculateExpirationTime(channel));
 
         TokenEntity savedEntity = save(tokenEntity);
         return convertToResponse(savedEntity);

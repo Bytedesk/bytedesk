@@ -1,5 +1,3 @@
-import { FeedbackConfig as FeedbackConfig_2 } from '../types';
-
 declare interface Animation_2 {
     enabled?: boolean;
     duration?: number;
@@ -134,6 +132,7 @@ declare class BytedeskWeb {
     private getPrimaryActionFromConfig;
     private syncChatPathByAction;
     private getDefaultConfig;
+    private getDefaultTabsConfig;
     private getEffectiveButtonConfigs;
     private hasVisibleButtons;
     private isMultiButtonLayout;
@@ -180,9 +179,12 @@ declare class BytedeskWeb {
     private startBubbleMessageRotation;
     private createBubble;
     private createChatWindow;
+    private getEnabledEmbeddedTabs;
+    private getDefaultEmbeddedTab;
     private generateChatUrl;
     private normalizePath;
     private getChatPageBaseUrl;
+    private getChatPathByTab;
     private setupMessageListener;
     private handleLocalStorageData;
     sendMessageToIframe(message: any): void;
@@ -314,7 +316,7 @@ declare class BytedeskWeb {
      */
     getDebugInfo(): {
         config: BytedeskConfig;
-        feedbackConfig: FeedbackConfig_2 | undefined;
+        feedbackConfig: FeedbackConfig | undefined;
         feedbackTooltip: boolean;
         feedbackDialog: boolean;
         selectedText: string;
@@ -352,6 +354,8 @@ declare interface ChatConfig {
     draft?: boolean;
     settingsUid?: string;
     loadHistory?: boolean;
+    threadDetail?: string | boolean;
+    visitorProfile?: string | boolean;
     [key: string]: string | number | boolean | undefined;
 }
 
@@ -407,6 +411,7 @@ declare interface MessageBubbleClickEvent {
     uid?: string;
     type?: string;
     content?: unknown;
+    navigateToPath?: string | null;
     extra?: unknown;
     position?: string;
     status?: string;
@@ -414,13 +419,13 @@ declare interface MessageBubbleClickEvent {
 
 declare interface SetConfigOptions {
     replaceChatConfig?: boolean;
+    replaceTabsConfig?: boolean;
 }
 
 declare interface TabsConfig {
-    home?: boolean;
     messages?: boolean;
+    thread?: boolean;
     help?: boolean;
-    news?: boolean;
 }
 
 declare interface Theme {

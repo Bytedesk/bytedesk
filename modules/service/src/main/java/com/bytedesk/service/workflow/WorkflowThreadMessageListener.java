@@ -7,6 +7,8 @@ package com.bytedesk.service.workflow;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -36,6 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkflowThreadMessageListener {
 
+    private final ConcurrentMap<String, Object> threadWorkflowLocks = new ConcurrentHashMap<>();
+
     private final ThreadRestService threadRestService;
     private final WorkflowRestService workflowRestService;
     private final WorkflowChatService workflowChatService;
@@ -55,6 +59,8 @@ public class WorkflowThreadMessageListener {
             return;
         }
 
+        String threadUid = inboundMessage.getThread().getUid();
+
         UserProtobuf inboundUser = inboundMessage.getUser();
         if (inboundUser == null || !Boolean.TRUE.equals(inboundUser.isVisitor())) {
             return;
@@ -67,6 +73,39 @@ public class WorkflowThreadMessageListener {
         if (!threadOptional.isPresent()) {
             return;
         }
+        ThreadEntity thread = threadOptional.get();
+        if (!ThreadTypeEnum.WORKFLOW.name().equals(thread.getType())) {
+            return;
+        }
+
+        String workflowUid = resolveWorkflowUid(thread);
+        if (!StringUtils.hasText(workflowUid)) {
+            return;
+        }
+
+        Optional<WorkflowEntity> workflowOptional = workflowRestService.findByUid(workflowUid);
+        if (!workflowOptional.isPresent()) {
+            return;
+        }
+
+        ThreadExtra extra = ThreadExtra.fromJson(thread.getExtra());
+        if (!StringUtils.hasText(selectedOptionKey)
+                && (!StringUtils.hasText(answerText) || !StringUtils.hasText(extra.getWorkflowWaitingQuestionNodeId()))) {
+            return;
+        }
+
+        Object threadLock = threadWorkflowLocks.computeIfAbsent(threadUid, key -> new Object());
+        synchronized (threadLock) {
+            processWorkflowReply(threadUid, selectedOptionKey, answerText);
+        }
+    }
+
+    private void processWorkflowReply(String threadUid, String selectedOptionKey, String answerText) {
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadUid);
+        if (!threadOptional.isPresent()) {
+            return;
+        }
+
         ThreadEntity thread = threadOptional.get();
         if (!ThreadTypeEnum.WORKFLOW.name().equals(thread.getType())) {
             return;

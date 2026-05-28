@@ -108,6 +108,8 @@ declare interface ChatConfig {
     draft?: boolean;
     settingsUid?: string;
     loadHistory?: boolean;
+    threadDetail?: string | boolean;
+    visitorProfile?: string | boolean;
     [key: string]: string | number | boolean | undefined;
 }
 
@@ -163,16 +165,16 @@ declare interface MessageBubbleClickEvent {
     uid?: string;
     type?: string;
     content?: unknown;
+    navigateToPath?: string | null;
     extra?: unknown;
     position?: string;
     status?: string;
 }
 
 declare interface TabsConfig {
-    home?: boolean;
     messages?: boolean;
+    thread?: boolean;
     help?: boolean;
-    news?: boolean;
 }
 
 declare interface Theme {

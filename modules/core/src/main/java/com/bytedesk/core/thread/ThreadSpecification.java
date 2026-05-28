@@ -253,14 +253,27 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             // 时间范围过滤（按 updatedAt）
             applyUpdatedAtRange(request, root, criteriaBuilder, predicates);
 
-            // visitor 侧 searchText：对齐旧实现（topic 或 uid 模糊匹配）
+            // visitor 侧 searchText：支持会话标题相关字段 + 最近一条会话内容 + 关联消息内容
             if (StringUtils.hasText(request.getSearchText())) {
                 String searchText = request.getSearchText();
                 Predicate threadMatch = criteriaBuilder.or(
+                    criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("agent"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("robot"), "%" + searchText + "%"),
+                    criteriaBuilder.like(root.get("workgroup"), "%" + searchText + "%"),
                     criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
                     criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
                 Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
                 predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
+            }
+
+            // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
+            if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                if (messageOnly != null) {
+                    predicates.add(messageOnly);
+                }
             }
 
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));

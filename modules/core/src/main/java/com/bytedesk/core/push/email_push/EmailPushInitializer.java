@@ -16,7 +16,6 @@ package com.bytedesk.core.push.email_push;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -26,7 +25,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class EmailPushInitializer implements SmartInitializingSingleton {
 
-    private final EmailPushRestService email_pushRestService;
+    // private final EmailPushRestService email_pushRestService;
 
     private final AuthorityRestService authorityRestService;
 
@@ -34,8 +33,8 @@ public class EmailPushInitializer implements SmartInitializingSingleton {
     public void afterSingletonsInstantiated() {
         initAuthority();
         // create default
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        email_pushRestService.initEmailPushs(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // email_pushRestService.initEmailPushs(orgUid);
     }
 
     private void initAuthority() {

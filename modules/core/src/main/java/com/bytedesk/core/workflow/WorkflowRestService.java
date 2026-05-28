@@ -86,7 +86,16 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return workflowRepository.findAll(specs, pageable);
     }
 
-        public List<WorkflowTemplateOptionResponse> queryIvrDemoTemplateOptions() {
+    public List<WorkflowTemplateOptionResponse> queryChatDemoTemplateOptions() {
+        return List.of(
+            createTemplateOption(
+                "demo-lead-collection",
+                WorkflowInitData.DEFAULT_WORKFLOW_NAME,
+                WorkflowInitData.DEFAULT_WORKFLOW_DESCRIPTION,
+                WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson()));
+    }
+
+    public List<WorkflowTemplateOptionResponse> queryIvrDemoTemplateOptions() {
         return List.of(
             createTemplateOption(
                 "demo-default",
@@ -108,7 +117,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_NAME,
                 WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_DESCRIPTION,
                 WorkflowInitData.buildDefaultBotIvrWorkflowSchemaJson()));
-        }
+            }
     
     // @Cacheable(value = CACHE_WORKFLOW, key = "#uid", unless = "#result == null || #result.isEmpty()")
     @Override
@@ -119,7 +128,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         }
 
         WorkflowEntity entity = optional.get();
-        return Optional.of(refreshManagedDefaultIvrWorkflowIfNeeded(entity));
+        return Optional.of(refreshManagedDefaultWorkflowIfNeeded(entity));
     }
 
     @Override
@@ -205,7 +214,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         entity.setSchema(resetSchema);
         entity.setCurrentNodeId(resetStartNodeId);
         if (!StringUtils.hasText(entity.getType())) {
-            entity.setType(WorkflowTypeEnum.IVR.name());
+            entity.setType(resolveResetWorkflowType(entity).name());
         }
 
         WorkflowEntity savedEntity = save(entity);
@@ -435,6 +444,40 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         return saved;
     }
 
+    private WorkflowEntity refreshManagedDefaultWorkflowIfNeeded(WorkflowEntity entity) {
+        WorkflowEntity refreshedEntity = refreshManagedDefaultChatbotWorkflowIfNeeded(entity);
+        return refreshManagedDefaultIvrWorkflowIfNeeded(refreshedEntity);
+    }
+
+    private WorkflowEntity refreshManagedDefaultChatbotWorkflowIfNeeded(WorkflowEntity entity) {
+        DefaultChatbotWorkflowDefinition definition = resolveManagedDefaultChatbotDefinition(entity);
+        if (definition == null || !requiresDefaultChatbotWorkflowRefresh(entity,
+                definition.orgUid(),
+                definition.nickname(),
+                definition.description(),
+                definition.schema(),
+                definition.startNodeId())) {
+            return entity;
+        }
+
+        applyDefaultChatbotWorkflowDefinition(entity,
+                definition.orgUid(),
+                definition.nickname(),
+                definition.description(),
+                definition.schema(),
+                definition.startNodeId());
+
+        WorkflowEntity saved = save(entity);
+        if (saved == null) {
+            throw new RuntimeException("Refresh managed default chatbot workflow failed: " + entity.getUid());
+        }
+        refreshWorkflowCache(saved);
+        log.info("Auto-refreshed managed default chatbot workflow on read, org: {}, workflowUid: {}",
+                definition.orgUid(),
+                entity.getUid());
+        return saved;
+    }
+
     private void applyDefaultIvrWorkflowDefinition(WorkflowEntity entity, String orgUid, String nickname,
             String description, String schema, String startNodeId) {
         entity.setDeleted(false);
@@ -507,18 +550,38 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             String startNodeId) {
     }
 
+    private record DefaultChatbotWorkflowDefinition(String orgUid, String nickname, String description, String schema,
+            String startNodeId) {
+    }
+
     private WorkflowResponse initDefaultChatbotWorkflow(String orgUid) {
         Assert.hasText(orgUid, "Organization UID must not be empty");
         String workflowUid = Utils.formatUid(orgUid, WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX);
+        String schema = WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson();
+        String startNodeId = WorkflowInitData.DEFAULT_START_NODE_ID;
 
         Optional<WorkflowEntity> existing = workflowRepository.findByUid(workflowUid);
         if (existing.isPresent() && !existing.get().isDeleted()) {
-            log.debug("Default workflow already initialized for org: {}", orgUid);
-            return convertToResponse(existing.get());
+            WorkflowEntity existingEntity = existing.get();
+            if (!requiresDefaultChatbotWorkflowRefresh(existingEntity, orgUid, DEFAULT_NICKNAME, DEFAULT_DESCRIPTION,
+                    schema, startNodeId)) {
+                log.debug("Default workflow already initialized for org: {}", orgUid);
+                return convertToResponse(existingEntity);
+            }
+
+            applyDefaultChatbotWorkflowDefinition(existingEntity, orgUid, DEFAULT_NICKNAME, DEFAULT_DESCRIPTION,
+                    schema, startNodeId);
+            WorkflowEntity saved = save(existingEntity);
+            if (saved == null) {
+                throw new RuntimeException("Refresh default workflow failed");
+            }
+            refreshWorkflowCache(saved);
+            log.info("Refreshed default workflow for org: {}", orgUid);
+            return convertToResponse(saved);
         }
 
-        WorkflowSchema schema = WorkflowInitData.buildDefaultWorkflow();
-        if (!WorkflowUtils.validateWorkflowDocument(schema)) {
+        WorkflowSchema workflowSchema = WorkflowSchema.fromJson(schema);
+        if (!WorkflowUtils.validateWorkflowDocument(workflowSchema)) {
             throw new IllegalStateException("Default workflow schema validation failed");
         }
 
@@ -526,15 +589,8 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 .uid(workflowUid)
                 .orgUid(orgUid)
                 .build());
-        entity.setDeleted(false);
-        entity.setNickname(DEFAULT_NICKNAME);
-        entity.setDescription(DEFAULT_DESCRIPTION);
-        entity.setSchema(schema.toJson());
-        entity.setCurrentNodeId(WorkflowInitData.DEFAULT_START_NODE_ID);
-        entity.setType(WorkflowTypeEnum.CHATBOT.name());
-        entity.setAvatar(AvatarConsts.getDefaultWorkflowAvatar());
-        entity.setOrgUid(orgUid);
-        entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
+        applyDefaultChatbotWorkflowDefinition(entity, orgUid, DEFAULT_NICKNAME, DEFAULT_DESCRIPTION, schema,
+                startNodeId);
 
         WorkflowEntity saved = save(entity);
         if (saved == null) {
@@ -543,6 +599,49 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         refreshWorkflowCache(saved);
         log.info("Initialized default workflow for org: {}", orgUid);
         return convertToResponse(saved);
+    }
+
+    private void applyDefaultChatbotWorkflowDefinition(WorkflowEntity entity, String orgUid, String nickname,
+            String description, String schema, String startNodeId) {
+        entity.setDeleted(false);
+        entity.setNickname(nickname);
+        entity.setDescription(description);
+        entity.setSchema(schema);
+        entity.setCurrentNodeId(startNodeId);
+        entity.setType(WorkflowTypeEnum.CHATBOT.name());
+        entity.setAvatar(AvatarConsts.getDefaultWorkflowAvatar());
+        entity.setOrgUid(orgUid);
+        entity.setSettings(workflowSettingsRestService.getOrCreateDefault(orgUid));
+    }
+
+    private boolean requiresDefaultChatbotWorkflowRefresh(WorkflowEntity entity, String orgUid, String nickname,
+            String description, String schema, String startNodeId) {
+        return !StringUtils.pathEquals(orgUid, entity.getOrgUid())
+                || !StringUtils.pathEquals(nickname, entity.getNickname())
+                || !StringUtils.pathEquals(description, entity.getDescription())
+                || !StringUtils.pathEquals(schema, entity.getSchema())
+                || !StringUtils.pathEquals(startNodeId, entity.getCurrentNodeId())
+                || !WorkflowTypeEnum.CHATBOT.name().equals(entity.getType())
+                || !StringUtils.pathEquals(AvatarConsts.getDefaultWorkflowAvatar(), entity.getAvatar())
+                || entity.getSettings() == null;
+    }
+
+    private DefaultChatbotWorkflowDefinition resolveManagedDefaultChatbotDefinition(WorkflowEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getUid()) || !StringUtils.hasText(entity.getOrgUid())) {
+            return null;
+        }
+
+        String workflowUid = Utils.formatUid(entity.getOrgUid(), WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX);
+        if (!workflowUid.equals(entity.getUid())) {
+            return null;
+        }
+
+        return new DefaultChatbotWorkflowDefinition(
+                entity.getOrgUid(),
+                DEFAULT_NICKNAME,
+                DEFAULT_DESCRIPTION,
+                WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson(),
+                WorkflowInitData.DEFAULT_START_NODE_ID);
     }
 
     private String resolveDefaultIvrWorkflowUid(String orgUid) {
@@ -577,6 +676,9 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         String uid = entity.getUid();
         String orgUid = entity.getOrgUid();
 
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson();
+        }
         if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
             return WorkflowInitData.buildDefaultIvrWorkflowSchemaJson();
         }
@@ -596,6 +698,9 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         String uid = entity.getUid();
         String orgUid = entity.getOrgUid();
 
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowInitData.DEFAULT_START_NODE_ID;
+        }
         if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
             return WorkflowInitData.DEFAULT_IVR_START_NODE_ID;
         }
@@ -607,6 +712,22 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
         }
         if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX)) {
             return WorkflowInitData.DEFAULT_IVR_BOT_START_NODE_ID;
+        }
+        throw new IllegalArgumentException("Workflow does not support demo reset: " + uid);
+    }
+
+    private WorkflowTypeEnum resolveResetWorkflowType(WorkflowEntity entity) {
+        String uid = entity.getUid();
+        String orgUid = entity.getOrgUid();
+
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowTypeEnum.CHATBOT;
+        }
+        if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)
+                || matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX)
+                || matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX)
+                || matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX)) {
+            return WorkflowTypeEnum.IVR;
         }
         throw new IllegalArgumentException("Workflow does not support demo reset: " + uid);
     }

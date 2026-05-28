@@ -13,20 +13,6 @@
  */
 package com.bytedesk.core.workflow;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.bytedesk.core.workflow.edge.WorkflowEdge;
-import com.bytedesk.core.workflow.node.WorkflowBaseNode;
-import com.bytedesk.core.workflow.node.WorkflowChoiceNode;
-import com.bytedesk.core.workflow.node.WorkflowEndNode;
-import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
-import com.bytedesk.core.workflow.node.WorkflowNodeTypeEnum;
-import com.bytedesk.core.workflow.node.WorkflowStartNode;
-import com.bytedesk.core.workflow.node.WorkflowTextNode;
-
 /**
  * Workflow initialization data holder.
  * 提供用于后端初始化和示例演示的默认工作流结构。
@@ -49,10 +35,10 @@ public final class WorkflowInitData {
         public static final String DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_bot_builder";
 
         /** 默认流程名称 */
-        public static final String DEFAULT_WORKFLOW_NAME = "默认智能流程";
+        public static final String DEFAULT_WORKFLOW_NAME = "默认主动获客流程";
 
         /** 默认流程描述 */
-        public static final String DEFAULT_WORKFLOW_DESCRIPTION = "FlowBuilder 示例流程";
+        public static final String DEFAULT_WORKFLOW_DESCRIPTION = "用于教育、医疗等行业的联系方式采集示例流程，支持多轮问答与手机号校验";
 
         /** 默认 IVR 流程名称 */
         public static final String DEFAULT_IVR_WORKFLOW_NAME = "默认 IVR 自助服务流程";
@@ -97,163 +83,248 @@ public final class WorkflowInitData {
         }
 
         /**
-         * 构建默认示例工作流 Schema。
+         * 构建默认获客工作流 Schema。
          */
         public static WorkflowSchema buildDefaultWorkflow() {
-                List<WorkflowBaseNode> nodes = new ArrayList<>();
-                List<WorkflowEdge> edges = new ArrayList<>();
-
-                WorkflowStartNode startNode = WorkflowStartNode.builder()
-                                .id(DEFAULT_START_NODE_ID)
-                                .type(WorkflowNodeTypeEnum.START.getValue())
-                                .name("开始接待")
-                                .meta(WorkflowNodeMeta.builder()
-                                                .position(WorkflowNodeMeta.Position.builder()
-                                                                .x(100.0)
-                                                                .y(200.0)
-                                                                .build())
-                                                .build())
-                                .data(WorkflowBaseNode.NodeData.builder()
-                                                .title("开始接待")
-                                                .outputs(createOutputs("query", "string", "Hello Flow."))
-                                                .build())
-                                .build();
-                nodes.add(startNode);
-
-                WorkflowTextNode textNode1 = WorkflowTextNode.builder()
-                                .id("text_0")
-                                .type(WorkflowNodeTypeEnum.TEXT.getValue())
-                                .name("文本节点")
-                                .meta(WorkflowNodeMeta.builder()
-                                                .position(WorkflowNodeMeta.Position.builder()
-                                                                .x(320.0)
-                                                                .y(200.0)
-                                                                .build())
-                                                .build())
-                                .data(WorkflowBaseNode.NodeData.builder()
-                                                .title("文本节点")
-                                                .content("您好，欢迎进入默认工作流。")
-                                                .build())
-                                .build();
-                nodes.add(textNode1);
-
-                WorkflowChoiceNode choiceNode = WorkflowChoiceNode.builder()
-                                .id("choice_0")
-                                .type(WorkflowNodeTypeEnum.CHOICE.getValue())
-                                .name("选择类型节点")
-                                .meta(WorkflowNodeMeta.builder()
-                                                .position(WorkflowNodeMeta.Position.builder()
-                                                                .x(560.0)
-                                                                .y(200.0)
-                                                                .build())
-                                                .build())
-                                .data(WorkflowBaseNode.NodeData.builder()
-                                                .title("选择类型节点")
-                                                .content("请选择接下来要继续的内容")
-                                                .options(createChoiceOptions())
-                                                .build())
-                                .build();
-                nodes.add(choiceNode);
-
-                WorkflowTextNode textNode2 = WorkflowTextNode.builder()
-                                .id("text_1")
-                                .type(WorkflowNodeTypeEnum.TEXT.getValue())
-                                .name("文本节点")
-                                .meta(WorkflowNodeMeta.builder()
-                                                .position(WorkflowNodeMeta.Position.builder()
-                                                                .x(800.0)
-                                                                .y(200.0)
-                                                                .build())
-                                                .build())
-                                .data(WorkflowBaseNode.NodeData.builder()
-                                                .title("文本节点")
-                                                .content("感谢您的选择，默认工作流继续执行到这里。")
-                                                .build())
-                                .build();
-                nodes.add(textNode2);
-
-                WorkflowEndNode endNode = WorkflowEndNode.builder()
-                                .id("end_0")
-                                .type(WorkflowNodeTypeEnum.END.getValue())
-                                .name("结束")
-                                .meta(WorkflowNodeMeta.builder()
-                                                .position(WorkflowNodeMeta.Position.builder()
-                                                                .x(1040.0)
-                                                                .y(200.0)
-                                                                .build())
-                                                .build())
-                                .data(WorkflowBaseNode.NodeData.builder()
-                                                .title("结束")
-                                                .outputs(createOutputs("result", "string", null))
-                                                .build())
-                                .build();
-                nodes.add(endNode);
-
-                WorkflowEdge edge1 = WorkflowEdge.builder()
-                                .id("edge_start_text_0")
-                                .sourceNodeId(DEFAULT_START_NODE_ID)
-                                .targetNodeId("text_0")
-                                .build();
-                edges.add(edge1);
-
-                WorkflowEdge edge2 = WorkflowEdge.builder()
-                                .id("edge_text_choice_0")
-                                .sourceNodeId("text_0")
-                                .targetNodeId("choice_0")
-                                .build();
-                edges.add(edge2);
-
-                WorkflowEdge edge3 = WorkflowEdge.builder()
-                                .id("edge_choice_text_1")
-                                .sourceNodeId("choice_0")
-                                .targetNodeId("text_1")
-                                .build();
-                edges.add(edge3);
-
-                WorkflowEdge edge4 = WorkflowEdge.builder()
-                                .id("edge_text_end_0")
-                                .sourceNodeId("text_1")
-                                .targetNodeId("end_0")
-                                .build();
-                edges.add(edge4);
-
-                return WorkflowSchema.builder()
-                                .nodes(nodes)
-                                .edges(edges)
-                                .build();
+                return WorkflowSchema.fromJson(buildDefaultLeadCollectionWorkflowSchemaJson());
         }
 
-        private static List<Map<String, Object>> createChoiceOptions() {
-                List<Map<String, Object>> options = new ArrayList<>();
-
-                Map<String, Object> option1 = new HashMap<>();
-                option1.put("label", "继续了解产品");
-                option1.put("value", "product");
-                options.add(option1);
-
-                Map<String, Object> option2 = new HashMap<>();
-                option2.put("label", "继续了解服务");
-                option2.put("value", "service");
-                options.add(option2);
-
-                return options;
-        }
-
-        private static Map<String, Object> createOutputs(String propertyName, String type, String defaultValue) {
-                Map<String, Object> outputs = new HashMap<>();
-                Map<String, Object> properties = new HashMap<>();
-                Map<String, Object> property = new HashMap<>();
-
-                property.put("type", type);
-                if (defaultValue != null) {
-                        property.put("default", defaultValue);
-                }
-
-                properties.put(propertyName, property);
-                outputs.put("type", "object");
-                outputs.put("properties", properties);
-
-                return outputs;
+        public static String buildDefaultLeadCollectionWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 100, "y": 240 }
+                                                        },
+                                                        "data": {
+                                                                "title": "主动邀约开始",
+                                                                "description": "教育、医疗等主动获客对话入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-opening",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 360, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "开场提示",
+                                                                "content": "您好，请问您目前的学历是？",
+                                                                "description": "主动获客首轮问答"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-choice-education",
+                                                        "type": "choice",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "学历选择",
+                                                                "content": "您好，请问您目前的学历是？",
+                                                                "variable": "educationLevel",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "lead-education-college",
+                                                                                "label": "1.大专",
+                                                                                "value": "大专",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-1"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-education-undergraduate",
+                                                                                "label": "2.本科",
+                                                                                "value": "本科",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-2"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-education-other",
+                                                                                "label": "3.其他",
+                                                                                "value": "其他",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-3"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-choice-goal",
+                                                        "type": "choice",
+                                                        "meta": {
+                                                                "position": { "x": 1060, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "诉求判断",
+                                                                "content": "嗯嗯，您主要是想简单拿证还是想系统学习知识呢？",
+                                                                "variable": "learningGoal",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "lead-goal-certificate",
+                                                                                "label": "1. 简单拿证",
+                                                                                "value": "简单拿证",
+                                                                                "outgoingEdgeId": "edge-lead-goal-summary-1"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-goal-learning",
+                                                                                "label": "2. 系统学习知识",
+                                                                                "value": "系统学习知识",
+                                                                                "outgoingEdgeId": "edge-lead-goal-summary-2"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-summary",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1400, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "资料说明",
+                                                                "content": "收到，您当前是【{{educationLevel}}】学历，倾向于【{{learningGoal}}】。不同地区的报考条件、就诊流程和服务安排会有差异，老师先为您整理适合的院校/科室、费用、流程和注意事项，请留下接收资料的联系方式。",
+                                                                "description": "引导进入联系方式采集"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-form-contact",
+                                                        "type": "form",
+                                                        "meta": {
+                                                                "position": { "x": 1760, "y": 180 }
+                                                        },
+                                                        "data": {
+                                                                "title": "联系方式采集",
+                                                                "content": "请补充所在城市、手机号。手机号用于免费发送资料，如号码格式不正确会提示重新填写。",
+                                                                "description": "采集并校验访客联系方式",
+                                                                "formFields": [
+                                                                        {
+                                                                                "id": "city",
+                                                                                "type": "input",
+                                                                                "label": "所在城市",
+                                                                                "required": true
+                                                                        },
+                                                                        {
+                                                                                "id": "mobile",
+                                                                                "type": "text",
+                                                                                "label": "手机号",
+                                                                                "required": true,
+                                                                                "props": {
+                                                                                        "type": "tel"
+                                                                                },
+                                                                                "rules": [
+                                                                                        {
+                                                                                                "pattern": "^1\\\\d{10}$",
+                                                                                                "message": "请输入正确的11位手机号"
+                                                                                        }
+                                                                                ]
+                                                                        },
+                                                                        {
+                                                                                "id": "remark",
+                                                                                "type": "textarea",
+                                                                                "label": "补充说明",
+                                                                                "required": false
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-confirm",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 2140, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "确认与兜底",
+                                                                "content": "好的，请您确认手机号 {{mobile}}{{wechat}}。您已成功预留联系方式，这边会尽快安排顾问添加您并发送资料，请耐心等待，不要频繁重复进线咨询。",
+                                                                "description": "已采集到手机号后的确认与收尾"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "end_0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 2480, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束主动获客流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "id": "edge-lead-start-opening",
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "lead-text-opening",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-opening-education",
+                                                        "sourceNodeId": "lead-text-opening",
+                                                        "targetNodeId": "lead-choice-education",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-1",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-college",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-2",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-undergraduate",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-3",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-other",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-goal-summary-1",
+                                                        "sourceNodeId": "lead-choice-goal",
+                                                        "targetNodeId": "lead-text-summary",
+                                                        "sourcePortId": "choice-option-lead-goal-certificate",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-goal-summary-2",
+                                                        "sourceNodeId": "lead-choice-goal",
+                                                        "targetNodeId": "lead-text-summary",
+                                                        "sourcePortId": "choice-option-lead-goal-learning",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-summary-form",
+                                                        "sourceNodeId": "lead-text-summary",
+                                                        "targetNodeId": "lead-form-contact",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-form-confirm",
+                                                        "sourceNodeId": "lead-form-contact",
+                                                        "targetNodeId": "lead-text-confirm",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-confirm-end",
+                                                        "sourceNodeId": "lead-text-confirm",
+                                                        "targetNodeId": "end_0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """.formatted(DEFAULT_START_NODE_ID, DEFAULT_START_NODE_ID);
         }
 
         public static String buildDefaultIvrWorkflowSchemaJson() {

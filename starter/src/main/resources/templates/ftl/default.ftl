@@ -290,7 +290,7 @@
         </div>
         
         <footer>
-            <p>© 2025 <@t key="default.copyright">版权所有</@t></p>
+            <p>© 2013~2026 <@t key="default.copyright">版权所有</@t></p>
         </footer>
     </div>
     <script>

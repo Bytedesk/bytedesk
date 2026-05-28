@@ -1,1 +1,0 @@
-var e=(e,t)=>{let n=t.toLowerCase();for(let[t,r]of e.entries())if(t.toLowerCase()===n)return r},t=e=>{let t={};for(let[n,r]of e.entries())t[n.toLowerCase()]=r;return t},n=(e,t)=>e[t.toLowerCase()]||``,r=e=>{let t=(e||``).trim().toLowerCase();return t===`1`||t===`true`||t===`yes`||t===`on`};export{t as i,e as n,r,n as t};

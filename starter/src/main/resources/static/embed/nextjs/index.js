@@ -1,7 +1,7 @@
 import { __toESM as e } from "../_virtual/_rolldown/runtime/index.js";
 import t from "../utils/logger/index.js";
 import { messages as n } from "../locales/index/index.js";
-import { require_dynamic as r } from "../node_modules/.pnpm/next@16.2.4_react-dom@19.2.5_react@19.2.5__react@19.2.5_sass@1.97.3/node_modules/next/dynamic/index.js";
+import { require_dynamic as r } from "../node_modules/.pnpm/next@16.2.6_@babel_core@7.29.0_react-dom@19.2.6_react@19.2.6__react@19.2.6_sass@1.97.3/node_modules/next/dynamic/index.js";
 import { useEffect as i, useRef as a } from "react";
 import { IntlProvider as o } from "react-intl";
 import { jsx as s } from "react/jsx-runtime";

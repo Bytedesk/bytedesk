@@ -14,7 +14,10 @@ var o = (e) => Array.isArray(e) ? e.map(o) : typeof e == "function" ? e.toString
 	})
 }), l = null, u = 0, d = (t) => {
 	let i = r(null), a = r(!1), { onInit: o, ...c } = t;
-	return n(() => (u++, l ? (i.current = l, window.bytedesk = l, l.setConfig(c, { replaceChatConfig: !0 }), a.current || (a.current = !0, o?.())) : (l = new e(c), i.current = l, window.bytedesk = l, l.init().then(() => {
+	return n(() => (u++, l ? (i.current = l, window.bytedesk = l, l.setConfig(c, {
+		replaceChatConfig: !0,
+		replaceTabsConfig: !0
+	}), a.current || (a.current = !0, o?.())) : (l = new e(c), i.current = l, window.bytedesk = l, l.init().then(() => {
 		a.current = !0, o?.();
 	}).catch((e) => {
 		console.error("BytedeskWeb 初始化失败:", e), a.current = !0, o?.();

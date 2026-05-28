@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -51,6 +52,9 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.workflow.WorkflowEntity;
+import com.bytedesk.core.workflow.WorkflowInitData;
+import com.bytedesk.core.workflow_log.WorkflowLogEntity;
+import com.bytedesk.core.workflow_log.WorkflowLogRepository;
 import com.bytedesk.core.workflow_variable.WorkflowVariableScopeEnum;
 import com.bytedesk.core.workflow_variable.WorkflowVariableService;
 import com.bytedesk.core.workflow_variable.WorkflowVariableTypeEnum;
@@ -71,6 +75,9 @@ class WorkflowChatServiceTest {
   @Mock
   private WorkflowVariableService workflowVariableService;
 
+  @Mock
+  private WorkflowLogRepository workflowLogRepository;
+
   private WorkflowChatService workflowChatService;
 
   @BeforeEach
@@ -88,9 +95,11 @@ class WorkflowChatServiceTest {
       threadRestService,
       messageRestService,
       restTemplate,
-      workflowVariableService);
+      workflowVariableService,
+      workflowLogRepository);
     when(threadRestService.save(any(ThreadEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(messageRestService.save(any(MessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    when(workflowLogRepository.save(any(WorkflowLogEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(workflowVariableService.getVariables(anyString())).thenReturn(new HashMap<>());
     lenient().when(restTemplate.exchange(any(URI.class), any(HttpMethod.class), any(), eq(String.class)))
       .thenReturn(ResponseEntity.ok("{}"));
@@ -248,6 +257,15 @@ class WorkflowChatServiceTest {
     assertThat(afterContinue.getWorkflowFormResponseData()).isEqualTo("{\"name\":\"张三\"}");
     assertThat(afterContinue.getWorkflowCurrentNodeId()).isEqualTo("end-1");
     assertThat(afterContinue.getWorkflowCompleted()).isTrue();
+
+    ArgumentCaptor<WorkflowLogEntity> logCaptor = ArgumentCaptor.forClass(WorkflowLogEntity.class);
+    verify(workflowLogRepository).save(logCaptor.capture());
+    WorkflowLogEntity savedLog = logCaptor.getValue();
+    assertThat(savedLog.getWorkflowUid()).isEqualTo("wf-1");
+    assertThat(savedLog.getExecutionUid()).isEqualTo("thread-1");
+    assertThat(savedLog.getNodeUid()).isEqualTo("form-1");
+    assertThat(savedLog.getNodeType()).isEqualTo("form");
+    assertThat(savedLog.getOutputPayload()).contains("张三");
   }
 
   @Test
@@ -285,6 +303,62 @@ class WorkflowChatServiceTest {
         eq(WorkflowVariableTypeEnum.STRING),
         eq(WorkflowVariableScopeEnum.GLOBAL));
   }
+
+    @Test
+    void defaultLeadWorkflowShouldPersistChoiceVariablesForSummaryRendering() {
+    WorkflowEntity workflow = buildWorkflow(WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson());
+    ThreadEntity thread = buildThread();
+
+    Map<String, Object> storedVariables = new HashMap<>();
+    when(workflowVariableService.getVariables("wf-1")).thenAnswer(invocation -> new HashMap<>(storedVariables));
+    doAnswer(invocation -> {
+      storedVariables.put(invocation.getArgument(1), invocation.getArgument(2));
+      return null;
+    }).when(workflowVariableService).setVariable(
+      eq("wf-1"),
+      anyString(),
+      any(),
+      eq(WorkflowVariableTypeEnum.STRING),
+      eq(WorkflowVariableScopeEnum.GLOBAL));
+
+    MessageProtobuf firstMessage = workflowChatService.createStartMessage(workflow, thread);
+    assertThat(firstMessage.getContent()).isEqualTo("您好，请问您目前的学历是？");
+
+    List<MessageProtobuf> goalQuestionMessages = workflowChatService.continueAfterChoiceMessages(
+      workflow,
+      thread,
+      "lead-education-college");
+
+    assertThat(goalQuestionMessages).hasSize(1);
+    assertThat(String.valueOf(goalQuestionMessages.get(0).getType())).isEqualTo(MessageTypeEnum.CHOICE.name());
+    ChoiceContent goalChoice = ChoiceContent.fromJson(goalQuestionMessages.get(0).getContent());
+    assertThat(goalChoice.getContent()).isEqualTo("嗯嗯，您主要是想简单拿证还是想系统学习知识呢？");
+    assertThat(storedVariables).containsEntry("educationLevel", "大专");
+
+    List<MessageProtobuf> summaryMessages = workflowChatService.continueAfterChoiceMessages(
+      workflow,
+      thread,
+      "lead-goal-certificate");
+
+    assertThat(summaryMessages).isNotEmpty();
+    assertThat(summaryMessages.get(0).getContent())
+      .startsWith("收到，您当前是【大专】学历，倾向于【简单拿证】。");
+    assertThat(storedVariables)
+      .containsEntry("educationLevel", "大专")
+      .containsEntry("learningGoal", "简单拿证");
+    verify(workflowVariableService).setVariable(
+      eq("wf-1"),
+      eq("educationLevel"),
+      eq("大专"),
+      eq(WorkflowVariableTypeEnum.STRING),
+      eq(WorkflowVariableScopeEnum.GLOBAL));
+    verify(workflowVariableService).setVariable(
+      eq("wf-1"),
+      eq("learningGoal"),
+      eq("简单拿证"),
+      eq(WorkflowVariableTypeEnum.STRING),
+      eq(WorkflowVariableScopeEnum.GLOBAL));
+    }
 
   private WorkflowEntity buildWorkflow(String schema) {
     return WorkflowEntity.builder()

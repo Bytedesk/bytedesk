@@ -7,10 +7,9 @@ var e = {
 			subtitle: "点击开始对话"
 		},
 		tabs: {
-			home: "首页",
 			messages: "消息",
-			help: "帮助",
-			news: "新闻"
+			thread: "历史会话",
+			help: "帮助"
 		},
 		settings: {
 			position: "位置",
@@ -32,10 +31,9 @@ var e = {
 			subtitle: "點擊開始對話"
 		},
 		tabs: {
-			home: "首頁",
 			messages: "消息",
-			help: "幫助",
-			news: "新聞"
+			thread: "歷史會話",
+			help: "幫助"
 		},
 		settings: {
 			position: "位置",
@@ -57,10 +55,9 @@ var e = {
 			subtitle: "Click to start chat"
 		},
 		tabs: {
-			home: "Home",
 			messages: "Messages",
-			help: "Help",
-			news: "News"
+			thread: "History",
+			help: "Help"
 		},
 		settings: {
 			position: "Position",
@@ -82,10 +79,9 @@ var e = {
 			subtitle: "クリックして会話を開始"
 		},
 		tabs: {
-			home: "ホーム",
 			messages: "メッセージ",
-			help: "ヘルプ",
-			news: "ニュース"
+			thread: "履歴",
+			help: "ヘルプ"
 		},
 		settings: {
 			position: "位置",
@@ -107,10 +103,9 @@ var e = {
 			subtitle: "クリックして会話を開始"
 		},
 		tabs: {
-			home: "ホーム",
 			messages: "メッセージ",
-			help: "ヘルプ",
-			news: "ニュース"
+			thread: "履歴",
+			help: "ヘルプ"
 		},
 		settings: {
 			position: "位置",
