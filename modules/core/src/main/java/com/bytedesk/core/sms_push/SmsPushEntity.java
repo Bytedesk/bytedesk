@@ -1,0 +1,78 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2024-05-11 18:14:28
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2025-06-04 15:35:31
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license.
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ *  联系：270580156@qq.com
+ * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
+ */
+package com.bytedesk.core.sms_push;
+
+import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.push.PushStatusEnum;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+// import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
+
+/**
+ * 短信推送记录
+ */
+@Entity
+@Data
+@SuperBuilder
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+// @EntityListeners({SmsPushEntityListener.class})
+@Table(name = "bytedesk_core_sms_push")
+public class SmsPushEntity extends BaseEntity {
+
+    private static final long serialVersionUID = 1L;
+
+    @Builder.Default
+    @Column(name = "sms_push_type")
+    private String type = "SMS_NOTIFICATION";
+
+    private String sender;
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    private String country;
+
+    private String receiver;
+
+    private String ip;
+
+    private String ipLocation;
+
+    private String deviceUid;
+
+    @Builder.Default
+    @Column(name = "push_status")
+    private String status = PushStatusEnum.PENDING.name();
+
+    @Builder.Default
+    private String channel = ChannelEnum.SMS.name();
+
+    private Boolean sendSuccess;
+
+    private String sendMessage;
+
+}

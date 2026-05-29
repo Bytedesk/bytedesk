@@ -35,6 +35,11 @@
 			<#assign visitorDemoUrl = 'https://www.weiyuai.cn/reactdemo/'>
 			<#assign githubUrl = 'https://github.com/Bytedesk/bytedesk'>
 			<#assign giteeUrl = 'https://gitee.com/bytedesk/weiyu'>
+			<#assign suiteAdminUrl = '/admin'>
+			<#assign suiteAgentUrl = '/agent/chat'>
+			<#assign suiteKbaseUrl = '/notebase'>
+			<#assign suiteWorkflowUrl = '/workflow'>
+			<#assign suiteCallcenterUrl = '/ippbx'>
 
 			<!-- Logo START -->
 			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 开源AI工作平台'}">
@@ -61,6 +66,7 @@
 				<li class="nav-item">
 					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
 				</li>
+				
 				<!-- Nav item 2 Course -->
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="docsMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="nav.docs">文档</@t></a>
@@ -78,6 +84,16 @@
 				<#-- pruned: voice, forum, help, architecture -->
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="suiteMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="default.title">系统入口</@t></a>
+					<ul class="dropdown-menu" aria-labelledby="suiteMenu">
+						<li><a class="dropdown-item" href="${suiteAdminUrl}" target="_blank"><@t key="default.admin.title">管理后台</@t></a></li>
+						<li><a class="dropdown-item" href="${suiteAgentUrl}" target="_blank"><@t key="default.agent.title">客服工作台</@t></a></li>
+						<li><a class="dropdown-item" href="${suiteKbaseUrl}" target="_blank"><@t key="section.suite.item.kbase.title">企业知识库</@t></a></li>
+						<li><a class="dropdown-item" href="${suiteWorkflowUrl}" target="_blank"><@t key="section.suite.item.workflow.title">工作流</@t></a></li>
+						<li><a class="dropdown-item" href="${suiteCallcenterUrl}" target="_blank"><@t key="section.suite.item.callcenter.title">呼叫中心</@t></a></li>
+					</ul>
+				</li>
 				<!-- Nav item 3 link-->
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="repoMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="nav.github">Github</@t></a>
@@ -85,26 +101,27 @@
 						<li><a class="dropdown-item" href="${githubUrl}" target="_blank">Github</a></li>
 						<li><a class="dropdown-item" href="${giteeUrl}" target="_blank">Gitee</a></li>
 					</ul>
-				</li>				<!-- Language Switch Dropdown -->
-					<li class="nav-item dropdown">
-						<#-- Language switch label shows target language; highlight current in the list -->
+				</li>				
+				<!-- Language Switch Dropdown -->
+				<li class="nav-item dropdown">
+					<#-- Language switch label shows target language; highlight current in the list -->
 
-						<#-- Toggle label: if current is English -> show 简体中文; otherwise show English -->
-						<#assign langSwitchLabel = (currentLang == 'en')?string('简体中文', 'English')>
+					<#-- Toggle label: if current is English -> show 简体中文; otherwise show English -->
+					<#assign langSwitchLabel = (currentLang == 'en')?string('简体中文', 'English')>
 
-						<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-current-lang="${currentLang}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${langSwitchLabel}</a>
-						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
-							<li>
-								<a class="dropdown-item ${(currentLang == 'zh-cn')?string('active','')}" href="#" data-lang="zh-CN" aria-current="${(currentLang == 'zh-cn')?string('true','false')}">简体中文<#if currentLang == 'zh-cn'> ✓</#if></a>
-							</li>
-							<li>
-								<a class="dropdown-item ${(currentLang == 'zh-tw')?string('active','')}" href="#" data-lang="zh-TW" aria-current="${(currentLang == 'zh-tw')?string('true','false')}">繁體中文<#if currentLang == 'zh-tw'> ✓</#if></a>
-							</li>
-							<li>
-								<a class="dropdown-item ${(currentLang == 'en')?string('active','')}" href="#" data-lang="en" aria-current="${(currentLang == 'en')?string('true','false')}">English<#if currentLang == 'en'> ✓</#if></a>
-							</li>
-						</ul>
-					</li>
+					<a class="nav-link dropdown-toggle" href="#" id="langMenu" data-current-lang="${currentLang}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">${langSwitchLabel}</a>
+					<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="langMenu">
+						<li>
+							<a class="dropdown-item ${(currentLang == 'zh-cn')?string('active','')}" href="#" data-lang="zh-CN" aria-current="${(currentLang == 'zh-cn')?string('true','false')}">简体中文<#if currentLang == 'zh-cn'> ✓</#if></a>
+						</li>
+						<li>
+							<a class="dropdown-item ${(currentLang == 'zh-tw')?string('active','')}" href="#" data-lang="zh-TW" aria-current="${(currentLang == 'zh-tw')?string('true','false')}">繁體中文<#if currentLang == 'zh-tw'> ✓</#if></a>
+						</li>
+						<li>
+							<a class="dropdown-item ${(currentLang == 'en')?string('active','')}" href="#" data-lang="en" aria-current="${(currentLang == 'en')?string('true','false')}">English<#if currentLang == 'en'> ✓</#if></a>
+						</li>
+					</ul>
+				</li>
 				</ul>
 			</div>
 			<!-- Main navbar END -->

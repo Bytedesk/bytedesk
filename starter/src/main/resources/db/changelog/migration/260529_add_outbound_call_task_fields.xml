@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260529-add-call-task-outbound-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_task" />
+                <not>
+                    <columnExists tableName="bytedesk_call_task" columnName="customer_list_uid" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_task">
+            <column name="status" type="varchar(32)" defaultValue="DRAFT" />
+            <column name="is_enabled" type="boolean" defaultValueBoolean="true" />
+            <column name="customer_list_uid" type="varchar(64)" />
+            <column name="customer_list_name" type="varchar(255)" />
+            <column name="schedule_type" type="varchar(32)" defaultValue="DAILY" />
+            <column name="daily_start_time" type="time" />
+            <column name="daily_end_time" type="time" />
+            <column name="interval_seconds" type="int" defaultValueNumeric="300" />
+            <column name="call_timeout_seconds" type="int" defaultValueNumeric="30" />
+            <column name="max_attempts_per_customer" type="int" defaultValueNumeric="1" />
+            <column name="daily_limit" type="int" defaultValueNumeric="0" />
+            <column name="caller_number" type="varchar(64)" />
+            <column name="gateway_uid" type="varchar(64)" />
+            <column name="gateway_name" type="varchar(128)" />
+            <column name="last_run_at" type="datetime" />
+            <column name="next_run_at" type="datetime" />
+            <column name="last_completed_at" type="datetime" />
+            <column name="total_customers" type="int" defaultValueNumeric="0" />
+            <column name="dialed_count" type="int" defaultValueNumeric="0" />
+            <column name="success_count" type="int" defaultValueNumeric="0" />
+            <column name="failed_count" type="int" defaultValueNumeric="0" />
+            <column name="current_index" type="int" defaultValueNumeric="0" />
+            <column name="variables_json" type="text" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260529-add-call-customer-list-outbound-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_customer_list" />
+                <not>
+                    <columnExists tableName="bytedesk_call_customer_list" columnName="customer_count" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_customer_list">
+            <column name="status" type="varchar(32)" defaultValue="ACTIVE" />
+            <column name="is_enabled" type="boolean" defaultValueBoolean="true" />
+            <column name="customer_count" type="int" defaultValueNumeric="0" />
+            <column name="pending_count" type="int" defaultValueNumeric="0" />
+            <column name="completed_count" type="int" defaultValueNumeric="0" />
+            <column name="invalid_count" type="int" defaultValueNumeric="0" />
+            <column name="source_type" type="varchar(64)" />
+            <column name="owner_user_uid" type="varchar(64)" />
+            <column name="owner_nickname" type="varchar(255)" />
+            <column name="last_import_at" type="datetime" />
+            <column name="tags" type="text" />
+            <column name="config_json" type="text" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260529-add-call-customer-outbound-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_customer" />
+                <not>
+                    <columnExists tableName="bytedesk_call_customer" columnName="customer_list_uid" />
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_customer">
+            <column name="status" type="varchar(32)" defaultValue="PENDING" />
+            <column name="phone" type="varchar(64)" />
+            <column name="country_code" type="varchar(16)" defaultValue="86" />
+            <column name="email" type="varchar(255)" />
+            <column name="company" type="varchar(255)" />
+            <column name="title" type="varchar(255)" />
+            <column name="address" type="varchar(512)" />
+            <column name="external_id" type="varchar(128)" />
+            <column name="customer_list_uid" type="varchar(64)" />
+            <column name="customer_list_name" type="varchar(255)" />
+            <column name="priority" type="int" defaultValueNumeric="0" />
+            <column name="call_attempts" type="int" defaultValueNumeric="0" />
+            <column name="max_call_attempts" type="int" defaultValueNumeric="1" />
+            <column name="last_call_task_uid" type="varchar(64)" />
+            <column name="last_call_task_name" type="varchar(255)" />
+            <column name="last_call_at" type="datetime" />
+            <column name="next_call_at" type="datetime" />
+            <column name="completed_at" type="datetime" />
+            <column name="last_call_result" type="varchar(1024)" />
+            <column name="last_cdr_uid" type="varchar(64)" />
+            <column name="remark" type="text" />
+            <column name="variables_json" type="text" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

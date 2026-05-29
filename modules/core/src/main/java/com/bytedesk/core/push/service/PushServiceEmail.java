@@ -15,8 +15,8 @@ package com.bytedesk.core.push.service;
 
 import org.springframework.stereotype.Service;
 
-import com.bytedesk.core.email.EmailSendResult;
-import com.bytedesk.core.email.EmailSendService;
+import com.bytedesk.core.email_provider.EmailSendResult;
+import com.bytedesk.core.email_provider.EmailSendService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 import { ACCESS_TOKEN as e, ANONYMOUS as t, EVENT_BUS_HTTP_ERROR as n, EVENT_BUS_SERVER_ERROR_500 as r } from "../../utils/constants/index.js";
 import i from "../../utils/logger/index.js";
-import a from "../../node_modules/.pnpm/axios@1.16.1/node_modules/axios/lib/axios/index.js";
+import a from "../../node_modules/.pnpm/axios@1.16.1_debug@4.4.3/node_modules/axios/lib/axios/index.js";
 import o from "../../utils/eventsEmitter/index.js";
 //#region src/apis/request.ts
 var s = "";
