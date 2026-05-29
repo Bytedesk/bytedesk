@@ -131,3 +131,8 @@ prod/
 !deploy/freeswitch/bin/
 !deploy/freeswitch/bin/**
 
+# Keep Maven wrapper only for the startup project.
+**/.mvn/
+!starter/.mvn/
+!starter/.mvn/**
+
