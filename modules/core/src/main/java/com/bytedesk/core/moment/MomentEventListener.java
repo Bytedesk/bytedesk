@@ -23,17 +23,5 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MomentEventListener {
 
-    // private final MomentRestService momentRestService;
-
-    // @Order(3)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     String orgUid = organization.getUid();
-    //     log.info("thread - organization created: {}", organization.getName());
-    //     momentRestService.initMoments(orgUid);
-    // }
-
- 
 }
 

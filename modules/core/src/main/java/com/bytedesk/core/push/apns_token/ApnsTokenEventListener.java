@@ -13,12 +13,7 @@
  */
 package com.bytedesk.core.push.apns_token;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class ApnsTokenEventListener {
-
-    private final ApnsTokenRestService apns_tokenRestService;
-
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("thread - organization created: {}", organization.getName());
-        apns_tokenRestService.initApnsTokens(orgUid);
-    }
-
  
 }
 

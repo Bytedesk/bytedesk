@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.TypeReference;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
 import com.bytedesk.core.workflow.node.WorkflowBaseNode;
 import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
@@ -31,21 +30,21 @@ public class WorkflowUtils {
      * 从JSON字符串解析工作流文档
      */
     public static WorkflowSchema parseWorkflowSchema(String json) {
-        return JSON.parseObject(json, WorkflowSchema.class);
+        return WorkflowSchema.fromJson(json);
     }
     
     /**
      * 从JSON字符串解析节点列表
      */
     public static List<WorkflowBaseNode> parseNodes(String json) {
-        return JSON.parseObject(json, new TypeReference<List<WorkflowBaseNode>>() {});
+        return WorkflowSchema.fromJson("{\"nodes\":" + json + ",\"edges\":[]}").getNodes();
     }
     
     /**
      * 从JSON字符串解析边列表
      */
     public static List<WorkflowEdge> parseEdges(String json) {
-        return JSON.parseObject(json, new TypeReference<List<WorkflowEdge>>() {});
+        return JSON.parseArray(json, WorkflowEdge.class);
     }
     
     /**

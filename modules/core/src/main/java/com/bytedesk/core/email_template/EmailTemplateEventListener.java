@@ -23,17 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class EmailTemplateEventListener {
 
-    // private final EmailTemplateRestService email_templateRestService;
-
-    // @Order(3)
-    // @EventListener
-    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
-    //     String orgUid = organization.getUid();
-    //     log.info("thread - organization created: {}", organization.getName());
-    //     email_templateRestService.initEmailTemplates(orgUid);
-    // }
-
  
 }
 

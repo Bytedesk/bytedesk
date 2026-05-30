@@ -59,6 +59,15 @@ public class SmsPushSendService {
     @Value("${aliyun.sms.templatecode:}")
     private String templateCode;
 
+    @Value("${aliyun.sms.domain:dysmsapi.aliyuncs.com}")
+    private String smsDomain;
+
+    @Value("${aliyun.sms.version:2017-05-25}")
+    private String smsVersion;
+
+    @Value("${aliyun.sms.action:SendSms}")
+    private String smsAction;
+
     /**
      * 默认关闭，开启后优先使用外部短信发送器。
      */
@@ -202,9 +211,9 @@ public class SmsPushSendService {
 
         CommonRequest request = new CommonRequest();
         request.setSysMethod(MethodType.POST);
-        request.setSysDomain("dysmsapi.aliyuncs.com");
-        request.setSysVersion("2017-05-25");
-        request.setSysAction("SendSms");
+        request.setSysDomain(smsDomain);
+        request.setSysVersion(smsVersion);
+        request.setSysAction(smsAction);
         request.putQueryParameter("RegionId", regionId);
         request.putQueryParameter("PhoneNumbers", phoneNumber);
         // 已在init方法中处理了编码问题，此处直接使用

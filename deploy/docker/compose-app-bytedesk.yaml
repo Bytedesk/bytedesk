@@ -391,6 +391,9 @@ services:
       WECHAT_PAY_CERTPATH: ''
       ALIYUN_SMS_SIGNNAME: ''
       ALIYUN_SMS_TEMPLATECODE: ''
+      ALIYUN_SMS_DOMAIN: dysmsapi.aliyuncs.com
+      ALIYUN_SMS_VERSION: 2017-05-25
+      ALIYUN_SMS_ACTION: SendSms
       SPRINGDOC_SHOW_ACTUATOR: "false"
       SPRINGDOC_SWAGGER_UI_ENABLED: "false"
       SPRINGDOC_SWAGGER_UI_PATH: /index.html

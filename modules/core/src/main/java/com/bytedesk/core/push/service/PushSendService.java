@@ -93,12 +93,14 @@ public class PushSendService {
         String code = generateCode(receiver);
         
         // 保存验证码记录(会在内部发送并保存结果)
-        saveCodeRecord(authRequest, code, ip, request);
+        PushSendResult sendResult = saveCodeRecord(authRequest, code, ip, request);
         
-        // 更新IP最后发送验证码的时间
-        pushFilterService.updateIpLastSentTime(ip);
+        // 仅在实际发送成功后才更新IP最后发送时间，失败时允许修复配置后立即重试
+        if (sendResult.isSuccess()) {
+            pushFilterService.updateIpLastSentTime(ip);
+        }
 
-        return PushSendResult.success();
+        return sendResult;
     }
 
     private String generateCode(String receiver) {
@@ -140,7 +142,7 @@ public class PushSendService {
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, smsResult.getErrorMessage());
     }
 
-    private void saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {
+    private PushSendResult saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {
         String ipLocation = ipService.getIpLocation(ip);
         String country = authRequest.getCountry();
         String receiver = authRequest.getReceiver();
@@ -169,6 +171,8 @@ public class PushSendService {
         }
         // 
         pushRestService.create(pushRequest);
+
+        return sendResult;
     }
 
     // =============== 重新发送功能 ===============

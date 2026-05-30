@@ -25,8 +25,8 @@
 构建与测试：
 
 ```bash
-./control/mvnw -f pom.xml -pl modules/cli -am -DskipTests compile
-./control/mvnw -f pom.xml -pl modules/cli -am -Dtest=BytedeskCliTests -Dsurefire.failIfNoSpecifiedTests=false test
+./starter/mvnw -f pom.xml -pl modules/cli -am -DskipTests compile
+./starter/mvnw -f pom.xml -pl modules/cli -am -Dtest=BytedeskCliTests -Dsurefire.failIfNoSpecifiedTests=false test
 ```
 
 运行方式：
