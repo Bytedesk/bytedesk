@@ -6,6 +6,7 @@
 
     <changeSet id="260606-01-add-apns-token-environment" author="copilot">
         <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_token" />
             <not>
                 <columnExists tableName="bytedesk_core_apns_token" columnName="environment" />
             </not>
