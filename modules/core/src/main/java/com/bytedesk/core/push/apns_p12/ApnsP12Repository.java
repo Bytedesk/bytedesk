@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.push.apns_p12;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,8 @@ public interface ApnsP12Repository extends JpaRepository<ApnsP12Entity, Long>, J
     Boolean existsByUid(String uid);
 
     Optional<ApnsP12Entity> findByBundleIdAndOrgUidAndSandboxAndDeletedFalse(String bundleId, String orgUid, Boolean sandbox);
+
+    List<ApnsP12Entity> findByBundleIdAndOrgUidAndEnabledTrueAndDeletedFalse(String bundleId, String orgUid);
 
     // Boolean existsByPlatform(String platform);
 }

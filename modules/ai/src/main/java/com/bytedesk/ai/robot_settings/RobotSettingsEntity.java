@@ -22,8 +22,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-// import com.bytedesk.core.constant.I18Consts;
-
 /**
  * Robot configuration settings for reusable settings
  * 

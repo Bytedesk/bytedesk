@@ -35,6 +35,21 @@ public class CallSettingsResponse extends BaseResponse {
     private Boolean enabled;
 
     /**
+     * Whether the agent expects the softphone to stay signed in after page refresh.
+     */
+    private Boolean signedIn;
+
+    /**
+     * Whether outbound calls should first dial the agent mobile phone.
+     */
+    private Boolean mobileOutboundEnabled;
+
+    /**
+     * Agent mobile phone number used for callback-style outbound calling.
+     */
+    private String mobilePhoneNumber;
+
+    /**
      * External phone number shown to users for inbound or outbound calls.
      */
     private String number;
@@ -48,6 +63,11 @@ public class CallSettingsResponse extends BaseResponse {
      * Internal extension or SIP target used by CTI/SIP registration and dialing.
      */
     private String target;
+
+    /**
+     * Current registration status synced from RegistrationEntity with the same extension number.
+     */
+    private String registrationStatus;
 
     /**
      * Hold media URL played to the customer side while the call is on hold.

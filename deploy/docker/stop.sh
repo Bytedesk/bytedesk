@@ -22,9 +22,10 @@ case "${DB}" in
 esac
 
 case "${SCENARIO}" in
-  standard|noai|call|webrtc) ;;
+  standard|noai|call|webrtc|call-webrtc) ;;
+  webrtc-call) SCENARIO="call-webrtc" ;;
   *)
-    echo "[ERROR] Unsupported scenario: ${SCENARIO}. Allowed: standard|noai|call|webrtc"
+    echo "[ERROR] Unsupported scenario: ${SCENARIO}. Allowed: standard|noai|call|webrtc|call-webrtc|webrtc-call"
     exit 1
     ;;
 esac
@@ -57,11 +58,24 @@ BASE_FILE="${SCRIPT_DIR}/compose-base.yaml"
 DB_FILE="${SCRIPT_DIR}/compose-db-${DB}.yaml"
 MQ_FILE="${SCRIPT_DIR}/compose-mq-${MQ}.yaml"
 SCENARIO_FILE="${SCRIPT_DIR}/compose-scenario-${SCENARIO}.yaml"
+SCENARIO_FILES=()
 APP_FILE="${SCRIPT_DIR}/compose-app-bytedesk.yaml"
 APP_MQ_FILE="${SCRIPT_DIR}/compose-app-mq-${MQ}.yaml"
 CALL_DB_FILE=""
 
-if [[ "${SCENARIO}" == "call" ]]; then
+case "${SCENARIO}" in
+  call-webrtc)
+    SCENARIO_FILES+=(
+      "${SCRIPT_DIR}/compose-scenario-call.yaml"
+      "${SCRIPT_DIR}/compose-scenario-webrtc.yaml"
+    )
+    ;;
+  *)
+    SCENARIO_FILES+=("${SCENARIO_FILE}")
+    ;;
+esac
+
+if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
   case "${DB}" in
     mysql|postgresql)
       CALL_DB_FILE="${SCRIPT_DIR}/compose-call-db-${DB}.yaml"
@@ -73,7 +87,7 @@ if [[ "${SCENARIO}" == "call" ]]; then
   esac
 fi
 
-for file in "${BASE_FILE}" "${DB_FILE}" "${MQ_FILE}" "${SCENARIO_FILE}"; do
+for file in "${BASE_FILE}" "${DB_FILE}" "${MQ_FILE}" "${SCENARIO_FILES[@]}"; do
   if [[ ! -f "${file}" ]]; then
     echo "[ERROR] Missing compose file: ${file}"
     exit 1
@@ -96,8 +110,11 @@ compose_files=(
   -f "${BASE_FILE}"
   -f "${DB_FILE}"
   -f "${MQ_FILE}"
-  -f "${SCENARIO_FILE}"
 )
+
+for file in "${SCENARIO_FILES[@]}"; do
+  compose_files+=( -f "${file}" )
+done
 
 if [[ -n "${CALL_DB_FILE}" ]]; then
   compose_files+=( -f "${CALL_DB_FILE}" )

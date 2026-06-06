@@ -48,6 +48,16 @@ public class ApnsTokenEntity extends BaseEntity {
     @Column(name = "device_token", length = 512, nullable = false)
     private String token;
 
+    /**
+     * Binds this token to a specific APNS p12 certificate uid.
+     */
+    @Column(name = "p12_uid")
+    private String p12Uid;
+
+    @Builder.Default
+    @Column(name = "environment", length = 32)
+    private String environment = ApnsTokenEnvironmentEnum.DEVELOPMENT.name();
+
     @Builder.Default
     @Column(name = "apns_token_type")
     private String type = ApnsTokenTypeEnum.IOS.name();

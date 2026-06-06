@@ -1,6 +1,9 @@
 package com.bytedesk.call.call_settings;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -87,6 +90,48 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
     }
 
     @Transactional
+    public void disableByTargetForOrg(String target, String orgUid) {
+        if (!StringUtils.hasText(target) || !StringUtils.hasText(orgUid)) {
+            return;
+        }
+
+        String targetExtension = extractExtensionNo(target);
+        if (!StringUtils.hasText(targetExtension)) {
+            return;
+        }
+
+        List<CallSettingsEntity> settingsList = callSettingsRepository.findAllByOrgUidAndDeletedFalse(orgUid.trim());
+        for (CallSettingsEntity settings : settingsList) {
+            String settingsExtension = extractExtensionNo(settings.getTarget());
+            if (targetExtension.equals(settingsExtension) && !Boolean.FALSE.equals(settings.getEnabled())) {
+                settings.setEnabled(false);
+                callSettingsRepository.save(settings);
+            }
+        }
+    }
+
+    @Transactional
+    public void syncRegistrationStatus(String extensionNo, String registrationUser, String orgUid, String registrationStatus) {
+        if (!StringUtils.hasText(orgUid)) {
+            return;
+        }
+
+        Set<String> extensionCandidates = buildExtensionCandidates(extensionNo, registrationUser);
+        if (extensionCandidates.isEmpty()) {
+            return;
+        }
+
+        List<CallSettingsEntity> settingsList = callSettingsRepository.findAllByOrgUidAndDeletedFalse(orgUid.trim());
+        for (CallSettingsEntity settings : settingsList) {
+            String settingsExtension = extractExtensionNo(settings.getTarget());
+            if (StringUtils.hasText(settingsExtension) && extensionCandidates.contains(settingsExtension)) {
+                settings.setRegistrationStatus(normalizeNullable(registrationStatus));
+                callSettingsRepository.save(settings);
+            }
+        }
+    }
+
+    @Transactional
     @Override
     public CallSettingsResponse create(CallSettingsRequest request) {
         if (!StringUtils.hasText(request.getAgentUid())) {
@@ -124,9 +169,13 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
                 String originalTransferTargetNumbers = entity.getTransferTargetNumbers();
                 String originalConferenceTargetNumbers = entity.getConferenceTargetNumbers();
                 String originalIvrTargetNumbers = entity.getIvrTargetNumbers();
+                Boolean originalSignedIn = entity.getSignedIn();
                 modelMapper.map(request, entity);
                 entity.setId(originalId);
                 entity.setUid(originalUid);
+                if (request.getSignedIn() == null) {
+                    entity.setSignedIn(originalSignedIn);
+                }
                 if (request.getHoldMediaUrl() == null) {
                     entity.setHoldMediaUrl(originalHoldMediaUrl);
                 }
@@ -163,9 +212,13 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
                 String originalTransferTargetNumbers = entity.getTransferTargetNumbers();
                 String originalConferenceTargetNumbers = entity.getConferenceTargetNumbers();
                 String originalIvrTargetNumbers = entity.getIvrTargetNumbers();
+                Boolean originalSignedIn = entity.getSignedIn();
                 modelMapper.map(request, entity);
                 entity.setId(originalId);
                 entity.setUid(originalUid);
+                if (request.getSignedIn() == null) {
+                    entity.setSignedIn(originalSignedIn);
+                }
                 if (request.getHoldMediaUrl() == null) {
                     entity.setHoldMediaUrl(originalHoldMediaUrl);
                 }
@@ -199,6 +252,33 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
         return callSettingsRepository.save(entity);
     }
 
+    @Transactional
+    public CallSettingsResponse updateSignedIn(CallSettingsRequest request) {
+        if (request.getSignedIn() == null) {
+            throw new RuntimeException("signedIn is required");
+        }
+
+        Optional<CallSettingsEntity> existing = Optional.empty();
+        if (StringUtils.hasText(request.getUid())) {
+            existing = findByUid(request.getUid());
+        }
+        if (existing.isEmpty() && StringUtils.hasText(request.getAgentUid())) {
+            existing = findByAgentUid(request.getAgentUid());
+        }
+
+        CallSettingsEntity entity = existing.orElseThrow(() -> new RuntimeException("Call settings not found"));
+        entity.setSignedIn(Boolean.TRUE.equals(request.getSignedIn()));
+        if (!Boolean.TRUE.equals(entity.getSignedIn())) {
+            entity.setRegistrationStatus(null);
+        }
+        applyAuditContext(entity, request);
+        CallSettingsEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Update call settings signed in state failed");
+        }
+        return convertToResponse(savedEntity);
+    }
+
     @Override
     public CallSettingsEntity handleOptimisticLockingFailureException(
         ObjectOptimisticLockingFailureException e,
@@ -210,9 +290,13 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
                 CallSettingsEntity latestEntity = latest.get();
                 latestEntity.setAgentUid(entity.getAgentUid());
                 latestEntity.setEnabled(entity.getEnabled());
+                latestEntity.setSignedIn(entity.getSignedIn());
+                latestEntity.setMobileOutboundEnabled(entity.getMobileOutboundEnabled());
+                latestEntity.setMobilePhoneNumber(normalizeNullable(entity.getMobilePhoneNumber()));
                 latestEntity.setNumber(entity.getNumber());
                 latestEntity.setDisplayName(entity.getDisplayName());
                 latestEntity.setTarget(entity.getTarget());
+                latestEntity.setRegistrationStatus(entity.getRegistrationStatus());
                 latestEntity.setHoldMediaUrl(normalizeHoldMediaUrl(entity.getHoldMediaUrl()));
                 latestEntity.setConsultExtensionNumbers(normalizeString(entity.getConsultExtensionNumbers(), DEFAULT_CONSULT_EXTENSION_NUMBERS));
                 latestEntity.setTransferTargetNumbers(normalizeString(entity.getTransferTargetNumbers(), DEFAULT_TRANSFER_TARGET_NUMBERS));
@@ -306,6 +390,9 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
     }
 
     private void normalizeCallControlSettings(CallSettingsEntity entity) {
+        entity.setSignedIn(Boolean.TRUE.equals(entity.getSignedIn()));
+        entity.setMobileOutboundEnabled(Boolean.TRUE.equals(entity.getMobileOutboundEnabled()));
+        entity.setMobilePhoneNumber(normalizeNullable(entity.getMobilePhoneNumber()));
         entity.setHoldMediaUrl(normalizeHoldMediaUrl(entity.getHoldMediaUrl()));
         entity.setConsultExtensionNumbers(normalizeString(entity.getConsultExtensionNumbers(), DEFAULT_CONSULT_EXTENSION_NUMBERS));
         entity.setTransferTargetNumbers(normalizeString(entity.getTransferTargetNumbers(), DEFAULT_TRANSFER_TARGET_NUMBERS));
@@ -318,5 +405,38 @@ public class CallSettingsRestService extends BaseRestServiceWithExport<CallSetti
             return defaultValue;
         }
         return value.trim();
+    }
+
+    private String normalizeNullable(String value) {
+        return StringUtils.hasText(value) ? value.trim() : null;
+    }
+
+    private Set<String> buildExtensionCandidates(String extensionNo, String registrationUser) {
+        Set<String> candidates = new LinkedHashSet<>();
+        addExtensionCandidate(candidates, extensionNo);
+        addExtensionCandidate(candidates, registrationUser);
+        addExtensionCandidate(candidates, extractExtensionNo(registrationUser));
+        return candidates;
+    }
+
+    private void addExtensionCandidate(Set<String> candidates, String value) {
+        if (StringUtils.hasText(value)) {
+            candidates.add(value.trim());
+        }
+    }
+
+    private String extractExtensionNo(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        String normalized = value.trim();
+        if (normalized.regionMatches(true, 0, "sip:", 0, 4)) {
+            normalized = normalized.substring(4);
+        }
+        int atIndex = normalized.indexOf('@');
+        if (atIndex > 0) {
+            normalized = normalized.substring(0, atIndex);
+        }
+        return normalized;
     }
 }

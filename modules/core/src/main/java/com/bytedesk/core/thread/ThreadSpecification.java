@@ -24,6 +24,8 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -121,7 +123,19 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     criteriaBuilder.like(root.get("monitors"), "%" + userUid + "%"),
                     criteriaBuilder.like(root.get("assistants"), "%" + userUid + "%"),
                     criteriaBuilder.like(root.get("ticketors"), "%" + userUid + "%"));
-            predicates.add(participatedPredicate);
+
+            Predicate robotingWorkgroupPredicate = criteriaBuilder.disjunction();
+            if (StringUtils.hasText(orgUid)) {
+                robotingWorkgroupPredicate = criteriaBuilder.and(
+                        criteriaBuilder.equal(root.get("orgUid"), orgUid),
+                        criteriaBuilder.equal(root.get("type"), ThreadTypeEnum.WORKGROUP.name()),
+                        criteriaBuilder.equal(root.get("status"), ThreadProcessStatusEnum.ROBOTING.name()));
+            }
+
+            Predicate visibleToCurrentAgentPredicate = criteriaBuilder.or(
+                    participatedPredicate,
+                    robotingWorkgroupPredicate);
+            predicates.add(visibleToCurrentAgentPredicate);
 
             // 合并相同 topic，仅取参与范围内 updatedAt 最新的一条
             Subquery<ZonedDateTime> maxDateSubquery = query.subquery(ZonedDateTime.class);
@@ -138,11 +152,23 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     criteriaBuilder.like(subRoot.get("assistants"), "%" + userUid + "%"),
                     criteriaBuilder.like(subRoot.get("ticketors"), "%" + userUid + "%"));
 
+            Predicate subRobotingWorkgroupPredicate = criteriaBuilder.disjunction();
+            if (StringUtils.hasText(orgUid)) {
+                subRobotingWorkgroupPredicate = criteriaBuilder.and(
+                        criteriaBuilder.equal(subRoot.get("orgUid"), orgUid),
+                        criteriaBuilder.equal(subRoot.get("type"), ThreadTypeEnum.WORKGROUP.name()),
+                        criteriaBuilder.equal(subRoot.get("status"), ThreadProcessStatusEnum.ROBOTING.name()));
+            }
+
+            Predicate subVisibleToCurrentAgentPredicate = criteriaBuilder.or(
+                    subParticipatedPredicate,
+                    subRobotingWorkgroupPredicate);
+
             List<Predicate> subPredicates = new ArrayList<>();
             subPredicates.add(criteriaBuilder.equal(subRoot.get("deleted"), false));
             subPredicates.add(criteriaBuilder.equal(subRoot.get("hide"), false));
             subPredicates.add(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
-            subPredicates.add(subParticipatedPredicate);
+            subPredicates.add(subVisibleToCurrentAgentPredicate);
             if (StringUtils.hasText(orgUid)) {
                 subPredicates.add(
                         criteriaBuilder.or(
@@ -187,20 +213,22 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                         criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
-                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query,
+                        criteriaBuilder);
                 predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
             }
 
             // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
             if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
-                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root,
+                        query, criteriaBuilder);
                 if (messageOnly != null) {
                     predicates.add(messageOnly);
                 }
             }
 
             query.orderBy(criteriaBuilder.desc(root.get("updatedAt")));
-            
+
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -257,20 +285,22 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             if (StringUtils.hasText(request.getSearchText())) {
                 String searchText = request.getSearchText();
                 Predicate threadMatch = criteriaBuilder.or(
-                    criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("agent"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("robot"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("workgroup"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
-                    criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
-                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                        criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("agent"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("robot"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("workgroup"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query,
+                        criteriaBuilder);
                 predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
             }
 
             // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
             if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
-                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root,
+                        query, criteriaBuilder);
                 if (messageOnly != null) {
                     predicates.add(messageOnly);
                 }
@@ -280,7 +310,6 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
-
 
     public static Specification<ThreadEntity> search(ThreadRequest request, AuthService authService) {
         // log.info("request: {}", request);
@@ -306,7 +335,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     predicates.add(criteriaBuilder.or(topicPredicates.toArray(new Predicate[0])));
                 }
             }
-            
+
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
@@ -366,26 +395,30 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 orPredicates.add(criteriaBuilder.like(root.get("user"), "%" + searchText + "%"));
 
                 // 同时搜索消息内容：message.content 命中则返回关联会话（并集）
-                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query, criteriaBuilder);
+                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query,
+                        criteriaBuilder);
                 if (messageMatch != null) {
                     orPredicates.add(messageMatch);
                 }
 
                 // 添加拼音搜索
-                // orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" + pinyinText + "%"));
-                // orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" + pinyinText + "%"));
+                // orPredicates.add(criteriaBuilder.like(root.get("contentPinyin"), "%" +
+                // pinyinText + "%"));
+                // orPredicates.add(criteriaBuilder.like(root.get("userPinyin"), "%" +
+                // pinyinText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }
 
             // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
             if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
-                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root, query, criteriaBuilder);
+                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root,
+                        query, criteriaBuilder);
                 if (messageOnly != null) {
                     predicates.add(messageOnly);
                 }
             }
-            
+
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };

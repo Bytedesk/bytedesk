@@ -13,6 +13,9 @@
  */
 package com.bytedesk.core.push.apns_token;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -28,9 +31,13 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.push.apns_p12.ApnsP12Entity;
+import com.bytedesk.core.push.apns_p12.ApnsP12Repository;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +54,12 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final UserRepository userRepository;
+
+    private final OrganizationRepository organizationRepository;
+
+    private final ApnsP12Repository apnsP12Repository;
     
     private final PermissionService permissionService;
     
@@ -79,6 +92,11 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
     @Cacheable(value = "apns_token", key = "#token", unless="#result==null")
     public Optional<ApnsTokenEntity> findByToken(String token) {
         return apnsTokenRepository.findByTokenAndDeletedFalse(token);
+    }
+
+    @Cacheable(value = "apns_token_user", key = "#userUid", unless="#result==null || #result.isEmpty()")
+    public List<ApnsTokenEntity> findByUserUid(String userUid) {
+        return apnsTokenRepository.findByUserUidAndDeletedFalse(userUid);
     }
 
     public Boolean existsByUid(String uid) {
@@ -119,6 +137,60 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
         save(entity);
     }
 
+    public Boolean isCurrentUserTokenRegistered(ApnsTokenRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new RuntimeException("unauthorized");
+        }
+
+        request.setUserUid(user.getUid());
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            request.setOrgUid(user.getOrgUid());
+        }
+        if (!StringUtils.hasText(request.getType())) {
+            request.setType(ApnsTokenTypeEnum.IOS.name());
+        }
+
+        boolean hasToken = StringUtils.hasText(request.getToken());
+        boolean hasAppBinding = StringUtils.hasText(request.getP12Uid()) || StringUtils.hasText(request.getBundleId());
+        if (!hasToken && !hasAppBinding) {
+            throw new IllegalArgumentException("token or bundleId or p12Uid is required");
+        }
+
+        if (hasAppBinding) {
+            resolveP12Binding(request);
+            normalizeEnvironment(request);
+        }
+
+        if (hasToken) {
+            Optional<ApnsTokenEntity> existing = findByToken(request.getToken());
+            if (existing.isEmpty()) {
+                return false;
+            }
+
+            ApnsTokenEntity entity = existing.get();
+            if (!Objects.equals(user.getUid(), entity.getUserUid())) {
+                return false;
+            }
+            if (StringUtils.hasText(request.getType()) && !request.getType().equalsIgnoreCase(entity.getType())) {
+                return false;
+            }
+            if (StringUtils.hasText(request.getP12Uid()) && !Objects.equals(request.getP12Uid(), entity.getP12Uid())) {
+                return false;
+            }
+            if (StringUtils.hasText(request.getEnvironment()) && !request.getEnvironment().equalsIgnoreCase(entity.getEnvironment())) {
+                return false;
+            }
+            return true;
+        }
+
+        if (!StringUtils.hasText(request.getP12Uid())) {
+            return false;
+        }
+
+        return apnsTokenRepository.existsByUserUidAndP12UidAndDeletedFalse(user.getUid(), request.getP12Uid());
+    }
+
     @Transactional
     public ApnsTokenResponse createSystemApnsToken(ApnsTokenRequest request) {
         return createInternal(request, true);
@@ -156,8 +228,10 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(ApnsTokenPermissions.MODULE_NAME, level)) {
             throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
-        
-        // 
+
+        resolveP12Binding(request);
+        normalizeEnvironment(request);
+
         ApnsTokenEntity entity = modelMapper.map(request, ApnsTokenEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
@@ -188,12 +262,16 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
         if (!StringUtils.hasText(request.getType())) {
             request.setType("IOS");
         }
+        resolveP12Binding(request);
+        normalizeEnvironment(request);
 
         Optional<ApnsTokenEntity> existing = findByToken(request.getToken());
         if (existing.isPresent()) {
             ApnsTokenEntity entity = existing.get();
             entity.setUserUid(request.getUserUid());
             entity.setOrgUid(request.getOrgUid());
+            entity.setP12Uid(request.getP12Uid());
+            entity.setEnvironment(request.getEnvironment());
             entity.setType(request.getType());
             entity.setLevel(request.getLevel());
             entity.setPlatform(request.getPlatform());
@@ -217,9 +295,99 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
         }
     }
 
+    private void resolveP12Binding(ApnsTokenRequest request) {
+        if (StringUtils.hasText(request.getP12Uid())) {
+            return;
+        }
+
+        if (!StringUtils.hasText(request.getBundleId()) || !StringUtils.hasText(request.getOrgUid())) {
+            return;
+        }
+
+        if (StringUtils.hasText(request.getEnvironment())) {
+            Boolean sandbox = toSandbox(request.getEnvironment());
+            if (sandbox != null) {
+                apnsP12Repository.findByBundleIdAndOrgUidAndSandboxAndDeletedFalse(
+                        request.getBundleId(),
+                        request.getOrgUid(),
+                        sandbox)
+                    .ifPresent(apnsP12 -> applyP12Binding(request, apnsP12));
+            }
+            return;
+        }
+
+        List<ApnsP12Entity> candidates = apnsP12Repository.findByBundleIdAndOrgUidAndEnabledTrueAndDeletedFalse(
+            request.getBundleId(),
+            request.getOrgUid());
+        if (candidates.size() == 1) {
+            applyP12Binding(request, candidates.get(0));
+            return;
+        }
+
+        List<ApnsP12Entity> exactCandidates = new ArrayList<>();
+        for (ApnsP12Entity candidate : candidates) {
+            if (Boolean.TRUE.equals(candidate.getSandbox()) || Boolean.FALSE.equals(candidate.getSandbox())) {
+                exactCandidates.add(candidate);
+            }
+        }
+        if (exactCandidates.size() == 1) {
+            applyP12Binding(request, exactCandidates.get(0));
+            return;
+        }
+
+        if (candidates.size() > 1) {
+            log.warn("APNs token bundleId {} matched multiple enabled p12 configs in org {}, environment is required to disambiguate",
+                request.getBundleId(), request.getOrgUid());
+            throw new IllegalArgumentException("environment is required when bundleId matches multiple APNS certificates");
+        }
+    }
+
+    private void normalizeEnvironment(ApnsTokenRequest request) {
+        if (StringUtils.hasText(request.getEnvironment())) {
+            return;
+        }
+
+        if (StringUtils.hasText(request.getP12Uid())) {
+            Optional<ApnsP12Entity> apnsP12Optional = apnsP12Repository.findByUid(request.getP12Uid());
+            if (apnsP12Optional.isPresent()) {
+                request.setEnvironment(Boolean.TRUE.equals(apnsP12Optional.get().getSandbox())
+                    ? "DEVELOPMENT"
+                    : "PRODUCTION");
+                return;
+            }
+        }
+
+        request.setEnvironment("DEVELOPMENT");
+    }
+
+    private Boolean toSandbox(String environment) {
+        if (!StringUtils.hasText(environment)) {
+            return null;
+        }
+
+        if ("DEVELOPMENT".equalsIgnoreCase(environment) || "SANDBOX".equalsIgnoreCase(environment)) {
+            return Boolean.TRUE;
+        }
+
+        if ("PRODUCTION".equalsIgnoreCase(environment)) {
+            return Boolean.FALSE;
+        }
+
+        return null;
+    }
+
+    private void applyP12Binding(ApnsTokenRequest request, ApnsP12Entity apnsP12) {
+        request.setP12Uid(apnsP12.getUid());
+        request.setEnvironment(Boolean.TRUE.equals(apnsP12.getSandbox())
+            ? "DEVELOPMENT"
+            : "PRODUCTION");
+    }
+
     @Transactional
     @Override
     public ApnsTokenResponse update(ApnsTokenRequest request) {
+        resolveP12Binding(request);
+        normalizeEnvironment(request);
         Optional<ApnsTokenEntity> optional = apnsTokenRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ApnsTokenEntity entity = optional.get();
@@ -255,6 +423,8 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
                 ApnsTokenEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setToken(entity.getToken());
+                latestEntity.setP12Uid(entity.getP12Uid());
+                latestEntity.setEnvironment(entity.getEnvironment());
                 latestEntity.setType(entity.getType());
                 latestEntity.setUserUid(entity.getUserUid());
                 latestEntity.setOrgUid(entity.getOrgUid());
@@ -297,7 +467,17 @@ public class ApnsTokenRestService extends BaseRestServiceWithExport<ApnsTokenEnt
 
     @Override
     public ApnsTokenResponse convertToResponse(ApnsTokenEntity entity) {
-        return modelMapper.map(entity, ApnsTokenResponse.class);
+        ApnsTokenResponse response = modelMapper.map(entity, ApnsTokenResponse.class);
+
+        if (StringUtils.hasText(entity.getUserUid())) {
+            userRepository.findByUid(entity.getUserUid()).ifPresent(user -> response.setUserNickname(user.getNickname()));
+        }
+
+        if (StringUtils.hasText(entity.getOrgUid())) {
+            organizationRepository.findByUid(entity.getOrgUid()).ifPresent(org -> response.setOrgName(org.getName()));
+        }
+
+        return response;
     }
 
     @Override

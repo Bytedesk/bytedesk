@@ -34,6 +34,7 @@
 - `51-jpa-web-actuator.properties`
 - `60-mq-mail-quartz.properties`
 - `70-ai-batch-liquibase.properties`
+- `75-mcp.properties`
 - `80-flowable-log.properties`
 - `90-thirdparty-cloud.properties`
 - `99-docker-compose.properties`

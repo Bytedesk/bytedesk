@@ -1,0 +1,1 @@
+import e from"./request-Std2a46-.js";function t(t){return e({url:`/visitor/api/feedback/submit`,method:`post`,data:t})}export{t as submitFeedback};

@@ -29,6 +29,7 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -47,6 +48,8 @@ public class ApnsP12RestService extends BaseRestServiceWithExport<ApnsP12Entity,
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final OrganizationRepository organizationRepository;
     
     private final PermissionService permissionService;
     
@@ -222,7 +225,13 @@ public class ApnsP12RestService extends BaseRestServiceWithExport<ApnsP12Entity,
 
     @Override
     public ApnsP12Response convertToResponse(ApnsP12Entity entity) {
-        return modelMapper.map(entity, ApnsP12Response.class);
+        ApnsP12Response response = modelMapper.map(entity, ApnsP12Response.class);
+
+        if (StringUtils.hasText(entity.getOrgUid())) {
+            organizationRepository.findByUid(entity.getOrgUid()).ifPresent(org -> response.setOrgName(org.getName()));
+        }
+
+        return response;
     }
 
     @Override

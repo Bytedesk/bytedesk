@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.domain.Pageable;
 
 @Data
 @SuperBuilder
@@ -33,8 +34,38 @@ public class ApnsPushRequest extends BaseRequest {
 
     private String name;
 
+    private String sender;
+
+    private String receiver;
+
+    private String deviceToken;
+
+    private String p12Uid;
+
+    private String bundleId;
+
+    private String messageUid;
+
+    private String threadUid;
+
+    private String content;
+
     private String description;
 
-    // @Builder.Default
-    // private String type = ApnsPushTypeEnum.CUSTOMER.name();
+    private String type;
+
+    private String status;
+
+    private String channel;
+
+    private Boolean sandbox;
+
+    private Boolean sendSuccess;
+
+    private String sendMessage;
+
+    @Override
+	public Pageable getPageable() {
+		return super.getPageable();
+	}
 }

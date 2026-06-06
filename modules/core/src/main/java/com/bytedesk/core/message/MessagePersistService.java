@@ -27,6 +27,7 @@ import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
+import com.bytedesk.core.redis.RedisService;
 
 import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
@@ -37,11 +38,15 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessagePersistService {
 
+    private static final long RECEIPT_DEDUP_TTL_SECONDS = 300L;
+
     private final MessageRestService messageRestService;
 
     private final ThreadRestService threadRestService;
 
     private final ModelMapper modelMapper;
+
+    private final RedisService redisService;
 
     public void persist(String messageJSON) {
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
@@ -230,9 +235,16 @@ public class MessagePersistService {
     // 处理消息回执
     private void dealWithMessageReceipt(MessageTypeEnum type, @Nonnull MessageProtobuf message) {
         log.info("dealWithMessageReceipt: {}, content: {}", type, message.getContent());
+        String receiptContent = message.getContent();
+        String receiptDedupKey = type.name() + ":" + receiptContent;
+        if (!redisService.tryMarkMessageReceiptProcessed(receiptDedupKey, RECEIPT_DEDUP_TTL_SECONDS)) {
+            log.debug("skip duplicate message receipt: type {}, targetMessageUid {}, receiptUid {}",
+                    type, receiptContent, message.getUid());
+            return;
+        }
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
-        Optional<MessageEntity> messageOpt = messageRestService.findByUid(message.getContent());
+        Optional<MessageEntity> messageOpt = messageRestService.findByUid(receiptContent);
         if (messageOpt.isPresent() && !MessageStatusEnum.READ.name().equals(messageOpt.get().getStatus())) {
             MessageEntity messageEntity = messageOpt.get();
             // 直接设置状态，避免重复判断

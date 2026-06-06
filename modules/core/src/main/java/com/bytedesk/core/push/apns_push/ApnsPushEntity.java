@@ -14,7 +14,8 @@
 package com.bytedesk.core.push.apns_push;
 
 import com.bytedesk.core.base.BaseEntity;
-import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.push.PushStatusEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
@@ -28,11 +29,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * ApnsPush entity for content categorization and organization
- * Provides apns_pushging functionality for various system entities
- * 
- * Database Table: bytedesk_core_apns_push
- * Purpose: Stores apns_push definitions, colors, and organization settings
+ * APNS push delivery record.
  */
 @Entity
 @Data
@@ -47,22 +44,60 @@ public class ApnsPushEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Name of the apns_push
-     */
+    /** Push title shown in notification center. */
     private String name;
 
-    /**
-     * Description of the apns_push
-     */
-    @Builder.Default
-    private String description = I18Consts.I18N_DESCRIPTION;
+    /** Sender display name / uid. */
+    private String sender;
 
-    /**
-     * Type of apns_push (CUSTOMER, TICKET, ARTICLE, etc.)
-     */
+    /** Receiver user uid. */
+    private String receiver;
+
+    /** Receiver device token. */
+    @Column(name = "device_token", length = 512)
+    private String deviceToken;
+
+    /** Bound APNS certificate uid. */
+    @Column(name = "p12_uid")
+    private String p12Uid;
+
+    /** APNS bundle identifier used for this push. */
+    @Column(name = "bundle_id")
+    private String bundleId;
+
+    /** Message uid that triggered this push. */
+    @Column(name = "message_uid")
+    private String messageUid;
+
+    /** Thread uid for the message conversation. */
+    @Column(name = "thread_uid")
+    private String threadUid;
+
+    /** Serialized message content used in APNS payload. */
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    /** Additional note / failure reason. */
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    /** Record type / business source. */
     @Builder.Default
     @Column(name = "apns_push_type")
-    private String type = ApnsPushTypeEnum.CUSTOMER.name();
+    private String type = ApnsPushTypeEnum.MESSAGE.name();
+
+    @Builder.Default
+    @Column(name = "push_status")
+    private String status = PushStatusEnum.PENDING.name();
+
+    @Builder.Default
+    private String channel = ChannelEnum.IOS.name();
+
+    private Boolean sandbox;
+
+    private Boolean sendSuccess;
+
+    @Column(columnDefinition = "TEXT")
+    private String sendMessage;
 
 }

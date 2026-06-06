@@ -48,6 +48,8 @@ public interface PushRepository extends JpaRepository<PushEntity, Long>, JpaSpec
     Optional<PushEntity> findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(String deviceUid, String status,
             String type);
 
+    Optional<PushEntity> findTopByDeviceUidAndTypeOrderByUpdatedAtDesc(String deviceUid, String type);
+
     Optional<PushEntity> findByDeviceUidAndContent(String deviceUid, String code);
 
     Boolean existsByStatusAndTypeAndReceiver(String status, String type, String receiver);

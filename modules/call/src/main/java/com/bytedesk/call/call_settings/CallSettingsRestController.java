@@ -84,6 +84,13 @@ public class CallSettingsRestController extends BaseRestController<CallSettingsR
         return ResponseEntity.ok(JsonResult.success(callSettingsRestService.update(request)));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CALL_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update call settings signed in state")
+    @Operation(summary = "Update call settings signed in state")
+    @PostMapping("/update/signed-in")
+    public ResponseEntity<?> updateSignedIn(@RequestBody CallSettingsRequest request) {
+        return ResponseEntity.ok(JsonResult.success(callSettingsRestService.updateSignedIn(request)));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_CALL_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete call settings")
     @Operation(summary = "Delete call settings")
     @PreAuthorize(CallSettingsPermissions.HAS_CALL_SETTINGS_DELETE)

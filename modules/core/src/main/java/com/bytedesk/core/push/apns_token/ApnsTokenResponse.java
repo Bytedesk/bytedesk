@@ -35,6 +35,14 @@ public class ApnsTokenResponse extends BaseResponse {
 
     private String token;
 
+    private String p12Uid;
+
+    private String environment;
+
     private String type;
+
+    private String userNickname;
+
+    private String orgName;
 
 }

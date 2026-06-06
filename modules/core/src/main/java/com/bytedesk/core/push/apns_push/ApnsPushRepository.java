@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.push.apns_push;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,8 @@ public interface ApnsPushRepository extends JpaRepository<ApnsPushEntity, Long>,
     Boolean existsByUid(String uid);
 
     Optional<ApnsPushEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+
+    List<ApnsPushEntity> findByMessageUidAndDeletedFalse(String messageUid);
 
     // Boolean existsByPlatform(String platform);
 }

@@ -43,9 +43,21 @@ public class ApnsPushSpecification extends BaseSpecification<ApnsPushEntity, Apn
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
+            if (StringUtils.hasText(request.getReceiver())) {
+                predicates.add(criteriaBuilder.equal(root.get("receiver"), request.getReceiver()));
+            }
+            if (StringUtils.hasText(request.getMessageUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("messageUid"), request.getMessageUid()));
+            }
+            if (StringUtils.hasText(request.getP12Uid())) {
+                predicates.add(criteriaBuilder.equal(root.get("p12Uid"), request.getP12Uid()));
+            }
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
             // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {

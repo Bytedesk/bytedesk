@@ -13,5 +13,7 @@ public interface CallSettingsRepository extends JpaRepository<CallSettingsEntity
 
     Optional<CallSettingsEntity> findByAgentUidAndDeletedFalse(String agentUid);
 
+    List<CallSettingsEntity> findAllByOrgUidAndDeletedFalse(String orgUid);
+
     List<CallSettingsEntity> findAllByTargetInAndEnabledTrueAndDeletedFalse(Collection<String> targets);
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260606-rename-apns-token-builder-id" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_token"/>
+            <columnExists tableName="bytedesk_core_apns_token" columnName="builder_id"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_token" columnName="p12_uid"/>
+            </not>
+        </preConditions>
+        <renameColumn tableName="bytedesk_core_apns_token" oldColumnName="builder_id" newColumnName="p12_uid" columnDataType="VARCHAR(64)"/>
+    </changeSet>
+
+    <changeSet id="260606-rename-apns-push-builder-id" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_push"/>
+            <columnExists tableName="bytedesk_core_apns_push" columnName="builder_id"/>
+            <not>
+                <columnExists tableName="bytedesk_core_apns_push" columnName="p12_uid"/>
+            </not>
+        </preConditions>
+        <renameColumn tableName="bytedesk_core_apns_push" oldColumnName="builder_id" newColumnName="p12_uid" columnDataType="VARCHAR(64)"/>
+    </changeSet>
+
+</databaseChangeLog>

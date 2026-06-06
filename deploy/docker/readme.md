@@ -109,6 +109,15 @@ cp .env.example .env
 ./stop.sh postgresql rabbitmq webrtc stop middleware
 ./stop.sh postgresql rabbitmq webrtc down middleware
 
+# 9) Call-center + WebRTC middleware scenarios (FreeSWITCH + coturn + janus)
+./start.sh mysql artemis call-webrtc middleware
+./stop.sh mysql artemis call-webrtc stop middleware
+./stop.sh mysql artemis call-webrtc down middleware
+
+./start.sh postgresql rabbitmq call-webrtc middleware
+./stop.sh postgresql rabbitmq call-webrtc stop middleware
+./stop.sh postgresql rabbitmq call-webrtc down middleware
+
 # production release (all: middleware + bytedesk app image)
 # 1) MySQL + Artemis + standard (default release combination)
 ./start.sh mysql artemis standard all
@@ -140,11 +149,17 @@ cp .env.example .env
 ./stop.sh mysql artemis webrtc stop all
 ./stop.sh mysql artemis webrtc down all
 
+# 7) PostgreSQL + Artemis + call-webrtc (call-center + audio/video customer service release)
+./start.sh postgresql artemis call-webrtc all
+./stop.sh postgresql artemis call-webrtc stop all
+./stop.sh postgresql artemis call-webrtc down all
+
 # quick reference:
 # db: mysql | postgresql | oracle | kingbase9
 # mq: artemis | rabbitmq
-# scenario: standard | noai | call | webrtc
-# note: call scenario supports mysql and postgresql only; webrtc scenario has no extra DB restriction
+# scenario: standard | noai | call | webrtc | call-webrtc
+# note: call/call-webrtc scenarios support mysql and postgresql only; webrtc scenario has no extra DB restriction
+# call-webrtc also supports the webrtc-call alias
 # target: middleware | all
 # action: stop (stop containers) | down (remove containers, keep volumes)
 
@@ -158,7 +173,7 @@ cp .env.example .env
 # for kingbase9: start.sh will auto ensure KINGBASE_DATABASE exists (create if missing)
 # for mysql+call: when FREESWITCH_DATABASE is empty, start.sh auto imports deploy/sql/freeswitch-1.10.12.sql;
 #                 if tables already exist, initialization is skipped to avoid re-running DROP TABLE statements.
-# when you need both FreeSWITCH and WebRTC, combine compose-scenario-call.yaml and compose-scenario-webrtc.yaml manually.
+# when you need both FreeSWITCH and WebRTC, use the call-webrtc scenario; scripts combine compose-scenario-call.yaml and compose-scenario-webrtc.yaml automatically.
 
 # start docker compose container, -f flag to specify file path, -d flag to start container in background mode
 # note: ollama is part of compose-base.yaml now

@@ -43,6 +43,10 @@ public class ApnsTokenSpecification extends BaseSpecification<ApnsTokenEntity, A
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
+            // environment
+            if (StringUtils.hasText(request.getEnvironment())) {
+                predicates.add(criteriaBuilder.equal(root.get("environment"), request.getEnvironment()));
+            }
             // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));

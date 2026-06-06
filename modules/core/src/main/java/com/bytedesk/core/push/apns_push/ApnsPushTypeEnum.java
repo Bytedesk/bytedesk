@@ -14,8 +14,5 @@
 package com.bytedesk.core.push.apns_push;
 
 public enum ApnsPushTypeEnum {
-    THREAD,
-    VISITOR,
-    CUSTOMER,
-    TICKET
+    MESSAGE,
 }

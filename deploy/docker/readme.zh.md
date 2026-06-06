@@ -120,6 +120,15 @@ cp .env.example .env
 ./stop.sh postgresql rabbitmq webrtc stop middleware
 ./stop.sh postgresql rabbitmq webrtc down middleware
 
+# 9) 呼叫中心 + WebRTC 中间件场景（FreeSWITCH + coturn + janus）
+./start.sh mysql artemis call-webrtc middleware
+./stop.sh mysql artemis call-webrtc stop middleware
+./stop.sh mysql artemis call-webrtc down middleware
+
+./start.sh postgresql rabbitmq call-webrtc middleware
+./stop.sh postgresql rabbitmq call-webrtc stop middleware
+./stop.sh postgresql rabbitmq call-webrtc down middleware
+
 # 线上发布（all，中间件 + bytedesk 应用镜像）
 # 1) MySQL + Artemis + 标准场景（默认发布组合）
 ./start.sh mysql artemis standard all
@@ -151,11 +160,17 @@ cp .env.example .env
 ./stop.sh mysql artemis webrtc stop all
 ./stop.sh mysql artemis webrtc down all
 
+# 7) PostgreSQL + Artemis + call-webrtc（呼叫中心 + 音视频客服发布）
+./start.sh postgresql artemis call-webrtc all
+./stop.sh postgresql artemis call-webrtc stop all
+./stop.sh postgresql artemis call-webrtc down all
+
 # 参数速查：
 # db: mysql | postgresql | oracle | kingbase9
 # mq: artemis | rabbitmq
-# scenario: standard | noai | call | webrtc
-# 注意：call 场景仅支持 mysql 与 postgresql；webrtc 场景无额外数据库限制
+# scenario: standard | noai | call | webrtc | call-webrtc
+# 注意：call/call-webrtc 场景仅支持 mysql 与 postgresql；webrtc 场景无额外数据库限制
+# call-webrtc 也支持别名 webrtc-call
 # target: middleware | all
 # action: stop(停止容器) | down(删除容器，保留卷)
 
@@ -168,7 +183,7 @@ cp .env.example .env
 # PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
 # mysql/postgresql/oracle/kingbase9 场景下：start.sh 会自动确保对应数据库存在（不存在则创建）
 # 默认数据库变量分别为：MYSQL_DATABASE / POSTGRES_DB / ORACLE_DATABASE / KINGBASE_DATABASE
-# 如需同时启用 FreeSWITCH 与 WebRTC，请手动组合 compose-scenario-call.yaml 与 compose-scenario-webrtc.yaml
+# 如需同时启用 FreeSWITCH 与 WebRTC，可使用 call-webrtc 场景，脚本会自动组合 compose-scenario-call.yaml 与 compose-scenario-webrtc.yaml
 
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
 # 说明：ollama 已经放到 compose-base.yaml 公共组件

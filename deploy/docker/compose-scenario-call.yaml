@@ -19,16 +19,16 @@ services:
       TZ: Asia/Shanghai
       DISABLE_IPV6: "true"
       # 默认分机密码（对应 vars.xml 的 default_password）
-      FREESWITCH_DEFAULT_PASSWORD: ${FREESWITCH_DEFAULT_PASSWORD:-12345679}
+      FREESWITCH_DEFAULT_PASSWORD: ${FREESWITCH_DEFAULT_PASSWORD:-123456}
       # SIP 注册/鉴权默认域名（对应 vars.xml 的 domain）
       FREESWITCH_DOMAIN: ${FREESWITCH_DOMAIN:-localhost}
       # 对外宣告给 SIP/SDP 的地址。局域网硬话机场景应固定为宿主机可达地址，避免容器 NAT/STUN 误判。
       FREESWITCH_EXTERNAL_SIP_IP: ${FREESWITCH_EXTERNAL_SIP_IP:-}
       FREESWITCH_EXTERNAL_RTP_IP: ${FREESWITCH_EXTERNAL_RTP_IP:-}
       # ESL 入站口令（与 vars.xml 的 esl_password 对应）
-      FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD}
+      FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD:-123456}
       # xml_cdr Basic 凭据密码
-      FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-bytedesk123}
+      FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-123456}
       # mod_xml_curl 鉴权 token（需与应用侧配置一致）
       FREESWITCH_XML_CURL_TOKEN: ${FREESWITCH_XML_CURL_TOKEN:-change_me_in_production}
       # mod_xml_curl 回源地址（与 XmlCurlController 统一：/freeswitch/api/v1/xmlcurl）

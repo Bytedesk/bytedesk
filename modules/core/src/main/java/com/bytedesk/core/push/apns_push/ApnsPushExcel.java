@@ -27,20 +27,28 @@ import lombok.Data;
 @Data
 public class ApnsPushExcel {
 
-    @ExcelProperty(index = 0, value = "标签名称")
+    @ExcelProperty(index = 0, value = "通知标题")
     @ColumnWidth(20)
     private String name;
 
-    @ExcelProperty(index = 1, value = "类型")
+    @ExcelProperty(index = 1, value = "接收用户")
     @ColumnWidth(20)
-    private String type;
+    private String receiver;
 
-    @ExcelProperty(index = 2, value = "颜色")
-    @ColumnWidth(20)
-    private String color;
+    @ExcelProperty(index = 2, value = "设备 Token")
+    @ColumnWidth(30)
+    private String deviceToken;
+
+    @ExcelProperty(index = 3, value = "状态")
+    @ColumnWidth(15)
+    private String status;
+
+    @ExcelProperty(index = 4, value = "发送结果")
+    @ColumnWidth(30)
+    private String sendMessage;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
-    @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
+    @ExcelProperty(index = 5, value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)
     private ZonedDateTime createdAt;
 

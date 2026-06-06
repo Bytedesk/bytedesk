@@ -55,6 +55,26 @@ public class CallSettingsEntity extends BaseEntity {
     private Boolean enabled = false;
 
     /**
+     * Whether the agent expects the softphone to stay signed in after page refresh.
+     */
+    @Builder.Default
+    @Column(name = "is_signed_in")
+    private Boolean signedIn = false;
+
+    /**
+     * Whether outbound calls should first dial the agent mobile phone.
+     */
+    @Builder.Default
+    @Column(name = "is_mobile_outbound_enabled")
+    private Boolean mobileOutboundEnabled = false;
+
+    /**
+     * Agent mobile phone number used for callback-style outbound calling.
+     */
+    @Column(name = "mobile_phone_number", length = 32)
+    private String mobilePhoneNumber;
+
+    /**
      * External phone number shown to users for inbound or outbound calls.
      * Example: hotline number, DID number, or displayed caller number.
      */
@@ -71,6 +91,12 @@ public class CallSettingsEntity extends BaseEntity {
      * Example: 1000, sip:1000@pbx.local.
      */
     private String target;
+
+    /**
+     * Current registration status synced from RegistrationEntity with the same extension number.
+     */
+    @Column(name = "registration_status", length = 64)
+    private String registrationStatus;
 
     /**
      * Hold media URL played to the customer side while the agent puts the call on hold.

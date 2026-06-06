@@ -35,8 +35,40 @@ public class ApnsPushResponse extends BaseResponse {
 
     private String name;
 
+    private String sender;
+
+    private String receiver;
+
+    private String receiverNickname;
+
+    private String deviceToken;
+
+    private String p12Uid;
+
+    private String p12Name;
+
+    private String bundleId;
+
+    private String messageUid;
+
+    private String threadUid;
+
+    private String content;
+
     private String description;
 
     private String type;
+
+    private String status;
+
+    private String channel;
+
+    private Boolean sandbox;
+
+    private Boolean sendSuccess;
+
+    private String sendMessage;
+
+    private String orgName;
 
 }

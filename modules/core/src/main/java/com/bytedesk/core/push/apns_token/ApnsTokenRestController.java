@@ -91,7 +91,7 @@ public class ApnsTokenRestController extends BaseRestController<ApnsTokenRequest
     }
 
     @ActionAnnotation(title = I18Consts.I18N_APNS_TOKEN, action = I18Consts.I18N_ACTION_CREATE, description = "register current user apns token")
-    @Operation(summary = "Register Current User APNs Token", description = "Create or update the APNs token bound to the current authenticated user")
+    @Operation(summary = "Register Current User APNs Token", description = "Create or update the APNs token bound to the current authenticated user. When p12Uid is omitted, the backend will try to resolve it from bundleId and orgUid; if both sandbox and production certificates exist for the same bundleId, the client must also provide environment.")
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody ApnsTokenRequest request) {
@@ -110,6 +110,17 @@ public class ApnsTokenRestController extends BaseRestController<ApnsTokenRequest
         apnsTokenRestService.unregisterCurrentUserToken(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_APNS_TOKEN, action = I18Consts.I18N_ACTION_QUERY_USER, description = "check whether current user ios app already registered apns token")
+    @Operation(summary = "Check Current User APNs Token Registration", description = "Check whether the current authenticated user has already registered an APNs token for the specified iOS app. The request can provide token directly, or provide p12Uid, or provide bundleId plus orgUid and optional environment for resolution.")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/is/registered")
+    public ResponseEntity<?> isRegistered(ApnsTokenRequest request) {
+
+        Boolean registered = apnsTokenRestService.isCurrentUserTokenRegistered(request);
+
+        return ResponseEntity.ok(JsonResult.success(registered));
     }
 
     @ActionAnnotation(title = I18Consts.I18N_APNS_TOKEN, action = I18Consts.I18N_ACTION_UPDATE, description = "update apns_token")
@@ -151,7 +162,6 @@ public class ApnsTokenRestController extends BaseRestController<ApnsTokenRequest
             "apns_token"
         );
     }
-
     
     
 }

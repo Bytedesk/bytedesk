@@ -58,7 +58,9 @@ Listed course START -->
 						<img src="/assets/images/element/online.svg" alt="<@t key='alt.download.macIcon'>Mac客户端下载图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-universal.dmg" class="stretched-link" target="_blank"><@t key="page.download.mac">Mac客户端</@t></a></h5>
+						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-universal.dmg" target="_blank"><@t key="page.download.mac">Mac 客户端(Electron)</@t></a></h5>
+						<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-qt-mac.dmg" target="_blank"><@t key="page.download.macQt">Mac 客户端(Qt 开发中)</@t></a></h5>
+						<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-flutter-macos.dmg" target="_blank"><@t key="page.download.macFlutter">Mac 客户端(Flutter 开发中)</@t></a></h5>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
@@ -114,7 +116,8 @@ Listed course START -->
 						<img src="/assets/images/element/contact.svg" alt="<@t key='alt.download.softphoneIcon'>微语软电话下载图标</@t>">
 					</div>
 					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/siphone-android.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话</@t></a></h5>
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/siphone-android.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话(安卓)</@t></a></h5>
+					<#--  <h5 class="mb-0"><a href="https://www.weiyuai.cn/download/siphone-flutter-macos.dmg" class="stretched-link" target="_blank"><@t key="page.download.softphone.macOS">微语软电话(Mac)</@t></a></h5>  -->
 					<a href="/assets/qr/qr_softphone.png" target="_blank">
 						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
 					</a>

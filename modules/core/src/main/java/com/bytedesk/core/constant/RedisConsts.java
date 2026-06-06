@@ -32,6 +32,14 @@ public class RedisConsts {
     public static final String AUTO_REPLY_PROCESSED_PREFIX = BYTEDESK_REDIS_PREFIX + "auto_reply_processed:";
     public static final String AUTO_REPLY_PROCESSED_VALUE = "1";
 
+    // 消息回执短窗口去重相关常量
+    public static final String MESSAGE_RECEIPT_PROCESSED_PREFIX = BYTEDESK_REDIS_PREFIX + "message_receipt_processed:";
+    public static final String MESSAGE_RECEIPT_PROCESSED_VALUE = "1";
+
+    // 已读未读删除短窗口去重相关常量
+    public static final String MESSAGE_READ_UNREAD_PROCESSED_PREFIX = BYTEDESK_REDIS_PREFIX + "message_read_unread_processed:";
+    public static final String MESSAGE_READ_UNREAD_PROCESSED_VALUE = "1";
+
     // 登录失败重试相关常量
     public static final String LOGIN_FAILED_PREFIX = BYTEDESK_REDIS_PREFIX + "login_failed:";
     public static final String LOGIN_LOCKED_PREFIX = BYTEDESK_REDIS_PREFIX + "login_locked:";

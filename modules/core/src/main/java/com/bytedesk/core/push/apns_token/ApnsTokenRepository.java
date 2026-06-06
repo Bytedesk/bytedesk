@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.push.apns_token;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,10 @@ public interface ApnsTokenRepository extends JpaRepository<ApnsTokenEntity, Long
     Boolean existsByUid(String uid);
 
     Optional<ApnsTokenEntity> findByTokenAndDeletedFalse(String token);
+
+    Boolean existsByUserUidAndP12UidAndDeletedFalse(String userUid, String p12Uid);
+
+    List<ApnsTokenEntity> findByUserUidAndDeletedFalse(String userUid);
 
     // Boolean existsByPlatform(String platform);
 }

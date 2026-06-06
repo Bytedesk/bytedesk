@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260602-add-call-recordings-audio-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_recordings" />
+                <not>
+                    <columnExists tableName="bytedesk_call_recordings" columnName="source_type" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_recordings">
+            <column name="source_type" type="varchar(32)" />
+            <column name="audio_url" type="varchar(1024)" />
+            <column name="audio_format" type="varchar(32)" />
+            <column name="text_content" type="varchar(4000)" />
+            <column name="language" type="varchar(32)" />
+            <column name="tts_model" type="varchar(128)" />
+            <column name="tts_voice" type="varchar(128)" />
+            <column name="interruptible" type="boolean" />
+            <column name="play_times" type="int" />
+        </addColumn>
+
+        <update tableName="bytedesk_call_recordings">
+            <column name="source_type" value="MANUAL" />
+            <where>source_type IS NULL</where>
+        </update>
+
+        <update tableName="bytedesk_call_recordings">
+            <column name="interruptible" valueBoolean="true" />
+            <where>interruptible IS NULL</where>
+        </update>
+
+        <update tableName="bytedesk_call_recordings">
+            <column name="play_times" valueNumeric="1" />
+            <where>play_times IS NULL OR play_times &lt; 1</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

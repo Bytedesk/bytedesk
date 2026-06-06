@@ -19,6 +19,7 @@ import java.util.Map;
  * the response index, message content, finish reason, and metadata.
  */
 @JsonDeserialize(using = AssistantChoiceDeserializer.class)
+@SuppressWarnings({ "all", "unchecked" })
 public class AssistantChoice extends ObjectNode {
 
 	/**
@@ -95,9 +96,10 @@ public class AssistantChoice extends ObjectNode {
 		while (fieldNames.hasNext()) {
 			String fieldName = fieldNames.next();
 			JsonNode field = objectNode.get(fieldName);
-			this.set(fieldName, field);
+			this.replace(fieldName, field);
 		}
 	}
+
 	// Getters and Setters
 
 	public int getIndex() {

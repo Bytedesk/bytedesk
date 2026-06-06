@@ -33,6 +33,12 @@ public class ApnsTokenRequest extends BaseRequest {
 
     private String token;
 
+    private String bundleId;
+
+    private String p12Uid;
+
+    private String environment;
+
     private String type;
 
 }

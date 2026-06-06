@@ -157,5 +157,36 @@ public class RedisService {
         String key = RedisConsts.AUTO_REPLY_PROCESSED_PREFIX + messageUid;
         return redisTemplate.opsForValue().get(key);
     }
+
+    public boolean tryMarkMessageReceiptProcessed(String receiptKey, long ttl) {
+        return tryMarkProcessed(
+            RedisConsts.MESSAGE_RECEIPT_PROCESSED_PREFIX,
+            RedisConsts.MESSAGE_RECEIPT_PROCESSED_VALUE,
+            receiptKey,
+            ttl
+        );
+    }
+
+    public boolean tryMarkMessageReadUnreadProcessed(String messageUid, long ttl) {
+        return tryMarkProcessed(
+            RedisConsts.MESSAGE_READ_UNREAD_PROCESSED_PREFIX,
+            RedisConsts.MESSAGE_READ_UNREAD_PROCESSED_VALUE,
+            messageUid,
+            ttl
+        );
+    }
+
+    private boolean tryMarkProcessed(String prefix, String value, String keyPart, long ttl) {
+        if (keyPart == null || keyPart.trim().isEmpty()) {
+            return true;
+        }
+        try {
+            String key = prefix + keyPart;
+            Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, ttl, TimeUnit.SECONDS);
+            return Boolean.TRUE.equals(result);
+        } catch (Exception e) {
+            return true;
+        }
+    }
     
 }

@@ -26,8 +26,29 @@
     <include file="db/changelog/migration/260522_add_call_settings_hold_media_url.xml" />
     <include file="db/changelog/migration/260522_add_acd_runtime_tables.xml" />
     <include file="db/changelog/migration/260523_add_call_settings_control_targets.xml" />
+    <include file="db/changelog/migration/260523_add_call_settings_registration_status.xml" />
+    <include file="db/changelog/migration/260523_add_extension_registration_status.xml" />
+    <include file="db/changelog/migration/260523_add_extension_lease_fields.xml" />
     <include file="db/changelog/migration/260523_rename_goods_order_keyword_columns.xml" />
     <include file="db/changelog/migration/260526_add_call_cdr_call_type.xml" />
     <include file="db/changelog/migration/260529_add_outbound_call_task_fields.xml" />
+    <include file="db/changelog/migration/260530_add_robot_workspace_agent_fields.xml" />
+    <include file="db/changelog/migration/260601_add_call_cdr_transcript_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_cdr_thread_uid.xml" />
+    <include file="db/changelog/migration/260602_add_call_recordings_audio_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_popup_iframe_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_settings_mobile_outbound_fields.xml" />
+    <include file="db/changelog/migration/260602_cleanup_extension_blank_name.xml" />
+    <include file="db/changelog/migration/260603_add_call_settings_signed_in.xml" />
+    <include file="db/changelog/migration/260603_add_call_task_transfer_and_ivr_fields.xml" />
+    <include file="db/changelog/migration/260604_add_time_condition_detail_table.xml" />
+    <include file="db/changelog/migration/260604_add_service_holiday_official_fields.xml" />
+    <include file="db/changelog/migration/260604_add_call_route_time_condition_uid.xml" />
+    <include file="db/changelog/migration/260604_add_ring_group_fields.xml" />
+    <include file="db/changelog/migration/260605_add_dialplan_generated_xml_cache_fields.xml" />
+    <include file="db/changelog/migration/260605_add_bridge_runtime_fields.xml" />
+    <include file="db/changelog/migration/260606_add_apns_push_record_fields.xml" />
+    <include file="db/changelog/migration/260606_add_apns_token_environment.xml" />
+    <include file="db/changelog/migration/260606_rename_apns_builder_id_to_p12_uid.xml" />
 
 </databaseChangeLog>

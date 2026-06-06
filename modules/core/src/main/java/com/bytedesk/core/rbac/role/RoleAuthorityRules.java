@@ -169,6 +169,8 @@ public final class RoleAuthorityRules {
     // queue (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String QUEUE_READ = "QUEUE_READ";
+    // public static final String QUEUE_CREATE = "QUEUE_CREATE";
+    public static final String QUEUE_UPDATE = "QUEUE_UPDATE";
 
     // 
     public static final String ROUTING_POOL_READ = "ROUTING_POOL_READ";
@@ -390,7 +392,9 @@ public final class RoleAuthorityRules {
             GOODS_CREATE,
             GOODS_UPDATE,
             GOODS_DELETE,
-            GOODS_EXPORT
+            GOODS_EXPORT,
+
+            QUEUE_UPDATE
         );
 
     public static boolean isKbaseReadPermission(String permissionValue) {

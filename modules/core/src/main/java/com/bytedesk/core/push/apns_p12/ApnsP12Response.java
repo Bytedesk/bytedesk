@@ -47,4 +47,6 @@ public class ApnsP12Response extends BaseResponse {
 
     private String description;
 
+    private String orgName;
+
 }

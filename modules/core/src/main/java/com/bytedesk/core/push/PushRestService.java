@@ -45,6 +45,10 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
         return pushRepository.findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(deviceUid, status, type);
     }
 
+    public Optional<PushEntity> findTopByDeviceUidAndTypeOrderByUpdatedAtDesc(String deviceUid, String type) {
+        return pushRepository.findTopByDeviceUidAndTypeOrderByUpdatedAtDesc(deviceUid, type);
+    }
+
     /**
      * 检查是否存在指定状态、类型和接收者的记录
      */

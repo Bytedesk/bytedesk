@@ -391,6 +391,27 @@ public class ThreadMessageUtil {
         return message;
     }
 
+    public static MessageEntity getThreadSystemMessage(String content, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .type(MessageTypeEnum.SYSTEM.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return message;
+    }
+
     // 检查无响应触发
     public static void checkNoResponse(String userUid, long lastActiveTime, TriggerSettingsEntity settings) {
         if (settings == null || settings.getTriggers() == null || settings.getTriggers().isEmpty()) {

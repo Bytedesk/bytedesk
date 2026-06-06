@@ -23,6 +23,7 @@
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<zai-sdk.version>0.3.3</zai-sdk.version>
+		<mcp.version>0.18.2</mcp.version>
 	</properties>
 
 	<dependencies>
@@ -251,13 +252,84 @@
 			<version>4.4.0</version>
 		</dependency>
 
+		<!-- Google Gemini Java SDK -->
+		 <!-- https://mvnrepository.com/artifact/com.google.genai/google-genai -->
+        <dependency>
+            <groupId>com.google.genai</groupId>
+            <artifactId>google-genai</artifactId>
+			<version>1.56.0</version>
+        </dependency>
+
+        <!-- Anthropic Java SDK -->
+		<!-- https://mvnrepository.com/artifact/com.anthropic/anthropic-java -->
+        <dependency>
+            <groupId>com.anthropic</groupId>
+            <artifactId>anthropic-java</artifactId>
+			<version>2.35.0</version>
+        </dependency>
+
+        <!-- Model Context Protocol (MCP) SDK -->
+		<!-- https://mvnrepository.com/artifact/io.modelcontextprotocol.sdk/mcp -->
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp</artifactId>
+			<version>${mcp.version}</version>
+        </dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
+		<dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>kubernetes-client</artifactId>
+			<version>7.7.0</version>
+        </dependency>
+
+		<!-- 暂时使用直接集成源码替代 -->
+		<!-- https://java.agentscope.io/zh/intro.html -->
+		<!-- https://github.com/agentscope-ai/agentscope-java -->
+		<!-- https://mvnrepository.com/artifact/io.agentscope/agentscope-core -->
+		<!-- <dependency>
+            <groupId>io.agentscope</groupId>
+            <artifactId>agentscope-core</artifactId>
+			<version>1.0.12</version>
+        </dependency> -->
+
+		<!-- 暂时使用直接集成源码替代 -->
+		<!-- https://java.agentscope.io/zh/intro.html -->
+		<!-- https://github.com/agentscope-ai/agentscope-java -->
+		<!-- https://mvnrepository.com/artifact/io.agentscope/agentscope-harness -->
+		<!-- <dependency>
+            <groupId>io.agentscope</groupId>
+            <artifactId>agentscope-harness</artifactId>
+			<version>1.1.0-RC2</version>
+        </dependency> -->
+
+		<!-- https://github.com/dashscope/dashscope-sdk-java -->
+		<!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+		 <dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>dashscope-sdk-java</artifactId>
+			<version>${dashscope-sdk-java.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.github.victools</groupId>
+					<artifactId>jsonschema-generator</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-simple</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<!-- https://java2ai.com/docs/quick-start -->
 		<!-- https://github.com/alibaba/spring-ai-alibaba -->
 		<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
-		<!-- https://github.com/dashscope/dashscope-sdk-java -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-dashscope -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>

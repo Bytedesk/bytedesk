@@ -111,4 +111,19 @@ public class CallI18nConsts {
 	public static final String CONFIG_ESL_RETRY_INTERRUPTED = "连接重试被中断";
 	public static final String CONFIG_ESL_FINAL_FAILURE = "Call ESL连接最终失败，已尝试{}次";
 	public static final String CONFIG_ESL_SKIP_FILTER_REGISTER = "跳过ESL事件过滤器注册（bytedesk.call.freeswitch.enableEventFilters=false）";
+
+	public static final String TASK_DEMO_CUSTOMER_LIST_NAME = "默认客户列表";
+	public static final String TASK_DEMO_CUSTOMER_LIST_DESCRIPTION = "默认客户列表，用于外呼任务预览。";
+	public static final String TASK_DEMO_CUSTOMER_LIST_TAGS = "demo,outbound,seed";
+	public static final String TASK_DEMO_NAME = "默认外呼任务";
+	public static final String TASK_DEMO_DESCRIPTION = "用于预览每日外呼调度的种子任务。";
+	public static final String TASK_CREATE_FAILED = "Create call_task failed";
+	public static final String TASK_UPDATE_FAILED = "Update call_task failed";
+	public static final String TASK_NOT_FOUND = "CallTask not found";
+	public static final String TASK_CUSTOMER_LIST_NOT_FOUND = "CallCustomerList not found";
+	public static final String TASK_DEMO_INIT_SKIPPED = "Skip demo outbound task initialization because customer list was not created. orgUid={}";
+	public static final String TASK_DEMO_CUSTOMER_DESCRIPTION = "演示用客户。";
+	public static final String TASK_DEMO_CUSTOMER_TITLE = "跟进联系人";
+	public static final String TASK_DEMO_CUSTOMER_ADDRESS = "演示地址";
+	public static final String TASK_DEMO_CUSTOMER_REMARK = "演示用客户记录，用于外呼任务初始化。";
 }

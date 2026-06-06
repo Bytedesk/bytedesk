@@ -27,9 +27,12 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.push.apns_p12.ApnsP12Repository;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +49,12 @@ public class ApnsPushRestService extends BaseRestServiceWithExport<ApnsPushEntit
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final OrganizationRepository organizationRepository;
+
+    private final UserRepository userRepository;
+
+    private final ApnsP12Repository apnsP12Repository;
     
     private final PermissionService permissionService;
     
@@ -177,8 +186,21 @@ public class ApnsPushRestService extends BaseRestServiceWithExport<ApnsPushEntit
                 ApnsPushEntity latestEntity = latest.get();
                 // 合并需要保留的数据
                 latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                latestEntity.setSender(entity.getSender());
+                latestEntity.setReceiver(entity.getReceiver());
+                latestEntity.setDeviceToken(entity.getDeviceToken());
+                latestEntity.setP12Uid(entity.getP12Uid());
+                latestEntity.setBundleId(entity.getBundleId());
+                latestEntity.setMessageUid(entity.getMessageUid());
+                latestEntity.setThreadUid(entity.getThreadUid());
+                latestEntity.setContent(entity.getContent());
+                latestEntity.setDescription(entity.getDescription());
+                latestEntity.setType(entity.getType());
+                latestEntity.setStatus(entity.getStatus());
+                latestEntity.setChannel(entity.getChannel());
+                latestEntity.setSandbox(entity.getSandbox());
+                latestEntity.setSendSuccess(entity.getSendSuccess());
+                latestEntity.setSendMessage(entity.getSendMessage());
                 return apnsPushRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -216,7 +238,21 @@ public class ApnsPushRestService extends BaseRestServiceWithExport<ApnsPushEntit
 
     @Override
     public ApnsPushResponse convertToResponse(ApnsPushEntity entity) {
-        return modelMapper.map(entity, ApnsPushResponse.class);
+        ApnsPushResponse response = modelMapper.map(entity, ApnsPushResponse.class);
+
+        if (StringUtils.hasText(entity.getReceiver())) {
+            userRepository.findByUid(entity.getReceiver()).ifPresent(user -> response.setReceiverNickname(user.getNickname()));
+        }
+
+        if (StringUtils.hasText(entity.getP12Uid())) {
+            apnsP12Repository.findByUid(entity.getP12Uid()).ifPresent(apnsP12 -> response.setP12Name(apnsP12.getName()));
+        }
+
+        if (StringUtils.hasText(entity.getOrgUid())) {
+            organizationRepository.findByUid(entity.getOrgUid()).ifPresent(org -> response.setOrgName(org.getName()));
+        }
+
+        return response;
     }
 
     @Override

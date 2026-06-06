@@ -295,6 +295,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (forceTransfer) {
             // 若此前仅被动标记为 QUEUING（例如关键词监听器提前切状态），这里确保队列成员存在
             queueMemberEntity = queueService.enqueueWorkgroup(latestThread, null, workgroup, visitorRequest);
+            handleForceAgentTransfer(visitorRequest, latestThread, queueMemberEntity);
         }
 
         // 不在服务时间内，保持当前排队（避免刷新时意外切换流程）
@@ -513,6 +514,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             VisitorCallTypeEnum callType) {
         log.debug("开始路由到人工客服 - threadUid: {}, workgroupUid: {}",
                 thread.getUid(), workgroup.getUid());
+
+        if (shouldProcessForceTransfer(visitorRequest, thread)) {
+            emitRobotToAgentSystemMessage(thread);
+        }
 
         // 检查是否在工作时间内
         boolean isInServiceTime = resolveIsInServiceTime(visitorRequest, workgroup);
@@ -1008,19 +1013,49 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     private void handleForceAgentTransfer(VisitorRequest visitorRequest, ThreadEntity thread,
             QueueMemberEntity queueMemberEntity) {
-        if (visitorRequest.getForceAgent()) {
-            log.info("Processing force agent transfer");
-
-            // 发布转人工事件
-            bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
-            // 更新队列状态
-            queueMemberEntity.transferRobotToAgent();
-
-            // 异步处理转人工操作
-            // Map<String, Object> updates = new HashMap<>();
-            // updates.put("robotToAgent", true);
-            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+        boolean forceTransfer = visitorRequest != null && Boolean.TRUE.equals(visitorRequest.getForceAgent());
+        boolean pendingTransfer = thread != null
+                && StringUtils.hasText(thread.getTransferStatus())
+                && ThreadTransferStatusEnum.TRANSFER_PENDING.name().equalsIgnoreCase(thread.getTransferStatus());
+        if (!forceTransfer && !pendingTransfer) {
+            return;
         }
+
+        log.info("Processing force agent transfer - threadUid: {}, forceAgent: {}, transferStatus: {}",
+                thread != null ? thread.getUid() : null,
+                forceTransfer,
+                thread != null ? thread.getTransferStatus() : null);
+
+        // 发布转人工事件
+        bytedeskEventPublisher.publishEvent(new ThreadTransferToAgentEvent(this, thread));
+
+        // 更新队列状态
+        if (queueMemberEntity != null) {
+            queueMemberEntity.transferRobotToAgent();
+            queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
+        }
+
+        emitRobotToAgentSystemMessage(thread);
+    }
+
+    private void emitRobotToAgentSystemMessage(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getUid())) {
+            return;
+        }
+
+        Optional<MessageEntity> latestMessageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
+        if (latestMessageOptional.isPresent()) {
+            MessageEntity latestMessage = latestMessageOptional.get();
+            if (MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(latestMessage.getType())
+                    && I18Consts.I18N_ROBOT_TO_AGENT_TIP.equals(latestMessage.getContent())) {
+                return;
+            }
+        }
+
+        MessageEntity message = ThreadMessageUtil.getThreadSystemMessage(I18Consts.I18N_ROBOT_TO_AGENT_TIP, thread);
+        messageRestService.save(message);
+        MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+        messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
 

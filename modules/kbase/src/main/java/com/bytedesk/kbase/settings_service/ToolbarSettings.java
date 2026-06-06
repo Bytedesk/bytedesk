@@ -44,17 +44,17 @@ public class ToolbarSettings implements Serializable {
     // - 仅在机器人接待场景生效，人工接待由 upload 控制
     @Builder.Default
     @Column(name = "toolbar_upload_robot")
-    private Boolean uploadRobot = true;
+    private Boolean uploadRobot = false;
 
     // 语音转文字输入按钮
     @Builder.Default
     @Column(name = "toolbar_speech_input")
-    private Boolean speechInput = true;
+    private Boolean speechInput = false;
 
     // 语音输入按钮（输入框右侧录音能力）
     @Builder.Default
     @Column(name = "toolbar_voice_input")
-    private Boolean voiceInput = true;
+    private Boolean voiceInput = false;
 
     // 上传按钮（已统一替代 image/file）
     @Builder.Default
@@ -71,23 +71,23 @@ public class ToolbarSettings implements Serializable {
 
     @Builder.Default
     @Column(name = "toolbar_goods")
-    private Boolean goods = true;
+    private Boolean goods = false;
 
     @Builder.Default
     @Column(name = "toolbar_order_selector")
-    private Boolean orderSelector = true;
+    private Boolean orderSelector = false;
 
     @Builder.Default
     @Column(name = "toolbar_ticket")
-    private Boolean ticket = true;
+    private Boolean ticket = false;
 
     @Builder.Default
     @Column(name = "toolbar_webrtc")
-    private Boolean webrtc = true;
+    private Boolean webrtc = false;
 
     @Builder.Default
     @Column(name = "toolbar_tel")
-    private Boolean tel = true;
+    private Boolean tel = false;
 
     // 工具栏排列顺序（从左到右），未设置则按默认顺序
     // 说明：

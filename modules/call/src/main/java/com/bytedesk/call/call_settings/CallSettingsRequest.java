@@ -35,6 +35,21 @@ public class CallSettingsRequest extends BaseRequest {
     private Boolean enabled;
 
     /**
+     * Whether the agent expects the softphone to stay signed in after page refresh.
+     */
+    private Boolean signedIn;
+
+    /**
+     * Whether outbound calls should first dial the agent mobile phone.
+     */
+    private Boolean mobileOutboundEnabled;
+
+    /**
+     * Agent mobile phone number used for callback-style outbound calling.
+     */
+    private String mobilePhoneNumber;
+
+    /**
      * External phone number shown to users for inbound or outbound calls.
      */
     private String number;
