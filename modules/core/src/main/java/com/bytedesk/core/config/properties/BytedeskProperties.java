@@ -267,6 +267,8 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean forceValidateMobile = false;
         private Boolean forceValidateEmail = false;
         private Boolean forceVisitorAuth = false; // 是否强制访客认证，默认false
+        private Boolean wechatMpSubscribePromptEnabled = false;
+        private String wechatMpSubscribePromptAppId;
     }
 
     @Getter

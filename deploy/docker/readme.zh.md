@@ -49,6 +49,7 @@ cd bytedesk/deploy/docker
 cp .env.example .env
 # 重要：密码/API Key/JWT 等敏感信息已统一迁移到 .env
 # start.sh/stop.sh 会通过 --env-file 自动加载 deploy/docker/.env
+# 如需调整本地 ASR 模型或设备，可在 .env 中修改 FUNASR_DEVICE、FUNASR_MODEL、FUNASR_VAD_MODEL。
 
 # 脚本方式（推荐）
 # 参数格式：

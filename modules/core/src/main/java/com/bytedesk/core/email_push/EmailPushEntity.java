@@ -14,6 +14,7 @@
 package com.bytedesk.core.email_push;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.push.PushStatusEnum;
 import jakarta.persistence.Column;
@@ -50,7 +51,7 @@ public class EmailPushEntity extends BaseEntity {
 
     private String sender;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     private String country;

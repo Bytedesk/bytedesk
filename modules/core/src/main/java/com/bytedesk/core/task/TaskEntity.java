@@ -15,6 +15,7 @@ package com.bytedesk.core.task;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.JsonStringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -129,7 +130,7 @@ public class TaskEntity extends BaseEntity {
      */
     @Builder.Default
     @Convert(converter = JsonStringListConverter.class)
-    @Column(name = "task_images", columnDefinition = "TEXT")
+    @Column(name = "task_images", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
     /**

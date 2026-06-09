@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260609-add-wechat-mp-template-app-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="app_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="app_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-template-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="template_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="template_id" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-template-url" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="template_url"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="template_url" type="VARCHAR(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-template-page" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="template_page"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="template_page" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-mini-program-app-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="mini_program_app_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="mini_program_app_id" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-mini-program-page-path" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="mini_program_page_path"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="mini_program_page_path" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-mini-program-state" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="mini_program_state"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="mini_program_state" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-lang" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="lang"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="lang" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-data-json" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="data_json"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="data_json" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-payload-json" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="payload_json"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="payload_json" type="TEXT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-template-use-raw-payload" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_template"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_template" columnName="use_raw_payload"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_template">
+            <column name="use_raw_payload" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -50,5 +50,11 @@
     <include file="db/changelog/migration/260606_add_apns_push_record_fields.xml" />
     <include file="db/changelog/migration/260606_add_apns_token_environment.xml" />
     <include file="db/changelog/migration/260606_rename_apns_builder_id_to_p12_uid.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_template_message_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_subscribe_scan_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_qrcode_table.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_qrcode_scan_link_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_shorten_table.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_push_record_fields.xml" />
 
 </databaseChangeLog>

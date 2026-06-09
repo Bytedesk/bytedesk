@@ -9,6 +9,7 @@ services:
       - bytedesk-db
       - bytedesk-redis
       - bytedesk-ollama
+      - bytedesk-ttsasr
       - bytedesk-elasticsearch
       - bytedesk-mq
       - bytedesk-zipkin
@@ -144,6 +145,11 @@ services:
       SPRING_CACHE_REDIS_CACHE_NULL_VALUES: "false"
       SPRING_CACHE_REDIS_USE_KEY_PREFIX: "true"
       SPRING_CACHE_REDIS_KEY_PREFIX: "bytedeskim:cache:"
+      # 
+      BYTEDESK_AI_ASR_TTSASR_ENABLED: "true"
+      BYTEDESK_AI_ASR_TTSASR_BASE_URL: http://ttsasr-bytedesk:8000
+      BYTEDESK_AI_ASR_TTSASR_MODEL: funasr
+      BYTEDESK_AI_ASR_TTSASR_LANGUAGE: auto
       # ===============================
       # Upload config
       # Final file URL = BYTEDESK_UPLOAD_URL + '/' + last segment of BYTEDESK_UPLOAD_DIR + generated relative path. 完整文件访问地址由上传 URL、目录最后一级和系统生成路径组成。

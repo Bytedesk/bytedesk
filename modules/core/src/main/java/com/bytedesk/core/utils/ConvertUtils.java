@@ -69,6 +69,11 @@ public class ConvertUtils {
             response.getCustom().setAutoRegisterOnLogin(bytedeskProperties.getCustom().getAutoRegisterOnLogin());
             response.getCustom().setForceValidateMobile(bytedeskProperties.getCustom().getForceValidateMobile());
             response.getCustom().setForceValidateEmail(bytedeskProperties.getCustom().getForceValidateEmail());
+                response.getCustom().setForceVisitorAuth(bytedeskProperties.getCustom().getForceVisitorAuth());
+                response.getCustom().setWechatMpSubscribePromptEnabled(
+                    bytedeskProperties.getCustom().getWechatMpSubscribePromptEnabled());
+                response.getCustom().setWechatMpSubscribePromptAppId(
+                    bytedeskProperties.getCustom().getWechatMpSubscribePromptAppId());
         }
 
         // 明确设置Organization部分字段，确保从配置中获取

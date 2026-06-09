@@ -270,6 +270,10 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
 
     public int updateStatus(@NonNull String uid, @NonNull String newStatus) {
+        if (!StringUtils.hasText(uid) || !StringUtils.hasText(newStatus)) {
+            log.warn("skip visitor status update because uid or status is blank, uid: {}, status: {}", uid, newStatus);
+            return 0;
+        }
         return visitorRepository.updateStatusByUid(uid, newStatus);
     }
 

@@ -14,6 +14,7 @@
 package com.bytedesk.core.task_comment;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.JsonStringListConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -78,7 +79,7 @@ public class TaskCommentEntity extends BaseEntity {
     */
     @Builder.Default
     @Convert(converter = JsonStringListConverter.class)
-    @Column(name = "images", columnDefinition = "TEXT")
+    @Column(name = "images", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
 

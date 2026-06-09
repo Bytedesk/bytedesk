@@ -160,7 +160,8 @@ public class VisitorRequest extends BaseRequest {
 	
 	public Boolean isWeChat() {
 		// 忽略大小写，常量放在前面避免空指针异常
-		return this.channel != null && ChannelEnum.WECHAT.name().toLowerCase().contains(this.channel.toLowerCase());
+		return this.channel != null
+				&& this.channel.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
 	}
 
 	public Boolean isMeta() {

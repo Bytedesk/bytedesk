@@ -14,6 +14,7 @@
 package com.bytedesk.core.push.apns_push;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.push.PushStatusEnum;
 import jakarta.persistence.Column;
@@ -74,11 +75,11 @@ public class ApnsPushEntity extends BaseEntity {
     private String threadUid;
 
     /** Serialized message content used in APNS payload. */
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     /** Additional note / failure reason. */
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String description;
 
     /** Record type / business source. */
@@ -97,7 +98,7 @@ public class ApnsPushEntity extends BaseEntity {
 
     private Boolean sendSuccess;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String sendMessage;
 
 }

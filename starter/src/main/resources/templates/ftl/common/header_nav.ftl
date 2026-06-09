@@ -64,7 +64,7 @@
 
 				<!-- Nav item: Home -->
 				<li class="nav-item">
-					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page"><@t key="nav.home">首页</@t></a>
+					<a class="nav-link active" href="${langPrefix}/index.html" id="homeMenu" aria-current="page" target="_blank"><@t key="nav.home">首页</@t></a>
 				</li>
 				
 				<!-- Nav item 2 Course -->
@@ -82,8 +82,8 @@
 				
 				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
 				<#-- pruned: voice, forum, help, architecture -->
-				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html"><@t key="nav.download">下载</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html"><@t key="nav.about">关于</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="suiteMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="default.title">系统入口</@t></a>
 					<ul class="dropdown-menu" aria-labelledby="suiteMenu">

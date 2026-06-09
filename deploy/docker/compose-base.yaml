@@ -31,6 +31,52 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+  # docker compose -f compose-base.yaml up -d bytedesk-ttsasr
+  # docker compose -f compose-base.yaml logs -f bytedesk-ttsasr
+  bytedesk-ttsasr:
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/ttsasr:latest
+    container_name: ttsasr-bytedesk
+    ports:
+      - "18000:8000"
+    environment:
+      - FUNASR_DEVICE=${FUNASR_DEVICE:-cpu}
+      - FUNASR_MODEL=${FUNASR_MODEL:-iic/SenseVoiceSmall}
+      - FUNASR_VAD_MODEL=${FUNASR_VAD_MODEL:-fsmn-vad}
+      - FUNASR_MAX_URL_FILE_SIZE=${FUNASR_MAX_URL_FILE_SIZE:-52428800}
+      - FUNASR_PRELOAD=${FUNASR_PRELOAD:-false}
+      - FUNASR_DISABLE_UPDATE=${FUNASR_DISABLE_UPDATE:-true}
+      - FUNASR_TRUST_REMOTE_CODE=${FUNASR_TRUST_REMOTE_CODE:-false}
+      - TTS_PROVIDER=${TTS_PROVIDER:-voxcpm}
+      - VOXCPM_MODEL=${VOXCPM_MODEL:-openbmb/VoxCPM2}
+      - VOXCPM_SOURCE=${VOXCPM_SOURCE:-modelscope}
+      - VOXCPM_MODELSCOPE_MODEL=${VOXCPM_MODELSCOPE_MODEL:-OpenBMB/VoxCPM2}
+      - VOXCPM_DEVICE=${VOXCPM_DEVICE:-cpu}
+      - VOXCPM_LOAD_DENOISER=${VOXCPM_LOAD_DENOISER:-false}
+      - VOXCPM_PRELOAD=${VOXCPM_PRELOAD:-false}
+      - QWEN_TTS_MODEL=${QWEN_TTS_MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice}
+      - QWEN_TTS_SOURCE=${QWEN_TTS_SOURCE:-modelscope}
+      - QWEN_TTS_MODELSCOPE_MODEL=${QWEN_TTS_MODELSCOPE_MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice}
+      - QWEN_TTS_DEVICE_MAP=${QWEN_TTS_DEVICE_MAP:-cpu}
+      - QWEN_TTS_LANGUAGE=${QWEN_TTS_LANGUAGE:-Auto}
+      - QWEN_TTS_SPEAKER=${QWEN_TTS_SPEAKER:-Vivian}
+      - QWEN_TTS_PRELOAD=${QWEN_TTS_PRELOAD:-false}
+    # 复用模型缓存，避免每次重启重复下载大模型
+    volumes:
+      - ttsasr_modelscope:/root/.cache/modelscope
+    # 避免 VoxCPM 首次加载时 OOM（可按宿主机情况调整）
+    mem_limit: 16g
+    memswap_limit: 24g
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # 首次冷启动（下载/加载模型）可能很久，避免过早判定不健康
+      start_period: 600s
+    restart: unless-stopped
       
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
@@ -110,6 +156,8 @@ volumes:
     name: bytedesk_redis_data
   ollama_models:
     name: bytedesk_ollama_models
+  ttsasr_modelscope:
+    name: bytedesk_ttsasr_modelscope
   elasticsearch_data:
     name: bytedesk_elasticsearch_data
   zipkin_data:
