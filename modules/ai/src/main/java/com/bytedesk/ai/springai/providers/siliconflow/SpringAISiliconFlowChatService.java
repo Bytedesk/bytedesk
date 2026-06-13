@@ -32,6 +32,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -49,7 +50,7 @@ import java.util.Optional;
 public class SpringAISiliconFlowChatService extends BaseSpringAIService {
 
     public SpringAISiliconFlowChatService(
-            ObjectProvider<OpenAiChatModel> siliconFlowChatModelProvider,
+            @Qualifier("siliconFlowChatModel") ObjectProvider<OpenAiChatModel> siliconFlowChatModelProvider,
             TokenUsageHelper tokenUsageHelper,
             SseMessageHelper sseMessageHelper,
             PromptHelper promptHelper) {

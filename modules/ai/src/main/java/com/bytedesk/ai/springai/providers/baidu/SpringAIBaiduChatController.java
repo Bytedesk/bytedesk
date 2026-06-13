@@ -38,7 +38,6 @@ import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -48,14 +47,21 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/baidu")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduChatController {
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIBaiduChatService springAIBaiduService;
-    @Qualifier("virtualAsyncExecutor")
     private final ExecutorService executorService;
+
+    public SpringAIBaiduChatController(
+            BytedeskProperties bytedeskProperties,
+            SpringAIBaiduChatService springAIBaiduService,
+            @Qualifier("virtualAsyncExecutor") ExecutorService executorService) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.springAIBaiduService = springAIBaiduService;
+        this.executorService = executorService;
+    }
 
     // http://127.0.0.1:9003/baidu/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html

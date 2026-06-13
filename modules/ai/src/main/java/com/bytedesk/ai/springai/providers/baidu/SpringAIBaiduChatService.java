@@ -21,6 +21,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIBaiduChatService extends BaseSpringAIService {
 
     public SpringAIBaiduChatService(
-            ObjectProvider<OpenAiChatModel> baiduChatModelProvider,
+            @Qualifier("baiduChatModel") ObjectProvider<OpenAiChatModel> baiduChatModelProvider,
             TokenUsageHelper tokenUsageHelper) {
         this.baiduChatModel = baiduChatModelProvider.getIfAvailable();
         this.tokenUsageHelper = tokenUsageHelper;

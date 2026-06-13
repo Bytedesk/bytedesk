@@ -21,6 +21,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAITencentChatService extends BaseSpringAIService {
 
     public SpringAITencentChatService(
-            ObjectProvider<OpenAiChatModel> tencentChatModelProvider,
+            @Qualifier("tencentChatModel") ObjectProvider<OpenAiChatModel> tencentChatModelProvider,
             TokenUsageHelper tokenUsageHelper) {
         this.tencentChatModel = tencentChatModelProvider.getIfAvailable();
         this.tokenUsageHelper = tokenUsageHelper;
