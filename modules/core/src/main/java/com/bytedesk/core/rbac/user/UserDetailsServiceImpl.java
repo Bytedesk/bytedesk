@@ -16,7 +16,6 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,16 +33,17 @@ import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.utils.JwtSubject;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * https://wankhedeshubham.medium.com/spring-boot-security-with-userdetailsservice-and-custom-authentication-provider-3df3a188993f
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
     @Cacheable(value = "user", key = "#email + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {

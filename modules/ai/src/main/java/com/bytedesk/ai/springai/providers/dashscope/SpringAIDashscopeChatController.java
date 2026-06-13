@@ -25,7 +25,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,6 @@ import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -49,14 +48,25 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/dashscope")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeChatController {
 
+    public SpringAIDashscopeChatController(
+            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<ChatModel> bytedeskDashscopeChatModelProvider,
+            BytedeskProperties bytedeskProperties,
+            ChatClient bytedeskDashscopeChatClient,
+            SpringAIDashscopeChatService springAIDashscopeService,
+            ExecutorService executorService) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.bytedeskDashscopeChatClient = bytedeskDashscopeChatClient;
+        this.springAIDashscopeService = springAIDashscopeService;
+        this.executorService = executorService;
+        this.bytedeskDashscopeChatModel = bytedeskDashscopeChatModelProvider.getIfAvailable();
+    }
+
+
     private final BytedeskProperties bytedeskProperties;
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatModel")
-    private ChatModel bytedeskDashscopeChatModel;
+    private final ChatModel bytedeskDashscopeChatModel;
     private final ChatClient bytedeskDashscopeChatClient;
     private final SpringAIDashscopeChatService springAIDashscopeService;
     @Qualifier("virtualAsyncExecutor")

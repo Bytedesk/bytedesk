@@ -116,7 +116,8 @@ public class EslEventEntity extends BaseEntity {
     /**
      * API argument for API events
      */
-    @Column(name = "api_argument")
+    @Lob
+    @Column(name = "api_argument", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String apiArgument;
 
     /**

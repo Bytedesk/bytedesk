@@ -3,12 +3,12 @@ package com.bytedesk.core.upload.aliyun;
 import com.aliyun.oss.OSS;
 // import com.aliyun.oss.model.PutObjectResult;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,20 +32,15 @@ import java.net.URI;
  */
 @Component
 @ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)
+@RequiredArgsConstructor
 @Slf4j
 public class AliyunOss {
 
     private String uploadDirPrefix = "";
 
-    public AliyunOss() {
-        // 构造函数
-    }
+    private final AliyunProperties aliyunProperties;
 
-    @Autowired
-    private AliyunProperties aliyunProperties;
-
-    @Autowired
-    private OSS ossClient;
+    private final OSS ossClient;
 
     public String uploadAttachment(MediaType mediaType, String fileName, int width, int height, String username,
             File file) {

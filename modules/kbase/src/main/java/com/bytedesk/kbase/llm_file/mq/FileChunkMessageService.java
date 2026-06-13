@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_file.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -21,17 +20,18 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 文件Chunk消息服务
  * 使用消息队列处理文件chunk相关的异步任务
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FileChunkMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
 
     @Value("${bytedesk.mq.type:artemis}")
     private String mqType;

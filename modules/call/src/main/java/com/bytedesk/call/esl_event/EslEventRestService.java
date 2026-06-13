@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.call.ip_blacklist.CallIpBlacklistEntity;
-import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
+import com.bytedesk.call.call_ip_blacklist.CallIpBlacklistEntity;
+import com.bytedesk.call.call_ip_blacklist.CallIpBlacklistService;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;

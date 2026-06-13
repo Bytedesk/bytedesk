@@ -15,7 +15,6 @@ package com.bytedesk.core.redis;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,18 +38,23 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 public class RedisConfig {
 
-    @Autowired
-    private JedisProperties jedisProperties;
+    private final JedisProperties jedisProperties;
 
-    @Autowired
-    private JedisPoolProperties jedisPoolProperties;
+    private final JedisPoolProperties jedisPoolProperties;
 
-    @Autowired
-    private RedisClusterSwitchProperties redisClusterSwitchProperties;
+    private final RedisClusterSwitchProperties redisClusterSwitchProperties;
     
-    @Autowired
-    @Qualifier("redisObjectMapper")
-    private ObjectMapper objectMapperBean;
+    private final ObjectMapper objectMapperBean;
+
+    public RedisConfig(JedisProperties jedisProperties,
+            JedisPoolProperties jedisPoolProperties,
+            RedisClusterSwitchProperties redisClusterSwitchProperties,
+            @Qualifier("redisObjectMapper") ObjectMapper objectMapperBean) {
+        this.jedisProperties = jedisProperties;
+        this.jedisPoolProperties = jedisPoolProperties;
+        this.redisClusterSwitchProperties = redisClusterSwitchProperties;
+        this.objectMapperBean = objectMapperBean;
+    }
     
     // https://github.com/redis/jedis
     @Bean

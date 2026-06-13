@@ -19,10 +19,12 @@ import org.springframework.util.StringUtils;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Lightweight context shared with workflow nodes while executing.
  */
+@RequiredArgsConstructor
 @Getter
 @Builder
 public class WorkflowExecutionContext {

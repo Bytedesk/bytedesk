@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,6 +36,7 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FaqVectorService {
 
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final FaqRestService faqRestService;
 
@@ -75,7 +76,7 @@ public class FaqVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -231,7 +232,7 @@ public class FaqVectorService {
 
         try {
             if (!docIdsToDelete.isEmpty()) {
-                vectorStore.delete(docIdsToDelete);
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
             }
             for (FaqEntity faq : faqList) {
                 faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
@@ -244,7 +245,7 @@ public class FaqVectorService {
                 try {
                     // 兼容：docIdList 为空时也尝试默认 docId
                     if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
-                        vectorStore.delete(List.of("faq_" + faq.getUid()));
+                        vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(List.of("faq_" + faq.getUid()));
                         faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
                         faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
                         successCount++;
@@ -295,7 +296,7 @@ public class FaqVectorService {
         if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
             try {
                 String defaultDocId = "faq_" + faq.getUid();
-                vectorStore.delete(List.of(defaultDocId));
+                vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(List.of(defaultDocId));
             } catch (Exception e) {
                 log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", faq.getUid(), e.getMessage());
             }
@@ -326,7 +327,7 @@ public class FaqVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
     
@@ -414,7 +415,7 @@ public class FaqVectorService {
 
             // 添加新文档到向量存储
             log.info("向向量存储添加文档: {}", id);
-            vectorStore.add(List.of(document));
+            vectorStoreResolver.resolveByKbase(currentFaq.getKbase()).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
 
             // 3. 更新FAQ实体中的文档ID列表
@@ -518,7 +519,7 @@ public class FaqVectorService {
 
             // 从向量存储中删除所有相关文档
             log.info("删除FAQ向量文档, 数量: {}, IDs: {}", docIdList.size(), docIdList);
-            vectorStore.delete(docIdList);
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(docIdList);
 
             // 不再在此方法中更新实体状态，避免乐观锁冲突
             // 状态更新将在indexFaqVector方法中完成
@@ -583,7 +584,7 @@ public class FaqVectorService {
                 .build();
 
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = vectorStoreResolver.resolveByKbUid(kbUid).similaritySearch(searchRequest);
 
         // 解析结果
         List<FaqVectorSearchResult> resultList = new ArrayList<>();
@@ -634,6 +635,13 @@ public class FaqVectorService {
         }
 
         return resultList;
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return faqRestService.findByUidNoCache(uid)
+                .map(FaqEntity::getKbase)
+                .map(vectorStoreResolver::resolveByKbase)
+                .orElseGet(vectorStoreResolver::resolveDefault);
     }
 
     /**

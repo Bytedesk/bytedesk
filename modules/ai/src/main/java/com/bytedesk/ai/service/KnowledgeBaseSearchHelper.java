@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -49,29 +49,41 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KnowledgeBaseSearchHelper {
 
+    public KnowledgeBaseSearchHelper(
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider,
+            ObjectProvider<TextVectorService> textVectorServiceProvider,
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider,
+            FaqElasticService faqElasticService,
+            TextElasticService textElasticService,
+            ChunkElasticService chunkElasticService,
+            WebpageElasticService webpageElasticService) {
+        this.faqElasticService = faqElasticService;
+        this.textElasticService = textElasticService;
+        this.chunkElasticService = chunkElasticService;
+        this.webpageElasticService = webpageElasticService;
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
+    }
+
+
     private static final int DEFAULT_VECTOR_RECALL_LIMIT = 5;
     private static final int MAX_VECTOR_RECALL_LIMIT = 50;
 
     private static final int DEFAULT_FULLTEXT_RECALL_LIMIT = 10;
     private static final int MAX_FULLTEXT_RECALL_LIMIT = 200;
 
-    @Autowired
-    private FaqElasticService faqElasticService;
-    @Autowired
-    private TextElasticService textElasticService;
-    @Autowired
-    private ChunkElasticService chunkElasticService;
-    @Autowired
-    private WebpageElasticService webpageElasticService;
+    private final FaqElasticService faqElasticService;
+    private final TextElasticService textElasticService;
+    private final ChunkElasticService chunkElasticService;
+    private final WebpageElasticService webpageElasticService;
 
-    @Autowired(required = false)
-    private FaqVectorService faqVectorService;
-    @Autowired(required = false)
-    private TextVectorService textVectorService;
-    @Autowired(required = false)
-    private ChunkVectorService chunkVectorService;
-    @Autowired(required = false)
-    private WebpageVectorService webpageVectorService;
+    private final FaqVectorService faqVectorService;
+    private final TextVectorService textVectorService;
+    private final ChunkVectorService chunkVectorService;
+    private final WebpageVectorService webpageVectorService;
 
     // 2. 知识库搜索相关方法
     protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {

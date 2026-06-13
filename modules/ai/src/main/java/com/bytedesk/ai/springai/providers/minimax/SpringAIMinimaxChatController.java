@@ -25,7 +25,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +39,6 @@ import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -49,14 +48,23 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/minimax")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.minimax.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIMinimaxChatController {
 
+    public SpringAIMinimaxChatController(
+            @Qualifier("minimaxChatModel") ObjectProvider<ChatModel> minimaxChatModelProvider,
+            BytedeskProperties bytedeskProperties,
+            SpringAIMinimaxChatService springAIMinimaxService,
+            ExecutorService executorService) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.springAIMinimaxService = springAIMinimaxService;
+        this.executorService = executorService;
+        this.minimaxChatModel = minimaxChatModelProvider.getIfAvailable();
+    }
+
+
     private final BytedeskProperties bytedeskProperties;
-    @Autowired(required = false)
-    @Qualifier("minimaxChatModel")
-    private ChatModel minimaxChatModel;
+    private final ChatModel minimaxChatModel;
     private final SpringAIMinimaxChatService springAIMinimaxService;
     @Qualifier("virtualAsyncExecutor")
     private final ExecutorService executorService;

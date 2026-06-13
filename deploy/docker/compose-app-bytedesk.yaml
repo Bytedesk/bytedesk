@@ -8,11 +8,8 @@ services:
     depends_on:
       - bytedesk-db
       - bytedesk-redis
-      - bytedesk-ollama
-      - bytedesk-ttsasr
       - bytedesk-elasticsearch
       - bytedesk-mq
-      - bytedesk-zipkin
       - bytedesk-minio
     environment:
       TZ: Asia/Shanghai
@@ -392,6 +389,8 @@ services:
       LOGGING_LEVEL_COM_BYTEDESK_TEAM: DEBUG
       LOGGING_LEVEL_COM_BYTEDESK_TICKET: DEBUG
       LOGGING_LEVEL_COM_BYTEDESK_STARTER: DEBUG
+      LOGGING_FILE_NAME: /app/logs/bytedeskim.log
+      LOGGING_PATTERN_FILE: '[RID:%X{requestId} TRACEID:%X{traceId}] %d{yyyy-MM-dd HH:mm:ss.SSS} %5p --- [%15.15t] %-40.40logger{39} : %m%n%wEx'
       # 
       WECHAT_PAY_ENABLED: "false"
       WECHAT_PAY_CERTPATH: ''
@@ -414,6 +413,7 @@ services:
       - upload_data:/app/uploads
       - helpcenter_data:/app/helpcenter
       - blog_data:/app/blog
+      - log_data:/app/logs
     networks:
       - bytedesk-network
 
@@ -424,3 +424,5 @@ volumes:
     name: bytedesk_helpcenter_data
   blog_data:
     name: bytedesk_blog_data
+  log_data:
+    name: bytedesk_log_data

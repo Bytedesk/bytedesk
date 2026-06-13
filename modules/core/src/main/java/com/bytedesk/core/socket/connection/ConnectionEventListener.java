@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.socket.mqtt.event.MqttConnectedEvent;
 import com.bytedesk.core.socket.mqtt.event.MqttDisconnectedEvent;
+import com.bytedesk.core.quartz.event.QuartzDay0Event;
 import com.bytedesk.core.quartz.event.QuartzOneMinEvent;
 
 import lombok.AllArgsConstructor;
@@ -75,6 +76,12 @@ public class ConnectionEventListener {
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
         connectionRestService.expireStaleSessions();
+    }
+
+    @EventListener
+    public void onQuartzDay0Event(QuartzDay0Event event) {
+        int deleted = connectionRestService.cleanupInvalidRecordsOlderThan24Hours();
+        log.info("connection onQuartzDay0Event: cleaned {} disconnected records older than 24 hours", deleted);
     }
 }
 

@@ -15,18 +15,18 @@ package com.bytedesk.ticket.ticket.delegate;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.core.utils.BdDateUtils;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Component
 public class TicketCloseDelegate implements JavaDelegate {
 
-    @Autowired
-    private TicketNotificationService notificationService;
+    private final TicketNotificationService notificationService;
 
     @Override
     public void execute(DelegateExecution execution) {

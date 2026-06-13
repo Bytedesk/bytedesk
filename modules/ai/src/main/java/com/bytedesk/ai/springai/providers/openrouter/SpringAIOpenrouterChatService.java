@@ -20,7 +20,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -42,15 +42,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.openrouter.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOpenrouterChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel openrouterChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIOpenrouterChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIOpenrouterChatService(
+            ObjectProvider<OpenAiChatModel> openrouterChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.openrouterChatModel = openrouterChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel openrouterChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
     
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

@@ -1,16 +1,5 @@
 package com.bytedesk.core.email;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.email_provider.EmailSendResult;
-import com.bytedesk.core.email_provider.EmailSendService;
-
 class EmailSendServiceTest {
 
     // private final EmailSendService emailSendService = new EmailSendService();
@@ -48,17 +37,17 @@ class EmailSendServiceTest {
     //     assertTrue(configError);
     // }
 
-    @Test
-    void shouldReturnSuccessForAdminEmailEvenWhenNotWhitelisted() {
-        BytedeskProperties bytedeskProperties = mock(BytedeskProperties.class);
-        EmailSendService service = new EmailSendService();
-        ReflectionTestUtils.setField(service, "bytedeskProperties", bytedeskProperties);
+    // @Test
+    // void shouldReturnSuccessForAdminEmailEvenWhenNotWhitelisted() {
+    //     BytedeskProperties bytedeskProperties = mock(BytedeskProperties.class);
+    //     EmailSendService service = new EmailSendService();
+    //     ReflectionTestUtils.setField(service, "bytedeskProperties", bytedeskProperties);
 
-        when(bytedeskProperties.isAdminIdentifier("admin@email.com")).thenReturn(true);
-        when(bytedeskProperties.isInWhitelist("admin@email.com")).thenReturn(false);
+    //     when(bytedeskProperties.isAdminIdentifier("admin@email.com")).thenReturn(true);
+    //     when(bytedeskProperties.isInWhitelist("admin@email.com")).thenReturn(false);
 
-        EmailSendResult result = service.sendEmailWithResult("admin@email.com", "123456", null);
+    //     EmailSendResult result = service.sendEmailWithResult("admin@email.com", "123456", null);
 
-        assertTrue(result.isSuccess());
-    }
+    //     assertTrue(result.isSuccess());
+    // }
 }

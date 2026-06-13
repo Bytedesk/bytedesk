@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import com.bytedesk.ai.utils.AIFileUtils;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -62,15 +62,21 @@ import com.bytedesk.core.message.content.AudioContent;
 @Service
 public class ZhipuaiMultiModelService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    public ZhipuaiMultiModelService(
+            @Qualifier("zhipuAiClient") ObjectProvider<ZhipuAiClient> defaultClientProvider,
+            LlmProviderRestService llmProviderRestService,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.defaultClient = defaultClientProvider.getIfAvailable();
+    }
 
-    @Autowired(required = false)
-    @Qualifier("zhipuAiClient")
-    private ZhipuAiClient defaultClient;
 
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final ZhipuAiClient defaultClient;
+
+    private final TokenUsageHelper tokenUsageHelper;
 
     private static final String DEFAULT_MULTI_MODEL = "glm-4.1v-thinking-flash";
     // zai-sdk 角色/思维模式常量

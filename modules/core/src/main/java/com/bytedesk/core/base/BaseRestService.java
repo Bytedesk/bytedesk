@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -31,8 +31,12 @@ import com.bytedesk.core.rbac.user.UserEntity;
  */
 public abstract class BaseRestService<T, TRequest extends PageableRequest, TResponse> {
 
-    @Autowired
     protected AuthService authService;
+
+    @Autowired
+    protected void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
 
     // === 原有的抽象方法 ===
     abstract public Optional<T> findByUid(String uid);

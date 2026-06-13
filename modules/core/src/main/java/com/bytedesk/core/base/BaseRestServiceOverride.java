@@ -11,7 +11,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,16 +20,17 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.rbac.auth.AuthService;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 需要自己重新实现的抽象方法
  * 改进的基础RestService类
  * 在原有抽象方法基础上，提供通用的默认实现来减少重复代码
  */
+@RequiredArgsConstructor
 public abstract class BaseRestServiceOverride<T, TRequest extends PageableRequest, TResponse> {
 
-    @Autowired
-    protected AuthService authService;
+    protected final AuthService authService;
 
     // === 原有的抽象方法 ===
     abstract public Optional<T> findByUid(String uid);

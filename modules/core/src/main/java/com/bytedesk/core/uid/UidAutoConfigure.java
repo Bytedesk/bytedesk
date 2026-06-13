@@ -15,16 +15,19 @@ package com.bytedesk.core.uid;
 
 import com.bytedesk.core.uid.impl.CachedUidGenerator;
 import com.bytedesk.core.uid.impl.UidProperties;
+import com.bytedesk.core.uid.buffer.RejectedPutBufferHandler;
+import com.bytedesk.core.uid.buffer.RejectedTakeBufferHandler;
 import com.bytedesk.core.uid.worker.DisposableWorkerIdAssigner;
 import com.bytedesk.core.uid.worker.WorkerIdAssigner;
 import com.bytedesk.core.uid.impl.DefaultUidGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import lombok.RequiredArgsConstructor;
 
 /**
  * https://github.com/wujun234/uid-generator-spring-boot-starter
@@ -33,31 +36,36 @@ import org.springframework.context.annotation.Lazy;
  * @author wujun
  * @date 2019.02.20 10:57
  */
+@RequiredArgsConstructor
 @Configuration
 @ConditionalOnClass({ DefaultUidGenerator.class, CachedUidGenerator.class })
 @EnableConfigurationProperties(UidProperties.class)
 public class UidAutoConfigure {
 
-	@Autowired
-	private UidProperties uidProperties;
+	private final UidProperties uidProperties;
 
 	@Bean
 	@ConditionalOnMissingBean
 	@Lazy
-	DefaultUidGenerator defaultUidGenerator() {
-		return new DefaultUidGenerator(uidProperties);
+	DefaultUidGenerator defaultUidGenerator(WorkerIdAssigner workerIdAssigner) {
+		return new DefaultUidGenerator(uidProperties, workerIdAssigner);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@Lazy
-	CachedUidGenerator cachedUidGenerator() {
-		return new CachedUidGenerator(uidProperties);
+	CachedUidGenerator cachedUidGenerator(WorkerIdAssigner workerIdAssigner,
+			ObjectProvider<RejectedPutBufferHandler> rejectedPutBufferHandlerProvider,
+			ObjectProvider<RejectedTakeBufferHandler> rejectedTakeBufferHandlerProvider) {
+		return new CachedUidGenerator(uidProperties,
+				workerIdAssigner,
+				rejectedPutBufferHandlerProvider,
+				rejectedTakeBufferHandlerProvider);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-    WorkerIdAssigner workerIdAssigner() {
-		return new DisposableWorkerIdAssigner();
+    WorkerIdAssigner workerIdAssigner(UidGereratorRepository uidGereratorRepository) {
+		return new DisposableWorkerIdAssigner(uidGereratorRepository);
 	}
 }

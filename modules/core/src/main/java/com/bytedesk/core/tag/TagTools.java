@@ -14,34 +14,34 @@ public class TagTools extends BaseTools<TagRequest, TagResponse> {
         super("tag", TagRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query tag by uid")
+    @Tool(description = "Query tag by uid. This tool returns structured data for AI tool invocation.")
     public Object tagQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query tag by org with request json")
+    @Tool(description = "Query tag by org with request json. This tool returns structured data for AI tool invocation.")
     public Object tagQueryByOrg(@ToolParam(description = "TagRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query tag by user with request json")
+    @Tool(description = "Query tag by user with request json. This tool returns structured data for AI tool invocation.")
     public Object tagQueryByUser(@ToolParam(description = "TagRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create tag with request json")
+    @Tool(description = "Create tag with request json. This tool returns structured data for AI tool invocation.")
     public Object tagCreate(@ToolParam(description = "TagRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update tag with request json")
+    @Tool(description = "Update tag with request json. This tool returns structured data for AI tool invocation.")
     public Object tagUpdate(@ToolParam(description = "TagRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete tag by uid")
+    @Tool(description = "Delete tag by uid. This tool returns structured data for AI tool invocation.")
     public Object tagDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

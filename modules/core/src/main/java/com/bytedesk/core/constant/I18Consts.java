@@ -362,6 +362,7 @@ public class I18Consts {
     public static final String I18N_ACTION_UPDATE_PROMPT = I18N_PREFIX + "action.update.prompt";
     public static final String I18N_ACTION_UPDATE_PROMPT_TEXT = I18N_PREFIX + "action.update.prompt.text";
     public static final String I18N_ACTION_UPDATE_KB_UID = I18N_PREFIX + "action.update.kb.uid";
+    public static final String I18N_EMBEDDING_SETTINGS = I18N_PREFIX + "embedding.settings";
 
     // 角色描述（用于 RoleInitializer 默认角色 description，前端通过 translateString 翻译）
     public static final String I18N_ROLE_SUPER_DESCRIPTION = I18N_DESCRIPTION_PREFIX + "role.super";
@@ -482,6 +483,8 @@ public class I18Consts {
     public static final String I18N_AGENT_NICKNAME = I18N_PREFIX + "agent.nickname"; // 客服昵称
     public static final String I18N_AGENT_DESCRIPTION = I18N_PREFIX + "agent.description"; // 客服描述
     public static final String I18N_AGENT_EXISTS = I18N_PREFIX + "agent.exists"; // 坐席已存在
+    public static final String I18N_AGENT_LIMIT_EXCEEDED = I18N_PREFIX + "agent.limit.exceeded"; // 坐席人数已达上限
+    public static final String I18N_AGENT_SEAT_LIMIT_EXCEEDED = I18N_PREFIX + "agent.seat.limit.exceeded"; // 坐席席位已达上限
     public static final String I18N_AGENT_OFFLINE = I18N_PREFIX + "agent.offline"; // 客服离线
     public static final String I18N_AGENT_UNAVAILABLE = I18N_PREFIX + "agent.unavailable"; // 客服不可用
     public static final String I18N_AGENT_AVAILABLE = I18N_PREFIX + "agent.available"; // 客服可用

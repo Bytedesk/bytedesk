@@ -13,8 +13,8 @@
  */
 package com.bytedesk.kbase.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -33,6 +33,14 @@ import java.sql.Connection;
 @Component
 public class KbaseHealthIndicator implements HealthIndicator {
 
+    public KbaseHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.elasticsearchVectorStore = elasticsearchVectorStoreProvider.getIfAvailable();
+    }
+
+
     @Value("${spring.ai.vectorstore.elasticsearch.enabled:false}")
     private boolean vectorStoreEnabled;
 
@@ -42,11 +50,9 @@ public class KbaseHealthIndicator implements HealthIndicator {
     @Value("${spring.batch.job.enabled:true}")
     private boolean batchJobEnabled;
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired(required = false)
-    private ElasticsearchVectorStore elasticsearchVectorStore;
+    private final ElasticsearchVectorStore elasticsearchVectorStore;
 
     @Override
     public Health health() {

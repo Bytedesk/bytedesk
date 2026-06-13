@@ -16,7 +16,6 @@ package com.bytedesk.forum.controller;
 // import com.bytedesk.core.category.CategoryRepository;
 // import com.bytedesk.forum.post.PostService;
 // import com.bytedesk.forum.user.ForumUserService;
-// import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.beans.factory.annotation.Value;
 // import org.springframework.data.domain.Pageable;
 // import org.springframework.data.domain.Sort;

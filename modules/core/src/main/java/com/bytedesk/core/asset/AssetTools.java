@@ -14,34 +14,34 @@ public class AssetTools extends BaseTools<AssetRequest, AssetResponse> {
         super("asset", AssetRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query asset by uid")
+    @Tool(description = "Query asset by uid. This tool returns structured data for AI tool invocation.")
     public Object assetQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query asset by org with request json")
+    @Tool(description = "Query asset by org with request json. This tool returns structured data for AI tool invocation.")
     public Object assetQueryByOrg(@ToolParam(description = "AssetRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query asset by user with request json")
+    @Tool(description = "Query asset by user with request json. This tool returns structured data for AI tool invocation.")
     public Object assetQueryByUser(@ToolParam(description = "AssetRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create asset with request json")
+    @Tool(description = "Create asset with request json. This tool returns structured data for AI tool invocation.")
     public Object assetCreate(@ToolParam(description = "AssetRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update asset with request json")
+    @Tool(description = "Update asset with request json. This tool returns structured data for AI tool invocation.")
     public Object assetUpdate(@ToolParam(description = "AssetRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete asset by uid")
+    @Tool(description = "Delete asset by uid. This tool returns structured data for AI tool invocation.")
     public Object assetDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

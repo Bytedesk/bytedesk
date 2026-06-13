@@ -31,8 +31,8 @@ services:
       FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-123456}
       # mod_xml_curl 鉴权 token（需与应用侧配置一致）
       FREESWITCH_XML_CURL_TOKEN: ${FREESWITCH_XML_CURL_TOKEN:-change_me_in_production}
-      # mod_xml_curl 回源地址（与 XmlCurlController 统一：/freeswitch/api/v1/xmlcurl）
-      FREESWITCH_XML_CURL_GATEWAY_URL: ${FREESWITCH_XML_CURL_GATEWAY_URL:-http://host.docker.internal:9003/freeswitch/api/v1/xmlcurl}
+      # mod_xml_curl 回源地址（与 XmlCurlController 统一：/visitor/api/v1/xmlcurl）
+      FREESWITCH_XML_CURL_GATEWAY_URL: ${FREESWITCH_XML_CURL_GATEWAY_URL:-http://host.docker.internal:9003/visitor/api/v1/xmlcurl}
       # 应用基础地址（用于 cdr_url/user_lookup_url 等派生）
       FREESWITCH_API_BASE_URL: ${FREESWITCH_API_BASE_URL:-http://host.docker.internal:9003}
       # FreeSWITCH 数据库连接参数

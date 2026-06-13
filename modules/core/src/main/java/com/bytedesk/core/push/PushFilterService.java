@@ -14,7 +14,6 @@
 package com.bytedesk.core.push;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +23,9 @@ import com.bytedesk.core.constant.RedisConsts;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class PushFilterService {
@@ -32,11 +33,9 @@ public class PushFilterService {
     // 验证码发送间隔阈值（单位：秒）
     private static final long VALIDATE_CODE_SEND_INTERVAL_SECONDS = 10 * 60; // 10分钟
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
     // 检查是否可以发送验证码
     public Boolean canSendCode(String ip) {

@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.uid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.uid.impl.CachedUidGenerator;
@@ -22,20 +21,21 @@ import com.bytedesk.core.uid.impl.CachedUidGenerator;
 import jakarta.annotation.PostConstruct;
 
 // import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * https://github.com/wujun234/uid-generator-spring-boot-starter/blob/master/README.md
  * UidGenerator接口提供了 UID 生成和解析的方法，提供了两种实现:
  */
 // @Slf4j
+@RequiredArgsConstructor
 @Component
 public class UidUtils {
 
     // @Autowired
     // private DefaultUidGenerator defaultUidGenerator;
 
-    @Autowired
-    private CachedUidGenerator cachedUidGenerator;
+    private final CachedUidGenerator cachedUidGenerator;
 
     private static UidUtils instance;
 

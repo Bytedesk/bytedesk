@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,7 @@ import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +52,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ChunkVectorService {
     
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
     
     private final ChunkRestService chunkRestService;
 
@@ -72,7 +73,7 @@ public class ChunkVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -141,7 +142,8 @@ public class ChunkVectorService {
             
             // 2. 添加到向量存储
             // 检查是否已存在该文档ID
-            checkAndDeleteExistingDoc(id);
+            VectorStore vectorStore = vectorStoreResolver.resolveByKbase(chunk.getKbase());
+            checkAndDeleteExistingDoc(vectorStore, id);
             
             // 添加新文档
             vectorStore.add(List.of(document));
@@ -363,7 +365,7 @@ public class ChunkVectorService {
 
         try {
             if (!docIdsToDelete.isEmpty()) {
-                vectorStore.delete(docIdsToDelete);
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
             }
             for (ChunkEntity chunk : chunkList) {
                 chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
@@ -373,7 +375,7 @@ public class ChunkVectorService {
             log.warn("批量删除Chunk向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
             for (ChunkEntity chunk : chunkList) {
                 try {
-                    vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+                    vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of("chunk_" + chunk.getUid()));
                     chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
                     successCount++;
                 } catch (Exception ex) {
@@ -406,7 +408,7 @@ public class ChunkVectorService {
 
         Boolean deleted;
         try {
-            vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of("chunk_" + chunk.getUid()));
             deleted = true;
         } catch (Exception e) {
             log.warn("删除Chunk向量索引失败: uid={}, error={}", chunk.getUid(), e.getMessage());
@@ -435,7 +437,7 @@ public class ChunkVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
     
@@ -450,7 +452,7 @@ public class ChunkVectorService {
         try {
             // 删除向量文档
             String id = "chunk_" + chunk.getUid();
-            vectorStore.delete(List.of(id));
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of(id));
             
             log.info("Chunk向量索引删除成功: {}", chunk.getName());
         } catch (Exception e) {
@@ -528,7 +530,7 @@ public class ChunkVectorService {
                     .build();
             
             // 执行相似度搜索
-            List<Document> documents = vectorStore.similaritySearch(searchRequest);
+            List<Document> documents = vectorStoreResolver.resolveByKbUid(kbUid).similaritySearch(searchRequest);
             
             // 处理结果
             for (Document doc : documents) {
@@ -600,7 +602,7 @@ public class ChunkVectorService {
      * 检查并删除已存在的文档
      * @param id 文档ID
      */
-    private void checkAndDeleteExistingDoc(String id) {
+    private void checkAndDeleteExistingDoc(VectorStore vectorStore, String id) {
         try {
             // 使用过滤表达式查询已存在的文档
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -629,5 +631,12 @@ public class ChunkVectorService {
                 log.warn("删除可能存在的文档时出错: {}", ex.getMessage());
             }
         }
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return chunkRestService.findByUidNoCache(uid)
+                .map(ChunkEntity::getKbase)
+                .map(vectorStoreResolver::resolveByKbase)
+                .orElseGet(vectorStoreResolver::resolveDefault);
     }
 }

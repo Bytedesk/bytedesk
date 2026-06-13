@@ -126,4 +126,6 @@ public class CallI18nConsts {
 	public static final String TASK_DEMO_CUSTOMER_TITLE = "跟进联系人";
 	public static final String TASK_DEMO_CUSTOMER_ADDRESS = "演示地址";
 	public static final String TASK_DEMO_CUSTOMER_REMARK = "演示用客户记录，用于外呼任务初始化。";
+
+	public static final String I18N_XML_CURL_TRACE = "i18n.xml_curl_trace";
 }

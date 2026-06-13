@@ -20,7 +20,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -43,16 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.deepseek.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDeepseekChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskDeepseekChatModel")
-    private OpenAiChatModel bytedeskDeepseekChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIDeepseekChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIDeepseekChatService(
+            @Qualifier("bytedeskDeepseekChatModel") ObjectProvider<OpenAiChatModel> bytedeskDeepseekChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.bytedeskDeepseekChatModel = bytedeskDeepseekChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel bytedeskDeepseekChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

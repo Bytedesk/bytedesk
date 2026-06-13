@@ -1,6 +1,5 @@
 package com.bytedesk.forum.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -8,15 +7,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.forum.post.PostEntity;
 import com.bytedesk.forum.post.PostRepository;
+import lombok.RequiredArgsConstructor;
 // import com.bytedesk.forum.comment.CommentRepository;
 
 // import com.bytedesk.core.rbac.user.UserService;
 
+@RequiredArgsConstructor
 @Service
 public class ForumUserServiceImpl implements ForumUserService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
     // @Autowired
     // private CommentRepository commentRepository;

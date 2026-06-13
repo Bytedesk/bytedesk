@@ -19,7 +19,7 @@ import java.util.Optional;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -46,19 +46,22 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIDashscopeService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatModel")
-    private DashScopeChatModel defaultChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIDashscopeService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIDashscopeService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<DashScopeChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final DashScopeChatModel defaultChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的DashScopeChatOptions

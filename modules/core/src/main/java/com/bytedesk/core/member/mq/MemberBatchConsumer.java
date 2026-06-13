@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.member.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,21 +26,21 @@ import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import jakarta.jms.MessageListener;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Member批量导入消息消费者
  * 参考FAQ的异步处理模式，用于处理Member批量导入消息
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class MemberBatchConsumer implements MessageListener {
 
-    @Autowired
-    private MemberBatchMessageService memberBatchMessageService;
+    private final MemberBatchMessageService memberBatchMessageService;
 
-    @Autowired
-    private MemberBatchMessageProcessor memberBatchMessageProcessor;
+    private final MemberBatchMessageProcessor memberBatchMessageProcessor;
 
     @Override
     @JmsListener(destination = JmsArtemisConsts.QUEUE_MEMBER_BATCH_IMPORT, containerFactory = "jmsArtemisQueueFactory")

@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
@@ -33,27 +32,30 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import com.bytedesk.core.rbac.auth.AuthEntryPoint;
 import com.bytedesk.core.rbac.auth.AuthTokenFilter;
 import com.bytedesk.core.rbac.user.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 
 /**
  * https://github.com/pengjinning/spring-boot-3-jwt-security
  * https://github.com/pengjinning/spring-boot-spring-security-jwt-authentication
  * https://dev.to/jean_claude_van_debug/spring-security-mutliple-authentication-providers-new-spring-boot-3-e1j
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @Description("Web Security Configuration - Web安全配置类，配置JWT认证、CORS、CSRF等安全策略")
 public class WebSecurityConfig {
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthEntryPoint unauthorizedHandler;
+    private final AuthEntryPoint unauthorizedHandler;
+
+    private final AuthTokenFilter authTokenFilter;
+
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        //
         http
             .cors(withDefaults())
             .csrf(csrf -> csrf.disable())
@@ -87,14 +89,9 @@ public class WebSecurityConfig {
             //         // ...existing code...
             // )
             .authenticationProvider(authenticationProvider())
-            .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         //
         return http.build();
-    }
-
-    @Bean
-    public AuthTokenFilter authTokenFilter() {
-        return new AuthTokenFilter();
     }
 
     /**
@@ -105,7 +102,7 @@ public class WebSecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         // 直接创建 UserDetailsServiceImpl 实例，避免Spring Security的警告
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(new UserDetailsServiceImpl());
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }

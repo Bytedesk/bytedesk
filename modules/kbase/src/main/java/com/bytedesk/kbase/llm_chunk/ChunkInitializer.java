@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_chunk;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -28,8 +27,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ChunkInitializer implements SmartInitializingSingleton {
 
-    @Autowired
-    private ChunkRestService chunkRestService;
+    private final ChunkRestService chunkRestService;
 
     private final AuthorityRestService authorityRestService;
 

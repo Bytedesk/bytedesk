@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -100,6 +101,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     }
 
     private void assertWorkgroupCapacityAvailable(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
         if (authService.getUser() != null && authService.getUser().isSuperUser()) {
             return;
         }

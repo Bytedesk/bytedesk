@@ -14,34 +14,34 @@ public class ReportTools extends BaseTools<ReportRequest, ReportResponse> {
         super("report", ReportRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query report by uid")
+    @Tool(description = "Query report by uid. This tool returns structured data for AI tool invocation.")
     public Object reportQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query report by org with request json")
+    @Tool(description = "Query report by org with request json. This tool returns structured data for AI tool invocation.")
     public Object reportQueryByOrg(@ToolParam(description = "ReportRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query report by user with request json")
+    @Tool(description = "Query report by user with request json. This tool returns structured data for AI tool invocation.")
     public Object reportQueryByUser(@ToolParam(description = "ReportRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create report with request json")
+    @Tool(description = "Create report with request json. This tool returns structured data for AI tool invocation.")
     public Object reportCreate(@ToolParam(description = "ReportRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update report with request json")
+    @Tool(description = "Update report with request json. This tool returns structured data for AI tool invocation.")
     public Object reportUpdate(@ToolParam(description = "ReportRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete report by uid")
+    @Tool(description = "Delete report by uid. This tool returns structured data for AI tool invocation.")
     public Object reportDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

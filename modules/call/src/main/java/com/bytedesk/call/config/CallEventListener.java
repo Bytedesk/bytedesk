@@ -17,7 +17,7 @@ import com.bytedesk.call.esl.client.inbound.IEslEventListener;
 import com.bytedesk.call.esl.client.internal.Context;
 import com.bytedesk.call.esl.client.transport.event.EslEvent;
 import com.bytedesk.call.esl_event.EslEventIngestService;
-import com.bytedesk.call.ip_blacklist.CallIpBlacklistService;
+import com.bytedesk.call.call_ip_blacklist.CallIpBlacklistService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

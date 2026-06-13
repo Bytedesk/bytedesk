@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -37,20 +36,20 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * elasticsearch 全文检索服务
  * @author jackning
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class ChunkElasticService {
         
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchOperations elasticsearchOperations;
 
-    @Autowired
-    private ChunkRestService chunkRestService;
+    private final ChunkRestService chunkRestService;
 
     public Map<String, Object> queryElasticByUid(ChunkRequest request) {
         String uid = request.getUid();

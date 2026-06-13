@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -27,7 +28,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,18 +43,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
-@RequiredArgsConstructor
 public class RobotController {
 
-    @Autowired(required = false)
-    private ChatModel primaryChatModel;
+    public RobotController(
+            ObjectProvider<ChatModel> primaryChatModelProvider,
+            ObjectMapper objectMapper) {
+        this.primaryChatModel = primaryChatModelProvider.getIfAvailable();
+        this.objectMapper = objectMapper;
+    }
+
+
+    private final ChatModel primaryChatModel;
     
     private final ObjectMapper objectMapper;
 

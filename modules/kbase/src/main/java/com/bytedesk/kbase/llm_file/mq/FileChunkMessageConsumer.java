@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_file.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,21 +22,21 @@ import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_file.FileRestService;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 文件Chunk消息消费者
  * 处理文件chunk相关的异步消息
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class FileChunkMessageConsumer {
 
-    @Autowired
-    private FileRestService fileRestService;
+    private final FileRestService fileRestService;
     
-    @Autowired
-    private ChunkRestService chunkRestService;
+    private final ChunkRestService chunkRestService;
     
     /**
      * 处理文件块重试消息

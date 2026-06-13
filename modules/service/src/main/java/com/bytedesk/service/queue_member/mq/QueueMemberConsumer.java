@@ -16,7 +16,6 @@ package com.bytedesk.service.queue_member.mq;
 // import java.util.Map;
 // import java.util.Optional;
 
-// import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.jms.annotation.JmsListener;
 // import org.springframework.stereotype.Component;
 // import org.springframework.transaction.annotation.Transactional;

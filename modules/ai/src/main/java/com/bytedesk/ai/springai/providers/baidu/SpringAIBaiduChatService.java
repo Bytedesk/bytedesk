@@ -20,7 +20,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -42,15 +42,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel baiduChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIBaiduChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIBaiduChatService(
+            ObjectProvider<OpenAiChatModel> baiduChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.baiduChatModel = baiduChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel baiduChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

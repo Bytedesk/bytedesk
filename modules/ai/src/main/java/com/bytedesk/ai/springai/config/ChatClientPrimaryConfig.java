@@ -13,10 +13,10 @@
  */
 package com.bytedesk.ai.springai.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.SpringAIModels;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -35,52 +35,56 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class ChatClientPrimaryConfig {
 
+    public ChatClientPrimaryConfig(
+            @Qualifier("bytedeskZhipuaiChatClient") ObjectProvider<ChatClient> zhipuaiChatClientProvider,
+            @Qualifier("bytedeskOllamaChatClient") ObjectProvider<ChatClient> ollamaChatClientProvider,
+            @Qualifier("bytedeskDashscopeChatClient") ObjectProvider<ChatClient> dashscopeChatClientProvider,
+            @Qualifier("deepseekChatClient") ObjectProvider<ChatClient> deepseekChatClientProvider,
+            @Qualifier("baiduChatClient") ObjectProvider<ChatClient> baiduChatClientProvider,
+            @Qualifier("tencentChatClient") ObjectProvider<ChatClient> tencentChatClientProvider,
+            @Qualifier("volcengineChatClient") ObjectProvider<ChatClient> volcengineChatClientProvider,
+            @Qualifier("openaiChatClient") ObjectProvider<ChatClient> openaiChatClientProvider,
+            @Qualifier("openrouterChatClient") ObjectProvider<ChatClient> openrouterChatClientProvider,
+            @Qualifier("siliconFlowChatClient") ObjectProvider<ChatClient> siliconflowChatClientProvider,
+            @Qualifier("giteeChatClient") ObjectProvider<ChatClient> giteeChatClientProvider) {
+        this.zhipuaiChatClient = zhipuaiChatClientProvider.getIfAvailable();
+        this.ollamaChatClient = ollamaChatClientProvider.getIfAvailable();
+        this.dashscopeChatClient = dashscopeChatClientProvider.getIfAvailable();
+        this.deepseekChatClient = deepseekChatClientProvider.getIfAvailable();
+        this.baiduChatClient = baiduChatClientProvider.getIfAvailable();
+        this.tencentChatClient = tencentChatClientProvider.getIfAvailable();
+        this.volcengineChatClient = volcengineChatClientProvider.getIfAvailable();
+        this.openaiChatClient = openaiChatClientProvider.getIfAvailable();
+        this.openrouterChatClient = openrouterChatClientProvider.getIfAvailable();
+        this.siliconflowChatClient = siliconflowChatClientProvider.getIfAvailable();
+        this.giteeChatClient = giteeChatClientProvider.getIfAvailable();
+    }
+
+
     // @Value("${spring.ai.model.chat:none}")
     // private String chatModel;
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskZhipuaiChatClient")
-    private ChatClient zhipuaiChatClient;
+    private final ChatClient zhipuaiChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskOllamaChatClient")
-    private ChatClient ollamaChatClient;
+    private final ChatClient ollamaChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatClient")
-    private ChatClient dashscopeChatClient;
+    private final ChatClient dashscopeChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("deepseekChatClient")
-    private ChatClient deepseekChatClient;
+    private final ChatClient deepseekChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("baiduChatClient")
-    private ChatClient baiduChatClient;
+    private final ChatClient baiduChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("tencentChatClient")
-    private ChatClient tencentChatClient;
+    private final ChatClient tencentChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("volcengineChatClient")
-    private ChatClient volcengineChatClient;
+    private final ChatClient volcengineChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("openaiChatClient")
-    private ChatClient openaiChatClient;
+    private final ChatClient openaiChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("openrouterChatClient")
-    private ChatClient openrouterChatClient;
+    private final ChatClient openrouterChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("siliconFlowChatClient")
-    private ChatClient siliconflowChatClient;
+    private final ChatClient siliconflowChatClient;
 
-    @Autowired(required = false)
-    @Qualifier("giteeChatClient")
-    private ChatClient giteeChatClient;
+    private final ChatClient giteeChatClient;
 
     @Bean
     @Primary

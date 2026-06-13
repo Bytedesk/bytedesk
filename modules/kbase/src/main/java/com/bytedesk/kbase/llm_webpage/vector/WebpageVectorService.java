@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,7 @@ import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class WebpageVectorService {
 
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final WebpageRestService webpageRestService;
 
@@ -74,7 +75,7 @@ public class WebpageVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -150,7 +151,7 @@ public class WebpageVectorService {
 
             // 添加新文档到向量存储
             log.info("向向量存储添加文档: {}", id);
-            vectorStore.add(List.of(document));
+            resolveStoreByWebpage(currentWebpage).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
 
             // 3. 更新网页实体中的文档ID列表
@@ -316,6 +317,7 @@ public class WebpageVectorService {
 
         int successCount = 0;
         int errorCount = 0;
+        VectorStore vectorStore = resolveStoreByKbUid(kbUid);
 
         try {
             List<String> sanitizedToDelete = sanitizeDocIds(docIdsToDelete);
@@ -375,6 +377,7 @@ public class WebpageVectorService {
         }
 
         WebpageEntity webpage = webpageOpt.get();
+        VectorStore vectorStore = resolveStoreByWebpage(webpage);
 
         if (webpage.getDocIdList() == null || webpage.getDocIdList().isEmpty()) {
             try {
@@ -408,7 +411,7 @@ public class WebpageVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
 
@@ -423,6 +426,7 @@ public class WebpageVectorService {
     public Boolean deleteWebpageVector(WebpageEntity webpage) {
         log.info("从向量索引中删除网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
         try {
+            VectorStore vectorStore = resolveStoreByWebpage(webpage);
             // 获取网页文档ID列表
             List<String> docIdList = sanitizeDocIds(webpage.getDocIdList());
             if (docIdList.isEmpty()) {
@@ -537,7 +541,7 @@ public class WebpageVectorService {
                 .build();
 
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = resolveStoreByKbUid(kbUid).similaritySearch(searchRequest);
 
         // 解析结果
         List<WebpageVectorSearchResult> resultList = new ArrayList<>();
@@ -618,5 +622,25 @@ public class WebpageVectorService {
             .orgUid((String) metadata.getOrDefault("orgUid", ""))
             .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
             .build();
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return webpageRestService.findByUidWithKbaseNoCache(uid)
+                .map(this::resolveStoreByWebpage)
+                .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
+    private VectorStore resolveStoreByWebpage(WebpageEntity webpage) {
+        if (webpage != null && webpage.getKbase() != null) {
+            return vectorStoreResolver.resolveByKbase(webpage.getKbase());
+        }
+        return vectorStoreResolver.resolveDefault();
+    }
+
+    private VectorStore resolveStoreByKbUid(String kbUid) {
+        if (StringUtils.hasText(kbUid)) {
+            return vectorStoreResolver.resolveByKbUid(kbUid);
+        }
+        return vectorStoreResolver.resolveDefault();
     }
 }

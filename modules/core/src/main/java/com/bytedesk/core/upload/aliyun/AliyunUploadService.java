@@ -13,24 +13,24 @@
  */
 package com.bytedesk.core.upload.aliyun;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 阿里云OSS上传服务实现
  *
  * @author bytedesk.com
  */
+@RequiredArgsConstructor
 @Service("aliyunUploadService")
 @ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)
 public class AliyunUploadService {
 
-    @Autowired
-    private AliyunOss aliyunOss;
+    private final AliyunOss aliyunOss;
 
     public String uploadAttachment(MediaType mediaType, String fileName, int width, int height, String username, File file) {
         return aliyunOss.uploadAttachment(mediaType, fileName, width, height, username, file);

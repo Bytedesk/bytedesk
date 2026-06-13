@@ -14,7 +14,7 @@ public class WebrtcSettingsTools extends BaseTools<WebrtcSettingsRequest, Webrtc
         super("webrtc_settings", WebrtcSettingsRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query webrtc_settings by uid")
+    @Tool(description = "Query webrtc_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object webrtc_settingsQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
@@ -31,17 +31,17 @@ public class WebrtcSettingsTools extends BaseTools<WebrtcSettingsRequest, Webrtc
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create webrtc_settings with request json")
+    @Tool(description = "Create webrtc_settings with request json. This tool returns structured data for AI tool invocation.")
     public Object webrtc_settingsCreate(@ToolParam(description = "WebrtcSettingsRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update webrtc_settings with request json")
+    @Tool(description = "Update webrtc_settings with request json. This tool returns structured data for AI tool invocation.")
     public Object webrtc_settingsUpdate(@ToolParam(description = "WebrtcSettingsRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete webrtc_settings by uid")
+    @Tool(description = "Delete webrtc_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object webrtc_settingsDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

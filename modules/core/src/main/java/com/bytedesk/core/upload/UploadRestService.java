@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -57,13 +57,11 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.BdUploadUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 // https://spring.io/guides/gs/uploading-files
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UploadRestService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
@@ -83,11 +81,31 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final UploadSecurityLogger uploadSecurityLogger;
 
 	// 可选依赖：水印服务（当 bytedesk.watermark.enabled=false 时不加载）
-	@Autowired(required = false)
-	private UploadWatermarkService uploadWatermarkService;
+	private final UploadWatermarkService uploadWatermarkService;
 
-	@Autowired(required = false)
-	private UploadMinioService uploadMinioService;
+	private final UploadMinioService uploadMinioService;
+
+	public UploadRestService(Path uploadDir,
+			UidUtils uidUtils,
+			ModelMapper modelMapper,
+			UploadRepository uploadRepository,
+			BytedeskProperties bytedeskProperties,
+			AuthService authService,
+			UploadSecurityConfig uploadSecurityConfig,
+			UploadSecurityLogger uploadSecurityLogger,
+			ObjectProvider<UploadWatermarkService> uploadWatermarkServiceProvider,
+			ObjectProvider<UploadMinioService> uploadMinioServiceProvider) {
+		this.uploadDir = uploadDir;
+		this.uidUtils = uidUtils;
+		this.modelMapper = modelMapper;
+		this.uploadRepository = uploadRepository;
+		this.bytedeskProperties = bytedeskProperties;
+		this.authService = authService;
+		this.uploadSecurityConfig = uploadSecurityConfig;
+		this.uploadSecurityLogger = uploadSecurityLogger;
+		this.uploadWatermarkService = uploadWatermarkServiceProvider.getIfAvailable();
+		this.uploadMinioService = uploadMinioServiceProvider.getIfAvailable();
+	}
 
 	@Override
 	protected Specification<UploadEntity> createSpecification(UploadRequest request) {

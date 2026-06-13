@@ -15,18 +15,18 @@ package com.bytedesk.core.redis;
 
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.RedisConsts;
+import lombok.RequiredArgsConstructor;
 
 // https://redis.io/docs/latest/develop/data-types/streams/
+@RequiredArgsConstructor
 @Service
 public class RedisService {
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
   
     public void push(String key, String value, long ttl) {
         // redisTemplate.opsForValue().get(key); // Returns the associated value

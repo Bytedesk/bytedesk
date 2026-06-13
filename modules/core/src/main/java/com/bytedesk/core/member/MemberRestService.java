@@ -109,6 +109,9 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     }
 
     private void assertMemberCapacityAvailable(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxMembers = resolveMaxMembers(organization);
         long current = memberRepository.countByOrgUidAndDeletedFalse(orgUid);

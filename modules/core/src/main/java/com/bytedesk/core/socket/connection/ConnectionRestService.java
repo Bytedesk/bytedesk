@@ -79,6 +79,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
+    private static final long INVALID_RECORD_RETENTION_MS = 24L * 60 * 60 * 1000;
     
     @Override
     protected Specification<ConnectionEntity> createSpecification(ConnectionRequest request) {
@@ -437,6 +438,12 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         // long cost = System.currentTimeMillis() - start;
         // log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
         return changed;
+    }
+
+    @Transactional
+    public int cleanupInvalidRecordsOlderThan24Hours() {
+        long cutoff = System.currentTimeMillis() - INVALID_RECORD_RETENTION_MS;
+        return connectionRepository.deleteDisconnectedBefore(DISCONNECTED.name(), cutoff);
     }
 
     /** Determine online (has >=1 active non-expired connection) */

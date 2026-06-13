@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_text;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -30,8 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TextInitializer implements SmartInitializingSingleton {
 
-    @Autowired
-    private TextRestService textRestService;
+    private final TextRestService textRestService;
 
     private final AuthorityRestService authorityRestService;
 

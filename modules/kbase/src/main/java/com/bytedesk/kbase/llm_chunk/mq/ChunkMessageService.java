@@ -16,7 +16,6 @@ package com.bytedesk.kbase.llm_chunk.mq;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -24,18 +23,19 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Chunk消息服务
  * 使用核心模块中的JmsTemplate发送Chunk索引请求
  * 优化了批处理逻辑，避免大文件处理时的并发问题
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class ChunkMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
 
     @Value("${bytedesk.mq.type:artemis}")
     private String mqType;

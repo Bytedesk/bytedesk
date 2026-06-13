@@ -24,8 +24,6 @@ import com.bytedesk.core.uid.worker.WorkerIdAssigner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * Represents an implementation of {@link UidGeneratorService}
  * <p&gt;
@@ -76,11 +74,11 @@ public class DefaultUidGenerator implements UidGeneratorService, InitializingBea
     /**
      * Spring property
      */
-    @Autowired
     protected WorkerIdAssigner workerIdAssigner;
 
-    public DefaultUidGenerator(UidProperties uidProperties) {
+    public DefaultUidGenerator(UidProperties uidProperties, WorkerIdAssigner workerIdAssigner) {
         this.uidProperties = uidProperties;
+        this.workerIdAssigner = workerIdAssigner;
     }
 
     @Override

@@ -10,33 +10,25 @@ import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 import lombok.Data;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
 public class ProtocolProcess {
 
-    @Autowired
-    private MqttSessionService mqttSessionStoreService;
+    private final MqttSessionService mqttSessionStoreService;
     
-    @Autowired
-    private MqttAuthService mqttAuthService;
+    private final MqttAuthService mqttAuthService;
 
-    @Autowired
-    private MqttMessageIdService mqttMessageIdService;
+    private final MqttMessageIdService mqttMessageIdService;
 
-    @Autowired
-    private MqttEventPublisher mqttEventPublisher;
+    private final MqttEventPublisher mqttEventPublisher;
 
-    @Autowired
-    private IMessageSendService messageSendService;
+    private final IMessageSendService messageSendService;
 
-    @Autowired
-    private MqttConnectionService mqttConnectionService;
+    private final MqttConnectionService mqttConnectionService;
 
-    @Autowired
-    private ConnectionRestService connectionRestService;
+    private final ConnectionRestService connectionRestService;
 
     private Connect connect;
 

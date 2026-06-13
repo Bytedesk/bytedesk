@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.email_provider;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailException;
@@ -37,6 +36,7 @@ import com.bytedesk.core.utils.Utils;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.util.Assert;
 
 /**
@@ -47,12 +47,12 @@ import org.springframework.util.Assert;
  * https://www.thymeleaf.org/doc/articles/springmail.html
  * http://blog.didispace.com/springbootmailsender/
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class EmailSendService {
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
     @Value("${aliyun.access.key.id:}")
     private String accessKeyId;
@@ -60,8 +60,7 @@ public class EmailSendService {
     @Value("${aliyun.access.key.secret:}")
     private String accessKeySecret;
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     @Value("${spring.mail.username:}")
     private String from;

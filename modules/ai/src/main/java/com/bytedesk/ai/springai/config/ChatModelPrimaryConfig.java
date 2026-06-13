@@ -13,10 +13,10 @@
  */
 package com.bytedesk.ai.springai.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.SpringAIModels;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -35,49 +35,53 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class ChatModelPrimaryConfig {
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskZhipuaiChatModel")
-    private ChatModel zhipuaiChatModel;
+    public ChatModelPrimaryConfig(
+            @Qualifier("bytedeskZhipuaiChatModel") ObjectProvider<ChatModel> zhipuaiChatModelProvider,
+            @Qualifier("bytedeskOllamaChatModel") ObjectProvider<ChatModel> ollamaChatModelProvider,
+            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<ChatModel> dashscopeChatModelProvider,
+            @Qualifier("deepseekChatModel") ObjectProvider<ChatModel> deepseekChatModelProvider,
+            @Qualifier("baiduChatModel") ObjectProvider<ChatModel> baiduChatModelProvider,
+            @Qualifier("tencentChatModel") ObjectProvider<ChatModel> tencentChatModelProvider,
+            @Qualifier("volcengineChatModel") ObjectProvider<ChatModel> volcengineChatModelProvider,
+            @Qualifier("openaiChatModel") ObjectProvider<ChatModel> openaiChatModelProvider,
+            @Qualifier("openrouterChatModel") ObjectProvider<ChatModel> openrouterChatModelProvider,
+            @Qualifier("siliconFlowChatModel") ObjectProvider<ChatModel> siliconflowChatModelProvider,
+            @Qualifier("giteeChatModel") ObjectProvider<ChatModel> giteeChatModelProvider) {
+        this.zhipuaiChatModel = zhipuaiChatModelProvider.getIfAvailable();
+        this.ollamaChatModel = ollamaChatModelProvider.getIfAvailable();
+        this.dashscopeChatModel = dashscopeChatModelProvider.getIfAvailable();
+        this.deepseekChatModel = deepseekChatModelProvider.getIfAvailable();
+        this.baiduChatModel = baiduChatModelProvider.getIfAvailable();
+        this.tencentChatModel = tencentChatModelProvider.getIfAvailable();
+        this.volcengineChatModel = volcengineChatModelProvider.getIfAvailable();
+        this.openaiChatModel = openaiChatModelProvider.getIfAvailable();
+        this.openrouterChatModel = openrouterChatModelProvider.getIfAvailable();
+        this.siliconflowChatModel = siliconflowChatModelProvider.getIfAvailable();
+        this.giteeChatModel = giteeChatModelProvider.getIfAvailable();
+    }
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskOllamaChatModel")
-    private ChatModel ollamaChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatModel")
-    private ChatModel dashscopeChatModel;
+    private final ChatModel zhipuaiChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("deepseekChatModel")
-    private ChatModel deepseekChatModel;
+    private final ChatModel ollamaChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("baiduChatModel")
-    private ChatModel baiduChatModel;
+    private final ChatModel dashscopeChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("tencentChatModel")
-    private ChatModel tencentChatModel;
+    private final ChatModel deepseekChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("volcengineChatModel")
-    private ChatModel volcengineChatModel;
+    private final ChatModel baiduChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("openaiChatModel")
-    private ChatModel openaiChatModel;
+    private final ChatModel tencentChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("openrouterChatModel")
-    private ChatModel openrouterChatModel;
+    private final ChatModel volcengineChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("siliconFlowChatModel")
-    private ChatModel siliconflowChatModel;
+    private final ChatModel openaiChatModel;
 
-    @Autowired(required = false)
-    @Qualifier("giteeChatModel")
-    private ChatModel giteeChatModel;
+    private final ChatModel openrouterChatModel;
+
+    private final ChatModel siliconflowChatModel;
+
+    private final ChatModel giteeChatModel;
 
     @Bean
     @Primary

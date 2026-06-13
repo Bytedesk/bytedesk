@@ -14,7 +14,7 @@ public class WorkflowSettingsTools extends BaseTools<WorkflowSettingsRequest, Wo
         super("workflow_settings", WorkflowSettingsRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query workflow_settings by uid")
+    @Tool(description = "Query workflow_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object workflow_settingsQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
@@ -31,17 +31,17 @@ public class WorkflowSettingsTools extends BaseTools<WorkflowSettingsRequest, Wo
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create workflow_settings with request json")
+    @Tool(description = "Create workflow_settings with request json. This tool returns structured data for AI tool invocation.")
     public Object workflow_settingsCreate(@ToolParam(description = "WorkflowSettingsRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update workflow_settings with request json")
+    @Tool(description = "Update workflow_settings with request json. This tool returns structured data for AI tool invocation.")
     public Object workflow_settingsUpdate(@ToolParam(description = "WorkflowSettingsRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete workflow_settings by uid")
+    @Tool(description = "Delete workflow_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object workflow_settingsDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

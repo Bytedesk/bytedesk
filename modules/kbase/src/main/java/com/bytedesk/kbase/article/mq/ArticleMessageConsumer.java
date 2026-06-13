@@ -16,6 +16,7 @@ package com.bytedesk.kbase.article.mq;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,7 +27,6 @@ import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -40,11 +40,12 @@ public class ArticleMessageConsumer {
 
     private final ArticleElasticService articleElasticService;
     private final ArticleRestService articleRestService;
-    @Autowired(required = false)
-    private ArticleVectorService articleVectorService;
+    private final ArticleVectorService articleVectorService;
     private final Random random = new Random();
 
-    public ArticleMessageConsumer(ArticleElasticService articleElasticService, ArticleRestService articleRestService) {
+    public ArticleMessageConsumer(ArticleElasticService articleElasticService, ArticleRestService articleRestService,
+            ObjectProvider<ArticleVectorService> articleVectorServiceProvider) {
+        this.articleVectorService = articleVectorServiceProvider.getIfAvailable();
         this.articleElasticService = articleElasticService;
         this.articleRestService = articleRestService;
     }

@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.upload.minio;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,14 +21,15 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Configuration
 @ConditionalOnProperty(name = "bytedesk.minio.enabled", havingValue = "true", matchIfMissing = false)
 public class MinioConfig {
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
     /**
      * 初始化 MinIO 客户端

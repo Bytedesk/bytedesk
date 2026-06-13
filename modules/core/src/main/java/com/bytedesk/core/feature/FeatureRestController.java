@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.feature;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +23,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/features")
 public class FeatureRestController extends BaseRestController<FeatureRequest, FeatureRestService> {
 
-    @Autowired
-    private FeatureService featureService;
+    private final FeatureService featureService;
 
     @Override
     public ResponseEntity<?> queryByOrg(FeatureRequest request) {

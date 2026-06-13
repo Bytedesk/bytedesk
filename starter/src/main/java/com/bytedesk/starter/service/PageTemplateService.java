@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -31,11 +30,14 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * only used for development
  * 页面服务，仅用于开发阶段
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class PageTemplateService {
 
@@ -46,8 +48,7 @@ public class PageTemplateService {
     // private static final String htmlSavePlanPath = "/templates/plan/";
     // private static final String templatePlanPath = "/templates/ftl/plan/";
 
-    @Autowired
-    Configuration configuration;
+    private final Configuration configuration;
 
     public void toHtml(String tempName) {
 

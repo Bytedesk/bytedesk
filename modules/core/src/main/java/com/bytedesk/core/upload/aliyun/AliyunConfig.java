@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.upload.aliyun;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +25,11 @@ import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 @Configuration
 public class AliyunConfig {
 
-    @Autowired
-    AliyunProperties aliyunProperties;
+    private final AliyunProperties aliyunProperties;
+
+    public AliyunConfig(AliyunProperties aliyunProperties) {
+        this.aliyunProperties = aliyunProperties;
+    }
 
     @Bean
     @ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)

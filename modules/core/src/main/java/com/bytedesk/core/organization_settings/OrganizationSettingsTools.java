@@ -14,7 +14,7 @@ public class OrganizationSettingsTools extends BaseTools<OrganizationSettingsReq
         super("organization_settings", OrganizationSettingsRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query organization_settings by uid")
+    @Tool(description = "Query organization_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object organization_settingsQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
@@ -41,7 +41,7 @@ public class OrganizationSettingsTools extends BaseTools<OrganizationSettingsReq
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete organization_settings by uid")
+    @Tool(description = "Delete organization_settings by uid. This tool returns structured data for AI tool invocation.")
     public Object organization_settingsDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

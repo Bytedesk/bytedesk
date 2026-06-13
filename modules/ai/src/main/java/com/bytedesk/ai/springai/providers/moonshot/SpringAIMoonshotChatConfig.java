@@ -16,7 +16,7 @@ package com.bytedesk.ai.springai.providers.moonshot;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +33,16 @@ import io.micrometer.observation.ObservationRegistry;
 @ConditionalOnProperty(prefix = "spring.ai.moonshot.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIMoonshotChatConfig {
 
+    public SpringAIMoonshotChatConfig(
+            ObjectProvider<ToolCallingManager> toolCallingManagerProvider,
+            ObjectProvider<RetryTemplate> retryTemplateProvider,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider) {
+        this.toolCallingManager = toolCallingManagerProvider.getIfAvailable();
+        this.retryTemplate = retryTemplateProvider.getIfAvailable();
+        this.observationRegistry = observationRegistryProvider.getIfAvailable();
+    }
+
+
     @Value("${spring.ai.moonshot.base-url:https://api.moonshot.cn}")
     private String baseUrl;
 
@@ -45,14 +55,11 @@ public class SpringAIMoonshotChatConfig {
     @Value("${spring.ai.moonshot.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Autowired(required = false)
-    private ToolCallingManager toolCallingManager;
+    private final ToolCallingManager toolCallingManager;
 
-    @Autowired(required = false)
-    private RetryTemplate retryTemplate;
+    private final RetryTemplate retryTemplate;
 
-    @Autowired(required = false)
-    private ObservationRegistry observationRegistry;
+    private final ObservationRegistry observationRegistry;
 
     @Bean("moonshotApi")
     MoonshotApi moonshotApi() {

@@ -29,7 +29,9 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.AgentCapacityExceededException;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -102,6 +104,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     }
 
     private void assertAgentCapacityAvailable(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
         UserEntity authUser = authService.getUser();
         if (authUser != null && authUser.isSuperUser()) {
             return;
@@ -111,15 +116,15 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         long current = agentRepository.countByOrgUidAndDeletedFalse(orgUid);
         if (agentSeatDomainService.isSeatEnabled()) {
             if (current >= maxAgents) {
-                throw new RuntimeException("Organization agent limit exceeded");
+                throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_LIMIT_EXCEEDED);
             }
             if (!agentSeatDomainService.hasAvailableSeat(orgUid)) {
-                throw new RuntimeException("Organization agent seat limit exceeded");
+                throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_SEAT_LIMIT_EXCEEDED);
             }
             return;
         }
         if (current >= maxAgents) {
-            throw new RuntimeException("Organization agent limit exceeded");
+            throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_LIMIT_EXCEEDED);
         }
     }
 

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.social.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -33,17 +33,23 @@ import java.sql.Connection;
 @Component
 public class SocialHealthIndicator implements HealthIndicator {
 
+    public SocialHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<RedisTemplate<String, Object>> redisTemplateProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.redisTemplate = redisTemplateProvider.getIfAvailable();
+    }
+
+
     @Value("${bytedesk.social.max-connections:5000}")
     private int maxConnections;
 
     @Value("${bytedesk.social.cache.enabled:true}")
     private boolean cacheEnabled;
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired(required = false)
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Health health() {

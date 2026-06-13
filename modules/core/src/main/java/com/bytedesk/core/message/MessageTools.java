@@ -14,34 +14,34 @@ public class MessageTools extends BaseTools<MessageRequest, MessageResponse> {
         super("message", MessageRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query message by uid")
+    @Tool(description = "Query message by uid. This tool returns structured data for AI tool invocation.")
     public Object messageQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query message by org with request json")
+    @Tool(description = "Query message by org with request json. This tool returns structured data for AI tool invocation.")
     public Object messageQueryByOrg(@ToolParam(description = "MessageRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query message by user with request json")
+    @Tool(description = "Query message by user with request json. This tool returns structured data for AI tool invocation.")
     public Object messageQueryByUser(@ToolParam(description = "MessageRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create message with request json")
+    @Tool(description = "Create message with request json. This tool returns structured data for AI tool invocation.")
     public Object messageCreate(@ToolParam(description = "MessageRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update message with request json")
+    @Tool(description = "Update message with request json. This tool returns structured data for AI tool invocation.")
     public Object messageUpdate(@ToolParam(description = "MessageRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete message by uid")
+    @Tool(description = "Delete message by uid. This tool returns structured data for AI tool invocation.")
     public Object messageDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

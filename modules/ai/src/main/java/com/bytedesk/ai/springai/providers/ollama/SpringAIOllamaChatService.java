@@ -20,7 +20,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
@@ -47,20 +47,21 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIOllamaChatService extends BaseSpringAIService {
 
-    @Autowired
-    @Qualifier("bytedeskOllamaApi")
-    private OllamaApi bytedeskOllamaApi;
-
-    @Autowired(required = false)
-    @Qualifier("bytedeskOllamaChatModel")
-    private OllamaChatModel bytedeskOllamaChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIOllamaChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIOllamaChatService(
+            @Qualifier("bytedeskOllamaApi") OllamaApi bytedeskOllamaApi,
+            @Qualifier("bytedeskOllamaChatModel") ObjectProvider<OllamaChatModel> bytedeskOllamaChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.bytedeskOllamaApi = bytedeskOllamaApi;
+        this.bytedeskOllamaChatModel = bytedeskOllamaChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+    private final OllamaApi bytedeskOllamaApi;
+
+    private final OllamaChatModel bytedeskOllamaChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OllamaChatOptions
@@ -99,7 +100,9 @@ public class SpringAIOllamaChatService extends BaseSpringAIService {
      * @return 如果模型存在返回true，否则返回false
      */
     public Boolean isModelExists(OllamaRequest request) {
-        OllamaApi ollamaApi = createOllamaApi(request.getBaseUrl());
+        OllamaApi ollamaApi = StringUtils.hasText(request.getBaseUrl())
+            ? createOllamaApi(request.getBaseUrl())
+            : bytedeskOllamaApi;
         String modelName = request.getModel();
         Assert.hasText(modelName, "Model name must not be null or empty");
         try {

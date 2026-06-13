@@ -31,7 +31,6 @@ public class AgentSeatDomainService {
     private final AgentSeatRepository agentSeatRepository;
     private final AgentRepository agentRepository;
     private final MemberRestService memberRestService;
-    // private final UidUtils uidUtils;
 
     public boolean isSeatEnabled() {
         return agentSeatEnabled;

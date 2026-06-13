@@ -13,7 +13,8 @@
  */
 package com.bytedesk.ai.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class AiPlugin extends AbstractBytedeskPlugin {
+
+    public AiPlugin(
+            @Qualifier("aiHealthIndicator") ObjectProvider<HealthIndicator> aiHealthIndicatorProvider) {
+        this.aiHealthIndicator = aiHealthIndicatorProvider.getIfAvailable();
+    }
+
     
     @Value("${bytedesk.ai.enabled:true}")
     private boolean enabled;
@@ -36,8 +43,7 @@ public class AiPlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.ai.version:1.0.0}")
     private String version;
     
-    @Autowired(required = false)
-    private HealthIndicator aiHealthIndicator;
+    private final HealthIndicator aiHealthIndicator;
     
     @Override
     protected HealthIndicator getHealthIndicator() {

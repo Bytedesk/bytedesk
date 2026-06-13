@@ -215,6 +215,15 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(e.getMessage(), HttpStatus.CONFLICT.value()));
     }
 
+    @ExceptionHandler(AgentCapacityExceededException.class)
+    public ResponseEntity<?> handleAgentCapacityExceededException(AgentCapacityExceededException e) {
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        log.warn("Agent capacity exceeded: {}", e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         String rawMessage = e.getMessage();

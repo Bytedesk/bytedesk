@@ -18,7 +18,6 @@ package com.bytedesk.starter.swagger;
 
 // import org.springdoc.core.customizers.OpenApiCustomizer;
 // import org.springdoc.core.customizers.OperationCustomizer;
-// import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.context.MessageSource;
 // import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

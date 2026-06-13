@@ -15,7 +15,6 @@ package com.bytedesk.core.sms_push;
 
 import java.nio.charset.StandardCharsets;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -33,6 +32,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -43,6 +43,14 @@ import org.springframework.util.Assert;
 @Slf4j
 @Service
 public class SmsPushSendService {
+
+    public SmsPushSendService(
+            ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider,
+            BytedeskProperties bytedeskProperties) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.smsPushExternalSenderProvider = smsPushExternalSenderProvider;
+    }
+
 
     @Value("${aliyun.region.id:cn-hangzhou}")
     private String regionId;
@@ -83,7 +91,7 @@ public class SmsPushSendService {
     /**
      * 初始化时处理配置项编码问题
      */
-    @Autowired
+    @PostConstruct
     public void init() {
         try {
             // 检查签名是否为乱码，如果是则进行转换
@@ -106,11 +114,9 @@ public class SmsPushSendService {
         }
     }
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
-    @Autowired(required = false)
-    private ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider;
+    private final ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 

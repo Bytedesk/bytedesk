@@ -13,7 +13,6 @@
  */
 package com.bytedesk.starter.swagger;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +24,13 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import lombok.RequiredArgsConstructor;
 
 /**
  * http://127.0.0.1:9003/swagger-ui/index.html?lang=zh_CN
  * 支持国际化: 添加参数 ?lang=en|zh_CN|zh_TW
  */
+@RequiredArgsConstructor
 @Configuration
 public class SpringDocConfig {
 
@@ -39,8 +40,7 @@ public class SpringDocConfig {
     @Value("${server.port}")
     private String port;
     
-    @Autowired
-    private MessageSource messageSource;
+    private final MessageSource messageSource;
     
     /**
      * 配置 OpenAPI Bean，并添加国际化和安全配置

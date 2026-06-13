@@ -14,7 +14,7 @@ public class OrganizationApplyTools extends BaseTools<OrganizationApplyRequest, 
         super("organizationApply", OrganizationApplyRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query organizationApply by uid")
+    @Tool(description = "Query organizationApply by uid. This tool returns structured data for AI tool invocation.")
     public Object organizationApplyQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
@@ -31,17 +31,17 @@ public class OrganizationApplyTools extends BaseTools<OrganizationApplyRequest, 
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create organizationApply with request json")
+    @Tool(description = "Create organizationApply with request json. This tool returns structured data for AI tool invocation.")
     public Object organizationApplyCreate(@ToolParam(description = "OrganizationApplyRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update organizationApply with request json")
+    @Tool(description = "Update organizationApply with request json. This tool returns structured data for AI tool invocation.")
     public Object organizationApplyUpdate(@ToolParam(description = "OrganizationApplyRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete organizationApply by uid")
+    @Tool(description = "Delete organizationApply by uid. This tool returns structured data for AI tool invocation.")
     public Object organizationApplyDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

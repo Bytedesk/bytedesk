@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -29,17 +28,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ JSON文件加载器
  * 用于从JSON文件中加载FAQ数据并解析成对象
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FaqJsonLoader {
     
-    @Autowired
-    private ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
     /**
      * 加载FAQ配置

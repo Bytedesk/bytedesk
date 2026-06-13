@@ -14,34 +14,34 @@ public class TaskCommentTools extends BaseTools<TaskCommentRequest, TaskCommentR
         super("taskComment", TaskCommentRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query taskComment by uid")
+    @Tool(description = "Query taskComment by uid. This tool returns structured data for AI tool invocation.")
     public Object taskCommentQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query taskComment by org with request json")
+    @Tool(description = "Query taskComment by org with request json. This tool returns structured data for AI tool invocation.")
     public Object taskCommentQueryByOrg(@ToolParam(description = "TaskCommentRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query taskComment by user with request json")
+    @Tool(description = "Query taskComment by user with request json. This tool returns structured data for AI tool invocation.")
     public Object taskCommentQueryByUser(@ToolParam(description = "TaskCommentRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create taskComment with request json")
+    @Tool(description = "Create taskComment with request json. This tool returns structured data for AI tool invocation.")
     public Object taskCommentCreate(@ToolParam(description = "TaskCommentRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update taskComment with request json")
+    @Tool(description = "Update taskComment with request json. This tool returns structured data for AI tool invocation.")
     public Object taskCommentUpdate(@ToolParam(description = "TaskCommentRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete taskComment by uid")
+    @Tool(description = "Delete taskComment by uid. This tool returns structured data for AI tool invocation.")
     public Object taskCommentDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

@@ -56,5 +56,10 @@
     <include file="db/changelog/migration/260609_add_wechat_mp_qrcode_scan_link_fields.xml" />
     <include file="db/changelog/migration/260609_add_wechat_mp_shorten_table.xml" />
     <include file="db/changelog/migration/260609_add_wechat_mp_push_record_fields.xml" />
+    <include file="db/changelog/migration/260610_add_connection_presence_index.xml" />
+    <include file="db/changelog/migration/260611_add_ticket_statistics_indexes.xml" />
+    <include file="db/changelog/migration/260611_add_service_statistic_scope_indexes.xml" />
+    <include file="db/changelog/migration/260611_refactor_xml_curl_trace_table.xml" />
+    <include file="db/changelog/migration/260612_alter_esl_event_api_argument_to_text.xml" />
 
 </databaseChangeLog>

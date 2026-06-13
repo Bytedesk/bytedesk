@@ -16,7 +16,9 @@ package com.bytedesk.kbase.llm_chunk.mq;
 import java.util.Optional;
 import java.util.Random;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
@@ -26,7 +28,6 @@ import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -42,17 +43,17 @@ public class ChunkIndexConsumer {
     private final ChunkElasticService chunkElasticService;
     private final ChunkRestService chunkRestService;
     private final ChunkVectorService chunkVectorService;
+    private final JmsTemplate jmsTemplate;
     private final Random random = new Random();
-    
-    @Autowired
-    private org.springframework.jms.core.JmsTemplate jmsTemplate;
 
     public ChunkIndexConsumer(ChunkElasticService chunkElasticService,
             ChunkRestService chunkRestService,
-            @Autowired(required = false) ChunkVectorService chunkVectorService) {
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
+            JmsTemplate jmsTemplate) {
         this.chunkElasticService = chunkElasticService;
         this.chunkRestService = chunkRestService;
-        this.chunkVectorService = chunkVectorService;
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
+        this.jmsTemplate = jmsTemplate;
         
         // 在构造函数中检查并记录向量服务状态
         if (chunkVectorService == null) {

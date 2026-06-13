@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_faq;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,6 @@ import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,10 +47,11 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     private final FaqElasticService faqElasticService;
 
-    @Autowired(required = false)
-    private FaqVectorService faqVectorService;
+    private final FaqVectorService faqVectorService;
 
-    public FaqRestController(FaqRestService faqRestService, FaqElasticService faqElasticService) {
+    public FaqRestController(FaqRestService faqRestService, FaqElasticService faqElasticService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider) {
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
         this.faqRestService = faqRestService;
         this.faqElasticService = faqElasticService;
     }

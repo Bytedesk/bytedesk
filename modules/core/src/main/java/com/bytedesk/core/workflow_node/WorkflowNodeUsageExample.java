@@ -16,7 +16,6 @@ package com.bytedesk.core.workflow_node;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.workflow.WorkflowEntity;
@@ -29,17 +28,18 @@ import com.bytedesk.core.workflow.node.WorkflowStartNode;
 import com.bytedesk.core.workflow.node.WorkflowEndNode;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 工作流节点使用示例
  * 演示如何在WorkflowNodeEntity和node文件夹中的类之间进行格式转换
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class WorkflowNodeUsageExample {
 
-    @Autowired
-    private WorkflowNodeService workflowNodeService;
+    private final WorkflowNodeService workflowNodeService;
 
     /**
      * 示例1：创建一个简单的工作流节点并保存到数据库

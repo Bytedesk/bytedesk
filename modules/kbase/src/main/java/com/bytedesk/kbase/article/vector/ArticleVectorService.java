@@ -20,16 +20,18 @@ import java.util.Map;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleRequest;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 // import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -47,7 +49,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ArticleVectorService {
 
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final ArticleRestService articleRestService;
 
@@ -83,7 +85,7 @@ public class ArticleVectorService {
             Map<String, Object> metadata = Map.of(
                     "uid", currentArticle.getUid(),
                     "title", currentArticle.getTitle(),
-                    KbaseConst.KBASE_KB_UID, currentArticle.getKbase().getUid() != null ? currentArticle.getKbase().getUid() : "",
+                    KbaseConst.KBASE_KB_UID, currentArticle.getKbase() != null && currentArticle.getKbase().getUid() != null ? currentArticle.getKbase().getUid() : "",
                     "categoryUid", currentArticle.getCategoryUid() != null ? currentArticle.getCategoryUid() : "",
                     "orgUid", currentArticle.getOrgUid(),
                     "enabled", Boolean.toString(currentArticle.getPublished()),
@@ -94,7 +96,7 @@ public class ArticleVectorService {
 
             // 添加新文档到向量存储
             log.info("向向量存储添加文档: {}", id);
-            vectorStore.add(List.of(document));
+            resolveStoreByArticle(currentArticle).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
 
             // 3. 更新文章实体中的文档ID列表
@@ -192,7 +194,7 @@ public class ArticleVectorService {
 
             // 从向量存储中删除所有相关文档
             log.info("删除文章向量文档, 数量: {}, IDs: {}", docIdList.size(), docIdList);
-            vectorStore.delete(docIdList);
+            resolveStoreByArticle(article).delete(docIdList);
 
             // 不再在此方法中更新实体状态，避免乐观锁冲突
             // 状态更新将在indexArticleVector方法中完成
@@ -254,7 +256,7 @@ public class ArticleVectorService {
                 .build();
 
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = resolveStoreByKbUid(kbUid).similaritySearch(searchRequest);
 
         // 解析结果
         List<ArticleVectorSearchResult> resultList = new ArrayList<>();
@@ -343,5 +345,19 @@ public class ArticleVectorService {
                 .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
                 .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
                 .build();
+    }
+
+    private VectorStore resolveStoreByArticle(ArticleEntity article) {
+        if (article != null && article.getKbase() != null) {
+            return vectorStoreResolver.resolveByKbase(article.getKbase());
+        }
+        return vectorStoreResolver.resolveDefault();
+    }
+
+    private VectorStore resolveStoreByKbUid(String kbUid) {
+        if (StringUtils.hasText(kbUid)) {
+            return vectorStoreResolver.resolveByKbUid(kbUid);
+        }
+        return vectorStoreResolver.resolveDefault();
     }
 }

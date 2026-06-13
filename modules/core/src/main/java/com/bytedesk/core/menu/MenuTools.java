@@ -14,34 +14,34 @@ public class MenuTools extends BaseTools<MenuRequest, MenuResponse> {
         super("menu", MenuRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query menu by uid")
+    @Tool(description = "Query menu by uid. This tool returns structured data for AI tool invocation.")
     public Object menuQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query menu by org with request json")
+    @Tool(description = "Query menu by org with request json. This tool returns structured data for AI tool invocation.")
     public Object menuQueryByOrg(@ToolParam(description = "MenuRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query menu by user with request json")
+    @Tool(description = "Query menu by user with request json. This tool returns structured data for AI tool invocation.")
     public Object menuQueryByUser(@ToolParam(description = "MenuRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create menu with request json")
+    @Tool(description = "Create menu with request json. This tool returns structured data for AI tool invocation.")
     public Object menuCreate(@ToolParam(description = "MenuRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update menu with request json")
+    @Tool(description = "Update menu with request json. This tool returns structured data for AI tool invocation.")
     public Object menuUpdate(@ToolParam(description = "MenuRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete menu by uid")
+    @Tool(description = "Delete menu by uid. This tool returns structured data for AI tool invocation.")
     public Object menuDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

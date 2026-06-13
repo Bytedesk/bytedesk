@@ -1,11 +1,10 @@
 package com.bytedesk.ai.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -23,22 +22,30 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmbeddingModelInfoService {
+
+    public EmbeddingModelInfoService(
+            ObjectProvider<ZhiPuAiEmbeddingModel> zhipuaiEmbeddingModelProvider,
+            ObjectProvider<OllamaEmbeddingModel> ollamaEmbeddingModelProvider,
+            ObjectProvider<DashScopeEmbeddingModel> dashscopeEmbeddingModelProvider,
+            ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.zhipuaiEmbeddingModel = zhipuaiEmbeddingModelProvider.getIfAvailable();
+        this.ollamaEmbeddingModel = ollamaEmbeddingModelProvider.getIfAvailable();
+        this.dashscopeEmbeddingModel = dashscopeEmbeddingModelProvider.getIfAvailable();
+    }
+
 
     private final ApplicationContext applicationContext;
     
     @Value("${spring.ai.model.embedding:none}")
     private String primaryEmbeddingProvider;
 
-    @Autowired(required = false)
-    private ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel;
+    private final ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel;
 
-    @Autowired(required = false)
-    private OllamaEmbeddingModel ollamaEmbeddingModel;
+    private final OllamaEmbeddingModel ollamaEmbeddingModel;
 
-    @Autowired(required = false)
-    private DashScopeEmbeddingModel dashscopeEmbeddingModel;
+    private final DashScopeEmbeddingModel dashscopeEmbeddingModel;
 
     /**
      * 测试不同的 embedding 模型

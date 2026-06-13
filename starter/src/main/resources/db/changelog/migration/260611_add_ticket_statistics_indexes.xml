@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260611-add-ticket-statistics-department-index-mysql" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="hour"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="is_deleted"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="department_uid"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_dept"/>
+            </not>
+        </preConditions>
+
+        <sql><![CDATA[
+            ALTER TABLE `bytedesk_ticket_statistics`
+            ADD INDEX `idx_ticket_stats_org_type_date_hour_dept` (
+                `org_uid`(64),
+                `statistic_type`(32),
+                `date`(16),
+                `hour`,
+                `is_deleted`,
+                `department_uid`(64)
+            )
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="260611-add-ticket-statistics-department-index-postgresql" author="githubcopilot" dbms="postgresql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="hour"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="is_deleted"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="department_uid"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_dept"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_dept">
+            <column name="org_uid"/>
+            <column name="statistic_type"/>
+            <column name="date"/>
+            <column name="hour"/>
+            <column name="is_deleted"/>
+            <column name="department_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260611-add-ticket-statistics-assignee-index-mysql" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="hour"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="is_deleted"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="assignee_uid"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_assignee"/>
+            </not>
+        </preConditions>
+
+        <sql><![CDATA[
+            ALTER TABLE `bytedesk_ticket_statistics`
+            ADD INDEX `idx_ticket_stats_org_type_date_hour_assignee` (
+                `org_uid`(64),
+                `statistic_type`(32),
+                `date`(16),
+                `hour`,
+                `is_deleted`,
+                `assignee_uid`(64)
+            )
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="260611-add-ticket-statistics-assignee-index-postgresql" author="githubcopilot" dbms="postgresql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="hour"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="is_deleted"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="assignee_uid"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_assignee"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_type_date_hour_assignee">
+            <column name="org_uid"/>
+            <column name="statistic_type"/>
+            <column name="date"/>
+            <column name="hour"/>
+            <column name="is_deleted"/>
+            <column name="assignee_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

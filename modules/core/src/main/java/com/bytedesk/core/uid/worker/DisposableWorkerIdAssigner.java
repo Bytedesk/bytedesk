@@ -21,11 +21,11 @@ import com.bytedesk.core.uid.UidGereratorRepository;
 import com.bytedesk.core.uid.utils.NetUtils;
 import com.bytedesk.core.utils.Utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 // import org.apache.commons.lang.math.RandomUtils;
 // import org.slf4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Represents an implementation of {@link WorkerIdAssigner},
@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author yutianbao
  */
+@RequiredArgsConstructor
 public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
 
     // @Value("${server.host}")
@@ -42,8 +43,7 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     private String port;
 
     // @Resource
-    @Autowired
-    private UidGereratorRepository workerNodeDAO;
+    private final UidGereratorRepository workerNodeDAO;
 
     /**
      * Assign worker id base on database.<p&gt;

@@ -13,24 +13,24 @@
  */
 package com.bytedesk.kbase.quick_reply.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 快捷回复消息服务
  * 使用核心模块中的JmsTemplate发送快捷回复索引请求
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class QuickReplyMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
     
     /**
      * 发送快捷回复到索引队列，用于创建或更新索引

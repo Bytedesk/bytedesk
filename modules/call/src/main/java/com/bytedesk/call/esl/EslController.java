@@ -5,7 +5,7 @@
 package com.bytedesk.call.esl;
 
 import com.bytedesk.call.esl.client.internal.IModEslApi;
-import com.bytedesk.call.xml_curl.XmlCurlTraceService;
+import com.bytedesk.call.xml_curl_trace.XmlCurlTraceService;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;

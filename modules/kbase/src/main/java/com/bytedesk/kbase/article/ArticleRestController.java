@@ -15,6 +15,7 @@ package com.bytedesk.kbase.article;
 
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +32,6 @@ import com.bytedesk.kbase.article.elastic.ArticleElasticService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import com.bytedesk.core.annotation.ActionAnnotation;
 
@@ -52,10 +52,11 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
     private final ArticleElasticService articleElasticService;
 
-    @Autowired(required = false)
-    private ArticleVectorService articleVectorService;
+    private final ArticleVectorService articleVectorService;
 
-    public ArticleRestController(ArticleRestService articleRestService, ArticleElasticService articleElasticService) {
+    public ArticleRestController(ArticleRestService articleRestService, ArticleElasticService articleElasticService,
+            ObjectProvider<ArticleVectorService> articleVectorServiceProvider) {
+        this.articleVectorService = articleVectorServiceProvider.getIfAvailable();
         this.articleRestService = articleRestService;
         this.articleElasticService = articleElasticService;
     }

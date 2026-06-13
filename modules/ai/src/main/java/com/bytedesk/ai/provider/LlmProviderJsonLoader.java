@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -26,15 +25,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class LlmProviderJsonLoader {
 
-    @Autowired
-    private ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
     public Map<String, ProviderJson> loadProviders() {
         Resource resource = resourceLoader.getResource("classpath:ai/providers.json");

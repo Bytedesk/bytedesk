@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_webpage;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,6 @@ import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/v1/llm/webpage")
@@ -39,10 +39,11 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
 
     private final WebpageElasticService webpageElasticService;
 
-    @Autowired(required = false)
-    private WebpageVectorService webpageVectorService;
+    private final WebpageVectorService webpageVectorService;
 
-    public WebpageRestController(WebpageRestService webpageRestService, WebpageElasticService webpageElasticService) {
+    public WebpageRestController(WebpageRestService webpageRestService, WebpageElasticService webpageElasticService,
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider) {
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
         this.webpageRestService = webpageRestService;
         this.webpageElasticService = webpageElasticService;
     }

@@ -15,7 +15,6 @@ package com.bytedesk.ticket.ticket.listener;
 
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.service.TicketNotificationService;
@@ -23,19 +22,18 @@ import com.bytedesk.ticket.ticket.TicketRestService;
 import com.bytedesk.ticket.ticket.TicketSLAService;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class TicketCaseListener implements CaseInstanceLifecycleListener {
     
-    @Autowired
-    private TicketRestService ticketService;
+    private final TicketRestService ticketService;
     
-    @Autowired
-    private TicketSLAService slaService;
+    private final TicketSLAService slaService;
     
-    @Autowired
-    private TicketNotificationService notificationService;
+    private final TicketNotificationService notificationService;
     
     @Override
     public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -34,20 +34,27 @@ import java.sql.Connection;
 @Component
 public class CoreHealthIndicator implements HealthIndicator {
 
+    public CoreHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<RedisConnectionFactory> redisConnectionFactoryProvider,
+            ObjectProvider<DatabaseTypeChecker> databaseTypeCheckerProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.redisConnectionFactory = redisConnectionFactoryProvider.getIfAvailable();
+        this.databaseTypeChecker = databaseTypeCheckerProvider.getIfAvailable();
+    }
+
+
     @Value("${application.version:unknown}")
     private String appVersion;
 
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired(required = false)
-    private RedisConnectionFactory redisConnectionFactory;
+    private final RedisConnectionFactory redisConnectionFactory;
 
-    @Autowired(required = false)
-    private DatabaseTypeChecker databaseTypeChecker;
+    private final DatabaseTypeChecker databaseTypeChecker;
 
     @Override
     public Health health() {

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,6 @@ import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
 
 @RestController
@@ -42,10 +42,11 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
 
     private final TextElasticService textElasticService;
 
-    @Autowired(required = false)
-    private TextVectorService textVectorService;
+    private final TextVectorService textVectorService;
 
-    public TextRestController(TextRestService textRestService, TextElasticService textElasticService) {
+    public TextRestController(TextRestService textRestService, TextElasticService textElasticService,
+            ObjectProvider<TextVectorService> textVectorServiceProvider) {
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
         this.textRestService = textRestService;
         this.textElasticService = textElasticService;
     }

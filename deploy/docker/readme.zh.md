@@ -255,6 +255,82 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f comp
 - 当没有加密内容时，保持该变量为空即可，Jasypt 会自动降级为明文。
 - 需要调整算法或迭代次数时，可额外设置 `BYTEDESK_SECURITY_JASYPT_ALGORITHM`、`BYTEDESK_SECURITY_JASYPT_KEY_OBTENTION_ITERATIONS` 等环境变量。
 
+## Logstash 日志采集
+
+`compose-base.yaml` 已内置 `bytedesk-logstash`，默认同时采集两类日志：
+
+- Docker 应用容器写入共享卷 `/app/logs/bytedeskim.log` 的日志
+- 本地源码运行写入 [starter/logs](starter/logs) 的 `bytedeskim.log`
+
+```bash
+# 启动全量服务后，Logstash 会自动读取 bytedesk 应用日志并写入 Elasticsearch
+./start.sh mysql artemis standard all
+
+# 如果你是本地源码运行 starter，只需要保证 Logstash 已启动，starter/logs/bytedeskim.log 也会被采集
+docker compose -p bytedesk --env-file .env -f compose-base.yaml up -d bytedesk-logstash
+
+# 查看 Logstash 运行状态
+docker compose -p bytedesk --env-file .env -f compose-base.yaml ps bytedesk-logstash
+docker compose -p bytedesk --env-file .env -f compose-base.yaml logs -f bytedesk-logstash
+
+# 在 Elasticsearch 中查看日志索引
+curl -u elastic:${ELASTIC_PASSWORD} http://127.0.0.1:19200/_cat/indices/bytedesk-logs-*?v
+
+# 查询最近 20 条日志
+curl -u elastic:${ELASTIC_PASSWORD} 'http://127.0.0.1:19200/bytedesk-logs-*/_search?size=20&sort=@timestamp:desc'
+```
+
+说明：
+
+- Logstash 监控接口暴露在 `19600` 端口。
+- 日志索引命名为 `bytedesk-logs-YYYY.MM.dd`。
+- 管道会自动合并 Java 异常堆栈；应用文件日志已切换为纯文本格式，便于在 Elasticsearch 中检索。
+- 本地源码运行时，默认读取 [starter/logs](starter/logs) 下的 `bytedeskim.log`。
+- 如果 starter 已经在本地运行，请在本次更新后重启一次源码进程，让新的纯文本文件日志格式生效；重启后新写入的日志会被稳定解析并按字段入库。
+
+## Kibana 日志查询
+
+`compose-base.yaml` 已内置 `bytedesk-kibana`，启动后可通过浏览器直接查看 Elasticsearch 中的日志索引。
+
+```bash
+# 单独启动 Kibana
+docker compose -p bytedesk --env-file .env -f compose-base.yaml up -d bytedesk-kibana
+
+# 查看 Kibana 运行状态
+docker compose -p bytedesk --env-file .env -f compose-base.yaml ps bytedesk-kibana
+docker compose -p bytedesk --env-file .env -f compose-base.yaml logs -f bytedesk-kibana
+```
+
+访问地址：
+
+- Kibana: <http://127.0.0.1:15601>
+- Elasticsearch: <http://127.0.0.1:19200>
+- 登录方式: 浏览器打开后直接进入登录页，使用 Elasticsearch 内置账号登录即可
+- 推荐账号: `elastic`
+- 登录密码: `.env` 中的 `ELASTIC_PASSWORD`
+
+当前本地默认值（若你没有改过 `deploy/docker/.env`）：
+
+- 用户名: `elastic`
+- 密码: `bytedesk123`
+
+说明：Kibana 服务自身连接 Elasticsearch 使用的是 `.env` 中的 `KIBANA_SERVICE_ACCOUNT_TOKEN`，无需再用超级账号作为后端连接账户。
+
+首次进入建议：
+
+- 打开 <http://127.0.0.1:15601>，输入 `elastic` 和 `.env` 中的 `ELASTIC_PASSWORD` 登录
+- 若浏览器提示跳转到 `/login?next=%2F`，属于正常行为，继续在登录页输入账号密码即可
+- 在 Kibana 的 Data Views 中创建索引模式 `bytedesk-logs-*`
+- 时间字段选择 `@timestamp`
+- 之后可在 Discover 页面直接按 `requestId`、`traceId`、`message` 检索日志
+
+推荐查询路径：
+
+- 左侧进入 `Discover`
+- 选择刚创建的 `bytedesk-logs-*` Data View
+- 在顶部搜索框输入例如 `requestId : "a9d759fa-f7af-4551-b219-9d358403553d"`
+- 或输入 `message : "Completed 200 OK"` 查看某次请求链路
+
 ## FreeSWITCH 数据库兼容说明（MySQL / PostgreSQL）
 
 数据库端口、账号、密码等信息已统一从 `deploy/docker/.env` 读取，不再写死在 compose 覆盖文件和 `switch.conf.*.xml` 中。

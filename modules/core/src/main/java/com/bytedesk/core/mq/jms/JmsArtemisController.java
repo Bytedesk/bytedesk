@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.mq.jms;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,10 +25,12 @@ import com.bytedesk.core.utils.JsonResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * for testing api
  */
+@RequiredArgsConstructor
 @Slf4j
 @RestController
 @RequestMapping("/jms")
@@ -37,11 +38,9 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class JmsArtemisController {
     
-    @Autowired
-	private JmsArtemisService jmsArtemisService;
+	private final JmsArtemisService jmsArtemisService;
 
-	@Autowired
-	private BytedeskProperties bytedeskProperties;
+	private final BytedeskProperties bytedeskProperties;
 
     // http://127.0.0.1:9003/jms/artemis/queue
 	@Operation(summary = "Test JMS Queue", description = "Test sending a message to JMS Artemis queue (debug mode only)")

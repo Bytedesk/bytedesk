@@ -235,3 +235,79 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f
 
 - Leave `JASYPT_ENCRYPTOR_PASSWORD` blank (or remove the line) when no encrypted values are in use—startup will fall back to plain text.
 - You can also override algorithms or iterations with additional variables (for example `BYTEDESK_SECURITY_JASYPT_ALGORITHM=PBEWITHHMACSHA512ANDAES_256`).
+
+## Logstash Log Ingestion
+
+`compose-base.yaml` now includes `bytedesk-logstash`, which collects logs from both of these sources by default:
+
+- Docker app container logs written to the shared `/app/logs/bytedeskim.log`
+- Local source-run logs written to [starter/logs](starter/logs)/bytedeskim.log
+
+```bash
+# Start the full stack; Logstash will begin shipping Bytedesk application logs automatically
+./start.sh mysql artemis standard all
+
+# If you run starter from source locally, only Logstash needs to be up; starter/logs/bytedeskim.log will also be collected
+docker compose -p bytedesk --env-file .env -f compose-base.yaml up -d bytedesk-logstash
+
+# Inspect Logstash status and logs
+docker compose -p bytedesk --env-file .env -f compose-base.yaml ps bytedesk-logstash
+docker compose -p bytedesk --env-file .env -f compose-base.yaml logs -f bytedesk-logstash
+
+# List the generated Elasticsearch log indices
+curl -u elastic:${ELASTIC_PASSWORD} http://127.0.0.1:19200/_cat/indices/bytedesk-logs-*?v
+
+# Fetch the latest 20 log events
+curl -u elastic:${ELASTIC_PASSWORD} 'http://127.0.0.1:19200/bytedesk-logs-*/_search?size=20&sort=@timestamp:desc'
+```
+
+Notes:
+
+- The Logstash monitoring API is exposed on port `19600`.
+- Log indices are named `bytedesk-logs-YYYY.MM.dd`.
+- The pipeline merges Java stack traces, and the application file log is now emitted as plain text for clean Elasticsearch indexing.
+- For local source runs, Logstash reads starter/logs/bytedeskim.log by default.
+- If starter is already running locally, restart that source-run process once after this update so the new plain-text file logging pattern takes effect; newly written lines will then be parsed and indexed reliably.
+
+## Kibana Log Viewer
+
+`compose-base.yaml` now also includes `bytedesk-kibana`, so you can browse Elasticsearch log indices from a web UI.
+
+```bash
+# Start Kibana only
+docker compose -p bytedesk --env-file .env -f compose-base.yaml up -d bytedesk-kibana
+
+# Inspect Kibana status and logs
+docker compose -p bytedesk --env-file .env -f compose-base.yaml ps bytedesk-kibana
+docker compose -p bytedesk --env-file .env -f compose-base.yaml logs -f bytedesk-kibana
+```
+
+Access:
+
+- Kibana: <http://127.0.0.1:15601>
+- Elasticsearch: <http://127.0.0.1:19200>
+- Login flow: open the browser UI and sign in with a built-in Elasticsearch user
+- Recommended username: `elastic`
+- Password: `ELASTIC_PASSWORD` from `.env`
+
+Current local default values if you have not changed `deploy/docker/.env`:
+
+- Username: `elastic`
+- Password: `bytedesk123`
+
+Kibana itself connects to Elasticsearch through `KIBANA_SERVICE_ACCOUNT_TOKEN` in `.env`, so it does not need the forbidden superuser backend configuration.
+
+Recommended first steps:
+
+- Open <http://127.0.0.1:15601> and sign in with `elastic` and the `ELASTIC_PASSWORD` value from `.env`
+- If the browser redirects to `/login?next=%2F`, that is expected; just continue on the login page
+- Create a data view for `bytedesk-logs-*`
+- Use `@timestamp` as the time field
+- Search logs in Discover by `requestId`, `traceId`, or `message`
+
+Suggested query flow:
+
+- Open `Discover`
+- Select the `bytedesk-logs-*` data view
+- Search for `requestId : "a9d759fa-f7af-4551-b219-9d358403553d"`
+- Or search for `message : "Completed 200 OK"` to inspect one request path

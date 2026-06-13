@@ -22,7 +22,6 @@ package com.bytedesk.ai.springai.providers.zhipuai;
 // import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 // import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 // import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
-// import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.stereotype.Service;
 // import org.springframework.util.StringUtils;
 // import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

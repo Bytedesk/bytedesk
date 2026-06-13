@@ -41,7 +41,6 @@ public class AgentInitializer implements SmartInitializingSingleton {
     }
 
     public void init() {
-        // 
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         String mobile = bytedeskProperties.getMobile();
         String nickname = bytedeskProperties.getNickname();

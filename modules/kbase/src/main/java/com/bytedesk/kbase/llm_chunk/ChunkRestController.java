@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_chunk;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,7 +31,6 @@ import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/v1/llm/chunk")
@@ -40,10 +40,11 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     
     private final ChunkElasticService chunkElasticService;
 
-    @Autowired(required = false)
-    private ChunkVectorService chunkVectorService;
+    private final ChunkVectorService chunkVectorService;
 
-    public ChunkRestController(ChunkRestService chunkRestService, ChunkElasticService chunkElasticService) {
+    public ChunkRestController(ChunkRestService chunkRestService, ChunkElasticService chunkElasticService,
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider) {
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
         this.chunkRestService = chunkRestService;
         this.chunkElasticService = chunkElasticService;
     }

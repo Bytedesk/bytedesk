@@ -20,7 +20,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
@@ -50,30 +50,37 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIMoonshotService extends BaseSpringAIService {
 
+    public SpringAIMoonshotService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("moonshotChatModel") ObjectProvider<MoonshotChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper,
+            ObjectProvider<ToolCallingManager> toolCallingManagerProvider,
+            ObjectProvider<RetryTemplate> retryTemplateProvider,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.toolCallingManager = toolCallingManagerProvider.getIfAvailable();
+        this.retryTemplate = retryTemplateProvider.getIfAvailable();
+        this.observationRegistry = observationRegistryProvider.getIfAvailable();
+    }
+
+    // public SpringAIMoonshotService() {}
+
     static final String DEFAULT_MOONSHOT_MODEL = "kimi-k2.6";
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    private final LlmProviderRestService llmProviderRestService;
 
-    @Autowired(required = false)
-    @Qualifier("moonshotChatModel")
-    private MoonshotChatModel defaultChatModel;
+    private final MoonshotChatModel defaultChatModel;
 
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
+    private final TokenUsageHelper tokenUsageHelper;
 
-    @Autowired(required = false)
-    private ToolCallingManager toolCallingManager;
+    private final ToolCallingManager toolCallingManager;
 
-    @Autowired(required = false)
-    private RetryTemplate retryTemplate;
+    private final RetryTemplate retryTemplate;
 
-    @Autowired(required = false)
-    private ObservationRegistry observationRegistry;
+    private final ObservationRegistry observationRegistry;
 
-    public SpringAIMoonshotService() {
-        super();
-    }
 
     static boolean requiresFixedTemperature(String model) {
         return StringUtils.hasText(model) && model.startsWith("kimi-k2");

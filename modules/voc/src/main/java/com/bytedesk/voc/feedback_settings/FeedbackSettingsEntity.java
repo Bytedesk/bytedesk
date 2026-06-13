@@ -77,7 +77,7 @@ public class FeedbackSettingsEntity extends BaseEntity {
      * Whether this scene widget is enabled
      */
     @Builder.Default
-    @Column(name = "enabled")
+    @Column(name = "is_enabled")
     private Boolean enabled = Boolean.TRUE;
 
     /**

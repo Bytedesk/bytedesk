@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -17,16 +16,16 @@ import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class SseMessageHelper {
 
-    @Autowired
-    private MessagePersistenceHelper messagePersistenceHelper;
+    private final MessagePersistenceHelper messagePersistenceHelper;
 
-    @Autowired
-    private PromptHelper promptHelper;
+    private final PromptHelper promptHelper;
 
     private boolean shouldPersist(SseEmitter emitter) {
         if (emitter instanceof SsePersistenceControl persistControl) {

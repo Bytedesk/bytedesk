@@ -22,18 +22,26 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.call.config.CallConstants;
+import com.bytedesk.call.xml_curl.conf.XmlCurlProperties;
+import com.bytedesk.call.xml_curl_trace.XmlCurlTraceService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 最小可用的 mod_xml_curl HTTP 控制器。
+ * Minimal mod_xml_curl HTTP controller.
  *
  * FreeSWITCH 配置 xml_curl.conf.xml 后，会以 HTTP 请求获取 directory 与 dialplan 的 XML。
+ * After FreeSWITCH is configured with xml_curl.conf.xml, it fetches directory
+ * and dialplan XML through HTTP requests.
  * 本控制器通过查询参数进行路由：
+ * This controller routes requests by query parameters:
  * - type=directory&user=1000&domain=default
  * - type=dialplan&context=default&dest=1000
  *
  * 注意：生产环境需加入鉴权、白名单、限流与审计；此处为演示用途。
+ * Note: production environments should add authentication, IP allowlists,
+ * rate limiting, and auditing; this controller remains a demo-oriented entry.
  */
 @Slf4j
 @RestController
@@ -46,6 +54,12 @@ public class XmlCurlController {
     private final XmlCurlProperties xmlCurlProperties;
     private final XmlCurlTraceService xmlCurlTraceService;
 
+    /**
+     * 统一接收 FreeSWITCH 的 xml_curl HTTP 请求，并根据 section 分发到对应的
+     * XmlCurlService 处理入口。
+     * Receives xml_curl HTTP requests from FreeSWITCH and dispatches them to the
+     * matching XmlCurlService handler according to the requested section.
+     */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, produces = "application/xml;charset=UTF-8")
     public @ResponseBody byte[] fsXml(@RequestParam MultiValueMap<String, String> paramsRaw, HttpServletRequest request) {
         if (!isAuthorized(paramsRaw, request)) {
@@ -54,6 +68,7 @@ public class XmlCurlController {
 
         long t0 = System.nanoTime();
         // 记录请求来源与代理链（ngrok）信息，定位转发问题
+        // Records request source and proxy-chain metadata to diagnose forwarding issues.
         try {
             String remote = (request.getRemoteAddr() == null ? "" : request.getRemoteAddr()) + ":" + request.getRemotePort();
             String xff = safe(request.getHeader("X-Forwarded-For"));
@@ -95,6 +110,7 @@ public class XmlCurlController {
                 out = xmlCurlService.resultNotFound();
                 break;
         }
+        // 
         long costMs = (System.nanoTime() - t0) / 1_000_000L;
         boolean found = false;
         int size = out == null ? 0 : out.length;
@@ -109,7 +125,7 @@ public class XmlCurlController {
         } catch (Exception ex) {
             log.debug("XML-CURL response logging failed", ex);
         }
-
+        // 
         try {
             String remote = (request.getRemoteAddr() == null ? "" : request.getRemoteAddr()) + ":" + request.getRemotePort();
             xmlCurlTraceService.record(
@@ -123,15 +139,28 @@ public class XmlCurlController {
                     size,
                     costMs);
         } catch (Exception ex) {
-            log.debug("XML-CURL trace record failed", ex);
+            log.warn("XML-CURL trace record failed section='{}' uri='{}' method={} err={}",
+                    section,
+                    request.getRequestURI(),
+                    request.getMethod(),
+                    ex.getMessage(),
+                    ex);
         }
         return out;
     }
 
-    // 健康检查（用于 ngrok/反向代理连通性排查）
+    /**
+     * 健康检查接口，用于排查 ngrok 或反向代理到 xml_curl 入口的连通性。
+     * Health check endpoint used to verify connectivity through ngrok or a
+     * reverse proxy toward the xml_curl entrypoint.
+     */
     @GetMapping(value = "/_healthz", produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String health() { return "OK"; }
 
+    /**
+     * 校验 xml_curl 请求是否携带预期 token。
+     * Validates whether the xml_curl request carries the expected token.
+     */
     private boolean isAuthorized(MultiValueMap<String, String> paramsRaw, HttpServletRequest request) {
         String expectedToken = xmlCurlProperties.getToken();
         if (!StringUtils.hasText(expectedToken)) {
@@ -147,6 +176,13 @@ public class XmlCurlController {
         return false;
     }
 
+    /**
+     * 规范化 FreeSWITCH 传入参数，补充原始键、variable_ 前缀键和大写键，方便兼容
+     * 不同模块或版本传入的字段名差异。
+     * Normalizes incoming FreeSWITCH parameters and adds raw, variable_-prefixed,
+     * and upper-case aliases so different module versions and field variants can
+     * be handled uniformly.
+     */
     private static Map<String, String> normalize(MultiValueMap<String, String> raw) {
         Map<String, String> m = new HashMap<>();
         for (Map.Entry<String, java.util.List<String>> e : raw.entrySet()) {

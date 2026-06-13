@@ -19,6 +19,7 @@ import java.util.Random;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.ObjectProvider;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_webpage.WebpageCrawlerService;
@@ -27,7 +28,6 @@ import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -48,11 +48,11 @@ public class WebpageIndexConsumer {
     public WebpageIndexConsumer(WebpageElasticService webpageElasticService,
             WebpageRestService webpageRestService,
             WebpageCrawlerService webpageCrawlerService,
-            @Autowired(required = false) WebpageVectorService webpageVectorService) {
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider) {
         this.webpageElasticService = webpageElasticService;
         this.webpageRestService = webpageRestService;
         this.webpageCrawlerService = webpageCrawlerService;
-        this.webpageVectorService = webpageVectorService;
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
 
         // 在构造函数中检查并记录向量服务状态
         if (webpageVectorService == null) {

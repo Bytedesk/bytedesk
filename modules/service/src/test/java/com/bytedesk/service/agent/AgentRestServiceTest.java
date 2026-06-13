@@ -21,6 +21,9 @@ import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.AgentCapacityExceededException;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.message.MessageService;
@@ -181,14 +184,51 @@ class AgentRestServiceTest {
         when(organizationRestService.findByUid("org-1")).thenReturn(Optional.of(organization));
         when(agentRepository.existsByUserUidAndOrgUidAndDeletedFalse("user-1", "org-1")).thenReturn(false);
         when(agentRepository.countByOrgUidAndDeletedFalse("org-1")).thenReturn(0L);
+        when(agentSeatDomainService.isSeatEnabled()).thenReturn(true);
         when(agentSeatDomainService.hasManagedSeats("org-1")).thenReturn(true);
         when(agentSeatDomainService.hasAvailableSeat("org-1")).thenReturn(false);
 
         assertThatThrownBy(() -> agentRestService.create(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Organization agent seat limit exceeded");
+                .isInstanceOf(AgentCapacityExceededException.class)
+                .hasMessage(I18Consts.I18N_AGENT_SEAT_LIMIT_EXCEEDED);
 
         verify(agentRepository, never()).save(any(AgentEntity.class));
+    }
+
+    @Test
+    void createShouldSkipSeatValidationForDefaultOrganization() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+
+        MemberEntity member = new MemberEntity();
+        member.setUid("member-1");
+        member.setUser(user);
+        member.setCountry("CN");
+
+        AgentRequest request = AgentRequest.builder()
+                .uid("agent-1")
+                .orgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID)
+                .memberUid("member-1")
+                .nickname("Agent A")
+                .mobile("13800138000")
+                .email("agent-a@test.com")
+                .build();
+
+        when(memberRestService.findByUid("member-1")).thenReturn(Optional.of(member));
+        when(agentRepository.existsByUserUidAndOrgUidAndDeletedFalse("user-1", BytedeskConsts.DEFAULT_ORGANIZATION_UID))
+                .thenReturn(false);
+        when(userService.ensureCurrentOrganization(user, BytedeskConsts.DEFAULT_ORGANIZATION_UID)).thenReturn(user);
+        when(userService.addRoleAgent(user)).thenReturn(user);
+        when(agentSeatDomainService.isSeatEnabled()).thenReturn(true);
+        when(agentSeatDomainService.assignSeatForAgent(BytedeskConsts.DEFAULT_ORGANIZATION_UID, "agent-1"))
+                .thenReturn(Optional.empty());
+        when(agentRepository.save(any(AgentEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AgentResponse response = agentRestService.create(request);
+
+        assertThat(response).isNotNull();
+        verify(agentSeatDomainService, never()).hasAvailableSeat(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        verify(agentRepository).save(any(AgentEntity.class));
     }
 
     @Test

@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;
@@ -26,20 +25,20 @@ import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.mq.FaqMessageService;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ数据写入器
  * 将处理后的FaqEntity批量保存到数据库
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class FaqItemWriter implements ItemWriter<FaqEntity> {
 
-    @Autowired
-    private FaqRestService faqRestService;
+    private final FaqRestService faqRestService;
     
-    @Autowired
-    private FaqMessageService faqMessageService;
+    private final FaqMessageService faqMessageService;
 
     /**
      * 批量写入FAQ数据

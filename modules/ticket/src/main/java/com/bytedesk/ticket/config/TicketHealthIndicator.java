@@ -15,7 +15,7 @@ package com.bytedesk.ticket.config;
 
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -36,6 +36,16 @@ import java.sql.Connection;
 @Component
 public class TicketHealthIndicator implements HealthIndicator {
 
+    public TicketHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<RepositoryService> repositoryServiceProvider,
+            ObjectProvider<RuntimeService> runtimeServiceProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.repositoryService = repositoryServiceProvider.getIfAvailable();
+        this.runtimeService = runtimeServiceProvider.getIfAvailable();
+    }
+
+
     @Value("${bytedesk.ticket.ldap.enabled:false}")
     private boolean ldapEnabled;
 
@@ -45,14 +55,11 @@ public class TicketHealthIndicator implements HealthIndicator {
     @Value("${bytedesk.ticket.ldap.port:389}")
     private int ldapPort;
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired(required = false)
-    private RepositoryService repositoryService;
+    private final RepositoryService repositoryService;
 
-    @Autowired(required = false)
-    private RuntimeService runtimeService;
+    private final RuntimeService runtimeService;
 
     @Override
     public Health health() {

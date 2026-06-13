@@ -22,7 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -49,19 +49,22 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIOllamaService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired(required = false)
-    @Qualifier("bytedeskOllamaChatModel")
-    private OllamaChatModel defaultChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIOllamaService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIOllamaService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("bytedeskOllamaChatModel") ObjectProvider<OllamaChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final OllamaChatModel defaultChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OllamaChatOptions

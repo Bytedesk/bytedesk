@@ -15,6 +15,7 @@ package com.bytedesk.kbase.article.mq;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,7 +26,6 @@ import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 文章索引消息监听器
@@ -37,11 +37,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ArticleIndexMessageListener {
 
     private final ArticleRestService articleRestService;
-    @Autowired(required = false)
-    private ArticleVectorService articleVectorService;
+    private final ArticleVectorService articleVectorService;
     // private final ArticleElasticService articleElasticService;
 
-    public ArticleIndexMessageListener(ArticleRestService articleRestService) {
+    public ArticleIndexMessageListener(ArticleRestService articleRestService,
+            ObjectProvider<ArticleVectorService> articleVectorServiceProvider) {
+        this.articleVectorService = articleVectorServiceProvider.getIfAvailable();
         this.articleRestService = articleRestService;
     }
 

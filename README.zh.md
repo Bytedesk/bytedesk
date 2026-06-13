@@ -155,6 +155,7 @@ bytedesk/
 - [视频会议](https://github.com/Bytedesk/bytedesk-conference)
 - [呼叫中心Freeswitch](https://github.com/Bytedesk/bytedesk-freeswitch)
 - [视频客服Janus](https://github.com/Bytedesk/bytedesk-janus)
+- [TtsAsr](https://github.com/Bytedesk/bytedesk-ttsasr)
 <!-- - [Jitsi Docker](https://github.com/Bytedesk/bytedesk-jitsi) -->
 
 ## 开源Demo + SDK

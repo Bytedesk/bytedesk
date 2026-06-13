@@ -22,7 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -45,19 +45,22 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIVolcengineService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired(required = false)
-    @Qualifier("volcengineChatModel")
-    private OpenAiChatModel defaultChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIVolcengineService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIVolcengineService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("volcengineChatModel") ObjectProvider<OpenAiChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final OpenAiChatModel defaultChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
     
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

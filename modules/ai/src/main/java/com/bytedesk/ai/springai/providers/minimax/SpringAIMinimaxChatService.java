@@ -20,7 +20,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.minimax.MiniMaxChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -44,16 +44,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.minimax.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIMinimaxChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    @Qualifier("minimaxChatModel")
-    private ChatModel minimaxChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIMinimaxChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIMinimaxChatService(
+            @Qualifier("minimaxChatModel") ObjectProvider<ChatModel> minimaxChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.minimaxChatModel = minimaxChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final ChatModel minimaxChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的MiniMaxChatOptions

@@ -14,34 +14,34 @@ public class ActionTools extends BaseTools<ActionRequest, ActionResponse> {
         super("action", ActionRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query action by uid")
+    @Tool(description = "Query action by uid. This tool returns structured data for AI tool invocation.")
     public Object actionQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query action by org with request json")
+    @Tool(description = "Query action by org with request json. This tool returns structured data for AI tool invocation.")
     public Object actionQueryByOrg(@ToolParam(description = "ActionRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query action by user with request json")
+    @Tool(description = "Query action by user with request json. This tool returns structured data for AI tool invocation.")
     public Object actionQueryByUser(@ToolParam(description = "ActionRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create action with request json")
+    @Tool(description = "Create action with request json. This tool returns structured data for AI tool invocation.")
     public Object actionCreate(@ToolParam(description = "ActionRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update action with request json")
+    @Tool(description = "Update action with request json. This tool returns structured data for AI tool invocation.")
     public Object actionUpdate(@ToolParam(description = "ActionRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete action by uid")
+    @Tool(description = "Delete action by uid. This tool returns structured data for AI tool invocation.")
     public Object actionDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

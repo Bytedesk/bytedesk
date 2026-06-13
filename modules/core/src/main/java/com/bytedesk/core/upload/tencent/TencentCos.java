@@ -3,12 +3,12 @@ package com.bytedesk.core.upload.tencent;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ObjectMetadata;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,21 +28,16 @@ import java.net.URI;
  */
 @Component
 @ConditionalOnProperty(name = "bytedesk.tencent.enabled", havingValue = "true", matchIfMissing = false)
+@RequiredArgsConstructor
 @Slf4j
 public class TencentCos {
     
 
     private String uploadDirPrefix = "";
 
-    public TencentCos() {
-        // 构造函数
-    }
+    private final TencentProperties tencentProperties;
 
-    @Autowired
-    private TencentProperties tencentProperties;
-
-    @Autowired
-    private COSClient cosClient;
+    private final COSClient cosClient;
 
     public String uploadAttachment(MediaType mediaType, String fileName, int width, int height, String username, File file) {
 

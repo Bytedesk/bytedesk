@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_faq.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -21,17 +20,18 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ消息服务
  * 使用核心模块中的JmsTemplate发送FAQ索引请求
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FaqMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
 
     @Value("${bytedesk.mq.type:artemis}")
     private String mqType;

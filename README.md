@@ -162,6 +162,7 @@ bytedesk/
 - [conference](https://github.com/Bytedesk/bytedesk-conference)
 - [freeswitch docker](https://github.com/Bytedesk/bytedesk-freeswitch)
 - [janus docker](https://github.com/Bytedesk/bytedesk-janus)
+- [tts asr docker](https://github.com/Bytedesk/bytedesk-ttsasr)
 <!-- - [jitsi docker](https://github.com/Bytedesk/bytedesk-jitsi) -->
 
 ## Open Source Demo + SDK

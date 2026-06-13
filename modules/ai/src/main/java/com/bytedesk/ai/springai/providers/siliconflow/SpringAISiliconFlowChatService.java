@@ -31,7 +31,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -48,21 +48,26 @@ import java.util.Optional;
 @ConditionalOnProperty(prefix = "spring.ai.siliconflow.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAISiliconFlowChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private Optional<OpenAiChatModel> siliconFlowChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    @Autowired
-    private SseMessageHelper sseMessageHelper;
-
-    @Autowired
-    private PromptHelper promptHelper;
-
-    public SpringAISiliconFlowChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAISiliconFlowChatService(
+            ObjectProvider<OpenAiChatModel> siliconFlowChatModelProvider,
+            TokenUsageHelper tokenUsageHelper,
+            SseMessageHelper sseMessageHelper,
+            PromptHelper promptHelper) {
+        this.siliconFlowChatModel = Optional.ofNullable(siliconFlowChatModelProvider.getIfAvailable());
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.sseMessageHelper = sseMessageHelper;
+        this.promptHelper = promptHelper;
     }
+
+
+    private final Optional<OpenAiChatModel> siliconFlowChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
+    private final SseMessageHelper sseMessageHelper;
+
+    private final PromptHelper promptHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

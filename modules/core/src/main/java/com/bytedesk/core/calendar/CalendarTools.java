@@ -14,34 +14,34 @@ public class CalendarTools extends BaseTools<CalendarRequest, CalendarResponse> 
         super("calendar", CalendarRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query calendar by uid")
+    @Tool(description = "Query calendar by uid. This tool returns structured data for AI tool invocation.")
     public Object calendarQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query calendar by org with request json")
+    @Tool(description = "Query calendar by org with request json. This tool returns structured data for AI tool invocation.")
     public Object calendarQueryByOrg(@ToolParam(description = "CalendarRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query calendar by user with request json")
+    @Tool(description = "Query calendar by user with request json. This tool returns structured data for AI tool invocation.")
     public Object calendarQueryByUser(@ToolParam(description = "CalendarRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create calendar with request json")
+    @Tool(description = "Create calendar with request json. This tool returns structured data for AI tool invocation.")
     public Object calendarCreate(@ToolParam(description = "CalendarRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update calendar with request json")
+    @Tool(description = "Update calendar with request json. This tool returns structured data for AI tool invocation.")
     public Object calendarUpdate(@ToolParam(description = "CalendarRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete calendar by uid")
+    @Tool(description = "Delete calendar by uid. This tool returns structured data for AI tool invocation.")
     public Object calendarDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

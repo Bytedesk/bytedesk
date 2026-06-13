@@ -38,6 +38,10 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
     @Query("update ConnectionEntity c set c.lastHeartbeatAt = :now where c.clientId = :clientId and (c.lastHeartbeatAt is null or c.lastHeartbeatAt <= :threshold)")
     int updateHeartbeatIfOlder(@Param("clientId") String clientId, @Param("now") long now, @Param("threshold") long threshold);
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from ConnectionEntity c where c.status = :status and c.disconnectedAt is not null and c.disconnectedAt < :cutoff")
+    int deleteDisconnectedBefore(@Param("status") String status, @Param("cutoff") long cutoff);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select c from ConnectionEntity c where c.clientId = :clientId")
     Optional<ConnectionEntity> findByClientIdForUpdate(@Param("clientId") String clientId);

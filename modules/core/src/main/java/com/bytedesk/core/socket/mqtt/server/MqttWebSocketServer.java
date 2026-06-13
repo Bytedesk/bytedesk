@@ -29,7 +29,7 @@ import com.bytedesk.core.socket.mqtt.MqttProperties;
 import com.bytedesk.core.socket.mqtt.initializer.MqttWebSocketServerInitializer;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,15 +37,14 @@ import org.springframework.stereotype.Component;
  * 
  * @author bytedesk.com on 2019-07-23
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class MqttWebSocketServer {
 
-    @Autowired
-    private MqttProperties mqttProperties;
+    private final MqttProperties mqttProperties;
 
-    @Autowired
-    private ProtocolProcess protocolProcess;
+    private final ProtocolProcess protocolProcess;
 
     private Channel serverChannel;
 

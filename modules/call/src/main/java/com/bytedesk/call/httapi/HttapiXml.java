@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttapiXml {
+    
     private final StringBuilder sb = new StringBuilder();
     private boolean opened = false;
 

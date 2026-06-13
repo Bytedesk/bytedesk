@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,16 +25,16 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class TicketSLAService {
     
-    @Autowired
-    private TicketNotificationService notificationService;
+    private final TicketNotificationService notificationService;
 
-    @Autowired
-    private DmnDecisionService dmnDecisionService;
+    private final DmnDecisionService dmnDecisionService;
 
     /**
      * 根据工单类型和优先级确定 SLA 规则

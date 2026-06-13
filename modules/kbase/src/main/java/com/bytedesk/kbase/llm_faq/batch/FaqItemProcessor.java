@@ -14,7 +14,6 @@
 package com.bytedesk.kbase.llm_faq.batch;
 
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;
@@ -22,17 +21,18 @@ import com.bytedesk.kbase.llm_faq.FaqExcel;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ数据处理器
  * 将Excel中的FAQ数据转换为FaqEntity对象
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class FaqItemProcessor implements ItemProcessor<FaqExcel, FaqEntity> {
 
-    @Autowired
-    private FaqRestService faqRestService;
+    private final FaqRestService faqRestService;
 
     private String kbType;
     private String fileUid;

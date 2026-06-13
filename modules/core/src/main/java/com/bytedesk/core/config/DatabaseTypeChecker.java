@@ -19,13 +19,14 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class DatabaseTypeChecker {
@@ -33,8 +34,7 @@ public class DatabaseTypeChecker {
     @Value("${spring.datasource.url}")
     private String dataSourceUrl;
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     @PostConstruct
     public void checkDatabaseType() {

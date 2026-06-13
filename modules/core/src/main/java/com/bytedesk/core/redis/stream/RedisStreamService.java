@@ -15,7 +15,6 @@ package com.bytedesk.core.redis.stream;
 
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.connection.stream.RecordId;
@@ -26,8 +25,10 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.redis.RedisEvent;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 // https://howtodoinjava.com/spring-data/redis-streams-processing/
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class RedisStreamService {
@@ -35,8 +36,7 @@ public class RedisStreamService {
     @Value("${bytedesk.cache.redis-stream-key}")
     private String streamKey;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public RecordId produce(RedisEvent redisEvent) {
         log.info("produce streamKey {}, redisEvent {}", streamKey, redisEvent.toString());

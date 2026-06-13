@@ -17,27 +17,23 @@ import java.util.Optional;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRestService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 评估工单优先级
  */
 @Slf4j
+@RequiredArgsConstructor
 @Component("ticketEvaluatePriorityDelegate")
 public class TicketEvaluatePriorityDelegate implements JavaDelegate {
 
-    @Autowired
-    private TicketRestService ticketRestService;
-
-    public TicketEvaluatePriorityDelegate() {
-        // 默认构造函数
-    }
+    private final TicketRestService ticketRestService;
 
     @Override
     public void execute(DelegateExecution execution) {

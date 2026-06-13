@@ -3,7 +3,6 @@ package com.bytedesk.ai.service;
 import java.math.BigDecimal;
 
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -12,13 +11,14 @@ import com.bytedesk.ai.springai.event.LlmTokenUsageEvent;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class TokenUsageHelper {
 
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * Record AI token usage statistics by publishing an event

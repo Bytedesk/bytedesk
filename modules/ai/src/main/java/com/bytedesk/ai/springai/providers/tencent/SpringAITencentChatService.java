@@ -20,7 +20,7 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,15 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.tencent.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAITencentChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel tencentChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAITencentChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAITencentChatService(
+            ObjectProvider<OpenAiChatModel> tencentChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.tencentChatModel = tencentChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel tencentChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
     
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

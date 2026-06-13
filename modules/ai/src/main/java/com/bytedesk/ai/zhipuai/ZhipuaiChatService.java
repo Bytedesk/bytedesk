@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -46,14 +46,19 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ZhipuaiChatService {
 
+    public ZhipuaiChatService(
+            @Qualifier("zhipuAiClient") ObjectProvider<ZhipuAiClient> clientProvider,
+            ZhipuaiChatConfig zhipuaiChatConfig) {
+        this.zhipuaiChatConfig = zhipuaiChatConfig;
+        this.client = clientProvider.getIfAvailable();
+    }
+
+
     private static final String CLIENT_UNAVAILABLE_MESSAGE = "Zhipuai client is not available";
 
-    @Autowired(required = false)
-    @Qualifier("zhipuAiClient")
-    private ZhipuAiClient client;
+    private final ZhipuAiClient client;
 
-    @Autowired
-    private ZhipuaiChatConfig zhipuaiChatConfig;
+    private final ZhipuaiChatConfig zhipuaiChatConfig;
 
     private boolean isClientUnavailable(String operation) {
         if (client != null) {

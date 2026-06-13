@@ -9,7 +9,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -23,13 +22,14 @@ import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class PromptHelper {
 
-    @Autowired
-    private MessageRestService messageRestService;
+    private final MessageRestService messageRestService;
 
     public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {

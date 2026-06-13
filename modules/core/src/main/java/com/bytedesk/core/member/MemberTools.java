@@ -14,34 +14,34 @@ public class MemberTools extends BaseTools<MemberRequest, MemberResponse> {
         super("member", MemberRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query member by uid")
+    @Tool(description = "Query member by uid. This tool returns structured data for AI tool invocation.")
     public Object memberQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query member by org with request json")
+    @Tool(description = "Query member by org with request json. This tool returns structured data for AI tool invocation.")
     public Object memberQueryByOrg(@ToolParam(description = "MemberRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query member by user with request json")
+    @Tool(description = "Query member by user with request json. This tool returns structured data for AI tool invocation.")
     public Object memberQueryByUser(@ToolParam(description = "MemberRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create member with request json")
+    @Tool(description = "Create member with request json. This tool returns structured data for AI tool invocation.")
     public Object memberCreate(@ToolParam(description = "MemberRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update member with request json")
+    @Tool(description = "Update member with request json. This tool returns structured data for AI tool invocation.")
     public Object memberUpdate(@ToolParam(description = "MemberRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete member by uid")
+    @Tool(description = "Delete member by uid. This tool returns structured data for AI tool invocation.")
     public Object memberDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

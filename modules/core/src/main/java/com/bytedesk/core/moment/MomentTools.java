@@ -14,34 +14,34 @@ public class MomentTools extends BaseTools<MomentRequest, MomentResponse> {
         super("moment", MomentRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query moment by uid")
+    @Tool(description = "Query moment by uid. This tool returns structured data for AI tool invocation.")
     public Object momentQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query moment by org with request json")
+    @Tool(description = "Query moment by org with request json. This tool returns structured data for AI tool invocation.")
     public Object momentQueryByOrg(@ToolParam(description = "MomentRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query moment by user with request json")
+    @Tool(description = "Query moment by user with request json. This tool returns structured data for AI tool invocation.")
     public Object momentQueryByUser(@ToolParam(description = "MomentRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create moment with request json")
+    @Tool(description = "Create moment with request json. This tool returns structured data for AI tool invocation.")
     public Object momentCreate(@ToolParam(description = "MomentRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update moment with request json")
+    @Tool(description = "Update moment with request json. This tool returns structured data for AI tool invocation.")
     public Object momentUpdate(@ToolParam(description = "MomentRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete moment by uid")
+    @Tool(description = "Delete moment by uid. This tool returns structured data for AI tool invocation.")
     public Object momentDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

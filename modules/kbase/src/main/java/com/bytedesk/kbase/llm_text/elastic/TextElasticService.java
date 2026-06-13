@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -37,20 +36,20 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * elasticsearch 全文检索服务
  * @author jackning
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class TextElasticService {
     
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchOperations elasticsearchOperations;
 
-    @Autowired
-    private TextRestService textRestService;
+    private final TextRestService textRestService;
 
     public Map<String, Object> queryElasticByUid(TextRequest request) {
         String uid = request.getUid();

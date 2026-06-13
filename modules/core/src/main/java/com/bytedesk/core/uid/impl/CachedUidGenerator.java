@@ -20,9 +20,11 @@ import java.util.List;
 
 import com.bytedesk.core.uid.UidGeneratorService;
 import com.bytedesk.core.uid.exception.UidGenerateException;
+import com.bytedesk.core.uid.worker.WorkerIdAssigner;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.Assert;
 
@@ -74,12 +76,10 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
 
     /** 拒绝策略: 当环已满, 无法继续填充时
      默认无需指定, 将丢弃Put操作, 仅日志记录. 如有特殊需求, 请实现RejectedPutBufferHandler接口(支持Lambda表达式)并以@Autowired方式注入 */
-    @Autowired(required = false)
     private RejectedPutBufferHandler rejectedPutBufferHandler;
 
     /** 拒绝策略: 当环已空, 无法继续获取时
      默认无需指定, 将记录日志, 并抛出UidGenerateException异常. 如有特殊需求, 请实现RejectedTakeBufferHandler接口(支持Lambda表达式)并以@Autowired方式注入 */
-    @Autowired(required = false)
     private RejectedTakeBufferHandler rejectedTakeBufferHandler;
 
     /**
@@ -88,8 +88,13 @@ public class CachedUidGenerator extends DefaultUidGenerator implements Disposabl
     private RingBuffer ringBuffer;
     private BufferPaddingExecutor bufferPaddingExecutor;
 
-    public CachedUidGenerator(UidProperties uidProperties) {
-        super(uidProperties);
+    public CachedUidGenerator(UidProperties uidProperties,
+            WorkerIdAssigner workerIdAssigner,
+            ObjectProvider<RejectedPutBufferHandler> rejectedPutBufferHandlerProvider,
+            ObjectProvider<RejectedTakeBufferHandler> rejectedTakeBufferHandlerProvider) {
+        super(uidProperties, workerIdAssigner);
+        this.rejectedPutBufferHandler = rejectedPutBufferHandlerProvider.getIfAvailable();
+        this.rejectedTakeBufferHandler = rejectedTakeBufferHandlerProvider.getIfAvailable();
     }
 
     @Override

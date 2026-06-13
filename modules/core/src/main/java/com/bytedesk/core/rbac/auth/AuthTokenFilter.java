@@ -21,8 +21,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,18 +39,16 @@ import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-  @Autowired
-  private AuthService authService;
+  private final AuthService authService;
 
-  @Autowired
-  private TokenRestService tokenRestService;
+  private final TokenRestService tokenRestService;
 
-  @Autowired
-  private BytedeskProperties bytedeskProperties;
+  private final BytedeskProperties bytedeskProperties;
 
   @Override
   protected void doFilterInternal(@NonNull HttpServletRequest request,
