@@ -97,10 +97,10 @@
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
+# 创建 .env
+cp .env.example .env
 # 默认启动（MySQL + Artemis + standard，仅中间件）
 ./start.sh mysql artemis standard middleware
-# or WebRTC 音视频客服中间件场景（coturn + janus，仅中间件）
-./start.sh mysql artemis webrtc middleware
 ```
 
 更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、webrtc、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)。

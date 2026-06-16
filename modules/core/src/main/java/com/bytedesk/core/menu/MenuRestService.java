@@ -14,11 +14,13 @@
 package com.bytedesk.core.menu;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -323,6 +325,7 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
         if (seeds == null || seeds.isEmpty()) {
             return;
         }
+        reconcilePlatformMenus(seeds, type);
         Map<String, String> keyToUid = new HashMap<>();
         for (MenuInitData.MenuSeed seed : seeds) {
             String parentUid = null;
@@ -369,6 +372,20 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
                 if (response != null && StringUtils.hasText(seed.getKey())) {
                     keyToUid.put(seed.getKey(), response.getUid());
                 }
+            }
+        }
+    }
+
+    private void reconcilePlatformMenus(List<MenuInitData.MenuSeed> seeds, String type) {
+        Set<String> activeLinks = new HashSet<>();
+        for (MenuInitData.MenuSeed seed : seeds) {
+            activeLinks.add(seed.getLink());
+        }
+        List<MenuEntity> existingMenus = menuRepository.findByOrgUidIsNullAndTypeAndDeletedFalse(type);
+        for (MenuEntity entity : existingMenus) {
+            if (!activeLinks.contains(entity.getLink())) {
+                entity.setDeleted(true);
+                menuRepository.save(entity);
             }
         }
     }

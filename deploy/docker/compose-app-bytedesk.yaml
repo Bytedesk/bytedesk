@@ -55,6 +55,8 @@ services:
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
       # Login page language: zh-CN / en-US / zh-TW. 登录页语言。
       BYTEDESK_CUSTOM_LANG: zh-CN
+      # Custom default LLM prompt; leave empty to fall back to the built-in RobotConsts default. 自定义默认 LLM Prompt，留空时回退到内置默认值。
+      BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT:
       BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
       # Auto-register users when they log in with mobile/email and no account exists yet. 手机号或邮箱登录时若用户不存在则自动注册。
       BYTEDESK_CUSTOM_AUTO_REGISTER_ON_LOGIN: "true"

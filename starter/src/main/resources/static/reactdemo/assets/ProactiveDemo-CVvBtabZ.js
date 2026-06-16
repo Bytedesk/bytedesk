@@ -1,1 +1,0 @@
-import{n as e}from"./react-vendor-C4iwnPb-.js";var t=e(),n=()=>(0,t.jsxs)(`div`,{children:[(0,t.jsx)(`h1`,{children:`Proactive Demo`}),(0,t.jsx)(`p`,{children:`This is a demo page for proactive features.`})]});export{n as default};

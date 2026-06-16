@@ -65,6 +65,7 @@ public class BytedeskProperties implements EnvironmentAware {
                             this.custom.setName(handleChineseText(this.custom.getName(), "BYTEDESK_CUSTOM_NAME"));
                             this.custom.setDescription(handleChineseText(this.custom.getDescription(), "BYTEDESK_CUSTOM_DESCRIPTION"));
                             this.custom.setLogo(handleChineseText(this.custom.getLogo(), "BYTEDESK_CUSTOM_LOGO"));
+                            this.custom.setDefaultLlmPrompt(handleChineseText(this.custom.getDefaultLlmPrompt(), "BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT"));
                         }
 
                         // 处理 Admin 相关字段
@@ -269,6 +270,10 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean forceVisitorAuth = false; // 是否强制访客认证，默认false
         private Boolean wechatMpSubscribePromptEnabled = false;
         private String wechatMpSubscribePromptAppId;
+        /**
+         * 自定义默认 LLM Prompt；为空时回退到代码内置默认值。
+         */
+        private String defaultLlmPrompt;
     }
 
     @Getter

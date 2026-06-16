@@ -39,6 +39,8 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Long>, JpaSpec
 
     Optional<MenuEntity> findByLinkAndOrgUidIsNullAndType(String link, String type);
 
+    List<MenuEntity> findByOrgUidIsNullAndTypeAndDeletedFalse(String type);
+
     List<MenuEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
     List<MenuEntity> findByOrgUidIsNullAndDeletedFalse();

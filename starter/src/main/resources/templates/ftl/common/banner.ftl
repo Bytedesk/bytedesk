@@ -14,7 +14,7 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3"><@t key="banner.title">基于AI全新打造</@t></h1>
+				<h1 class="mb-3"><@t key="banner.title">企业一站式管理专家</@t></h1>
 				<h4 class="mb-3"><@t key="banner.subtitle">开源AI工作平台</@t></h4>
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》<@t key="banner.register">免费注册</@t></a>

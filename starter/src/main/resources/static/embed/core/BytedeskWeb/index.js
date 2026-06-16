@@ -372,58 +372,61 @@ var v = class {
 		}), document.body.appendChild(n), this.buttonPreviewElement = n;
 	}
 	createButtonElement(e, t, n) {
-		let r = document.createElement("button"), i = n?.isMultiLayout === !0, a = e.width || 60, o = e.height || 60, s = Math.max(a, o), c = i ? s : a, l = i ? s : o, u = i ? 0 : Math.min(c, l) / 2, d = this.config.theme?.mode === "dark", f = d ? "#3B82F6" : "#0066FF", p = this.config.theme?.backgroundColor || f, m = this.config.theme?.textColor || "#ffffff", g = i ? "none" : `0 4px 16px rgba(0, 0, 0, ${d ? "0.3" : "0.12"})`, _ = i && !n?.isLastButton ? `1px solid rgba(255, 255, 255, ${d ? "0.14" : "0.28"})` : "none", v = i ? "translateY(-1px)" : "scale(1.1)";
+		let r = document.createElement("button"), i = n?.isMultiLayout === !0, a = e.width || 60, o = e.height || 60, s = !!e.text, c = Math.max(a, o), l = i ? c : a, u = i ? c : o, d = i ? 0 : u / 2, f = !i && s ? Math.max(14, Math.round(u * .3)) : 0, p = this.config.theme?.mode === "dark", m = p ? "#3B82F6" : "#0066FF", g = this.config.theme?.backgroundColor || m, _ = this.config.theme?.textColor || "#ffffff", v = i ? "none" : `0 4px 16px rgba(0, 0, 0, ${p ? "0.3" : "0.12"})`, y = i && !n?.isLastButton ? `1px solid rgba(255, 255, 255, ${p ? "0.14" : "0.28"})` : "none", b = i ? "translateY(-1px)" : "scale(1.1)";
 		r.style.cssText = `
-      background-color: ${i ? "transparent" : p};
-      width: ${c}px;
-      height: ${l}px;
-      border-radius: ${u}px;
+      background-color: ${i ? "transparent" : g};
+      width: ${!i && s ? "auto" : `${l}px`};
+      min-width: ${!i && s ? `${Math.max(l, u)}px` : `${l}px`};
+      height: ${u}px;
+      border-radius: ${d}px;
       border: none;
-      border-bottom: ${_};
+      border-bottom: ${y};
       cursor: ${this.config.draggable ? "move" : "pointer"};
       display: ${e.show === !1 ? "none" : "flex"};
       align-items: center;
       justify-content: center;
-      box-shadow: ${g};
+      box-shadow: ${v};
       transition: all 0.3s ease;
       outline: none;
       position: relative;
       user-select: none;
-      padding: 0;
+      padding: 0 ${f}px;
+      white-space: nowrap;
     `;
-		let y = document.createElement("div");
-		if (y.style.cssText = `
+		let x = document.createElement("div");
+		if (x.style.cssText = `
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: ${i && e.text ? "column" : "row"};
-      gap: ${i ? "4px" : "8px"};
-      width: 100%;
+      gap: ${i ? "4px" : s ? "6px" : "8px"};
+      width: ${!i && s ? "auto" : "100%"};
       height: 100%;
+      min-width: 0;
     `, e.icon) {
 			let t = document.createElement("span");
-			t.textContent = e.icon, t.style.fontSize = `${l * (i ? .34 : .4)}px`, t.style.lineHeight = "1", y.appendChild(t);
+			t.textContent = e.icon, t.style.fontSize = `${u * (i ? .34 : .4)}px`, t.style.lineHeight = "1", x.appendChild(t);
 		} else {
 			let e = document.createElement("div");
-			e.innerHTML = "\n        <svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path d=\"M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z\" fill=\"white\"/>\n        </svg>\n      ", y.appendChild(e);
+			e.innerHTML = "\n        <svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path d=\"M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 14.663 3.04094 17.0829 4.73812 18.875L2.72681 21.1705C2.44361 21.4937 2.67314 22 3.10288 22H12Z\" fill=\"white\"/>\n        </svg>\n      ", x.appendChild(e);
 		}
 		if (e.text) {
 			let t = document.createElement("span");
 			t.textContent = e.text, t.style.cssText = `
-        color: ${m};
-        font-size: ${l * (i ? .16 : .25)}px;
+        color: ${_};
+        font-size: ${u * (i ? .16 : .25)}px;
         white-space: nowrap;
         line-height: 1.1;
         text-align: center;
-        max-width: ${i ? `${c - 8}px` : "none"};
+        max-width: ${i ? `${l - 8}px` : "none"};
         overflow: hidden;
         text-overflow: ellipsis;
-      `, y.appendChild(t);
+      `, x.appendChild(t);
 		}
-		return r.appendChild(y), r.addEventListener("mouseenter", () => {
-			this.cancelButtonPreviewHide(), r.style.transform = v, i && (r.style.backgroundColor = "rgba(255, 255, 255, 0.12)"), e.previewImageUrl && this.showButtonPreview(r, e);
+		return r.appendChild(x), r.addEventListener("mouseenter", () => {
+			this.cancelButtonPreviewHide(), r.style.transform = b, i && (r.style.backgroundColor = "rgba(255, 255, 255, 0.12)"), e.previewImageUrl && this.showButtonPreview(r, e);
 		}), r.addEventListener("mouseleave", () => {
-			r.style.transform = "scale(1)", i && (r.style.backgroundColor = "transparent"), e.previewImageUrl && this.scheduleHideButtonPreview();
+			r.style.transform = i ? "translateY(0)" : "scale(1)", i && (r.style.backgroundColor = "transparent"), e.previewImageUrl && this.scheduleHideButtonPreview();
 		}), r.addEventListener("click", () => {
 			this.isDragging || (h.debug("bubble click", e.action || "chat"), t instanceof HTMLElement && this.hideBubbleMessageElement(), this.triggerButtonAction(e));
 		}), r.addEventListener("contextmenu", (e) => {

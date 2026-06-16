@@ -217,6 +217,8 @@ services:
       BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
       BYTEDESK_CUSTOM_LANG: zh-CN
+      # Custom default LLM prompt; leave empty to fall back to the built-in RobotConsts default.
+      BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT:
       # allow register 注册开启
       BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
       # force validate mobile 强制验证手机号

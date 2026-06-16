@@ -217,7 +217,7 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "llm_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String prompt = RobotConsts.ROBOT_LLM_DEFAULT_PROMPT;
+    private String prompt = RobotConsts.resolveDefaultLlmPrompt();
     
     // 上下文消息数，默认0条。一同传递给大模型
     @Builder.Default

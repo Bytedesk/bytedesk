@@ -82,6 +82,7 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean forceVisitorAuth; // 是否强制访客认证，默认false
         private Boolean wechatMpSubscribePromptEnabled = false;
         private String wechatMpSubscribePromptAppId;
+        private String defaultLlmPrompt;
     }
 
     @Getter

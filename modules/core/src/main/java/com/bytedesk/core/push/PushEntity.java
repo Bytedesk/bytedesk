@@ -55,7 +55,6 @@ public class PushEntity extends BaseEntity {
 
     private String ip;
 
-    // according to ip address
     private String ipLocation;
 
     private String deviceUid; // 设备唯一标识

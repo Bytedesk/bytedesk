@@ -74,6 +74,8 @@ public class ConvertUtils {
                     bytedeskProperties.getCustom().getWechatMpSubscribePromptEnabled());
                 response.getCustom().setWechatMpSubscribePromptAppId(
                     bytedeskProperties.getCustom().getWechatMpSubscribePromptAppId());
+                response.getCustom().setDefaultLlmPrompt(
+                    bytedeskProperties.getCustom().getDefaultLlmPrompt());
         }
 
         // 明确设置Organization部分字段，确保从配置中获取

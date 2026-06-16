@@ -1,0 +1,1 @@
+import{di as e,ui as t}from"./configUtils-BW85XKkB.js";import{d as n,f as r,p as i,u as a}from"./react-vendor-CyTLWWV6.js";var o=i()(n(r(a((e,n)=>({accessToken:``,setAccessToken(n){localStorage.setItem(t,n),e({accessToken:n})},getAccessToken(){return n().accessToken},removeAccessToken(){localStorage.removeItem(t),e({accessToken:``})}})),{name:e})));export{o as t};
