@@ -1,0 +1,20 @@
+[Unit] 
+Description=FreeSWITCH open source softswitch 
+Wants=network-online.target Requires=network.target local-fs.target 
+After=network.target network-online.target local-fs.target 
+
+[Service] 
+; service 
+Type=forking 
+PIDFile=/usr/local/freeswitch/run/freeswitch.pid 
+Environment="DAEMON_OPTS=-nonat" 
+Environment="USER=freeswitch" 
+Environment="GROUP=freeswitch" 
+EnvironmentFile=-/etc/default/freeswitch 
+ExecStartPre=/bin/chown -R ${USER}:${GROUP} /usr/local/freeswitch 
+ExecStart=/usr/local/freeswitch/bin/freeswitch -u ${USER} -g ${GROUP} -ncwait ${DAEMON_OPTS} 
+TimeoutSec=45s 
+Restart=always 
+
+[Install] 
+WantedBy=multi-user.target
