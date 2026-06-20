@@ -61,5 +61,9 @@
     <include file="db/changelog/migration/260611_add_service_statistic_scope_indexes.xml" />
     <include file="db/changelog/migration/260611_refactor_xml_curl_trace_table.xml" />
     <include file="db/changelog/migration/260612_alter_esl_event_api_argument_to_text.xml" />
+    <include file="db/changelog/migration/260617_drop_time_condition_json_column.xml" />
+    <include file="db/changelog/migration/260616_add_quality_rule_engine_tables.xml" />
+    <include file="db/changelog/migration/260617_add_quality_inspection_task_table.xml" />
+    <include file="db/changelog/migration/260620_add_ticket_statistics_customer_metrics.xml" />
 
 </databaseChangeLog>

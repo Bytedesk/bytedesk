@@ -72,6 +72,22 @@ public class NotificationService {
                 .build();
     }
 
+    public NotificationEntity dispatchSystemNotificationToUser(NotificationRequest request) {
+        validateNotificationRequest(request);
+        Assert.hasText(request.getUserUid(), "Notification recipient UID cannot be empty");
+
+        NotificationEntity entity = modelMapper.map(request, NotificationEntity.class);
+        entity.setUid(uidUtils.getUid());
+        entity.setType(normalizeType(request.getType()));
+        entity.setStatus(NotificationStatusEnum.UNREAD.name());
+        entity.setUserUid(request.getUserUid());
+        entity.setCreatorUid(request.getCreatorUid());
+        entity.setOrgUid(request.getOrgUid());
+        entity.setLevel(normalizeLevel(request.getLevel()).name());
+        entity.setExtra(resolveExtra(request));
+        return notificationRepository.save(entity);
+    }
+
     private NotificationEntity dispatchSingleUserNotification(NotificationRequest request, String type, UserEntity recipient, UserEntity operator) {
         NotificationEntity entity = modelMapper.map(request, NotificationEntity.class);
         entity.setUid(uidUtils.getUid());
@@ -98,6 +114,11 @@ public class NotificationService {
     }
 
     private UserEntity validateDispatchPermission(NotificationRequest request) {
+        if (StringUtils.hasText(request.getCreatorUid())) {
+            return userRepository.findByUid(request.getCreatorUid())
+                    .orElseThrow(() -> new RuntimeException("Notification creator not found: " + request.getCreatorUid()));
+        }
+
         UserEntity user = authService.getUser();
         if (user == null) {
             throw new RuntimeException("Current user is required");

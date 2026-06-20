@@ -1393,6 +1393,18 @@ public class SwaggerApiConfig {
     }
 
     /**
+     * 质量规则管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityRuleApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-rule-apis")
+                .displayName("QualityRule Management APIs")
+                .pathsToMatch("/api/v1/quality/rule/**")
+                .build();
+    }
+
+    /**
      * Token统计管理接口
      */
     @Bean

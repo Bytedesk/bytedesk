@@ -45,4 +45,12 @@ public class NotificationRequest extends BaseRequest {
 
     private String extra;
 
+    private String creatorUid;
+
+    /**
+     * 前端自定义访客标识（如 visitor_001），用于 visitor 端未读通知数查询
+     * 后端通过 native query join visitor 表自动解析为系统 uid
+     */
+    private String visitorUid;
+
 }

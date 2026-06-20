@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260617-drop-time-condition-json-column" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_time_condition" />
+            <columnExists tableName="bytedesk_call_time_condition" columnName="condition_json" />
+        </preConditions>
+
+        <dropColumn tableName="bytedesk_call_time_condition" columnName="condition_json" />
+    </changeSet>
+
+</databaseChangeLog>

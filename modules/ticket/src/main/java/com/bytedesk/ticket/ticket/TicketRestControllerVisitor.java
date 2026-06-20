@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketRestControllerVisitor {
 
     private final TicketRestService ticketRestService;
+    private final TicketService ticketService;
 
     // query by visitor uid
     @GetMapping("/query")
@@ -41,6 +45,14 @@ public class TicketRestControllerVisitor {
         Page<TicketResponse> page = ticketRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @GetMapping("/query/uid")
+    public ResponseEntity<?> queryByUid(TicketRequest request) {
+
+        TicketResponse response = ticketRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     // create ticket by visitor
@@ -58,6 +70,14 @@ public class TicketRestControllerVisitor {
         ticketRestService.deleteByVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @GetMapping("/history/activity")
+    public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
+
+        List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);
+
+        return ResponseEntity.ok(JsonResult.success(activities));
     }
 
     

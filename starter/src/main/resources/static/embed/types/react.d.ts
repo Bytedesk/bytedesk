@@ -39,7 +39,7 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
-    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket';
     previewImageUrl?: string;
     previewImageAlt?: string;
     onClick?: () => void;
@@ -54,6 +54,7 @@ declare interface BytedeskConfig {
     threadPath?: string;
     webrtcPath?: string;
     callPath?: string;
+    ticketPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -71,6 +72,7 @@ declare interface BytedeskConfig {
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
     window?: WindowConfig;
+    minimizedBarConfig?: MinimizedBarConfig;
     theme?: Theme;
     onInit?: () => void;
     onShowChat?: () => void;
@@ -169,6 +171,10 @@ declare interface MessageBubbleClickEvent {
     extra?: unknown;
     position?: string;
     status?: string;
+}
+
+declare interface MinimizedBarConfig {
+    text?: string;
 }
 
 declare interface TabsConfig {

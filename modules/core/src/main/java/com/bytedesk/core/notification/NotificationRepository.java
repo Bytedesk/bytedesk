@@ -34,4 +34,21 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     long countByUserUidAndStatusAndDeletedFalse(String userUid, String status);
 
     List<NotificationEntity> findByUserUidAndStatusAndDeletedFalse(String userUid, String status);
+
+    /**
+     * 通过 visitorUid（前端自定义标识如 visitor_001）+ orgUid 查询未读通知数。
+     * 使用 native query join bytedesk_service_visitor 表将 visitorUid 解析为系统 uid，
+     * 避免 modules/core 对 modules/service 的编译期依赖。
+     */
+    @org.springframework.data.jpa.repository.Query(value = "SELECT COUNT(*) "
+            + "FROM bytedesk_core_notification n "
+            + "INNER JOIN bytedesk_service_visitor v ON n.user_uid = v.uuid "
+            + "WHERE v.visitor_uid = :visitorUid "
+            + "AND v.org_uid = :orgUid "
+            + "AND n.notification_status = :status "
+            + "AND n.is_deleted = false", nativeQuery = true)
+    long countByVisitorUidAndOrgUidAndStatusAndDeletedFalse(
+            @org.springframework.data.repository.query.Param("visitorUid") String visitorUid,
+            @org.springframework.data.repository.query.Param("orgUid") String orgUid,
+            @org.springframework.data.repository.query.Param("status") String status);
 }

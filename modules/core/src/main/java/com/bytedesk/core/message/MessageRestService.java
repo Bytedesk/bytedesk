@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
@@ -178,6 +179,11 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     // @CachePut(value = "message", key = "#message.uid")
     protected MessageEntity doSave(MessageEntity entity) {
         return messageRepository.save(entity);
+    }
+
+    @Recover
+    public MessageEntity recover(ObjectOptimisticLockingFailureException e, MessageEntity entity) {
+        return handleOptimisticLockingFailureException(e, entity);
     }
 
     @Caching(evict = {

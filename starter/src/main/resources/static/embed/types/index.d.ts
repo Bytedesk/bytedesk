@@ -37,7 +37,7 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
-    action?: 'chat' | 'thread' | 'webrtc' | 'call';
+    action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket';
     previewImageUrl?: string;
     previewImageAlt?: string;
     onClick?: () => void;
@@ -52,6 +52,7 @@ export declare interface BytedeskConfig {
     threadPath?: string;
     webrtcPath?: string;
     callPath?: string;
+    ticketPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -69,6 +70,7 @@ export declare interface BytedeskConfig {
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
     window?: WindowConfig;
+    minimizedBarConfig?: MinimizedBarConfig;
     theme?: Theme;
     onInit?: () => void;
     onShowChat?: () => void;
@@ -85,6 +87,7 @@ declare class BytedeskWeb {
     private unreadBadgeCount;
     private bubble;
     private bubbleContainer;
+    private minimizedBar;
     private buttonElements;
     private buttonPreviewElement;
     private buttonPreviewHideTimer;
@@ -125,6 +128,14 @@ declare class BytedeskWeb {
     private setupApiUrl;
     private mergeConfig;
     private refreshFloatingUi;
+    private getMinimizedBarLabel;
+    private createMinimizedBarIcon;
+    private createMinimizedBarLabelElement;
+    private hideDefaultFloatingUi;
+    private restoreDefaultFloatingUi;
+    private removeMinimizedBar;
+    private showMinimizedBar;
+    private restoreMinimizedWindow;
     private updateChatWindowLayout;
     private refreshChatIframeUrl;
     setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>): void;
@@ -190,10 +201,13 @@ declare class BytedeskWeb {
     sendMessageToIframe(message: any): void;
     resetAnonymousVisitor(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
-    hideChat(): void;
+    hideChat(options?: {
+        preserveFloatingUiHidden?: boolean;
+    }): void;
     showThread(config?: Partial<BytedeskConfig>): void;
     showWebrtc(config?: Partial<BytedeskConfig>): void;
     showCall(config?: Partial<BytedeskConfig>): void;
+    showTicket(config?: Partial<BytedeskConfig>): void;
     private minimizeWindow;
     private toggleMaximize;
     private setupResizeListener;
@@ -415,6 +429,10 @@ declare interface MessageBubbleClickEvent {
     extra?: unknown;
     position?: string;
     status?: string;
+}
+
+declare interface MinimizedBarConfig {
+    text?: string;
 }
 
 declare interface SetConfigOptions {

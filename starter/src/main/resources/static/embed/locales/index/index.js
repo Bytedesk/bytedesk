@@ -2,6 +2,7 @@
 var e = {
 	"zh-cn": {
 		title: "在线客服",
+		actions: { continueChat: "继续对话" },
 		bubble: {
 			title: "需要帮助吗？",
 			subtitle: "点击开始对话"
@@ -26,6 +27,7 @@ var e = {
 	},
 	"zh-tw": {
 		title: "線上客服",
+		actions: { continueChat: "繼續對話" },
 		bubble: {
 			title: "需要幫助嗎？",
 			subtitle: "點擊開始對話"
@@ -50,6 +52,7 @@ var e = {
 	},
 	en: {
 		title: "Online Support",
+		actions: { continueChat: "Continue chat" },
 		bubble: {
 			title: "Need help?",
 			subtitle: "Click to start chat"
@@ -74,6 +77,7 @@ var e = {
 	},
 	ja: {
 		title: "オンラインサポート",
+		actions: { continueChat: "会話を続ける" },
 		bubble: {
 			title: "お困りですか？",
 			subtitle: "クリックして会話を開始"
@@ -98,6 +102,7 @@ var e = {
 	},
 	"ja-jp": {
 		title: "オンラインサポート",
+		actions: { continueChat: "会話を続ける" },
 		bubble: {
 			title: "お困りですか？",
 			subtitle: "クリックして会話を開始"
@@ -120,6 +125,9 @@ var e = {
 			embed: "埋め込みコード"
 		}
 	}
+}, t = (t) => {
+	let n = (t || "zh-cn").toLowerCase();
+	return e[n] || e[n.split("-")[0]] || e["zh-cn"];
 };
 //#endregion
-export { e as messages };
+export { t as getLocaleMessages, e as messages };

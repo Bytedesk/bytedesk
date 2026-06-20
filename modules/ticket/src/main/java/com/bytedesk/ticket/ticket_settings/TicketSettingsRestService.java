@@ -44,6 +44,7 @@ import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.process.ProcessResponse;
 import com.bytedesk.ticket.process.ProcessTypeEnum;
+import com.bytedesk.ticket.ticket.TicketCategories;
 import com.bytedesk.ticket.ticket.TicketConsts;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
@@ -51,8 +52,8 @@ import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository;
-import com.bytedesk.ticket.ticket_settings_category.CategoryItemData;
-import com.bytedesk.ticket.ticket_settings_category.CategorySettingsData;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemData;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsData;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRequest;
@@ -146,15 +147,9 @@ public class TicketSettingsRestService extends
                 entity.getOrgUid());
         entity.setDraftBasicSettings(draftBasic);
 
-        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request.getCategorySettings(),
-                uidUtils::getUid);
-        category.setUid(uidUtils.getUid());
-        entity.setCategorySettings(category);
+        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings()));
 
-        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity
-                .fromRequest(resolveDraftCategoryRequest(request), uidUtils::getUid);
-        draftCategory.setUid(uidUtils.getUid());
-        entity.setDraftCategorySettings(draftCategory);
+        entity.setDraftCategorySettings(createCategorySettingsEntity(resolveDraftCategoryRequest(request)));
 
         String resolvedProcessUid = resolveProcessUidOrDefault(request, entity.getOrgUid(), normalizedType);
         entity.setProcess(resolveProcessReference(resolvedProcessUid, entity.getOrgUid()));
@@ -433,13 +428,9 @@ public class TicketSettingsRestService extends
                 .customFormEnabled(false)
                 .build();
 
-        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
-        category.setUid(uidUtils.getUid());
-        settings.setCategorySettings(category);
+        settings.setCategorySettings(createCategorySettingsEntity(null));
 
-        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
-        draftCategory.setUid(uidUtils.getUid());
-        settings.setDraftCategorySettings(draftCategory);
+        settings.setDraftCategorySettings(createCategorySettingsEntity(null));
 
         TicketBasicSettingsEntity basic = createBasicSettingsEntity(null, orgUid);
         settings.setBasicSettings(basic);
@@ -618,7 +609,7 @@ public class TicketSettingsRestService extends
                 draftCategory.getContent().normalize();
                 publishedCategory.setContent(copyCategorySettings(draftCategory.getContent()));
             } else {
-                publishedCategory.setContent(CategorySettingsData.builder().build());
+                publishedCategory.setContent(TicketCategorySettingsData.builder().build());
             }
         }
 
@@ -714,6 +705,34 @@ public class TicketSettingsRestService extends
             return null;
         }
         return request.getCategorySettings();
+    }
+
+    private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request) {
+        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request, uidUtils::getUid);
+        category.setUid(uidUtils.getUid());
+        if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+            category.setContent(buildDefaultCategorySettingsData());
+        }
+        return category;
+    }
+
+    private TicketCategorySettingsData buildDefaultCategorySettingsData() {
+        List<TicketCategoryItemData> items = new ArrayList<>();
+        String[] defaultCategories = TicketCategories.getAllCategories();
+        for (int index = 0; index < defaultCategories.length; index++) {
+            items.add(TicketCategoryItemData.builder()
+                    .uid(uidUtils.getUid())
+                    .name(defaultCategories[index])
+                    .enabled(Boolean.TRUE)
+                    .defaultCategory(index == 0)
+                    .orderIndex(index)
+                    .build());
+        }
+        TicketCategorySettingsData data = TicketCategorySettingsData.builder()
+                .items(items)
+                .build();
+        data.normalize();
+        return data;
     }
 
     private TicketBasicSettingsRequest resolveDraftBasicRequest(TicketSettingsRequest request) {
@@ -958,16 +977,16 @@ public class TicketSettingsRestService extends
                 .build();
     }
 
-    private CategorySettingsData copyCategorySettings(CategorySettingsData source) {
+    private TicketCategorySettingsData copyCategorySettings(TicketCategorySettingsData source) {
         if (source == null) {
-            CategorySettingsData copy = CategorySettingsData.builder().build();
+            TicketCategorySettingsData copy = TicketCategorySettingsData.builder().build();
             copy.normalize();
             return copy;
         }
-        List<CategoryItemData> copiedItems = source.getItems() == null
+        List<TicketCategoryItemData> copiedItems = source.getItems() == null
                 ? new ArrayList<>()
                 : source.getItems().stream()
-                        .map(item -> CategoryItemData.builder()
+                        .map(item -> TicketCategoryItemData.builder()
                                 .uid(item.getUid())
                                 .name(item.getName())
                                 .description(item.getDescription())
@@ -976,7 +995,7 @@ public class TicketSettingsRestService extends
                                 .orderIndex(item.getOrderIndex())
                                 .build())
                         .collect(Collectors.toList());
-        CategorySettingsData copy = CategorySettingsData.builder()
+        TicketCategorySettingsData copy = TicketCategorySettingsData.builder()
                 .items(copiedItems)
                 .build();
         copy.normalize();
@@ -987,7 +1006,7 @@ public class TicketSettingsRestService extends
         if (entity == null || entity.getContent() == null) {
             return null;
         }
-        CategorySettingsData content = entity.getContent();
+        TicketCategorySettingsData content = entity.getContent();
         List<TicketCategoryItemResponse> items = content.getItems() == null
                 ? new ArrayList<>()
                 : content.getItems().stream()

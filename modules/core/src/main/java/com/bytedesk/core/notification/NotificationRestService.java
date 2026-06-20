@@ -122,12 +122,47 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
         return notificationRepository.countByUserUidAndStatusAndDeletedFalse(user.getUid(), NotificationStatusEnum.UNREAD.name());
     }
 
+    public long countUnread(String userUid) {
+        String resolvedUserUid = resolveUserUid(userUid);
+        if (!StringUtils.hasText(resolvedUserUid)) {
+            return 0L;
+        }
+        return notificationRepository.countByUserUidAndStatusAndDeletedFalse(resolvedUserUid, NotificationStatusEnum.UNREAD.name());
+    }
+
+    /**
+     * 通过 visitorUid（前端自定义标识）+ orgUid 查询未读通知数。
+     * 利用 native query join bytedesk_service_visitor 表自动将 visitorUid 解析为系统 uid。
+     */
+    public long countUnreadByVisitorUid(String visitorUid, String orgUid) {
+        if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {
+            return 0L;
+        }
+        return notificationRepository.countByVisitorUidAndOrgUidAndStatusAndDeletedFalse(
+                visitorUid, orgUid, NotificationStatusEnum.UNREAD.name());
+    }
+
     public NotificationResponse markRead(String uid) {
         UserEntity user = authService.getUser();
         if (user == null || !StringUtils.hasText(user.getUid())) {
             throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
         NotificationEntity entity = notificationRepository.findByUidAndUserUidAndDeletedFalse(uid, user.getUid())
+                .orElseThrow(() -> new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND));
+        entity.setStatus(NotificationStatusEnum.READ.name());
+        NotificationEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
+        }
+        return convertToResponse(savedEntity);
+    }
+
+    public NotificationResponse markRead(String uid, String userUid) {
+        String resolvedUserUid = resolveUserUid(userUid);
+        if (!StringUtils.hasText(resolvedUserUid)) {
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+        NotificationEntity entity = notificationRepository.findByUidAndUserUidAndDeletedFalse(uid, resolvedUserUid)
                 .orElseThrow(() -> new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND));
         entity.setStatus(NotificationStatusEnum.READ.name());
         NotificationEntity savedEntity = save(entity);
@@ -144,6 +179,18 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
         }
 
         List<NotificationEntity> unreadNotifications = notificationRepository.findByUserUidAndStatusAndDeletedFalse(user.getUid(), NotificationStatusEnum.UNREAD.name());
+        unreadNotifications.forEach(notification -> notification.setStatus(NotificationStatusEnum.READ.name()));
+        notificationRepository.saveAll(unreadNotifications);
+        return unreadNotifications.size();
+    }
+
+    public long markAllRead(String userUid) {
+        String resolvedUserUid = resolveUserUid(userUid);
+        if (!StringUtils.hasText(resolvedUserUid)) {
+            return 0L;
+        }
+
+        List<NotificationEntity> unreadNotifications = notificationRepository.findByUserUidAndStatusAndDeletedFalse(resolvedUserUid, NotificationStatusEnum.UNREAD.name());
         unreadNotifications.forEach(notification -> notification.setStatus(NotificationStatusEnum.READ.name()));
         notificationRepository.saveAll(unreadNotifications);
         return unreadNotifications.size();
@@ -274,6 +321,17 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
         }
 
         return response;
+    }
+
+    private String resolveUserUid(String userUid) {
+        if (StringUtils.hasText(userUid)) {
+            return userUid;
+        }
+        UserEntity user = authService.getUser();
+        if (user != null && StringUtils.hasText(user.getUid())) {
+            return user.getUid();
+        }
+        return null;
     }
     
 }

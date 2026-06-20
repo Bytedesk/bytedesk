@@ -85,6 +85,25 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
         return queueMemberRepository.findByThreadUids(threadUids);
     }
+
+    public List<QueueMemberEntity> findClosedQueueMembersForQualityRerun(
+            String orgUid,
+            List<String> threadTypes,
+            ZonedDateTime startTime,
+            ZonedDateTime endTime,
+            int limit) {
+        if (!StringUtils.hasText(orgUid) || threadTypes == null || threadTypes.isEmpty() || startTime == null || endTime == null) {
+            return Collections.emptyList();
+        }
+        int pageSize = Math.max(1, limit);
+        return queueMemberRepository.findClosedQueueMembersForQualityRerun(
+                orgUid,
+                threadTypes,
+                ThreadProcessStatusEnum.CLOSED.name(),
+                startTime,
+                endTime,
+                PageRequest.of(0, pageSize));
+    }
     
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {

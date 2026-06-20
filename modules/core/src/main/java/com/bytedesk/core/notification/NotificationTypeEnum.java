@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 public enum NotificationTypeEnum {
     GENERAL,
+    TICKET,
     ANNOUNCEMENT,
     MAINTENANCE,
     SECURITY;

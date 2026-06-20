@@ -71,6 +71,7 @@ public class TopicUtils {
     private static final String TOPIC_FILE_PATTERN = "file/%s";
     private static final String TOPIC_CLIPBOARD_PATTERN = "clipboard/%s";
     private static final String TOPIC_SYSTEM_PATTERN = "system/%s";
+    private static final String TOPIC_NOTIFICATION_PATTERN = "notification/%s";
     private static final String TOPIC_GROUP_PATTERN = "group/%s";
     private static final String TOPIC_PRIVATE_PATTERN = "private/%s/%s";
     private static final String TOPIC_ROBOT_PATTERN = "robot/%s/%s";
@@ -142,6 +143,10 @@ public class TopicUtils {
 
     public static String getSystemTopic(String userUid) {
         return String.format(TOPIC_SYSTEM_PATTERN, userUid);
+    }
+
+    public static String getNotificationTopic(String userUid) {
+        return String.format(TOPIC_NOTIFICATION_PATTERN, userUid);
     }
 
     public static String getOrgTopic(String orgUid) {

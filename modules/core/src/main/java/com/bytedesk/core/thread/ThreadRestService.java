@@ -203,15 +203,7 @@ public class ThreadRestService
         Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
 
         if (Boolean.TRUE.equals(request.getMergeByTopic())) {
-            List<ThreadEntity> mergedThreads = threadRepository.findAll(specs).stream()
-                    .collect(Collectors.collectingAndThen(
-                            Collectors.toMap(
-                                    thread -> StringUtils.hasText(thread.getTopic()) ? thread.getTopic()
-                                            : thread.getUid(),
-                                    thread -> thread,
-                                    (existing, ignored) -> existing,
-                                    LinkedHashMap::new),
-                            map -> new ArrayList<>(map.values())));
+            List<ThreadEntity> mergedThreads = mergeThreadsByTopic(threadRepository.findAll(specs));
 
             if (pageable == null || pageable.isUnpaged()) {
                 return new PageImpl<>(
@@ -234,6 +226,39 @@ public class ThreadRestService
 
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, effectivePageable);
         return threadPage.map(this::convertToResponse);
+    }
+
+    /**
+     * 访客端-查询全部匹配会话，用于上层做跨实体过滤后再分页。
+     */
+    public List<ThreadResponse> queryAllByVisitor(ThreadRequest request) {
+        if (request == null) {
+            return List.of();
+        }
+
+        String uid = request.getUid();
+        String visitorUid = request.getVisitorUid();
+        if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+            return List.of();
+        }
+
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
+        List<ThreadEntity> threads = threadRepository.findAll(specs);
+        List<ThreadEntity> effectiveThreads = Boolean.TRUE.equals(request.getMergeByTopic())
+                ? mergeThreadsByTopic(threads)
+                : threads;
+        return effectiveThreads.stream().map(this::convertToResponse).toList();
+    }
+
+    private List<ThreadEntity> mergeThreadsByTopic(List<ThreadEntity> threads) {
+        return threads.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                thread -> StringUtils.hasText(thread.getTopic()) ? thread.getTopic() : thread.getUid(),
+                                thread -> thread,
+                                (existing, ignored) -> existing,
+                                LinkedHashMap::new),
+                        map -> new ArrayList<>(map.values())));
     }
 
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {

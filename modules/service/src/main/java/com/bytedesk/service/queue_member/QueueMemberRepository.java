@@ -58,6 +58,19 @@ public interface QueueMemberRepository
         @Query("SELECT qm FROM QueueMemberEntity qm JOIN FETCH qm.thread t WHERE t.uid IN :threadUids AND qm.deleted = false")
         List<QueueMemberEntity> findByThreadUids(@Param("threadUids") List<String> threadUids);
 
+       @Query("SELECT qm FROM QueueMemberEntity qm JOIN FETCH qm.thread t " +
+                     "WHERE qm.orgUid = :orgUid AND qm.deleted = false " +
+                     "AND t.status = :threadStatus AND t.type IN :threadTypes " +
+                     "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime " +
+                     "ORDER BY qm.createdAt DESC")
+       List<QueueMemberEntity> findClosedQueueMembersForQualityRerun(
+                     @Param("orgUid") String orgUid,
+                     @Param("threadTypes") List<String> threadTypes,
+                     @Param("threadStatus") String threadStatus,
+                     @Param("startTime") ZonedDateTime startTime,
+                     @Param("endTime") ZonedDateTime endTime,
+                     Pageable pageable);
+
         // 统计指定组织在指定日期范围内的会话总数
         @Query("SELECT COUNT(qm) FROM QueueMemberEntity qm WHERE qm.orgUid = :orgUid AND qm.createdAt >= :startDate AND qm.createdAt <= :endDate")
         Long countByOrgUidAndDateBetween(@Param("orgUid") String orgUid, @Param("startDate") ZonedDateTime startDate,

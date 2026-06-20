@@ -34,6 +34,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
+import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
@@ -69,6 +70,7 @@ public class TicketService {
     private final ThreadRestService threadRestService;
     private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final TicketRestService ticketRestService;
+    private final TicketNotificationService ticketNotificationService;
 
     private TicketEntity getTicketOrThrow(String ticketUid) {
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticketUid);
@@ -115,6 +117,13 @@ public class TicketService {
         taskService.saveComment(comment);
     }
 
+    private void persistAndNotifyStatusChange(TicketEntity ticket, String previousStatus) {
+        ticketRestService.save(ticket);
+        if (!Objects.equals(previousStatus, ticket.getStatus())) {
+            ticketNotificationService.notifyTicketStatusChanged(ticket, previousStatus, ticket.getStatus());
+        }
+    }
+
     /**
      * 认领工单
      * NEW -&gt; CLAIMED (认领)
@@ -134,6 +143,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         final String status = ticket.getStatus();
         final String statusNew = TicketStatusEnum.NEW.name();
@@ -257,8 +267,8 @@ public class TicketService {
             // .build());
         }
 
-        // 6. 保存工单
-        ticketRestService.save(ticket);
+    // 6. 保存工单
+    persistAndNotifyStatusChange(ticket, previousStatus);
 
         // 7. 返回工单响应
         return TicketConvertUtils.convertToResponse(ticket);
@@ -283,6 +293,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态 - 修改此处以支持REOPENED状态
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name()) && 
@@ -333,7 +344,7 @@ public class TicketService {
 
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.PROCESSING.name());
-            ticketRestService.save(ticket);
+            persistAndNotifyStatusChange(ticket, previousStatus);
 
             log.info("工单开始处理成功: taskId={}, assigneeUid={}", task.getId(), ticket.getAssigneeString());
 
@@ -363,6 +374,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 判断状态是否为已认领，如果不是，则不能退回
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
@@ -405,7 +417,7 @@ public class TicketService {
         // 更新工单状态
         ticket.setAssignee(null);
         ticket.setStatus(TicketStatusEnum.UNCLAIMED.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         // 发布工单退回消息事件
         // eventPublisher.publishEvent(TicketMessageEvent.builder()
@@ -436,6 +448,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
@@ -465,7 +478,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -488,6 +501,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) &&
@@ -517,7 +531,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.HOLDING.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -541,6 +555,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.HOLDING.name())) {
@@ -569,7 +584,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.RESUMED.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -593,6 +608,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
@@ -621,7 +637,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PENDING.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -645,6 +661,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.CLOSED.name()) &&
@@ -674,7 +691,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.PROCESSING.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -698,6 +715,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
@@ -727,7 +745,7 @@ public class TicketService {
 
             // 5. 更新工单状态
             ticket.setStatus(TicketStatusEnum.ESCALATED.name());
-            ticketRestService.save(ticket);
+            persistAndNotifyStatusChange(ticket, previousStatus);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -755,6 +773,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) &&
@@ -790,7 +809,7 @@ public class TicketService {
             // 7. 更新工单状态
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
             ticket.setResolvedTime(BdDateUtils.now());
-            ticketRestService.save(ticket);
+            persistAndNotifyStatusChange(ticket, previousStatus);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -819,6 +838,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.RESOLVED.name())) {
@@ -868,7 +888,7 @@ public class TicketService {
                 // 重置解决时间
                 ticket.setResolvedTime(null);
             }
-            ticketRestService.save(ticket);
+            persistAndNotifyStatusChange(ticket, previousStatus);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -897,6 +917,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态 - 修改此处，允许RESUMED状态也可以关闭
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name()) && 
@@ -927,7 +948,7 @@ public class TicketService {
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
         ticket.setClosedTime(BdDateUtils.now()); // 添加关闭时间记录
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -951,6 +972,7 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
+        String previousStatus = ticket.getStatus();
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.PROCESSING.name())) {
@@ -982,7 +1004,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
-        ticketRestService.save(ticket);
+        persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -1167,6 +1189,7 @@ public class TicketService {
         Assert.hasText(operatorUid, "操作人uid不能为空");
 
         TicketEntity ticket = getTicketOrThrow(request.getUid());
+    String previousStatus = ticket.getStatus();
 
         // 尽量先给当前活动任务写评论（删除实例后就无法再写 task comment）
         List<Task> tasks = taskService.createTaskQuery()
@@ -1189,7 +1212,7 @@ public class TicketService {
 
         // 工单侧统一落到 CANCELLED（前端已有该状态）
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
-        ticketRestService.save(ticket);
+    persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }

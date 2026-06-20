@@ -113,6 +113,17 @@ public class MessageSocketService {
         doSendToSubscribers(topic, messageProto);
     }
 
+    public void sendMqttMessageToUser(@NonNull String userUid, @NonNull String topic,
+            @NonNull MessageProto.Message messageProto) {
+        Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(Set.of(userUid));
+        Set<String> clientIds = clientIdsByUserUid.get(userUid);
+        if (clientIds == null || clientIds.isEmpty()) {
+            log.debug("skip mqtt direct notification: no active client, userUid={}, topic={}", userUid, topic);
+            return;
+        }
+        clientIds.forEach(clientId -> doSendMessage(topic, messageProto, clientId));
+    }
+
     private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
         // log.debug("doSendToSubscribers: topic={}", topic);
         Set<String> subscriberUserUids = topicSubscriptionRestService.findSubscriberUserUidsByTopic(topic);

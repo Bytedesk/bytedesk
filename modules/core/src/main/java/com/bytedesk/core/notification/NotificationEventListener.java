@@ -13,17 +13,24 @@
  */
 package com.bytedesk.core.notification;
 
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.notification.event.NotificationCreateEvent;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class NotificationEventListener {
 
-    // @EventListener
-    // public void onMessageUpdateEvent(MessageUpdateEvent event) {
-    //     log.info("NotificationEventListener onMessageUpdateEvent");
-    // }
-    
+    private final NotificationRealtimeService notificationRealtimeService;
+
+    @EventListener
+    public void onNotificationCreateEvent(NotificationCreateEvent event) {
+        notificationRealtimeService.onNotificationCreateEvent(event);
+    }
+
 }
