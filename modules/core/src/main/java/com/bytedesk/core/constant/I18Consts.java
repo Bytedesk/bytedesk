@@ -177,6 +177,7 @@ public class I18Consts {
     public static final String I18N_VISITOR = I18N_PREFIX + "visitor.management";
     public static final String I18N_TICKET = I18N_PREFIX + "ticket.management";
     public static final String I18N_TICKET_RATING = I18N_PREFIX + "ticket.rating";
+    public static final String I18N_TICKET_COMMENT = I18N_PREFIX + "ticket.comment";
     public static final String I18N_BUG = I18N_PREFIX + "bug.management";
     public static final String I18N_MESSAGE_LEAVE = I18N_PREFIX + "message.leave.management";
     public static final String I18N_TICKET_SETTINGS = I18N_PREFIX + "ticket.settings.management";

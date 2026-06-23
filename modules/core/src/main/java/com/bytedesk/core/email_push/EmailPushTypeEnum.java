@@ -14,8 +14,18 @@
 package com.bytedesk.core.email_push;
 
 public enum EmailPushTypeEnum {
-    THREAD,
-    VISITOR,
-    CUSTOMER,
-    TICKET
+    EMAIL_NOTIFICATION,  // 邮件通知
+    EMAIL_REGISTER,      // 邮箱注册
+    EMAIL_LOGIN,         // 邮箱登录
+    EMAIL_RESET,         // 邮箱重置
+    EMAIL_VERIFY;        // 邮箱验证
+
+    public static EmailPushTypeEnum fromValue(String value) {
+        for (EmailPushTypeEnum type : EmailPushTypeEnum.values()) {
+            if (type.name().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return EMAIL_NOTIFICATION; // 默认返回
+    }
 }

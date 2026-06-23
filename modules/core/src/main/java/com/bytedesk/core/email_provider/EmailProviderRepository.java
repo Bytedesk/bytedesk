@@ -27,5 +27,7 @@ public interface EmailProviderRepository extends JpaRepository<EmailProviderEnti
 
     List<EmailProviderEntity> findByEnabledTrueAndDeletedFalse();
 
+    Optional<EmailProviderEntity> findFirstByOrgUidAndTypeAndEnabledTrueAndDeletedFalse(String orgUid, String type);
+
     // Boolean existsByPlatform(String platform);
 }

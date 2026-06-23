@@ -134,7 +134,7 @@ public final class RoleAuthorityRules {
 
     // notification (modules/notification)
     public static final String NOTIFICATION_READ = "NOTIFICATION_READ";
-    // public static final String NOTIFICATION_CREATE = "NOTIFICATION_CREATE";
+    public static final String NOTIFICATION_CREATE = "NOTIFICATION_CREATE";
     public static final String NOTIFICATION_UPDATE = "NOTIFICATION_UPDATE";
     public static final String NOTIFICATION_DELETE = "NOTIFICATION_DELETE";
     public static final String NOTIFICATION_EXPORT = "NOTIFICATION_EXPORT";
@@ -313,7 +313,7 @@ public final class RoleAuthorityRules {
             ROOM_DELETE,
             // 
             NOTIFICATION_READ,
-            // NOTIFICATION_CREATE,
+            NOTIFICATION_CREATE,
             NOTIFICATION_UPDATE,
             NOTIFICATION_DELETE,
             NOTIFICATION_EXPORT,

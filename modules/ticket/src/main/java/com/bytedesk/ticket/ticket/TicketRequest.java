@@ -14,6 +14,7 @@
 package com.bytedesk.ticket.ticket;
 
 import java.util.Set;
+import java.util.Map;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -94,6 +95,10 @@ public class TicketRequest extends BaseRequest {
     private String taskId;
     // 委托：将当前任务委托给指定处理人（member uid）
     private String delegateUid;
+    // 指派/转派：目标处理人（member uid）
+    private String targetAssigneeUid;
+    // 跨部门转派：目标部门 uid
+    private String targetDepartmentUid;
     // 抄送：知会人员列表（member uid）
     private Set<String> ccUids;
     // 加签：新增候选审批人（member uid），最小实现为追加候选人
@@ -104,6 +109,12 @@ public class TicketRequest extends BaseRequest {
     private String rollbackFromActivityId;
     // 撤销/退回/加签/抄送等操作原因
     private String reason;
+    // 处理意见/暂存说明/关单说明
+    private String processComment;
+    // 统一工作流动作：claim/complete/delegate/rollback/revoke 等
+    private String actionKey;
+    // 完成任务时传入的流程变量
+    private Map<String, Object> variables;
 
     public String getAssigneeJson() {
         if (assignee == null) {

@@ -1,0 +1,321 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "meta": {
+        "position": {
+          "x": -589,
+          "y": 202
+        }
+      },
+      "data": {
+        "title": "提交申请",
+        "description": "员工提交请假审批申请。"
+      }
+    },
+    {
+      "id": "submitLeave",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": -246,
+          "y": 202
+        }
+      },
+      "data": {
+        "title": "填写请假申请",
+        "description": "员工填写请假申请，包括请假类型、开始时间、结束时间、请假事由。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${applicantUid}"
+        ],
+        "assigneeNames": [
+          "申请人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "checkDaysGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 92,
+          "y": 202
+        }
+      },
+      "data": {
+        "title": "判断请假天数",
+        "description": "根据请假天数进入短期或长期审批分支。",
+        "conditions": [
+          {
+            "key": "shortLeave",
+            "label": "短期请假（≤3天）",
+            "expression": "${leaveDays <= 3}",
+            "outgoingEdgeId": "supervisorApproval"
+          },
+          {
+            "key": "longLeave",
+            "label": "长期请假（>3天）",
+            "expression": "${leaveDays > 3}",
+            "outgoingEdgeId": "managerApproval"
+          }
+        ]
+      }
+    },
+    {
+      "id": "supervisorApproval",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 430,
+          "y": 80
+        }
+      },
+      "data": {
+        "title": "主管审批",
+        "description": "直接主管审批请假申请。",
+        "assigneeType": "role",
+        "roleUid": "${supervisorGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "supervisorResultGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 822,
+          "y": 80
+        }
+      },
+      "data": {
+        "title": "主管审批结果",
+        "description": "判断主管审批是否通过。",
+        "conditions": [
+          {
+            "key": "supervisorApproved",
+            "label": "批准",
+            "expression": "${supervisorApproved == true}",
+            "outgoingEdgeId": "end"
+          },
+          {
+            "key": "supervisorRejected",
+            "label": "拒绝",
+            "expression": "${supervisorApproved == false}",
+            "outgoingEdgeId": "rejectEnd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "managerApproval",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 430,
+          "y": 280
+        }
+      },
+      "data": {
+        "title": "部门经理审批",
+        "description": "部门经理审批长期请假申请。",
+        "assigneeType": "role",
+        "roleUid": "${managerGroupId}",
+        "timeoutMinutes": 2880,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "managerResultGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 822,
+          "y": 280
+        }
+      },
+      "data": {
+        "title": "经理审批结果",
+        "description": "判断部门经理审批是否通过。",
+        "conditions": [
+          {
+            "key": "managerApproved",
+            "label": "批准",
+            "expression": "${managerApproved == true}",
+            "outgoingEdgeId": "hrRecord"
+          },
+          {
+            "key": "managerRejected",
+            "label": "拒绝",
+            "expression": "${managerApproved == false}",
+            "outgoingEdgeId": "rejectEnd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hrRecord",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1176,
+          "y": 280
+        }
+      },
+      "data": {
+        "title": "HR备案",
+        "description": "HR部门记录请假信息，更新考勤系统。",
+        "assigneeType": "role",
+        "roleUid": "${hrGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": false,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "managerTimeoutNotify",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 430,
+          "y": 488.63739251735655
+        }
+      },
+      "data": {
+        "title": "超时提醒",
+        "description": "经理审批超过2天后发送提醒。",
+        "channels": [
+          "message"
+        ],
+        "template": "请假审批已超时，请及时处理。",
+        "recipientType": "role",
+        "recipientUids": [
+          "${managerGroupId}"
+        ]
+      }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 1540,
+          "y": 280
+        }
+      },
+      "data": {
+        "title": "批准结束",
+        "description": "请假审批通过并结束。"
+      }
+    },
+    {
+      "id": "rejectEnd",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 1540,
+          "y": 80
+        }
+      },
+      "data": {
+        "title": "拒绝结束",
+        "description": "请假审批拒绝并结束。"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "start",
+      "targetNodeId": "submitLeave",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "submitLeave",
+      "targetNodeId": "checkDaysGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "checkDaysGateway",
+      "targetNodeId": "supervisorApproval",
+      "sourcePortId": "condition-branch-shortLeave",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "checkDaysGateway",
+      "targetNodeId": "managerApproval",
+      "sourcePortId": "condition-branch-longLeave",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "supervisorApproval",
+      "targetNodeId": "supervisorResultGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "supervisorResultGateway",
+      "targetNodeId": "end",
+      "sourcePortId": "condition-branch-supervisorApproved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "supervisorResultGateway",
+      "targetNodeId": "rejectEnd",
+      "sourcePortId": "condition-branch-supervisorRejected",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerTimeoutNotify",
+      "targetNodeId": "managerApproval",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerApproval",
+      "targetNodeId": "managerResultGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerApproval",
+      "targetNodeId": "managerTimeoutNotify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerResultGateway",
+      "targetNodeId": "hrRecord",
+      "sourcePortId": "condition-branch-managerApproved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerResultGateway",
+      "targetNodeId": "rejectEnd",
+      "sourcePortId": "condition-branch-managerRejected",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "hrRecord",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.QueueMeta;
+import com.bytedesk.core.thread.ThreadQueueMeta;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRepository;
@@ -194,7 +194,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
                 waitingMs = Math.max(0, now - enqueuedAt);
             }
 
-            QueueMeta meta = QueueMeta.builder()
+            ThreadQueueMeta meta = ThreadQueueMeta.builder()
                     .queueMemberUid(qm.getUid())
                     .position(qm.getQueueNumber())
                     .serverTimestamp(now)
@@ -378,7 +378,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             QueueMemberEntity qm = queueMemberByThreadUid.get(threadUid);
             String queueMemberUid = (qm == null) ? null : qm.getUid();
 
-            QueueMeta meta = QueueMeta.builder()
+            ThreadQueueMeta meta = ThreadQueueMeta.builder()
                     .queueMemberUid(queueMemberUid)
                     .serverTimestamp(now)
                     // 复用字段：这里 enqueuedAt 表示“最早未回复访客消息时间”

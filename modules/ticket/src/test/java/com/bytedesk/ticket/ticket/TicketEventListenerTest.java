@@ -14,12 +14,18 @@ import org.junit.jupiter.api.Test;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
+import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.core.email_provider.EmailProviderRepository;
+import com.bytedesk.core.email_push.EmailPushSendService;
+import com.bytedesk.core.sms_push.SmsPushSendService;
+import com.bytedesk.service.visitor.VisitorRepository;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 
 class TicketEventListenerTest {
 
@@ -27,7 +33,15 @@ class TicketEventListenerTest {
     void notifyNewTicketShouldDispatchNotificationToReporterAndWorkgroupUsers() {
         NotificationService notificationService = mock(NotificationService.class);
         WorkgroupRepository workgroupRepository = mock(WorkgroupRepository.class);
-        TicketNotificationService ticketNotificationService = new TicketNotificationService(notificationService, workgroupRepository);
+        VisitorRepository visitorRepository = mock(VisitorRepository.class);
+        EmailProviderRepository emailProviderRepository = mock(EmailProviderRepository.class);
+        SmsPushSendService smsPushSendService = mock(SmsPushSendService.class);
+        ApnsPushService apnsPushService = mock(ApnsPushService.class);
+        EmailPushSendService emailPushSendService = mock(EmailPushSendService.class);
+        TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
+        TicketNotificationService ticketNotificationService = new TicketNotificationService(
+                notificationService, workgroupRepository, visitorRepository, emailProviderRepository,
+                smsPushSendService, apnsPushService, emailPushSendService, ticketSettingsRepository);
 
         AgentEntity agentA = buildAgent("agent-a", "user-a");
         AgentEntity agentB = buildAgent("agent-b", "user-b");

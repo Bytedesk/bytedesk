@@ -65,4 +65,11 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
     long countByOrgUidAndWorkgroupUidAndStatusAndDeletedFalse(String orgUid, String workgroupUid, String status);
 
     long countByOrgUidAndDepartmentUidAndStatusAndDeletedFalse(String orgUid, String departmentUid, String status);
+
+    /** Count active tickets for a member (assigned, not closed/cancelled) */
+    long countByAssigneeContainingAndStatusNotAndStatusNot(String assigneeUid, String status1, String status2);
+
+    /** Find most recently created ticket in a department that has a non-empty assignee */
+    Optional<TicketEntity> findFirstByDepartmentUidAndAssigneeNotAndAssigneeNotOrderByCreatedAtDesc(
+            String departmentUid, String emptyJson, String emptyJson2);
 } 

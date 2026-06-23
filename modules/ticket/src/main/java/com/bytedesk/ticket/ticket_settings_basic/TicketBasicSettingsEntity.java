@@ -59,7 +59,7 @@ public class TicketBasicSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "assignment_mode", length = 64)
-    private String assignmentMode = TicketAssignmentModeEnum.ROUND_ROBIN.name();
+    private String assignmentMode = TicketAssignmentModeEnum.MANUAL.name();
 
     // ============ 工单提示语配置 ============
 

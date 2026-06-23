@@ -31,6 +31,8 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBatchBindRequest;
+
+import java.util.Map;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryVisitorItemResponse;
@@ -271,7 +273,28 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
             .build();
     }
 
-    
-    
-    
+    // ===== 测试邮件 / 短信 =====
+
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = "testEmail", description = "send test email notification")
+    @Operation(summary = "Send test email", description = "Send a test email using the configured email provider")
+    @PostMapping("/test-email")
+    public ResponseEntity<?> testEmail(@RequestBody Map<String, String> body) {
+        String emailProviderUid = body.get("emailProviderUid");
+        String to = body.get("to");
+        JsonResult<Boolean> result = ticketSettingsRestService.sendTestEmail(emailProviderUid, to);
+        return ResponseEntity.ok(result);
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_TICKET_SETTINGS, action = "testSms", description = "send test sms notification")
+    @Operation(summary = "Send test SMS", description = "Send a test SMS using the configured SMS provider and template")
+    @PostMapping("/test-sms")
+    public ResponseEntity<?> testSms(@RequestBody Map<String, String> body) {
+        String to = body.get("to");
+        String country = body.get("country");
+        String signName = body.get("signName");
+        String templateCode = body.get("templateCode");
+        JsonResult<Boolean> result = ticketSettingsRestService.sendTestSms(to, country, signName, templateCode);
+        return ResponseEntity.ok(result);
+    }
+
 }

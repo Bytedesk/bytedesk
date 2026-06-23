@@ -79,14 +79,14 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
      * - false: 访客端使用对话框方式留言
      */
     @Builder.Default
-    private Boolean messageLeaveFormEnabled = true;
+    private Boolean messageLeaveFormEnabled = false;
 
     /**
      * 客服离线时是否允许访客继续在会话中发送消息。
      * 默认允许，只有显式配置为 false 时才阻断。
      */
     @Builder.Default
-    private Boolean messageLeaveAllowVisitorSendWhenOffline = true;
+    private Boolean messageLeaveAllowVisitorSendWhenOffline = false;
 
     /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：

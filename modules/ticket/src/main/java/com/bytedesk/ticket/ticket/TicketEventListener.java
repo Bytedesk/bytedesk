@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
@@ -27,9 +29,13 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
+import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
@@ -38,6 +44,7 @@ import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentService;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.utils.FlowableIdUtils;
 
@@ -58,6 +65,13 @@ public class TicketEventListener {
     private final ThreadRestService threadRestService;
 
     private final TicketNotificationService ticketNotificationService;
+
+    private final TicketAssignmentService ticketAssignmentService;
+
+    private final TicketRepository ticketRepository;
+
+    // 用于防止同一消息重复处理
+    private final Set<String> processedMessageUids = ConcurrentHashMap.newKeySet();
 
     @Order(3)
     @EventListener
@@ -145,6 +159,9 @@ public class TicketEventListener {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             ticketRestService.save(ticketEntity);
+
+            // 7. 自动分配处理人
+            ticketAssignmentService.autoAssign(ticketEntity, processInstance.getId());
         }
 
         ticketNotificationService.notifyNewTicket(ticket);
@@ -198,6 +215,66 @@ public class TicketEventListener {
             // ProcessInstance processInstance =
             // runtimeService.startProcessInstanceByKey(upload.getFileName());
         }
+    }
+
+    /**
+     * 监听工单会话中的消息创建事件，当客服在 TICKET_EXTERNAL 会话中发送消息时，
+     * 通过 TicketNotificationService 向访客推送邮件/短信通知。
+     * 参考 QueueMemberEventListener.onMessageCreateEvent 实现。
+     */
+    @EventListener
+    public void onMessageCreateEvent(MessageCreateEvent event) {
+        MessageEntity message = event.getMessage();
+        if (message == null) {
+            return;
+        }
+
+        // 防止重复处理同一消息
+        String messageUid = message.getUid();
+        if (!StringUtils.hasText(messageUid) || !processedMessageUids.add(messageUid)) {
+            log.debug("TicketEventListener onMessageCreateEvent: skip duplicate, messageUid={}", messageUid);
+            return;
+        }
+
+        // 仅处理客服（AGENT）发送的消息
+        if (!message.isFromAgent()) {
+            log.debug("TicketEventListener onMessageCreateEvent: skip non-agent, messageUid={}, userType={}",
+                    messageUid, message.getUserProtobuf() != null ? message.getUserProtobuf().getType() : "null");
+            return;
+        }
+
+        // 获取消息对应的会话
+        ThreadEntity thread = threadRestService.findByUid(message.getThread().getUid()).orElse(null);
+        if (thread == null) {
+            log.warn("TicketEventListener onMessageCreateEvent: thread not found, messageUid={}, threadUid={}",
+                    messageUid, message.getThread().getUid());
+            return;
+        }
+
+        // 仅处理 TICKET_EXTERNAL 类型会话（客服↔访客）
+        if (!ThreadTypeEnum.TICKET_EXTERNAL.name().equals(thread.getType())) {
+            log.debug("TicketEventListener onMessageCreateEvent: skip non-ticket thread, messageUid={}, threadUid={}, threadType={}",
+                    messageUid, thread.getUid(), thread.getType());
+            return;
+        }
+
+        log.info("TicketEventListener onMessageCreateEvent: agent message in ticket thread, messageUid={}, threadUid={}, agentUid={}",
+                messageUid, thread.getUid(), message.getUserProtobuf().getUid());
+
+        // 根据 threadUid 查询对应工单
+        Optional<TicketEntity> ticketOpt = ticketRepository
+                .findFirstByOrgUidAndThreadUidOrderByCreatedAtDesc(thread.getOrgUid(), thread.getUid());
+        if (ticketOpt.isEmpty()) {
+            log.warn("TicketEventListener onMessageCreateEvent: no ticket found, messageUid={}, threadUid={}, orgUid={}",
+                    messageUid, thread.getUid(), thread.getOrgUid());
+            return;
+        }
+        TicketEntity ticket = ticketOpt.get();
+        log.info("TicketEventListener onMessageCreateEvent: notify visitor, ticketUid={}, ticketNumber={}, agent={}",
+                ticket.getUid(), ticket.getTicketNumber(), message.getUserProtobuf().getNickname());
+
+        // 通知访客（邮件 + 短信），仅告知有新回复
+        ticketNotificationService.notifyVisitorOfAgentMessage(ticket, message.getUserProtobuf().getNickname());
     }
 
 }

@@ -26,8 +26,6 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -136,51 +134,6 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                     participatedPredicate,
                     robotingWorkgroupPredicate);
             predicates.add(visibleToCurrentAgentPredicate);
-
-            // 合并相同 topic，仅取参与范围内 updatedAt 最新的一条
-            Subquery<ZonedDateTime> maxDateSubquery = query.subquery(ZonedDateTime.class);
-            var subRoot = maxDateSubquery.from(ThreadEntity.class);
-            Path<ZonedDateTime> updatedAtPath = subRoot.get("updatedAt");
-            Expression<ZonedDateTime> maxExpression = criteriaBuilder.greatest(updatedAtPath);
-
-            Predicate subParticipatedPredicate = criteriaBuilder.or(
-                    criteriaBuilder.and(
-                            criteriaBuilder.isNotNull(subRoot.get("owner")),
-                            criteriaBuilder.equal(subRoot.get("owner").get("uid"), userUid)),
-                    criteriaBuilder.like(subRoot.get("invites"), "%" + userUid + "%"),
-                    criteriaBuilder.like(subRoot.get("monitors"), "%" + userUid + "%"),
-                    criteriaBuilder.like(subRoot.get("assistants"), "%" + userUid + "%"),
-                    criteriaBuilder.like(subRoot.get("ticketors"), "%" + userUid + "%"));
-
-            Predicate subRobotingWorkgroupPredicate = criteriaBuilder.disjunction();
-            if (StringUtils.hasText(orgUid)) {
-                subRobotingWorkgroupPredicate = criteriaBuilder.and(
-                        criteriaBuilder.equal(subRoot.get("orgUid"), orgUid),
-                        criteriaBuilder.equal(subRoot.get("type"), ThreadTypeEnum.WORKGROUP.name()),
-                        criteriaBuilder.equal(subRoot.get("status"), ThreadProcessStatusEnum.ROBOTING.name()));
-            }
-
-            Predicate subVisibleToCurrentAgentPredicate = criteriaBuilder.or(
-                    subParticipatedPredicate,
-                    subRobotingWorkgroupPredicate);
-
-            List<Predicate> subPredicates = new ArrayList<>();
-            subPredicates.add(criteriaBuilder.equal(subRoot.get("deleted"), false));
-            subPredicates.add(criteriaBuilder.equal(subRoot.get("hide"), false));
-            subPredicates.add(criteriaBuilder.equal(subRoot.get("topic"), root.get("topic")));
-            subPredicates.add(subVisibleToCurrentAgentPredicate);
-            if (StringUtils.hasText(orgUid)) {
-                subPredicates.add(
-                        criteriaBuilder.or(
-                                criteriaBuilder.equal(subRoot.get("orgUid"), orgUid),
-                                criteriaBuilder.and(
-                                        criteriaBuilder.isNull(subRoot.get("orgUid")),
-                                        criteriaBuilder.equal(subRoot.get("level"), LevelEnum.USER.name()))));
-            }
-
-            maxDateSubquery.select(maxExpression)
-                    .where(criteriaBuilder.and(subPredicates.toArray(new Predicate[0])));
-            predicates.add(criteriaBuilder.equal(root.get("updatedAt"), maxDateSubquery));
 
             // 时间范围过滤（按 updatedAt）
             applyUpdatedAtRange(request, root, criteriaBuilder, predicates);

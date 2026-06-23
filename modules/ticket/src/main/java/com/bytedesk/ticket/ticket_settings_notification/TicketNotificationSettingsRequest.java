@@ -21,6 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class TicketNotificationSettingsRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
     private Boolean emailEnabled;
+    private String emailProviderUid;
     private String emailEvents;
     private String emailTemplates;
     private Boolean internalEnabled;
@@ -28,4 +29,15 @@ public class TicketNotificationSettingsRequest extends BaseRequest {
     private Boolean webhookEnabled;
     private String webhookUrl;
     private String webhookEvents;
+    // SMS notification fields
+    private Boolean smsEnabled;
+    private String smsProviderUid;
+    private String smsEvents;
+    private String smsTemplateIds;
+
+    /** 用户在线时是否仍发送邮件通知 */
+    private Boolean emailNotifyWhenOnline;
+
+    /** 用户在线时是否仍发送短信通知 */
+    private Boolean smsNotifyWhenOnline;
 }

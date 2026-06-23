@@ -65,5 +65,6 @@
     <include file="db/changelog/migration/260616_add_quality_rule_engine_tables.xml" />
     <include file="db/changelog/migration/260617_add_quality_inspection_task_table.xml" />
     <include file="db/changelog/migration/260620_add_ticket_statistics_customer_metrics.xml" />
+    <include file="db/changelog/migration/260623_add_thread_query_indexes.xml" />
 
 </databaseChangeLog>

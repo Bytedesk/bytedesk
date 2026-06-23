@@ -24,6 +24,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
+import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
 
 @Slf4j
 @RestController
@@ -32,6 +33,28 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 public class TicketController {
     
     private final TicketService ticketService;
+
+    /**
+     * 查询当前流程实例的活动任务和可执行操作。
+     */
+    @GetMapping("/workflow/actions")
+    public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
+
+        List<TicketWorkflowTaskResponse> actions = ticketService.queryWorkflowActions(request);
+
+        return ResponseEntity.ok(JsonResult.success(actions));
+    }
+
+    /**
+     * 按当前 Flowable 活动任务执行流程动作。
+     */
+    @PostMapping("/workflow/action")
+    public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.executeWorkflowAction(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
 
     /**
      * 认领工单

@@ -35,6 +35,7 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.service.form.FormRepository;
@@ -58,6 +59,13 @@ import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRequest;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
+import com.bytedesk.core.email_provider.EmailProviderEntity;
+import com.bytedesk.core.email_provider.EmailProviderRepository;
+import com.bytedesk.core.email_push.EmailPushSendService;
+import com.bytedesk.core.sms_push.SmsPushSendService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +89,12 @@ public class TicketSettingsRestService extends
     private final ProcessRepository ticketProcessRepository;
 
     private final FormRepository formRepository;
+
+    private final EmailProviderRepository emailProviderRepository;
+
+    private final EmailPushSendService emailPushSendService;
+
+    private final SmsPushSendService smsPushSendService;
 
     @Override
     protected Specification<TicketSettingsEntity> createSpecification(TicketSettingsRequest request) {
@@ -151,6 +165,10 @@ public class TicketSettingsRestService extends
 
         entity.setDraftCategorySettings(createCategorySettingsEntity(resolveDraftCategoryRequest(request)));
 
+        // 通知设置
+        entity.setNotificationSettings(createNotificationSettingsEntity(request.getNotificationSettings()));
+        entity.setDraftNotificationSettings(createNotificationSettingsEntity(resolveDraftNotificationRequest(request)));
+
         String resolvedProcessUid = resolveProcessUidOrDefault(request, entity.getOrgUid(), normalizedType);
         entity.setProcess(resolveProcessReference(resolvedProcessUid, entity.getOrgUid()));
         entity.setDraftProcess(resolveProcessReference(resolvedProcessUid, entity.getOrgUid()));
@@ -220,6 +238,21 @@ public class TicketSettingsRestService extends
                     entity.setDraftCategorySettings(draftCategory);
                 } else {
                     draftCategory.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
+                }
+                draftUpdated = true;
+            }
+
+            // 通知设置草稿
+            TicketNotificationSettingsRequest draftNotifRequest = resolveDraftNotificationRequest(request);
+            if (draftNotifRequest != null) {
+                TicketNotificationSettingsEntity draftNotif = entity.getDraftNotificationSettings();
+                if (draftNotif == null) {
+                    draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                    draftNotif.setUid(uidUtils.getUid());
+                    entity.setDraftNotificationSettings(draftNotif);
+                } else {
+                    TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                    applyNotificationSettings(draftNotif, updated);
                 }
                 draftUpdated = true;
             }
@@ -432,6 +465,10 @@ public class TicketSettingsRestService extends
 
         settings.setDraftCategorySettings(createCategorySettingsEntity(null));
 
+        // 通知设置
+        settings.setNotificationSettings(createNotificationSettingsEntity(null));
+        settings.setDraftNotificationSettings(createNotificationSettingsEntity(null));
+
         TicketBasicSettingsEntity basic = createBasicSettingsEntity(null, orgUid);
         settings.setBasicSettings(basic);
         TicketBasicSettingsEntity draftBasic = createBasicSettingsEntity(null, orgUid);
@@ -557,6 +594,21 @@ public class TicketSettingsRestService extends
             draftUpdated = true;
         }
 
+        // 通知设置
+        TicketNotificationSettingsRequest draftNotifRequest = resolveDraftNotificationRequest(request);
+        if (draftNotifRequest != null) {
+            TicketNotificationSettingsEntity draftNotif = entity.getDraftNotificationSettings();
+            if (draftNotif == null) {
+                draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                draftNotif.setUid(uidUtils.getUid());
+                entity.setDraftNotificationSettings(draftNotif);
+            } else {
+                TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                applyNotificationSettings(draftNotif, updated);
+            }
+            draftUpdated = true;
+        }
+
         if (request.getProcessUid() != null) {
             entity.setDraftProcess(resolveProcessReference(request.getProcessUid(), entity.getOrgUid()));
             draftUpdated = true;
@@ -616,6 +668,17 @@ public class TicketSettingsRestService extends
         // 同步流程及表单引用
         entity.setProcess(entity.getDraftProcess());
         entity.setForm(entity.getDraftForm());
+
+        // 同步通知设置
+        if (entity.getDraftNotificationSettings() != null) {
+            TicketNotificationSettingsEntity publishedNotif = entity.getNotificationSettings();
+            if (publishedNotif == null) {
+                publishedNotif = TicketNotificationSettingsEntity.fromRequest(null);
+                publishedNotif.setUid(uidUtils.getUid());
+                entity.setNotificationSettings(publishedNotif);
+            }
+            copyNotificationSettings(entity.getDraftNotificationSettings(), publishedNotif);
+        }
 
         // 发布时间与草稿标记维护
         entity.setPublishedAt(ZonedDateTime.now());
@@ -705,6 +768,19 @@ public class TicketSettingsRestService extends
             return null;
         }
         return request.getCategorySettings();
+    }
+
+    private TicketNotificationSettingsRequest resolveDraftNotificationRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getNotificationSettings();
+    }
+
+    private TicketNotificationSettingsEntity createNotificationSettingsEntity(TicketNotificationSettingsRequest request) {
+        TicketNotificationSettingsEntity entity = TicketNotificationSettingsEntity.fromRequest(request);
+        entity.setUid(uidUtils.getUid());
+        return entity;
     }
 
     private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request) {
@@ -1028,6 +1104,68 @@ public class TicketSettingsRestService extends
                 .build();
     }
 
+    private TicketNotificationSettingsResponse mapNotificationSettings(TicketNotificationSettingsEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return TicketNotificationSettingsResponse.builder()
+                .uid(entity.getUid())
+                .emailEnabled(entity.getEmailEnabled())
+                .emailProviderUid(entity.getEmailProviderUid())
+                .emailEvents(entity.getEmailEvents())
+                .emailTemplates(entity.getEmailTemplates())
+                .internalEnabled(entity.getInternalEnabled())
+                .internalEvents(entity.getInternalEvents())
+                .webhookEnabled(entity.getWebhookEnabled())
+                .webhookUrl(entity.getWebhookUrl())
+                .webhookEvents(entity.getWebhookEvents())
+                .smsEnabled(entity.getSmsEnabled())
+                .smsProviderUid(entity.getSmsProviderUid())
+                .smsEvents(entity.getSmsEvents())
+                .smsTemplateIds(entity.getSmsTemplateIds())
+                .emailNotifyWhenOnline(entity.getEmailNotifyWhenOnline())
+                .smsNotifyWhenOnline(entity.getSmsNotifyWhenOnline())
+                .build();
+    }
+
+    private void applyNotificationSettings(TicketNotificationSettingsEntity target, TicketNotificationSettingsEntity source) {
+        if (target == null || source == null) return;
+        if (source.getEmailEnabled() != null) target.setEmailEnabled(source.getEmailEnabled());
+        if (source.getEmailProviderUid() != null) target.setEmailProviderUid(source.getEmailProviderUid());
+        if (source.getEmailEvents() != null) target.setEmailEvents(source.getEmailEvents());
+        if (source.getEmailTemplates() != null) target.setEmailTemplates(source.getEmailTemplates());
+        if (source.getInternalEnabled() != null) target.setInternalEnabled(source.getInternalEnabled());
+        if (source.getInternalEvents() != null) target.setInternalEvents(source.getInternalEvents());
+        if (source.getWebhookEnabled() != null) target.setWebhookEnabled(source.getWebhookEnabled());
+        if (source.getWebhookUrl() != null) target.setWebhookUrl(source.getWebhookUrl());
+        if (source.getWebhookEvents() != null) target.setWebhookEvents(source.getWebhookEvents());
+        if (source.getSmsEnabled() != null) target.setSmsEnabled(source.getSmsEnabled());
+        if (source.getSmsProviderUid() != null) target.setSmsProviderUid(source.getSmsProviderUid());
+        if (source.getSmsEvents() != null) target.setSmsEvents(source.getSmsEvents());
+        if (source.getSmsTemplateIds() != null) target.setSmsTemplateIds(source.getSmsTemplateIds());
+        if (source.getEmailNotifyWhenOnline() != null) target.setEmailNotifyWhenOnline(source.getEmailNotifyWhenOnline());
+        if (source.getSmsNotifyWhenOnline() != null) target.setSmsNotifyWhenOnline(source.getSmsNotifyWhenOnline());
+    }
+
+    private void copyNotificationSettings(TicketNotificationSettingsEntity source, TicketNotificationSettingsEntity target) {
+        if (source == null || target == null) return;
+        target.setEmailEnabled(source.getEmailEnabled());
+        target.setEmailProviderUid(source.getEmailProviderUid());
+        target.setEmailEvents(source.getEmailEvents() != null ? new java.util.ArrayList<>(source.getEmailEvents()) : new java.util.ArrayList<>());
+        target.setEmailTemplates(source.getEmailTemplates() != null ? new java.util.ArrayList<>(source.getEmailTemplates()) : new java.util.ArrayList<>());
+        target.setInternalEnabled(source.getInternalEnabled());
+        target.setInternalEvents(source.getInternalEvents() != null ? new java.util.ArrayList<>(source.getInternalEvents()) : new java.util.ArrayList<>());
+        target.setWebhookEnabled(source.getWebhookEnabled());
+        target.setWebhookUrl(source.getWebhookUrl());
+        target.setWebhookEvents(source.getWebhookEvents() != null ? new java.util.ArrayList<>(source.getWebhookEvents()) : new java.util.ArrayList<>());
+        target.setSmsEnabled(source.getSmsEnabled());
+        target.setSmsProviderUid(source.getSmsProviderUid());
+        target.setSmsEvents(source.getSmsEvents() != null ? new java.util.ArrayList<>(source.getSmsEvents()) : new java.util.ArrayList<>());
+        target.setSmsTemplateIds(source.getSmsTemplateIds() != null ? new java.util.HashMap<>(source.getSmsTemplateIds()) : new java.util.HashMap<>());
+        target.setEmailNotifyWhenOnline(source.getEmailNotifyWhenOnline());
+        target.setSmsNotifyWhenOnline(source.getSmsNotifyWhenOnline());
+    }
+
     private ProcessResponse mapProcess(ProcessEntity entity) {
         if (entity == null) {
             return null;
@@ -1073,6 +1211,10 @@ public class TicketSettingsRestService extends
         resp.setForm(mapForm(entity.getForm()));
         resp.setDraftForm(mapForm(entity.getDraftForm()));
 
+        // 通知设置
+        resp.setNotificationSettings(mapNotificationSettings(entity.getNotificationSettings()));
+        resp.setDraftNotificationSettings(mapNotificationSettings(entity.getDraftNotificationSettings()));
+
         return resp;
     }
 
@@ -1115,6 +1257,58 @@ public class TicketSettingsRestService extends
             }
         }
         target.setIsDefault(true);
+    }
+
+    // ========== 测试邮件 / 短信 ==========
+
+    /**
+     * 发送测试邮件，使用指定的邮件供应商。
+     */
+    public JsonResult<Boolean> sendTestEmail(String emailProviderUid, String to) {
+        if (!StringUtils.hasText(emailProviderUid)) {
+            return JsonResult.error("请选择邮件供应商");
+        }
+        if (!StringUtils.hasText(to)) {
+            return JsonResult.error("请输入测试收件邮箱");
+        }
+        Optional<EmailProviderEntity> emailOpt = emailProviderRepository.findByUid(emailProviderUid);
+        if (emailOpt.isEmpty() || emailOpt.get().isDeleted() || !Boolean.TRUE.equals(emailOpt.get().getEnabled())) {
+            return JsonResult.error("邮件供应商不存在或已禁用");
+        }
+        String subject = "【微语客服】测试邮件";
+        String html = "<h3>测试邮件</h3><p>这是一封来自微语客服系统的测试邮件，如果您收到此邮件，说明邮件配置正确。</p>";
+        String orgUid = authService.getCurrentUser().getOrgUid();
+        var result = emailPushSendService.sendEmail(emailOpt.get(), to, subject, html, orgUid);
+        if (result.isSuccess()) {
+            return JsonResult.success("测试邮件发送成功");
+        }
+        return JsonResult.error("测试邮件发送失败: " + (result.getErrorMessage() != null ? result.getErrorMessage() : "未知错误"));
+    }
+
+    /**
+     * 发送测试短信，直接传入模板编码和签名。
+     */
+    public JsonResult<Boolean> sendTestSms(String to, String country, String signName, String templateCode) {
+        if (!StringUtils.hasText(to)) {
+            return JsonResult.error("请输入测试手机号");
+        }
+        if (!StringUtils.hasText(templateCode)) {
+            return JsonResult.error("请选择短信模板");
+        }
+        if (!StringUtils.hasText(signName)) {
+            return JsonResult.error("短信签名缺失");
+        }
+        String mobileCountry = StringUtils.hasText(country) ? country : "86";
+        java.util.Map<String, String> testParams = new java.util.HashMap<>();
+        testParams.put("name", "测试用户");
+        testParams.put("ticketNumber", "TEST001");
+        testParams.put("status", "测试");
+        String orgUid = authService.getCurrentUser().getOrgUid();
+        var result = smsPushSendService.sendSmsWithTemplate(to, mobileCountry, signName, templateCode, testParams, orgUid);
+        if (result.isSuccess()) {
+            return JsonResult.success("测试短信发送成功");
+        }
+        return JsonResult.error("测试短信发送失败: " + (result.getErrorMessage() != null ? result.getErrorMessage() : "未知错误"));
     }
 
 }

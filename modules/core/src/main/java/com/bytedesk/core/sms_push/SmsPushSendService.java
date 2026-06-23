@@ -14,6 +14,11 @@
 package com.bytedesk.core.sms_push;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +34,10 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.push.PushStatusEnum;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -46,9 +55,11 @@ public class SmsPushSendService {
 
     public SmsPushSendService(
             ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider,
-            BytedeskProperties bytedeskProperties) {
+            BytedeskProperties bytedeskProperties,
+            SmsPushRepository smsPushRepository) {
         this.bytedeskProperties = bytedeskProperties;
         this.smsPushExternalSenderProvider = smsPushExternalSenderProvider;
+        this.smsPushRepository = smsPushRepository;
     }
 
 
@@ -117,6 +128,8 @@ public class SmsPushSendService {
     private final BytedeskProperties bytedeskProperties;
 
     private final ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider;
+
+    private final SmsPushRepository smsPushRepository;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -196,7 +209,7 @@ public class SmsPushSendService {
     }
 
     /**
-     * 发送验证码
+     * 发送验证码（原有流程，不做任何改动）
      * @param mobile 手机号
      * @param country 国家代码
      * @param code 验证码
@@ -248,6 +261,129 @@ public class SmsPushSendService {
                 log.error("阿里云短信发送失败 - ClientException: code={}, message={}", errorCode, e.getErrMsg(), e);
             }
             return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, errorMessage);
+        }
+    }
+
+    /**
+     * 使用指定签名和模板发送通用通知短信（非验证码场景）。
+     * 模板参数中至少需包含 "content" 键，作为短信内容。
+     *
+     * @param mobile       手机号
+     * @param country      国家代码
+     * @param signName     短信签名（如：微语）
+     * @param templateCode 阿里云短信模板编码（如：SMS_xxx）
+     * @param templateParams 模板参数键值对
+     * @return 发送结果
+     */
+    public SmsSendResult sendSmsWithTemplate(String mobile, String country, String signName,
+            String templateCode, Map<String, String> templateParams, String orgUid) {
+        Assert.hasText(mobile, "手机号不能为空");
+        Assert.hasText(signName, "短信签名不能为空");
+        Assert.hasText(templateCode, "短信模板编码不能为空");
+        Assert.notEmpty(templateParams, "模板参数不能为空");
+
+        String normalizedMobile = normalizeAndValidateMobile(mobile);
+        String phoneNumber = formatPhoneNumber(normalizedMobile, country);
+
+        String templateParamJson;
+        try {
+            templateParamJson = objectMapper.writeValueAsString(templateParams);
+        } catch (JsonProcessingException e) {
+            log.error("序列化模板参数失败", e);
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "模板参数序列化失败");
+        }
+
+        log.info("sendSmsWithTemplate to {}, signName: {}, templateCode: {}, params: {}",
+                normalizedMobile, signName, templateCode, templateParamJson);
+
+        SmsSendResult result = doSendAliyunSms(phoneNumber, signName, templateCode, templateParamJson);
+
+        // 记录短信发送历史
+        String contentSummary = templateParams.containsKey("content")
+                ? templateParams.get("content")
+                : templateParamJson;
+        saveSmsPushRecord(normalizedMobile, country, contentSummary, result, orgUid);
+        return result;
+    }
+
+    /**
+     * 执行阿里云短信 API 调用
+     */
+    private SmsSendResult doSendAliyunSms(String phoneNumber, String signName, String templateCode,
+            String templateParamJson) {
+        DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
+        IAcsClient client = new DefaultAcsClient(profile);
+
+        CommonRequest request = new CommonRequest();
+        request.setSysMethod(MethodType.POST);
+        request.setSysDomain(smsDomain);
+        request.setSysVersion(smsVersion);
+        request.setSysAction(smsAction);
+        request.putQueryParameter("RegionId", regionId);
+        request.putQueryParameter("PhoneNumbers", phoneNumber);
+        request.putQueryParameter("SignName", signName);
+        request.putQueryParameter("TemplateCode", templateCode);
+        request.putQueryParameter("TemplateParam", templateParamJson);
+        try {
+            CommonResponse response = client.getCommonResponse(request);
+            log.info("aliyun sms response: {}", response.getData());
+            return parseAliyunSmsPushResponse(response.getData());
+        } catch (ServerException e) {
+            log.error("阿里云短信发送失败 - ServerException", e);
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED,
+                    resolveAliyunErrorMessage(e.getErrCode(), e.getErrMsg()));
+        } catch (ClientException e) {
+            String errorCode = e.getErrCode();
+            String errorMessage = resolveAliyunErrorMessage(errorCode, e.getErrMsg());
+            if (isAliyunCredentialOrPermissionError(errorCode)) {
+                log.warn("阿里云短信配置异常: code={}, message={}", errorCode, e.getErrMsg());
+            } else {
+                log.error("阿里云短信发送失败 - ClientException: code={}, message={}", errorCode, e.getErrMsg(), e);
+            }
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, errorMessage);
+        }
+    }
+
+    /**
+     * 构建工单通知短信模板变量。
+     * 仅输出 {@code variableNames} 中声明的键，值从上下文填充。
+     * <p>支持的变量：name（客户称呼）、ticketNumber（工单编号）、status（状态）、title（工单标题）。</p>
+     */
+    public static Map<String, String> buildTicketSmsVariables(List<String> variableNames,
+            String ticketNumber, String currentStatusLabel, String eventType, String reporterName) {
+        Map<String, String> vars = new HashMap<>();
+        Set<String> allowed = new HashSet<>(variableNames);
+        if (allowed.contains("name") && reporterName != null) vars.put("name", reporterName);
+        if (allowed.contains("ticketNumber")) vars.put("ticketNumber", ticketNumber);
+        if (allowed.contains("status")) {
+            vars.put("status", "TICKET_CREATED".equals(eventType) ? "已创建" : currentStatusLabel);
+        }
+        return vars;
+    }
+
+    /**
+     * 保存短信发送记录到 SmsPushEntity
+     */
+    private void saveSmsPushRecord(String mobile, String country, String content, SmsSendResult result, String orgUid) {
+        try {
+            SmsPushEntity record = SmsPushEntity.builder()
+                    .uid(UidUtils.getInstance().getUid())
+                    .type("TICKET_NOTIFICATION")
+                    .sender("SYSTEM")
+                    .content(content)
+                    .country(country)
+                    .receiver(mobile)
+                    .status(result.isSuccess() ? PushStatusEnum.SUCCESS.name() : PushStatusEnum.ERROR.name())
+                    .sendSuccess(result.isSuccess())
+                    .sendMessage(result.isSuccess() ? null : result.getErrorMessage())
+                    .build();
+            record.setOrgUid(orgUid);
+            record.setCreatedAt(BdDateUtils.now());
+            record.setUpdatedAt(BdDateUtils.now());
+            smsPushRepository.save(record);
+            log.debug("SmsPushEntity record saved: uid={}, mobile={}, orgUid={}, success={}", record.getUid(), mobile, orgUid, result.isSuccess());
+        } catch (Exception e) {
+            log.warn("Failed to save SmsPushEntity record for mobile {}: {}", mobile, e.getMessage());
         }
     }
 

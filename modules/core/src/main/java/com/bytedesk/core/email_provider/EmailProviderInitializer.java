@@ -16,6 +16,7 @@ package com.bytedesk.core.email_provider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -27,12 +28,14 @@ public class EmailProviderInitializer implements SmartInitializingSingleton {
 
     private final AuthorityRestService authorityRestService;
 
+    private final EmailProviderRestService emailProviderRestService;
+
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        // create default
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // tagRestService.initTags(orgUid);
+        // 初始化默认邮件服务提供商
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        emailProviderRestService.initEmailProviders(orgUid);
     }
 
     private void initAuthority() {

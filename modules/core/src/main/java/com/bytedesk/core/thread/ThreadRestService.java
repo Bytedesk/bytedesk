@@ -175,6 +175,12 @@ public class ThreadRestService
 
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.searchForUser(request, user.getUid(), user.getOrgUid());
+
+        if (!Boolean.FALSE.equals(request.getMergeByTopic())) {
+            List<ThreadEntity> mergedThreads = mergeThreadsByTopic(threadRepository.findAll(specs));
+            return pageMergedThreads(mergedThreads, pageable);
+        }
+
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
         return threadPage.map(this::convertToResponse);
     }
@@ -259,6 +265,26 @@ public class ThreadRestService
                                 (existing, ignored) -> existing,
                                 LinkedHashMap::new),
                         map -> new ArrayList<>(map.values())));
+    }
+
+    private Page<ThreadResponse> pageMergedThreads(List<ThreadEntity> mergedThreads, Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return new PageImpl<>(
+                    mergedThreads.stream().map(this::convertToResponse).toList(),
+                    Pageable.unpaged(),
+                    mergedThreads.size());
+        }
+
+        int start = Math.toIntExact(pageable.getOffset());
+        if (start >= mergedThreads.size()) {
+            return new PageImpl<>(List.of(), pageable, mergedThreads.size());
+        }
+
+        int end = Math.min(start + pageable.getPageSize(), mergedThreads.size());
+        List<ThreadResponse> content = mergedThreads.subList(start, end).stream()
+                .map(this::convertToResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, mergedThreads.size());
     }
 
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {

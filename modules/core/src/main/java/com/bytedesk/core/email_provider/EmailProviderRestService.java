@@ -159,5 +159,48 @@ public class EmailProviderRestService extends BaseRestServiceWithExport<EmailPro
     public EmailProviderExcel convertToExcel(EmailProviderEntity entity) {
         return modelMapper.map(entity, EmailProviderExcel.class);
     }
-    
+
+    /**
+     * 初始化默认邮件服务提供商
+     * 仅在对应 uid 不存在时创建，不会覆盖已有配置
+     */
+    public void initEmailProviders(String orgUid) {
+        for (EmailProviderInitData.EmailProviderDef def : EmailProviderInitData.DEFAULT_EMAIL_PROVIDERS) {
+            String uid = def.uid();
+            if (!existsByUid(uid)) {
+                try {
+                    EmailProviderEntity entity = EmailProviderEntity.builder()
+                            .uid(uid)
+                            .name(def.name())
+                            .description("系统预设的" + def.name() + "配置，请填写邮箱地址和授权码后即可使用")
+                            .provider(def.provider())
+                            .type(def.type())
+                            .protocol(def.protocol())
+                            .smtpHost(def.smtpHost())
+                            .smtpPort(def.smtpPort())
+                            .smtpSslEnabled(def.smtpSslEnabled())
+                            .smtpTlsEnabled(def.smtpTlsEnabled())
+                            .imapHost(def.imapHost())
+                            .imapPort(def.imapPort())
+                            .imapSslEnabled(def.imapSslEnabled())
+                            .pop3Host(def.pop3Host())
+                            .pop3Port(def.pop3Port())
+                            .pop3SslEnabled(def.pop3SslEnabled())
+                            .exchangeHost(def.exchangeHost())
+                            .exchangePort(def.exchangePort() != null ? def.exchangePort() : 993)
+                            .exchangeSslEnabled(def.exchangeSslEnabled() != null ? def.exchangeSslEnabled() : true)
+                            .syncInterval(def.syncInterval())
+                            .autoSyncEnabled(def.autoSyncEnabled())
+                            .autoReplyEnabled(def.autoReplyEnabled())
+                            .autoReplyContent(def.autoReplyContent())
+                            .orgUid(orgUid)
+                            .build();
+                    emailRepository.save(entity);
+                    log.info("initEmailProviders created: uid={}, name={}", uid, def.name());
+                } catch (Exception e) {
+                    log.warn("initEmailProviders failed for uid={}: {}", uid, e.getMessage());
+                }
+            }
+        }
+    }
 }

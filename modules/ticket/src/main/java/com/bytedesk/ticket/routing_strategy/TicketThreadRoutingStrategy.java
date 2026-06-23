@@ -182,6 +182,20 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     }
 
     /**
+     * 从 TicketBasicSettingsEntity 读取工单分配模式。
+     * 外部工单依赖此配置决定客服分配策略（ROUND_ROBIN / LEAST_ACTIVE / RANDOM / MANUAL 等）。
+     * 内部工单如已直接指定处理人，则不会经过此路径。
+     */
+    private String getTicketAssignmentMode(TicketEntity ticket) {
+        TicketBasicSettingsResponse basicSettings = resolveBasicSettings(ticket);
+        if (basicSettings != null && StringUtils.hasText(basicSettings.getAssignmentMode())) {
+            return basicSettings.getAssignmentMode();
+        }
+        // fallback：未配置时使用 ROUND_ROBIN（与 TicketAssignmentModeEnum 默认值一致）
+        return "ROUND_ROBIN";
+    }
+
+    /**
      * 处理工单会话 NEW 状态：
      * - 发送工单接入提示语
      * - 切换线程状态为 CHATTING
@@ -279,9 +293,12 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         WorkgroupEntity workgroup = workgroupRestService.findByUid(workgroupUid)
                 .orElseThrow(() -> new IllegalArgumentException("Workgroup uid " + workgroupUid + " not found"));
 
-        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, thread);
+        // 按 TicketBasicSettingsEntity.assignmentMode 选择客服（MANUAL 时返回 null 即不分配）
+        String assignmentMode = getTicketAssignmentMode(ticket);
+        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, thread, assignmentMode);
         if (selectedAgent == null) {
-            log.info("No available agent for ticket {}, workgroup {}", ticket.getUid(), workgroupUid);
+            log.info("No available agent for ticket {}, workgroup {}, assignmentMode={}",
+                    ticket.getUid(), workgroupUid, assignmentMode);
             return thread;
         }
 

@@ -1,0 +1,451 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "meta": {
+        "position": {
+          "x": -1007.5585023400936,
+          "y": 285
+        }
+      },
+      "data": {
+        "title": "提交报销",
+        "description": "员工提交报销审批申请。"
+      }
+    },
+    {
+      "id": "submitReimbursement",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": -637.5429017160687,
+          "y": 285
+        }
+      },
+      "data": {
+        "title": "填写报销申请",
+        "description": "员工填写报销申请，包括报销类型、金额、发票附件。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${applicantUid}"
+        ],
+        "assigneeNames": [
+          "申请人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "financeReview",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": -267.5273010920439,
+          "y": 285
+        }
+      },
+      "data": {
+        "title": "财务初审",
+        "description": "财务人员审核报销单据的合规性。",
+        "assigneeType": "role",
+        "roleUid": "${financeGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "financeReviewGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 102.48829953198094,
+          "y": 285
+        }
+      },
+      "data": {
+        "title": "财务初审结果",
+        "description": "判断财务初审是否通过。",
+        "conditions": [
+          {
+            "key": "financeApproved",
+            "label": "初审通过",
+            "expression": "${financeApproved == true}",
+            "outgoingEdgeId": "checkAmountGateway"
+          },
+          {
+            "key": "financeRejected",
+            "label": "初审不通过",
+            "expression": "${financeApproved == false}",
+            "outgoingEdgeId": "rejectEnd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "checkAmountGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 486.1778471138845,
+          "y": 354.3213728549142
+        }
+      },
+      "data": {
+        "title": "判断报销金额",
+        "description": "根据报销金额选择小额或大额审批路径。",
+        "conditions": [
+          {
+            "key": "smallAmount",
+            "label": "小额报销（≤5000）",
+            "expression": "${amount <= 5000}",
+            "outgoingEdgeId": "managerApproval"
+          },
+          {
+            "key": "largeAmount",
+            "label": "大额报销（>5000）",
+            "expression": "${amount > 5000}",
+            "outgoingEdgeId": "parallelFork"
+          }
+        ]
+      }
+    },
+    {
+      "id": "managerApproval",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1014.6099843993761,
+          "y": 45.53822152886116
+        }
+      },
+      "data": {
+        "title": "部门经理审批",
+        "description": "部门经理审批小额报销。",
+        "assigneeType": "role",
+        "roleUid": "${managerGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "parallelFork",
+      "type": "parallel",
+      "meta": {
+        "position": {
+          "x": 883.0850774114588,
+          "y": 354.3213728549142
+        }
+      },
+      "data": {
+        "title": "并行审批",
+        "description": "大额报销同时发起财务总监和总经理审批。"
+      }
+    },
+    {
+      "id": "cfoApproval",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1324.7020442452997,
+          "y": 189.09048361934475
+        }
+      },
+      "data": {
+        "title": "财务总监审批",
+        "description": "财务总监审批大额报销。",
+        "assigneeType": "role",
+        "roleUid": "${cfoGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "ceoApproval",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1324.7020442452997,
+          "y": 461.3983398536875
+        }
+      },
+      "data": {
+        "title": "总经理审批",
+        "description": "总经理审批大额报销。",
+        "assigneeType": "role",
+        "roleUid": "${ceoGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "parallelJoin",
+      "type": "join",
+      "meta": {
+        "position": {
+          "x": 1726.6403677698786,
+          "y": 277.09048361934475
+        }
+      },
+      "data": {
+        "title": "等待并行审批完成",
+        "description": "等待财务总监和总经理审批完成。"
+      }
+    },
+    {
+      "id": "largeAmountResultGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 2083.990275876771,
+          "y": 277.09048361934475
+        }
+      },
+      "data": {
+        "title": "大额审批结果",
+        "description": "判断大额报销审批是否全部通过。",
+        "conditions": [
+          {
+            "key": "largeApproved",
+            "label": "全部批准",
+            "expression": "${cfoApproved == true && ceoApproved == true}",
+            "outgoingEdgeId": "paymentProcess"
+          },
+          {
+            "key": "largeRejected",
+            "label": "有拒绝",
+            "expression": "${cfoApproved == false || ceoApproved == false}",
+            "outgoingEdgeId": "rejectEnd"
+          }
+        ]
+      }
+    },
+    {
+      "id": "paymentProcess",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 2476.292589957256,
+          "y": 277.09048361934475
+        }
+      },
+      "data": {
+        "title": "打款处理",
+        "description": "财务系统自动打款。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "notifyPayment",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 2836.023605217378,
+          "y": 277.09048361934475
+        }
+      },
+      "data": {
+        "title": "发送打款通知",
+        "description": "发送打款成功通知给申请人。",
+        "channels": [
+          "message"
+        ],
+        "template": "报销打款已完成。",
+        "recipientType": "reporter",
+        "recipientUids": []
+      }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 3195.7546204775003,
+          "y": 277.09048361934475
+        }
+      },
+      "data": {
+        "title": "流程结束",
+        "description": "报销审批通过并结束。"
+      }
+    },
+    {
+      "id": "rejectEnd",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 2836.023605217378,
+          "y": -161.08624139669453
+        }
+      },
+      "data": {
+        "title": "拒绝结束",
+        "description": "报销审批拒绝并结束。"
+      }
+    },
+    {
+      "id": "managerResultGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 2083.990275876771,
+          "y": 45.53822152886116
+        }
+      },
+      "data": {
+        "title": "经理审批结果",
+        "description": "判断部门经理审批是否通过。",
+        "conditions": [
+          {
+            "key": "managerApproved",
+            "label": "批准",
+            "expression": "${managerApproved == true}",
+            "outgoingEdgeId": "paymentProcess"
+          },
+          {
+            "key": "managerRejected",
+            "label": "拒绝",
+            "expression": "${managerApproved == false}",
+            "outgoingEdgeId": "rejectEnd"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "start",
+      "targetNodeId": "submitReimbursement",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "submitReimbursement",
+      "targetNodeId": "financeReview",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "financeReview",
+      "targetNodeId": "financeReviewGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "financeReviewGateway",
+      "targetNodeId": "checkAmountGateway",
+      "sourcePortId": "condition-branch-financeApproved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "financeReviewGateway",
+      "targetNodeId": "rejectEnd",
+      "sourcePortId": "condition-branch-financeRejected",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "checkAmountGateway",
+      "targetNodeId": "managerApproval",
+      "sourcePortId": "condition-branch-smallAmount",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "checkAmountGateway",
+      "targetNodeId": "parallelFork",
+      "sourcePortId": "condition-branch-largeAmount",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerApproval",
+      "targetNodeId": "managerResultGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "parallelFork",
+      "targetNodeId": "cfoApproval",
+      "sourcePortId": "parallel-branch-1",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "parallelFork",
+      "targetNodeId": "ceoApproval",
+      "sourcePortId": "parallel-branch-2",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "cfoApproval",
+      "targetNodeId": "parallelJoin",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "ceoApproval",
+      "targetNodeId": "parallelJoin",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "parallelJoin",
+      "targetNodeId": "largeAmountResultGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "largeAmountResultGateway",
+      "targetNodeId": "paymentProcess",
+      "sourcePortId": "condition-branch-largeApproved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "largeAmountResultGateway",
+      "targetNodeId": "rejectEnd",
+      "sourcePortId": "condition-branch-largeRejected",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerResultGateway",
+      "targetNodeId": "paymentProcess",
+      "sourcePortId": "condition-branch-managerApproved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "paymentProcess",
+      "targetNodeId": "notifyPayment",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "notifyPayment",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "managerResultGateway",
+      "targetNodeId": "rejectEnd",
+      "sourcePortId": "condition-branch-managerRejected",
+      "targetPortId": "defaultInput"
+    }
+  ]
+}

@@ -16,6 +16,7 @@ package com.bytedesk.core.email_template;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -25,16 +26,16 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class EmailTemplateInitializer implements SmartInitializingSingleton {
 
-    // private final EmailTemplateRestService email_templateRestService;
+    private final EmailTemplateRestService emailTemplateRestService;
 
     private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        // create default
-        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        // email_templateRestService.initEmailTemplates(orgUid);
+        // 初始化默认邮件模板
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        emailTemplateRestService.initEmailTemplates(orgUid);
     }
 
     private void initAuthority() {

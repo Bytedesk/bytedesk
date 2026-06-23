@@ -215,12 +215,12 @@ public class CallEventListener implements IEslEventListener {
 
         // sofia::register 是高频注册心跳类事件，默认降到 DEBUG，避免刷屏。
         if ("sofia::register".equals(eventSubclass)) {
-            log.debug("自定义事件(注册): subclass={} fromUser={} toUser={} status={} contact={}",
-                    eventSubclass,
-                    headers.get("from-user"),
-                    headers.get("to-user"),
-                    headers.get("status"),
-                    headers.get("contact"));
+            // log.debug("自定义事件(注册): subclass={} fromUser={} toUser={} status={} contact={}",
+            //         eventSubclass,
+            //         headers.get("from-user"),
+            //         headers.get("to-user"),
+            //         headers.get("status"),
+            //         headers.get("contact"));
             return;
         }
 
@@ -285,7 +285,7 @@ public class CallEventListener implements IEslEventListener {
             return;
         }
 
-        log.info("自定义事件: subclass={} headers={}", eventSubclass, headers);
+        // log.info("自定义事件: subclass={} headers={}", eventSubclass, headers);
     }
 
     private String firstNonBlank(Map<String, String> headers, String... keys) {

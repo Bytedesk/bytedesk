@@ -132,4 +132,35 @@ public class EmailTemplateRestService extends BaseRestService<EmailTemplateEntit
     public EmailTemplateResponse convertToResponse(EmailTemplateEntity entity) {
         return modelMapper.map(entity, EmailTemplateResponse.class);
     }
+
+    /**
+     * 初始化默认邮件模板
+     * 仅在模板不存在时创建，不会覆盖已有模板
+     */
+    public void initEmailTemplates(String orgUid) {
+        for (EmailTemplateInitData.EmailTemplateDef def : EmailTemplateInitData.DEFAULT_TICKET_TEMPLATES) {
+            String uid = def.uid();
+            if (!existsByUid(uid)) {
+                try {
+                    EmailTemplateEntity entity = EmailTemplateEntity.builder()
+                            .uid(uid)
+                            .name(def.name())
+                            .subject(def.subject())
+                            .content(def.content())
+                            .templateType(def.templateType())
+                            .description(def.description())
+                            .contentType(EmailTemplateContentTypeEnum.HTML.name())
+                            .status(EmailTemplateStatusEnum.PUBLISHED.name())
+                            .enabled(true)
+                            .defaultTemplate(true)
+                            .orgUid(orgUid)
+                            .build();
+                    emailTemplateRepository.save(entity);
+                    log.info("initEmailTemplates created: uid={}, name={}", uid, def.name());
+                } catch (Exception e) {
+                    log.warn("initEmailTemplates failed for uid={}: {}", uid, e.getMessage());
+                }
+            }
+        }
+    }
 }

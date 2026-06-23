@@ -51,7 +51,11 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Optional<ThreadEntity> findFirstByTopicAndStatusNotContainingAndDeleted(String topic, String status, Boolean deleted);
 
-        @Query(value = "select * from bytedesk_core_thread t where t.thread_topic = ?1 and t.thread_status not in ?2 and t.is_deleted = ?3 order by t.updated_at desc, t.created_at desc LIMIT 1", nativeQuery = true)
+        // JPQL to avoid full-session auto-flush triggered by native query (Hibernate 6 flushes all
+        // dirty entities before native SQL; JPQL only flushes entities relevant to the query).
+        // This prevents StaleObjectStateException on unrelated entities (e.g. VisitorEntity) when
+        // concurrent transactions update the same row.
+        @Query("SELECT t FROM ThreadEntity t WHERE t.topic = ?1 AND t.status NOT IN ?2 AND t.deleted = ?3 ORDER BY t.updatedAt DESC, t.createdAt DESC LIMIT 1")
         Optional<ThreadEntity> findTopicAndStatusesNotInAndDeleted(String topic, List<String> statuses, Boolean deleted);
 
         Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);

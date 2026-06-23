@@ -111,6 +111,43 @@ public class ApnsPushService {
     @Transactional
     public ApnsPushEntity pushWithToken(ApnsTokenEntity apnsToken, String title, String content, MessageProtobuf message) {
         ApnsPushEntity record = buildPushRecord(apnsToken, title, content, message);
+        return pushWithTokenInternal(apnsToken, title, content, record);
+    }
+
+    /**
+     * Push a notification to a user's iOS devices without requiring a MessageProtobuf.
+     * Used for business notifications such as ticket status changes.
+     *
+     * @param receiverUid the user uid to push to
+     * @param title       notification title
+     * @param body        notification body
+     * @param ticketUid   related ticket uid (for tracking), can be null
+     */
+    @Transactional
+    public void pushNotificationToUser(String receiverUid, String title, String body, String ticketUid) {
+        if (!StringUtils.hasText(receiverUid)) {
+            log.debug("Skip APNS notification push because receiverUid is empty");
+            return;
+        }
+
+        List<ApnsTokenEntity> apnsTokens = apnsTokenRestService.findByUserUid(receiverUid);
+        if (apnsTokens == null || apnsTokens.isEmpty()) {
+            log.info("Skip APNS notification push because no token found, receiverUid={}", receiverUid);
+            return;
+        }
+
+        log.info("Prepare APNS notification push, receiverUid={}, tokenCount={}, ticketUid={}",
+                receiverUid, apnsTokens.size(), ticketUid);
+
+        for (ApnsTokenEntity apnsToken : apnsTokens) {
+            ApnsPushEntity record = buildNotificationPushRecord(apnsToken, title, body, ticketUid);
+            record = apnsPushRepository.save(record);
+            pushWithTokenInternal(apnsToken, title, body, record);
+        }
+    }
+
+    @Transactional
+    public ApnsPushEntity pushWithTokenInternal(ApnsTokenEntity apnsToken, String title, String content, ApnsPushEntity record) {
         record = apnsPushRepository.save(record);
 
         log.debug("Create APNS push record, recordUid={}, messageUid={}, receiver={}, token={}, p12Uid={}",
@@ -343,6 +380,27 @@ public class ApnsPushService {
                 .threadUid(thread != null ? thread.getUid() : null)
                 .content(content)
                 .type(ApnsPushTypeEnum.MESSAGE.name())
+                .status(PushStatusEnum.PENDING.name())
+                .channel(ChannelEnum.IOS.name())
+                .build();
+    }
+
+    /**
+     * Build a push record for business notifications (e.g., ticket status changes).
+     * Does not require a MessageProtobuf.
+     */
+    private ApnsPushEntity buildNotificationPushRecord(ApnsTokenEntity apnsToken, String title, String content, String ticketUid) {
+        return ApnsPushEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(apnsToken != null ? apnsToken.getOrgUid() : null)
+                .userUid(apnsToken != null ? apnsToken.getUserUid() : null)
+                .name(title)
+                .receiver(apnsToken != null ? apnsToken.getUserUid() : null)
+                .deviceToken(apnsToken != null ? apnsToken.getToken() : null)
+                .p12Uid(apnsToken != null ? apnsToken.getP12Uid() : null)
+                .messageUid(ticketUid)
+                .content(content)
+                .type(ApnsPushTypeEnum.TICKET.name())
                 .status(PushStatusEnum.PENDING.name())
                 .channel(ChannelEnum.IOS.name())
                 .build();

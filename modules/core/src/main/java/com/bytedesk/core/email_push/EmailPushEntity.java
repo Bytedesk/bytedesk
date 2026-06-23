@@ -47,7 +47,7 @@ public class EmailPushEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "email_push_type")
-    private String type = "EMAIL_NOTIFICATION";
+    private String type = EmailPushTypeEnum.EMAIL_NOTIFICATION.name();
 
     private String sender;
 

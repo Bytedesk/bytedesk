@@ -14,13 +14,18 @@
 package com.bytedesk.ticket.process;
 
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
@@ -34,7 +39,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -43,6 +53,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.thread.ThreadConsts;
 import com.bytedesk.ticket.ticket.TicketConsts;
+import com.bytedesk.ticket.ticket.TicketStatusEnum;
 import com.bytedesk.ticket.utils.FlowableIdUtils;
 
 import lombok.AllArgsConstructor;
@@ -136,6 +147,9 @@ public class ProcessRestService
             entity.setSchema(request.getSchema());
             entity.setDescription(request.getDescription());
             entity.setType(request.getType());
+            if (StringUtils.hasText(request.getFlowgramSchema())) {
+                entity.setFlowgramSchema(request.getFlowgramSchema());
+            }
             // entity.setStatus(request.getStatus()); // 不允许手动修改状态
             //
             ProcessEntity savedEntity = save(entity);
@@ -205,16 +219,17 @@ public class ProcessRestService
         try {
             // 第一步：在数据库中创建 ProcessEntity 记录（去重）
             String ticketBpmn20Xml = loadDefaultProcessSchema();
+                String ticketFlowgramJson = loadDefaultProcessFlowgramSchema();
             String processUid = Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
             String externalProcessUid = Utils.formatUid(orgUid,
                     TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX);
 
             // 创建 TICKET_INTERNAL 流程记录（使用 processUid 作为 deploymentName）
-            create(buildDefaultProcessRequest(processUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_INTERNAL, TicketConsts.TICKET_PROCESS_NAME));
+                create(buildDefaultProcessRequest(processUid, orgUid, ticketBpmn20Xml, ticketFlowgramJson, ProcessTypeEnum.TICKET_INTERNAL, TicketConsts.TICKET_PROCESS_NAME));
             log.info("创建内部工单流程记录成功: processUid={}, orgUid={}", processUid, orgUid);
 
             // 创建 TICKET_EXTERNAL 流程记录（使用 externalProcessUid 作为 deploymentName）
-            create(buildDefaultProcessRequest(externalProcessUid, orgUid, ticketBpmn20Xml, ProcessTypeEnum.TICKET_EXTERNAL, TicketConsts.TICKET_PROCESS_NAME_EXTERNAL));
+                create(buildDefaultProcessRequest(externalProcessUid, orgUid, ticketBpmn20Xml, ticketFlowgramJson, ProcessTypeEnum.TICKET_EXTERNAL, TicketConsts.TICKET_PROCESS_NAME_EXTERNAL));
             log.info("创建外部工单流程记录成功: processUid={}, orgUid={}", externalProcessUid, orgUid);
 
             // 第二步：分别处理 TICKET_INTERNAL 和 TICKET_EXTERNAL 的 Deployment
@@ -347,10 +362,16 @@ public class ProcessRestService
 
     private ProcessRequest buildDefaultProcessRequest(String uid, String orgUid, String schema,
             ProcessTypeEnum type, String processName) {
+        return buildDefaultProcessRequest(uid, orgUid, schema, null, type, processName);
+    }
+
+    private ProcessRequest buildDefaultProcessRequest(String uid, String orgUid, String schema, String flowgramSchema,
+            ProcessTypeEnum type, String processName) {
         return ProcessRequest.builder()
                 .uid(uid)
                 .name(processName)
                 .schema(schema)
+                .flowgramSchema(flowgramSchema)
                 .type(type.name())
                 .description(processName)
                 .orgUid(orgUid)
@@ -385,6 +406,7 @@ public class ProcessRestService
         ProcessEntity processEntity = optional.get();
         String orgUid = processEntity.getOrgUid();
         String bpmnXml = processEntity.getSchema();
+        validateProcessBeforeDeploy(processEntity);
         // 统一：部署时将 BPMN <process id> 归一为可运行的 processDefinitionKey
         String processDefinitionKey = FlowableIdUtils.toProcessDefinitionKey(processUid);
         String originalProcessKey;
@@ -583,8 +605,310 @@ public class ProcessRestService
                 .build();
     }
 
+    public ProcessValidationResponse validateProcess(ProcessRequest request) {
+        Optional<ProcessEntity> optional = StringUtils.hasText(request.getUid())
+                ? processRepository.findByUid(request.getUid())
+                : Optional.empty();
+        String processUid = StringUtils.hasText(request.getUid()) ? request.getUid() : null;
+        String type = StringUtils.hasText(request.getType())
+                ? request.getType()
+                : optional.map(ProcessEntity::getType).orElse(ProcessTypeEnum.TICKET_INTERNAL.name());
+        String bpmnXml = StringUtils.hasText(request.getSchema())
+                ? request.getSchema()
+                : optional.map(ProcessEntity::getSchema).orElse(null);
+        String flowgramSchema = StringUtils.hasText(request.getFlowgramSchema())
+                ? request.getFlowgramSchema()
+                : optional.map(ProcessEntity::getFlowgramSchema).orElse(null);
+
+        List<ProcessValidationIssueResponse> errors = new ArrayList<>();
+        List<ProcessValidationIssueResponse> warnings = new ArrayList<>();
+
+        if (!StringUtils.hasText(bpmnXml)) {
+            addIssue(errors, "ERROR", "BPMN_SCHEMA_REQUIRED", "流程 BPMN schema 不能为空", null);
+            return buildValidationResponse(processUid, type, errors, warnings);
+        }
+
+        Set<String> bpmnUserTaskIds = new HashSet<>();
+        try {
+            bpmnUserTaskIds = parseBpmnUserTaskIds(bpmnXml);
+        } catch (Exception e) {
+            addIssue(errors, "ERROR", "BPMN_PARSE_FAILED", "BPMN XML 解析失败: " + e.getMessage(), null);
+        }
+
+        JSONObject flowgram = null;
+        JSONArray nodes = null;
+        if (!StringUtils.hasText(flowgramSchema)) {
+            if (isTicketProcessType(type)) {
+                addIssue(errors, "ERROR", "FLOWGRAM_SCHEMA_REQUIRED", "工单流程必须配置 flowgramSchema", null);
+            } else {
+                addIssue(warnings, "WARN", "FLOWGRAM_SCHEMA_MISSING", "未配置 flowgramSchema，将无法提供可视化流程语义", null);
+            }
+        } else {
+            try {
+                flowgram = JSON.parseObject(flowgramSchema);
+                nodes = flowgram.getJSONArray("nodes");
+                if (nodes == null || nodes.isEmpty()) {
+                    addIssue(errors, "ERROR", "FLOWGRAM_NODES_REQUIRED", "flowgramSchema.nodes 不能为空", null);
+                }
+            } catch (Exception e) {
+                addIssue(errors, "ERROR", "FLOWGRAM_PARSE_FAILED", "flowgramSchema JSON 解析失败: " + e.getMessage(), null);
+            }
+        }
+
+        if (nodes != null && !bpmnUserTaskIds.isEmpty()) {
+            validateFlowgramBpmnAlignment(bpmnUserTaskIds, nodes, errors, warnings, isTicketProcessType(type));
+            if (isTicketProcessType(type)) {
+                validateTicketWorkflowSemantics(nodes, errors, warnings);
+            }
+        }
+
+        return buildValidationResponse(processUid, type, errors, warnings);
+    }
+
+    private void validateProcessBeforeDeploy(ProcessEntity processEntity) {
+        ProcessValidationResponse validation = validateProcess(ProcessRequest.builder()
+                .uid(processEntity.getUid())
+                .type(processEntity.getType())
+                .schema(processEntity.getSchema())
+                .flowgramSchema(processEntity.getFlowgramSchema())
+                .build());
+        if (validation.getErrors() != null && !validation.getErrors().isEmpty()) {
+            String message = validation.getErrors().stream()
+                    .map(ProcessValidationIssueResponse::getMessage)
+                    .collect(Collectors.joining("; "));
+            throw new RuntimeException("流程校验失败: " + message);
+        }
+    }
+
+    private ProcessValidationResponse buildValidationResponse(String processUid, String type,
+            List<ProcessValidationIssueResponse> errors, List<ProcessValidationIssueResponse> warnings) {
+        return ProcessValidationResponse.builder()
+                .valid(errors.isEmpty())
+                .processUid(processUid)
+                .type(type)
+                .errors(errors)
+                .warnings(warnings)
+                .build();
+    }
+
+    private Set<String> parseBpmnUserTaskIds(String bpmnXml) throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setNamespaceAware(true);
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        Document document = factory.newDocumentBuilder()
+                .parse(new ByteArrayInputStream(bpmnXml.getBytes(StandardCharsets.UTF_8)));
+        NodeList userTasks = document.getElementsByTagNameNS("*", "userTask");
+        Set<String> ids = new HashSet<>();
+        for (int i = 0; i < userTasks.getLength(); i++) {
+            org.w3c.dom.Node node = userTasks.item(i);
+            org.w3c.dom.Node idNode = node.getAttributes().getNamedItem("id");
+            if (idNode != null && StringUtils.hasText(idNode.getNodeValue())) {
+                ids.add(idNode.getNodeValue());
+            }
+        }
+        return ids;
+    }
+
+    private void validateFlowgramBpmnAlignment(Set<String> bpmnUserTaskIds, JSONArray nodes,
+            List<ProcessValidationIssueResponse> errors, List<ProcessValidationIssueResponse> warnings,
+            boolean strictTicketProcess) {
+        Set<String> flowgramTaskNodeIds = new HashSet<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            JSONObject node = nodes.getJSONObject(i);
+            String nodeId = node.getString("id");
+            String nodeType = node.getString("type");
+            if (isFlowgramTaskNode(nodeType) && StringUtils.hasText(nodeId)) {
+                flowgramTaskNodeIds.add(nodeId);
+            }
+        }
+
+        for (String taskId : bpmnUserTaskIds) {
+            if (!flowgramTaskNodeIds.contains(taskId)) {
+                addIssue(strictTicketProcess ? errors : warnings,
+                        strictTicketProcess ? "ERROR" : "WARN",
+                        "BPMN_TASK_MISSING_FLOWGRAM_NODE",
+                        "BPMN userTask 未找到对应 flowgram 节点: " + taskId,
+                        taskId);
+            }
+        }
+        for (String nodeId : flowgramTaskNodeIds) {
+            if (!bpmnUserTaskIds.contains(nodeId)) {
+                addIssue(warnings, "WARN", "FLOWGRAM_NODE_MISSING_BPMN_TASK",
+                        "flowgram 任务节点未找到对应 BPMN userTask: " + nodeId,
+                        nodeId);
+            }
+        }
+    }
+
+    private void validateTicketWorkflowSemantics(JSONArray nodes,
+            List<ProcessValidationIssueResponse> errors, List<ProcessValidationIssueResponse> warnings) {
+        boolean hasWaitClaim = false;
+        boolean hasProcessing = false;
+        Set<String> stages = new HashSet<>();
+        List<JSONObject> taskNodes = new ArrayList<>();
+        for (int i = 0; i < nodes.size(); i++) {
+            JSONObject node = nodes.getJSONObject(i);
+            JSONObject data = node.getJSONObject("data");
+            if (data == null || !isFlowgramTaskNode(node.getString("type"))) {
+                continue;
+            }
+            taskNodes.add(node);
+            String nodeId = node.getString("id");
+            String ticketStage = data.getString("ticketStage");
+            if (!StringUtils.hasText(ticketStage)) {
+                addIssue(warnings, "WARN", "TICKET_STAGE_MISSING",
+                        "工单任务节点建议配置 ticketStage，避免依赖节点 id: " + nodeId,
+                        nodeId);
+            } else {
+                stages.add(ticketStage);
+                hasWaitClaim = hasWaitClaim || "WAIT_CLAIM".equals(ticketStage);
+                hasProcessing = hasProcessing || "PROCESSING".equals(ticketStage);
+            }
+            validateTicketStatusConfig(nodeId, data, "ticketStatusOnEnter", errors);
+            validateTicketStatusConfig(nodeId, data, "ticketStatusOnComplete", errors);
+        }
+
+        for (JSONObject node : taskNodes) {
+            validateAvailableActions(node.getString("id"), node.getJSONObject("data"), stages, errors, warnings);
+        }
+
+        if (hasWaitClaim && !hasProcessing) {
+            addIssue(errors, "ERROR", "PROCESSING_STAGE_REQUIRED",
+                    "配置了 WAIT_CLAIM 节点，但缺少 PROCESSING 处理节点", null);
+        }
+        if (!stages.contains("PROCESSING")) {
+            addIssue(warnings, "WARN", "PROCESSING_STAGE_MISSING",
+                    "工单流程建议至少配置一个 PROCESSING 节点", null);
+        }
+    }
+
+    private void validateAvailableActions(String nodeId, JSONObject data, Set<String> stages,
+            List<ProcessValidationIssueResponse> errors, List<ProcessValidationIssueResponse> warnings) {
+        JSONArray actions = data.getJSONArray("availableActions");
+        if (actions == null || actions.isEmpty()) {
+            addIssue(warnings, "WARN", "AVAILABLE_ACTIONS_MISSING",
+                    "工单任务节点未配置 availableActions，将回退到后端默认动作推断: " + nodeId,
+                    nodeId);
+            return;
+        }
+        for (int i = 0; i < actions.size(); i++) {
+            Object action = actions.get(i);
+            JSONObject actionConfig = action instanceof JSONObject ? (JSONObject) action : null;
+            String key = actionConfig != null ? actionConfig.getString("key") : String.valueOf(action);
+            if (!StringUtils.hasText(key)) {
+                addIssue(errors, "ERROR", "ACTION_KEY_REQUIRED", "动作配置缺少 key", nodeId);
+                continue;
+            }
+            String actionType = actionConfig != null ? actionConfig.getString("type") : null;
+            if (StringUtils.hasText(actionType) && !supportedTicketActionTypes().contains(actionType)) {
+                addIssue(errors, "ERROR", "ACTION_TYPE_UNSUPPORTED", "不支持的工单动作 type: " + actionType, nodeId);
+            }
+            if (!StringUtils.hasText(actionType) && !supportedTicketActionKeys().contains(key)) {
+                addIssue(errors, "ERROR", "ACTION_TYPE_REQUIRED",
+                        "自定义工单动作 key 必须配置运行时 type: " + key, nodeId);
+            }
+            if (actionConfig != null && actionConfig.containsKey("decisionValue")) {
+                String decisionVariable = StringUtils.hasText(actionConfig.getString("decisionVariable"))
+                        ? actionConfig.getString("decisionVariable")
+                        : data.getString("decisionVariable");
+                if (!StringUtils.hasText(decisionVariable)) {
+                    addIssue(errors, "ERROR", "DECISION_VARIABLE_REQUIRED",
+                            "动作 " + key + " 配置了 decisionValue，但节点未配置 decisionVariable", nodeId);
+                }
+            }
+            if (actionConfig != null) {
+                validateTicketStatusConfig(nodeId, actionConfig, "ticketStatus", errors);
+                validateTicketStatusConfig(nodeId, actionConfig, "ticketStatusOnComplete", errors);
+                validateNextTaskStage(nodeId, key, actionConfig, stages, errors);
+            }
+            validateActionFields(nodeId, key, actionConfig, errors);
+        }
+    }
+
+    private void validateTicketStatusConfig(String nodeId, JSONObject config, String fieldName,
+            List<ProcessValidationIssueResponse> errors) {
+        if (config == null || !StringUtils.hasText(config.getString(fieldName))) {
+            return;
+        }
+        String status = config.getString(fieldName).trim().toUpperCase();
+        try {
+            TicketStatusEnum.valueOf(status);
+        } catch (IllegalArgumentException e) {
+            addIssue(errors, "ERROR", "TICKET_STATUS_UNSUPPORTED",
+                    "不支持的工单状态配置 " + fieldName + ": " + config.getString(fieldName), nodeId);
+        }
+    }
+
+    private void validateNextTaskStage(String nodeId, String actionKey, JSONObject actionConfig, Set<String> stages,
+            List<ProcessValidationIssueResponse> errors) {
+        String nextTaskStage = actionConfig != null ? actionConfig.getString("nextTaskStage") : null;
+        if (!StringUtils.hasText(nextTaskStage) || stages.contains(nextTaskStage)) {
+            return;
+        }
+        addIssue(errors, "ERROR", "NEXT_TASK_STAGE_NOT_FOUND",
+                "动作 " + actionKey + " 配置的 nextTaskStage 未找到对应 ticketStage: " + nextTaskStage, nodeId);
+    }
+
+    private void validateActionFields(String nodeId, String actionKey, JSONObject actionConfig,
+            List<ProcessValidationIssueResponse> errors) {
+        JSONArray fields = actionConfig != null ? actionConfig.getJSONArray("fields") : null;
+        if (fields == null) {
+            return;
+        }
+        for (int i = 0; i < fields.size(); i++) {
+            JSONObject field = fields.getJSONObject(i);
+            if (field == null || !StringUtils.hasText(field.getString("name"))) {
+                addIssue(errors, "ERROR", "ACTION_FIELD_NAME_REQUIRED",
+                        "动作 " + actionKey + " 的字段缺少 name", nodeId);
+            }
+            if (field == null || !StringUtils.hasText(field.getString("component"))) {
+                addIssue(errors, "ERROR", "ACTION_FIELD_COMPONENT_REQUIRED",
+                        "动作 " + actionKey + " 的字段缺少 component", nodeId);
+            }
+        }
+    }
+
+    private boolean isTicketProcessType(String type) {
+        return ProcessTypeEnum.TICKET_INTERNAL.name().equalsIgnoreCase(type)
+                || ProcessTypeEnum.TICKET_EXTERNAL.name().equalsIgnoreCase(type);
+    }
+
+    private boolean isFlowgramTaskNode(String nodeType) {
+        return "approval".equals(nodeType) || "task".equals(nodeType) || "userTask".equals(nodeType);
+    }
+
+    private Set<String> supportedTicketActionKeys() {
+        return Set.of("CLAIM", "ASSIGN", "TRANSFER", "TRANSFER_DEPARTMENT", "COMPLETE",
+                "COMPLETE_VERIFIED", "COMPLETE_REJECTED", "HOLD", "CLOSE", "DELEGATE",
+                "DELEGATE_RESOLVE", "CC", "ADDSIGN", "ROLLBACK", "REVOKE");
+    }
+
+    private Set<String> supportedTicketActionTypes() {
+        return Set.of("claim", "assign", "transfer", "transferDepartment", "complete", "hold", "close",
+                "delegate", "delegateResolve", "cc", "addSign", "rollback", "revoke");
+    }
+
+    private void addIssue(List<ProcessValidationIssueResponse> issues, String level, String code,
+            String message, String nodeId) {
+        issues.add(ProcessValidationIssueResponse.builder()
+                .level(level)
+                .code(code)
+                .message(message)
+                .nodeId(nodeId)
+                .build());
+    }
+
     private String loadDefaultProcessSchema() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_PATH);
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
+    }
+
+    private String loadDefaultProcessFlowgramSchema() throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_FLOWGRAM_PATH);
         try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
@@ -610,6 +934,7 @@ public class ProcessRestService
         try {
             // 根据类型加载默认流程模板
             String defaultSchema;
+            String defaultFlowgramSchema = null;
             // String deploymentName;
             
             if (ProcessTypeEnum.THREAD.name().equals(type)) {
@@ -619,6 +944,7 @@ public class ProcessRestService
             } else {
                 // TICKET_INTERNAL 和 TICKET_EXTERNAL 类型使用工单流程模板
                 defaultSchema = loadDefaultProcessSchema();
+                defaultFlowgramSchema = loadDefaultProcessFlowgramSchema();
                 // deploymentName = ProcessTypeEnum.TICKET_INTERNAL.name().equals(type)
                 // //         ? TicketConsts.TICKET_PROCESS_NAME
                 //         : TicketConsts.TICKET_PROCESS_NAME_EXTERNAL;
@@ -626,6 +952,7 @@ public class ProcessRestService
 
             // 更新 ProcessEntity 的 schema、name 和 description
             entity.setSchema(defaultSchema);
+            entity.setFlowgramSchema(defaultFlowgramSchema);
             // entity.setName(deploymentName);
             // entity.setDescription(deploymentName);
             // 重置部署状态，需要重新部署
@@ -672,11 +999,13 @@ public class ProcessRestService
     private void initLeaveApprovalProcess(String orgUid) throws IOException {
         String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_KEY);
         String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_PATH);
+        String flowgramJson = loadDemoProcessSchema(ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_FLOWGRAM_PATH);
 
-        create(buildDefaultProcessRequest(
+        createOrSyncDemoProcess(buildDefaultProcessRequest(
                 processUid,
                 orgUid,
                 bpmnXml,
+                flowgramJson,
                 ProcessTypeEnum.DEMO,
                 ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_NAME));
 
@@ -690,11 +1019,13 @@ public class ProcessRestService
     private void initReimbursementApprovalProcess(String orgUid) throws IOException {
         String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_KEY);
         String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_PATH);
+        String flowgramJson = loadDemoProcessSchema(ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_FLOWGRAM_PATH);
 
-        create(buildDefaultProcessRequest(
+        createOrSyncDemoProcess(buildDefaultProcessRequest(
                 processUid,
                 orgUid,
                 bpmnXml,
+                flowgramJson,
                 ProcessTypeEnum.DEMO,
                 ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_NAME));
 
@@ -708,11 +1039,13 @@ public class ProcessRestService
     private void initItSupportProcess(String orgUid) throws IOException {
         String processUid = Utils.formatUid(orgUid, ProcessDemoConsts.IT_SUPPORT_PROCESS_KEY);
         String bpmnXml = loadDemoProcessSchema(ProcessDemoConsts.IT_SUPPORT_PROCESS_PATH);
+        String flowgramJson = loadDemoProcessSchema(ProcessDemoConsts.IT_SUPPORT_PROCESS_FLOWGRAM_PATH);
 
-        create(buildDefaultProcessRequest(
+        createOrSyncDemoProcess(buildDefaultProcessRequest(
                 processUid,
                 orgUid,
                 bpmnXml,
+                flowgramJson,
                 ProcessTypeEnum.DEMO,
                 ProcessDemoConsts.IT_SUPPORT_PROCESS_NAME));
 
@@ -728,6 +1061,113 @@ public class ProcessRestService
         try (InputStream inputStream = resource.getInputStream()) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private void createOrSyncDemoProcess(ProcessRequest request) {
+        Optional<ProcessEntity> optional = processRepository.findByUid(request.getUid());
+        if (optional.isEmpty()) {
+            create(request);
+            return;
+        }
+
+        ProcessEntity entity = optional.get();
+        if (StringUtils.hasText(request.getFlowgramSchema())
+            && !request.getFlowgramSchema().equals(entity.getFlowgramSchema())) {
+            entity.setFlowgramSchema(request.getFlowgramSchema());
+            save(entity);
+            log.info("同步演示流程 flowgramSchema 成功: processUid={}", entity.getUid());
+        }
+    }
+
+    /**
+     * 迁移脚本：为缺少 flowgramSchema 的旧流程从 resources/processes/*.json 填充 flowgram JSON
+     * 在 ProcessInitializer 中调用，确保升级后旧流程可在 TicketBuilder 中打开编辑
+     */
+    public void migrateFlowgramSchemas() {
+        List<ProcessEntity> entities = processRepository.findBySchemaIsNotNullAndFlowgramSchemaIsNull();
+        if (entities.isEmpty()) {
+            log.info("migrateFlowgramSchemas: no processes need migration");
+            return;
+        }
+        log.info("migrateFlowgramSchemas: migrating {} processes", entities.size());
+        int migrated = 0;
+        for (ProcessEntity entity : entities) {
+            try {
+                // 如果 flowgramSchema 已经存在，跳过
+                if (StringUtils.hasText(entity.getFlowgramSchema())) {
+                    continue;
+                }
+                String flowgramJson = loadFlowgramResource(entity.getType(), entity.getName());
+                if (flowgramJson != null) {
+                    entity.setFlowgramSchema(flowgramJson);
+                    save(entity);
+                    migrated++;
+                    log.info("migrateFlowgramSchemas: filled flowgramSchema for processUid={}, type={}",
+                            entity.getUid(), entity.getType());
+                } else {
+                    log.warn("migrateFlowgramSchemas: no flowgram resource found for processUid={}, type={}, name={}",
+                            entity.getUid(), entity.getType(), entity.getName());
+                }
+            } catch (Exception e) {
+                log.warn("migrateFlowgramSchemas: failed for processUid={}, error={}",
+                        entity.getUid(), e.getMessage());
+            }
+        }
+        log.info("migrateFlowgramSchemas: migrated {}/{} processes", migrated, entities.size());
+    }
+
+    /**
+     * 根据流程类型和名称加载对应的 flowgram JSON 资源文件
+     */
+    private String loadFlowgramResource(String type, String name) {
+        String resourcePath = resolveFlowgramPath(type, name);
+        if (resourcePath == null) {
+            return null;
+        }
+        try {
+            Resource resource = resourceLoader.getResource("classpath:" + resourcePath);
+            if (!resource.exists()) {
+                log.warn("loadFlowgramResource: resource not found at {}", resourcePath);
+                return null;
+            }
+            try (InputStream inputStream = resource.getInputStream()) {
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            log.warn("loadFlowgramResource: failed to load {}, error={}", resourcePath, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 根据流程类型和名称解析对应的 flowgram JSON 资源路径
+     */
+    private String resolveFlowgramPath(String type, String name) {
+        if (type == null) {
+            return null;
+        }
+        // 会话流程
+        if (ProcessTypeEnum.THREAD.name().equalsIgnoreCase(type)) {
+            return ThreadConsts.THREAD_PROCESS_FLOWGRAM_PATH;
+        }
+        // 工单流程（内部/外部共用同一个 flowgram）
+        if (ProcessTypeEnum.TICKET_INTERNAL.name().equalsIgnoreCase(type)
+                || ProcessTypeEnum.TICKET_EXTERNAL.name().equalsIgnoreCase(type)) {
+            return TicketConsts.TICKET_PROCESS_FLOWGRAM_PATH;
+        }
+        // 演示流程：根据名称区分
+        if (ProcessTypeEnum.DEMO.name().equalsIgnoreCase(type) && StringUtils.hasText(name)) {
+            if (name.contains("请假")) {
+                return ProcessDemoConsts.LEAVE_APPROVAL_PROCESS_FLOWGRAM_PATH;
+            }
+            if (name.contains("报销")) {
+                return ProcessDemoConsts.REIMBURSEMENT_APPROVAL_PROCESS_FLOWGRAM_PATH;
+            }
+            if (name.contains("IT") || name.contains("支持")) {
+                return ProcessDemoConsts.IT_SUPPORT_PROCESS_FLOWGRAM_PATH;
+            }
+        }
+        return null;
     }
 
 }

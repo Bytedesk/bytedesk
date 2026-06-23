@@ -25,7 +25,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-// import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import jakarta.servlet.DispatcherType;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -65,10 +66,10 @@ public class WebSecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
+                    // Async 分发（SSE/StreamingResponseBody）已通过初次请求认证，跳过重新授权
+                    .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                     // 系统状态监控接口允许匿名访问
                     // .requestMatchers("/api/system/**").permitAll()
-                    // SSE 端点特殊处理，在授权检查前确保有效认证
-                    // .requestMatchers("/api/v1/agent/message/sse").authenticated()
                     .requestMatchers("/api/**").authenticated()
                     // .requestMatchers("/actuator/**").authenticated() // monitor endpoints
                     .anyRequest().permitAll())

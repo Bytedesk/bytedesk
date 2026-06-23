@@ -1,0 +1,514 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "meta": {
+        "position": {
+          "x": -559.2782915299075,
+          "y": 245
+        }
+      },
+      "data": {
+        "title": "提交工单",
+        "description": "用户提交IT支持工单。"
+      }
+    },
+    {
+      "id": "submitTicket",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": -198.25327075669315,
+          "y": 245
+        }
+      },
+      "data": {
+        "title": "提交IT工单",
+        "description": "用户填写IT工单，包括问题描述、优先级、附件。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${requesterUid}"
+        ],
+        "assigneeNames": [
+          "请求人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "categoryGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 162.7717500165212,
+          "y": 245
+        }
+      },
+      "data": {
+        "title": "工单分类",
+        "description": "根据IT工单分类分派处理团队。",
+        "conditions": [
+          {
+            "key": "hardware",
+            "label": "硬件问题",
+            "expression": "${category == 'HARDWARE'}",
+            "outgoingEdgeId": "hardwareSupport"
+          },
+          {
+            "key": "software",
+            "label": "软件问题",
+            "expression": "${category == 'SOFTWARE'}",
+            "outgoingEdgeId": "softwareSupport"
+          },
+          {
+            "key": "network",
+            "label": "网络问题",
+            "expression": "${category == 'NETWORK'}",
+            "outgoingEdgeId": "networkSupport"
+          },
+          {
+            "key": "account",
+            "label": "账号权限",
+            "expression": "${category == 'ACCOUNT'}",
+            "outgoingEdgeId": "accountSupport"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hardwareSupport",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 507.755145853067,
+          "y": -87.32787496420397
+        }
+      },
+      "data": {
+        "title": "硬件支持",
+        "description": "IT硬件团队处理硬件相关问题。",
+        "assigneeType": "role",
+        "roleUid": "${hardwareGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "softwareSupport",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 507.755145853067,
+          "y": 59.48748961339281
+        }
+      },
+      "data": {
+        "title": "软件支持",
+        "description": "IT软件团队处理软件相关问题。",
+        "assigneeType": "role",
+        "roleUid": "${softwareGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "networkSupport",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 514.7033437382975,
+          "y": 413.3174687300368
+        }
+      },
+      "data": {
+        "title": "网络支持",
+        "description": "IT网络团队处理网络相关问题。",
+        "assigneeType": "role",
+        "roleUid": "${networkGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "accountSupport",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 514.7033437382975,
+          "y": 573.0540207952428
+        }
+      },
+      "data": {
+        "title": "自动账号处理",
+        "description": "自动处理账号权限相关问题。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "priorityGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 869.5037434813223,
+          "y": 245
+        }
+      },
+      "data": {
+        "title": "判断优先级",
+        "description": "根据工单优先级判断是否升级处理。",
+        "conditions": [
+          {
+            "key": "highPriority",
+            "label": "高优先级",
+            "expression": "${priority == 'HIGH' || priority == 'URGENT'}",
+            "outgoingEdgeId": "escalate"
+          },
+          {
+            "key": "normalPriority",
+            "label": "普通优先级",
+            "expression": "${priority == 'NORMAL' || priority == 'LOW'}",
+            "outgoingEdgeId": "verify"
+          }
+        ]
+      }
+    },
+    {
+      "id": "escalate",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1261.9284068389131,
+          "y": 59.4874896133928
+        }
+      },
+      "data": {
+        "title": "升级处理",
+        "description": "IT经理处理高优先级问题。",
+        "assigneeType": "role",
+        "roleUid": "${itManagerGroupId}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true
+      }
+    },
+    {
+      "id": "slaTimeoutNotify",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 507.755145853067,
+          "y": -283.5499270183957
+        }
+      },
+      "data": {
+        "title": "SLA超时通知",
+        "description": "支持任务超过SLA后发送提醒。",
+        "channels": [
+          "message"
+        ],
+        "template": "IT支持工单已超过SLA。",
+        "recipientType": "role",
+        "recipientUids": [
+          "${hardwareGroupId}"
+        ]
+      }
+    },
+    {
+      "id": "verifyResultGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 1748.0711225053744,
+          "y": 255
+        }
+      },
+      "data": {
+        "title": "验证结果",
+        "description": "判断用户验证结果。",
+        "conditions": [
+          {
+            "key": "solved",
+            "label": "已解决",
+            "expression": "${solved == true}",
+            "outgoingEdgeId": "closeTicket"
+          },
+          {
+            "key": "notSolved",
+            "label": "未解决",
+            "expression": "${solved == false}",
+            "outgoingEdgeId": "categoryGateway"
+          }
+        ]
+      }
+    },
+    {
+      "id": "closeTicket",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 2081.4099011098474,
+          "y": 255
+        }
+      },
+      "data": {
+        "title": "关闭工单",
+        "description": "关闭工单并触发满意度调查。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "satisfactionSurvey",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 2470.250284063458,
+          "y": 255.00000000000003
+        }
+      },
+      "data": {
+        "title": "满意度调查",
+        "description": "发送满意度调查问卷。",
+        "channels": [
+          "message"
+        ],
+        "template": "请对本次IT支持服务进行满意度评价。",
+        "recipientType": "reporter",
+        "recipientUids": []
+      }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 2832.9783761692293,
+          "y": 255
+        }
+      },
+      "data": {
+        "title": "流程结束",
+        "description": "IT支持流程结束。"
+      }
+    },
+    {
+      "id": "notifyEnd",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 2850.055792892041,
+          "y": 58.23444791276583
+        }
+      },
+      "data": {
+        "title": "发送升级通知结束",
+        "description": "升级通知发送完成。"
+      }
+    },
+    {
+      "id": "escalateTimeoutNotify",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 2478.788992424864,
+          "y": 58.23444791276583
+        }
+      },
+      "data": {
+        "title": "超时升级通知",
+        "description": "升级处理超时后发送通知。",
+        "channels": [
+          "message"
+        ],
+        "template": "高优先级IT工单处理已超时。",
+        "recipientType": "role",
+        "recipientUids": [
+          "${itManagerGroupId}"
+        ]
+      }
+    },
+    {
+      "id": "verify",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1502.4353590185117,
+          "y": 470.79830561902077
+        }
+      },
+      "data": {
+        "title": "用户验证",
+        "description": "用户验证问题是否已解决。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${requesterUid}"
+        ],
+        "assigneeNames": [
+          "请求人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": false,
+        "allowAddSign": false,
+        "commentRequired": true
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "start",
+      "targetNodeId": "submitTicket",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "submitTicket",
+      "targetNodeId": "categoryGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "verifyResultGateway",
+      "targetNodeId": "categoryGateway",
+      "sourcePortId": "condition-branch-notSolved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "categoryGateway",
+      "targetNodeId": "hardwareSupport",
+      "sourcePortId": "condition-branch-hardware",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "categoryGateway",
+      "targetNodeId": "softwareSupport",
+      "sourcePortId": "condition-branch-software",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "categoryGateway",
+      "targetNodeId": "networkSupport",
+      "sourcePortId": "condition-branch-network",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "categoryGateway",
+      "targetNodeId": "accountSupport",
+      "sourcePortId": "condition-branch-account",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "slaTimeoutNotify",
+      "targetNodeId": "hardwareSupport",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "hardwareSupport",
+      "targetNodeId": "priorityGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "hardwareSupport",
+      "targetNodeId": "slaTimeoutNotify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "softwareSupport",
+      "targetNodeId": "priorityGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "networkSupport",
+      "targetNodeId": "priorityGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "accountSupport",
+      "targetNodeId": "verify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "priorityGateway",
+      "targetNodeId": "escalate",
+      "sourcePortId": "condition-branch-highPriority",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "priorityGateway",
+      "targetNodeId": "verify",
+      "sourcePortId": "condition-branch-normalPriority",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "escalate",
+      "targetNodeId": "verify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "escalate",
+      "targetNodeId": "escalateTimeoutNotify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "verify",
+      "targetNodeId": "verifyResultGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "verifyResultGateway",
+      "targetNodeId": "closeTicket",
+      "sourcePortId": "condition-branch-solved",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "closeTicket",
+      "targetNodeId": "satisfactionSurvey",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "satisfactionSurvey",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "escalateTimeoutNotify",
+      "targetNodeId": "notifyEnd",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    }
+  ]
+}
