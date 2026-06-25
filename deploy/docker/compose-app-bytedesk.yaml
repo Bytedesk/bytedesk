@@ -39,6 +39,8 @@ services:
       BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL:
       # Public upload API base URL without the upload path, useful for multi-node or reverse-proxy upload setups. 外网上传 API 基础地址，不带上传路径。
       # BYTEDESK_CUSTOM_UPLOAD_API_URL: https://upload.example.com
+      # Public visitor ticket HTML base URL without trailing slash, used in ticket notification emails. 访客工单页面基础地址，不带末尾斜杠。
+      # BYTEDESK_CUSTOM_TICKET_HTML_URL: https://support.example.com/ticket
       # Default WeChat Mini Program goods detail route. 微信小程序商品详情默认跳转路径。
       BYTEDESK_CUSTOM_WECHAT_MINI_PROGRAM_GOODS_DETAIL_PATH: /pages/goods/detail/index
       # Default WeChat Mini Program order detail route. 微信小程序订单详情默认跳转路径。

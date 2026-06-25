@@ -22,6 +22,7 @@ import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
 
 import jakarta.persistence.CascadeType;
@@ -119,6 +120,13 @@ public class TicketSettingsEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketNotificationSettingsEntity draftNotificationSettings;
+
+    // ===== SLA 设置 =====
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketSlaSettingsEntity slaSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketSlaSettingsEntity draftSlaSettings;
     
     /**
      * Whether there are unpublished changes in draft

@@ -12,11 +12,14 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
@@ -39,9 +42,14 @@ class TicketEventListenerTest {
         ApnsPushService apnsPushService = mock(ApnsPushService.class);
         EmailPushSendService emailPushSendService = mock(EmailPushSendService.class);
         TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
+        TicketRepository ticketRepository = mock(TicketRepository.class);
+        ThreadRestService threadRestService = mock(ThreadRestService.class);
+        MessageRestService messageRestService = mock(MessageRestService.class);
+        IMessageSendService messageSendService = mock(IMessageSendService.class);
         TicketNotificationService ticketNotificationService = new TicketNotificationService(
                 notificationService, workgroupRepository, visitorRepository, emailProviderRepository,
-                smsPushSendService, apnsPushService, emailPushSendService, ticketSettingsRepository);
+                smsPushSendService, apnsPushService, emailPushSendService, ticketSettingsRepository,
+                ticketRepository, threadRestService, messageRestService, messageSendService);
 
         AgentEntity agentA = buildAgent("agent-a", "user-a");
         AgentEntity agentB = buildAgent("agent-b", "user-b");

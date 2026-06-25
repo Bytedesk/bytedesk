@@ -62,6 +62,11 @@ import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRespon
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsResponse;
+import com.bytedesk.ticket.ticket_sla_rule.TicketSlaRuleEntity;
+import com.bytedesk.ticket.ticket_sla_rule.TicketSlaRuleResponse;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
@@ -161,13 +166,16 @@ public class TicketSettingsRestService extends
                 entity.getOrgUid());
         entity.setDraftBasicSettings(draftBasic);
 
-        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings()));
+        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings(), entity.getOrgUid()));
 
-        entity.setDraftCategorySettings(createCategorySettingsEntity(resolveDraftCategoryRequest(request)));
+        entity.setDraftCategorySettings(createCategorySettingsEntity(resolveDraftCategoryRequest(request), entity.getOrgUid()));
 
         // 通知设置
-        entity.setNotificationSettings(createNotificationSettingsEntity(request.getNotificationSettings()));
-        entity.setDraftNotificationSettings(createNotificationSettingsEntity(resolveDraftNotificationRequest(request)));
+        entity.setNotificationSettings(createNotificationSettingsEntity(request.getNotificationSettings(), entity.getOrgUid()));
+        entity.setDraftNotificationSettings(createNotificationSettingsEntity(resolveDraftNotificationRequest(request), entity.getOrgUid()));
+
+        entity.setSlaSettings(createSlaSettingsEntity(request.getSlaSettings(), entity.getOrgUid()));
+        entity.setDraftSlaSettings(createSlaSettingsEntity(resolveDraftSlaRequest(request), entity.getOrgUid()));
 
         String resolvedProcessUid = resolveProcessUidOrDefault(request, entity.getOrgUid(), normalizedType);
         entity.setProcess(resolveProcessReference(resolvedProcessUid, entity.getOrgUid()));
@@ -235,6 +243,7 @@ public class TicketSettingsRestService extends
                     draftCategory = TicketCategorySettingsEntity.fromRequest(request.getCategorySettings(),
                             uidUtils::getUid);
                     draftCategory.setUid(uidUtils.getUid());
+                    draftCategory.setOrgUid(entity.getOrgUid());
                     entity.setDraftCategorySettings(draftCategory);
                 } else {
                     draftCategory.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
@@ -249,10 +258,23 @@ public class TicketSettingsRestService extends
                 if (draftNotif == null) {
                     draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
                     draftNotif.setUid(uidUtils.getUid());
+                    draftNotif.setOrgUid(entity.getOrgUid());
                     entity.setDraftNotificationSettings(draftNotif);
                 } else {
                     TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
                     applyNotificationSettings(draftNotif, updated);
+                }
+                draftUpdated = true;
+            }
+
+            TicketSlaSettingsRequest draftSlaRequest = resolveDraftSlaRequest(request);
+            if (draftSlaRequest != null) {
+                TicketSlaSettingsEntity draftSla = entity.getDraftSlaSettings();
+                if (draftSla == null) {
+                    draftSla = createSlaSettingsEntity(draftSlaRequest, entity.getOrgUid());
+                    entity.setDraftSlaSettings(draftSla);
+                } else {
+                    TicketSlaSettingsEntity.applyRequest(draftSla, draftSlaRequest, uidUtils::getUid, entity.getOrgUid());
                 }
                 draftUpdated = true;
             }
@@ -461,13 +483,16 @@ public class TicketSettingsRestService extends
                 .customFormEnabled(false)
                 .build();
 
-        settings.setCategorySettings(createCategorySettingsEntity(null));
+        settings.setCategorySettings(createCategorySettingsEntity(null, orgUid));
 
-        settings.setDraftCategorySettings(createCategorySettingsEntity(null));
+        settings.setDraftCategorySettings(createCategorySettingsEntity(null, orgUid));
 
         // 通知设置
-        settings.setNotificationSettings(createNotificationSettingsEntity(null));
-        settings.setDraftNotificationSettings(createNotificationSettingsEntity(null));
+        settings.setNotificationSettings(createNotificationSettingsEntity(null, orgUid));
+        settings.setDraftNotificationSettings(createNotificationSettingsEntity(null, orgUid));
+
+        settings.setSlaSettings(createSlaSettingsEntity(null, orgUid));
+        settings.setDraftSlaSettings(createSlaSettingsEntity(null, orgUid));
 
         TicketBasicSettingsEntity basic = createBasicSettingsEntity(null, orgUid);
         settings.setBasicSettings(basic);
@@ -576,6 +601,7 @@ public class TicketSettingsRestService extends
                 draftCategory = TicketCategorySettingsEntity
                         .fromRequest(draftCategoryRequest, uidUtils::getUid);
                 draftCategory.setUid(uidUtils.getUid());
+                draftCategory.setOrgUid(entity.getOrgUid());
                 entity.setDraftCategorySettings(draftCategory);
             } else {
                 draftCategory.replaceFromRequest(draftCategoryRequest, uidUtils::getUid);
@@ -601,10 +627,23 @@ public class TicketSettingsRestService extends
             if (draftNotif == null) {
                 draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
                 draftNotif.setUid(uidUtils.getUid());
+                draftNotif.setOrgUid(entity.getOrgUid());
                 entity.setDraftNotificationSettings(draftNotif);
             } else {
                 TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
                 applyNotificationSettings(draftNotif, updated);
+            }
+            draftUpdated = true;
+        }
+
+        TicketSlaSettingsRequest draftSlaRequest = resolveDraftSlaRequest(request);
+        if (draftSlaRequest != null) {
+            TicketSlaSettingsEntity draftSla = entity.getDraftSlaSettings();
+            if (draftSla == null) {
+                draftSla = createSlaSettingsEntity(draftSlaRequest, entity.getOrgUid());
+                entity.setDraftSlaSettings(draftSla);
+            } else {
+                TicketSlaSettingsEntity.applyRequest(draftSla, draftSlaRequest, uidUtils::getUid, entity.getOrgUid());
             }
             draftUpdated = true;
         }
@@ -655,6 +694,7 @@ public class TicketSettingsRestService extends
             if (publishedCategory == null) {
                 publishedCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
                 publishedCategory.setUid(uidUtils.getUid());
+                publishedCategory.setOrgUid(entity.getOrgUid());
                 entity.setCategorySettings(publishedCategory);
             }
             if (draftCategory.getContent() != null) {
@@ -675,9 +715,19 @@ public class TicketSettingsRestService extends
             if (publishedNotif == null) {
                 publishedNotif = TicketNotificationSettingsEntity.fromRequest(null);
                 publishedNotif.setUid(uidUtils.getUid());
+                publishedNotif.setOrgUid(entity.getOrgUid());
                 entity.setNotificationSettings(publishedNotif);
             }
             copyNotificationSettings(entity.getDraftNotificationSettings(), publishedNotif);
+        }
+
+        if (entity.getDraftSlaSettings() != null) {
+            TicketSlaSettingsEntity publishedSla = entity.getSlaSettings();
+            if (publishedSla == null) {
+                publishedSla = createSlaSettingsEntity(null, entity.getOrgUid());
+                entity.setSlaSettings(publishedSla);
+            }
+            copySlaSettings(entity.getDraftSlaSettings(), publishedSla);
         }
 
         // 发布时间与草稿标记维护
@@ -777,15 +827,30 @@ public class TicketSettingsRestService extends
         return request.getNotificationSettings();
     }
 
-    private TicketNotificationSettingsEntity createNotificationSettingsEntity(TicketNotificationSettingsRequest request) {
+    private TicketSlaSettingsRequest resolveDraftSlaRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getSlaSettings();
+    }
+
+    private TicketNotificationSettingsEntity createNotificationSettingsEntity(TicketNotificationSettingsRequest request, String orgUid) {
         TicketNotificationSettingsEntity entity = TicketNotificationSettingsEntity.fromRequest(request);
         entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(orgUid);
         return entity;
     }
 
-    private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request) {
+    private TicketSlaSettingsEntity createSlaSettingsEntity(TicketSlaSettingsRequest request, String orgUid) {
+        TicketSlaSettingsEntity entity = TicketSlaSettingsEntity.fromRequest(request, uidUtils::getUid, orgUid);
+        entity.setOrgUid(orgUid);
+        return entity;
+    }
+
+    private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request, String orgUid) {
         TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request, uidUtils::getUid);
         category.setUid(uidUtils.getUid());
+        category.setOrgUid(orgUid);
         if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
             category.setContent(buildDefaultCategorySettingsData());
         }
@@ -988,6 +1053,14 @@ public class TicketSettingsRestService extends
         if (request.getRequireWechat() != null) {
             target.setRequireWechat(request.getRequireWechat());
         }
+
+        // 智能工单生成
+        if (request.getEnableSmartTicketGenerate() != null) {
+            target.setEnableSmartTicketGenerate(request.getEnableSmartTicketGenerate());
+        }
+        if (request.getSmartTicketRobotUid() != null || !StringUtils.hasText(target.getSmartTicketRobotUid())) {
+            target.setSmartTicketRobotUid(request.getSmartTicketRobotUid());
+        }
     }
 
     private void copyBasicSettings(TicketBasicSettingsEntity source, TicketBasicSettingsEntity target) {
@@ -1018,6 +1091,10 @@ public class TicketSettingsRestService extends
         target.setRequirePhone(source.getRequirePhone());
         target.setShowWechat(source.getShowWechat());
         target.setRequireWechat(source.getRequireWechat());
+
+        // 智能工单生成
+        target.setEnableSmartTicketGenerate(source.getEnableSmartTicketGenerate());
+        target.setSmartTicketRobotUid(source.getSmartTicketRobotUid());
     }
 
     private TicketBasicSettingsResponse mapBasicSettings(TicketBasicSettingsEntity entity) {
@@ -1050,6 +1127,10 @@ public class TicketSettingsRestService extends
                 .requirePhone(entity.getRequirePhone())
                 .showWechat(entity.getShowWechat())
                 .requireWechat(entity.getRequireWechat())
+
+                // 智能工单生成
+                .enableSmartTicketGenerate(entity.getEnableSmartTicketGenerate())
+                .smartTicketRobotUid(entity.getSmartTicketRobotUid())
                 .build();
     }
 
@@ -1128,6 +1209,42 @@ public class TicketSettingsRestService extends
                 .build();
     }
 
+            private TicketSlaSettingsResponse mapSlaSettings(TicketSlaSettingsEntity entity) {
+            if (entity == null) {
+                return null;
+            }
+            List<TicketSlaRuleResponse> rules = entity.getRules() == null ? new ArrayList<>()
+                : entity.getRules().stream()
+                    .map(rule -> TicketSlaRuleResponse.builder()
+                        .uid(rule.getUid())
+                        .slaType(rule.getSlaType())
+                        .priority(rule.getPriority())
+                        .categoryUid(rule.getCategoryUid())
+                        .durationMinutes(rule.getDurationMinutes())
+                        .warningMinutes(rule.getWarningMinutes())
+                        .enabled(rule.getEnabled())
+                        .orderIndex(rule.getOrderIndex())
+                        .build())
+                    .collect(Collectors.toList());
+            return TicketSlaSettingsResponse.builder()
+                .uid(entity.getUid())
+                .enabled(entity.getEnabled())
+                .businessHoursEnabled(entity.getBusinessHoursEnabled())
+                .businessHoursStartTime(entity.getBusinessHoursStartTime())
+                .businessHoursEndTime(entity.getBusinessHoursEndTime())
+                .businessHoursTimezone(entity.getBusinessHoursTimezone())
+                .businessHoursCountryCode(entity.getBusinessHoursCountryCode())
+                .pauseOnHold(entity.getPauseOnHold())
+                .notifyOnBreach(entity.getNotifyOnBreach())
+                .autoEscalateEnabled(entity.getAutoEscalateEnabled())
+                .escalateAssigneeUid(entity.getEscalateAssigneeUid())
+                .autoCloseCustomerPendingEnabled(entity.getAutoCloseCustomerPendingEnabled())
+                .customerVerifyAutoCloseHours(entity.getCustomerVerifyAutoCloseHours())
+                .warningPercent(entity.getWarningPercent())
+                .rules(rules)
+                .build();
+            }
+
     private void applyNotificationSettings(TicketNotificationSettingsEntity target, TicketNotificationSettingsEntity source) {
         if (target == null || source == null) return;
         if (source.getEmailEnabled() != null) target.setEmailEnabled(source.getEmailEnabled());
@@ -1164,6 +1281,38 @@ public class TicketSettingsRestService extends
         target.setSmsTemplateIds(source.getSmsTemplateIds() != null ? new java.util.HashMap<>(source.getSmsTemplateIds()) : new java.util.HashMap<>());
         target.setEmailNotifyWhenOnline(source.getEmailNotifyWhenOnline());
         target.setSmsNotifyWhenOnline(source.getSmsNotifyWhenOnline());
+    }
+
+    private void copySlaSettings(TicketSlaSettingsEntity source, TicketSlaSettingsEntity target) {
+        if (source == null || target == null) return;
+        target.setEnabled(source.getEnabled());
+        target.setBusinessHoursEnabled(source.getBusinessHoursEnabled());
+        target.setBusinessHoursStartTime(source.getBusinessHoursStartTime());
+        target.setBusinessHoursEndTime(source.getBusinessHoursEndTime());
+        target.setBusinessHoursTimezone(source.getBusinessHoursTimezone());
+        target.setBusinessHoursCountryCode(source.getBusinessHoursCountryCode());
+        target.setPauseOnHold(source.getPauseOnHold());
+        target.setNotifyOnBreach(source.getNotifyOnBreach());
+        target.setAutoEscalateEnabled(source.getAutoEscalateEnabled());
+        target.setEscalateAssigneeUid(source.getEscalateAssigneeUid());
+        target.setAutoCloseCustomerPendingEnabled(source.getAutoCloseCustomerPendingEnabled());
+        target.setCustomerVerifyAutoCloseHours(source.getCustomerVerifyAutoCloseHours());
+        target.setWarningPercent(source.getWarningPercent());
+        target.getRules().clear();
+        if (source.getRules() != null) {
+            for (TicketSlaRuleEntity rule : source.getRules()) {
+                target.getRules().add(TicketSlaRuleEntity.builder()
+                        .uid(uidUtils.getUid())
+                        .slaType(rule.getSlaType())
+                        .priority(rule.getPriority())
+                        .categoryUid(rule.getCategoryUid())
+                        .durationMinutes(rule.getDurationMinutes())
+                        .warningMinutes(rule.getWarningMinutes())
+                        .enabled(rule.getEnabled())
+                        .orderIndex(rule.getOrderIndex())
+                        .build());
+            }
+        }
     }
 
     private ProcessResponse mapProcess(ProcessEntity entity) {
@@ -1214,6 +1363,9 @@ public class TicketSettingsRestService extends
         // 通知设置
         resp.setNotificationSettings(mapNotificationSettings(entity.getNotificationSettings()));
         resp.setDraftNotificationSettings(mapNotificationSettings(entity.getDraftNotificationSettings()));
+
+        resp.setSlaSettings(mapSlaSettings(entity.getSlaSettings()));
+        resp.setDraftSlaSettings(mapSlaSettings(entity.getDraftSlaSettings()));
 
         return resp;
     }

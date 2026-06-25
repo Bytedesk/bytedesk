@@ -407,6 +407,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidDataAccessApiUsageException.class)
     public ResponseEntity<?> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e) {
         Throwable cause = e.getCause();
+        // 如果底层是 IllegalArgumentException，则委托给专门的 handler 处理
+        // 典型场景：BaseSpecification.getBasicPredicates 中的组织访问校验抛出的 IllegalArgumentException
+        // 被 Spring Data JPA 包装为 InvalidDataAccessApiUsageException
+        if (cause instanceof IllegalArgumentException) {
+            return handleIllegalArgumentException((IllegalArgumentException) cause);
+        }
         String rawMessage = cause != null ? cause.getMessage() : e.getMessage();
         String normalizedMessage = normalizeBusinessMessageKey(rawMessage);
         String resolvedMessage = resolveRuntimeMessage(normalizedMessage);

@@ -70,6 +70,8 @@ public class TicketEventListener {
 
     private final TicketRepository ticketRepository;
 
+    private final TicketSLAService ticketSLAService;
+
     // 用于防止同一消息重复处理
     private final Set<String> processedMessageUids = ConcurrentHashMap.newKeySet();
 
@@ -99,6 +101,7 @@ public class TicketEventListener {
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         variables.put(TicketConsts.TICKET_VARIABLE_PRIORITY, ticket.getPriority());
         variables.put(TicketConsts.TICKET_VARIABLE_CATEGORY_UID, ticket.getCategoryUid());
+        variables.putAll(ticketSLAService.buildProcessVariables(ticket));
         //
         // processEntityUid 同时作为 Flowable 的 processDefinitionKey
         String processKey = ticket.getProcessEntityUid();
@@ -140,16 +143,7 @@ public class TicketEventListener {
         // 每次调用都会有一次数据库操作
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_START_TIME, new Date());
 
-        // 5. 设置 SLA 时间
-        String slaTime = switch (ticket.getPriority()) {
-            case "CRITICAL" -> "PT30M";
-            case "URGENT" -> "PT1H";
-            case "HIGH" -> "PT2H";
-            case "MEDIUM" -> "PT4H";
-            case "LOW" -> "PT8H";
-            default -> "P1D";
-        };
-        runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_SLA_TIME, slaTime);
+        runtimeService.setVariables(processInstance.getId(), ticketSLAService.buildProcessVariables(ticket));
         // 第一步的assignee设置为reporter
         runtimeService.setVariable(processInstance.getId(), TicketConsts.TICKET_VARIABLE_ASSIGNEE,
                 ticket.getReporter());
@@ -159,6 +153,7 @@ public class TicketEventListener {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
             ticketRestService.save(ticketEntity);
+            ticketSLAService.initializeSlaRecords(ticketEntity);
 
             // 7. 自动分配处理人
             ticketAssignmentService.autoAssign(ticketEntity, processInstance.getId());
@@ -272,6 +267,7 @@ public class TicketEventListener {
         TicketEntity ticket = ticketOpt.get();
         log.info("TicketEventListener onMessageCreateEvent: notify visitor, ticketUid={}, ticketNumber={}, agent={}",
                 ticket.getUid(), ticket.getTicketNumber(), message.getUserProtobuf().getNickname());
+        ticketSLAService.completeFirstResponse(ticket, message.getUserProtobuf().getUid());
 
         // 通知访客（邮件 + 短信），仅告知有新回复
         ticketNotificationService.notifyVisitorOfAgentMessage(ticket, message.getUserProtobuf().getNickname());

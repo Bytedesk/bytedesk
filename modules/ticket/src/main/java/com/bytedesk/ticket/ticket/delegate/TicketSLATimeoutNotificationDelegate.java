@@ -16,8 +16,14 @@ package com.bytedesk.ticket.ticket.delegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.ticket.ticket.TicketConsts;
+import com.bytedesk.ticket.ticket.TicketSLAService;
+import com.bytedesk.ticket.ticket_sla.TicketSlaTypeEnum;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
 
@@ -30,7 +36,10 @@ import java.util.Date;
  */
 @Slf4j
 @Component("ticketSLATimeoutNotificationDelegate")
+@RequiredArgsConstructor
 public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
+
+    private final TicketSLAService ticketSLAService;
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -41,12 +50,35 @@ public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
         String status = (String) execution.getVariable("status");
         Date startTime = (Date) execution.getVariable("startTime");
         String slaTime = (String) execution.getVariable("slaTime");
+        String slaTypeValue = (String) execution.getVariable(TicketConsts.TICKET_VARIABLE_SLA_TYPE);
+        String activityId = execution.getCurrentActivityId();
+        TicketSlaTypeEnum slaType = resolveSlaType(slaTypeValue, activityId);
         
         // 设置 SLA 相关变量
         execution.setVariable("slaTimeoutTime", new Date());
         execution.setVariable("slaTimeoutReason", "超过处理时限");
+        boolean breached = ticketSLAService.markBreachedByProcessInstance(processInstanceId, slaType, "超过处理时限");
+        execution.setVariable("slaBreached", breached);
+        execution.setVariable("slaBreachedType", breached ? slaType.name() : null);
         
         log.info("SLA timeout notification - processId: {}, status: {}, startTime: {}, slaTime: {}", 
             processInstanceId, status, startTime, slaTime);
+    }
+
+    private TicketSlaTypeEnum resolveSlaType(String slaTypeValue, String activityId) {
+        if (StringUtils.hasText(slaTypeValue)) {
+            return TicketSlaTypeEnum.valueOf(slaTypeValue);
+        }
+        String normalizedActivityId = StringUtils.hasText(activityId) ? activityId.toLowerCase() : "";
+        if (normalizedActivityId.contains("claim")) {
+            return TicketSlaTypeEnum.CLAIM;
+        }
+        if (normalizedActivityId.contains("first_response") || normalizedActivityId.contains("firstresponse")) {
+            return TicketSlaTypeEnum.FIRST_RESPONSE;
+        }
+        if (normalizedActivityId.contains("verify")) {
+            return TicketSlaTypeEnum.CUSTOMER_VERIFY;
+        }
+        return TicketSlaTypeEnum.RESOLUTION;
     }
 }

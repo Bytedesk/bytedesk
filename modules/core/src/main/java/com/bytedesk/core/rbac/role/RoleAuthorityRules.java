@@ -240,6 +240,13 @@ public final class RoleAuthorityRules {
     public static final String ROBOT_DELETE = "ROBOT_DELETE";
     public static final String ROBOT_EXPORT = "ROBOT_EXPORT";
 
+    // ticket comment (modules/ticket)
+    public static final String TICKET_COMMENT_READ = "TICKET_COMMENT_READ";
+    public static final String TICKET_COMMENT_CREATE = "TICKET_COMMENT_CREATE";
+    public static final String TICKET_COMMENT_UPDATE = "TICKET_COMMENT_UPDATE";
+    public static final String TICKET_COMMENT_DELETE = "TICKET_COMMENT_DELETE";
+    // public static final String TICKET_COMMENT_EXPORT = "TICKET_COMMENT_EXPORT";
+
     public static final Set<String> DEFAULT_ROLE_USER_AUTHORITY_VALUES = Set.of(
             USER_READ,
             USER_UPDATE,
@@ -328,7 +335,13 @@ public final class RoleAuthorityRules {
             ROBOT_READ,
             ROBOT_CREATE,
             ROBOT_UPDATE,
-            ROBOT_DELETE
+            ROBOT_DELETE,
+
+            // ticket comment
+            TICKET_COMMENT_READ,
+            TICKET_COMMENT_CREATE,
+            TICKET_COMMENT_UPDATE,
+            TICKET_COMMENT_DELETE
     );
 
     /**

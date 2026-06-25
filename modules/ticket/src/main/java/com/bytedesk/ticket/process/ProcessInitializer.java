@@ -37,7 +37,7 @@ public class ProcessInitializer implements SmartInitializingSingleton {
         // 初始化默认组织机构的流程
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         processRestService.initProcess(orgUid);
-        processRestService.initThreadProcess(orgUid);
+        // processRestService.initThreadProcess(orgUid);
         // 初始化演示流程模板
         processRestService.initProcessDemos(orgUid);
         // 迁移：为缺少 flowgramSchema 的旧流程生成默认 JSON

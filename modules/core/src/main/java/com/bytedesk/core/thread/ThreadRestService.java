@@ -35,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -960,6 +961,11 @@ public class ThreadRestService
             activeThreadCacheService.addOrUpdateActiveThread(savedEntity);
         }
         return savedEntity;
+    }
+
+    @Recover
+    public ThreadEntity recover(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
+        return handleOptimisticLockingFailureException(e, entity);
     }
 
     @Override

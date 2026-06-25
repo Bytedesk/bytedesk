@@ -240,6 +240,11 @@ public class BytedeskProperties implements EnvironmentAware {
          * 例如：wss://api.example.com/websocket
          */
         private String mqttWebsocketUrl;
+        /**
+         * 外网可访问的访客工单页面地址（完整URL，不带末尾斜杠），用于邮件中的工单会话直达链接。
+         * 例如：https://support.example.com/ticket
+         */
+        private String ticketHtmlUrl;
         private Boolean showRightCornerChat = true;
         private String rightCornerChatPlacement = "bottom-right"; // 位置：bottom-right / bottom-left
         private Boolean showDemo = true; // 是否显示演示

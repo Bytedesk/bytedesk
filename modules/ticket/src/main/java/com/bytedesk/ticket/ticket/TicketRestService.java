@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -58,6 +59,8 @@ import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.topic.TopicUtils;
 
@@ -83,6 +86,8 @@ public class TicketRestService
     private final ThreadRestService threadRestService;
 
     private final MessageRepository messageRepository;
+
+    private final TicketSlaRecordRepository ticketSlaRecordRepository;
 
     private final UploadRestService uploadRestService;
 
@@ -516,6 +521,13 @@ public class TicketRestService
         } else {
             response.setVisitorUnreadCount(0);
         }
+        List<TicketSlaRecordResponse> slaRecords = ticketSlaRecordRepository
+                .findByTicketUidAndDeletedFalse(entity.getUid())
+                .stream()
+                .map(TicketSlaRecordResponse::fromEntity)
+                .sorted(Comparator.comparing(TicketSlaRecordResponse::getDueAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+        response.setSlaRecords(slaRecords);
         return response;
     }
 

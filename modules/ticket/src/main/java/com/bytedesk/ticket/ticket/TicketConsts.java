@@ -71,6 +71,16 @@ public class TicketConsts {
 
     public static final String TICKET_VARIABLE_SLA_TIME = "slaTime"; // SLA时间
 
+    public static final String TICKET_VARIABLE_SLA_CLAIM_TIME = "slaClaimTime";
+
+    public static final String TICKET_VARIABLE_SLA_FIRST_RESPONSE_TIME = "slaFirstResponseTime";
+
+    public static final String TICKET_VARIABLE_SLA_RESOLUTION_TIME = "slaResolutionTime";
+
+    public static final String TICKET_VARIABLE_SLA_CUSTOMER_VERIFY_TIME = "slaCustomerVerifyTime";
+
+    public static final String TICKET_VARIABLE_SLA_TYPE = "slaType";
+
     public static final String TICKET_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
 
     public static final String TICKET_VARIABLE_ASSIGNEE_UID = "assigneeUid"; // 分配给谁的 uid

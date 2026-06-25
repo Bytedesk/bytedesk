@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRequest;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -68,5 +69,6 @@ public class TicketSettingsRequest extends BaseRequest {
     private TicketBasicSettingsRequest basicSettings;
     private TicketNotificationSettingsRequest notificationSettings;
     private TicketCategorySettingsRequest categorySettings;
+    private TicketSlaSettingsRequest slaSettings;
 
 }

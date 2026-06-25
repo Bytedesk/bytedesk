@@ -149,6 +149,22 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Column(name = "require_wechat")
     private Boolean requireWechat = Boolean.FALSE;
 
+    // ============ 智能工单生成 ============
+
+    /**
+     * 是否启用智能工单生成（根据会话内容自动填充工单）
+     */
+    @Builder.Default
+    @Column(name = "enable_smart_ticket_generate")
+    private Boolean enableSmartTicketGenerate = Boolean.FALSE;
+
+    /**
+     * 智能工单生成使用的 RobotEntity.uid。
+     * 为空时默认使用 ROBOT_NAME_TICKET_GENERATE 对应的机器人。
+     */
+    @Column(name = "smart_ticket_robot_uid", length = 64)
+    private String smartTicketRobotUid;
+
     /**
      * 静态工厂：根据请求DTO与可选ModelMapper构建实体。
      * 为空时返回默认配置；非空字段才覆盖默认值。

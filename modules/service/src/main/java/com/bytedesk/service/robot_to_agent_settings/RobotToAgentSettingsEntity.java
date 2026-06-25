@@ -49,6 +49,7 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
+    @Column(name = "is_enabled")
     private Boolean enabled = Boolean.TRUE;
 
     @Builder.Default

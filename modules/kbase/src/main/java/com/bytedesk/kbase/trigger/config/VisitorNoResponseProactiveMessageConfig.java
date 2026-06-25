@@ -16,6 +16,9 @@ public class VisitorNoResponseProactiveMessageConfig {
     /** message content */
     public String proactiveMessage;
 
+    /** 最大触发次数（null = 不限制） */
+    public Integer maxTriggerCount;
+
     public static VisitorNoResponseProactiveMessageConfig defaults() {
         VisitorNoResponseProactiveMessageConfig config = new VisitorNoResponseProactiveMessageConfig();
         config.noResponseTimeout = DEFAULT_NO_RESPONSE_TIMEOUT;

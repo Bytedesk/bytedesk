@@ -87,6 +87,8 @@ public class TicketRequest extends BaseRequest {
 
     // 客户验证
     private Boolean verified;
+    // SLA 状态过滤：RUNNING/PAUSED/WARNED/BREACHED/COMPLETED/CANCELED
+    private String slaStatus;
     // 自定义表单 json schema
     private String schema;
 

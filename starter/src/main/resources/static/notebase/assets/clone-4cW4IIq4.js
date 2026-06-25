@@ -1,1 +1,0 @@
-import{h as e}from"./index-Ty4C5fuC.js";var t=4;function n(n){return e(n,t)}export{n as t};

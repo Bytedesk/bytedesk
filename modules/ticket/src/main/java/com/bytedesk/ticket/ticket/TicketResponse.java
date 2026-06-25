@@ -13,11 +13,13 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.List;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentResponse;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 
 import lombok.Data;
@@ -52,7 +54,8 @@ public class TicketResponse extends BaseResponse {
     private String status;
     private String priority;
     private String type;
-    // 
+    //
+    private String channel;
     private String threadTopic;
     // 工单对话
     private String threadUid;
@@ -91,6 +94,8 @@ public class TicketResponse extends BaseResponse {
     private Boolean verified;
     // 自定义表单 json schema
     private String schema;
+
+    private List<TicketSlaRecordResponse> slaRecords;
     
     // 
     public static TicketResponse fromEntity(TicketEntity ticket) {

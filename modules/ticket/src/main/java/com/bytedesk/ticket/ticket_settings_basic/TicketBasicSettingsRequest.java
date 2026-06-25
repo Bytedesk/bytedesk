@@ -44,4 +44,8 @@ public class TicketBasicSettingsRequest extends BaseRequest {
     private Boolean requirePhone;
     private Boolean showWechat;
     private Boolean requireWechat;
+
+    // 智能工单生成
+    private Boolean enableSmartTicketGenerate;
+    private String smartTicketRobotUid;
 }

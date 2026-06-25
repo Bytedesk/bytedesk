@@ -16,6 +16,7 @@ package com.bytedesk.ticket.service;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,7 +29,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.sms_push.SmsPushSendService;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
@@ -37,11 +44,14 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.utils.ServiceConvertUtils;
+import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRepository;
 import com.bytedesk.service.visitor.VisitorStatusEnum;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.ticket.ticket.TicketEntity;
+import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.TicketStatusEnum;
 import com.bytedesk.ticket.ticket.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
@@ -63,6 +73,10 @@ public class TicketNotificationService {
 
     public static final String EVENT_TYPE_TICKET_AGENT_MESSAGE = "TICKET_AGENT_MESSAGE";
 
+    public static final String EVENT_TYPE_TICKET_SLA_WARNING = "TICKET_SLA_WARNING";
+
+    public static final String EVENT_TYPE_TICKET_SLA_BREACH = "TICKET_SLA_BREACH";
+
     private final NotificationService notificationService;
 
     private final WorkgroupRepository workgroupRepository;
@@ -78,23 +92,31 @@ public class TicketNotificationService {
     private final EmailPushSendService emailPushSendService;
 
     private final TicketSettingsRepository ticketSettingsRepository;
-    
+
+    private final TicketRepository ticketRepository;
+
+    private final ThreadRestService threadRestService;
+
+    private final MessageRestService messageRestService;
+
+    private final IMessageSendService messageSendService;
+
     public void notifyNewTicket(TicketEntity ticket) {
         notifyTicketStatusChanged(ticket, null, ticket != null ? ticket.getStatus() : null);
     }
-    
+
     public void notifyTicketAssigned(TicketEntity ticket) {
         notifyTicketStatusChanged(ticket, null, ticket != null ? ticket.getStatus() : null);
     }
-    
+
     // public void notifyTicketComment(TicketCommentEntity comment) {
-    //     // 工单评论通知
+    // // 工单评论通知
     // }
-    
+
     public void notifySLABreach(TicketEntity ticket) {
         // SLA违规通知
     }
-    
+
     public void notifyTicketClosed(TicketEntity ticket) {
         notifyTicketStatusChanged(ticket, null, ticket != null ? ticket.getStatus() : null);
     }
@@ -104,16 +126,19 @@ public class TicketNotificationService {
             return;
         }
 
-        String eventType = StringUtils.hasText(previousStatus) ? EVENT_TYPE_TICKET_STATUS_CHANGED : EVENT_TYPE_TICKET_CREATED;
-        Set<String> recipients = resolveRecipientUids(ticket, EVENT_TYPE_TICKET_CREATED.equals(eventType));
-        if (recipients.isEmpty()) {
-            return;
-        }
-
+        String eventType = StringUtils.hasText(previousStatus) ? EVENT_TYPE_TICKET_STATUS_CHANGED
+                : EVENT_TYPE_TICKET_CREATED;
         String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
         String title = buildTitle(ticket, eventType);
         String content = buildContent(ticket, previousStatus, currentStatus, eventType);
         String extra = buildExtra(ticket, previousStatus, currentStatus, eventType);
+
+        emitTicketThreadStatusMessage(ticket, previousStatus, currentStatus, eventType, content);
+
+        Set<String> recipients = resolveRecipientUids(ticket, EVENT_TYPE_TICKET_CREATED.equals(eventType));
+        if (recipients.isEmpty()) {
+            return;
+        }
 
         for (String recipientUid : recipients) {
             try {
@@ -128,7 +153,7 @@ public class TicketNotificationService {
                         .orgUid(ticket.getOrgUid())
                         .userUid(recipientUid)
                         .extra(extra)
-                    .build();
+                        .build();
                 notificationService.dispatchSystemNotificationToUser(request);
             } catch (Exception ex) {
                 log.warn("dispatch ticket notification failed: ticketUid={}, recipientUid={}, error={}",
@@ -141,7 +166,33 @@ public class TicketNotificationService {
 
         notifyExternalChannels(ticket, previousStatus, currentStatus, eventType, title, content, extra);
     }
-    
+
+    private void emitTicketThreadStatusMessage(TicketEntity ticket, String previousStatus, String currentStatus,
+            String eventType, String content) {
+        if (!EVENT_TYPE_TICKET_STATUS_CHANGED.equals(eventType)
+                || !StringUtils.hasText(content)
+                || Objects.equals(previousStatus, currentStatus)
+                || !StringUtils.hasText(ticket.getThreadUid())) {
+            return;
+        }
+        try {
+            Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
+            if (threadOptional.isEmpty()) {
+                log.debug("ticket thread system message skipped: thread not found, ticketUid={}, threadUid={}",
+                        ticket.getUid(), ticket.getThreadUid());
+                return;
+            }
+            ThreadEntity thread = threadOptional.get();
+            MessageEntity message = ThreadMessageUtil.getThreadSystemMessage(content, thread);
+            messageRestService.save(message);
+            MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        } catch (Exception ex) {
+            log.warn("ticket thread system message failed: ticketUid={}, threadUid={}, error={}",
+                    ticket.getUid(), ticket.getThreadUid(), ex.getMessage());
+        }
+    }
+
     /**
      * 通知管理员
      */
@@ -149,26 +200,149 @@ public class TicketNotificationService {
         // TODO: 实现实际的通知逻辑，如发送邮件、短信等
         log.info("通知管理员 - 处理人: {}, 消息: {}", assignee, message);
     }
-    
+
     /**
      * 通知技术团队
      */
     public void notifyTechnicalTeam(String caseId, String message) {
         log.info("通知技术团队 - 案例ID: {}, 消息: {}", caseId, message);
     }
-    
+
     /**
      * 通知客户
      */
     public void notifyCustomer(String reporter, String message) {
         log.info("通知客户 - 报告人: {}, 消息: {}", reporter, message);
     }
-    
+
     /**
      * 发送 SLA 违规通知
      */
     public void sendSLABreachNotification(String ticketId, String type, String details) {
-        log.info("SLA违规通知 - 工单: {}, 类型: {}, 详情: {}", ticketId, type, details);
+        notifySla(ticketId, type, details, true);
+    }
+
+    /**
+     * 发送 SLA 预警通知
+     */
+    public void sendSLAWarningNotification(String ticketId, String type, String details) {
+        notifySla(ticketId, type, details, false);
+    }
+
+    private void notifySla(String ticketUid, String slaType, String details, boolean breached) {
+        if (!StringUtils.hasText(ticketUid)) {
+            return;
+        }
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(ticketUid);
+        if (ticketOptional.isEmpty()) {
+            log.warn("SLA notification skipped: ticket not found, ticketUid={}, slaType={}, breached={}",
+                    ticketUid, slaType, breached);
+            return;
+        }
+
+        TicketEntity ticket = ticketOptional.get();
+        String eventType = breached ? EVENT_TYPE_TICKET_SLA_BREACH : EVENT_TYPE_TICKET_SLA_WARNING;
+        String title = buildSlaTitle(ticket, slaType, breached);
+        String content = buildSlaContent(ticket, slaType, details, breached);
+        String extra = buildSlaExtra(ticket, slaType, details, eventType);
+
+        emitSlaThreadSystemMessage(ticket, content);
+        notifySlaRecipients(ticket, eventType, title, content, extra);
+        pushToAgentDevices(ticket, eventType, ticket.getReporter() != null ? ticket.getReporter().getUid() : null,
+                resolveRecipientUids(ticket, true));
+        notifyExternalChannels(ticket, null, breached ? "BREACHED" : "WARNED", eventType, title, content, extra);
+
+        log.info("SLA notification sent: ticketUid={}, slaType={}, eventType={}, details={}",
+                ticketUid, slaType, eventType, details);
+    }
+
+    private void notifySlaRecipients(TicketEntity ticket, String eventType, String title, String content,
+            String extra) {
+        Set<String> recipients = resolveRecipientUids(ticket, true);
+        if (recipients.isEmpty()) {
+            return;
+        }
+        for (String recipientUid : recipients) {
+            try {
+                NotificationRequest request = NotificationRequest.builder()
+                        .title(title)
+                        .content(content)
+                        .type(NotificationTypeEnum.TICKET.name())
+                        .level(LevelEnum.USER.name())
+                        .orgUid(ticket.getOrgUid())
+                        .userUid(recipientUid)
+                        .extra(extra)
+                        .build();
+                notificationService.dispatchSystemNotificationToUser(request);
+            } catch (Exception ex) {
+                log.warn(
+                        "dispatch SLA ticket notification failed: ticketUid={}, eventType={}, recipientUid={}, error={}",
+                        ticket.getUid(), eventType, recipientUid, ex.getMessage());
+            }
+        }
+    }
+
+    private void emitSlaThreadSystemMessage(TicketEntity ticket, String content) {
+        if (ticket == null || !StringUtils.hasText(ticket.getThreadUid())) {
+            return;
+        }
+        try {
+            Optional<ThreadEntity> threadOptional = threadRestService.findByUid(ticket.getThreadUid());
+            if (threadOptional.isEmpty()) {
+                log.debug("SLA thread system message skipped: thread not found, ticketUid={}, threadUid={}",
+                        ticket.getUid(), ticket.getThreadUid());
+                return;
+            }
+            ThreadEntity thread = threadOptional.get();
+            MessageEntity message = ThreadMessageUtil.getThreadSystemMessage(content, thread);
+            messageRestService.save(message);
+            MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        } catch (Exception ex) {
+            log.warn("SLA thread system message failed: ticketUid={}, threadUid={}, error={}",
+                    ticket.getUid(), ticket.getThreadUid(), ex.getMessage());
+        }
+    }
+
+    private String buildSlaTitle(TicketEntity ticket, String slaType, boolean breached) {
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
+        return (breached ? "SLA已超时：#" : "SLA即将超时：#") + ticketNumber + " " + toSlaTypeLabel(slaType);
+    }
+
+    private String buildSlaContent(TicketEntity ticket, String slaType, String details, boolean breached) {
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
+        StringBuilder builder = new StringBuilder();
+        builder.append("工单 #").append(ticketNumber).append(" 的 ").append(toSlaTypeLabel(slaType));
+        builder.append(breached ? " SLA 已超时" : " SLA 即将超时");
+        if (StringUtils.hasText(details)) {
+            builder.append("，").append(details);
+        }
+        return builder.toString();
+    }
+
+    private String buildSlaExtra(TicketEntity ticket, String slaType, String details, String eventType) {
+        JSONObject extra = new JSONObject();
+        extra.put("eventType", eventType);
+        extra.put("ticketUid", ticket.getUid());
+        extra.put("uid", ticket.getUid());
+        extra.put("ticketNumber", ticket.getTicketNumber());
+        extra.put("title", ticket.getTitle());
+        extra.put("slaType", slaType);
+        extra.put("details", details);
+        extra.put("priority", ticket.getPriority());
+        extra.put("type", ticket.getType());
+        extra.put("workgroupUid", ticket.getWorkgroupUid());
+        UserProtobuf reporter = ticket.getReporter();
+        if (reporter != null && StringUtils.hasText(reporter.getUid())) {
+            extra.put("reporterUid", reporter.getUid());
+        }
+        UserProtobuf assignee = ticket.getAssignee();
+        if (assignee != null && StringUtils.hasText(assignee.getUid())) {
+            extra.put("assigneeUid", assignee.getUid());
+        }
+        return JSON.toJSONString(extra);
     }
 
     // ============ 工单客服回复消息通知 ============
@@ -215,6 +389,8 @@ public class TicketNotificationService {
                 ticket.getTitle(),
                 ticket.getContactName(),
                 agentName,
+                ticket.getUid(),
+                ticket.getWorkgroupUid(),
                 ticket.getOrgUid());
     }
 
@@ -256,7 +432,8 @@ public class TicketNotificationService {
 
     /**
      * Push ticket notification to agent iOS devices via APNs.
-     * Only pushes to agents (assignee + workgroup members), not to the reporter/visitor.
+     * Only pushes to agents (assignee + workgroup members), not to the
+     * reporter/visitor.
      * Android push is reserved as a TODO placeholder for future implementation.
      */
     private void pushToAgentDevices(TicketEntity ticket, String eventType, String reporterUid, Set<String> recipients) {
@@ -275,16 +452,24 @@ public class TicketNotificationService {
                         ticket.getUid(), recipientUid, ex.getMessage());
             }
             // TODO: Android push - implement when Android push service is available
-            // androidPushService.pushToUser(recipientUid, agentPushTitle, agentPushBody, ticket.getUid());
+            // androidPushService.pushToUser(recipientUid, agentPushTitle, agentPushBody,
+            // ticket.getUid());
         }
     }
 
     /**
-     * Build push title for agent devices (shorter than the in-app notification title).
+     * Build push title for agent devices (shorter than the in-app notification
+     * title).
      */
     private String buildAgentPushTitle(TicketEntity ticket, String eventType) {
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "新工单";
+        }
+        if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
+            return "工单SLA即将超时";
+        }
+        if (EVENT_TYPE_TICKET_SLA_BREACH.equals(eventType)) {
+            return "工单SLA已超时";
         }
         return "工单状态更新";
     }
@@ -293,12 +478,23 @@ public class TicketNotificationService {
      * Build push body for agent devices.
      */
     private String buildAgentPushBody(TicketEntity ticket, String eventType) {
-        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber() : ticket.getUid();
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
         String summary = StringUtils.hasText(ticket.getTitle()) ? ticket.getTitle() : "";
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return StringUtils.hasText(summary)
                     ? "#" + ticketNumber + " " + summary
                     : "收到新工单 #" + ticketNumber;
+        }
+        if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
+            return StringUtils.hasText(summary)
+                    ? "#" + ticketNumber + " 即将超时 " + summary
+                    : "工单 #" + ticketNumber + " SLA 即将超时";
+        }
+        if (EVENT_TYPE_TICKET_SLA_BREACH.equals(eventType)) {
+            return StringUtils.hasText(summary)
+                    ? "#" + ticketNumber + " 已超时 " + summary
+                    : "工单 #" + ticketNumber + " SLA 已超时";
         }
         String statusLabel = toStatusLabel(ticket.getStatus());
         return StringUtils.hasText(summary)
@@ -307,7 +503,8 @@ public class TicketNotificationService {
     }
 
     private String buildTitle(TicketEntity ticket, String eventType) {
-        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber() : ticket.getUid();
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "新工单：#" + ticketNumber;
         }
@@ -315,7 +512,8 @@ public class TicketNotificationService {
     }
 
     private String buildReporterTitle(TicketEntity ticket, String eventType) {
-        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber() : ticket.getUid();
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "工单创建成功";
         }
@@ -323,7 +521,8 @@ public class TicketNotificationService {
     }
 
     private String buildContent(TicketEntity ticket, String previousStatus, String currentStatus, String eventType) {
-        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber() : ticket.getUid();
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
         String summary = StringUtils.hasText(ticket.getTitle()) ? ticket.getTitle() : ticket.getDescription();
         StringBuilder builder = new StringBuilder();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
@@ -341,7 +540,8 @@ public class TicketNotificationService {
     }
 
     private String buildReporterContent(TicketEntity ticket, String eventType) {
-        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber() : ticket.getUid();
+        String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
+                : ticket.getUid();
         StringBuilder builder = new StringBuilder();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             builder.append("您的工单 #").append(ticketNumber).append(" 已创建成功，请耐心等待客服处理");
@@ -393,7 +593,8 @@ public class TicketNotificationService {
         }
         if (!isReporterOffline(ticket)) {
             TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
-            boolean notifyWhenOnline = notifSettings != null && Boolean.TRUE.equals(notifSettings.getEmailNotifyWhenOnline());
+            boolean notifyWhenOnline = notifSettings != null
+                    && Boolean.TRUE.equals(notifSettings.getEmailNotifyWhenOnline());
             if (!notifyWhenOnline) {
                 log.debug("ticket email notification skipped: reporter is online, ticketUid={}", ticket.getUid());
                 return;
@@ -413,6 +614,8 @@ public class TicketNotificationService {
                 eventType,
                 toStatusLabel(currentStatus),
                 StringUtils.hasText(previousStatus) ? toStatusLabel(previousStatus) : null,
+                ticket.getUid(),
+                ticket.getWorkgroupUid(),
                 ticket.getOrgUid());
     }
 
@@ -457,7 +660,8 @@ public class TicketNotificationService {
         if (notifSettings != null && StringUtils.hasText(notifSettings.getEmailProviderUid())) {
             Optional<EmailProviderEntity> specific = emailProviderRepository
                     .findByUid(notifSettings.getEmailProviderUid());
-            if (specific.isPresent() && !specific.get().isDeleted() && Boolean.TRUE.equals(specific.get().getEnabled())) {
+            if (specific.isPresent() && !specific.get().isDeleted()
+                    && Boolean.TRUE.equals(specific.get().getEnabled())) {
                 return specific;
             }
             log.debug("ticket email notification: specified provider not found or disabled, uid={}",
@@ -483,7 +687,8 @@ public class TicketNotificationService {
         // 检查访客是否离线
         if (!isReporterOffline(ticket)) {
             TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
-            boolean notifyWhenOnline = notifSettings != null && Boolean.TRUE.equals(notifSettings.getSmsNotifyWhenOnline());
+            boolean notifyWhenOnline = notifSettings != null
+                    && Boolean.TRUE.equals(notifSettings.getSmsNotifyWhenOnline());
             if (!notifyWhenOnline) {
                 log.debug("ticket sms notification skipped: reporter is online, ticketUid={}", ticket.getUid());
                 return;
@@ -497,7 +702,8 @@ public class TicketNotificationService {
             smsTemplateIds = notifSettings.getSmsTemplateIds();
         }
         if (smsTemplateIds == null || smsTemplateIds.isEmpty()) {
-            log.debug("ticket sms notification: no smsTemplateIds configured, skipping for ticketUid={}", ticket.getUid());
+            log.debug("ticket sms notification: no smsTemplateIds configured, skipping for ticketUid={}",
+                    ticket.getUid());
             return;
         }
         // 按事件类型查找对应的模板配置 JSON
@@ -532,7 +738,8 @@ public class TicketNotificationService {
         }
 
         String ticketNumber = StringUtils.hasText(ticket.getTicketNumber())
-                ? ticket.getTicketNumber() : ticket.getUid();
+                ? ticket.getTicketNumber()
+                : ticket.getUid();
         Map<String, String> templateParams = SmsPushSendService.buildTicketSmsVariables(
                 smsVariableNames, ticketNumber, toStatusLabel(currentStatus), eventType,
                 ticket.getContactName());
@@ -551,7 +758,8 @@ public class TicketNotificationService {
      * 将后端 eventType + currentStatus 映射为前端 smsTemplateIds 中的事件 key。
      * <ul>
      * <li>TICKET_CREATED → "created"</li>
-     * <li>TICKET_STATUS_CHANGED → 根据 currentStatus 映射为 "assigned" / "resolved" / "closed" /
+     * <li>TICKET_STATUS_CHANGED → 根据 currentStatus 映射为 "assigned" / "resolved" /
+     * "closed" /
      * "status_changed" 等</li>
      * </ul>
      */
@@ -561,6 +769,12 @@ public class TicketNotificationService {
         }
         if (EVENT_TYPE_TICKET_AGENT_MESSAGE.equals(eventType)) {
             return "replied";
+        }
+        if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
+            return "sla_warning";
+        }
+        if (EVENT_TYPE_TICKET_SLA_BREACH.equals(eventType)) {
+            return "sla_breach";
         }
         // TICKET_STATUS_CHANGED: 推导具体事件
         if (StringUtils.hasText(currentStatus)) {
@@ -630,6 +844,19 @@ public class TicketNotificationService {
         }
     }
 
+    private String toSlaTypeLabel(String slaType) {
+        if (!StringUtils.hasText(slaType)) {
+            return "SLA";
+        }
+        return switch (slaType) {
+            case "CLAIM" -> "认领";
+            case "FIRST_RESPONSE" -> "首次响应";
+            case "RESOLUTION" -> "解决";
+            case "CUSTOMER_VERIFY" -> "客户确认";
+            default -> slaType;
+        };
+    }
+
     /**
      * 获取工单对应的通知设置实体。
      * 优先通过 ticket.ticketSettingsUid 精确定位，回退到 org 默认设置。
@@ -640,7 +867,8 @@ public class TicketNotificationService {
         }
         // 1. 优先通过 ticketSettingsUid 精确定位
         if (StringUtils.hasText(ticket.getTicketSettingsUid())) {
-            Optional<TicketSettingsEntity> settingsOpt = ticketSettingsRepository.findByUid(ticket.getTicketSettingsUid());
+            Optional<TicketSettingsEntity> settingsOpt = ticketSettingsRepository
+                    .findByUid(ticket.getTicketSettingsUid());
             if (settingsOpt.isPresent()) {
                 TicketNotificationSettingsEntity notifSettings = settingsOpt.get().getNotificationSettings();
                 if (notifSettings != null) {
@@ -657,4 +885,4 @@ public class TicketNotificationService {
         }
         return settingsList.get(0).getNotificationSettings();
     }
-} 
+}

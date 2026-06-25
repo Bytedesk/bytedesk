@@ -1,11 +1,15 @@
 package com.bytedesk.core.email_push;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -25,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailPushSendService {
 
     private final EmailPushRepository emailPushRepository;
+    private final BytedeskProperties bytedeskProperties;
 
     /**
      * 使用指定邮件供应商发送 HTML 邮件，并记录发送历史到 EmailPushEntity。
@@ -64,10 +69,12 @@ public class EmailPushSendService {
      */
     public void sendTicketEmail(EmailProviderEntity emailConfig, String to,
             String ticketNumber, String ticketTitle, String reporterName,
-            String eventType, String currentStatusLabel, String previousStatusLabel, String orgUid) {
+            String eventType, String currentStatusLabel, String previousStatusLabel,
+            String ticketUid, String workgroupUid, String orgUid) {
         String subject = buildEmailSubject(ticketNumber, eventType);
+        String ticketLink = buildTicketConversationLink(ticketUid, orgUid, workgroupUid);
         String html = buildEmailHtml(ticketNumber, ticketTitle, reporterName,
-                eventType, currentStatusLabel, previousStatusLabel);
+            eventType, currentStatusLabel, previousStatusLabel, ticketLink);
         sendEmail(emailConfig, to, subject, html, orgUid);
     }
 
@@ -81,7 +88,7 @@ public class EmailPushSendService {
     }
 
     static String buildEmailHtml(String ticketNumber, String ticketTitle, String reporterName,
-            String eventType, String currentStatusLabel, String previousStatusLabel) {
+            String eventType, String currentStatusLabel, String previousStatusLabel, String ticketLink) {
         String currentTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                 .format(java.time.ZonedDateTime.now());
 
@@ -115,6 +122,8 @@ public class EmailPushSendService {
         html.append("<td style=\"padding: 10px; border: 1px solid #ddd;\">").append(currentTime).append("</td></tr>");
         html.append("</table>");
 
+        appendTicketLinkBlock(html, ticketLink, "查看工单会话", "点击下方按钮可直接打开工单会话窗口：");
+
         html.append("<p style=\"margin-top: 20px; color: #999; font-size: 12px;\">如有疑问，请联系客服。此邮件由系统自动发送，请勿回复。</p>");
         html.append("</body></html>");
 
@@ -135,14 +144,15 @@ public class EmailPushSendService {
      */
     public void sendTicketMessageEmail(EmailProviderEntity emailConfig, String to,
             String ticketNumber, String ticketTitle, String reporterName,
-            String agentName, String orgUid) {
+            String agentName, String ticketUid, String workgroupUid, String orgUid) {
         String subject = "工单新回复 - " + ticketNumber;
-        String html = buildTicketMessageEmailHtml(ticketNumber, ticketTitle, reporterName, agentName);
+        String ticketLink = buildTicketConversationLink(ticketUid, orgUid, workgroupUid);
+        String html = buildTicketMessageEmailHtml(ticketNumber, ticketTitle, reporterName, agentName, ticketLink);
         sendEmail(emailConfig, to, subject, html, orgUid);
     }
 
     static String buildTicketMessageEmailHtml(String ticketNumber, String ticketTitle, String reporterName,
-            String agentName) {
+            String agentName, String ticketLink) {
         String currentTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
                 .format(java.time.ZonedDateTime.now());
 
@@ -163,10 +173,87 @@ public class EmailPushSendService {
         html.append("<td style=\"padding: 10px; border: 1px solid #ddd;\">").append(currentTime).append("</td></tr>");
         html.append("</table>");
 
+        appendTicketLinkBlock(html, ticketLink, "查看最新回复", "点击下方按钮可直接查看工单对话：");
+
         html.append("<p style=\"margin-top: 20px; color: #999; font-size: 12px;\">请登录系统查看完整对话。此邮件由系统自动发送，请勿回复。</p>");
         html.append("</body></html>");
 
         return html.toString();
+    }
+
+    private String buildTicketConversationLink(String ticketUid, String orgUid, String workgroupUid) {
+        if (!StringUtils.hasText(ticketUid)) {
+            return null;
+        }
+        String baseUrl = resolveTicketHtmlBaseUrl();
+        if (!StringUtils.hasText(baseUrl)) {
+            return null;
+        }
+        StringBuilder link = new StringBuilder();
+        link.append(trimTrailingSlash(baseUrl)).append("/thread/")
+                .append(urlEncode(ticketUid));
+
+        StringBuilder query = new StringBuilder();
+        appendQueryParam(query, "org", orgUid);
+        appendQueryParam(query, "sid", workgroupUid);
+        appendQueryParam(query, "ticketDebug", "1");
+
+        if (query.length() > 0) {
+            link.append('?').append(query);
+        }
+        return link.toString();
+    }
+
+    private String resolveTicketHtmlBaseUrl() {
+        if (bytedeskProperties.getCustom() != null && StringUtils.hasText(bytedeskProperties.getCustom().getTicketHtmlUrl())) {
+            return bytedeskProperties.getCustom().getTicketHtmlUrl();
+        }
+        String uploadUrl = bytedeskProperties.getUploadUrl();
+        if (!StringUtils.hasText(uploadUrl)) {
+            return null;
+        }
+        return trimTrailingSlash(uploadUrl) + "/ticket";
+    }
+
+    private static void appendTicketLinkBlock(StringBuilder html, String ticketLink, String buttonLabel, String hintText) {
+        if (!StringUtils.hasText(ticketLink)) {
+            return;
+        }
+        html.append("<div style=\"margin-top: 20px;\">");
+        html.append("<p style=\"margin-bottom: 12px;\">").append(hintText).append("</p>");
+        html.append("<a href=\"").append(ticketLink)
+                .append("\" style=\"display: inline-block; padding: 10px 18px; background: #1677ff; color: #fff; text-decoration: none; border-radius: 6px;\">")
+                .append(buttonLabel)
+                .append("</a>");
+        html.append("<p style=\"margin-top: 12px; font-size: 12px; color: #999; word-break: break-all;\">")
+                .append(ticketLink)
+                .append("</p>");
+        html.append("</div>");
+    }
+
+    private static void appendQueryParam(StringBuilder query, String key, String value) {
+        if (!StringUtils.hasText(value)) {
+            return;
+        }
+        if (query.length() > 0) {
+            query.append('&');
+        }
+        query.append(urlEncode(key)).append('=').append(urlEncode(value));
+    }
+
+    private static String trimTrailingSlash(String value) {
+        if (!StringUtils.hasText(value)) {
+            return value;
+        }
+        int end = value.length();
+        while (end > 0 && value.charAt(end - 1) == '/') {
+            end--;
+        }
+        return value.substring(0, end);
+    }
+
+    private static String urlEncode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 
     // ============ 邮件发送底层 ============

@@ -34,4 +34,6 @@ public class TriggerRequest extends BaseRequest {
     private String name;
 
     private String description;
+
+    private Integer maxTriggerCount;
 }

@@ -142,6 +142,9 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 访客端转人工按钮文案
     private String manualTransferLabel;
 
+    // 访客端是否隐藏机器人思考过程
+    private Boolean hideThinkingProcess;
+
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
 

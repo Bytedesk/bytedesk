@@ -24,6 +24,13 @@
         <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
       </extensionElements>
     </userTask>
+    <boundaryEvent id="waitClaimSlaTimer" name="认领 SLA 超时" attachedToRef="waitClaim" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>${slaClaimTime}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="slaClaimTimeoutTask" name="记录认领 SLA 超时" flowable:delegateExpression="${ticketSLATimeoutNotificationDelegate}"></serviceTask>
+    <endEvent id="slaClaimTimeoutEnd" name="认领 SLA 超时结束"></endEvent>
     <userTask id="processTicket" name="工单处理中" flowable:assignee="${assigneeUid}">
       <documentation>处理工单并提交处理结果</documentation>
       <extensionElements>
@@ -34,21 +41,40 @@
         <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
       </extensionElements>
     </userTask>
+    <boundaryEvent id="processTicketSlaTimer" name="处理 SLA 超时" attachedToRef="processTicket" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>${slaResolutionTime}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="slaResolutionTimeoutTask" name="记录处理 SLA 超时" flowable:delegateExpression="${ticketSLATimeoutNotificationDelegate}"></serviceTask>
+    <endEvent id="slaResolutionTimeoutEnd" name="处理 SLA 超时结束"></endEvent>
     <userTask id="customerVerify" name="工单待验证" flowable:assignee="${reporterUid}">
       <documentation>验证工单是否解决</documentation>
       <extensionElements>
         <flowable:executionListener event="end" delegateExpression="${ticketExecutionListener}"></flowable:executionListener>
       </extensionElements>
     </userTask>
-    <exclusiveGateway id="verifyGateway" name="验证结果"></exclusiveGateway>
+    <boundaryEvent id="customerVerifySlaTimer" name="客户验证 SLA 超时" attachedToRef="customerVerify" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>${slaCustomerVerifyTime}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="slaCustomerVerifyTimeoutTask" name="记录客户验证 SLA 超时" flowable:delegateExpression="${ticketSLATimeoutNotificationDelegate}"></serviceTask>
+    <endEvent id="slaCustomerVerifyTimeoutEnd" name="客户验证 SLA 超时结束"></endEvent>
+    <exclusiveGateway id="verifyGateway" name="验证结果" default="flow_verify_fail"></exclusiveGateway>
     <sequenceFlow id="flow3" sourceRef="waitClaim" targetRef="processTicket"></sequenceFlow>
+    <sequenceFlow id="flow_wait_claim_sla_timeout" sourceRef="waitClaimSlaTimer" targetRef="slaClaimTimeoutTask"></sequenceFlow>
+    <sequenceFlow id="flow_wait_claim_sla_timeout_end" sourceRef="slaClaimTimeoutTask" targetRef="slaClaimTimeoutEnd"></sequenceFlow>
     <sequenceFlow id="flow_process_to_verify" sourceRef="processTicket" targetRef="customerVerify"></sequenceFlow>
+    <sequenceFlow id="flow_process_sla_timeout" sourceRef="processTicketSlaTimer" targetRef="slaResolutionTimeoutTask"></sequenceFlow>
+    <sequenceFlow id="flow_process_sla_timeout_end" sourceRef="slaResolutionTimeoutTask" targetRef="slaResolutionTimeoutEnd"></sequenceFlow>
     <sequenceFlow id="flow_to_gateway" sourceRef="customerVerify" targetRef="verifyGateway"></sequenceFlow>
+    <sequenceFlow id="flow_customer_verify_sla_timeout" sourceRef="customerVerifySlaTimer" targetRef="slaCustomerVerifyTimeoutTask"></sequenceFlow>
+    <sequenceFlow id="flow_customer_verify_sla_timeout_end" sourceRef="slaCustomerVerifyTimeoutTask" targetRef="slaCustomerVerifyTimeoutEnd"></sequenceFlow>
     <sequenceFlow id="flow_verify_ok" name="已解决" sourceRef="verifyGateway" targetRef="end">
       <conditionExpression xsi:type="tFormalExpression">${verified == true}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow_verify_fail" name="未解决" sourceRef="verifyGateway" targetRef="processTicket">
-      <conditionExpression xsi:type="tFormalExpression">${verified == false}</conditionExpression>
     </sequenceFlow>
     <endEvent id="end" name="结束"></endEvent>
   </process>
@@ -74,6 +100,36 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
         <omgdc:Bounds height="28.0" width="28.0" x="900.0" y="316.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <!-- SLA 超时链路: waitClaim -->
+      <bpmndi:BPMNShape bpmnElement="waitClaimSlaTimer" id="BPMNShape_waitClaimSlaTimer">
+        <omgdc:Bounds height="31.0" width="31.0" x="399.0" y="345.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaClaimTimeoutTask" id="BPMNShape_slaClaimTimeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="360.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaClaimTimeoutEnd" id="BPMNShape_slaClaimTimeoutEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="396.0" y="540.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <!-- SLA 超时链路: processTicket -->
+      <bpmndi:BPMNShape bpmnElement="processTicketSlaTimer" id="BPMNShape_processTicketSlaTimer">
+        <omgdc:Bounds height="31.0" width="31.0" x="549.0" y="345.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaResolutionTimeoutTask" id="BPMNShape_slaResolutionTimeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="510.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaResolutionTimeoutEnd" id="BPMNShape_slaResolutionTimeoutEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="546.0" y="540.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <!-- SLA 超时链路: customerVerify -->
+      <bpmndi:BPMNShape bpmnElement="customerVerifySlaTimer" id="BPMNShape_customerVerifySlaTimer">
+        <omgdc:Bounds height="31.0" width="31.0" x="699.0" y="345.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaCustomerVerifyTimeoutTask" id="BPMNShape_slaCustomerVerifyTimeoutTask">
+        <omgdc:Bounds height="60.0" width="100.0" x="660.0" y="440.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="slaCustomerVerifyTimeoutEnd" id="BPMNShape_slaCustomerVerifyTimeoutEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="696.0" y="540.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="45.0" flowable:targetDockerY="30.5">
         <omgdi:waypoint x="159.94999861835544" y="330.0"></omgdi:waypoint>
@@ -104,6 +160,33 @@
       <bpmndi:BPMNEdge bpmnElement="flow_to_gateway" id="BPMNEdge_flow_to_gateway" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="20.0" flowable:targetDockerY="20.0">
         <omgdi:waypoint x="759.9499999998391" y="330.0"></omgdi:waypoint>
         <omgdi:waypoint x="810.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <!-- SLA 超时链路: waitClaim -->
+      <bpmndi:BPMNEdge bpmnElement="flow_wait_claim_sla_timeout" id="BPMNEdge_flow_wait_claim_sla_timeout" flowable:sourceDockerX="15.5" flowable:sourceDockerY="15.5" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="414.0" y="375.5"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_wait_claim_sla_timeout_end" id="BPMNEdge_flow_wait_claim_sla_timeout_end" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="460.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="554.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <!-- SLA 超时链路: processTicket -->
+      <bpmndi:BPMNEdge bpmnElement="flow_process_sla_timeout" id="BPMNEdge_flow_process_sla_timeout" flowable:sourceDockerX="15.5" flowable:sourceDockerY="15.5" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="564.0" y="375.5"></omgdi:waypoint>
+        <omgdi:waypoint x="560.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_process_sla_timeout_end" id="BPMNEdge_flow_process_sla_timeout_end" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="610.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="560.0" y="554.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <!-- SLA 超时链路: customerVerify -->
+      <bpmndi:BPMNEdge bpmnElement="flow_customer_verify_sla_timeout" id="BPMNEdge_flow_customer_verify_sla_timeout" flowable:sourceDockerX="15.5" flowable:sourceDockerY="15.5" flowable:targetDockerX="50.0" flowable:targetDockerY="30.0">
+        <omgdi:waypoint x="714.0" y="375.5"></omgdi:waypoint>
+        <omgdi:waypoint x="710.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow_customer_verify_sla_timeout_end" id="BPMNEdge_flow_customer_verify_sla_timeout_end" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="760.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="710.0" y="554.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

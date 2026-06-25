@@ -23,8 +23,10 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordEntity;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -160,6 +162,18 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
+
+            if (StringUtils.hasText(request.getSlaStatus())) {
+                Subquery<String> slaSubquery = query.subquery(String.class);
+                var slaRoot = slaSubquery.from(TicketSlaRecordEntity.class);
+                slaSubquery.select(slaRoot.get("ticketUid"));
+                slaSubquery.where(
+                        criteriaBuilder.equal(slaRoot.get("deleted"), false),
+                        criteriaBuilder.equal(slaRoot.get("status"), request.getSlaStatus()),
+                        criteriaBuilder.equal(slaRoot.get("ticketUid"), root.get("uid")));
+                predicates.add(criteriaBuilder.exists(slaSubquery));
+            }
+
             // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
             if (StringUtils.hasText(request.getCreatedAtStart())) {
                 try {

@@ -86,5 +86,13 @@ public class TriggerEntity extends BaseEntity {
     @Column(name = "trigger_type")
     private String type = TriggerTypeEnum.CUSTOMER.name();
 
+    /**
+     * 最大触发次数（null = 不限制，默认 3 次防止无限触发）。
+     * 达到上限后该触发的后续触发尝试将被静默忽略。
+     */
+    @Builder.Default
+    @Column(name = "max_trigger_count")
+    private Integer maxTriggerCount = 3;
+
 
 }

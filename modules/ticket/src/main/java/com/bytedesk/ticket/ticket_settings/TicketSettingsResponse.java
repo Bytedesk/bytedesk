@@ -22,6 +22,7 @@ import com.bytedesk.ticket.process.ProcessResponse;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -79,6 +80,7 @@ public class TicketSettingsResponse extends BaseResponse {
     // private TicketPrioritySettingsResponse prioritySettings;
     // private TicketAssignmentSettingsResponse assignmentSettings;
     private TicketNotificationSettingsResponse notificationSettings;
+    private TicketSlaSettingsResponse slaSettings;
     // private TicketCustomFieldSettingsResponse customFieldSettings;
     private TicketCategorySettingsResponse categorySettings;
     private ProcessResponse process;
@@ -90,6 +92,7 @@ public class TicketSettingsResponse extends BaseResponse {
     // private TicketPrioritySettingsResponse draftPrioritySettings;
     // private TicketAssignmentSettingsResponse draftAssignmentSettings;
     private TicketNotificationSettingsResponse draftNotificationSettings;
+    private TicketSlaSettingsResponse draftSlaSettings;
     // private TicketCustomFieldSettingsResponse draftCustomFieldSettings;
     private TicketCategorySettingsResponse draftCategorySettings;
     private ProcessResponse draftProcess;

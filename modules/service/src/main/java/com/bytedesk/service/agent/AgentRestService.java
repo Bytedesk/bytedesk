@@ -44,6 +44,7 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
@@ -551,6 +552,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             throw new IllegalStateException("thread already accepted: " + thread.getStatus());
         }
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        if (ThreadTransferStatusEnum.TRANSFER_PENDING.name().equalsIgnoreCase(thread.getTransferStatus())) {
+            thread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
+        }
         AgentEntity agent = agentOptional.get();
         thread.setAgent(agent.toUserProtobuf().toJson());
         MemberEntity member = agent.getMember();

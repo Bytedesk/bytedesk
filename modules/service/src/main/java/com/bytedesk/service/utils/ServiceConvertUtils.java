@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.util.StringUtils;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.core.thread.ThreadConvertUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -335,6 +336,11 @@ public class ServiceConvertUtils {
             svc = ServiceSettingsEntity.builder().build();
         }
         ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        if (settingsContainer instanceof RobotSettingsEntity robotSettings) {
+            resp.setHideThinkingProcess(Boolean.TRUE.equals(robotSettings.getHideThinkingProcess()));
+        } else {
+            resp.setHideThinkingProcess(false);
+        }
         resp.setShowPreForm(Boolean.TRUE.equals(svc.getShowPreForm()));
         resp.setPreFormRequired(Boolean.TRUE.equals(svc.getPreFormRequired()));
         resp.setPreForm(resolvePreFormSchema(svc));

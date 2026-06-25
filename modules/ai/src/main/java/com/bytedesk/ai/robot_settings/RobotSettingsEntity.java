@@ -12,10 +12,12 @@ import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Index;
+import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -53,39 +55,46 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "bytedesk_ai_robot_settings", indexes = {
-        @Index(name = "idx_robot_settings_org", columnList = "org_uid"),
-        @Index(name = "idx_robot_settings_default", columnList = "is_default")
+                @Index(name = "idx_robot_settings_org", columnList = "org_uid"),
+                @Index(name = "idx_robot_settings_default", columnList = "is_default")
 })
 public class RobotSettingsEntity extends BaseSettingsEntity {
 
-    private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
 
-    /**
-     * Rating down settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private RatedownSettingsEntity rateDownSettings;
+        /**
+         * Hide thinking process from visitor UI while still showing the final answer.
+         */
+        @Builder.Default
+        @Column(name = "hide_thinking_process")
+        private Boolean hideThinkingProcess = false;
 
-    /**
-     * Draft Rating down settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private RatedownSettingsEntity draftRateDownSettings;
+        /**
+         * Rating down settings
+         */
+        @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+                        CascadeType.REMOVE })
+        private RatedownSettingsEntity rateDownSettings;
 
-    /**
-     * Spring AI tools orchestration (published)
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private RobotToolsSettingsEntity toolsSettings;
+        /**
+         * Draft Rating down settings
+         */
+        @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+                        CascadeType.REMOVE })
+        private RatedownSettingsEntity draftRateDownSettings;
 
-    /**
-     * Spring AI tools orchestration draft
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
-            CascadeType.REMOVE })
-    private RobotToolsSettingsEntity draftToolsSettings;
+        /**
+         * Spring AI tools orchestration (published)
+         */
+        @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+                        CascadeType.REMOVE })
+        private RobotToolsSettingsEntity toolsSettings;
+
+        /**
+         * Spring AI tools orchestration draft
+         */
+        @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+                        CascadeType.REMOVE })
+        private RobotToolsSettingsEntity draftToolsSettings;
 
 }

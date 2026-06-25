@@ -41,6 +41,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
@@ -374,6 +375,9 @@ public class QueueMemberEventListener {
         }
 
         targetThread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        if (ThreadTransferStatusEnum.TRANSFER_PENDING.name().equalsIgnoreCase(targetThread.getTransferStatus())) {
+            targetThread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
+        }
         targetThread.setAgent(agentProto.toJson());
         targetThread.setUserUid(agentProto.getUid());
         if (referenceThread != null && referenceThread.getOwner() != null) {

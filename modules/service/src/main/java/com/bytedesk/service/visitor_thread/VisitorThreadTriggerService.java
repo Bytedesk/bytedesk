@@ -103,7 +103,7 @@ public class VisitorThreadTriggerService {
                 }
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
-                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -136,7 +136,7 @@ public class VisitorThreadTriggerService {
                 }
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
-                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -169,7 +169,7 @@ public class VisitorThreadTriggerService {
                 }
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
-                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds())) {
+                if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(cache.getUid(), config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -203,7 +203,7 @@ public class VisitorThreadTriggerService {
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
                 if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(),
-                        config.timeoutSeconds())) {
+                        config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -235,7 +235,7 @@ public class VisitorThreadTriggerService {
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
                 if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(),
-                        config.timeoutSeconds())) {
+                        config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -267,7 +267,7 @@ public class VisitorThreadTriggerService {
                 NoResponseProactiveTriggerConfig config = configOpt.get();
 
                 if (!visitorThreadService.consumeVisitorNoResponseTriggerPermit(thread.getUid(),
-                        config.timeoutSeconds())) {
+                        config.timeoutSeconds(), config.maxTriggerCount())) {
                     return;
                 }
 
@@ -280,7 +280,7 @@ public class VisitorThreadTriggerService {
         }
     }
 
-    private record NoResponseProactiveTriggerConfig(int timeoutSeconds, String message) {
+    private record NoResponseProactiveTriggerConfig(int timeoutSeconds, String message, Integer maxTriggerCount) {
     }
 
     private Optional<NoResponseProactiveTriggerConfig> resolveNoResponseProactiveTriggerConfig(
@@ -300,6 +300,7 @@ public class VisitorThreadTriggerService {
 
         int timeoutSeconds = VisitorNoResponseProactiveMessageConfig.DEFAULT_NO_RESPONSE_TIMEOUT;
         String message = VisitorNoResponseProactiveMessageConfig.DEFAULT_PROACTIVE_MESSAGE;
+        Integer maxTriggerCount = trigger.getMaxTriggerCount();
 
         if (StringUtils.hasText(trigger.getConfig())) {
             Object parsed = TriggerConfigRegistry
@@ -312,10 +313,14 @@ public class VisitorThreadTriggerService {
                 if (StringUtils.hasText(payload.proactiveMessage)) {
                     message = payload.proactiveMessage;
                 }
+                // config JSON 中的 maxTriggerCount 优先级高于实体字段
+                if (payload.maxTriggerCount != null && payload.maxTriggerCount > 0) {
+                    maxTriggerCount = payload.maxTriggerCount;
+                }
             }
         }
 
-        return Optional.of(new NoResponseProactiveTriggerConfig(timeoutSeconds, message));
+        return Optional.of(new NoResponseProactiveTriggerConfig(timeoutSeconds, message, maxTriggerCount));
     }
 
 }

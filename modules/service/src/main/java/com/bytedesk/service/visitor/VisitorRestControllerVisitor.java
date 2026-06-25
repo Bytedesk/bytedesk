@@ -517,6 +517,10 @@ public class VisitorRestControllerVisitor {
             return createInvalidSseEmitter("message required");
         }
 
+        // IMPORTANT: publishVisitorMessageEvent must complete BEFORE the async SSE processing below.
+        // @EventListener is synchronous by default, so RobotToAgentKeywordListener runs inline here
+        // and may mutate thread state (e.g. ROBOTING→QUEUING). The async executor then sees the
+        // updated state when it calls robotService.processSseVisitorMessage().
         visitorRestService.publishVisitorMessageEvent(message);
 
         // 延长超时时间至10分钟

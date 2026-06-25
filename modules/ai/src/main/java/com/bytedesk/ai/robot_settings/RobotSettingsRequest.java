@@ -35,6 +35,11 @@ public class RobotSettingsRequest extends BaseSettingsRequest {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Hide thinking process from visitor UI.
+     */
+    private Boolean hideThinkingProcess;
+
+    /**
      * Rating down settings (Robot-specific)
      */
     private RatedownSettingsRequest rateDownSettings;

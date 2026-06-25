@@ -140,6 +140,8 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         if (!StringUtils.hasText(orgUid)) {
             orgUid = request.getOrgUid();
         }
+        // 确保 orgUid 已写回 request，避免下游 BaseSpecification 验证失败
+        request.setOrgUid(orgUid);
 
         String userUid = user != null ? user.getUid() : request.getUserUid();
         Optional<AgentEntity> agentOptional = (StringUtils.hasText(orgUid) && StringUtils.hasText(userUid))

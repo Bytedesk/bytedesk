@@ -51,6 +51,7 @@ import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -100,14 +101,17 @@ public class VisitorThreadService
 
     /**
      * 主动触发：判断“访客长时间未发送消息”是否达到阈值，并用 QueueMember.lastNotifiedAt 做节流。
+     * 同时检查 maxTriggerCount 防止无限触发。
      *
      * 规则：
      * - 优先使用 QueueMember.visitorLastMessageAt 作为基准时间
      * - 若为空，则使用 visitorEnqueueAt 作为兜底
      * - 达到 noResponseTimeoutSeconds 才允许触发
      * - 触发后写入 lastNotifiedAt，避免每分钟重复触发
+     * - maxTriggerCount 不为 null 时，notifiedCount >= maxTriggerCount 则拒绝触发
      */
-    public boolean consumeVisitorNoResponseTriggerPermit(String threadUid, int noResponseTimeoutSeconds) {
+    public boolean consumeVisitorNoResponseTriggerPermit(String threadUid, int noResponseTimeoutSeconds,
+            Integer maxTriggerCount) {
         if (!StringUtils.hasText(threadUid) || noResponseTimeoutSeconds <= 0) {
             return false;
         }
@@ -141,6 +145,15 @@ public class VisitorThreadService
             if (sinceNotifySeconds >= 0 && sinceNotifySeconds < noResponseTimeoutSeconds) {
                 return false;
             }
+        }
+
+        // maxTriggerCount 不为 null 时，检查已触发次数是否达到上限
+        if (maxTriggerCount != null && maxTriggerCount > 0) {
+            int currentCount = queueMember.getNotifiedCount() != null ? queueMember.getNotifiedCount() : 0;
+            if (currentCount >= maxTriggerCount) {
+                return false;
+            }
+            queueMember.setNotifiedCount(currentCount + 1);
         }
 
         queueMember.setLastNotifiedAt(now);
@@ -416,6 +429,22 @@ public class VisitorThreadService
             extra.setManualTransferLabel(robotToAgentSettings.getManualTransferLabel());
         } else {
             extra.setManualTransferLabel(null);
+        }
+
+        // 读取工作组关联机器人的 hideThinkingProcess 设置，使工作组会话中的 RobotBubble 也能响应
+        RobotRoutingSettingsEntity robotRoutingSettings = null;
+        if (settings != null) {
+            if (preview && settings.getDraftRobotSettings() != null) {
+                robotRoutingSettings = settings.getDraftRobotSettings();
+            } else {
+                robotRoutingSettings = settings.getRobotSettings();
+            }
+        }
+        if (robotRoutingSettings != null && robotRoutingSettings.getRobot() != null) {
+            RobotSettingsEntity robotSettings = robotRoutingSettings.getRobot().getSettings();
+            if (robotSettings != null) {
+                extra.setHideThinkingProcess(Boolean.TRUE.equals(robotSettings.getHideThinkingProcess()));
+            }
         }
 
         return JSON.toJSONString(extra);

@@ -278,6 +278,10 @@
         <omgdi:waypoint x="844" y="580" />
         <omgdi:waypoint x="844" y="344" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFinishToEnd" bpmnElement="flowFinishToEnd" flowable:sourceDockerX="50.0" flowable:sourceDockerY="30.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="619.9499999999999" y="330" />
+        <omgdi:waypoint x="830" y="330" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>

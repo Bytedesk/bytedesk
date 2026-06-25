@@ -80,6 +80,7 @@ public class TicketService {
     private final TicketRestService ticketRestService;
     private final TicketNotificationService ticketNotificationService;
     private final ProcessRepository processRepository;
+    private final TicketSLAService ticketSLAService;
 
     private TicketEntity getTicketOrThrow(String ticketUid) {
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticketUid);
@@ -173,6 +174,7 @@ public class TicketService {
                     runtimeContext);
             case "complete" -> completeWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
             case "hold" -> holdWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
+            case "resume" -> resumeWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
             case "close" -> closeWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
             case "delegate" -> delegateTicket(request);
             case "delegateResolve" -> resolveDelegatedTicket(request);
@@ -215,13 +217,18 @@ public class TicketService {
                 .nodeType(nodeType)
                 .nodeTitle(nodeTitle)
                 .actionable(actionable)
-                .actions(actionable ? buildWorkflowActions(task, node, nodeTitle, unassigned,
+                .actions(actionable ? buildWorkflowActions(ticket, task, node, nodeTitle, unassigned,
                         hasVerifiedGatewayAfterNode(flowgramSchema, task.getTaskDefinitionKey())) : List.of())
                 .build();
     }
 
-    private List<TicketWorkflowActionResponse> buildWorkflowActions(Task task, JSONObject node, String nodeTitle,
+    private List<TicketWorkflowActionResponse> buildWorkflowActions(TicketEntity ticket, Task task, JSONObject node,
+            String nodeTitle,
             boolean unassigned, boolean followedByVerifiedGateway) {
+        if (TicketStatusEnum.HOLDING.name().equals(ticket.getStatus())) {
+            return buildHoldingWorkflowActions(task);
+        }
+
         List<TicketWorkflowActionResponse> configuredActions = buildConfiguredWorkflowActions(task, node);
         if (!configuredActions.isEmpty()) {
             if (unassigned) {
@@ -369,6 +376,16 @@ public class TicketService {
         return actions;
     }
 
+    private List<TicketWorkflowActionResponse> buildHoldingWorkflowActions(Task task) {
+        return List.of(TicketWorkflowActionResponse.builder()
+                .key("RESUME")
+                .label("继续处理")
+                .type("resume")
+                .taskId(task.getId())
+                .taskDefinitionKey(task.getTaskDefinitionKey())
+                .build());
+    }
+
     private List<TicketWorkflowActionResponse> buildConfiguredWorkflowActions(Task task, JSONObject node) {
         JSONObject data = node != null ? node.getJSONObject("data") : null;
         JSONArray availableActions = data != null ? data.getJSONArray("availableActions") : null;
@@ -413,6 +430,7 @@ public class TicketService {
             case "COMPLETE_VERIFIED" -> "确认解决";
             case "COMPLETE_REJECTED" -> "未解决";
             case "HOLD" -> "暂存";
+            case "RESUME" -> "继续处理";
             case "CLOSE" -> "关单";
             default -> key;
         };
@@ -425,6 +443,7 @@ public class TicketService {
             case "TRANSFER" -> "transfer";
             case "TRANSFER_DEPARTMENT" -> "transferDepartment";
             case "HOLD" -> "hold";
+            case "RESUME" -> "resume";
             case "CLOSE" -> "close";
             default -> "complete";
         };
@@ -629,6 +648,7 @@ public class TicketService {
                         + (StringUtils.hasText(targetMember.getNickname()) ? targetMember.getNickname() : targetMember.getUid())
                         + buildCommentSuffix(request));
         taskService.complete(waitClaimTask.getId(), variables);
+        ticketSLAService.completeClaim(ticket, StringUtils.hasText(operatorUid) ? operatorUid : targetMember.getUid());
 
         String nextTaskStage = configuredString(runtimeContext.actionConfig(), runtimeContext.nodeData(), "nextTaskStage");
         Task processTask = findNextTaskByStage(ticket, waitClaimTask,
@@ -719,7 +739,33 @@ public class TicketService {
             variables.put("processComment", request.getProcessComment());
         }
         runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
+        ticketSLAService.pauseOpenRecords(ticket, operatorUid);
         addTaskComment(task, ticket, operatorUid, "HOLDING", "工单已暂存" + buildCommentSuffix(request));
+    }
+
+    private void resumeWorkflowTask(TicketEntity ticket, Task task, TicketRequest request, String operatorUid,
+            TicketWorkflowRuntimeContext runtimeContext) {
+        if (!TicketStatusEnum.HOLDING.name().equals(ticket.getStatus())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能恢复: " + ticket.getUid());
+        }
+        if (StringUtils.hasText(task.getAssignee()) && !Objects.equals(task.getAssignee(), operatorUid)) {
+            throw new RuntimeException("非当前任务处理人，不能恢复");
+        }
+
+        taskService.setAssignee(task.getId(), operatorUid);
+        ticket.setStatus(resolveConfiguredStatus(runtimeContext.actionConfig(), runtimeContext.nodeData(),
+                TicketStatusEnum.RESUMED.name(), "ticketStatus", "ticketStatusOnComplete"));
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+        variables.put("resumeTime", new Date());
+        variables.put("resumeBy", operatorUid);
+        if (StringUtils.hasText(request.getProcessComment())) {
+            variables.put("processComment", request.getProcessComment());
+        }
+        runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
+        ticketSLAService.resumePausedRecords(ticket, operatorUid);
+        addTaskComment(task, ticket, operatorUid, TicketStatusEnum.RESUMED.name(),
+                "工单已恢复处理" + buildCommentSuffix(request));
     }
 
         private void closeWorkflowTask(TicketEntity ticket, Task task, TicketRequest request, String operatorUid,
@@ -741,6 +787,7 @@ public class TicketService {
 
         ticket.setStatus(targetStatus);
         ticket.setClosedTime(BdDateUtils.now());
+        ticketSLAService.completeResolution(ticket, operatorUid);
     }
 
     private void syncTicketThreadAssignee(TicketEntity ticket, UserProtobuf assignee, MemberEntity member) {
@@ -816,10 +863,14 @@ public class TicketService {
                 ticket.setStatus(configuredCompleteStatus);
                 if (TicketStatusEnum.RESOLVED.name().equals(configuredCompleteStatus)) {
                     ticket.setResolvedTime(BdDateUtils.now());
+                    ticketSLAService.completeResolution(ticket, null);
+                    ticketSLAService.startCustomerVerify(ticket);
                 }
                 if (TicketStatusEnum.CLOSED.name().equals(configuredCompleteStatus)
                         || TicketStatusEnum.VERIFIED_OK.name().equals(configuredCompleteStatus)) {
                     ticket.setClosedTime(BdDateUtils.now());
+                    ticketSLAService.completeResolution(ticket, null);
+                    ticketSLAService.completeCustomerVerify(ticket, null);
                 }
                 if (TicketStatusEnum.REOPENED.name().equals(configuredCompleteStatus)) {
                     ticket.setResolvedTime(null);
@@ -830,6 +881,7 @@ public class TicketService {
             if ("COMPLETE_REJECTED".equals(runtimeContext.actionKey())) {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
                 ticket.setResolvedTime(null);
+                ticketSLAService.completeCustomerVerify(ticket, null);
                 return;
             }
 
@@ -841,6 +893,8 @@ public class TicketService {
                 ticket.setStatus("COMPLETE_VERIFIED".equals(runtimeContext.actionKey()) ? TicketStatusEnum.VERIFIED_OK.name()
                         : TicketStatusEnum.CLOSED.name());
                 ticket.setClosedTime(BdDateUtils.now());
+                ticketSLAService.completeResolution(ticket, null);
+                ticketSLAService.completeCustomerVerify(ticket, null);
                 return;
             }
 
@@ -853,6 +907,8 @@ public class TicketService {
                     ticket.setStatus(nextStatus);
                     if (TicketStatusEnum.RESOLVED.name().equals(nextStatus)) {
                         ticket.setResolvedTime(BdDateUtils.now());
+                        ticketSLAService.completeResolution(ticket, null);
+                        ticketSLAService.startCustomerVerify(ticket);
                     }
                     return;
                 }
@@ -864,6 +920,8 @@ public class TicketService {
             if (waitingReporter) {
                 ticket.setStatus(TicketStatusEnum.RESOLVED.name());
                 ticket.setResolvedTime(BdDateUtils.now());
+                ticketSLAService.completeResolution(ticket, null);
+                ticketSLAService.startCustomerVerify(ticket);
             } else {
                 ticket.setStatus(TicketStatusEnum.PROCESSING.name());
             }
@@ -1356,6 +1414,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.HOLDING.name());
+        ticketSLAService.pauseOpenRecords(ticket, assigneeUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
@@ -1409,6 +1468,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.RESUMED.name());
+        ticketSLAService.resumePausedRecords(ticket, assigneeUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
