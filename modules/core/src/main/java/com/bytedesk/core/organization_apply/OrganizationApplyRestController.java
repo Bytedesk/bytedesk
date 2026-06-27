@@ -59,6 +59,13 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_CANCEL, description = "cancel join organization apply")
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancel(@RequestBody OrganizationApplyRequest request) {
+        OrganizationApplyResponse response = organizationRestService.cancel(request);
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_EXPORT, description = "export organizationApply")
     @Override
     // @PreAuthorize("hasAuthority('organizationApply_EXPORT')")

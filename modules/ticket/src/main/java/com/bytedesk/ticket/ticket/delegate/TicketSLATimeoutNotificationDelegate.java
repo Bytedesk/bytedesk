@@ -13,8 +13,10 @@
  */
 package com.bytedesk.ticket.ticket.delegate;
 
+import org.flowable.engine.TaskService;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.task.api.Task;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -26,6 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * SLA超时通知
@@ -33,6 +38,8 @@ import java.util.Date;
  * 两种服务任务的区别：
  * SLA 超时：自动触发，基于时间
  * 工单升级：人工触发，基于状态
+ * 
+ * 当 CUSTOMER_VERIFY SLA 超时时，自动通过验证（verified=true），使工单流程正常结束。
  */
 @Slf4j
 @Component("ticketSLATimeoutNotificationDelegate")
@@ -40,6 +47,7 @@ import java.util.Date;
 public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
 
     private final TicketSLAService ticketSLAService;
+    private final TaskService taskService;
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -63,6 +71,53 @@ public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
         
         log.info("SLA timeout notification - processId: {}, status: {}, startTime: {}, slaTime: {}", 
             processInstanceId, status, startTime, slaTime);
+
+        // 客户验证 SLA 超时：自动通过验证，使流程正常结束
+        if (slaType == TicketSlaTypeEnum.CUSTOMER_VERIFY) {
+            autoVerifyCustomerVerifyTask(execution, processInstanceId);
+        }
+    }
+
+    /**
+     * 客户验证 SLA 超时自动通过：找到 customerVerify 任务，设置 verified=true 并完成。
+     */
+    private void autoVerifyCustomerVerifyTask(DelegateExecution execution, String processInstanceId) {
+        try {
+            List<Task> activeTasks = taskService.createTaskQuery()
+                    .processInstanceId(processInstanceId)
+                    .active()
+                    .list();
+            if (activeTasks == null || activeTasks.isEmpty()) {
+                log.warn("No active tasks found for auto-verify, processInstanceId={}", processInstanceId);
+                return;
+            }
+
+            // 找到 customerVerify 任务（taskDefinitionKey 通常为 "customerVerify"）
+            Task verifyTask = activeTasks.stream()
+                    .filter(task -> task.getTaskDefinitionKey() != null
+                            && task.getTaskDefinitionKey().toLowerCase().contains("verify"))
+                    .findFirst()
+                    .orElse(null);
+
+            if (verifyTask == null) {
+                log.warn("No verify task found in active tasks for auto-verify, processInstanceId={}", processInstanceId);
+                return;
+            }
+
+            // 设置 verified=true 并完成任务
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("verified", true);
+            variables.put("slaAutoVerified", true);
+            variables.put("slaAutoVerifiedTime", new Date());
+
+            taskService.setVariables(verifyTask.getId(), variables);
+            taskService.complete(verifyTask.getId(), variables);
+
+            log.info("Auto-verified customerVerify task: taskId={}, processInstanceId={}",
+                    verifyTask.getId(), processInstanceId);
+        } catch (Exception e) {
+            log.error("Failed to auto-verify customerVerify task, processInstanceId={}", processInstanceId, e);
+        }
     }
 
     private TicketSlaTypeEnum resolveSlaType(String slaTypeValue, String activityId) {

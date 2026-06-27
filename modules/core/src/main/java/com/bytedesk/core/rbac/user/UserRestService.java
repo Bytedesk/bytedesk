@@ -37,11 +37,13 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +56,8 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     private final UserService userService;
 
     private final UserDetailsServiceImpl userDetailsService;
+
+    private final MemberRepository memberRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -257,6 +261,40 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         }
 
         return convertToResponse(saved);
+    }
+
+    /**
+     * 用户主动退出组织（只能退出非当前组织）
+     * - 软删除该用户在该组织下的 MemberEntity
+     * - 移除 UserEntity.userOrganizationRoles 中该组织的关联
+     */
+    @Transactional
+    public void leaveOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+
+        // 不允许退出当前组织，需先切换到其他组织
+        if (authUser.getCurrentOrganization() != null
+                && StringUtils.hasText(authUser.getCurrentOrganization().getUid())
+                && orgUid.equals(authUser.getCurrentOrganization().getUid())) {
+            throw new RuntimeException("Cannot leave current organization, please switch to another organization first");
+        }
+
+        // 软删除该用户在该组织下的 MemberEntity
+        memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(authUser.getUid(), orgUid)
+                .ifPresent(member -> {
+                    member.setDeleted(true);
+                    memberRepository.save(member);
+                });
+
+        // 移除 user-organization 角色关联
+        userService.removeUserFromOrganization(authUser.getUid(), orgUid);
     }
 
     @Override

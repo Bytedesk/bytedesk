@@ -112,7 +112,7 @@
       },
       "data": {
         "title": "工单处理中",
-        "description": "处理工单并提交处理结果。",
+        "description": "处理工单并已解决。",
         "assigneeType": "user",
         "assigneeUids": [
           "${assigneeUid}"
@@ -130,11 +130,11 @@
         "ticketStage": "PROCESSING",
         "ticketStatusOnEnter": "PROCESSING",
         "ticketStatusOnComplete": "RESOLVED",
-        "completeActionLabel": "提交处理结果",
+        "completeActionLabel": "已解决",
         "availableActions": [
           {
             "key": "COMPLETE",
-            "label": "提交处理结果",
+            "label": "已解决",
             "type": "complete",
             "fields": [
               {
@@ -148,7 +148,7 @@
           },
           {
             "key": "HOLD",
-            "label": "暂存",
+            "label": "挂起",
             "type": "hold",
             "fields": [
               {

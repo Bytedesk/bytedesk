@@ -136,5 +136,11 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + "       OR m.message_user LIKE '%\"type\":\"agent\"%')", nativeQuery = true)
     long countVisitorUnreadByThreadUid(@Param("threadUid") String threadUid);
 
+        /**
+         * 查找会话中全部 ROBOT_STREAM 消息（按创建时间升序）。
+         * 用于热门问题统计：从 RobotContent.question 提取访客原始提问。
+         */
+        List<MessageEntity> findByThread_UidAndTypeOrderByCreatedAtAsc(String threadUid, String type);
+
     boolean existsByUid(String uid);
 }

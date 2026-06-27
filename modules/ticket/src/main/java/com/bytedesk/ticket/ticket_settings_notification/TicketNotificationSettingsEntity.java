@@ -99,6 +99,14 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
     @Builder.Default
     private Boolean smsNotifyWhenOnline = Boolean.FALSE;
 
+    /** 是否开启 iOS APNs 推送，默认关闭 */
+    @Builder.Default
+    private Boolean apnsEnabled = Boolean.FALSE;
+
+    /** 是否开启微信服务号推送，默认关闭（开发中暂未上线） */
+    @Builder.Default
+    private Boolean wechatEnabled = Boolean.FALSE;
+
     public static TicketNotificationSettingsEntity fromRequest(TicketNotificationSettingsRequest req) {
         
         TicketNotificationSettingsEntity entity = new TicketNotificationSettingsEntity();
@@ -159,6 +167,8 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
         }
         if (req.getEmailNotifyWhenOnline() != null) entity.setEmailNotifyWhenOnline(req.getEmailNotifyWhenOnline());
         if (req.getSmsNotifyWhenOnline() != null) entity.setSmsNotifyWhenOnline(req.getSmsNotifyWhenOnline());
+        if (req.getApnsEnabled() != null) entity.setApnsEnabled(req.getApnsEnabled());
+        if (req.getWechatEnabled() != null) entity.setWechatEnabled(req.getWechatEnabled());
         return entity;
     }
 }

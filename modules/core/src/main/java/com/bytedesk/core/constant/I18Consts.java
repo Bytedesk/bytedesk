@@ -77,6 +77,8 @@ public class I18Consts {
     public static final String I18N_WORKFLOW_NODE = I18N_PREFIX + "workflow.node";
     public static final String I18N_ORGANIZATION = I18N_PREFIX + "organization";
     public static final String I18N_ORGANIZATION_APPLY = I18N_PREFIX + "organization.apply";
+    public static final String I18N_ORGANIZATION_APPLY_ALREADY_MEMBER = I18N_PREFIX + "organization.apply.already.member";
+    public static final String I18N_ORGANIZATION_APPLY_ALREADY_PENDING = I18N_PREFIX + "organization.apply.already.pending";
     public static final String I18N_ORGANIZATION_SETTINGS = I18N_PREFIX + "organization.settings";
     public static final String I18N_CITY = I18N_PREFIX + "city";
     public static final String I18N_WORKFLOW = I18N_PREFIX + "workflow";
@@ -234,6 +236,7 @@ public class I18Consts {
     public static final String I18N_ACTION_LOGIN_SCAN = I18N_PREFIX + "action.login.scan";
     public static final String I18N_ACTION_LOGOUT = I18N_PREFIX + "action.logout";
     public static final String I18N_ACTION_SWITCH_ORGANIZATION = I18N_PREFIX + "action.switch.organization";
+    public static final String I18N_ACTION_LEAVE_ORGANIZATION = I18N_PREFIX + "action.leave.organization";
     public static final String I18N_ACTION_CHANGE_PASSWORD = I18N_PREFIX + "action.change.password";
     public static final String I18N_ACTION_CHANGE_EMAIL = I18N_PREFIX + "action.change.email";
     public static final String I18N_ACTION_CHANGE_MOBILE = I18N_PREFIX + "action.change.mobile";
@@ -244,6 +247,7 @@ public class I18Consts {
     public static final String I18N_ACTION_SUBMIT_APPLY = I18N_PREFIX + "action.submit.apply";
     public static final String I18N_ACTION_APPROVE = I18N_PREFIX + "action.approve";
     public static final String I18N_ACTION_REJECT = I18N_PREFIX + "action.reject";
+    public static final String I18N_ACTION_CANCEL = I18N_PREFIX + "action.cancel";
     public static final String I18N_ACTION_APPROVE_APPEAL = I18N_PREFIX + "action.approve.appeal";
     public static final String I18N_ACTION_REJECT_APPEAL = I18N_PREFIX + "action.reject.appeal";
     public static final String I18N_ACTION_QUERY_DATE_RANGE_STATISTIC = I18N_PREFIX + "action.query.date.range.statistic";

@@ -14,10 +14,13 @@
 package com.bytedesk.core.organization_apply;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -46,6 +49,8 @@ import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.rbac.user.UserResponseContact;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.uid.UidUtils;
+
+import jakarta.persistence.criteria.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,8 +86,14 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
     @Override
     public Page<OrganizationApplyResponse> queryByOrg(OrganizationApplyRequest request) {
-        Page<OrganizationApplyEntity> page = queryByOrgEntity(request);
-        return page.map(this::convertToResponse);
+        // When a specific orgUid is provided, use the original org-scoped query
+        if (StringUtils.hasText(request.getOrgUid())) {
+            Page<OrganizationApplyEntity> page = queryByOrgEntity(request);
+            return page.map(this::convertToResponse);
+        }
+
+        // Otherwise, return unified results (admin + applicant)
+        return queryUnified(request);
     }
 
     @Override
@@ -133,13 +144,19 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
             throw new IllegalArgumentException("Organization is disabled");
         }
 
+        // 检查用户是否已经是该组织的成员
+        Optional<MemberEntity> existingMember = memberRepository.findByUserAndOrgUidAndDeletedFalse(user, request.getOrgUid());
+        if (existingMember.isPresent()) {
+            throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_APPLY_ALREADY_MEMBER);
+        }
+
         Optional<OrganizationApplyEntity> existed = organizationApplyRepository
                 .findFirstByOrgUidAndUserUidAndStatusAndDeletedFalse(
                         request.getOrgUid(),
                         userUid,
                         OrganizationApplyStatusEnum.PENDING.name());
         if (existed.isPresent()) {
-            return convertToResponse(existed.get());
+            throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_APPLY_ALREADY_PENDING);
         }
 
         OrganizationApplyEntity entity = OrganizationApplyEntity.builder()
@@ -216,9 +233,14 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
         UserEntity applicant = userRepository.findByUid(apply.getUserUid())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        // 1) 切换默认组织 + 写入组织角色（默认 ROLE_USER）
-        userService.ensureCurrentOrganization(applicant, org.getUid());
-        userService.updateUserRoles(applicant, new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID)));
+        // 1) 写入组织角色（默认 ROLE_USER）
+        //    若申请人已有当前组织，保留不变；若无当前组织（首次加入），则设为新组织
+        String originalCurrentOrgUid = null;
+        if (applicant.getCurrentOrganization() != null
+                && StringUtils.hasText(applicant.getCurrentOrganization().getUid())) {
+            originalCurrentOrgUid = applicant.getCurrentOrganization().getUid();
+        }
+        userService.updateUserRoles(applicant, new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_USER_UID)), org.getUid(), originalCurrentOrgUid != null);
 
         // 2) 创建/激活 Member
         Optional<MemberEntity> existedMember = memberRepository.findByUserAndOrgUidAndDeletedFalse(applicant, org.getUid());
@@ -254,6 +276,17 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
                         .user(applicant)
                         .build();
                 memberRepository.save(member);
+            }
+        }
+
+        // 若申请人已有当前组织且与新组织不同，确保审批后不切换当前组织
+        if (StringUtils.hasText(originalCurrentOrgUid) && !originalCurrentOrgUid.equals(org.getUid())) {
+            UserEntity refreshedApplicant = userRepository.findByUid(applicant.getUid())
+                    .orElseThrow(() -> new NotFoundException("User not found"));
+            if (refreshedApplicant.getCurrentOrganization() == null
+                    || !originalCurrentOrgUid.equals(refreshedApplicant.getCurrentOrganization().getUid())) {
+                userService.ensureCurrentOrganization(refreshedApplicant, originalCurrentOrgUid);
+                userRepository.save(refreshedApplicant);
             }
         }
 
@@ -302,6 +335,113 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
 
         OrganizationApplyEntity saved = save(apply);
         return convertToResponse(saved);
+    }
+
+    /**
+     * 申请人取消自己的申请（只能取消 PENDING 状态的申请）
+     */
+    @Transactional
+    public OrganizationApplyResponse cancel(OrganizationApplyRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("uid is required");
+        }
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new IllegalArgumentException("login required");
+        }
+
+        OrganizationApplyEntity apply = organizationApplyRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException("OrganizationApply not found"));
+        if (apply.isDeleted()) {
+            throw new NotFoundException("OrganizationApply not found");
+        }
+
+        // 只有申请人自己可以取消
+        if (!StringUtils.hasText(apply.getUserUid()) || !apply.getUserUid().equals(user.getUid())) {
+            throw new IllegalArgumentException("permission denied");
+        }
+
+        String currentStatus = StringUtils.hasText(apply.getStatus()) ? apply.getStatus() : OrganizationApplyStatusEnum.PENDING.name();
+        if (!OrganizationApplyStatusEnum.PENDING.name().equalsIgnoreCase(currentStatus)) {
+            return convertToResponse(apply);
+        }
+
+        apply.setStatus(OrganizationApplyStatusEnum.CANCELED.name());
+        OrganizationApplyEntity saved = save(apply);
+        return convertToResponse(saved);
+    }
+
+    /**
+     * Unified query: merge applications where current user is admin (org owner) AND applicant
+     */
+    public Page<OrganizationApplyResponse> queryUnified(OrganizationApplyRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new IllegalArgumentException("login required");
+        }
+        Pageable pageable = request.getPageable();
+
+        // Find org uids where current user is the owner
+        List<String> ownedOrgUids = organizationRepository.findAll().stream()
+                .filter(org -> org.getUser() != null
+                        && StringUtils.hasText(org.getUser().getUid())
+                        && org.getUser().getUid().equals(user.getUid()))
+                .map(OrganizationEntity::getUid)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toList());
+
+        Specification<OrganizationApplyEntity> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.equal(root.get("deleted"), false));
+
+            // Current user's applications OR applications to orgs owned by current user
+            Predicate userApplies = cb.equal(root.get("userUid"), user.getUid());
+            Predicate orgApplies = ownedOrgUids.isEmpty() ? cb.disjunction() : root.get("orgUid").in(ownedOrgUids);
+            predicates.add(cb.or(userApplies, orgApplies));
+
+            // Optional status filter
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(cb.equal(root.get("status"), request.getStatus()));
+            }
+
+            // Optional search text
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                Predicate nameLike = cb.like(root.get("name"), "%" + searchText + "%");
+                Predicate descLike = cb.like(root.get("description"), "%" + searchText + "%");
+                predicates.add(cb.or(nameLike, descLike));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<OrganizationApplyEntity> page = organizationApplyRepository.findAll(spec, pageable);
+
+        final Set<String> ownedOrgUidSet = new HashSet<>(ownedOrgUids);
+        final String currentUserUid = user.getUid();
+
+        return page.map(entity -> convertToResponseWithRelation(entity, currentUserUid, ownedOrgUidSet));
+    }
+
+    private OrganizationApplyResponse convertToResponseWithRelation(OrganizationApplyEntity entity, String currentUserUid, Set<String> ownedOrgUidSet) {
+        OrganizationApplyResponse response = convertToResponse(entity);
+
+        // Determine relation type
+        boolean isApplicant = StringUtils.hasText(entity.getUserUid()) && entity.getUserUid().equals(currentUserUid);
+        boolean isAdmin = StringUtils.hasText(entity.getOrgUid()) && ownedOrgUidSet.contains(entity.getOrgUid());
+
+        if (isApplicant && isAdmin) {
+            response.setRelationType("BOTH");
+        } else if (isAdmin) {
+            response.setRelationType("ADMIN");
+        } else if (isApplicant) {
+            response.setRelationType("APPLICANT");
+        } else {
+            response.setRelationType("NONE");
+        }
+
+        return response;
     }
 
     @Override

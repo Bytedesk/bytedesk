@@ -81,13 +81,17 @@ public class NotificationRealtimeService {
     private void sendMqttNotification(NotificationEntity notification) {
         String userUid = notification.getUserUid();
         String mqttTopic = TopicUtils.getSystemTopic(userUid);
+        log.info("[NOTICE-DIAG] sendMqttNotification: userUid={} topic={} title={}",
+                userUid, mqttTopic, notification.getTitle());
         MessageProto.Message message = buildMqttNotice(notification, mqttTopic);
         if (message == null) {
+            log.info("[NOTICE-DIAG] sendMqttNotification SKIPPED: buildMqttNotice returned null");
             return;
         }
 
         try {
             messageSocketService.sendMqttMessageToUser(userUid, mqttTopic, message);
+            log.info("[NOTICE-DIAG] sendMqttNotification sent successfully to userUid={}", userUid);
         } catch (Exception ex) {
             log.warn("send notification mqtt event failed: topic={}, notificationUid={}, error={}",
                     mqttTopic, notification.getUid(), ex.getMessage());

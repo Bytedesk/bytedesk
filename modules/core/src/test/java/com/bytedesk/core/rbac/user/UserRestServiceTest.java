@@ -13,6 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.role.RoleEntity;
@@ -30,6 +31,7 @@ class UserRestServiceTest {
                 authService,
                 userService,
                 mock(UserDetailsServiceImpl.class),
+                mock(MemberRepository.class),
                 mock(BCryptPasswordEncoder.class));
 
         UserEntity superUser = UserEntity.builder()

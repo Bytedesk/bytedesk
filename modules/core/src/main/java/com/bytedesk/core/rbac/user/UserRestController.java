@@ -244,5 +244,18 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok().body(JsonResult.success());
     }
 
+    /**
+     * 用户主动退出组织（只能退出非当前组织）
+     */
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_LEAVE_ORGANIZATION, description = "leave organization")
+    @PostMapping("/leave/organization")
+    @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> leaveOrganization(@RequestBody UserRequest userRequest) {
+
+        userRestService.leaveOrganization(userRequest.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success());
+    }
+
     
 }

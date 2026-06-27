@@ -41,8 +41,10 @@ import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
 import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
@@ -71,6 +73,8 @@ public class TicketNotificationService {
 
     public static final String EVENT_TYPE_TICKET_STATUS_CHANGED = "TICKET_STATUS_CHANGED";
 
+    public static final String EVENT_TYPE_TICKET_TRANSFERRED = "TICKET_TRANSFERRED";
+
     public static final String EVENT_TYPE_TICKET_AGENT_MESSAGE = "TICKET_AGENT_MESSAGE";
 
     public static final String EVENT_TYPE_TICKET_SLA_WARNING = "TICKET_SLA_WARNING";
@@ -78,6 +82,8 @@ public class TicketNotificationService {
     public static final String EVENT_TYPE_TICKET_SLA_BREACH = "TICKET_SLA_BREACH";
 
     private final NotificationService notificationService;
+
+    private final MemberRestService memberRestService;
 
     private final WorkgroupRepository workgroupRepository;
 
@@ -109,6 +115,40 @@ public class TicketNotificationService {
         notifyTicketStatusChanged(ticket, null, ticket != null ? ticket.getStatus() : null);
     }
 
+    public void notifyTicketTransferred(TicketEntity ticket) {
+        if (ticket == null || ticket.getAssignee() == null || !StringUtils.hasText(ticket.getAssignee().getUid())) {
+            return;
+        }
+
+        String eventType = EVENT_TYPE_TICKET_TRANSFERRED;
+        String title = buildTitle(ticket, eventType);
+        String content = buildContent(ticket, null, ticket.getStatus(), eventType);
+        String extra = buildExtra(ticket, null, ticket.getStatus(), eventType);
+        String assigneeUid = resolveNotificationUserUid(ticket.getAssignee());
+        if (!StringUtils.hasText(assigneeUid)) {
+            return;
+        }
+
+        try {
+            NotificationRequest request = NotificationRequest.builder()
+                    .title(title)
+                    .content(content)
+                    .type(NotificationTypeEnum.TICKET.name())
+                    .level(LevelEnum.USER.name())
+                    .orgUid(ticket.getOrgUid())
+                    .userUid(assigneeUid)
+                    .extra(extra)
+                    .build();
+            notificationService.dispatchSystemNotificationToUser(request);
+        } catch (Exception ex) {
+            log.warn("dispatch transferred ticket notification failed: ticketUid={}, recipientUid={}, error={}",
+                    ticket.getUid(), assigneeUid, ex.getMessage());
+        }
+
+        pushToAgentDevices(ticket, eventType, ticket.getReporter() != null ? ticket.getReporter().getUid() : null,
+                Set.of(assigneeUid));
+    }
+
     // public void notifyTicketComment(TicketCommentEntity comment) {
     // // 工单评论通知
     // }
@@ -123,11 +163,14 @@ public class TicketNotificationService {
 
     public void notifyTicketStatusChanged(TicketEntity ticket, String previousStatus, String currentStatus) {
         if (ticket == null || !StringUtils.hasText(ticket.getUid()) || !StringUtils.hasText(currentStatus)) {
+            log.info("[NOTICE-DIAG] notifyTicketStatusChanged SKIPPED: null/empty params");
             return;
         }
 
         String eventType = StringUtils.hasText(previousStatus) ? EVENT_TYPE_TICKET_STATUS_CHANGED
                 : EVENT_TYPE_TICKET_CREATED;
+        log.info("[NOTICE-DIAG] notifyTicketStatusChanged: ticketUid={} eventType={} previous={} current={}",
+                ticket.getUid(), eventType, previousStatus, currentStatus);
         String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
         String title = buildTitle(ticket, eventType);
         String content = buildContent(ticket, previousStatus, currentStatus, eventType);
@@ -136,7 +179,10 @@ public class TicketNotificationService {
         emitTicketThreadStatusMessage(ticket, previousStatus, currentStatus, eventType, content);
 
         Set<String> recipients = resolveRecipientUids(ticket, EVENT_TYPE_TICKET_CREATED.equals(eventType));
+        log.info("[NOTICE-DIAG] notifyTicketStatusChanged recipients: size={} uids={}",
+                recipients.size(), recipients);
         if (recipients.isEmpty()) {
+            log.info("[NOTICE-DIAG] notifyTicketStatusChanged SKIPPED: recipients empty");
             return;
         }
 
@@ -363,13 +409,21 @@ public class TicketNotificationService {
     }
 
     private void sendTicketAgentMessageEmailNotification(TicketEntity ticket, String agentName) {
+        TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
+        if (!isEmailEnabled(notifSettings)) {
+            log.debug("ticket agent message email skipped: email disabled, ticketUid={}", ticket.getUid());
+            return;
+        }
+        if (!isEventInList(notifSettings.getEmailEvents(), EVENT_TYPE_TICKET_AGENT_MESSAGE)) {
+            log.debug("ticket agent message email skipped: event not in emailEvents, ticketUid={}", ticket.getUid());
+            return;
+        }
         String recipientEmail = resolveReporterEmail(ticket);
         if (!StringUtils.hasText(recipientEmail)) {
             log.debug("ticket agent message email skipped: no reporter email, ticketUid={}", ticket.getUid());
             return;
         }
         if (!isReporterOffline(ticket)) {
-            TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
             boolean notifyWhenOnline = notifSettings != null
                     && Boolean.TRUE.equals(notifSettings.getEmailNotifyWhenOnline());
             if (!notifyWhenOnline) {
@@ -404,13 +458,15 @@ public class TicketNotificationService {
         Set<String> recipients = new LinkedHashSet<>();
 
         UserProtobuf reporter = ticket.getReporter();
-        if (reporter != null && StringUtils.hasText(reporter.getUid())) {
-            recipients.add(reporter.getUid());
+        String reporterUid = resolveNotificationUserUid(reporter);
+        if (StringUtils.hasText(reporterUid)) {
+            recipients.add(reporterUid);
         }
 
         UserProtobuf assignee = ticket.getAssignee();
-        if (assignee != null && StringUtils.hasText(assignee.getUid())) {
-            recipients.add(assignee.getUid());
+        String assigneeUid = resolveNotificationUserUid(assignee);
+        if (StringUtils.hasText(assigneeUid)) {
+            recipients.add(assigneeUid);
         }
 
         if (includeWorkgroupUsers && StringUtils.hasText(ticket.getWorkgroupUid())) {
@@ -430,6 +486,23 @@ public class TicketNotificationService {
         return recipients;
     }
 
+    private String resolveNotificationUserUid(UserProtobuf user) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return null;
+        }
+
+        if (UserTypeEnum.MEMBER.name().equals(user.getType())) {
+            return memberRestService.findByUid(user.getUid())
+                    .map(MemberEntity::getUser)
+                    .filter(Objects::nonNull)
+                    .map(userEntity -> userEntity.getUid())
+                    .filter(StringUtils::hasText)
+                    .orElse(user.getUid());
+        }
+
+        return user.getUid();
+    }
+
     /**
      * Push ticket notification to agent iOS devices via APNs.
      * Only pushes to agents (assignee + workgroup members), not to the
@@ -437,6 +510,10 @@ public class TicketNotificationService {
      * Android push is reserved as a TODO placeholder for future implementation.
      */
     private void pushToAgentDevices(TicketEntity ticket, String eventType, String reporterUid, Set<String> recipients) {
+        TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
+        if (notifSettings == null || !Boolean.TRUE.equals(notifSettings.getApnsEnabled())) {
+            return;
+        }
         String agentPushTitle = buildAgentPushTitle(ticket, eventType);
         String agentPushBody = buildAgentPushBody(ticket, eventType);
 
@@ -465,6 +542,9 @@ public class TicketNotificationService {
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "新工单";
         }
+        if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
+            return "工单转派";
+        }
         if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
             return "工单SLA即将超时";
         }
@@ -485,6 +565,11 @@ public class TicketNotificationService {
             return StringUtils.hasText(summary)
                     ? "#" + ticketNumber + " " + summary
                     : "收到新工单 #" + ticketNumber;
+        }
+        if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
+            return StringUtils.hasText(summary)
+                ? "工单 #" + ticketNumber + " 已转派给您。内容：" + summary
+                : "工单 #" + ticketNumber + " 已转派给您";
         }
         if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
             return StringUtils.hasText(summary)
@@ -508,6 +593,9 @@ public class TicketNotificationService {
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "新工单：#" + ticketNumber;
         }
+        if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
+            return "工单转派：#" + ticketNumber;
+        }
         return "工单状态更新：#" + ticketNumber;
     }
 
@@ -527,6 +615,8 @@ public class TicketNotificationService {
         StringBuilder builder = new StringBuilder();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             builder.append("收到新工单 #").append(ticketNumber);
+        } else if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
+            builder.append("工单 #").append(ticketNumber).append(" 已转派给您");
         } else {
             builder.append("工单 #").append(ticketNumber).append(" 状态更新为 ").append(toStatusLabel(currentStatus));
         }
@@ -586,13 +676,22 @@ public class TicketNotificationService {
         if (ticket == null) {
             return;
         }
+        TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
+        if (!isEmailEnabled(notifSettings)) {
+            log.debug("ticket email notification skipped: email disabled, ticketUid={}", ticket.getUid());
+            return;
+        }
+        if (!isEventInList(notifSettings.getEmailEvents(), resolveEventKey(eventType, currentStatus, ticket))) {
+            log.debug("ticket email notification skipped: event not in emailEvents, ticketUid={}, eventType={}",
+                    ticket.getUid(), eventType);
+            return;
+        }
         String recipientEmail = resolveReporterEmail(ticket);
         if (!StringUtils.hasText(recipientEmail)) {
             log.debug("ticket email notification skipped: no reporter email found, ticketUid={}", ticket.getUid());
             return;
         }
         if (!isReporterOffline(ticket)) {
-            TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
             boolean notifyWhenOnline = notifSettings != null
                     && Boolean.TRUE.equals(notifSettings.getEmailNotifyWhenOnline());
             if (!notifyWhenOnline) {
@@ -678,6 +777,16 @@ public class TicketNotificationService {
         if (ticket == null) {
             return;
         }
+        TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
+        if (!isSmsEnabled(notifSettings)) {
+            log.debug("ticket sms notification skipped: sms disabled, ticketUid={}", ticket.getUid());
+            return;
+        }
+        if (!isEventInList(notifSettings.getSmsEvents(), resolveEventKey(eventType, currentStatus, ticket))) {
+            log.debug("ticket sms notification skipped: event not in smsEvents, ticketUid={}, eventType={}",
+                    ticket.getUid(), eventType);
+            return;
+        }
         // 获取访客手机号：优先取 ticket.phone 字段，其次从 reporter VisitorEntity 中获取
         String recipientMobile = resolveReporterMobile(ticket);
         if (!StringUtils.hasText(recipientMobile)) {
@@ -686,7 +795,6 @@ public class TicketNotificationService {
         }
         // 检查访客是否离线
         if (!isReporterOffline(ticket)) {
-            TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
             boolean notifyWhenOnline = notifSettings != null
                     && Boolean.TRUE.equals(notifSettings.getSmsNotifyWhenOnline());
             if (!notifyWhenOnline) {
@@ -695,7 +803,6 @@ public class TicketNotificationService {
             }
         }
         // 获取 ticketSettings 中的短信模板配置（smsTemplateIds: event → {"tc":"...","sn":"..."})
-        TicketNotificationSettingsEntity notifSettings = resolveNotificationSettings(ticket);
         Map<String, String> smsTemplateIds = null;
         if (notifSettings != null && notifSettings.getSmsTemplateIds() != null
                 && !notifSettings.getSmsTemplateIds().isEmpty()) {
@@ -707,7 +814,7 @@ public class TicketNotificationService {
             return;
         }
         // 按事件类型查找对应的模板配置 JSON
-        String smsEventKey = resolveSmsEventKey(eventType, currentStatus, ticket);
+        String smsEventKey = resolveEventKey(eventType, currentStatus, ticket);
         String templateJson = smsTemplateIds.get(smsEventKey);
         if (!StringUtils.hasText(templateJson)) {
             log.debug("ticket sms notification: no template configured for eventKey={}, skipping ticketUid={}",
@@ -763,7 +870,7 @@ public class TicketNotificationService {
      * "status_changed" 等</li>
      * </ul>
      */
-    private String resolveSmsEventKey(String eventType, String currentStatus, TicketEntity ticket) {
+    private String resolveEventKey(String eventType, String currentStatus, TicketEntity ticket) {
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "created";
         }
@@ -776,7 +883,7 @@ public class TicketNotificationService {
         if (EVENT_TYPE_TICKET_SLA_BREACH.equals(eventType)) {
             return "sla_breach";
         }
-        // TICKET_STATUS_CHANGED: 推导具体事件
+        // TICKET_STATUS_CHANGED: derive specific event
         if (StringUtils.hasText(currentStatus)) {
             try {
                 TicketStatusEnum status = TicketStatusEnum.valueOf(currentStatus);
@@ -795,6 +902,18 @@ public class TicketNotificationService {
             }
         }
         return "status_changed";
+    }
+
+    private boolean isEmailEnabled(TicketNotificationSettingsEntity settings) {
+        return settings != null && Boolean.TRUE.equals(settings.getEmailEnabled());
+    }
+
+    private boolean isSmsEnabled(TicketNotificationSettingsEntity settings) {
+        return settings != null && Boolean.TRUE.equals(settings.getSmsEnabled());
+    }
+
+    private boolean isEventInList(java.util.List<String> events, String eventKey) {
+        return events != null && !events.isEmpty() && events.contains(eventKey);
     }
 
     /**

@@ -1206,6 +1206,7 @@ public class TicketSettingsRestService extends
                 .smsTemplateIds(entity.getSmsTemplateIds())
                 .emailNotifyWhenOnline(entity.getEmailNotifyWhenOnline())
                 .smsNotifyWhenOnline(entity.getSmsNotifyWhenOnline())
+                .apnsEnabled(entity.getApnsEnabled())
                 .build();
     }
 

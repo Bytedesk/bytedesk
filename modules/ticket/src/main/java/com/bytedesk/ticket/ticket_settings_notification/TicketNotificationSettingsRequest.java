@@ -40,4 +40,10 @@ public class TicketNotificationSettingsRequest extends BaseRequest {
 
     /** 用户在线时是否仍发送短信通知 */
     private Boolean smsNotifyWhenOnline;
+
+    /** 是否开启 iOS APNs 推送 */
+    private Boolean apnsEnabled;
+
+    /** 是否开启微信服务号推送（开发中暂未上线） */
+    private Boolean wechatEnabled;
 }

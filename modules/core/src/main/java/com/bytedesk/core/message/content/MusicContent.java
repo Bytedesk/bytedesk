@@ -36,4 +36,11 @@ public class MusicContent extends BaseContent {
     private String coverUrl;
     private String duration;
     private String label;
+
+    public static MusicContent fromJson(String json) {
+        if (json == null || json.isEmpty()) {
+            return null;
+        }
+        return BaseContent.fromJson(json, MusicContent.class);
+    }
 } 

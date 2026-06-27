@@ -56,5 +56,8 @@ public class OrganizationApplyResponse extends BaseResponse {
     // 申请人信息（管理员审核时展示）
     private UserResponseContact user;
 
+    // 当前用户与此申请的关系：ADMIN（当前用户是目标组织管理员）、APPLICANT（当前用户是申请人）
+    private String relationType;
+
     // private ZonedDateTime createdAt;
 }
