@@ -176,12 +176,12 @@ public class CallEventListener implements IEslEventListener {
      */
     private void handleChannelHangupComplete(EslEvent eslEvent) {
         String uuid = eslEvent.getEventHeaders().get("Unique-ID");
-        String hangupCause = eslEvent.getEventHeaders().getOrDefault("hangup_cause",
-                eslEvent.getEventHeaders().get("Hangup-Cause"));
-        String duration = eslEvent.getEventHeaders().getOrDefault("duration", "0");
-        String billsec = eslEvent.getEventHeaders().getOrDefault("billsec", "0");
+        // String hangupCause = eslEvent.getEventHeaders().getOrDefault("hangup_cause",
+        //         eslEvent.getEventHeaders().get("Hangup-Cause"));
+        // String duration = eslEvent.getEventHeaders().getOrDefault("duration", "0");
+        // String billsec = eslEvent.getEventHeaders().getOrDefault("billsec", "0");
 
-        log.info("通道挂断完成: UUID {} 原因 {} 通话时长(s) {} 计费时长(s) {}", uuid, hangupCause, duration, billsec);
+        // log.info("通道挂断完成: UUID {} 原因 {} 通话时长(s) {} 计费时长(s) {}", uuid, hangupCause, duration, billsec);
 
         try {
             // cdrService.finalizeCdr(uuid, hangupCause, Integer.parseInt(duration), Integer.parseInt(billsec));
@@ -370,13 +370,13 @@ public class CallEventListener implements IEslEventListener {
      * 处理通道状态事件
      */
     private void handleChannelState(EslEvent eslEvent) {
-        var headers = eslEvent.getEventHeaders();
-        String uuid = headers.get("Unique-ID");
-        String state = headers.get("Channel-State");
-        String callState = headers.get("Channel-Call-State");
-        String answerState = headers.get("Answer-State");
+        // var headers = eslEvent.getEventHeaders();
+        // String uuid = headers.get("Unique-ID");
+        // String state = headers.get("Channel-State");
+        // String callState = headers.get("Channel-Call-State");
+        // String answerState = headers.get("Answer-State");
 
-        log.info("通道状态: UUID {} State {} CallState {} AnswerState {}", uuid, state, callState, answerState);
+        // log.info("通道状态: UUID {} State {} CallState {} AnswerState {}", uuid, state, callState, answerState);
     }
 
     /**
@@ -435,8 +435,8 @@ public class CallEventListener implements IEslEventListener {
     private void handleChannelDestroy(EslEvent eslEvent) {
         var headers = eslEvent.getEventHeaders();
         String uuid = headers.get("Unique-ID");
-        String hangupCause = headers.getOrDefault("Hangup-Cause", headers.get("variable_hangup_cause"));
-        log.info("通道销毁: UUID {} 原因 {}", uuid, hangupCause);
+        // String hangupCause = headers.getOrDefault("Hangup-Cause", headers.get("variable_hangup_cause"));
+        // log.info("通道销毁: UUID {} 原因 {}", uuid, hangupCause);
 
         try {
             // cdrService.closeSession(uuid);
