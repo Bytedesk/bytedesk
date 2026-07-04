@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.BusinessConflictException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -52,7 +53,7 @@ public class AgentSeatRestService
 
     private final PermissionService permissionService;
 
-    private final AgentSeatDomainService agentSeatDomainService;
+    private final AgentSeatService agentSeatService;
 
     @Override
     public Page<AgentSeatEntity> queryByOrgEntity(AgentSeatRequest request) {
@@ -80,7 +81,7 @@ public class AgentSeatRestService
             throw new RuntimeException("assignedAgentUid is required");
         }
 
-        AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(request.getAssignedAgentUid())
+        AgentSeatEntity seat = agentSeatService.findManagedSeatByAgentUid(request.getAssignedAgentUid())
                 .orElse(null);
 
         if (seat == null) {
@@ -193,8 +194,32 @@ public class AgentSeatRestService
 
     @Override
     protected AgentSeatEntity doSave(AgentSeatEntity entity) {
+        validateSeatNoUniqueness(entity);
         validateAssignedAgentUniqueness(entity);
+        agentSeatService.normalizeSeatState(entity);
         return agentSeatRepository.save(entity);
+    }
+
+    private void validateSeatNoUniqueness(AgentSeatEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getSeatNo()) || !StringUtils.hasText(entity.getOrgUid())) {
+            return;
+        }
+
+        Optional<AgentSeatEntity> existingSeat = agentSeatRepository
+                .findByOrgUidAndSeatNoAndDeletedFalse(entity.getOrgUid(), entity.getSeatNo());
+
+        if (existingSeat.isEmpty()) {
+            return;
+        }
+
+        AgentSeatEntity duplicateSeat = existingSeat.get();
+        if (StringUtils.hasText(entity.getUid()) && entity.getUid().equals(duplicateSeat.getUid())) {
+            return;
+        }
+
+        throw new BusinessConflictException(I18Consts.withArgs(
+                I18ServiceConsts.I18N_AGENT_SEAT_NO_DUPLICATE,
+                entity.getSeatNo()));
     }
 
     private void validateAssignedAgentUniqueness(AgentSeatEntity entity) {
@@ -215,7 +240,7 @@ public class AgentSeatRestService
         }
 
         String conflictSeatNo = StringUtils.hasText(boundSeat.getSeatNo()) ? boundSeat.getSeatNo() : boundSeat.getUid();
-        throw new RuntimeException(I18Consts.withArgs(
+        throw new BusinessConflictException(I18Consts.withArgs(
                 I18ServiceConsts.I18N_AGENT_SEAT_ASSIGNED_AGENT_ALREADY_BOUND,
                 conflictSeatNo));
     }

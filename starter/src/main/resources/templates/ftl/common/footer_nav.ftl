@@ -18,7 +18,7 @@
 				</a>
 
 				<p class="my-4"><h3 class="text-white">${(i18n['brand.title'])! '微语 - 解决客户问题'}</h3></p>
-				<p><h5 class="text-white-50">${(i18n['brand.subtitle'])! '开源办公软件'}</h5></p>
+				<p><h5 class="text-white-50">${(i18n['brand.subtitle'])! '开源创造价值'}</h5></p>
 				<#--  开源即时通讯平台、开源智能客服系统、开源AI应用创新平台  -->
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
@@ -124,6 +124,17 @@
 					</div>
 					<div class="col-6 col-lg-3">
 						<a href="${langPrefix}/features/office.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.office">AI文档</@t></a>
+					</div>
+
+					<#--  第五行: MCP/CLI/Skills  -->
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/mcp.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.mcp">MCP 服务</@t></a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/cli.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.cli">CLI 命令行</@t></a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/skill.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.skill">Skills 技能</@t></a>
 					</div>
 				</div>
 			</div>

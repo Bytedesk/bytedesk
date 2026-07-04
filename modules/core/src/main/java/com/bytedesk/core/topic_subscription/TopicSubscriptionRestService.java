@@ -147,7 +147,8 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (user == null) {
             throw CommonI18nExceptions.loginRequired();
         }
-        return isTopicSubscribed(user.getUid(), request.getTopic(), CHAT_SUBSCRIPTION_TYPE);
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        return isTopicSubscribed(user.getUid(), request.getTopic(), type);
     }
 
     @Transactional
@@ -156,7 +157,8 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (user == null) {
             throw CommonI18nExceptions.loginRequired();
         }
-        return createChatSubscription(request.getTopic(), user.getUid());
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        return createTypedSubscription(request.getTopic(), user.getUid(), type);
     }
 
     @Transactional
@@ -174,7 +176,8 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (user == null) {
             throw CommonI18nExceptions.loginRequired();
         }
-        softDeleteChatTopicSubscription(request.getTopic(), user.getUid());
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        softDeleteTopicSubscriptionByType(request.getTopic(), user.getUid(), type);
     }
 
     @Transactional

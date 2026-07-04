@@ -13,15 +13,11 @@
  */
 package com.bytedesk.service.workgroup;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -182,67 +178,5 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
             "workgroup"
         );
     }
-
-    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_PREFIX + "action.query.admin.workgroup", description = "query workgroup by admin agent uid")
-    @Operation(summary = "Query Workgroups Managed by Agent", description = "Retrieve the workgroups where the agent acts as an administrator with monitor or takeover permissions")
-    @ApiResponse(responseCode = "200", description = "Query successful",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
-    @GetMapping("/query/admin/agent")
-    public ResponseEntity<?> queryAdminWorkgroups(
-            @RequestParam("agentUid") String agentUid,
-            @RequestParam(value = "orgUid", required = false) String orgUid) {
-
-        List<WorkgroupResponse> workgroups = workgroupRestService.queryAdminWorkgroups(agentUid, orgUid);
-        return ResponseEntity.ok(JsonResult.success(workgroups));
-    }
-
-    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_PREFIX + "action.query.admin.workgroup.batch", description = "batch query workgroup by admin agent uids")
-    @Operation(summary = "Batch Query Workgroups Managed by Agents", description = "Retrieve the workgroups where the given agents act as administrators with monitor or takeover permissions")
-    @ApiResponse(responseCode = "200", description = "Query successful")
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
-    @PostMapping("/query/admin/agents")
-    public ResponseEntity<?> queryAdminWorkgroups(@RequestBody WorkgroupAdminBatchRequest request) {
-
-        Map<String, List<WorkgroupResponse>> workgroupsByAgent = workgroupRestService.queryAdminWorkgroups(
-                request.getAgentUids(),
-                request.getOrgUid());
-        return ResponseEntity.ok(JsonResult.success(workgroupsByAgent));
-    }
-
-    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_PREFIX + "action.query.admin.ongoing.thread", description = "query ongoing threads by admin workgroups")
-    @Operation(summary = "Query Ongoing Threads in Agent-Managed Workgroups", description = "Retrieve ongoing threads under the workgroups managed by the specified agent")
-    @ApiResponse(responseCode = "200", description = "Query successful")
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
-    @GetMapping("/query/admin/threads/ongoing")
-    public ResponseEntity<?> queryAdminOngoingThreads(
-            @RequestParam("agentUid") String agentUid,
-            @RequestParam("orgUid") String orgUid,
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-
-        Page<com.bytedesk.core.thread.ThreadResponse> threadPage = workgroupRestService.queryAdminOngoingThreads(
-            agentUid,
-            orgUid,
-            pageNumber,
-            pageSize);
-        return ResponseEntity.ok(JsonResult.success(threadPage));
-    }
-
-    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_PREFIX + "action.batch.update.admin.workgroup", description = "batch update workgroups admin by agent")
-    @Operation(summary = "Batch Update Agent-Managed Workgroups", description = "Batch update the workgroups where the specified agent acts as an administrator with monitor or takeover permissions, without affecting other administrators")
-    @ApiResponse(responseCode = "200", description = "Updated successfully")
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
-    @PostMapping("/update/admin/agent/workgroups")
-    public ResponseEntity<?> updateAdminWorkgroupsForAgent(@RequestBody WorkgroupAdminRequest request) {
-        Map<String, Object> result = workgroupRestService.updateAdminWorkgroupsForAgent(request);
-        return ResponseEntity.ok(JsonResult.success(result));
-    }
-
-    
-    
-
-    
 
 }

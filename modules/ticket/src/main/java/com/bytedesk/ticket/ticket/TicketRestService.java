@@ -54,6 +54,9 @@ import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.process.ProcessEntity;
+import com.bytedesk.ticket.ticket.dto.TicketStatusCountResponse;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
@@ -694,10 +697,16 @@ public class TicketRestService
         Assert.notNull(ticket, "ticket required");
         Assert.notNull(request, "ticket request required");
 
-        TicketSettingsEntity settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                .orElseThrow(() -> new NotFoundException(
-                        "ticket settings not found: " + request.getTicketSettingsUid()));
-        ticket.setTicketSettingsUid(request.getTicketSettingsUid());
+        TicketSettingsEntity settings;
+        if (StringUtils.hasText(request.getTicketSettingsUid())) {
+            settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
+                    .orElseThrow(() -> new NotFoundException(
+                            "ticket settings not found: " + request.getTicketSettingsUid()));
+        } else {
+            settings = ticketSettingsRestService.getOrCreateDefault(request.getOrgUid(), request.getType());
+            request.setTicketSettingsUid(settings.getUid());
+        }
+        ticket.setTicketSettingsUid(settings.getUid());
 
         // 优先使用前端明确传入的流程 UID（便于草稿流程/自定义流程创建工单）
         if (StringUtils.hasText(request.getProcessEntityUid())) {

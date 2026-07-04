@@ -70,5 +70,6 @@
     <include file="db/changelog/migration/260624_rename_robot_to_agent_settings_enabled_column.xml" />
     <include file="db/changelog/migration/260625_add_robot_settings_hide_thinking_process.xml" />
     <include file="db/changelog/migration/260625_add_ticket_basic_settings_smart_ticket_generate.xml" />
+    <include file="db/changelog/migration/260704_add_nickname_pinyin.xml" />
 
 </databaseChangeLog>

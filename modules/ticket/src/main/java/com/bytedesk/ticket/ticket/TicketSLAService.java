@@ -41,6 +41,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.holiday.HolidayEntity;
 import com.bytedesk.service.holiday.HolidayRestService;
 import com.bytedesk.ticket.service.TicketNotificationService;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;

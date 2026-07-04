@@ -19,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import jakarta.persistence.EntityManager;
+
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.MessageRestService;
@@ -79,6 +81,9 @@ class QueueRestServiceTest {
     @Mock
     private QueueService queueService;
 
+    @Mock
+    private EntityManager entityManager;
+
     private QueueRestService queueRestService;
 
     @BeforeEach
@@ -95,7 +100,8 @@ class QueueRestServiceTest {
                 messageRepository,
                 messageRestService,
                 threadRepository,
-                queueService);
+                queueService,
+                entityManager);
     }
 
     @Test

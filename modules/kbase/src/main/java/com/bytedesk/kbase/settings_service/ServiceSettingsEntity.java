@@ -87,11 +87,7 @@ public class ServiceSettingsEntity extends BaseEntity {
     private ZonedDateTime topTipEnd;
 
     // 满意度评价设置--------------------------------------------------
-    // show rate btn on chat toolbar
-    @NotNull
-    @Builder.Default
-    private Boolean showRateBtn = false;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     // 关闭会话时自动发送满意度评价
     @NotNull
     @Builder.Default

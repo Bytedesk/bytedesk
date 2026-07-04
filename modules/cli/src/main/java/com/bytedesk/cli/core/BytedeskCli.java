@@ -11,6 +11,7 @@ import com.bytedesk.cli.command.AuthCommand;
 import com.bytedesk.cli.command.ConfigCommand;
 import com.bytedesk.cli.command.DomainPlaceholderCommand;
 import com.bytedesk.cli.command.HelpCommand;
+import com.bytedesk.cli.command.KnowledgeCommand;
 import com.bytedesk.cli.command.OrgCommand;
 import com.bytedesk.cli.command.TicketCommand;
 import com.bytedesk.cli.command.VersionCommand;
@@ -86,7 +87,7 @@ public class BytedeskCli {
 		registry.register(new OrgCommand());
 		registry.register(new DomainPlaceholderCommand("thread", "Conversation and queue operations", List.of("list", "show", "assign")));
 		registry.register(new DomainPlaceholderCommand("message", "Message send and export operations", List.of("send", "list", "export")));
-		registry.register(new DomainPlaceholderCommand("knowledge", "Knowledge base search and sync operations", List.of("search", "sync", "upload")));
+		registry.register(new KnowledgeCommand());
 		registry.register(new TicketCommand());
 	}
 

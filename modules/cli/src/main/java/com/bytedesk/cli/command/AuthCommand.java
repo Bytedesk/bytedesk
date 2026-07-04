@@ -86,9 +86,17 @@ public class AuthCommand implements CliCommand {
 		context.configStore().put(HttpApiClient.PLATFORM_KEY, platform);
 		context.configStore().put(HttpApiClient.CHANNEL_KEY, channel);
 		Map<String, Object> user = Jsons.object(authData, "user");
+		String userUid = Jsons.string(user, "uid");
+		String nickname = Jsons.string(user, "nickname");
 		Map<String, Object> currentOrg = Jsons.object(user, "currentOrganization");
 		String orgUid = Jsons.string(currentOrg, "uid");
 		String orgName = Jsons.string(currentOrg, "name");
+		if (userUid != null) {
+			context.configStore().put(HttpApiClient.CURRENT_USER_UID_KEY, userUid);
+		}
+		if (nickname != null) {
+			context.configStore().put(HttpApiClient.CURRENT_USER_NICKNAME_KEY, nickname);
+		}
 		if (orgUid != null) {
 			context.configStore().put(HttpApiClient.CURRENT_ORG_UID_KEY, orgUid);
 		}
@@ -106,10 +114,25 @@ public class AuthCommand implements CliCommand {
 	private CliResult whoami(CliContext context) {
 		Map<String, Object> response = apiClient.get(context, "/api/v1/user/profile", Map.of(), true);
 		Map<String, Object> user = Jsons.object(response, "data");
+		String userUid = Jsons.string(user, "uid");
+		String nickname = Jsons.string(user, "nickname");
 		Map<String, Object> currentOrg = Jsons.object(user, "currentOrganization");
+		String orgUid = Jsons.string(currentOrg, "uid");
+		String orgName = Jsons.string(currentOrg, "name");
+		if (userUid != null) {
+			context.configStore().put(HttpApiClient.CURRENT_USER_UID_KEY, userUid);
+		}
+		if (nickname != null) {
+			context.configStore().put(HttpApiClient.CURRENT_USER_NICKNAME_KEY, nickname);
+		}
+		if (orgUid != null) {
+			context.configStore().put(HttpApiClient.CURRENT_ORG_UID_KEY, orgUid);
+		}
+		if (orgName != null) {
+			context.configStore().put(HttpApiClient.CURRENT_ORG_NAME_KEY, orgName);
+		}
 		String server = context.configStore().get(HttpApiClient.SERVER_KEY).orElse("(unset)");
 		String username = Jsons.string(user, "username");
-		String orgName = Jsons.string(currentOrg, "name");
 		String message = "User: " + username + "\nServer: " + server + "\nCurrent organization: " + (orgName == null ? "(unset)" : orgName);
 		return CliResult.ok(message, Map.of("server", server, "user", user));
 	}
@@ -119,6 +142,8 @@ public class AuthCommand implements CliCommand {
 		context.configStore().remove(HttpApiClient.TOKEN_KEY);
 		context.configStore().remove(HttpApiClient.CURRENT_ORG_UID_KEY);
 		context.configStore().remove(HttpApiClient.CURRENT_ORG_NAME_KEY);
+		context.configStore().remove(HttpApiClient.CURRENT_USER_UID_KEY);
+		context.configStore().remove(HttpApiClient.CURRENT_USER_NICKNAME_KEY);
 		return CliResult.ok("Logged out and cleared stored auth token.", Map.of("tokenStored", false));
 	}
 

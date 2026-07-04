@@ -89,7 +89,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/{lang:zh-CN|zh-TW|en}/index.html",
-		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
 		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms}.html"
 	})
 	public String multiLanguageStaticPages(
@@ -137,7 +137,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/index.html",
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
 		"/pages/{page:download|contact|about|privacy|terms}.html"
 	})
 	public String rootStaticPages(
@@ -542,8 +542,8 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/features/office
 	 */
 	@GetMapping({ 
-		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", 
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}"
+		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}", 
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}"
 	})
 	public String handleFeatureRoutes(
 			@PathVariable(required = false) String feature, 

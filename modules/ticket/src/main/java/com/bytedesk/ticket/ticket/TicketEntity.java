@@ -22,6 +22,9 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketPriorityEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

@@ -24,4 +24,15 @@ public interface KbaseVectorStoreResolver {
     VectorStore resolveByKbUid(String kbUid);
 
     VectorStore resolveDefault();
+
+    /**
+     * 获取当前知识库使用的 embedding 配置信息（provider / model / dimensions）。
+     * 默认返回 null，由具体实现覆盖。
+     */
+    default EmbeddingInfo getEmbeddingInfo(KbaseEntity kbase) {
+        return null;
+    }
+
+    /** embedding 配置信息 */
+    record EmbeddingInfo(String provider, String model, Integer dimensions) {}
 }

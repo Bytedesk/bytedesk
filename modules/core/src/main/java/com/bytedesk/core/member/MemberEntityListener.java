@@ -14,12 +14,16 @@
 package com.bytedesk.core.member;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.utils.BdPinyinUtils;
 import com.bytedesk.core.member.event.MemberCreateEvent;
 import com.bytedesk.core.member.event.MemberUpdateEvent;
 
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostUpdate;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +32,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class MemberEntityListener {
+
+    @PrePersist
+    public void prePersist(MemberEntity member) {
+        populateNicknamePinyin(member);
+    }
+
+    @PreUpdate
+    public void preUpdate(MemberEntity member) {
+        populateNicknamePinyin(member);
+    }
 
     @PostPersist
     public void postPersist(MemberEntity member) {
@@ -45,5 +59,10 @@ public class MemberEntityListener {
         bytedeskEventPublisher.publishEvent(new MemberUpdateEvent(this, member));
     }
 
+    private void populateNicknamePinyin(MemberEntity member) {
+        if (StringUtils.hasText(member.getNickname())) {
+            member.setNicknamePinyin(BdPinyinUtils.toPinYin(member.getNickname()).replace(" ", ""));
+        }
+    }
 
 }

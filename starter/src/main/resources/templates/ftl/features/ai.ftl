@@ -7,6 +7,11 @@
 	<#include "../common/header_css.ftl" />
 	<#-- i18n macro -->
 	<#include "../common/macro/i18n.ftl" />
+	<#-- Language prefix for links -->
+	<#assign langPrefix = "">
+	<#if lang?? && lang != "zh-CN">
+		<#assign langPrefix = "/" + lang>
+	</#if>
 	
 </head>
 
@@ -239,6 +244,59 @@ AI Agents START -->
 </section>
 <!-- =======================
 AI Agents END -->
+
+<!-- =======================
+MCP / CLI / Skills START -->
+<section class="bg-light">
+	<div class="container">
+		<div class="row mb-4">
+			<div class="col-12 text-center">
+				<h2><@t key="page.ai.integration.title">AI 开放能力</@t></h2>
+				<p class="mb-0"><@t key="page.ai.integration.desc">通过 MCP、CLI、Skills 三种方式将微语 AI 能力对接到您的工具链中</@t></p>
+			</div>
+		</div>
+
+		<div class="row g-4">
+			<!-- MCP -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
+						<i class="bi bi-plug fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.mcp.title">MCP 服务</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.mcp.desc">基于 Model Context Protocol，让 Claude、Codex 等 AI Agent 直接调用微语的知识库、工单、客服等核心 API。</@t></p>
+					<a href="${langPrefix}/features/mcp.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.mcp.link">了解 MCP →</@t></a>
+				</div>
+			</div>
+
+			<!-- CLI -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-success bg-opacity-10 text-success rounded-circle mb-3">
+						<i class="bi bi-terminal fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.cli.title">CLI 命令行</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.cli.desc">在终端中通过命令行直接操作微语系统，支持管道、脚本和 CI/CD 集成。</@t></p>
+					<a href="${langPrefix}/features/cli.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.cli.link">了解 CLI →</@t></a>
+				</div>
+			</div>
+
+			<!-- Skills -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-3">
+						<i class="bi bi-puzzle fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.skill.title">Skills 技能</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.skill.desc">将客服经验沉淀为标准化技能包，让 AI Agent 像专家一样处理客户问题，支持自进化。</@t></p>
+					<a href="${langPrefix}/features/skill.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.skill.link">了解 Skills →</@t></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+MCP / CLI / Skills END -->
 
 <!-- =======================
 Models START -->

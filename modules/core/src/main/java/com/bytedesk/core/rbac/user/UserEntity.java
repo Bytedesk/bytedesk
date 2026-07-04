@@ -84,6 +84,12 @@ public class UserEntity extends BaseEntityNoOrg {
 	private String nickname;
 
 	/**
+	 * Pinyin of the nickname for pinyin-based search (auto-populated by UserEntityListener)
+	 */
+	@Column(name = "nickname_pinyin", length = 512)
+	private String nicknamePinyin;
+
+	/**
 	 * Encrypted password for user authentication
 	 */
 	private String password;

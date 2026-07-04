@@ -50,6 +50,9 @@ import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
@@ -84,6 +87,8 @@ public class ThreadRestService
     private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     private final ActiveThreadCacheService activeThreadCacheService;
+
+    private final MessageRestService messageRestService;
 
     // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
     public Optional<ThreadEntity> findByUid(@NonNull String uid) {
@@ -1122,6 +1127,33 @@ public class ThreadRestService
     @Override
     protected Page<ThreadEntity> executePageQuery(Specification<ThreadEntity> spec, Pageable pageable) {
         return threadRepository.findAll(spec, pageable);
+    }
+
+    /**
+     * 标记访客在当前会话中的未读客服消息为已读
+     * 将 thread 中所有 agent 发送的未读消息状态更新为 READ，
+     * 这样 getVisitorUnreadCount() 会返回 0。
+     */
+    @Transactional
+    public void markVisitorMessagesRead(String threadUid) {
+        if (!StringUtils.hasText(threadUid)) {
+            return;
+        }
+
+        List<MessageEntity> messages = messageRestService.findByThreadUid(threadUid);
+        int updated = 0;
+        for (MessageEntity message : messages) {
+            if (message == null || message.isDeleted()) {
+                continue;
+            }
+            // 只处理 agent 发送的未读消息
+            if (message.isFromAgent() && message.isUnread()) {
+                message.setStatus(MessageStatusEnum.READ.name());
+                messageRestService.save(message);
+                updated++;
+            }
+        }
+        log.info("markVisitorMessagesRead: threadUid={}, updated={}", threadUid, updated);
     }
 
 }

@@ -36,7 +36,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
-import com.bytedesk.service.agent_seat.AgentSeatDomainService;
+import com.bytedesk.service.agent_seat.AgentSeatService;
 import com.bytedesk.service.agent_seat.AgentSeatEntity;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,7 +77,7 @@ class AgentRestServiceTest {
         private MessageService messageService;
 
         @Mock
-        private AgentSeatDomainService agentSeatDomainService;
+        private AgentSeatService agentSeatDomainService;
 
     private AgentRestService agentRestService;
 

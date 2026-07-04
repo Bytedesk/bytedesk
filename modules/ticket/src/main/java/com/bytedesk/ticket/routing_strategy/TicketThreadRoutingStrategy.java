@@ -52,7 +52,7 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
-import com.bytedesk.ticket.ticket.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;

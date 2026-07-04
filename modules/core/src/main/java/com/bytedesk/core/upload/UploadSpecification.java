@@ -30,6 +30,8 @@ public class UploadSpecification extends BaseSpecification<UploadEntity, UploadR
     public static Specification<UploadEntity> search(UploadRequest request, AuthService authService) {
         log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
+            validateSuperUserPermission(request, authService);
+
             List<Predicate> predicates = new ArrayList<>();
             // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
@@ -56,7 +58,16 @@ public class UploadSpecification extends BaseSpecification<UploadEntity, UploadR
 
             // orgUid
             if (StringUtils.hasText(request.getOrgUid())) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                if (Boolean.TRUE.equals(request.getSuperUser())) {
+                    List<String> matchedOrgUids = resolveOrganizationUidsForKeyword(request.getOrgUid());
+                    if (matchedOrgUids.isEmpty()) {
+                        predicates.add(criteriaBuilder.disjunction());
+                    } else {
+                        predicates.add(root.get("orgUid").in(matchedOrgUids));
+                    }
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                }
             } else {
                 // TODO: 超级管理员查询所有
             }

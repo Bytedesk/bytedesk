@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;

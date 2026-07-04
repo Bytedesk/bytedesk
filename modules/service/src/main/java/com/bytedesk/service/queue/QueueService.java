@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -40,6 +43,9 @@ public class QueueService {
     private final WorkgroupRepository workgroupRepository;
 
     private final UidUtils uidUtils;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent,
@@ -239,8 +245,30 @@ public class QueueService {
         try {
             return queueRepository.save(queue);
         } catch (DataIntegrityViolationException e) {
+            // 保存失败后，实体可能仍被持久化上下文管理且 ID 为 null。
+            // 必须先 detach，否则后续查询触发 flush 时会抛出 AssertionFailure:
+            // "Entry for instance of QueueEntity has a null identifier"
+            detachEntity(queue);
             return queueRepository.findByTopicAndDayAndDeletedFalse(queueTopic, day)
                     .orElseThrow(() -> new RuntimeException("Queue creation failed for topic " + queueTopic, e));
+        }
+    }
+
+    /**
+     * 安全 detach 实体，避免在 persistence context 异常时二次抛错。
+     */
+    private void detachEntity(Object entity) {
+        try {
+            if (entityManager.contains(entity)) {
+                entityManager.detach(entity);
+            }
+        } catch (Exception ignored) {
+            // 如果 session 已损坏，clear 整个 persistence context
+            try {
+                entityManager.clear();
+            } catch (Exception ignored2) {
+                // 最终兜底
+            }
         }
     }
 
@@ -255,6 +283,8 @@ public class QueueService {
             }
             return updatedMember;
         } catch (DataIntegrityViolationException ex) {
+            // 保存失败后，detach 失败实体避免后续 flush 时 AssertionFailure
+            detachEntity(member);
             String threadUid = member.getThread() != null ? member.getThread().getUid() : null;
             if (threadUid != null) {
                 Optional<QueueMemberEntity> existingMember = queueMemberRestService.findByThreadUid(threadUid);
@@ -276,21 +306,48 @@ public class QueueService {
         }
     }
 
+    private static final int MAX_RETRY_COUNT = 3;
+
     /**
-     * 重试操作的通用方法
+     * 重试操作的通用方法（最多重试 3 次，不重试致命错误）
      */
     private <T> T retryOperation(java.util.function.Supplier<T> operation) {
-        while (true) {
+        int attempt = 0;
+        while (attempt < MAX_RETRY_COUNT) {
             try {
                 return operation.get();
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Queue operation interrupted", ie);
+            } catch (DataIntegrityViolationException e) {
+                // 唯一约束冲突：重试以获取并发创建的记录
+                attempt++;
+                if (attempt >= MAX_RETRY_COUNT) {
+                    throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts", e);
                 }
+                log.debug("Queue create conflict, retry attempt {}/{}", attempt, MAX_RETRY_COUNT);
+                sleepBeforeRetry();
+            } catch (QueueFullException e) {
+                // 队列满不应重试，直接抛出
+                throw e;
+            } catch (RuntimeException e) {
+                // 其他运行时异常不应无限重试
+                throw e;
+            } catch (Exception e) {
+                attempt++;
+                if (attempt >= MAX_RETRY_COUNT) {
+                    throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts", e);
+                }
+                log.warn("Queue operation error, retry attempt {}/{}", attempt, MAX_RETRY_COUNT, e);
+                sleepBeforeRetry();
             }
+        }
+        throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts");
+    }
+
+    private void sleepBeforeRetry() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Queue operation interrupted", ie);
         }
     }
 

@@ -224,6 +224,15 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
     }
 
+    @ExceptionHandler(BusinessConflictException.class)
+    public ResponseEntity<?> handleBusinessConflictException(BusinessConflictException e) {
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        log.warn("Business conflict: {}", e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         String rawMessage = e.getMessage();

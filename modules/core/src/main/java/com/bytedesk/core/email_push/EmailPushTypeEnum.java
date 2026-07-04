@@ -14,11 +14,12 @@
 package com.bytedesk.core.email_push;
 
 public enum EmailPushTypeEnum {
-    EMAIL_NOTIFICATION,  // 邮件通知
-    EMAIL_REGISTER,      // 邮箱注册
-    EMAIL_LOGIN,         // 邮箱登录
-    EMAIL_RESET,         // 邮箱重置
-    EMAIL_VERIFY;        // 邮箱验证
+    EMAIL_NOTIFICATION,    // 邮件通知
+    EMAIL_REGISTER,        // 邮箱注册
+    EMAIL_LOGIN,           // 邮箱登录
+    EMAIL_RESET,           // 邮箱重置
+    EMAIL_VERIFY,          // 邮箱验证
+    TICKET_NOTIFICATION;   // 工单通知
 
     public static EmailPushTypeEnum fromValue(String value) {
         for (EmailPushTypeEnum type : EmailPushTypeEnum.values()) {

@@ -21,8 +21,6 @@ import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
-import com.bytedesk.core.thread.ThreadRepository;
-import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -34,12 +32,6 @@ class WorkgroupRestServiceTest {
 
     @Mock
     private WorkgroupRepository workgroupRepository;
-
-    @Mock
-    private ThreadRepository threadRepository;
-
-    @Mock
-    private ThreadRestService threadRestService;
 
     @Mock
     private AgentRestService agentRestService;
@@ -68,8 +60,6 @@ class WorkgroupRestServiceTest {
     void setUp() {
         workgroupRestService = spy(new WorkgroupRestService(
                 workgroupRepository,
-                threadRepository,
-                threadRestService,
                 agentRestService,
                 modelMapper,
                 uidUtils,

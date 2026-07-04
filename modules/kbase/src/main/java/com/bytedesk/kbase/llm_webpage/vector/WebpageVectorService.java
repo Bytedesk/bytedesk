@@ -58,6 +58,8 @@ public class WebpageVectorService {
 
     private final WebpageRestService webpageRestService;
 
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
+
     public Map<String, Object> queryVectorByUid(WebpageRequest request) {
         String uid = request.getUid();
         if (!StringUtils.hasText(uid)) {
@@ -112,6 +114,7 @@ public class WebpageVectorService {
     @Transactional
     public void indexWebpageVector(WebpageEntity webpage) {
         log.info("开始向量索引网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
+        long startMs = System.currentTimeMillis();
 
         // 在处理前先获取最新的网页实体
         Optional<WebpageEntity> currentWebpageOpt = webpageRestService.findByUidWithKbaseNoCache(webpage.getUid());
@@ -171,6 +174,19 @@ public class WebpageVectorService {
             webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.SUCCESS.name());
             webpageRestService.evictWebpageCacheAllEntries();
 
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentWebpage.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("WEBPAGE", currentWebpage.getUid(), currentWebpage.getOrgUid(),
+                        embProvider, embModel, embDimensions, combinedContent, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录WEBPAGE向量化历史失败: uid={}, error={}", currentWebpage.getUid(), recEx.getMessage());
+            }
+
         } catch (Exception e) {
             log.error("网页向量索引失败: {}, 错误: {}", currentWebpage.getTitle(), e.getMessage(), e);
 
@@ -179,6 +195,21 @@ public class WebpageVectorService {
                 webpageRestService.evictWebpageCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新网页向量索引状态失败: {}, 错误: {}", currentWebpage.getUid(), saveEx.getMessage());
+            }
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentWebpage.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                String errContent = (currentWebpage.getTitle() != null ? currentWebpage.getTitle() : "")
+                        + "\n" + (currentWebpage.getContent() != null ? currentWebpage.getContent() : "");
+                llmEmbeddingRestService.recordEmbedding("WEBPAGE", currentWebpage.getUid(), currentWebpage.getOrgUid(),
+                        embProvider, embModel, embDimensions, errContent, "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录WEBPAGE向量化失败历史失败: uid={}, error={}", currentWebpage.getUid(), recEx.getMessage());
             }
 
             throw new RuntimeException("创建向量索引失败: " + e.getMessage(), e);

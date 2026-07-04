@@ -117,8 +117,8 @@ public class JmsArtemisConfig {
 		factory.setPubSubDomain(true);
 		// 避免缓存 Session/Consumer：断链恢复时旧 Session 容易处于 closed 状态
 		factory.setCacheLevel(DefaultMessageListenerContainer.CACHE_NONE);
-		// 设置并发数为1-3，允许适当的并发处理但避免过多实例
-		factory.setConcurrency("1-3");
+		// Topic 消息在单实例内必须串行消费，避免同一条消息被多个 consumer 重复处理
+		factory.setConcurrency("1");
 		// 设置确认模式为自动确认，避免阻塞
 		factory.setSessionAcknowledgeMode(Session.AUTO_ACKNOWLEDGE);
 		// 设置错误处理器

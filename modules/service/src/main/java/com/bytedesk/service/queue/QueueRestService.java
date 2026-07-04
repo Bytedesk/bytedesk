@@ -58,6 +58,9 @@ import com.bytedesk.service.workgroup.WorkgroupRepository;
 import org.springframework.util.StringUtils;
 import org.springframework.data.domain.PageImpl;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,6 +96,9 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
     private final ThreadRepository threadRepository;
 
     private final QueueService queueService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -628,10 +634,27 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         try {
             return queueRepository.save(queue);
         } catch (DataIntegrityViolationException e) {
+            // 保存失败后，实体可能仍被持久化上下文管理且 ID 为 null。
+            // 必须先 detach，否则后续查询触发 flush 时会抛出 AssertionFailure
+            detachSafely(queue);
             // 如果在保存时发生唯一约束冲突，说明其他线程已创建
             // 重新查询获取已存在的记录
             return queueRepository.findByTopicAndDayAndDeletedFalse(request.getTopic(), request.getDay())
                     .orElseThrow(() -> new RuntimeException("Queue creation failed"));
+        }
+    }
+
+    private void detachSafely(Object entity) {
+        try {
+            if (entityManager.contains(entity)) {
+                entityManager.detach(entity);
+            }
+        } catch (Exception ignored) {
+            try {
+                entityManager.clear();
+            } catch (Exception ignored2) {
+                // 最终兜底
+            }
         }
     }
 

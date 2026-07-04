@@ -2,6 +2,7 @@ package com.bytedesk.core.topic_subscription;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -122,6 +124,74 @@ class TopicSubscriptionRestServiceTest {
                 assertThat(request.getOrgUid()).isEqualTo("org-1");
                 verify(topicSubscriptionRepository).findAll(anySpecification(), anyPageable());
         }
+
+    @Test
+    void isSubscribedUsesRequestedTypeWhenProvided() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
+                .topic("org/workgroup/wg-1/visitor-1")
+                .type(TopicSubscriptionTypeEnum.MONITOR.name())
+                .build();
+
+        TopicSubscriptionEntity subscription = TopicSubscriptionEntity.builder()
+                .topic(request.getTopic())
+                .type(TopicSubscriptionTypeEnum.MONITOR.name())
+                .build();
+        ReflectionTestUtils.setField(subscription, "userUid", "user-1");
+
+        when(authService.getUser()).thenReturn(user);
+        when(topicSubscriptionRepository.findByUserUidAndTopic("user-1", request.getTopic()))
+                .thenReturn(java.util.List.of(subscription));
+
+        Boolean subscribed = topicSubscriptionRestService.isSubscribed(request);
+
+        assertThat(subscribed).isTrue();
+    }
+
+    @Test
+    void subscribeUsesRequestedTypeWhenProvided() {
+        UserEntity user = new UserEntity();
+        user.setUid("user-1");
+
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
+                .topic("org/workgroup/wg-1/visitor-1")
+                .type(TopicSubscriptionTypeEnum.INSERT.name())
+                .build();
+
+        TopicSubscriptionEntity saved = TopicSubscriptionEntity.builder()
+                .topic(request.getTopic())
+                .type(TopicSubscriptionTypeEnum.INSERT.name())
+                .build();
+        saved.setUid("sub-1");
+        ReflectionTestUtils.setField(saved, "userUid", "user-1");
+
+        TopicSubscriptionEntity mappedEntity = TopicSubscriptionEntity.builder()
+                .topic(request.getTopic())
+                .type(TopicSubscriptionTypeEnum.INSERT.name())
+                .build();
+
+        TopicSubscriptionResponse mapped = TopicSubscriptionResponse.builder()
+                .uid("sub-1")
+                .topic(request.getTopic())
+                .type(TopicSubscriptionTypeEnum.INSERT.name())
+                .userUid("user-1")
+                .build();
+
+        when(authService.getUser()).thenReturn(user);
+        when(uidUtils.getUid()).thenReturn("sub-1");
+        when(topicSubscriptionRepository.findByUserUidAndTopic("user-1", request.getTopic()))
+                .thenReturn(java.util.List.of());
+        when(modelMapper.map(request, TopicSubscriptionEntity.class)).thenReturn(mappedEntity);
+        when(topicSubscriptionRepository.save(argThat(entity -> TopicSubscriptionTypeEnum.INSERT.name().equals(entity.getType()))))
+                .thenReturn(saved);
+        when(modelMapper.map(saved, TopicSubscriptionResponse.class)).thenReturn(mapped);
+
+        TopicSubscriptionResponse response = topicSubscriptionRestService.subscribe(request);
+
+        assertThat(response.getType()).isEqualTo(TopicSubscriptionTypeEnum.INSERT.name());
+    }
 
         private static Specification<TopicSubscriptionEntity> anySpecification() {
                 return any();

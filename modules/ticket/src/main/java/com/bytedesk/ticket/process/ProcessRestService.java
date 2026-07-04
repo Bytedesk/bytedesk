@@ -53,7 +53,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.ticket.thread.ThreadConsts;
 import com.bytedesk.ticket.ticket.TicketConsts;
-import com.bytedesk.ticket.ticket.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.utils.FlowableIdUtils;
 
 import lombok.AllArgsConstructor;

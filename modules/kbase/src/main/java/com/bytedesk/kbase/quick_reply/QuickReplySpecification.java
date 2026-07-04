@@ -68,7 +68,16 @@ public class QuickReplySpecification extends BaseSpecification<QuickReplyEntity,
                 
                 if (StringUtils.hasText(request.getOrgUid())) {
                     List<Predicate> orgPredicates = new ArrayList<>();
-                    orgPredicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    if (Boolean.TRUE.equals(request.getSuperUser())) {
+                        List<String> matchedOrgUids = resolveOrganizationUidsForKeyword(request.getOrgUid());
+                        if (matchedOrgUids.isEmpty()) {
+                            orgPredicates.add(criteriaBuilder.disjunction());
+                        } else {
+                            orgPredicates.add(root.get("orgUid").in(matchedOrgUids));
+                        }
+                    } else {
+                        orgPredicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                    }
                     orgPredicates.add(criteriaBuilder.equal(root.get("level"), LevelEnum.ORGANIZATION.name()));
                     orPredicates.add(criteriaBuilder.and(orgPredicates.toArray(new Predicate[0])));
                 }
@@ -78,7 +87,16 @@ public class QuickReplySpecification extends BaseSpecification<QuickReplyEntity,
                     predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
                 }
             } else {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                if (Boolean.TRUE.equals(request.getSuperUser())) {
+                    List<String> matchedOrgUids = resolveOrganizationUidsForKeyword(request.getOrgUid());
+                    if (matchedOrgUids.isEmpty()) {
+                        predicates.add(criteriaBuilder.disjunction());
+                    } else {
+                        predicates.add(root.get("orgUid").in(matchedOrgUids));
+                    }
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                }
             }
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {

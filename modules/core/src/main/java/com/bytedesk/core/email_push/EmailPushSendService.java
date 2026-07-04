@@ -284,7 +284,7 @@ public class EmailPushSendService {
         try {
             EmailPushEntity record = EmailPushEntity.builder()
                     .uid(UidUtils.getInstance().getUid())
-                    .type("TICKET_NOTIFICATION")
+                    .type(EmailPushTypeEnum.TICKET_NOTIFICATION.name())
                     .sender("SYSTEM")
                     .content(subject != null ? subject : "")
                     .receiver(recipientEmail)

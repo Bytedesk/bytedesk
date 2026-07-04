@@ -51,7 +51,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
-import com.bytedesk.service.agent_seat.AgentSeatDomainService;
+import com.bytedesk.service.agent_seat.AgentSeatService;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -90,7 +90,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final MessageService messageService;
 
-    private final AgentSeatDomainService agentSeatDomainService;
+    private final AgentSeatService agentSeatDomainService;
 
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {

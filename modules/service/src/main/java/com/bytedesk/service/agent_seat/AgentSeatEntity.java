@@ -16,6 +16,10 @@ package com.bytedesk.service.agent_seat;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.service.agent_seat.enums.AgentSeatSourceEnum;
+import com.bytedesk.service.agent_seat.enums.AgentSeatStatusEnum;
+import com.bytedesk.service.agent_seat.enums.AgentSeatTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;

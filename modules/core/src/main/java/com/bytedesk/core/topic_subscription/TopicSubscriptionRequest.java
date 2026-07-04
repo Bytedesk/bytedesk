@@ -32,4 +32,6 @@ public class TopicSubscriptionRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
 
     private String topic;
+
+    private String type;
 }

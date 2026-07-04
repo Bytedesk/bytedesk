@@ -7,8 +7,8 @@
 - 不引入额外 CLI 框架，使用仓库现有 Java 体系实现命令行入口
 - 同时支持文本输出和 JSON 输出，便于 agent 调用
 - 提供本地配置、token 存储能力
-- 已接入 auth、org、ticket 三组真实 API 命令
-- 预留 thread、message、knowledge 命令组
+- 已接入 auth、org、knowledge、ticket 四组真实 API 命令
+- 预留 thread、message 命令组
 - 运行入口类使用 com.bytedesk.cli.CliApplication
 
 配置文件：
@@ -21,6 +21,8 @@
   - `auth.channel`
   - `auth.current-org-uid`
   - `auth.current-org-name`
+  - `auth.current-user-uid`
+  - `auth.current-user-nickname`
 
 构建与测试：
 
@@ -44,8 +46,9 @@ java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar --format=json version
 - `config`：查看或修改本地配置
 - `auth`：登录、查看当前登录信息、退出登录
 - `org`：列出组织、查看当前组织、切换组织、按 uid 查看组织
+- `knowledge`：语义/混合检索知识库
 - `ticket`：查询、查看、创建、关闭工单
-- `thread`、`message`、`knowledge`：当前仍为占位命令组
+- `thread`、`message`：当前仍为占位命令组
 
 推荐使用流程：
 
@@ -58,6 +61,7 @@ java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar auth login \
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar auth whoami
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar org list
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar org switch --org your-org-uid
+java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar knowledge search --query "退款流程" --kb your-kb-uid --search-type MIXED --topk 5
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar ticket list --page 0 --size 10
 ```
 
@@ -120,6 +124,29 @@ java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar ticket create \
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar ticket close --uid your-ticket-uid --reason resolved
 ```
 
+知识库命令：
+
+```bash
+java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar knowledge search \
+  --query "退款流程" \
+  --kb your-kb-uid \
+  --search-type MIXED \
+  --source-type FAQ \
+  --topk 5
+```
+
+说明：
+
+- 如果未显式传 `--org`，CLI 会优先读取本地缓存的 `auth.current-org-uid`
+- 必须至少传 `--kb` 或 `--robot` 其中之一
+- `--format=json` 适合脚本和 agent 工作流
+
+工单创建补充说明：
+
+- `ticket create` 依赖当前登录用户身份
+- 请先执行 `auth login` 或 `auth whoami`，让 CLI 缓存 `auth.current-user-uid` 与 `auth.current-user-nickname`
+- 如未缓存当前用户身份，CLI 会直接提示错误，而不是发送不完整请求
+
 配置命令：
 
 ```bash
@@ -135,12 +162,13 @@ JSON 输出：
 
 ```bash
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar --format=json auth whoami
+java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar --format=json knowledge search --query "退款流程" --kb your-kb-uid
 java -jar modules/cli/target/bytedesk-module-cli-1.9.0.jar --format=json ticket list --page 0 --size 5
 ```
 
 当前限制：
 
-- `thread`、`message`、`knowledge` 还只是占位实现
+- `thread`、`message` 还只是占位实现
 - 当前 HTTP 调用默认依赖微语服务端标准返回结构：`code`、`message`、`data`
 - 本地联调通常需要服务端先启动，常见地址是 `http://127.0.0.1:9003`
 

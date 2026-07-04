@@ -19,7 +19,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.process.ProcessEntity;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;

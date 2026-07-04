@@ -45,6 +45,7 @@ import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket.assignment.TicketAssignmentService;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.utils.FlowableIdUtils;
 

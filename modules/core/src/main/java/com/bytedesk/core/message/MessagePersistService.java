@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.springframework.util.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.lang.NonNull;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.thread.ThreadEntity;
@@ -40,6 +41,15 @@ public class MessagePersistService {
 
     private static final long RECEIPT_DEDUP_TTL_SECONDS = 300L;
 
+    /**
+     * 回执最大重试次数（12次 × 5秒 = 60秒）。
+     * 超过此次数后目标消息仍未入库，视为孤立回执，丢弃不再重试。
+     */
+    private static final int MAX_RECEIPT_RETRIES = 12;
+
+    /** 回执重试信息存储在 extra 字段中的 JSON key */
+    private static final String RECEIPT_RETRY_KEY = "_receiptRetries";
+
     private final MessageRestService messageRestService;
 
     private final ThreadRestService threadRestService;
@@ -47,6 +57,8 @@ public class MessagePersistService {
     private final ModelMapper modelMapper;
 
     private final RedisService redisService;
+
+    private final MessagePersistCache messagePersistCache;
 
     public void persist(String messageJSON) {
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJSON); 
@@ -237,19 +249,51 @@ public class MessagePersistService {
         log.info("dealWithMessageReceipt: {}, content: {}", type, message.getContent());
         String receiptContent = message.getContent();
         String receiptDedupKey = type.name() + ":" + receiptContent;
-        if (!redisService.tryMarkMessageReceiptProcessed(receiptDedupKey, RECEIPT_DEDUP_TTL_SECONDS)) {
-            log.debug("skip duplicate message receipt: type {}, targetMessageUid {}, receiptUid {}",
-                    type, receiptContent, message.getUid());
-            return;
-        }
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(receiptContent);
-        if (messageOpt.isPresent() && !MessageStatusEnum.READ.name().equals(messageOpt.get().getStatus())) {
-            MessageEntity messageEntity = messageOpt.get();
+        if (messageOpt.isEmpty()) {
+            // 原消息尚未持久化（可能在同一批次中排在后面，或跨批次延迟），
+            // 将回执重新推入缓存队列，在下一个5秒批次中重试
+            int retryCount = parseReceiptRetryCount(message.getExtra());
+            if (retryCount >= MAX_RECEIPT_RETRIES) {
+                log.error("receipt retry limit exceeded ({}), dropping orphan receipt: type {}, targetUid {}, receiptUid {}",
+                        retryCount, type, receiptContent, message.getUid());
+                return;
+            }
+            log.warn("receipt target message not found yet, retry {} of {}: type {}, targetUid {}",
+                    retryCount + 1, MAX_RECEIPT_RETRIES, type, receiptContent);
+            message.setExtra(buildReceiptRetryExtra(retryCount + 1));
+            messagePersistCache.pushForPersist(message.toJson());
+            return;
+        }
+
+        MessageEntity messageEntity = messageOpt.get();
+        if (MessageStatusEnum.READ.name().equals(messageEntity.getStatus())) {
+            redisService.tryMarkMessageReceiptProcessed(receiptDedupKey, RECEIPT_DEDUP_TTL_SECONDS);
+            log.debug("skip receipt update: message {} already READ", receiptContent);
+            return;
+        }
+
+        try {
             // 直接设置状态，避免重复判断
+            String previousStatus = messageEntity.getStatus();
             messageEntity.setStatus(type.name());
-            messageRestService.save(messageEntity);
+            MessageEntity savedMessage = messageRestService.save(messageEntity);
+            redisService.tryMarkMessageReceiptProcessed(receiptDedupKey, RECEIPT_DEDUP_TTL_SECONDS);
+            log.info("receipt status persisted: targetMessageUid {}, receiptUid {}, previousStatus {}, persistedStatus {}",
+                    receiptContent, message.getUid(), previousStatus, savedMessage.getStatus());
+        } catch (ObjectOptimisticLockingFailureException e) {
+            int retryCount = parseReceiptRetryCount(message.getExtra());
+            if (retryCount >= MAX_RECEIPT_RETRIES) {
+                log.error("receipt retry limit exceeded after optimistic lock conflict ({}), dropping: type {}, targetUid {}, receiptUid {}",
+                        retryCount, type, receiptContent, message.getUid());
+                return;
+            }
+            log.warn("receipt update conflicted, retry {} of {}: type {}, targetUid {}, receiptUid {}",
+                    retryCount + 1, MAX_RECEIPT_RETRIES, type, receiptContent, message.getUid());
+            message.setExtra(buildReceiptRetryExtra(retryCount + 1));
+            messagePersistCache.pushForPersist(message.toJson());
         }
     }
 
@@ -257,6 +301,33 @@ public class MessagePersistService {
     private void dealWithMessageRecall(MessageProtobuf message) {
         // content为撤回消息的uid
         messageRestService.deleteByUid(message.getContent());
+    }
+
+    /**
+     * 从 extra 字段解析回执重试次数。
+     * extra 为 null 或无法解析时返回 0。
+     */
+    private int parseReceiptRetryCount(String extra) {
+        if (extra == null || extra.isEmpty()) {
+            return 0;
+        }
+        try {
+            com.alibaba.fastjson2.JSONObject obj = com.alibaba.fastjson2.JSON.parseObject(extra);
+            Integer count = obj.getInteger(RECEIPT_RETRY_KEY);
+            return count != null ? count : 0;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    /**
+     * 构建包含回执重试次数的 extra JSON 字符串。
+     * 保留原有 extra 字段中的其他数据。
+     */
+    private String buildReceiptRetryExtra(int retryCount) {
+        com.alibaba.fastjson2.JSONObject obj = new com.alibaba.fastjson2.JSONObject();
+        obj.put(RECEIPT_RETRY_KEY, retryCount);
+        return obj.toJSONString();
     }
 
 

@@ -54,9 +54,7 @@ public class ServiceSettingsResponse implements Serializable {
 
     private ZonedDateTime topTipEnd;
 
-    // show rate btn on chat toolbar
-    private Boolean showRateBtn;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     private Boolean autoInviteRate;
 
     private String inviteRateTip;
@@ -183,7 +181,6 @@ public class ServiceSettingsResponse implements Serializable {
                 .topTip(settings.getTopTip())
                 .topTipStart(settings.getTopTipStart())
                 .topTipEnd(settings.getTopTipEnd())
-                .showRateBtn(settings.getShowRateBtn())
                 .autoInviteRate(settings.getAutoInviteRate())
                 .inviteRateTip(settings.getInviteRateTip())
                 .rateMsgCount(settings.getRateMsgCount())

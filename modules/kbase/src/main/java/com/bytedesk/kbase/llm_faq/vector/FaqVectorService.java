@@ -59,6 +59,8 @@ public class FaqVectorService {
 
     private final KbaseRestService kbaseRestService;
 
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
+
     public Map<String, Object> queryVectorByUid(FaqRequest request) {
         String uid = request.getUid();
         if (!StringUtils.hasText(uid)) {
@@ -345,6 +347,7 @@ public class FaqVectorService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void indexFaqVector(FaqEntity faq) {
         log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
+        long startMs = System.currentTimeMillis();
 
         // 尝试从入参携带的 kbase 取 kbUid 作为兜底（防止 DB 中关联缺失或保存时出现乐观锁冲突）
         final String kbUidHint = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
@@ -435,6 +438,19 @@ public class FaqVectorService {
             faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.SUCCESS.name());
             faqRestService.evictFaqCacheAllEntries();
 
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentFaq.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("FAQ", currentFaq.getUid(), currentFaq.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录向量化历史失败: uid={}, error={}", currentFaq.getUid(), recEx.getMessage());
+            }
+
         } catch (Exception e) {
             log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage());
 
@@ -445,6 +461,20 @@ public class FaqVectorService {
                 faqRestService.evictFaqCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新FAQ向量索引状态失败: {}, 错误: {}", currentFaq.getUid(), saveEx.getMessage());
+            }
+
+            // 记录向量化失败
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                String content = currentFaq.getQuestion() + "\n" + currentFaq.getAnswer();
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentFaq.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("FAQ", currentFaq.getUid(), currentFaq.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "ERROR", e.getMessage(), costMs);
+            } catch (Exception recEx) {
+                log.warn("记录向量化失败历史失败: uid={}, error={}", currentFaq.getUid(), recEx.getMessage());
             }
 
             throw new RuntimeException("创建向量索引失败: " + e.getMessage(), e);

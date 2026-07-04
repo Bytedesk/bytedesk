@@ -56,6 +56,8 @@ public class TextVectorService {
     
     private final TextRestService textRestService;
 
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
+
     public Map<String, Object> queryVectorByUid(TextRequest request) {
         String uid = request.getUid();
         if (!StringUtils.hasText(uid)) {
@@ -109,6 +111,7 @@ public class TextVectorService {
     @Transactional
     public void indexTextVector(TextEntity text) {
         log.info("向量索引文本: {}", text.getTitle());
+        long startMs = System.currentTimeMillis();
         
         try {
             // 1. 为标题和内容创建文档（带有元数据）
@@ -151,22 +154,46 @@ public class TextVectorService {
             }
             if (!docIdList.contains(id)) {
                 docIdList.add(id);
-                text.setDocIdList(docIdList);
                 
-                // 设置向量索引状态为成功
-                text.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-                
-                // 更新Text实体
-                textRestService.save(text);
+                // 使用原生SQL直接更新字段，避免触发JPA @PostUpdate监听器
+                // 和防止因updateVectorStatusOnly先更新了版本号导致的版本冲突
+                textRestService.updateDocIdListOnly(text.getUid(), docIdList);
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
             }
-            
+
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(text.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("TEXT", text.getUid(), text.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录TEXT向量化历史失败: uid={}, error={}", text.getUid(), recEx.getMessage());
+            }
+
             log.info("文本向量索引成功: {}", text.getTitle());
         } catch (Exception e) {
             log.error("文本向量索引失败: {}, 错误: {}", text.getTitle(), e.getMessage());
-            
-            // 设置向量索引状态为失败
-            text.setVectorStatus(ChunkStatusEnum.ERROR.name());
-            textRestService.save(text);
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(text.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                String errContent = text.getTitle() + "\n\n" + (text.getContent() != null ? text.getContent() : "");
+                llmEmbeddingRestService.recordEmbedding("TEXT", text.getUid(), text.getOrgUid(),
+                        embProvider, embModel, embDimensions, errContent, "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录TEXT向量化失败历史失败: uid={}, error={}", text.getUid(), recEx.getMessage());
+            }
+
+            // 设置向量索引状态为失败（使用原生SQL避免版本冲突）
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
             
             throw e;
         }

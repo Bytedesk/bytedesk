@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260704-add-member-nickname-pinyin" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_team_member"/>
+            <not>
+                <columnExists tableName="bytedesk_team_member" columnName="nickname_pinyin"/>
+            </not>
+        </preConditions>
+
+        <comment>Add nickname_pinyin column for pinyin-based contact search.</comment>
+        <addColumn tableName="bytedesk_team_member">
+            <column name="nickname_pinyin" type="VARCHAR(512)" defaultValue="">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260704-add-user-nickname-pinyin" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_user"/>
+            <not>
+                <columnExists tableName="bytedesk_core_user" columnName="nickname_pinyin"/>
+            </not>
+        </preConditions>
+
+        <comment>Add nickname_pinyin column for pinyin-based contact search.</comment>
+        <addColumn tableName="bytedesk_core_user">
+            <column name="nickname_pinyin" type="VARCHAR(512)" defaultValue="">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

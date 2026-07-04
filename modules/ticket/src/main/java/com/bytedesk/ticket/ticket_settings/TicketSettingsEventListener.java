@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.service.workgroup.event.WorkgroupCreateEvent;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 
 import lombok.AllArgsConstructor;

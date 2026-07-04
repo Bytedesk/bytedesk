@@ -15,8 +15,20 @@ package com.bytedesk.ai.embedding_settings;
 
 import java.util.Optional;
 import java.util.Objects;
+import java.util.Locale;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.ai.document.MetadataMode;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
+import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
+import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -28,6 +40,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
+import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -41,12 +56,12 @@ import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<EmbeddingSettingsEntity, EmbeddingSettingsRequest, EmbeddingSettingsResponse, EmbeddingSettingsExcel> {
 
     private static final String DEFAULT_KBASE_EMBEDDING_SETTINGS_NAME = "default-kbase-embedding-settings";
@@ -263,6 +278,151 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
         deleteByUid(request.getUid());
     }
 
+    /**
+     * 测试向量化是否正常
+     * 使用与实际向量索引相同的配置查找逻辑：defaultSettings=true 且 enabled=true
+     */
+    public EmbeddingSettingsTestResponse testVectorization(EmbeddingSettingsRequest request) {
+        requireSuperUser(false);
+
+        // 与实际 FaqVectorService → EmbeddingSettingsKbaseVectorStoreResolver 使用相同的查找逻辑
+        Optional<EmbeddingSettingsEntity> optional = findDefaultByLevelAndType(LevelEnum.PLATFORM.name(), EmbeddingSettingsTypeEnum.KBASE.name());
+        if (optional.isEmpty() || optional.get().isDeleted() || !Boolean.TRUE.equals(optional.get().getEnabled())) {
+            return EmbeddingSettingsTestResponse.fail(
+                "未找到默认启用的 Embedding 配置 (defaultSettings=true, enabled=true)。请在 Embedding Settings 页面设置一条记录为默认并启用。");
+        }
+        EmbeddingSettingsEntity entity = optional.get();
+
+        log.info("测试向量化: uid={}, provider={}, model={}, apiKey={}",
+                entity.getUid(), entity.getProvider(), entity.getModel(),
+                StringUtils.hasText(entity.getApiKey()) ? "***" + entity.getApiKey().substring(Math.max(0, entity.getApiKey().length() - 4)) : "(empty)");
+
+        try {
+            EmbeddingModel embeddingModel = buildEmbeddingModel(entity);
+            embeddingModel.embed("test");
+            return EmbeddingSettingsTestResponse.success("向量化测试成功 (provider=" + entity.getProvider() + ", model=" + entity.getModel() + ")");
+        } catch (Exception e) {
+            log.warn("EmbeddingSettings vectorization test failed: uid={}, provider={}, model={}, error={}",
+                    entity.getUid(), entity.getProvider(), entity.getModel(), e.getMessage());
+            String errorMsg = e.getMessage();
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                errorMsg = e.getCause().getMessage();
+            }
+            return EmbeddingSettingsTestResponse.fail(errorMsg);
+        }
+    }
+
+    // ========== EmbeddingModel 构建方法（不依赖 Elasticsearch） ==========
+
+    private EmbeddingModel buildEmbeddingModel(EmbeddingSettingsEntity settings) {
+        String provider = resolveProvider(settings);
+        if (LlmProviderConstants.DASHSCOPE.equals(provider)) {
+            return buildDashscopeEmbeddingModel(settings);
+        }
+        if (LlmProviderConstants.ZHIPUAI.equals(provider)) {
+            return buildZhipuaiEmbeddingModel(settings);
+        }
+        if (LlmProviderConstants.OLLAMA.equals(provider)) {
+            return buildOllamaEmbeddingModel(settings);
+        }
+        return buildOpenAiCompatibleEmbeddingModel(settings, provider);
+    }
+
+    private EmbeddingModel buildDashscopeEmbeddingModel(EmbeddingSettingsEntity settings) {
+        DashScopeApi api = DashScopeApi.builder()
+                .baseUrl(resolveBaseUrl(settings, "https://dashscope.aliyuncs.com"))
+                .apiKey(resolveApiKey(settings))
+                .build();
+        DashScopeEmbeddingOptions options = DashScopeEmbeddingOptions.builder()
+                .model(resolveModel(settings, "text-embedding-v4"))
+                .build();
+        return new DashScopeEmbeddingModel(api, MetadataMode.EMBED, options);
+    }
+
+    private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
+        ZhiPuAiApi api = ZhiPuAiApi.builder()
+                .apiKey(resolveApiKey(settings))
+                .build();
+        ZhiPuAiEmbeddingOptions options = ZhiPuAiEmbeddingOptions.builder()
+                .model(resolveModel(settings, "embedding-2"))
+                .build();
+        return new ZhiPuAiEmbeddingModel(api, MetadataMode.EMBED, options);
+    }
+
+    private EmbeddingModel buildOllamaEmbeddingModel(EmbeddingSettingsEntity settings) {
+        OllamaApi api = OllamaApi.builder()
+                .baseUrl(resolveBaseUrl(settings, "http://host.docker.internal:11434"))
+                .build();
+        OllamaEmbeddingOptions options = OllamaEmbeddingOptions.builder()
+                .model(resolveModel(settings, "bge-m3:latest"))
+                .build();
+        return OllamaEmbeddingModel.builder()
+                .ollamaApi(api)
+                .defaultOptions(options)
+                .build();
+    }
+
+    private EmbeddingModel buildOpenAiCompatibleEmbeddingModel(EmbeddingSettingsEntity settings, String provider) {
+        OpenAiApi api = OpenAiApi.builder()
+                .baseUrl(resolveBaseUrl(settings, resolveProviderBaseUrl(provider)))
+                .apiKey(resolveApiKey(settings))
+                .build();
+        OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
+                .model(resolveModel(settings, "text-embedding-3-small"));
+        Integer dimensions = settings.getDimensions();
+        if (dimensions != null && dimensions > 0) {
+            optionsBuilder.dimensions(dimensions);
+        }
+        return new OpenAiEmbeddingModel(api, MetadataMode.EMBED, optionsBuilder.build());
+    }
+
+    private String resolveProvider(EmbeddingSettingsEntity settings) {
+        String provider = settings.getProvider();
+        if (!StringUtils.hasText(provider)) {
+            provider = LlmDefaults.DEFAULT_EMBEDDING_PROVIDER;
+        }
+        return provider.toLowerCase(Locale.ROOT);
+    }
+
+    private String resolveModel(EmbeddingSettingsEntity settings, String defaultModel) {
+        if (StringUtils.hasText(settings.getModel())) {
+            return settings.getModel();
+        }
+        String provider = resolveProvider(settings);
+        return environment.getProperty("spring.ai." + provider + ".embedding.options.model", defaultModel);
+    }
+
+    private String resolveApiKey(EmbeddingSettingsEntity settings) {
+        if (StringUtils.hasText(settings.getApiKey())) {
+            return settings.getApiKey();
+        }
+        String provider = resolveProvider(settings);
+        String embeddingApiKey = environment.getProperty("spring.ai." + provider + ".embedding.api-key");
+        if (StringUtils.hasText(embeddingApiKey)) {
+            return embeddingApiKey;
+        }
+        return environment.getProperty("spring.ai." + provider + ".api-key", "");
+    }
+
+    private String resolveBaseUrl(EmbeddingSettingsEntity settings, String defaultBaseUrl) {
+        if (StringUtils.hasText(settings.getBaseUrl())) {
+            return settings.getBaseUrl();
+        }
+        String provider = resolveProvider(settings);
+        return environment.getProperty("spring.ai." + provider + ".base-url", defaultBaseUrl);
+    }
+
+    private String resolveProviderBaseUrl(String provider) {
+        String baseUrl = environment.getProperty("spring.ai." + provider + ".base-url");
+        if (StringUtils.hasText(baseUrl)) {
+            return baseUrl;
+        }
+        if (LlmProviderConstants.SILICONFLOW.equals(provider)) {
+            return "https://api.siliconflow.cn";
+        }
+        return "https://api.openai.com";
+    }
+
     @Override
     public EmbeddingSettingsResponse convertToResponse(EmbeddingSettingsEntity entity) {
         return modelMapper.map(entity, EmbeddingSettingsResponse.class);
@@ -387,6 +547,15 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
     public void initEmbeddingSettingss(String orgUid) {
         String level = LevelEnum.PLATFORM.name();
         String type = EmbeddingSettingsTypeEnum.KBASE.name();
+
+        // 1. 创建默认 embedding 配置
+        initDefaultEmbeddingSettings(level, type);
+
+        // 2. 将配置文件中所有已启用的 embedding provider 也同步到 DB
+        initProviderEmbeddingSettings(level, type);
+    }
+
+    private void initDefaultEmbeddingSettings(String level, String type) {
         if (findDefaultByLevelAndType(level, type).isPresent()) {
             return;
         }
@@ -411,6 +580,59 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
                 .enabled(true)
                 .build();
         createSystemEmbeddingSettings(request);
+    }
+
+    /**
+     * 扫描配置文件中所有已启用 embedding 的 provider，为每个 provider 在 DB 中创建对应记录。
+     * 支持的 provider: dashscope, zhipuai, ollama, siliconflow, openai, volcengine
+     */
+    private void initProviderEmbeddingSettings(String level, String type) {
+        String[] providers = {
+            LlmProviderConstants.DASHSCOPE,
+            LlmProviderConstants.ZHIPUAI,
+            LlmProviderConstants.OLLAMA,
+            LlmProviderConstants.SILICONFLOW,
+            "openai",
+            "volcengine"
+        };
+
+        for (String provider : providers) {
+            try {
+                initSingleProviderEmbeddingSettings(provider, level, type);
+            } catch (Exception e) {
+                log.warn("Failed to init embedding settings for provider={}: {}", provider, e.getMessage());
+            }
+        }
+    }
+
+    private void initSingleProviderEmbeddingSettings(String provider, String level, String type) {
+        // 检查该 provider 的 embedding 是否启用
+        Boolean enabled = environment.getProperty("spring.ai." + provider + ".embedding.enabled", Boolean.class, false);
+        if (!Boolean.TRUE.equals(enabled)) {
+            // 如果 embedding.enabled 未配置，检查是否有 api-key 或 base-url 作为备选判断
+            String apiKey = environment.getProperty("spring.ai." + provider + ".api-key");
+            String embeddingApiKey = environment.getProperty("spring.ai." + provider + ".embedding.api-key");
+            if (!StringUtils.hasText(apiKey) && !StringUtils.hasText(embeddingApiKey)) {
+                return; // 没有配置 key，跳过
+            }
+        }
+
+        String name = provider + "-kbase-embedding-settings";
+        // 检查是否已存在
+        if (findByNameAndLevelAndType(name, level, type).isPresent()) {
+            return;
+        }
+
+        EmbeddingSettingsRequest request = EmbeddingSettingsRequest.builder()
+                .name(name)
+                .description("Auto-created from config: " + provider + " embedding settings")
+                .type(type)
+                .provider(provider)
+                .defaultSettings(false)
+                .enabled(Boolean.TRUE.equals(enabled))
+                .build();
+        createSystemEmbeddingSettings(request);
+        log.info("Initialized embedding settings for provider={}", provider);
     }
 
     private void triggerReindexIfNeeded(EmbeddingSettingsSnapshot previousEffectiveSnapshot, EmbeddingSettingsEntity savedEntity) {

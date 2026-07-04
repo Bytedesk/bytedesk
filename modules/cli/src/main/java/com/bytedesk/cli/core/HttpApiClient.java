@@ -20,6 +20,8 @@ public class HttpApiClient {
 	public static final String CHANNEL_KEY = "auth.channel";
 	public static final String CURRENT_ORG_UID_KEY = "auth.current-org-uid";
 	public static final String CURRENT_ORG_NAME_KEY = "auth.current-org-name";
+	public static final String CURRENT_USER_UID_KEY = "auth.current-user-uid";
+	public static final String CURRENT_USER_NICKNAME_KEY = "auth.current-user-nickname";
 
 	private final HttpClient httpClient = HttpClient.newBuilder()
 		.connectTimeout(Duration.ofSeconds(10))

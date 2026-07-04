@@ -307,19 +307,69 @@ public class SmsPushSendService {
     }
 
     /**
+     * 使用指定短信服务商配置发送模板短信。
+     */
+    public SmsSendResult sendSmsWithTemplateByProvider(String mobile, String country,
+            String providerName, String region, String accessKeyId, String accessKeySecret, String endpoint,
+            String signName, String templateCode, Map<String, String> templateParams, String orgUid) {
+        Assert.hasText(accessKeyId, "短信服务商 AccessKeyId 不能为空");
+        Assert.hasText(accessKeySecret, "短信服务商 AccessKeySecret 不能为空");
+        Assert.hasText(mobile, "手机号不能为空");
+        Assert.hasText(signName, "短信签名不能为空");
+        Assert.hasText(templateCode, "短信模板编码不能为空");
+        Assert.notEmpty(templateParams, "模板参数不能为空");
+
+        String normalizedMobile = normalizeAndValidateMobile(mobile);
+        String phoneNumber = formatPhoneNumber(normalizedMobile, country);
+
+        String templateParamJson;
+        try {
+            templateParamJson = objectMapper.writeValueAsString(templateParams);
+        } catch (JsonProcessingException e) {
+            log.error("序列化模板参数失败", e);
+            return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "模板参数序列化失败");
+        }
+
+        log.info("sendSmsWithTemplateByProvider to {}, provider: {}, signName: {}, templateCode: {}, params: {}",
+        normalizedMobile, providerName, signName, templateCode, templateParamJson);
+
+        SmsSendResult result = doSendAliyunSms(
+                phoneNumber,
+                signName,
+                templateCode,
+                templateParamJson,
+        region,
+        accessKeyId,
+        accessKeySecret,
+        endpoint);
+
+        String contentSummary = templateParams.containsKey("content")
+                ? templateParams.get("content")
+                : templateParamJson;
+        saveSmsPushRecord(normalizedMobile, country, contentSummary, result, orgUid);
+        return result;
+    }
+
+    /**
      * 执行阿里云短信 API 调用
      */
     private SmsSendResult doSendAliyunSms(String phoneNumber, String signName, String templateCode,
             String templateParamJson) {
-        DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);
+        return doSendAliyunSms(phoneNumber, signName, templateCode, templateParamJson, regionId, accessKeyId,
+                accessKeySecret, smsDomain);
+    }
+
+    private SmsSendResult doSendAliyunSms(String phoneNumber, String signName, String templateCode,
+            String templateParamJson, String region, String keyId, String keySecret, String domain) {
+        DefaultProfile profile = DefaultProfile.getProfile(region, keyId, keySecret);
         IAcsClient client = new DefaultAcsClient(profile);
 
         CommonRequest request = new CommonRequest();
         request.setSysMethod(MethodType.POST);
-        request.setSysDomain(smsDomain);
+        request.setSysDomain(domain);
         request.setSysVersion(smsVersion);
         request.setSysAction(smsAction);
-        request.putQueryParameter("RegionId", regionId);
+        request.putQueryParameter("RegionId", region);
         request.putQueryParameter("PhoneNumbers", phoneNumber);
         request.putQueryParameter("SignName", signName);
         request.putQueryParameter("TemplateCode", templateCode);

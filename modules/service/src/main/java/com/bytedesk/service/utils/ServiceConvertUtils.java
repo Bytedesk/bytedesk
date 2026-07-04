@@ -40,8 +40,8 @@ import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
 import com.bytedesk.service.agent_seat.AgentSeatEntity;
-import com.bytedesk.service.agent_seat.AgentSeatDomainService;
-import com.bytedesk.service.agent_seat.AgentSeatStatusEnum;
+import com.bytedesk.service.agent_seat.enums.AgentSeatStatusEnum;
+import com.bytedesk.service.agent_seat.AgentSeatService;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.service.form.FormRepository;
@@ -197,7 +197,7 @@ public class ServiceConvertUtils {
             resp.setCountry(agent.getMember().getCountry());
         }
         try {
-            AgentSeatDomainService agentSeatDomainService = ApplicationContextHolder.getBean(AgentSeatDomainService.class);
+            AgentSeatService agentSeatDomainService = ApplicationContextHolder.getBean(AgentSeatService.class);
             AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(agent.getUid()).orElse(null);
             if (seat != null) {
                 if (AgentSeatStatusEnum.EXPIRED.name().equals(seat.getStatus())) {

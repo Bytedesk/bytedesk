@@ -31,7 +31,6 @@ import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -47,19 +46,18 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @Primary
-@RequiredArgsConstructor
-@ConditionalOnBean(ElasticsearchVectorStore.class)
 public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorStoreResolver {
 
-    private final RestClient restClient;
+    private final ObjectProvider<RestClient> restClientProvider;
 
-    private final ElasticsearchVectorStore elasticsearchVectorStore;
+    private final ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider;
 
     private final EmbeddingSettingsRestService embeddingSettingsRestService;
 
@@ -67,26 +65,78 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
 
     private final Environment environment;
 
+    public EmbeddingSettingsKbaseVectorStoreResolver(
+            ObjectProvider<RestClient> restClientProvider,
+            ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider,
+            EmbeddingSettingsRestService embeddingSettingsRestService,
+            KbaseRestService kbaseRestService,
+            Environment environment) {
+        this.restClientProvider = restClientProvider;
+        this.elasticsearchVectorStoreProvider = elasticsearchVectorStoreProvider;
+        this.embeddingSettingsRestService = embeddingSettingsRestService;
+        this.kbaseRestService = kbaseRestService;
+        this.environment = environment;
+    }
+
+    private ElasticsearchVectorStore getElasticsearchVectorStore() {
+        ElasticsearchVectorStore store = elasticsearchVectorStoreProvider.getIfAvailable();
+        if (store == null) {
+            throw new IllegalStateException("ElasticsearchVectorStore is not available");
+        }
+        return store;
+    }
+
+    private RestClient getRestClient() {
+        RestClient client = restClientProvider.getIfAvailable();
+        if (client == null) {
+            throw new IllegalStateException("RestClient is not available");
+        }
+        return client;
+    }
+
     @Override
     public VectorStore resolveByKbase(KbaseEntity kbase) {
         return resolveSettings(kbase)
                 .map(this::buildVectorStore)
-                .orElse(elasticsearchVectorStore);
+                .orElse(getElasticsearchVectorStore());
     }
 
     @Override
     public VectorStore resolveByKbUid(String kbUid) {
         if (!StringUtils.hasText(kbUid)) {
-            return elasticsearchVectorStore;
+            return getElasticsearchVectorStore();
         }
         return kbaseRestService.findByUid(kbUid)
                 .map(this::resolveByKbase)
-                .orElse(elasticsearchVectorStore);
+                .orElse(getElasticsearchVectorStore());
     }
 
     @Override
     public VectorStore resolveDefault() {
-        return elasticsearchVectorStore;
+        return getElasticsearchVectorStore();
+    }
+
+    /**
+     * 使用 DB 中的默认 EmbeddingSettings 构建 VectorStore。
+     * 如果 DB 中没有默认配置，返回 null（调用方应 fallback 到 Spring 托管的 store）。
+     */
+    public VectorStore resolveDefaultWithDbSettings() {
+        return embeddingSettingsRestService
+                .findDefaultByLevelAndType(LevelEnum.PLATFORM.name(), EmbeddingSettingsTypeEnum.KBASE.name())
+                .filter(settings -> !settings.isDeleted())
+                .filter(settings -> Boolean.TRUE.equals(settings.getEnabled()))
+                .map(this::buildVectorStore)
+                .orElse(null);
+    }
+
+    @Override
+    public EmbeddingInfo getEmbeddingInfo(KbaseEntity kbase) {
+        return resolveSettings(kbase)
+                .map(settings -> new EmbeddingInfo(
+                        resolveProvider(settings),
+                        resolveModel(settings, null),
+                        resolveModelDimensions(settings)))
+                .orElse(null);
     }
 
     private Optional<EmbeddingSettingsEntity> resolveSettings(KbaseEntity kbase) {
@@ -100,13 +150,13 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
         ElasticsearchVectorStoreOptions options = new ElasticsearchVectorStoreOptions();
         options.setIndexName(resolveIndexName(settings));
         options.setDimensions(resolveVectorDimensions(settings));
-        return ElasticsearchVectorStore.builder(restClient, embeddingModel)
+        return ElasticsearchVectorStore.builder(getRestClient(), embeddingModel)
                 .options(options)
                 .initializeSchema(true)
                 .build();
     }
 
-    private EmbeddingModel buildEmbeddingModel(EmbeddingSettingsEntity settings) {
+    EmbeddingModel buildEmbeddingModel(EmbeddingSettingsEntity settings) {
         String provider = resolveProvider(settings);
         if (LlmProviderConstants.DASHSCOPE.equals(provider)) {
             return buildDashscopeEmbeddingModel(settings);

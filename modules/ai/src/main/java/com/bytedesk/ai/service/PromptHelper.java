@@ -161,15 +161,7 @@ public class PromptHelper {
         for (Message message : messages) {
             String content = message.getText();
             if (content != null && !content.trim().isEmpty()) {
-                if (message instanceof SystemMessage) {
-                    fullPrompt.append(I18Consts.I18N_SYSTEM_PREFIX).append(content).append("\n");
-                } else if (message instanceof UserMessage) {
-                    fullPrompt.append(I18Consts.I18N_USER_PREFIX).append(content).append("\n");
-                } else if (message instanceof AssistantMessage) {
-                    fullPrompt.append(I18Consts.I18N_ASSISTANT_PREFIX).append(content).append("\n");
-                } else {
-                    fullPrompt.append(content).append("\n");
-                }
+                fullPrompt.append(content).append("\n");
             }
         }
         return fullPrompt.toString().trim();

@@ -43,8 +43,7 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private String topTip;
 
-    private Boolean showRateBtn;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     private Boolean autoInviteRate;
 
     private String inviteRateTip;

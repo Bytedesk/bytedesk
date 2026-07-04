@@ -33,6 +33,7 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -228,8 +229,11 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
             Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 MessageEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // 这里可以根据业务需求合并实体
+                String mergedStatus = mergeRecoverableStatus(latestEntity.getStatus(), entity.getStatus());
+                log.warn(
+                        "message optimistic lock recovery: uid {}, requestedStatus {}, latestStatusBeforeMerge {}, mergedStatus {}",
+                        entity.getUid(), entity.getStatus(), latestEntity.getStatus(), mergedStatus);
+                latestEntity.setStatus(mergedStatus);
                 return messageRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -237,6 +241,46 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
         return null;
+    }
+
+    private String mergeRecoverableStatus(String latestStatus, String requestedStatus) {
+        if (!StringUtils.hasText(requestedStatus)) {
+            return latestStatus;
+        }
+        if (!StringUtils.hasText(latestStatus)) {
+            return requestedStatus;
+        }
+
+        try {
+            MessageStatusEnum latest = MessageStatusEnum.fromValue(latestStatus);
+            MessageStatusEnum requested = MessageStatusEnum.fromValue(requestedStatus);
+
+            if (isDeliveryStatusRegression(latest, requested)) {
+                return latest.name();
+            }
+            return requested.name();
+        } catch (IllegalArgumentException ex) {
+            return requestedStatus;
+        }
+    }
+
+    private boolean isDeliveryStatusRegression(MessageStatusEnum latest, MessageStatusEnum requested) {
+        if (latest == requested) {
+            return false;
+        }
+        if (latest == MessageStatusEnum.READ) {
+            return requested == MessageStatusEnum.SENDING
+                    || requested == MessageStatusEnum.SUCCESS
+                    || requested == MessageStatusEnum.DELIVERED;
+        }
+        if (latest == MessageStatusEnum.DELIVERED) {
+            return requested == MessageStatusEnum.SENDING
+                    || requested == MessageStatusEnum.SUCCESS;
+        }
+        if (latest == MessageStatusEnum.SUCCESS) {
+            return requested == MessageStatusEnum.SENDING;
+        }
+        return false;
     }
 
     /**

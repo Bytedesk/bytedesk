@@ -20,6 +20,7 @@ import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.service.agent_seat.enums.AgentSeatStatusEnum;
 
 @ExtendWith(MockitoExtension.class)
 class AgentSeatDomainServiceAssignedAgentCleanupTest {
@@ -33,11 +34,11 @@ class AgentSeatDomainServiceAssignedAgentCleanupTest {
     @Mock
     private MemberRestService memberRestService;
 
-    private AgentSeatDomainService agentSeatDomainService;
+    private AgentSeatService agentSeatDomainService;
 
     @BeforeEach
     void setUp() {
-        agentSeatDomainService = new AgentSeatDomainService(agentSeatRepository, agentRepository, memberRestService);
+        agentSeatDomainService = new AgentSeatService(agentSeatRepository, agentRepository, memberRestService);
         ReflectionTestUtils.setField(agentSeatDomainService, "agentSeatEnabled", true);
     }
 

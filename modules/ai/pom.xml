@@ -276,6 +276,14 @@
 			<version>${mcp.version}</version>
         </dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server-webmvc -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
 		<dependency>
             <groupId>io.fabric8</groupId>
@@ -433,6 +441,13 @@
 				<groupId>com.alibaba.cloud.ai</groupId>
 				<artifactId>spring-ai-alibaba-bom</artifactId>
 				<version>${spring-ai-alibaba.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.modelcontextprotocol.sdk</groupId>
+				<artifactId>mcp-bom</artifactId>
+				<version>${mcp.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

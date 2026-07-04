@@ -47,7 +47,7 @@ import com.bytedesk.ticket.process.ProcessResponse;
 import com.bytedesk.ticket.process.ProcessTypeEnum;
 import com.bytedesk.ticket.ticket.TicketCategories;
 import com.bytedesk.ticket.ticket.TicketConsts;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;

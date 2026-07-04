@@ -42,8 +42,8 @@
 			<#assign suiteCallcenterUrl = '/ippbx'>
 
 			<!-- Logo START -->
-			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语 - 开源AI工作平台'}">
-				<h1 class="h5">${(i18n['brand.title'])! '微语 - 开源AI工作平台'}</h1>
+			<a class="navbar-brand me-0" href="${langPrefix}/index.html" title="${(i18n['brand.title'])! '微语'}">
+				<h1 class="h5">${(i18n['brand.title'])! '微语'}</h1>
 			</a>
 			<!-- Logo END -->
 

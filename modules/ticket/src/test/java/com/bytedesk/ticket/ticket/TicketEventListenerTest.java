@@ -30,6 +30,9 @@ import com.bytedesk.service.visitor.VisitorRepository;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
+import com.bytedesk.ticket.ticket.enums.TicketPriorityEnum;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 
 class TicketEventListenerTest {

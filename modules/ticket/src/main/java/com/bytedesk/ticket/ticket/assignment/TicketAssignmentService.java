@@ -32,7 +32,7 @@ import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.ticket.TicketConsts;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
-import com.bytedesk.ticket.ticket.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;

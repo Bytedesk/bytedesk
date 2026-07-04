@@ -130,6 +130,18 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
         );
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_SETTINGS, action = "test", description = "test embedding vectorization")
+    @Operation(summary = "Test Embedding Vectorization", description = "Test the embedding API vectorization with the configured settings")
+    @PreAuthorize(EmbeddingSettingsPermissions.HAS_EMBEDDING_SETTINGS_READ)
+    @PostMapping("/test")
+    public ResponseEntity<?> testVectorization(@RequestBody EmbeddingSettingsRequest request) {
+        EmbeddingSettingsTestResponse result = embedding_settingsRestService.testVectorization(request);
+        if (Boolean.TRUE.equals(result.getSuccess())) {
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error(result.getMessage()));
+    }
+
     
     
 }

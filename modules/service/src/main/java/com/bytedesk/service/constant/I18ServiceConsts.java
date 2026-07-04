@@ -24,6 +24,7 @@ public class I18ServiceConsts {
     // 客服相关
     public static final String I18N_AGENT_EXISTS = I18Consts.I18N_PREFIX + "agent.exists";
     public static final String I18N_AGENT_SEAT_ASSIGNED_AGENT_ALREADY_BOUND = I18Consts.I18N_PREFIX + "agent.seat.assigned.agent.already.bound";
+    public static final String I18N_AGENT_SEAT_NO_DUPLICATE = I18Consts.I18N_PREFIX + "agent.seat.no.duplicate";
     
     // 转接相关
     public static final String I18N_TRANSFER_NOTICE_TITLE = I18Consts.I18N_PREFIX + "transfer.notice.title";

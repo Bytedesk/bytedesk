@@ -59,6 +59,12 @@ public class MemberEntity extends BaseEntity {
     private String nickname;
 
     /**
+     * Pinyin of the nickname for pinyin-based search (auto-populated by MemberEntityListener)
+     */
+    @Column(name = "nickname_pinyin", length = 512)
+    private String nicknamePinyin;
+
+    /**
      * Profile picture URL for the member
      */
     @Builder.Default

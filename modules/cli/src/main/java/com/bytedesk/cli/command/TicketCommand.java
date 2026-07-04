@@ -75,8 +75,19 @@ public class TicketCommand implements CliCommand {
 	private CliResult create(CliContext context, CliArgs args) {
 		String title = args.option("--title").orElse(null);
 		String description = args.option("--description").orElse(null);
+		String orgUid = args.option("--org")
+			.or(() -> context.configStore().get(HttpApiClient.CURRENT_ORG_UID_KEY))
+			.orElse(null);
+		String reporterUid = context.configStore().get(HttpApiClient.CURRENT_USER_UID_KEY).orElse(null);
+		String reporterNickname = context.configStore().get(HttpApiClient.CURRENT_USER_NICKNAME_KEY).orElse(null);
 		if (title == null || description == null) {
-			return CliResult.error("Usage: " + context.cliName() + " ticket create --title <title> --description <desc> [--priority <priority>] [--type <type>] [--workgroup <uid>] [--category <uid>]");
+			return CliResult.error("Usage: " + context.cliName() + " ticket create --title <title> --description <desc> [--org <orgUid>] [--priority <priority>] [--type <type>] [--workgroup <uid>] [--category <uid>]");
+		}
+		if (orgUid == null || orgUid.isBlank()) {
+			return CliResult.error("Missing organization uid. Pass --org <orgUid> or run org switch first.");
+		}
+		if (reporterUid == null || reporterUid.isBlank()) {
+			return CliResult.error("Missing current user identity. Run auth whoami or auth login again before creating a ticket.");
 		}
 		Map<String, Object> payload = HttpApiClient.jsonBody(
 			"title", title,
@@ -85,7 +96,12 @@ public class TicketCommand implements CliCommand {
 			"type", args.option("--type").orElse(null),
 			"workgroupUid", args.option("--workgroup").orElse(null),
 			"categoryUid", args.option("--category").orElse(null),
-			"orgUid", context.configStore().get(HttpApiClient.CURRENT_ORG_UID_KEY).orElse(null));
+			"orgUid", orgUid,
+			"reporterUid", reporterUid,
+			"reporter", Map.of(
+				"uid", reporterUid,
+				"nickname", reporterNickname == null || reporterNickname.isBlank() ? reporterUid : reporterNickname,
+				"type", "USER"));
 		Map<String, Object> response = apiClient.post(context, "/api/v1/ticket/create", payload, true);
 		Map<String, Object> ticket = Jsons.object(response, "data");
 		return CliResult.ok("Created ticket: " + formatTicketLine(ticket), Map.of("ticket", ticket));

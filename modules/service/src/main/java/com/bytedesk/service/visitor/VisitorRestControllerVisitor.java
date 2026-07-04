@@ -48,7 +48,6 @@ import com.bytedesk.core.message_unread.MessageUnreadRestService;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadRequest;
-import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.core.utils.JsonResult;
@@ -211,28 +210,29 @@ public class VisitorRestControllerVisitor {
 
     /**
      * 访客主动关闭当前会话(按topic或uid)，支持传closeType=VISITOR
+     * 迁移到 ThreadRestControllerVisitor.closeThread()，保留此接口仅用于兼容旧版本
      */
-    @PostMapping("/thread/close")
-    public ResponseEntity<?> closeThread(@RequestBody ThreadRequest request) {
-        // 强制标记来源为VISITOR，除非显式传其他类型(允许未来扩展)
-        if (!StringUtils.hasText(request.getCloseType())) {
-            request.setCloseType(ThreadCloseTypeEnum.VISITOR.name());
-        }
-        // ThreadResponse response;
-        // if (StringUtils.hasText(request.getUid())) {
-        // response = threadRestService.closeByUid(request);
-        // // 从排队中退出（若存在）
-        // queueMemberRestService.visitorExitQueue(request.getUid());
-        // } else if (StringUtils.hasText(request.getTopic())) {
-        // response = threadRestService.closeByTopic(request);
-        // if (response != null && StringUtils.hasText(response.getUid())) {
-        // queueMemberRestService.visitorExitQueue(response.getUid());
-        // }
-        // } else {
-        // return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
-        // }
-        return ResponseEntity.ok(JsonResult.success("close success"));
-    }
+    // @PostMapping("/thread/close")
+    // public ResponseEntity<?> closeThread(@RequestBody ThreadRequest request) {
+    //     // 强制标记来源为VISITOR，除非显式传其他类型(允许未来扩展)
+    //     if (!StringUtils.hasText(request.getCloseType())) {
+    //         request.setCloseType(ThreadCloseTypeEnum.VISITOR.name());
+    //     }
+    //     // ThreadResponse response;
+    //     // if (StringUtils.hasText(request.getUid())) {
+    //     // response = threadRestService.closeByUid(request);
+    //     // // 从排队中退出（若存在）
+    //     // queueMemberRestService.visitorExitQueue(request.getUid());
+    //     // } else if (StringUtils.hasText(request.getTopic())) {
+    //     // response = threadRestService.closeByTopic(request);
+    //     // if (response != null && StringUtils.hasText(response.getUid())) {
+    //     // queueMemberRestService.visitorExitQueue(response.getUid());
+    //     // }
+    //     // } else {
+    //     // return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
+    //     // }
+    //     return ResponseEntity.ok(JsonResult.success("close success"));
+    // }
 
     /**
      * 关闭来源分布报表(按 updatedAt 时间范围统计)

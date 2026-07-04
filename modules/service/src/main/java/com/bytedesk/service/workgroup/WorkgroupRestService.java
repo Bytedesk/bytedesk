@@ -14,17 +14,9 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -45,13 +37,6 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadRepository;
-import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
-import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
@@ -69,10 +54,6 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, WorkgroupRequest, WorkgroupResponse> {
 
     private final WorkgroupRepository workgroupRepository;
-
-    private final ThreadRepository threadRepository;
-
-    private final ThreadRestService threadRestService;
 
     private final AgentRestService agentRestService;
 
@@ -426,97 +407,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         deleteByUid(request.getUid());
     }
 
-    /**
-     * 批量设置某个 agent 作为管理员(监控/接管权限)的工作组列表。
-     *
-     * 规则：只对每个 workgroup 增删该 agent 一条关系，不影响其它管理员。
-     */
-    @Transactional
-    public Map<String, Object> updateAdminWorkgroupsForAgent(WorkgroupAdminRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is required");
-        }
-        if (!StringUtils.hasText(request.getOrgUid())) {
-            throw new IllegalArgumentException("orgUid is required");
-        }
-        if (!StringUtils.hasText(request.getAgentUid())) {
-            throw new IllegalArgumentException("agentUid is required");
-        }
-
-        AgentEntity agent = agentRestService.findByUid(request.getAgentUid())
-                .orElseThrow(() -> new RuntimeException(request.getAgentUid() + " is not found."));
-
-        Set<String> targetUids = new HashSet<>(
-                Optional.ofNullable(request.getWorkgroupUids()).orElse(Collections.emptyList())
-                        .stream().filter(StringUtils::hasText).collect(Collectors.toSet()));
-
-        List<WorkgroupEntity> existingAdminWorkgroups = workgroupRepository.findByAdminAgentUid(request.getAgentUid());
-        if (existingAdminWorkgroups == null) {
-            existingAdminWorkgroups = new ArrayList<>();
-        }
-
-        // 仅处理当前 org 的 workgroup，避免跨组织误操作
-        List<WorkgroupEntity> existingInOrg = existingAdminWorkgroups.stream()
-                .filter(Objects::nonNull)
-                .filter(w -> request.getOrgUid().equals(w.getOrgUid()))
-            .filter(w -> !w.isDeleted())
-                .collect(Collectors.toList());
-
-        Set<String> existingUids = existingInOrg.stream().map(WorkgroupEntity::getUid).collect(Collectors.toSet());
-
-        Set<String> toAdd = new HashSet<>(targetUids);
-        toAdd.removeAll(existingUids);
-
-        Set<String> toRemove = new HashSet<>(existingUids);
-        toRemove.removeAll(targetUids);
-
-        int added = 0;
-        int removed = 0;
-
-        // remove
-        for (WorkgroupEntity workgroup : existingInOrg) {
-            if (!toRemove.contains(workgroup.getUid())) {
-                continue;
-            }
-            if (workgroup.getAdmins() == null) {
-                workgroup.setAdmins(new ArrayList<>());
-            }
-            boolean changed = workgroup.getAdmins().removeIf(a -> a != null && request.getAgentUid().equals(a.getUid()));
-            if (changed) {
-                save(workgroup);
-                removed++;
-            }
-        }
-
-        // add
-        for (String workgroupUid : toAdd) {
-            WorkgroupEntity workgroup = findByUid(workgroupUid)
-                    .orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + workgroupUid));
-            if (!request.getOrgUid().equals(workgroup.getOrgUid())) {
-                throw new RuntimeException("workgroup org mismatch: " + workgroupUid);
-            }
-            if (workgroup.isDeleted()) {
-                continue;
-            }
-            if (workgroup.getAdmins() == null) {
-                workgroup.setAdmins(new ArrayList<>());
-            }
-            boolean exists = workgroup.getAdmins().stream().anyMatch(a -> a != null && request.getAgentUid().equals(a.getUid()));
-            if (!exists) {
-                workgroup.getAdmins().add(agent);
-                save(workgroup);
-                added++;
-            }
-        }
-
-        return Map.of(
-                "agentUid", request.getAgentUid(),
-                "orgUid", request.getOrgUid(),
-                "assignedWorkgroupUids", targetUids,
-                "added", added,
-                "removed", removed);
-    }
-
     @Override
     public WorkgroupEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             WorkgroupEntity entity) {
@@ -592,134 +482,5 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         return workgroupUids;
     }
-
-    @Transactional(readOnly = true)
-    public List<WorkgroupResponse> queryAdminWorkgroups(String agentUid, String orgUid) {
-        if (!StringUtils.hasText(agentUid)) {
-            return new ArrayList<>();
-        }
-
-        List<WorkgroupEntity> workgroups = workgroupRepository.findByAdminAgentUid(agentUid);
-        return workgroups.stream()
-                .filter(w -> w != null && !w.isDeleted())
-                .filter(w -> !StringUtils.hasText(orgUid) || orgUid.equals(w.getOrgUid()))
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public Map<String, List<WorkgroupResponse>> queryAdminWorkgroups(List<String> agentUids, String orgUid) {
-        LinkedHashSet<String> normalizedAgentUids = agentUids == null
-                ? new LinkedHashSet<>()
-                : agentUids.stream()
-                        .filter(StringUtils::hasText)
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
-
-        Map<String, List<WorkgroupResponse>> workgroupsByAgent = normalizedAgentUids.stream()
-                .collect(Collectors.toMap(
-                        agentUid -> agentUid,
-                        agentUid -> new ArrayList<>(),
-                        (left, right) -> left,
-                        java.util.LinkedHashMap::new));
-
-        if (normalizedAgentUids.isEmpty()) {
-            return workgroupsByAgent;
-        }
-
-        List<WorkgroupEntity> workgroups = workgroupRepository.findByAdminAgentUids(new ArrayList<>(normalizedAgentUids), orgUid);
-        Map<String, WorkgroupResponse> responseCache = new java.util.HashMap<>();
-        Set<String> seenPairs = new HashSet<>();
-
-        for (WorkgroupEntity workgroup : workgroups) {
-            if (workgroup == null || workgroup.isDeleted()) {
-                continue;
-            }
-            if (StringUtils.hasText(orgUid) && !orgUid.equals(workgroup.getOrgUid())) {
-                continue;
-            }
-
-            List<AgentEntity> admins = workgroup.getAdmins();
-            if (admins == null || admins.isEmpty()) {
-                continue;
-            }
-
-            for (AgentEntity admin : admins) {
-                if (admin == null || !StringUtils.hasText(admin.getUid()) || !normalizedAgentUids.contains(admin.getUid())) {
-                    continue;
-                }
-
-                String pairKey = admin.getUid() + ":" + workgroup.getUid();
-                if (!seenPairs.add(pairKey)) {
-                    continue;
-                }
-
-                WorkgroupResponse response = responseCache.computeIfAbsent(workgroup.getUid(), key -> convertToResponse(workgroup));
-                workgroupsByAgent.computeIfAbsent(admin.getUid(), key -> new ArrayList<>()).add(response);
-            }
-        }
-
-        return workgroupsByAgent;
-    }
-
-    @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<ThreadResponse> queryAdminOngoingThreads(
-            String agentUid,
-            String orgUid,
-            int pageNumber,
-            int pageSize) {
-
-        int safePageNumber = Math.max(0, pageNumber);
-        int safePageSize = pageSize <= 0 ? 100 : pageSize;
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(safePageNumber, safePageSize);
-
-        if (!StringUtils.hasText(agentUid) || !StringUtils.hasText(orgUid)) {
-            return new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        Set<String> adminWorkgroupUids = workgroupRepository.findByAdminAgentUid(agentUid).stream()
-                .filter(w -> w != null && !w.isDeleted())
-                .filter(w -> orgUid.equals(w.getOrgUid()))
-                .map(WorkgroupEntity::getUid)
-                .filter(StringUtils::hasText)
-                .collect(Collectors.toSet());
-
-        if (adminWorkgroupUids.isEmpty()) {
-            return new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        List<String> ongoingStatuses = Arrays.asList(
-                ThreadProcessStatusEnum.CHATTING.name(),
-                ThreadProcessStatusEnum.NEW.name());
-
-        List<ThreadEntity> candidates = threadRepository
-                .findByOrgUidAndTypeAndStatusInAndDeletedFalseOrderByUpdatedAtDescCreatedAtDesc(
-                        orgUid,
-                        ThreadTypeEnum.WORKGROUP.name(),
-                        ongoingStatuses);
-
-        List<ThreadResponse> matched = candidates.stream()
-                .filter(t -> {
-                    try {
-                        if (t == null || t.getWorkgroup() == null) {
-                            return false;
-                        }
-                        UserProtobuf workgroup = UserProtobuf.fromJson(t.getWorkgroup());
-                        return workgroup != null
-                                && StringUtils.hasText(workgroup.getUid())
-                                && adminWorkgroupUids.contains(workgroup.getUid());
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .map(threadRestService::convertToResponse)
-                .collect(Collectors.toList());
-
-        int start = Math.min(safePageNumber * safePageSize, matched.size());
-        int end = Math.min(start + safePageSize, matched.size());
-        List<ThreadResponse> pageContent = matched.subList(start, end);
-
-        return new org.springframework.data.domain.PageImpl<>(pageContent, pageable, matched.size());
-    }
-
 
 }

@@ -16,9 +16,13 @@ package com.bytedesk.core.rbac.user;
 // import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.SerializationUtils;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.utils.BdPinyinUtils;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.PostPersist;
 // import lombok.extern.slf4j.Slf4j;
 import jakarta.persistence.PostUpdate;
@@ -30,6 +34,16 @@ public class UserEntityListener {
 
     // 无法注入bean，否则报错
     // private static TopicService topicService;
+
+    @PrePersist
+    public void prePersist(UserEntity user) {
+        populateNicknamePinyin(user);
+    }
+
+    @PreUpdate
+    public void preUpdate(UserEntity user) {
+        populateNicknamePinyin(user);
+    }
 
     @PostPersist
     public void postPersist(UserEntity user) {
@@ -66,5 +80,11 @@ public class UserEntityListener {
     // log.info("postRemove {}", user.getUid());
     // // topicService.deleteByTopicAndUid(user.getUid(), user.getUid());
     // }
+
+    private void populateNicknamePinyin(UserEntity user) {
+        if (StringUtils.hasText(user.getNickname())) {
+            user.setNicknamePinyin(BdPinyinUtils.toPinYin(user.getNickname()).replace(" ", ""));
+        }
+    }
 
 }

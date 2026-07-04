@@ -16,6 +16,9 @@ package com.bytedesk.service.agent_seat;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.service.agent_seat.enums.AgentSeatTypeEnum;
+
+
 import lombok.Builder;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -55,7 +55,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         this.tokenUsageHelper = tokenUsageHelper;
     }
 
-
     private final LlmProviderRestService llmProviderRestService;
 
     private final DashScopeChatModel defaultChatModel;

@@ -299,6 +299,24 @@ public class RobotService extends AbstractRobotService {
             robot,
             validationResult.getMessageProtobuf());
 
+        if (!shouldProcessVisitorSseMessage(validationResult.getMessageProtobuf(), query)) {
+            log.info("Skip visitor SSE AI processing for messageType={}, threadUid={}, reason=empty-or-non-ai-query",
+                    validationResult.getMessageProtobuf().getType(),
+                    validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+            sseMessageHelper.sendStreamEndMessage(
+                    validationResult.getMessageProtobuf(),
+                    messageProtobufReply,
+                    emitter,
+                    0,
+                    0,
+                    0,
+                    null,
+                    LlmProviderConstants.ZHIPUAI,
+                    "visitor-sse-skip",
+                    false);
+            return;
+        }
+
         if (RobotUtils.shouldBypassRobotReply(threadEntity)) {
             log.info("Thread {} is transferring to agent, skip robot stream response", threadEntity.getUid());
             sendTransferInterceptionResponse(validationResult, messageProtobufReply, emitter);
@@ -497,6 +515,41 @@ public class RobotService extends AbstractRobotService {
     }
 
     private record RobotContext(ThreadEntity thread, RobotProtobuf robot) {
+    }
+
+    private boolean shouldProcessVisitorSseMessage(MessageProtobuf messageProtobuf, String query) {
+        if (messageProtobuf == null) {
+            return false;
+        }
+
+        // 按消息类型过滤：参考前端 forceStomp 逻辑，以下类型不走 AI/SSE 机器人处理
+        MessageTypeEnum messageType = messageProtobuf.getType();
+        if (messageType == null) {
+            return false;
+        }
+
+        switch (messageType) {
+            case RATE:
+            case GOODS:
+            case ORDER:
+            case FORM:
+            case PREFORM:
+                log.info("Skip visitor SSE AI processing for messageType={}, threadUid={}, reason=non-ai-message-type",
+                        messageType,
+                        messageProtobuf.getThread() != null ? messageProtobuf.getThread().getUid() : null);
+                return false;
+            default:
+                break;
+        }
+
+        if (!StringUtils.hasText(query)) {
+            log.warn("Skip visitor SSE message with empty query, type={}, uid={}",
+                    messageType,
+                    messageProtobuf.getUid());
+            return false;
+        }
+
+        return true;
     }
 
     /**

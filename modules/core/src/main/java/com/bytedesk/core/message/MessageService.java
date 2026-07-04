@@ -62,6 +62,7 @@ public class MessageService {
     public String processMessageJson(String messageJson, Boolean isRobot) {
 
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJson); 
+        // validateThreadReplyPermission(messageProtobuf);
 
         // 收到消息，更新消息状态为发送成功
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
@@ -83,6 +84,47 @@ public class MessageService {
 
         return messageJsonResult;
     }
+
+    // private void validateThreadReplyPermission(MessageProtobuf messageProtobuf) {
+    //     if (messageProtobuf == null || messageProtobuf.getThread() == null || !StringUtils.hasText(messageProtobuf.getThread().getUid())) {
+    //         return;
+    //     }
+    //     UserProtobuf sender = messageProtobuf.getUser();
+    //     if (sender == null || !Boolean.TRUE.equals(sender.isAgent())) {
+    //         return;
+    //     }
+
+    //     ThreadEntity thread = threadRestService.findByUid(messageProtobuf.getThread().getUid()).orElse(null);
+    //     if (thread == null || !ThreadTypeEnum.WORKGROUP.name().equals(thread.getType())) {
+    //         return;
+    //     }
+    //     if (canAgentReplyInThread(thread, sender.getUid())) {
+    //         return;
+    //     }
+    //     throw new RuntimeException("agent has no reply permission in current thread");
+    // }
+
+    // private boolean canAgentReplyInThread(ThreadEntity thread, String senderUid) {
+    //     if (!StringUtils.hasText(senderUid)) {
+    //         return false;
+    //     }
+    //     UserEntity owner = thread.getOwner();
+    //     if (owner != null && senderUid.equals(owner.getUid())) {
+    //         return true;
+    //     }
+    //     return containsParticipantUid(thread.getAssistants(), senderUid)
+    //             || containsParticipantUid(thread.getInvites(), senderUid);
+    // }
+
+    // private boolean containsParticipantUid(List<String> participants, String senderUid) {
+    //     if (participants == null || participants.isEmpty() || !StringUtils.hasText(senderUid)) {
+    //         return false;
+    //     }
+    //     return participants.stream()
+    //             .map(UserProtobuf::fromJson)
+    //             .filter(java.util.Objects::nonNull)
+    //             .anyMatch(item -> senderUid.equals(item.getUid()));
+    // }
 
     public void sendForceLogoutMessage(UserEntity user, String orgUid, String sourceType, String sourceUid, String reason) {
         if (user == null || !StringUtils.hasText(user.getUid())) {

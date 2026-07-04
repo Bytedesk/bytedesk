@@ -56,6 +56,8 @@ public class ChunkVectorService {
     
     private final ChunkRestService chunkRestService;
 
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
+
     public Map<String, Object> queryVectorByUid(ChunkRequest request) {
         String uid = request.getUid();
         if (!StringUtils.hasText(uid)) {
@@ -109,6 +111,7 @@ public class ChunkVectorService {
     @Transactional
     public void indexChunkVector(ChunkEntity chunk) {
         log.info("向量索引chunk: {}", chunk.getName());
+        long startMs = System.currentTimeMillis();
         
         try {
             // 1. 为内容创建文档（带有元数据）
@@ -151,14 +154,40 @@ public class ChunkVectorService {
             // 3. 仅更新向量状态（避免 detached entity 的版本冲突）
             chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.SUCCESS.name());
             chunkRestService.evictChunkCacheAllEntries();
-            
+
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(chunk.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("CHUNK", chunk.getUid(), chunk.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录CHUNK向量化历史失败: uid={}, error={}", chunk.getUid(), recEx.getMessage());
+            }
+
             log.info("Chunk向量索引成功: {}", chunk.getName());
         } catch (Exception e) {
             log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
-            
+
             // 仅更新向量状态（避免 detached entity 的版本冲突）
             chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
             chunkRestService.evictChunkCacheAllEntries();
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(chunk.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("CHUNK", chunk.getUid(), chunk.getOrgUid(),
+                        embProvider, embModel, embDimensions, chunk.getContent(), "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录CHUNK向量化失败历史失败: uid={}, error={}", chunk.getUid(), recEx.getMessage());
+            }
             
             throw e;
         }

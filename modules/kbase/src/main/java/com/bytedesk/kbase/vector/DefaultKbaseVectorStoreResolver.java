@@ -21,25 +21,47 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DefaultKbaseVectorStoreResolver implements KbaseVectorStoreResolver {
 
     private final ObjectProvider<ElasticsearchVectorStore> vectorStoreProvider;
 
+    private final ObjectProvider<EmbeddingConfigProvider> embeddingConfigProvider;
+
     @Override
     public VectorStore resolveByKbase(KbaseEntity kbase) {
-        return resolveRequiredStore();
+        return resolveEffectiveStore();
     }
 
     @Override
     public VectorStore resolveByKbUid(String kbUid) {
-        return resolveRequiredStore();
+        return resolveEffectiveStore();
     }
 
     @Override
     public VectorStore resolveDefault() {
+        return resolveEffectiveStore();
+    }
+
+    /**
+     * 优先使用 DB EmbeddingSettings 配置的 VectorStore（通过 EmbeddingConfigProvider），
+     * fallback 到 Spring 托管的 elasticsearchVectorStore。
+     */
+    private VectorStore resolveEffectiveStore() {
+        VectorStore dbStore = embeddingConfigProvider
+                .stream()
+                .findFirst()
+                .flatMap(EmbeddingConfigProvider::getDefaultVectorStore)
+                .orElse(null);
+        if (dbStore != null) {
+            log.info("DefaultKbaseVectorStoreResolver: using DB-configured VectorStore");
+            return dbStore;
+        }
+        log.info("DefaultKbaseVectorStoreResolver: falling back to Spring-managed VectorStore (no DB config available)");
         return resolveRequiredStore();
     }
 

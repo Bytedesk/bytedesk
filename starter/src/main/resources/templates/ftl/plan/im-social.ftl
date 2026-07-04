@@ -33,8 +33,8 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3">AI协同平台</h1>
-				<h4 class="mb-3"><@t key="banner.subtitle">开源AI工作平台</@t></h4>
+				<h1 class="mb-3">开源企业协作与管理平台</h1>
+				<h4 class="mb-3"><@t key="banner.subtitle">基于AI全新打造</@t></h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->
 				<a href="https://www.weiyuai.cn/admin" class="btn btn-primary" target="_blank">》免费注册</a>

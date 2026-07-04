@@ -47,6 +47,7 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowActionFieldResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowActionResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 
