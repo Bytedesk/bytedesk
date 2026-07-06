@@ -157,7 +157,7 @@ public class CallEventListener implements IEslEventListener {
         String uuid = eslEvent.getEventHeaders().get("Unique-ID");
         String hangupCause = eslEvent.getEventHeaders().get("Hangup-Cause");
 
-        log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
+        // log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
 
         // 更新CDR记录 - 设置结束时间和挂断原因
         try {
@@ -383,13 +383,13 @@ public class CallEventListener implements IEslEventListener {
      * 处理通话状态变更事件
      */
     private void handleChannelCallState(EslEvent eslEvent) {
-        var headers = eslEvent.getEventHeaders();
-        String uuid = headers.get("Unique-ID");
-        String callState = headers.get("Channel-Call-State");
-        String original = headers.get("Original-Channel-Call-State");
-        String hangupCause = headers.get("Hangup-Cause");
+        // var headers = eslEvent.getEventHeaders();
+        // String uuid = headers.get("Unique-ID");
+        // String callState = headers.get("Channel-Call-State");
+        // String original = headers.get("Original-Channel-Call-State");
+        // String hangupCause = headers.get("Hangup-Cause");
 
-        log.info("通话状态: UUID {} CallState {} -> {} Cause {}", uuid, original, callState, hangupCause);
+        // log.info("通话状态: UUID {} CallState {} -> {} Cause {}", uuid, original, callState, hangupCause);
     }
 
     /**

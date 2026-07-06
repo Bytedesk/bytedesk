@@ -72,5 +72,6 @@
     <include file="db/changelog/migration/260625_add_ticket_basic_settings_smart_ticket_generate.xml" />
     <include file="db/changelog/migration/260704_add_nickname_pinyin.xml" />
     <include file="db/changelog/migration/260704_drop_service_settings_show_rate_btn.xml" />
+    <include file="db/changelog/migration/260704_alter_email_template_content_to_text.xml" />
 
 </databaseChangeLog>
