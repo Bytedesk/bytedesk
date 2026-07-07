@@ -25,7 +25,8 @@ public enum KbaseTypeEnum {
     AUTOREPLY, // 自动回复
     BLOG, // 博客
     EMAIL, // 邮件
-    TABOO; // 敏感词
+    TABOO, // 敏感词
+    PORTAL; // 门户
 
     // 根据字符串查找对应的枚举常量
     public static KbaseTypeEnum fromValue(String value) {

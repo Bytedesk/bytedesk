@@ -73,5 +73,7 @@
     <include file="db/changelog/migration/260704_add_nickname_pinyin.xml" />
     <include file="db/changelog/migration/260704_drop_service_settings_show_rate_btn.xml" />
     <include file="db/changelog/migration/260704_alter_email_template_content_to_text.xml" />
+    <include file="db/changelog/migration/260706_rename_wechat_mp_tables.xml" />
+    <include file="db/changelog/migration/260707_alter_license_key_to_text.xml" />
 
 </databaseChangeLog>

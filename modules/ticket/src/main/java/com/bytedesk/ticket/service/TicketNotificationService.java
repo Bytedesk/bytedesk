@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.apns_push.ApnsPushService;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
@@ -42,7 +43,6 @@ import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
-import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;

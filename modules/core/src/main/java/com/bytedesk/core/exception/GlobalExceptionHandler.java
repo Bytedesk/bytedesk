@@ -233,6 +233,13 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
     }
 
+    @ExceptionHandler(LicenseException.class)
+    public ResponseEntity<?> handleLicenseException(LicenseException e) {
+        // License 签名/密钥相关的错误属于环境配置问题，warn 级别，不打印堆栈
+        log.warn("License error: {}", e.getMessage());
+        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
         String rawMessage = e.getMessage();
@@ -244,6 +251,14 @@ public class GlobalExceptionHandler {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(JsonResult.error(I18Consts.I18N_RESOURCE_NOT_FOUND, 404));
+        }
+
+        // WeChat access token 刷新失败（如 IP 不在白名单），属于已知外部服务问题
+        // 类在 channels/wechat 模块，此处通过类名匹配避免跨模块依赖
+        if ("com.bytedesk.wechat.app.exception.WeChatAccessTokenRefreshException"
+                .equals(e.getClass().getName())) {
+            log.warn("WeChat access token refresh failed: {}", rawMessage);
+            return ResponseEntity.ok().body(JsonResult.error(rawMessage));
         }
 
         // 重复创建类业务冲突，返回更明确的错误码和可读文案

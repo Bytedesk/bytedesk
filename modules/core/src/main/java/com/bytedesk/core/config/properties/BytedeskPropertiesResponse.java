@@ -26,7 +26,7 @@ public class BytedeskPropertiesResponse implements Serializable {
 
     private Boolean debug;
     private String version; 
-    private String licenseKey; // 注意：这是加密后的licenseKey，前端需要先解密再解码
+    private String licenseKey; // 注意：这是前端专用的加密许可证摘要，不再暴露原始 licenseKey
 
     // 
     private Custom custom;

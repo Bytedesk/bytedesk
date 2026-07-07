@@ -42,7 +42,7 @@ import lombok.experimental.SuperBuilder;
  * Blog entity for content categorization and organization
  * Provides blogging functionality for various system entities
  * 
- * Database Table: bytedesk_kbase_blog
+ * Database Table: bytedesk_marketing_blog
  * Purpose: Stores blog definitions, colors, and organization settings
  */
 @Entity
@@ -53,7 +53,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ BlogEntityListener.class })
-@Table(name = "bytedesk_kbase_blog")
+@Table(name = "bytedesk_marketing_blog")
 public class BlogEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

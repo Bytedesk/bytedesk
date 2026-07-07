@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 
+        RSA-4096 signed license keys are ~900+ chars (Base64(payload):Base64(signature)).
+        varchar(255) is too small — expand both license_key and encrypted_license_key to TEXT.
+    -->
+    <changeSet id="260707-alter-license-key-to-text" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_license" />
+                <columnExists tableName="bytedesk_core_license" columnName="license_key" />
+            </and>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_license" columnName="license_key" newDataType="TEXT" />
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_license" columnName="license_key" newDataType="VARCHAR(255)" />
+        </rollback>
+    </changeSet>
+
+    <changeSet id="260707-alter-encrypted-license-key-to-text" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_license" />
+                <columnExists tableName="bytedesk_core_license" columnName="encrypted_license_key" />
+            </and>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_core_license" columnName="encrypted_license_key" newDataType="TEXT" />
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_core_license" columnName="encrypted_license_key" newDataType="VARCHAR(255)" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -16,8 +16,6 @@ package com.bytedesk.core.config.properties;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Base64;
-import java.nio.charset.StandardCharsets;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
@@ -30,8 +28,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import com.bytedesk.core.utils.LicenseValidator;
 
 @Slf4j
 @Getter
@@ -42,7 +39,6 @@ public class BytedeskProperties implements EnvironmentAware {
 
     public static final String CONFIG_PREFIX = "bytedesk";
     private static final String APPLICATION_VERSION_KEY = "application.version";
-    private static final String ENCRYPTION_KEY = "bytedesk_license"; // 16字节密钥
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
 
@@ -88,24 +84,29 @@ public class BytedeskProperties implements EnvironmentAware {
     }
 
     /**
-     * AES加密字符串
-     * @param plainText 明文
-     * @return 加密后的Base64字符串
+     * 许可证载荷缓存 (避免重复验签)
      */
-    public static String encryptString(String plainText) {
-        try {
-            if (!StringUtils.hasText(plainText)) {
-                return plainText;
+    private transient volatile LicenseValidator.LicenseInfo cachedLicenseInfo;
+    private transient volatile String cachedLicenseInfoFor;
+
+    /**
+     * 验证许可证并返回解析后的信息
+     * 结果会被缓存，仅在 licenseKey 变化时重新验证
+     *
+     * @return LicenseInfo 验证成功返回许可证信息，失败返回 null
+     */
+    public LicenseValidator.LicenseInfo validateLicense() {
+        String currentKey = this.licenseKey;
+        if (cachedLicenseInfo != null && currentKey != null && currentKey.equals(cachedLicenseInfoFor)) {
+            return cachedLicenseInfo;
+        }
+        synchronized (this) {
+            if (cachedLicenseInfo != null && currentKey != null && currentKey.equals(cachedLicenseInfoFor)) {
+                return cachedLicenseInfo;
             }
-            
-            SecretKeySpec secretKey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (Exception e) {
-            log.error("encryptString failed", e);
-            return plainText; // 加密失败时返回原值
+            cachedLicenseInfo = LicenseValidator.validate(currentKey);
+            cachedLicenseInfoFor = currentKey;
+            return cachedLicenseInfo;
         }
     }
 
@@ -164,6 +165,9 @@ public class BytedeskProperties implements EnvironmentAware {
     private String version;
 
     private String licenseKey;
+
+    // 许可证配置
+    private License license = new License();
 
     // 自定义配置
     private Custom custom = new Custom();
@@ -224,6 +228,13 @@ public class BytedeskProperties implements EnvironmentAware {
 
     @Getter
     @Setter
+    public static class License {
+        /** RSA 私钥文件路径，用于签发许可证签名 */
+        private String privateKeyPath;
+    }
+
+    @Getter
+    @Setter
     public static class Custom {
         private Boolean enabled = false;
         private String name;
@@ -275,6 +286,7 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean forceVisitorAuth = false; // 是否强制访客认证，默认false
         private Boolean wechatMpSubscribePromptEnabled = false;
         private String wechatMpSubscribePromptAppId;
+        private String wechatMpLoginNoticeTemplateId;
         /**
          * 自定义默认 LLM Prompt；为空时回退到代码内置默认值。
          */
@@ -659,12 +671,13 @@ public class BytedeskProperties implements EnvironmentAware {
     }
 
     /**
-     * 获取加密后的licenseKey
-     * @return 加密后的licenseKey字符串
+     * 获取 licenseKey（新格式为 RSA 签名，旧格式为 Base64 编码）
+     * 不再进行 AES 加密，前端通过 RSA 验签或 Base64 解码获取信息。
+     *
+     * @return licenseKey 字符串
      */
     public String getLicenseKey() {
-        // 原始licenseKey已经是Base64编码的许可证信息，直接AES加密
-        return encryptString(this.licenseKey);
+        return this.licenseKey;
     }
 
     /**

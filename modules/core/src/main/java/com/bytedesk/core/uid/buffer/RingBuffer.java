@@ -155,8 +155,8 @@ public class RingBuffer {
         // trigger padding in an async-mode if reach the threshold
         long currentTail = tail.get();
         if (currentTail - nextCursor < paddingThreshold) {
-            log.info("Reach the padding threshold:{}. tail:{}, cursor:{}, rest:{}", paddingThreshold, currentTail,
-                    nextCursor, currentTail - nextCursor);
+            // log.info("Reach the padding threshold:{}. tail:{}, cursor:{}, rest:{}", paddingThreshold, currentTail,
+            //         nextCursor, currentTail - nextCursor);
             bufferPaddingExecutor.asyncPadding();
         }
 
@@ -190,14 +190,14 @@ public class RingBuffer {
      * Discard policy for {@link RejectedPutBufferHandler}, we just do logging
      */
     protected void discardPutBuffer(RingBuffer ringBuffer, long uid) {
-        log.warn("Rejected putting buffer for uid:{}. {}", uid, ringBuffer);
+        // log.warn("Rejected putting buffer for uid:{}. {}", uid, ringBuffer);
     }
     
     /**
      * Policy for {@link RejectedTakeBufferHandler}, throws {@link RuntimeException} after logging 
      */
     protected void exceptionRejectedTakeBuffer(RingBuffer ringBuffer) {
-        log.warn("Rejected take buffer. {}", ringBuffer);
+        // log.warn("Rejected take buffer. {}", ringBuffer);
         throw new RuntimeException("Rejected take buffer. " + ringBuffer);
     }
     

@@ -19,12 +19,12 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.apns_push.ApnsPushService;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
-import com.bytedesk.core.push.apns_push.ApnsPushService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;

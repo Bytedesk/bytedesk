@@ -50,6 +50,7 @@ public class I18Consts {
     public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";
     public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
     public static final String I18N_EMAIL_PUSH = I18N_PREFIX + "email.push";
+    public static final String I18N_PUSH_SETTINGS = I18N_PREFIX + "push.settings";
     public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
     public static final String I18N_TOOL = I18N_PREFIX + "tool";
     public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
@@ -172,6 +173,7 @@ public class I18Consts {
     public static final String I18N_FORM = I18N_PREFIX + "form";
     public static final String I18N_HOLIDAY = I18N_PREFIX + "holiday";
     public static final String I18N_BLOG = I18N_PREFIX + "blog";
+    public static final String I18N_PORTAL = I18N_PREFIX + "portal";
     public static final String I18N_COURSE = I18N_PREFIX + "course";
     public static final String I18N_NOTE = I18N_PREFIX + "note";
     public static final String I18N_CHANNEL = I18N_PREFIX + "channel";

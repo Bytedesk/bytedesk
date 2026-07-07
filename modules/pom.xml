@@ -28,6 +28,7 @@
         <module>meet</module>
         <module>opinion</module>
         <module>service</module>
+        <module>shop</module>
         <module>remote</module>
         <module>social</module>
         <module>team</module>

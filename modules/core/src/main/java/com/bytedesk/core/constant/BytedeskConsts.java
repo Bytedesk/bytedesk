@@ -30,6 +30,7 @@ public class BytedeskConsts {
     // HTTP correlation id
     public static final String REQUEST_ID = "X-Request-Id";
     public static final String REQUEST_ID_MDC = "requestId";
+    public static final String LICENSE_VALID_CACHE_PREFIX = "bytedesk:license:valid:";
     // 空字符串
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_JSON_STRING = "{}";

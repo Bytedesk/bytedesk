@@ -14,18 +14,24 @@
 package com.bytedesk.core.config.properties;
 
 import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.utils.LicenseValidator;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/config/bytedesk", produces = "application/json;charset=UTF-8")
 @Tag(name = "Configuration Properties", description = "Configuration properties management APIs for system settings")
@@ -43,10 +49,15 @@ public class BytedeskPropertiesController {
     private static final long FALLBACK_ASR_TIMEOUT_MS = 180_000L;
     private static final long FALLBACK_ASR_POLL_INTERVAL_MS = 1_500L;
 
-    private final Environment environment;
+    private static final String LICENSE_INVALID_MESSAGE = "LICENSE_INVALID";
 
-    public BytedeskPropertiesController(Environment environment) {
+    private final Environment environment;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public BytedeskPropertiesController(Environment environment,
+                                         StringRedisTemplate stringRedisTemplate) {
         this.environment = environment;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     // http://127.0.0.1:9003/config/bytedesk/properties
@@ -66,6 +77,39 @@ public class BytedeskPropertiesController {
         }
         bytedeskPropertiesResponse.getService().setAgentSeatEnabled(
             environment.getProperty("bytedesk.service.agent-seat-enabled", Boolean.class, false));
+
+        // 服务端始终验证原始许可证，但只向前端返回提取后的加密摘要，避免暴露原始 licenseKey。
+        String licenseKey = bytedeskPropertiesResponse.getLicenseKey();
+        if (StringUtils.hasText(licenseKey)) {
+            String cacheKey = BytedeskConsts.LICENSE_VALID_CACHE_PREFIX + BytedeskProperties.getInstance().getOriginalAppkey();
+            String cachedResult = stringRedisTemplate.opsForValue().get(cacheKey);
+
+            // 即使 Redis 缓存为 "false"，仍需重新验证许可证。
+            // 原因：Redis 缓存可能来自上一次运行实例的失败记录（30 分钟有效），
+            // 而当前实例启动时验签可能已通过，缓存不应阻断前端获取正确的许可证摘要。
+            boolean cacheSaysInvalid = "false".equalsIgnoreCase(cachedResult);
+
+            LicenseValidator.LicenseInfo licenseInfo = BytedeskProperties.getInstance().validateLicense();
+            if (licenseInfo != null && licenseInfo.isValid()) {
+                // 验签通过：覆盖可能存在的旧缓存（包括将 "false" 刷新为 "true"）
+                if (!"true".equalsIgnoreCase(cachedResult)) {
+                    stringRedisTemplate.opsForValue().set(cacheKey, "true",
+                            java.time.Duration.ofHours(1));
+                }
+                if (cacheSaysInvalid) {
+                    log.info("License re-validated successfully, stale cache cleared: edition={}, expiry={}",
+                            licenseInfo.getEdition(), licenseInfo.getExpiryDate());
+                }
+                bytedeskPropertiesResponse.setLicenseKey(LicenseValidator.encryptForFrontend(licenseInfo));
+                log.info("License validated and transformed for frontend: format={}, edition={}, expiry={}",
+                        licenseInfo.getFormat(), licenseInfo.getEdition(), licenseInfo.getExpiryDate());
+            } else {
+                stringRedisTemplate.opsForValue().set(cacheKey, "false",
+                        java.time.Duration.ofMinutes(30));
+                log.warn("License validation FAILED, marking as invalid");
+                bytedeskPropertiesResponse.setLicenseKey(LICENSE_INVALID_MESSAGE);
+            }
+        }
 
         BytedeskPropertiesResponse.Ai ai = new BytedeskPropertiesResponse.Ai();
 
