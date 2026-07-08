@@ -3,13 +3,8 @@ package com.bytedesk.call.xml_curl.impl;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
-
 import com.bytedesk.call.xml_curl.XmlCurlService;
 
-@Service
-@ConditionalOnMissingBean(XmlCurlService.class)
 public class DefaultXmlCurlService implements XmlCurlService {
 
     @Override

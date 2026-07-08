@@ -3,14 +3,9 @@ package com.bytedesk.kbase.taboo;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Service;
-
 /**
  * 开源模块空实现：企业版未启用时返回空结果。
  */
-@Service
-@ConditionalOnMissingBean(TabooService.class)
 public class TabooServiceImpl implements TabooService {
 
     @Override

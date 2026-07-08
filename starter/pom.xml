@@ -215,7 +215,6 @@
 
 		<!-- /////////////////////////////////////开源模块//////////////////////////////////////// -->
 
-		<!--  -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-core</artifactId>
@@ -236,9 +235,21 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-marketing</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ai</artifactId>
 			<version>${revision}</version>
 		</dependency>
+
+		<!-- <dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-bi</artifactId>
+			<version>${revision}</version>
+		</dependency> -->
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
@@ -252,7 +263,6 @@
 			<version>${revision}</version>
 		</dependency>
 
-		
 		<dependency>
 			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-ticket</artifactId>
@@ -267,13 +277,25 @@
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-module-forum</artifactId>
+			<artifactId>bytedesk-module-meet</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-webrtc</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.bytedesk</groupId>
 			<artifactId>bytedesk-module-voc</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-forum</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
@@ -283,10 +305,21 @@
 			<version>${revision}</version>
 		</dependency>
 
-		<!-- kanban -->
 		<dependency>
 			<groupId>com.bytedesk</groupId>
-			<artifactId>bytedesk-plugin-kanban</artifactId>
+			<artifactId>bytedesk-module-remote</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-training</artifactId>
+			<version>${revision}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.bytedesk</groupId>
+			<artifactId>bytedesk-module-cli</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
