@@ -41,6 +41,8 @@ import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -449,6 +451,31 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     @Override
     public void delete(UserRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    public UserResponse updateEnabledBySuper(UserRequest request) {
+        Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+
+        UserEntity userEntity = userOptional.get();
+        Boolean enabled = request.getEnabled();
+        if (enabled == null) {
+            return convertToResponse(userEntity);
+        }
+
+        if (BytedeskConsts.DEFAULT_SUPER_UID.equals(userEntity.getUid()) && Boolean.FALSE.equals(enabled)) {
+            throw OrganizationI18nExceptions.superUserDisableDenied();
+        }
+
+        userEntity.setEnabled(enabled);
+        UserEntity saved = save(userEntity);
+        if (saved == null) {
+            throw new RuntimeException("Failed to save user");
+        }
+        return convertToResponse(saved);
     }
 
     public UserResponse restore(UserRequest request) {

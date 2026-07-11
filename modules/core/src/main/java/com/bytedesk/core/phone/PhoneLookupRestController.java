@@ -23,12 +23,12 @@ import lombok.AllArgsConstructor;
 @Tag(name = "Phone Number Lookup", description = "Public APIs for phone number location and carrier lookup")
 @RestController
 @AllArgsConstructor
-@RequestMapping("/test/api/v1/phone")
+@RequestMapping("/visitor/api/v1/phone")
 public class PhoneLookupRestController {
 
     private final PhoneLookupService phoneLookupService;
 
-    // http://127.0.0.1:9003/test/api/v1/phone/lookup?number=13800138000
+    // http://127.0.0.1:9003/visitor/api/v1/phone/lookup?number=13800138000
     @ApiRateLimiter(value = 5, timeout = 1)
     @GetMapping("/lookup")
     @Operation(summary = "Phone Number Lookup", description = "Enter an 11-digit phone number or the first 7 digits to return location and carrier information")
@@ -43,7 +43,8 @@ public class PhoneLookupRestController {
 
         Optional<PhoneNumberInfo> found = phoneLookupService.lookup(trimmed);
         if (found.isEmpty()) {
-            return ResponseEntity.status(404).body(JsonResult.error("not found", 404));
+            // 当前 phone.dat 仅含手机号段，固话/座机号码（0 开头）不在库中属于正常情况
+            return ResponseEntity.ok(JsonResult.success(PhoneLookupResponse.notFound(trimmed)));
         }
 
         return ResponseEntity.ok(JsonResult.success(PhoneLookupResponse.from(found.get())));

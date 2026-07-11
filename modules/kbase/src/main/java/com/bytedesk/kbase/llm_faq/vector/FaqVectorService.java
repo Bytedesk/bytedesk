@@ -36,6 +36,10 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -58,6 +62,8 @@ public class FaqVectorService {
     private final FaqRestService faqRestService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
@@ -402,16 +408,18 @@ public class FaqVectorService {
             String tags = String.join(",", currentFaq.getTagList());
 
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                    "uid", currentFaq.getUid(),
-                    "question", currentFaq.getQuestion(),
-                    "kbUid", kbUid,
-                    "categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "",
-                    "orgUid", currentFaq.getOrgUid(),
-                    "enabled", Boolean.toString(currentFaq.getEnabled()),
-                    "tags", tags,
-                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                    "sourceType", "FAQ");
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("uid", currentFaq.getUid());
+                metadata.put("question", currentFaq.getQuestion());
+                metadata.put("kbUid", kbUid);
+                metadata.put("categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "");
+                metadata.put("orgUid", currentFaq.getOrgUid());
+                metadata.put("enabled", Boolean.toString(currentFaq.getEnabled()));
+                metadata.put("tags", tags);
+                metadata.put("language", currentFaq.getKbase() != null && StringUtils.hasText(currentFaq.getKbase().getSourceLanguage()) ? currentFaq.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("sourceLanguage", currentFaq.getKbase() != null && StringUtils.hasText(currentFaq.getKbase().getSourceLanguage()) ? currentFaq.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("translated", Boolean.FALSE.toString());
+                metadata.put("sourceType", "FAQ");
 
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -420,6 +428,7 @@ public class FaqVectorService {
             log.info("向向量存储添加文档: {}", id);
             vectorStoreResolver.resolveByKbase(currentFaq.getKbase()).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
+            reindexTranslatedFaqVectors(currentFaq);
 
             // 3. 更新FAQ实体中的文档ID列表
             List<String> docIdList = currentFaq.getDocIdList();
@@ -574,6 +583,11 @@ public class FaqVectorService {
      */
     public List<FaqVectorSearchResult> searchFaqVector(String query, String kbUid, String categoryUid, String orgUid,
             int limit) {
+        return searchFaqVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<FaqVectorSearchResult> searchFaqVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("向量搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
 
         // 创建过滤表达式构建器
@@ -601,6 +615,11 @@ public class FaqVectorService {
         if (orgUid != null && !orgUid.isEmpty()) {
             FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
+        }
+
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
         }
 
         // 构建最终的过滤表达式
@@ -714,9 +733,104 @@ public class FaqVectorService {
                 .kbUid((String) metadata.getOrDefault(
                     KbaseConst.KBASE_KB_UID,
                     metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, "")))
+                .sourceUid((String) metadata.getOrDefault("sourceUid", uid))
                 .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
                 .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
                 .build();
+    }
+
+    private void reindexTranslatedFaqVectors(FaqEntity faq) {
+        deleteTranslatedFaqVectors(faq);
+
+        String kbUid = faq.getKbase() != null ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        faq.getUid(),
+                        KbaseTranslationSourceTypeEnum.FAQ.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            FaqVector translatedVector = FaqVector.fromTranslation(faq, translation);
+            String translatedQuestion = translatedVector.getQuestion();
+            String translatedAnswer = translatedVector.getAnswer();
+            if (!StringUtils.hasText(translatedQuestion) && !StringUtils.hasText(translatedAnswer)) {
+                continue;
+            }
+
+            String docId = "faq_translation_" + translation.getUid();
+            String content = (translatedQuestion != null ? translatedQuestion : "") + "\n"
+                    + (translatedAnswer != null ? translatedAnswer : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", faq.getUid());
+            metadata.put("question", translatedQuestion);
+            metadata.put("kbUid", kbUid);
+            metadata.put("categoryUid", faq.getCategoryUid() != null ? faq.getCategoryUid() : "");
+            metadata.put("orgUid", faq.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "FAQ");
+
+            documents.add(new Document(docId, content, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).add(documents);
+        }
+    }
+
+    private void deleteTranslatedFaqVectors(FaqEntity faq) {
+        if (faq.getKbase() == null || !StringUtils.hasText(faq.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+            expressionBuilder.eq("sourceType", "FAQ"),
+            expressionBuilder.eq("sourceUid", faq.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = vectorStoreResolver.resolveByKbase(faq.getKbase()).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(docIds);
+        }
     }
 
 

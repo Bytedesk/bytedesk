@@ -1,8 +1,10 @@
 package com.bytedesk.ai.mcp;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -55,10 +57,12 @@ public class BytedeskExternalMcpTools {
         validateKnowledgeRequest(request);
 
         RobotProtobuf robot = resolveRobot(request);
+        List<String> preferredLanguages = buildPreferredLanguages(request);
         SearchResultWithSources results = knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(
             request.getQuery(),
             robot,
-            request.getSourceType());
+            request.getSourceType(),
+            preferredLanguages);
 
         List<McpKnowledgeItem> items = mapKnowledgeItems(results);
         return McpKnowledgeSearchResponse.builder()
@@ -66,6 +70,8 @@ public class BytedeskExternalMcpTools {
             .orgUid(request.getOrgUid())
             .kbUid(robot.getKbUid())
             .searchType(robot.getLlm() != null ? robot.getLlm().getSearchType() : null)
+            .userLanguage(request.getUserLanguage())
+            .preferredLanguages(preferredLanguages)
             .total(items.size())
             .items(items)
             .build();
@@ -162,15 +168,37 @@ public class BytedeskExternalMcpTools {
                     .content(content)
                     .summary(truncate(content, SUMMARY_LENGTH))
                     .sourceType(source != null && source.getSourceType() != null ? source.getSourceType().name() : faq.getType())
-                    .sourceUid(source != null ? source.getSourceUid() : faq.getUid())
+                    .sourceUid(source != null ? source.getSourceUid() : (StringUtils.hasText(faq.getSourceUid()) ? faq.getSourceUid() : faq.getUid()))
                     .sourceName(source != null ? source.getSourceName() : faq.getQuestion())
                     .fileName(source != null ? source.getFileName() : null)
                     .fileUrl(source != null ? source.getFileUrl() : null)
                     .searchChannel(source != null ? source.getSearchChannel() : null)
+                    .language(faq.getLanguage())
+                    .sourceLanguage(faq.getSourceLanguage())
+                    .translated(faq.getTranslated())
                     .score(source != null ? source.getScore() : null)
                     .build());
         }
         return items;
+    }
+
+    private List<String> buildPreferredLanguages(McpKnowledgeSearchRequest request) {
+        Set<String> languages = new LinkedHashSet<>();
+        addLanguage(languages, request.getUserLanguage());
+        if (request.getPreferredLanguages() != null) {
+            request.getPreferredLanguages().forEach(language -> addLanguage(languages, language));
+        }
+        addLanguage(languages, request.getSourceLanguage());
+        if (request.getFallbackLanguages() != null) {
+            request.getFallbackLanguages().forEach(language -> addLanguage(languages, language));
+        }
+        return new ArrayList<>(languages);
+    }
+
+    private void addLanguage(Set<String> languages, String language) {
+        if (StringUtils.hasText(language)) {
+            languages.add(language.trim().toUpperCase());
+        }
     }
 
     private String truncate(String text, int maxLength) {

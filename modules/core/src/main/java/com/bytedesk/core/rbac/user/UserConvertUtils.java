@@ -289,6 +289,7 @@ public class UserConvertUtils {
                 .description(organization.getDescription())
                 .verifyStatus(organization.getVerifyStatus())
                 .enabled(organization.getEnabled())
+            .deleted(organization.isDeleted())
                 .vipLevel(organization.getVipLevel())
                 .maxMembers(organization.getMaxMembers())
                 .maxAgents(organization.getMaxAgents())

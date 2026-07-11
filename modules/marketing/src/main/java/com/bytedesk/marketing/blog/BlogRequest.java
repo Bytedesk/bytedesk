@@ -77,4 +77,14 @@ public class BlogRequest extends BaseRequest {
     @Builder.Default
     private String editor = BytedeskConsts.EMPTY_STRING;
 
+    // 来源URL（网页抓取）
+    private String sourceUrl;
+
+    // 来源名称
+    private String sourceName;
+
+    // 是否显示来源
+    @Builder.Default
+    private Boolean showSource = false;
+
 }

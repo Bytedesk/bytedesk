@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -35,6 +36,8 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRepository;
+import com.bytedesk.kbase.llm_webpage.WebpageCrawlerService;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 import com.bytedesk.kbase.utils.MarkdownRenderUtils;
 
@@ -53,6 +56,10 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     private final UidUtils uidUtils;
     
     private final KbaseRepository kbaseRepository;
+
+    private final WebpageCrawlerService webpageCrawlerService;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<ArticleEntity> createSpecification(ArticleRequest request) {
@@ -96,6 +103,7 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
         if (savedArticle == null) {
             throw new RuntimeException("article save failed");
         }
+        kbaseTranslationSyncService.syncArticle(savedArticle);
         // 
         return convertToResponse(savedArticle);
     }
@@ -118,11 +126,15 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
             entity.setTop(request.getTop());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
+            entity.setSourceUrl(request.getSourceUrl());
+            entity.setSourceName(request.getSourceName());
+            entity.setShowSource(request.getShowSource());
             //
             ArticleEntity savedArticle = save(entity);
             if (savedArticle == null) {
                 throw new RuntimeException("article save failed");
             }
+            kbaseTranslationSyncService.syncArticle(savedArticle);
             //
             return convertToResponse(savedArticle);
             
@@ -196,6 +208,29 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     @Override
     public ArticleExcel convertToExcel(ArticleEntity article) {
         return modelMapper.map(article, ArticleExcel.class);
+    }
+
+    public ArticleResponse crawlContent(ArticleRequest request) {
+        if (!StringUtils.hasText(request.getSourceUrl())) {
+            throw new RuntimeException("sourceUrl is empty");
+        }
+
+        WebpageCrawlerService.CrawlResult crawlResult = webpageCrawlerService.crawlPage(request.getSourceUrl());
+        if (crawlResult == null || !StringUtils.hasText(crawlResult.content())) {
+            throw new RuntimeException("crawl content failed");
+        }
+
+        String sourceName = StringUtils.hasText(request.getSourceName())
+                ? request.getSourceName()
+                : crawlResult.title();
+
+        return ArticleResponse.builder()
+                .sourceUrl(request.getSourceUrl())
+                .sourceName(sourceName)
+                .showSource(Boolean.TRUE.equals(request.getShowSource()))
+                .contentMarkdown(crawlResult.content())
+                .contentHtml(crawlResult.content())
+                .build();
     }
 
     /**

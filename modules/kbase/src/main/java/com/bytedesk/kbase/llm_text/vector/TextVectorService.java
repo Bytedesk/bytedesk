@@ -33,6 +33,10 @@ import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
 import com.bytedesk.kbase.llm_text.TextRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -55,6 +59,8 @@ public class TextVectorService {
     private final KbaseVectorStoreResolver vectorStoreResolver;
     
     private final TextRestService textRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
@@ -123,18 +129,20 @@ public class TextVectorService {
             String tags = String.join(",", text.getTagList());
             
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                "uid", text.getUid(),
-                "title", text.getTitle(),
-                KbaseConst.KBASE_KB_UID, text.getKbase() != null ? text.getKbase().getUid() : "",
-                "categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "",
-                "orgUid", text.getOrgUid(),
-                "enabled", Boolean.toString(text.getEnabled()),
-                "tags", tags,
-                "type", text.getType(),
-                // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                "sourceType", "TEXT"
-            );
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", text.getUid());
+            metadata.put("sourceUid", text.getUid());
+            metadata.put("title", text.getTitle());
+            metadata.put(KbaseConst.KBASE_KB_UID, text.getKbase() != null ? text.getKbase().getUid() : "");
+            metadata.put("categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "");
+            metadata.put("orgUid", text.getOrgUid());
+            metadata.put("enabled", Boolean.toString(text.getEnabled()));
+            metadata.put("tags", tags);
+            metadata.put("type", text.getType());
+            metadata.put("language", text.getKbase() != null && StringUtils.hasText(text.getKbase().getSourceLanguage()) ? text.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("sourceLanguage", text.getKbase() != null && StringUtils.hasText(text.getKbase().getSourceLanguage()) ? text.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("translated", Boolean.FALSE.toString());
+            metadata.put("sourceType", "TEXT");
             
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -146,6 +154,7 @@ public class TextVectorService {
             
             // 添加新文档
             vectorStore.add(List.of(document));
+            reindexTranslatedTextVectors(text);
             
             // 3. 更新Text实体中的文档ID列表
             List<String> docIdList = text.getDocIdList();
@@ -478,6 +487,11 @@ public class TextVectorService {
      * @return 相似度搜索结果列表
      */
     public List<TextVectorSearchResult> searchTextVector(String query, String kbUid, String categoryUid, String orgUid, int limit) {
+        return searchTextVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<TextVectorSearchResult> searchTextVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("向量搜索文本: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 创建过滤表达式构建器
@@ -505,6 +519,11 @@ public class TextVectorService {
         if (orgUid != null && !orgUid.isEmpty()) {
             FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
+        }
+
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
         }
         
         // 构建最终的过滤表达式
@@ -550,8 +569,12 @@ public class TextVectorService {
                 .content(docContent)
                 .type(docType)
                 .kbUid(docKbUid)
+                .sourceUid((String) metadata.getOrDefault("sourceUid", docUid))
                 .categoryUid(docCategoryUid)
                 .orgUid(docOrgUid)
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
                 .tagList(tagList)
                 .build();
             
@@ -610,5 +633,96 @@ public class TextVectorService {
                 .map(TextEntity::getKbase)
                 .map(vectorStoreResolver::resolveByKbase)
                 .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
+    private void reindexTranslatedTextVectors(TextEntity text) {
+        deleteTranslatedTextVectors(text);
+
+        String kbUid = text.getKbase() != null ? text.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        text.getUid(),
+                        KbaseTranslationSourceTypeEnum.TEXT.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            TextVector translatedVector = TextVector.fromTranslation(text, translation);
+            if (!StringUtils.hasText(translatedVector.getTitle()) && !StringUtils.hasText(translatedVector.getContent())) {
+                continue;
+            }
+
+            String docId = "text_translation_" + translation.getUid();
+            String content = (translatedVector.getTitle() != null ? translatedVector.getTitle() : "")
+                    + "\n\n"
+                    + (translatedVector.getContent() != null ? translatedVector.getContent() : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", text.getUid());
+            metadata.put("title", translatedVector.getTitle());
+            metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+            metadata.put("categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "");
+            metadata.put("orgUid", text.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("type", translatedVector.getType());
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "TEXT");
+
+            documents.add(new Document(docId, content, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(text.getKbase()).add(documents);
+        }
+    }
+
+    private void deleteTranslatedTextVectors(TextEntity text) {
+        if (text.getKbase() == null || !StringUtils.hasText(text.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+                expressionBuilder.eq("sourceType", "TEXT"),
+                expressionBuilder.eq("sourceUid", text.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = vectorStoreResolver.resolveByKbase(text.getKbase()).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(text.getKbase()).delete(docIds);
+        }
     }
 }

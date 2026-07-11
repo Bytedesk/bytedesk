@@ -253,6 +253,15 @@ services:
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
       # ===============================
+      # Spring Boot Admin Client (bytedesk-monitor)
+      # Uncomment to register this instance with a monitor server. 取消注释以注册到监控服务端。
+      # ===============================
+      # SPRING_BOOT_ADMIN_CLIENT_URL: http://bytedesk-monitor:9103
+      # SPRING_BOOT_ADMIN_CLIENT_USERNAME: admin
+      # SPRING_BOOT_ADMIN_CLIENT_PASSWORD: admin
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_NAME: bytedesk-starter
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL: http://127.0.0.1:9003
+      # ===============================
       # AI provider and model selection
       # Select default providers first, then configure API keys and model options for the providers you actually use. 先选择默认 provider，再为实际使用的 provider 配置密钥和模型参数。
       # ===============================

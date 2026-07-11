@@ -87,6 +87,10 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         return kbaseRepository.existsByUid(uid);
     }
 
+    public List<KbaseEntity> findAllNotDeleted() {
+        return kbaseRepository.findByDeleted(false);
+    }
+
     @Override
     public KbaseResponse create(KbaseRequest request) {
         // 判断uid是否已经存在
@@ -114,6 +118,13 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         entity.setDescriptionHtml(request.getDescriptionHtml());
         entity.setFooterHtml(request.getFooterHtml());
         entity.setLanguage(request.getLanguage());
+        entity.setSourceLanguage(StringUtils.hasText(request.getSourceLanguage())
+            ? request.getSourceLanguage()
+            : request.getLanguage());
+        entity.setTargetLanguages(request.getTargetLanguages());
+        entity.setAutoTranslateEnabled(request.getAutoTranslateEnabled());
+        entity.setTranslateQueryEnabled(request.getTranslateQueryEnabled());
+        entity.setAnswerWithUserLanguage(request.getAnswerWithUserLanguage());
         entity.setLevel(request.getLevel());
         entity.setOrgUid(request.getOrgUid());
         entity.setAgentUid(request.getAgentUid());

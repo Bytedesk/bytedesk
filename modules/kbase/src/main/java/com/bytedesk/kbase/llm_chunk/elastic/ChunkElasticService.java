@@ -31,6 +31,10 @@ import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -50,6 +54,8 @@ public class ChunkElasticService {
     private final ElasticsearchOperations elasticsearchOperations;
 
     private final ChunkRestService chunkRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     public Map<String, Object> queryElasticByUid(ChunkRequest request) {
         String uid = request.getUid();
@@ -248,6 +254,7 @@ public class ChunkElasticService {
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(chunkElastic);
+            reindexTranslatedChunks(chunk);
             
             if (exists) {
                 log.info("Chunk索引更新成功: {}", chunk.getUid());
@@ -289,6 +296,45 @@ public class ChunkElasticService {
             return false;
         }
     }
+
+        private void reindexTranslatedChunks(ChunkEntity chunk) {
+        deleteTranslatedChunkDocuments(chunk.getUid());
+
+        String kbUid = chunk.getKbase() != null ? chunk.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+            .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                kbUid,
+                chunk.getUid(),
+                KbaseTranslationSourceTypeEnum.CHUNK.name());
+
+        translations.stream()
+            .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+            .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+            .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+            .filter(translation -> StringUtils.hasText(translation.getTitle())
+                || StringUtils.hasText(translation.getContent())
+                || StringUtils.hasText(translation.getSummary()))
+            .forEach(translation -> elasticsearchOperations.save(ChunkElastic.fromTranslation(chunk, translation)));
+        }
+
+        private void deleteTranslatedChunkDocuments(String sourceUid) {
+        if (!StringUtils.hasText(sourceUid)) {
+            return;
+        }
+
+        Query query = NativeQuery.builder()
+            .withQuery(QueryBuilders.bool()
+                .filter(QueryBuilders.term().field("sourceUid").value(sourceUid).build()._toQuery())
+                .filter(QueryBuilders.term().field("translated").value(true).build()._toQuery())
+                .build()._toQuery())
+            .build();
+
+        elasticsearchOperations.delete(DeleteQuery.builder(query).build(), ChunkElastic.class);
+        }
     
     /**
      * 根据知识库UID删除所有相关Chunk索引
@@ -332,7 +378,7 @@ public class ChunkElasticService {
      */
     public List<ChunkElasticSearchResult> searchChunks(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("搜索Chunks: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchChunks(query, kbUid, categoryUid, orgUid, 10);
+        return searchChunks(query, kbUid, categoryUid, orgUid, 10, null);
     }
 
     /**
@@ -342,7 +388,14 @@ public class ChunkElasticService {
      */
     public List<ChunkElasticSearchResult> searchChunks(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
         log.info("搜索Chunks: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
-        return searchChunksInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+        return searchChunks(query, kbUid, categoryUid, orgUid, maxResults, null);
+    }
+
+    public List<ChunkElasticSearchResult> searchChunks(String query, String kbUid, String categoryUid, String orgUid,
+            Integer maxResults, List<String> preferredLanguages) {
+        log.info("搜索Chunks: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}, preferredLanguages={}",
+                query, kbUid, categoryUid, orgUid, maxResults, preferredLanguages);
+        return searchChunksInternal(query, kbUid, categoryUid, orgUid, false, maxResults, preferredLanguages);
     }
 
     /**
@@ -357,7 +410,7 @@ public class ChunkElasticService {
         
         log.info("联想Chunks: query={}, kbUid={}, orgUid={}", query, kbUid, orgUid);
         
-        List<ChunkElasticSearchResult> results = searchChunksInternal(query, kbUid, null, orgUid, true, 10);
+        List<ChunkElasticSearchResult> results = searchChunksInternal(query, kbUid, null, orgUid, true, 10, null);
         log.info("Chunk联想结果数: {}", results.size());
         return results;
     }
@@ -379,7 +432,8 @@ public class ChunkElasticService {
             String categoryUid, 
             String orgUid, 
             boolean isSuggest,
-            Integer maxResults) {
+            Integer maxResults,
+            List<String> preferredLanguages) {
         
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
@@ -461,6 +515,18 @@ public class ChunkElasticService {
             
             if (orgUid != null && !orgUid.trim().isEmpty()) {
                 boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+            }
+
+            if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+                BoolQuery.Builder languageQuery = new BoolQuery.Builder();
+                preferredLanguages.stream()
+                        .filter(StringUtils::hasText)
+                        .map(String::trim)
+                        .map(String::toUpperCase)
+                        .forEach(language -> languageQuery.should(
+                                QueryBuilders.term().field("language").value(language).build()._toQuery()));
+                languageQuery.minimumShouldMatch("1");
+                boolQueryBuilder.filter(languageQuery.build()._toQuery());
             }
             
             // 构建最终查询

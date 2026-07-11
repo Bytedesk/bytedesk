@@ -24,12 +24,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRepository;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseProperties;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,8 @@ public class BlogController {
     private final BlogRestService blogRestService;
 
     private final KbaseProperties kbaseProperties;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     // http://127.0.0.1:9003/blog/{kbUid}
     @GetMapping({"/{kbUid:[^\\.]*}", "/{kbUid:[^\\.]*}/"})
@@ -110,10 +115,16 @@ public class BlogController {
 
     // http://127.0.0.1:9003/blog/{kbUid}/post/{blogUid}
     // http://127.0.0.1:9003/blog/{kbUid}/post/{blogUid}.html
-    @GetMapping("/{kbUid}/post/{blogUid:[^\\.]*}")
-    public String blogPost(@PathVariable String kbUid, @PathVariable String blogUid, Model model) {
+    @GetMapping({"/{kbUid}/post/{blogUid:[^\\.]*}", "/{kbUid}/{lang}/post/{blogUid:[^\\.]*}"})
+    public String blogPost(
+            @PathVariable String kbUid,
+            @PathVariable(required = false) String lang,
+            @PathVariable String blogUid,
+            @RequestParam(value = "lang", required = false) String requestLang,
+            Model model) {
         blogUid = blogUid.replaceAll("\\.html$", "");
-        log.info("blogPost kbUid={}, blogUid={}", kbUid, blogUid);
+        String resolvedLang = StringUtils.hasText(requestLang) ? requestLang : lang;
+        log.info("blogPost kbUid={}, blogUid={}, lang={}", kbUid, blogUid, resolvedLang);
 
         Optional<KbaseEntity> kbaseOptional = kbaseRestService.findByUid(kbUid);
         if (kbaseOptional.isEmpty()) {
@@ -126,7 +137,33 @@ public class BlogController {
         if (blogOptional.isEmpty()) {
             return "redirect:/404";
         }
-        model.addAttribute("blog", blogRestService.convertToResponse(blogOptional.get()));
+        BlogResponse blogResponse = blogRestService.convertToResponse(blogOptional.get());
+        if (StringUtils.hasText(resolvedLang)) {
+            kbaseTranslationRepository
+                    .findByKbase_UidAndSourceUidAndSourceTypeAndTargetLanguageAndEnabledTrueAndDeletedFalse(
+                            kbUid,
+                            blogUid,
+                            KbaseTranslationSourceTypeEnum.BLOG.name(),
+                            resolvedLang.trim().toUpperCase())
+                    .ifPresent(translation -> {
+                        if (StringUtils.hasText(translation.getTitle())) {
+                            blogResponse.setName(translation.getTitle());
+                        }
+                        if (StringUtils.hasText(translation.getSummary())) {
+                            blogResponse.setDescription(translation.getSummary());
+                        }
+                        if (StringUtils.hasText(translation.getContentHtml())) {
+                            blogResponse.setContentHtml(translation.getContentHtml());
+                        }
+                        if (StringUtils.hasText(translation.getContentMarkdown())) {
+                            blogResponse.setContentMarkdown(translation.getContentMarkdown());
+                        }
+                        if (translation.getTagList() != null && !translation.getTagList().isEmpty()) {
+                            blogResponse.setTagList(translation.getTagList());
+                        }
+                    });
+        }
+        model.addAttribute("blog", blogResponse);
 
         List<CategoryEntity> categories = categoryRepository.findByKbUidAndDeletedFalse(kbUid);
         model.addAttribute("categories", categories);

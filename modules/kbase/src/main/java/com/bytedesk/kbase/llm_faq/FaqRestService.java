@@ -58,6 +58,7 @@ import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.llm_faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.llm_faq.event.FaqUpdateDocEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 import com.bytedesk.kbase.utils.KbaseMessageUtils;
 import lombok.AllArgsConstructor;
@@ -85,6 +86,8 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
     private final MessageRestService messageRestService;
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<FaqEntity> createSpecification(FaqRequest request) {
@@ -238,6 +241,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to create FAQ");
             }
+            kbaseTranslationSyncService.syncFaq(savedEntity);
             //
             return convertToResponse(savedEntity);
 
@@ -285,6 +289,8 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update FAQ");
             }
+
+            kbaseTranslationSyncService.syncFaq(savedEntity);
 
             return convertToResponse(savedEntity);
         } else {

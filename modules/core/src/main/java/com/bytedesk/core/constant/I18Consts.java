@@ -437,6 +437,12 @@ public class I18Consts {
             + "organization.create.constraint.failed"; // 创建组织失败，名称或代码冲突
     public static final String I18N_ORGANIZATION_SUPER_USER_DISABLE_DENIED = I18N_PREFIX
             + "organization.super.user.disable.denied"; // 超级用户组织不允许禁用
+    public static final String I18N_ORGANIZATION_DEFAULT_DISABLE_DENIED = I18N_PREFIX
+            + "organization.default.disable.denied"; // 默认组织不允许禁用
+    public static final String I18N_ORGANIZATION_DEFAULT_DELETE_DENIED = I18N_PREFIX
+            + "organization.default.delete.denied"; // 默认组织不允许删除
+    public static final String I18N_USER_SUPER_DISABLE_DENIED = I18N_PREFIX
+            + "user.super.disable.denied"; // 超级管理员用户不允许禁用
     public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空
     public static final String I18N_MOBILE_REQUIRED = I18N_PREFIX + "mobile.required"; // 手机号不能为空
     public static final String I18N_EMAIL_OR_MOBILE_REQUIRED = I18N_PREFIX + "email.or.mobile.required"; // 邮箱或手机号不能为空
@@ -659,6 +665,7 @@ public class I18Consts {
     public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》工单生成"; // 工单大模型配置提示
     public static final String I18N_LLM_AGENT_INSPECTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》客服质检"; // 客服质检大模型配置提示
     public static final String I18N_LLM_LANGUAGE_TRANSLATION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》语言翻译"; // 语言翻译大模型配置提示
+    public static final String I18N_LLM_KB_TRANSLATION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》知识库翻译"; // 知识库翻译大模型配置提示
     public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
 
     // AI 服务相关常量

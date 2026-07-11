@@ -13,6 +13,10 @@
  */
 package com.bytedesk.kbase.kbase;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +26,7 @@ import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.auto_reply.fixed.AutoReplyFixedInitializer;
 import com.bytedesk.kbase.auto_reply.keyword.AutoReplyKeywordInitializer;
+import com.bytedesk.kbase.elastic.KbaseElasticIndexUpgradeService;
 import com.bytedesk.kbase.llm_file.FileInitializer;
 import com.bytedesk.kbase.llm_chunk.ChunkInitializer;
 import com.bytedesk.kbase.llm_faq.FaqInitializer;
@@ -53,6 +58,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
 
     private final ChunkInitializer chunkInitializer;
 
+    private final KbaseElasticIndexUpgradeService kbaseElasticIndexUpgradeService;
+
     private final AutoReplyFixedInitializer autoReplyFixedInitializer;
 
     private final AutoReplyKeywordInitializer autoReplyKeywordInitializer;
@@ -81,6 +88,8 @@ public class KbaseInitializer implements SmartInitializingSingleton {
         fileInitializer.init();
         // 初始化分片
         chunkInitializer.init();
+
+        autoUpgradeElasticIndexesIfNeeded();
     }
 
     public void initKbase() {
@@ -103,6 +112,39 @@ public class KbaseInitializer implements SmartInitializingSingleton {
             String permissionValue = KbasePermissions.KBASE_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
+    }
+
+    private void autoUpgradeElasticIndexesIfNeeded() {
+        try {
+            var result = kbaseElasticIndexUpgradeService.checkAndUpgradeIkIndexes();
+            log.info("KbaseInitializer elastic index upgrade summary: {}", summarizeElasticUpgradeResult(result));
+        } catch (Exception e) {
+            log.error("KbaseInitializer auto upgrade elastic indexes failed: {}", e.getMessage(), e);
+        }
+    }
+
+    private Map<String, Object> summarizeElasticUpgradeResult(Map<String, Object> result) {
+        List<String> upgradedIndexes = new ArrayList<>();
+        Object indexesValue = result.get("indexes");
+        if (indexesValue instanceof List<?> indexes) {
+            for (Object item : indexes) {
+                if (item instanceof Map<?, ?> indexResult && Boolean.TRUE.equals(indexResult.get("upgraded"))) {
+                    Object name = indexResult.get("name");
+                    if (name instanceof String indexName) {
+                        upgradedIndexes.add(indexName);
+                    }
+                }
+            }
+        }
+
+        return Map.of(
+                "needsUpgrade", result.get("needsUpgrade"),
+                "upgradedCount", result.get("upgradedCount"),
+                "upgradedIndexes", upgradedIndexes,
+                "kbaseCount", result.get("kbaseCount"),
+                "skipped", result.get("skipped"),
+                "skipReason", result.getOrDefault("skipReason", ""),
+                "analyzerAvailable", result.get("analyzerAvailable"));
     }
     
 }

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.bytedesk.core.category.CategoryEntity;
@@ -31,6 +32,10 @@ import com.bytedesk.core.category.CategoryRepository;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseProperties;
 import com.bytedesk.kbase.kbase.KbaseRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -54,6 +59,8 @@ public class BlogStaticService {
 
     private final BlogRestService blogRestService;
 
+    private final KbaseTranslationRepository kbaseTranslationRepository;
+
     public void updateBlogKbase(String kbUid) {
         KbaseEntity kbase = kbaseRepository.findByUid(kbUid)
                 .orElseThrow(() -> new RuntimeException("kbase not found: " + kbUid));
@@ -75,6 +82,7 @@ public class BlogStaticService {
         }
         for (BlogResponse blog : blogs) {
             toHtmlPost(kbase, blog, categories);
+            toHtmlTranslatedPosts(kbase, blog, categories);
         }
     }
 
@@ -83,6 +91,7 @@ public class BlogStaticService {
                 .orElseThrow(() -> new RuntimeException("blog not found: " + blogUid));
         if (!entity.isDeleted()) {
             toHtmlPost(entity.getKbUid(), blogRestService.convertToResponse(entity));
+            toHtmlTranslatedPost(entity.getKbUid(), blogRestService.convertToResponse(entity));
             // 同步更新 index/category/search
             updateBlogIndex(entity.getKbUid());
         }
@@ -116,6 +125,16 @@ public class BlogStaticService {
         if (file.exists() && file.isFile()) {
             boolean ok = file.delete();
             log.info("deleteBlogPostStatic {} => {}", file.getAbsolutePath(), ok);
+        }
+        File[] languageDirectories = new File(root).listFiles(File::isDirectory);
+        if (languageDirectories != null) {
+            for (File languageDir : languageDirectories) {
+                File translatedFile = new File(languageDir, "post/" + blogUid + ".html");
+                if (translatedFile.exists() && translatedFile.isFile()) {
+                    boolean ok = translatedFile.delete();
+                    log.info("delete translated blog static {} => {}", translatedFile.getAbsolutePath(), ok);
+                }
+            }
         }
         // 删除后也更新首页与分类页（避免仍然展示）
         updateBlogIndex(kbUid);
@@ -180,6 +199,10 @@ public class BlogStaticService {
 
     // blog 文章页
     public void toHtmlPost(KbaseEntity kbase, BlogResponse blog, List<CategoryEntity> categories) {
+        toHtmlPost(kbase, blog, categories, null);
+    }
+
+    public void toHtmlPost(KbaseEntity kbase, BlogResponse blog, List<CategoryEntity> categories, String languageDirectory) {
         try {
             Template template = configuration.getTemplate(getTemplatePath(kbase, "post.ftl"));
             Map<String, Object> map = new HashMap<>();
@@ -190,7 +213,7 @@ public class BlogStaticService {
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, StandardCharsets.UTF_8);
 
-            String root = getBlogHtmlRoot(kbase.getUid()) + "/post";
+            String root = resolveBlogPostDirectory(kbase.getUid(), languageDirectory);
             ensureDir(root);
             FileOutputStream out = new FileOutputStream(new File(root + "/" + blog.getUid() + ".html"));
             IOUtils.copy(inputStream, out);
@@ -199,6 +222,51 @@ public class BlogStaticService {
 
         } catch (Exception e) {
             log.error("toHtmlPost failed", e);
+        }
+    }
+
+    private void toHtmlTranslatedPost(String kbUid, BlogResponse blog) {
+        KbaseEntity kbase = kbaseRepository.findByUid(kbUid)
+                .orElseThrow(() -> new RuntimeException("kbase not found: " + kbUid));
+        List<CategoryEntity> categories = categoryRepository.findByKbUidAndDeletedFalse(kbUid);
+        toHtmlTranslatedPosts(kbase, blog, categories);
+    }
+
+    private void toHtmlTranslatedPosts(KbaseEntity kbase, BlogResponse blog, List<CategoryEntity> categories) {
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbase.getUid(),
+                        blog.getUid(),
+                        KbaseTranslationSourceTypeEnum.BLOG.name())
+                .stream()
+                .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+                .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+                .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+                .toList();
+
+        for (KbaseTranslationEntity translation : translations) {
+            BlogResponse translatedBlog = BlogResponse.builder()
+                    .uid(blog.getUid())
+                    .name(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : blog.getName())
+                    .description(StringUtils.hasText(translation.getSummary()) ? translation.getSummary() : blog.getDescription())
+                    .type(blog.getType())
+                    .coverImageUrl(blog.getCoverImageUrl())
+                    .contentHtml(StringUtils.hasText(translation.getContentHtml()) ? translation.getContentHtml() : blog.getContentHtml())
+                    .contentMarkdown(StringUtils.hasText(translation.getContentMarkdown()) ? translation.getContentMarkdown() : blog.getContentMarkdown())
+                    .tagList(translation.getTagList() != null && !translation.getTagList().isEmpty() ? translation.getTagList() : blog.getTagList())
+                    .top(blog.getTop())
+                    .published(blog.getPublished())
+                    .readCount(blog.getReadCount())
+                    .likeCount(blog.getLikeCount())
+                    .editor(blog.getEditor())
+                    .categoryUid(blog.getCategoryUid())
+                    .kbUid(blog.getKbUid())
+                    .createdAt(blog.getCreatedAtRaw())
+                    .updatedAt(blog.getUpdatedAtRaw())
+                    .orgUid(blog.getOrgUid())
+                    .userUid(blog.getUserUid())
+                    .build();
+            toHtmlPost(kbase, translatedBlog, categories, translation.getTargetLanguage());
         }
     }
 
@@ -235,6 +303,14 @@ public class BlogStaticService {
 
     private String getBlogHtmlRoot(String kbUid) {
         return kbaseProperties.resolveBlogHtmlRootDir() + kbUid;
+    }
+
+    private String resolveBlogPostDirectory(String kbUid, String languageDirectory) {
+        String basePath = getBlogHtmlRoot(kbUid);
+        if (StringUtils.hasText(languageDirectory)) {
+            return basePath + "/" + languageDirectory.trim().toUpperCase() + "/post";
+        }
+        return basePath + "/post";
     }
 
     private void ensureDir(String dirPath) {

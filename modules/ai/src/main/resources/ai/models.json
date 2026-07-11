@@ -224,6 +224,24 @@
     ],
     "dashscope": [
         {
+            "name": "qwen-mt-flash",
+            "nickname": "Qwen MT Flash",
+            "description": "通义千问翻译模型，适合网站、知识库、博客等通用翻译场景，支持92种语言互译与增量输出",
+            "type": "TEXT"
+        },
+        {
+            "name": "qwen-mt-plus",
+            "nickname": "Qwen MT Plus",
+            "description": "通义千问高质量翻译模型，适用于正式文书、专业技术文档等高质量翻译场景",
+            "type": "TEXT"
+        },
+        {
+            "name": "qwen-mt-lite",
+            "nickname": "Qwen MT Lite",
+            "description": "通义千问低延迟翻译模型，适合实时聊天、弹幕等对时延敏感的翻译场景",
+            "type": "TEXT"
+        },
+        {
             "name": "qwen-turbo",
             "nickname": "Qwen Turbo",
             "description": "通义千问的快速响应版本，提供高效率的对话体验",

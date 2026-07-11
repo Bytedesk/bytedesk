@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text.vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,6 +23,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_text.TextEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,12 +61,24 @@ public class TextVector {
     
     @Field(type = FieldType.Keyword)
     private String kbUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
     
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
+
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -109,13 +123,47 @@ public class TextVector {
             .tagList(text.getTagList())
             .orgUid(text.getOrgUid())
             .kbUid(kbUid)
+            .sourceUid(text.getUid())
             .categoryUid(text.getCategoryUid())
             .enabled(text.getEnabled())
+            .language(text.getKbase() != null ? text.getKbase().getSourceLanguage() : null)
+            .sourceLanguage(text.getKbase() != null ? text.getKbase().getSourceLanguage() : null)
+            .translated(false)
             // .startDate(text.getStartDate())
             // .endDate(text.getEndDate())
             .status(text.getElasticStatus())
             .vectorStatus(text.getVectorStatus())
             .docIdList(text.getDocIdList())
             .build();
+    }
+
+    public static TextVector fromTranslation(TextEntity text, KbaseTranslationEntity translation) {
+        String kbUid = (text.getKbase() != null) ? text.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing translated text uid=" + text.getUid());
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+                ? translation.getTargetLanguage().trim().toUpperCase()
+                : (text.getKbase() != null ? text.getKbase().getSourceLanguage() : null);
+
+        return TextVector.builder()
+                .uid(translation.getUid())
+                .title(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : text.getTitle())
+                .content(StringUtils.hasText(translation.getContent()) ? translation.getContent() : translation.getSummary())
+                .type(text.getType())
+                .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? text.getTagList() : translation.getTagList())
+                .orgUid(text.getOrgUid())
+                .kbUid(kbUid)
+                .sourceUid(text.getUid())
+                .categoryUid(text.getCategoryUid())
+                .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(text.getEnabled()))
+                .language(targetLanguage)
+                .sourceLanguage(text.getKbase() != null ? text.getKbase().getSourceLanguage() : null)
+                .translated(true)
+                .status(text.getElasticStatus())
+                .vectorStatus(text.getVectorStatus())
+                .docIdList(new ArrayList<>())
+                .build();
     }
 }

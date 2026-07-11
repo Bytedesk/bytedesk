@@ -101,7 +101,7 @@ public class KnowledgeBaseSearchHelper {
      * @return 包含源引用信息的搜索结果
      */
     public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot) {
-        return searchKnowledgeBaseWithSources(query, robot, null);
+        return searchKnowledgeBaseWithSources(query, robot, null, null);
     }
 
     /**
@@ -114,6 +114,11 @@ public class KnowledgeBaseSearchHelper {
      */
     public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
             String sourceTypeFilter) {
+        return searchKnowledgeBaseWithSources(query, robot, sourceTypeFilter, null);
+        }
+
+        public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
+            String sourceTypeFilter, List<String> preferredLanguages) {
         // 如果知识库未启用，直接返回空结果
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
             log.info("知识库未启用或未指定知识库UID");
@@ -135,20 +140,20 @@ public class KnowledgeBaseSearchHelper {
             case VECTOR:
                 log.info("使用向量搜索");
                     executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                            sourceReferences, sourceTypeFilter);
+                            sourceReferences, sourceTypeFilter, preferredLanguages);
                 break;
             case MIXED:
                 log.info("使用混合搜索");
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                        sourceReferences);
+                    sourceReferences, preferredLanguages, sourceTypeFilter);
                     executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                            sourceReferences, sourceTypeFilter);
+                            sourceReferences, sourceTypeFilter, preferredLanguages);
                 break;
             case FULLTEXT:
             default:
                 log.info("使用全文搜索");
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                        sourceReferences);
+                    sourceReferences, preferredLanguages, sourceTypeFilter);
                 break;
         }
 
@@ -238,7 +243,8 @@ public class KnowledgeBaseSearchHelper {
         for (FaqProtobuf faq : searchResultList) {
             if (faq == null || !StringUtils.hasText(faq.getUid()))
                 continue;
-            faqByUidFirst.putIfAbsent(faq.getUid(), faq);
+            String resultKey = StringUtils.hasText(faq.getSourceUid()) ? faq.getSourceUid() : faq.getUid();
+            faqByUidFirst.putIfAbsent(resultKey, faq);
         }
 
         // 6) 根据过滤后的来源顺序构建对应的 Faq 列表，确保两者对齐
@@ -262,7 +268,15 @@ public class KnowledgeBaseSearchHelper {
      */
     public void executeFulltextSearchWithSources(String query, RobotProtobuf robot, String kbUid,
             List<FaqProtobuf> searchResultList,
-            List<RobotContent.SourceReference> sourceReferences) {
+            List<RobotContent.SourceReference> sourceReferences,
+            List<String> preferredLanguages,
+            String sourceTypeFilter) {
+
+        boolean allowAll = !StringUtils.hasText(sourceTypeFilter) || "ALL".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowFaq = allowAll || "FAQ".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowText = allowAll || "TEXT".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
 
         int recallLimit = DEFAULT_FULLTEXT_RECALL_LIMIT;
         try {
@@ -277,83 +291,122 @@ public class KnowledgeBaseSearchHelper {
             recallLimit = MAX_FULLTEXT_RECALL_LIMIT;
         }
 
-        List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null, recallLimit);
-        for (FaqElasticSearchResult withScore : searchResults) {
-            FaqElastic faq = withScore.getFaqElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
-            searchResultList.add(faqProtobuf);
+        List<String> languageFallbackOrder = buildLanguageFallbackOrder(preferredLanguages);
+        for (String language : languageFallbackOrder) {
+            int resultSizeBefore = searchResultList.size();
 
-            RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                    .sourceType(RobotContent.SourceTypeEnum.FAQ)
-                    .sourceUid(faq.getUid())
-                    .sourceName(faq.getQuestion())
-                    .contentSummary(getContentSummary(faq.getAnswer(), 200))
-                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
-                    .score((double) withScore.getScore())
-                    .highlighted(false)
-                    .build();
-            sourceReferences.add(sourceRef);
+            if (allowFaq) {
+                List<FaqElasticSearchResult> searchResults = faqElasticService.searchFaq(query, kbUid, null, null,
+                        recallLimit, language == null ? null : List.of(language));
+                for (FaqElasticSearchResult withScore : searchResults) {
+                    FaqElastic faq = withScore.getFaqElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromElastic(faq);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.FAQ)
+                            .sourceUid(StringUtils.hasText(faq.getSourceUid()) ? faq.getSourceUid() : faq.getUid())
+                            .sourceName(faq.getQuestion())
+                            .contentSummary(getContentSummary(faq.getAnswer(), 200))
+                            .language(faq.getLanguage())
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
+            if (allowText) {
+                List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null,
+                        recallLimit, language == null ? null : List.of(language));
+                for (TextElasticSearchResult withScore : textResults) {
+                    TextElastic text = withScore.getTextElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.TEXT)
+                            .sourceUid(StringUtils.hasText(text.getSourceUid()) ? text.getSourceUid() : text.getUid())
+                            .sourceName(text.getTitle())
+                            .contentSummary(getContentSummary(text.getContent(), 200))
+                            .language(text.getLanguage())
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
+            if (allowChunk) {
+                List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null,
+                        recallLimit, language == null ? null : List.of(language));
+                for (ChunkElasticSearchResult withScore : chunkResults) {
+                    ChunkElastic chunk = withScore.getChunkElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.CHUNK)
+                            .sourceUid(StringUtils.hasText(chunk.getSourceUid()) ? chunk.getSourceUid() : chunk.getUid())
+                            .sourceName(chunk.getName())
+                            .fileName(chunk.getFileName())
+                            .fileUrl(chunk.getFileUrl())
+                            .fileUid(chunk.getFileUid())
+                            .contentSummary(getContentSummary(chunk.getContent(), 200))
+                            .language(chunk.getLanguage())
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
+            if (allowWebpage) {
+                List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null,
+                        null, recallLimit, language == null ? null : List.of(language));
+                for (WebpageElasticSearchResult withScore : webpageResults) {
+                    WebpageElastic webpage = withScore.getWebpageElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
+                            .sourceUid(StringUtils.hasText(webpage.getSourceUid()) ? webpage.getSourceUid() : webpage.getUid())
+                            .sourceName(webpage.getTitle())
+                            .contentSummary(getContentSummary(webpage.getContent(), 200))
+                            .language(webpage.getLanguage())
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
+            if (searchResultList.size() > resultSizeBefore) {
+                log.debug("Fulltext language fallback hit: language={}, results={}", language,
+                        searchResultList.size() - resultSizeBefore);
+                break;
+            }
         }
+    }
 
-        List<TextElasticSearchResult> textResults = textElasticService.searchTexts(query, kbUid, null, null,
-                recallLimit);
-        for (TextElasticSearchResult withScore : textResults) {
-            TextElastic text = withScore.getTextElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromText(text);
-            searchResultList.add(faqProtobuf);
-
-            RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                    .sourceType(RobotContent.SourceTypeEnum.TEXT)
-                    .sourceUid(text.getUid())
-                    .sourceName(text.getTitle())
-                    .contentSummary(getContentSummary(text.getContent(), 200))
-                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
-                    .score((double) withScore.getScore())
-                    .highlighted(false)
-                    .build();
-            sourceReferences.add(sourceRef);
+    private List<String> buildLanguageFallbackOrder(List<String> preferredLanguages) {
+        List<String> languageOrder = new ArrayList<>();
+        if (preferredLanguages != null) {
+            for (String language : preferredLanguages) {
+                if (StringUtils.hasText(language)) {
+                    languageOrder.add(language.trim().toUpperCase());
+                }
+            }
         }
-
-        List<ChunkElasticSearchResult> chunkResults = chunkElasticService.searchChunks(query, kbUid, null, null,
-                recallLimit);
-        for (ChunkElasticSearchResult withScore : chunkResults) {
-            ChunkElastic chunk = withScore.getChunkElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromChunk(chunk);
-            searchResultList.add(faqProtobuf);
-
-            RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                    .sourceType(RobotContent.SourceTypeEnum.CHUNK)
-                    .sourceUid(chunk.getUid())
-                    .sourceName(chunk.getName())
-                    .fileName(chunk.getFileName())
-                    .fileUrl(chunk.getFileUrl())
-                    .fileUid(chunk.getFileUid())
-                    .contentSummary(getContentSummary(chunk.getContent(), 200))
-                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
-                    .score((double) withScore.getScore())
-                    .highlighted(false)
-                    .build();
-            sourceReferences.add(sourceRef);
+        if (languageOrder.isEmpty()) {
+            languageOrder.add(null);
         }
-
-        List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null, null,
-                recallLimit);
-        for (WebpageElasticSearchResult withScore : webpageResults) {
-            WebpageElastic webpage = withScore.getWebpageElastic();
-            FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpage(webpage);
-            searchResultList.add(faqProtobuf);
-
-            RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                    .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
-                    .sourceUid(webpage.getUid())
-                    .sourceName(webpage.getTitle())
-                    .contentSummary(getContentSummary(webpage.getContent(), 200))
-                    .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
-                    .score((double) withScore.getScore())
-                    .highlighted(false)
-                    .build();
-            sourceReferences.add(sourceRef);
-        }
+        return languageOrder;
     }
 
     /**
@@ -362,7 +415,8 @@ public class KnowledgeBaseSearchHelper {
     public void executeVectorSearchWithSources(String query, RobotProtobuf robot, String kbUid,
             List<FaqProtobuf> searchResultList,
             List<RobotContent.SourceReference> sourceReferences,
-            String sourceTypeFilter) {
+            String sourceTypeFilter,
+            List<String> preferredLanguages) {
 
         // 若指定了数据源类型，则只执行对应的向量检索（减少无谓召回）
         boolean allowAll = !StringUtils.hasText(sourceTypeFilter) || "ALL".equalsIgnoreCase(sourceTypeFilter);
@@ -383,106 +437,121 @@ public class KnowledgeBaseSearchHelper {
         }
         recallLimit = Math.min(recallLimit, MAX_VECTOR_RECALL_LIMIT);
 
-        if (allowFaq && faqVectorService != null) {
-            try {
-                List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
-                        recallLimit);
-                for (FaqVectorSearchResult withScore : searchResults) {
-                    FaqVector faqVector = withScore.getFaqVector();
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
-                    searchResultList.add(faqProtobuf);
+        List<String> languageFallbackOrder = buildLanguageFallbackOrder(preferredLanguages);
+        for (String language : languageFallbackOrder) {
+            int resultSizeBefore = searchResultList.size();
 
-                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                            .sourceType(RobotContent.SourceTypeEnum.FAQ)
-                            .sourceUid(faqVector.getUid())
-                            .sourceName(faqVector.getQuestion())
-                            .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
-                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
-                            .score((double) withScore.getScore())
-                            .highlighted(false)
-                            .build();
-                    sourceReferences.add(sourceRef);
+            if (allowFaq && faqVectorService != null) {
+                try {
+                    List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
+                            recallLimit, language);
+                    for (FaqVectorSearchResult withScore : searchResults) {
+                        FaqVector faqVector = withScore.getFaqVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromFaqVector(faqVector);
+                        searchResultList.add(faqProtobuf);
+
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.FAQ)
+                            .sourceUid(StringUtils.hasText(faqVector.getSourceUid()) ? faqVector.getSourceUid() : faqVector.getUid())
+                                .sourceName(faqVector.getQuestion())
+                                .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
+                                .language(faqVector.getLanguage())
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("FaqVectorService search failed: {}", e.getMessage());
                 }
-            } catch (Exception e) {
-                log.warn("FaqVectorService search failed: {}", e.getMessage());
             }
-        }
 
-        if (allowText && textVectorService != null) {
-            try {
-                List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
-                        recallLimit);
-                for (TextVectorSearchResult withScore : textResults) {
-                    TextVector textVector = withScore.getTextVector();
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
-                    searchResultList.add(faqProtobuf);
+            if (allowText && textVectorService != null) {
+                try {
+                    List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
+                            recallLimit, language);
+                    for (TextVectorSearchResult withScore : textResults) {
+                        TextVector textVector = withScore.getTextVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromTextVector(textVector);
+                        searchResultList.add(faqProtobuf);
 
-                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                            .sourceType(RobotContent.SourceTypeEnum.TEXT)
-                            .sourceUid(textVector.getUid())
-                            .sourceName(textVector.getTitle())
-                            .contentSummary(getContentSummary(textVector.getContent(), 200))
-                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
-                            .score((double) withScore.getScore())
-                            .highlighted(false)
-                            .build();
-                    sourceReferences.add(sourceRef);
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.TEXT)
+                            .sourceUid(StringUtils.hasText(textVector.getSourceUid()) ? textVector.getSourceUid() : textVector.getUid())
+                                .sourceName(textVector.getTitle())
+                                .contentSummary(getContentSummary(textVector.getContent(), 200))
+                                .language(textVector.getLanguage())
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("TextVectorService search failed: {}", e.getMessage());
                 }
-            } catch (Exception e) {
-                log.warn("TextVectorService search failed: {}", e.getMessage());
             }
-        }
 
-        if (allowChunk && chunkVectorService != null) {
-            try {
-                List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
-                        null, recallLimit);
-                for (ChunkVectorSearchResult withScore : chunkResults) {
-                    ChunkVector chunkVector = withScore.getChunkVector();
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
-                    searchResultList.add(faqProtobuf);
+            if (allowChunk && chunkVectorService != null) {
+                try {
+                    List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
+                            null, recallLimit, 0.0, language);
+                    for (ChunkVectorSearchResult withScore : chunkResults) {
+                        ChunkVector chunkVector = withScore.getChunkVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromChunkVector(chunkVector);
+                        searchResultList.add(faqProtobuf);
 
-                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                            .sourceType(RobotContent.SourceTypeEnum.CHUNK)
-                            .sourceUid(chunkVector.getUid())
-                            .sourceName(chunkVector.getName())
-                            .fileName(chunkVector.getFileName())
-                            .fileUrl(chunkVector.getFileUrl())
-                            .fileUid(chunkVector.getFileUid())
-                            .contentSummary(getContentSummary(chunkVector.getContent(), 200))
-                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
-                            .score((double) withScore.getScore())
-                            .highlighted(false)
-                            .build();
-                    sourceReferences.add(sourceRef);
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.CHUNK)
+                            .sourceUid(StringUtils.hasText(chunkVector.getSourceUid()) ? chunkVector.getSourceUid() : chunkVector.getUid())
+                                .sourceName(chunkVector.getName())
+                                .fileName(chunkVector.getFileName())
+                                .fileUrl(chunkVector.getFileUrl())
+                                .fileUid(chunkVector.getFileUid())
+                                .contentSummary(getContentSummary(chunkVector.getContent(), 200))
+                                .language(chunkVector.getLanguage())
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("ChunkVectorService search failed: {}", e.getMessage());
                 }
-            } catch (Exception e) {
-                log.warn("ChunkVectorService search failed: {}", e.getMessage());
             }
-        }
 
-        if (allowWebpage && webpageVectorService != null) {
-            try {
-                List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
-                        null, null, recallLimit);
-                for (WebpageVectorSearchResult withScore : webpageResults) {
-                    WebpageVector webpageVector = withScore.getWebpageVector();
-                    FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
-                    searchResultList.add(faqProtobuf);
+            if (allowWebpage && webpageVectorService != null) {
+                try {
+                    List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
+                            null, null, recallLimit, language);
+                    for (WebpageVectorSearchResult withScore : webpageResults) {
+                        WebpageVector webpageVector = withScore.getWebpageVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromWebpageVector(webpageVector);
+                        searchResultList.add(faqProtobuf);
 
-                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
-                            .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
-                            .sourceUid(webpageVector.getUid())
-                            .sourceName(webpageVector.getTitle())
-                            .contentSummary(getContentSummary(webpageVector.getContent(), 200))
-                            .searchChannel(RobotSearchTypeEnum.VECTOR.name())
-                            .score((double) withScore.getScore())
-                            .highlighted(false)
-                            .build();
-                    sourceReferences.add(sourceRef);
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
+                            .sourceUid(StringUtils.hasText(webpageVector.getSourceUid()) ? webpageVector.getSourceUid() : webpageVector.getUid())
+                                .sourceName(webpageVector.getTitle())
+                                .contentSummary(getContentSummary(webpageVector.getContent(), 200))
+                                .language(webpageVector.getLanguage())
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("WebpageVectorService search failed: {}", e.getMessage());
                 }
-            } catch (Exception e) {
-                log.warn("WebpageVectorService search failed: {}", e.getMessage());
+            }
+
+            if (searchResultList.size() > resultSizeBefore) {
+                log.debug("Vector language fallback hit: language={}, results={}", language,
+                        searchResultList.size() - resultSizeBefore);
+                break;
             }
         }
     }
@@ -527,7 +596,7 @@ public class KnowledgeBaseSearchHelper {
                     // 占位来源，分数为0，便于前端结构统一
                     RobotContent.SourceReference placeholder = RobotContent.SourceReference.builder()
                             .sourceType(RobotContent.SourceTypeEnum.FAQ)
-                            .sourceUid(faq.getUid())
+                            .sourceUid(StringUtils.hasText(faq.getSourceUid()) ? faq.getSourceUid() : faq.getUid())
                             .sourceName(faq.getQuestion())
                             .contentSummary(getContentSummary(faq.getAnswer(), 200))
                             .score(0.0)

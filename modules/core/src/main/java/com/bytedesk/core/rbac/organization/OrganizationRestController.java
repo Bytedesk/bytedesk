@@ -115,6 +115,16 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization enabled update by super")
+    @PostMapping("/update/enabled/by/super")
+    public ResponseEntity<?> updateEnabledBySuper(@RequestBody OrganizationRequest request) {
+
+        OrganizationResponse response = organizationRestService.updateEnabledBySuper(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_DELETE, description = "organization delete")
     @Override

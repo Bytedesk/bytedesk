@@ -94,12 +94,25 @@
                 </div>
                 <div class="uk-width-1-3@m">
                     <div class="uk-margin">
-                        <form class="uk-search uk-search-default">
-                            <a href="javascript:void(0)" class="uk-search-icon-flip" uk-search-icon onclick="searchContent()"></a>
-                            <input id="supportAdminUid" name="uid" type="text" style="display:none"/>
-                            <input id="supportSearch" class="uk-search-input" type="search" 
-                                autocomplete="off" placeholder="搜索" onkeyup="onKeyUp(arguments[0] || window.event)">
-                        </form>
+                        <div class="uk-flex uk-flex-middle uk-flex-right uk-grid-small" uk-grid>
+                            <#if languageOptions?? && (languageOptions?size > 1)>
+                                <div>
+                                    <select class="uk-select" style="min-width: 140px;" onchange="if(this.value){window.location.href=this.value;}">
+                                        <#list languageOptions as option>
+                                            <option value="${option.url}" <#if option.active == 'true'>selected</#if>>${option.label}</option>
+                                        </#list>
+                                    </select>
+                                </div>
+                            </#if>
+                            <div class="uk-width-expand">
+                                <form class="uk-search uk-search-default">
+                                    <a href="javascript:void(0)" class="uk-search-icon-flip" uk-search-icon onclick="searchContent()"></a>
+                                    <input id="supportAdminUid" name="uid" type="text" style="display:none"/>
+                                    <input id="supportSearch" class="uk-search-input" type="search" 
+                                        autocomplete="off" placeholder="搜索" onkeyup="onKeyUp(arguments[0] || window.event)">
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,6 +190,16 @@
                                 </#if>
                             <#else>
                                 <div id="supportArticleContent">${article.contentHtml!''}</div>
+                            </#if>
+                            <#if article.showSource?? && article.showSource && ((article.sourceName?? && article.sourceName?has_content) || (article.sourceUrl?? && article.sourceUrl?has_content))>
+                                <div class="uk-margin-small-top uk-text-meta">
+                                    来源：
+                                    <#if article.sourceUrl?? && article.sourceUrl?has_content>
+                                        <a href="${article.sourceUrl}" target="_blank" rel="noopener noreferrer">${article.sourceName!(article.sourceUrl)}</a>
+                                    <#else>
+                                        ${article.sourceName!''}
+                                    </#if>
+                                </div>
                             </#if>
                             <span class="uk-article-meta uk-margin-remove-top">最近更新：${article.updatedAt}</span>
                         </div>

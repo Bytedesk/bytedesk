@@ -82,6 +82,9 @@ public class OrganizationResponse extends BaseResponseNoOrg {
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
+    // 是否已删除（逻辑删除）
+    private Boolean deleted;
+
     // 是否启用自定义服务器（域名/IP）
     private Boolean customServerEnabled;
 

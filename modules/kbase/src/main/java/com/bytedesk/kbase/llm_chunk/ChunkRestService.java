@@ -36,6 +36,7 @@ import com.bytedesk.kbase.llm_file.FileRepository;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.event.ChunkUpdateDocEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.utils.BdDateUtils;
 
@@ -60,6 +61,8 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
     private final FileRepository fileRepository;
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<ChunkEntity> createSpecification(ChunkRequest request) {
@@ -145,6 +148,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
         if (savedEntity == null) {
             throw new RuntimeException("Create chunk failed");
         }
+        kbaseTranslationSyncService.syncChunk(savedEntity);
         return convertToResponse(savedEntity);
     }
 
@@ -176,6 +180,7 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
             if (savedEntity == null) {
                 throw new RuntimeException("Update chunk failed");
             }
+            kbaseTranslationSyncService.syncChunk(savedEntity);
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Chunk not found");

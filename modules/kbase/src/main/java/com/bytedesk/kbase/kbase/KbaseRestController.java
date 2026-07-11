@@ -37,6 +37,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.context.annotation.Description;
 
+import com.bytedesk.kbase.elastic.KbaseElasticIndexUpgradeService;
+import com.bytedesk.kbase.translation.KbaseTranslationBackfillRequest;
+import com.bytedesk.kbase.translation.KbaseTranslationIndexBackfillService;
+
 @Tag(name = "Knowledge Base Management", description = "Knowledge base management APIs")
 @RestController
 @RequestMapping("/api/v1/kbase")
@@ -45,6 +49,10 @@ import org.springframework.context.annotation.Description;
 public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseRestService> {
 
     private final KbaseRestService kbaseRestService;
+
+    private final KbaseElasticIndexUpgradeService kbaseElasticIndexUpgradeService;
+
+    private final KbaseTranslationIndexBackfillService kbaseTranslationIndexBackfillService;
 
     @Operation(summary = "Query Knowledge Bases by Organization", description = "Query the list of knowledge bases by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
@@ -143,6 +151,24 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
     public Object export(KbaseRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
+
+    @Operation(summary = "Check and upgrade Elasticsearch IK mappings", description = "Check knowledge base Elasticsearch index mappings and automatically rebuild/reindex when IK analyzer mapping is outdated")
+    @ApiResponse(responseCode = "200", description = "Check successful")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "check and upgrade kbase elasticsearch mappings")
+    @PostMapping("/elastic/check-upgrade")
+    public ResponseEntity<?> checkAndUpgradeElasticMappings() {
+        return ResponseEntity.ok(JsonResult.success(kbaseElasticIndexUpgradeService.checkAndUpgradeIkIndexes()));
+    }
+
+    @Operation(summary = "Backfill translated indexes", description = "Rebuild translated fulltext/vector indexes from existing successful translation records")
+    @ApiResponse(responseCode = "200", description = "Backfill successful")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "backfill translated indexes")
+    @PostMapping("/translation/backfill-indexes")
+    public ResponseEntity<?> backfillTranslatedIndexes(@RequestBody KbaseTranslationBackfillRequest request) {
+        return ResponseEntity.ok(JsonResult.success(kbaseTranslationIndexBackfillService.backfill(request)));
     }
 
 }

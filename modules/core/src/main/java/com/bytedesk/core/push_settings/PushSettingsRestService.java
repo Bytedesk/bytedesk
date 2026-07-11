@@ -248,7 +248,5 @@ public class PushSettingsRestService extends BaseRestServiceWithExport<PushSetti
         //     createSystemPushSettings(push_settingsRequest);
         // }
     }
-
-    
     
 }

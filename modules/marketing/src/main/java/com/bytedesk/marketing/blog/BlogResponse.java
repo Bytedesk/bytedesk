@@ -63,5 +63,13 @@ public class BlogResponse extends BaseResponse {
 
     private String kbUid;
 
+    // 来源URL（网页抓取）
+    private String sourceUrl;
+
+    // 来源名称
+    private String sourceName;
+
+    // 是否显示来源
+    private Boolean showSource;
 
 }

@@ -41,6 +41,7 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
@@ -60,6 +61,8 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
     private final CategoryRestService categoryRestService;
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<TextEntity> createSpecification(TextRequest request) {
@@ -135,6 +138,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         if (savedEntity == null) {
             throw new RuntimeException("Create text failed");
         }
+        kbaseTranslationSyncService.syncText(savedEntity);
         return convertToResponse(savedEntity);
     }
 
@@ -176,6 +180,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
             if (savedEntity == null) {
                 throw new RuntimeException("Update text failed");
             }
+            kbaseTranslationSyncService.syncText(savedEntity);
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Text not found");

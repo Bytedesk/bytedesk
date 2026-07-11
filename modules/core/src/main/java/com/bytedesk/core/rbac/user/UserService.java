@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.user;
 import java.util.Optional;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -38,6 +39,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -507,16 +509,48 @@ public class UserService {
         if (!StringUtils.hasText(orgUid)) {
             return user;
         }
-        if (user.getCurrentOrganization() != null && orgUid.equals(user.getCurrentOrganization().getUid())) {
-            return user;
-        }
 
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
         if (!orgOptional.isPresent()) {
-            throw new RuntimeException(I18Consts.I18N_ORGANIZATION_NOT_FOUND);
+            throw OrganizationI18nExceptions.organizationNotFound(orgUid);
         }
-        user.setCurrentOrganization(orgOptional.get());
+
+        OrganizationEntity organization = orgOptional.get();
+        if (organization.isDeleted()) {
+            throw OrganizationI18nExceptions.organizationNotFound(orgUid);
+        }
+        if (Boolean.FALSE.equals(organization.getEnabled())) {
+            throw OrganizationI18nExceptions.organizationAccessDenied();
+        }
+
+        if (user.getCurrentOrganization() != null && orgUid.equals(user.getCurrentOrganization().getUid())) {
+            user.setCurrentOrganization(organization);
+            return user;
+        }
+        user.setCurrentOrganization(organization);
         return user;
+    }
+
+    private boolean isOrganizationAvailable(OrganizationEntity organization) {
+        return organization != null
+                && StringUtils.hasText(organization.getUid())
+                && !organization.isDeleted()
+                && !Boolean.FALSE.equals(organization.getEnabled());
+    }
+
+    @Transactional
+    public void removeAllUsersFromOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        List<UserEntity> users = userRepository.findAllByOrganizationUidWithOrganizations(orgUid);
+        for (UserEntity user : users) {
+            if (user == null || !StringUtils.hasText(user.getUid())) {
+                continue;
+            }
+            removeUserFromOrganization(user.getUid(), orgUid);
+        }
     }
 
     /**
@@ -565,6 +599,9 @@ public class UserService {
                 for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
                     if (uor == null || uor.getOrganization() == null
                             || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                        continue;
+                    }
+                    if (!isOrganizationAvailable(uor.getOrganization())) {
                         continue;
                     }
                     nextOrgUid = uor.getOrganization().getUid();

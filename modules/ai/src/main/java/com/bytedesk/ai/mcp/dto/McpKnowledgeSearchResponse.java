@@ -21,6 +21,10 @@ public class McpKnowledgeSearchResponse {
 
     private String searchType;
 
+    private String userLanguage;
+
+    private List<String> preferredLanguages;
+
     private Integer total;
 
     private List<McpKnowledgeItem> items;

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.List;
 import java.util.Optional;
 
 // import org.springframework.cache.annotation.Cacheable;
@@ -31,64 +32,85 @@ import org.springframework.data.jpa.repository.EntityGraph;
 // @PreAuthorize("hasRole('ROLE_ADMIN')")
 public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
 
-    Optional<UserEntity> findByUid(String uid);
+        Optional<UserEntity> findByUid(String uid);
 
-    /**
-     * 用于 profile/前端组织展示：预加载组织 owner 信息，避免 LAZY 导致 owner 为空。
-     */
-    @EntityGraph(attributePaths = {
-            "currentOrganization",
-            "currentOrganization.user",
-            "userOrganizationRoles",
-            "userOrganizationRoles.organization",
-            "userOrganizationRoles.organization.user",
-            "userOrganizationRoles.roles"
-    })
-    @Query("select u from UserEntity u where u.uid = :uid")
-    Optional<UserEntity> findByUidWithOrganizations(@Param("uid") String uid);
+        /**
+         * 用于 profile/前端组织展示：预加载组织 owner 信息，避免 LAZY 导致 owner 为空。
+         */
+        @EntityGraph(attributePaths = {
+                        "currentOrganization",
+                        "currentOrganization.user",
+                        "userOrganizationRoles",
+                        "userOrganizationRoles.organization",
+                        "userOrganizationRoles.organization.user",
+                        "userOrganizationRoles.roles"
+        })
+        @Query("select u from UserEntity u where u.uid = :uid")
+        Optional<UserEntity> findByUidWithOrganizations(@Param("uid") String uid);
 
-    Optional<UserEntity> findByEmailAndPlatformAndDeletedFalse(String email, String platform);
+        @EntityGraph(attributePaths = {
+                        "currentOrganization",
+                        "currentOrganization.user",
+                        "userOrganizationRoles",
+                        "userOrganizationRoles.organization",
+                        "userOrganizationRoles.organization.user",
+                        "userOrganizationRoles.roles"
+        })
+        @Query("""
+                        select distinct u from UserEntity u
+                        left join u.currentOrganization currentOrganization
+                        left join u.userOrganizationRoles userOrganizationRole
+                        left join userOrganizationRole.organization organization
+                        where u.deleted = false
+                                and (
+                                        (currentOrganization is not null and currentOrganization.uid = :orgUid)
+                                        or (organization is not null and organization.uid = :orgUid)
+                                )
+                        """)
+        List<UserEntity> findAllByOrganizationUidWithOrganizations(@Param("orgUid") String orgUid);
 
-    Optional<UserEntity> findByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
+        Optional<UserEntity> findByEmailAndPlatformAndDeletedFalse(String email, String platform);
 
-    @Query("select u from UserEntity u where u.mobile = :mobile and u.platform = :platform and u.deleted = false "
-            + "and (u.country = :country or ((u.country is null or u.country = '') "
-            + "and not exists (select 1 from UserEntity exactUser where exactUser.mobile = :mobile "
-            + "and exactUser.platform = :platform and exactUser.deleted = false and exactUser.country = :country)))")
-    Optional<UserEntity> findByMobileAndCountryAndPlatformAndDeletedFalse(
-            @Param("mobile") String mobile,
-            @Param("country") String country,
-            @Param("platform") String platform);
+        Optional<UserEntity> findByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
 
-    Optional<UserEntity> findByUsernameAndPlatformAndDeletedFalse(String username, String platform);
+        @Query("select u from UserEntity u where u.mobile = :mobile and u.platform = :platform and u.deleted = false "
+                        + "and (u.country = :country or ((u.country is null or u.country = '') "
+                        + "and not exists (select 1 from UserEntity exactUser where exactUser.mobile = :mobile "
+                        + "and exactUser.platform = :platform and exactUser.deleted = false and exactUser.country = :country)))")
+        Optional<UserEntity> findByMobileAndCountryAndPlatformAndDeletedFalse(
+                        @Param("mobile") String mobile,
+                        @Param("country") String country,
+                        @Param("platform") String platform);
 
-    Boolean existsByUsernameAndPlatformAndDeletedFalse(String username, String platform);
+        Optional<UserEntity> findByUsernameAndPlatformAndDeletedFalse(String username, String platform);
 
-    Boolean existsByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
+        Boolean existsByUsernameAndPlatformAndDeletedFalse(String username, String platform);
 
-    @Query("select case when count(u) > 0 then true else false end from UserEntity u "
-            + "where u.mobile = :mobile and u.platform = :platform and u.deleted = false "
-            + "and (u.country = :country or u.country is null or u.country = '')")
-    Boolean existsByMobileAndCountryAndPlatformAndDeletedFalse(
-            @Param("mobile") String mobile,
-            @Param("country") String country,
-            @Param("platform") String platform);
+        Boolean existsByMobileAndPlatformAndDeletedFalse(String mobile, String platform);
 
-    Boolean existsByEmailAndPlatformAndDeletedFalse(String email, String platform);
+        @Query("select case when count(u) > 0 then true else false end from UserEntity u "
+                        + "where u.mobile = :mobile and u.platform = :platform and u.deleted = false "
+                        + "and (u.country = :country or u.country is null or u.country = '')")
+        Boolean existsByMobileAndCountryAndPlatformAndDeletedFalse(
+                        @Param("mobile") String mobile,
+                        @Param("country") String country,
+                        @Param("platform") String platform);
 
-    Boolean existsByUsernameAndMobileAndPlatformAndDeletedFalse(String username, String mobile, String platform);
+        Boolean existsByEmailAndPlatformAndDeletedFalse(String email, String platform);
 
-    @Query("select case when count(u) > 0 then true else false end from UserEntity u "
-            + "where u.username = :username and u.mobile = :mobile and u.platform = :platform and u.deleted = false "
-            + "and (u.country = :country or u.country is null or u.country = '')")
-    Boolean existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
-            @Param("username") String username,
-            @Param("mobile") String mobile,
-            @Param("country") String country,
-            @Param("platform") String platform);
+        Boolean existsByUsernameAndMobileAndPlatformAndDeletedFalse(String username, String mobile, String platform);
 
-    Boolean existsBySuperUserAndDeletedFalse(Boolean superUser);
+        @Query("select case when count(u) > 0 then true else false end from UserEntity u "
+                        + "where u.username = :username and u.mobile = :mobile and u.platform = :platform and u.deleted = false "
+                        + "and (u.country = :country or u.country is null or u.country = '')")
+        Boolean existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
+                        @Param("username") String username,
+                        @Param("mobile") String mobile,
+                        @Param("country") String country,
+                        @Param("platform") String platform);
 
-    Optional<UserEntity> findFirstBySuperUserAndDeletedFalse(Boolean superUser);
+        Boolean existsBySuperUserAndDeletedFalse(Boolean superUser);
+
+        Optional<UserEntity> findFirstBySuperUserAndDeletedFalse(Boolean superUser);
 
 }

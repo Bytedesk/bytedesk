@@ -15,6 +15,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 
 class FaqResponseMappingTests {
 
@@ -46,7 +47,8 @@ class FaqResponseMappingTests {
                 mock(KbaseRestService.class),
                 mock(ThreadRestService.class),
                 mock(MessageRestService.class),
-                mock(BytedeskEventPublisher.class));
+                mock(BytedeskEventPublisher.class),
+                mock(KbaseTranslationSyncService.class));
 
         FaqEntity existing = FaqEntity.builder()
                 .uid("faq-1")

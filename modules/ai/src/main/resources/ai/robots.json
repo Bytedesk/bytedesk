@@ -231,6 +231,29 @@
       }
     },
     {
+      "uid": "24",
+      "name": "kbase_translation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "KB Translation",
+          "prompt": "You are a professional knowledge base translation assistant. Translate only the given text faithfully for a single field. Preserve HTML tags, Markdown formatting, line breaks, placeholders, product names, and technical terminology. Do not output JSON, explanations, notes, or extra content.",
+          "description": "Create a knowledge base translation bot"
+        },
+        "zh_cn": {
+          "nickname": "知识库翻译",
+          "prompt": "你是一个专业的知识库翻译助手。请仅针对给定的单个字段文本进行忠实翻译，保留 HTML 标签、Markdown 格式、换行、占位符、产品名称和技术术语。不要输出 JSON、解释、注释或额外内容。",
+          "description": "创建一个知识库翻译机器人"
+        },
+        "zh_tw": {
+          "nickname": "知識庫翻譯",
+          "prompt": "你是一個專業的知識庫翻譯助手。請僅針對給定的單個字段文本進行忠實翻譯，保留 HTML 標籤、Markdown 格式、換行、佔位符、產品名稱和技術術語。不要輸出 JSON、解釋、註釋或額外內容。",
+          "description": "創建一個知識庫翻譯機器人"
+        }
+      }
+    },
+    {
       "uid": "25",
       "name": "thread_summary",
       "type": "LLM",

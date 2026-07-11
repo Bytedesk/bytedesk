@@ -22,6 +22,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,12 +60,24 @@ public class ChunkVector {
     
     @Field(type = FieldType.Keyword)
     private String kbUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
     
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
+
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -127,8 +140,12 @@ public class ChunkVector {
             .tagList(chunk.getTagList())
             .orgUid(chunk.getOrgUid())
             .kbUid(kbUid)
+            .sourceUid(chunk.getUid())
             .categoryUid(chunk.getCategoryUid())
             .enabled(chunk.getEnabled())
+            .language(chunk.getKbase() != null ? chunk.getKbase().getSourceLanguage() : null)
+            .sourceLanguage(chunk.getKbase() != null ? chunk.getKbase().getSourceLanguage() : null)
+            .translated(false)
             .docId(chunk.getDocId())
             .fileUid(fileUid)
             .fileName(fileName)
@@ -138,5 +155,47 @@ public class ChunkVector {
             .status(chunk.getElasticStatus())
             .vectorStatus(chunk.getVectorStatus())
             .build();
+    }
+
+    public static ChunkVector fromTranslation(ChunkEntity chunk, KbaseTranslationEntity translation) {
+        String kbUid = (chunk.getKbase() != null) ? chunk.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing translated chunk uid=" + chunk.getUid());
+        }
+
+        String fileUid = null;
+        String fileName = null;
+        String fileUrl = null;
+        if (chunk.getFile() != null) {
+            fileUid = chunk.getFile().getUid();
+            fileName = chunk.getFile().getFileName();
+            fileUrl = chunk.getFile().getFileUrl();
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+                ? translation.getTargetLanguage().trim().toUpperCase()
+                : (chunk.getKbase() != null ? chunk.getKbase().getSourceLanguage() : null);
+
+        return ChunkVector.builder()
+                .uid(translation.getUid())
+                .name(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : chunk.getName())
+                .content(StringUtils.hasText(translation.getContent()) ? translation.getContent() : translation.getSummary())
+                .type(chunk.getType())
+                .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? chunk.getTagList() : translation.getTagList())
+                .orgUid(chunk.getOrgUid())
+                .kbUid(kbUid)
+                .sourceUid(chunk.getUid())
+                .categoryUid(chunk.getCategoryUid())
+                .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(chunk.getEnabled()))
+                .language(targetLanguage)
+                .sourceLanguage(chunk.getKbase() != null ? chunk.getKbase().getSourceLanguage() : null)
+                .translated(true)
+                .docId(translation.getUid())
+                .fileUid(fileUid)
+                .fileName(fileName)
+                .fileUrl(fileUrl)
+                .status(chunk.getElasticStatus())
+                .vectorStatus(chunk.getVectorStatus())
+                .build();
     }
 }

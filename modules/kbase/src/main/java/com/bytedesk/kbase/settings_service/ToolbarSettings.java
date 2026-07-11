@@ -40,7 +40,6 @@ public class ToolbarSettings implements Serializable {
     private Boolean smile = true;
 
     // 机器人接待时是否显示上传按钮（用于发送图片/文件）
-    // - 默认显示（true）
     // - 仅在机器人接待场景生效，人工接待由 upload 控制
     @Builder.Default
     @Column(name = "toolbar_upload_robot")
@@ -67,15 +66,15 @@ public class ToolbarSettings implements Serializable {
 
     @Builder.Default
     @Column(name = "toolbar_leavemsg")
-    private Boolean leavemsg = true;
+    private Boolean leavemsg = false;
 
     @Builder.Default
     @Column(name = "toolbar_goods")
-    private Boolean goods = false;
+    private Boolean goods = true;
 
     @Builder.Default
     @Column(name = "toolbar_order_selector")
-    private Boolean orderSelector = false;
+    private Boolean orderSelector = true;
 
     @Builder.Default
     @Column(name = "toolbar_ticket")

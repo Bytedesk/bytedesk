@@ -32,6 +32,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 
 import lombok.AllArgsConstructor;
 
@@ -51,6 +52,8 @@ public class WebpageRestService
     private final CategoryRestService categoryRestService;
 
     private final WebpageCrawlerService webpageCrawlerService;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<WebpageEntity> createSpecification(WebpageRequest request) {
@@ -112,6 +115,7 @@ public class WebpageRestService
         if (savedEntity == null) {
             throw new RuntimeException("Create webpage failed");
         }
+        kbaseTranslationSyncService.syncWebpage(savedEntity);
         return convertToResponse(savedEntity);
     }
 
@@ -126,6 +130,7 @@ public class WebpageRestService
             if (savedEntity == null) {
                 throw new RuntimeException("Update webpage failed");
             }
+            kbaseTranslationSyncService.syncWebpage(savedEntity);
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Webpage not found");

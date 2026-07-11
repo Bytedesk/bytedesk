@@ -33,6 +33,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.llm_webpage.WebpageCrawlerService;
 import com.bytedesk.kbase.utils.MarkdownRenderUtils;
 
 import lombok.AllArgsConstructor;
@@ -52,6 +53,8 @@ public class BlogRestService extends BaseRestServiceWithExport<BlogEntity, BlogR
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final WebpageCrawlerService webpageCrawlerService;
     
     @Override
     public Page<BlogEntity> queryByOrgEntity(BlogRequest request) {
@@ -220,6 +223,15 @@ public class BlogRestService extends BaseRestServiceWithExport<BlogEntity, BlogR
             if (request.getEditor() != null) {
                 entity.setEditor(request.getEditor());
             }
+            if (request.getSourceUrl() != null) {
+                entity.setSourceUrl(request.getSourceUrl());
+            }
+            if (request.getSourceName() != null) {
+                entity.setSourceName(request.getSourceName());
+            }
+            if (request.getShowSource() != null) {
+                entity.setShowSource(request.getShowSource());
+            }
             //
             BlogEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -258,6 +270,9 @@ public class BlogRestService extends BaseRestServiceWithExport<BlogEntity, BlogR
                 latestEntity.setReadCount(entity.getReadCount());
                 latestEntity.setLikeCount(entity.getLikeCount());
                 latestEntity.setEditor(entity.getEditor());
+                latestEntity.setSourceUrl(entity.getSourceUrl());
+                latestEntity.setSourceName(entity.getSourceName());
+                latestEntity.setShowSource(entity.getShowSource());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return blogRepository.save(latestEntity);
@@ -327,6 +342,31 @@ public class BlogRestService extends BaseRestServiceWithExport<BlogEntity, BlogR
         // log.info("initBlogBlog");
     }
 
-    
-    
+    /**
+     * 抓取网页内容并返回响应
+     * 参考 ArticleRestService.crawlContent
+     */
+    public BlogResponse crawlContent(BlogRequest request) {
+        if (!StringUtils.hasText(request.getSourceUrl())) {
+            throw new RuntimeException("sourceUrl is empty");
+        }
+
+        WebpageCrawlerService.CrawlResult crawlResult = webpageCrawlerService.crawlPage(request.getSourceUrl());
+        if (crawlResult == null || !StringUtils.hasText(crawlResult.content())) {
+            throw new RuntimeException("crawl content failed");
+        }
+
+        String sourceName = StringUtils.hasText(request.getSourceName())
+                ? request.getSourceName()
+                : crawlResult.title();
+
+        return BlogResponse.builder()
+                .sourceUrl(request.getSourceUrl())
+                .sourceName(sourceName)
+                .showSource(Boolean.TRUE.equals(request.getShowSource()))
+                .contentMarkdown(crawlResult.content())
+                .contentHtml(crawlResult.content())
+                .build();
+    }
+
 }

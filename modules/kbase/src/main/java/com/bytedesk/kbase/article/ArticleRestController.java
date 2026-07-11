@@ -140,6 +140,20 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
         return ResponseEntity.ok(JsonResult.success(article));
     }
 
+    @Operation(summary = "Crawl Article Content", description = "Crawl webpage content by source URL for article editing")
+    @ApiResponse(responseCode = "200", description = "Crawl successful",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = ArticleResponse.class)))
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_UPDATE, description = "crawl article content")
+    @PostMapping("/crawl")
+    public ResponseEntity<?> crawlContent(@RequestBody ArticleRequest request) {
+
+        ArticleResponse article = articleRestService.crawlContent(request);
+
+        return ResponseEntity.ok(JsonResult.success(article));
+    }
+
     @Operation(summary = "Delete Article", description = "Delete the specified article")
     @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(ArticlePermissions.HAS_ARTICLE_DELETE)

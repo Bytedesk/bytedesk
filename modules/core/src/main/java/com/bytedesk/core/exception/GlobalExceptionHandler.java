@@ -261,6 +261,14 @@ public class GlobalExceptionHandler {
             return ResponseEntity.ok().body(JsonResult.error(rawMessage));
         }
 
+        // WeChat API 调用返回的业务错误（errcode 非 0），已在源头以 WARN 记录
+        // 类在 channels/wechat 模块，此处通过类名匹配避免跨模块依赖
+        if ("com.bytedesk.wechat.mp.exception.WeChatApiException"
+                .equals(e.getClass().getName())) {
+            log.debug("WeChat API error caught by GlobalExceptionHandler fallback: {}", rawMessage);
+            return ResponseEntity.ok().body(JsonResult.error(rawMessage));
+        }
+
         // 重复创建类业务冲突，返回更明确的错误码和可读文案
         if (I18Consts.I18N_AGENT_EXISTS.equals(rawMessage)) {
             log.warn("Business conflict: {}", rawMessage);

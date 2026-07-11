@@ -1,0 +1,2156 @@
+[
+    {
+        "code": "010",
+        "city": "北京",
+        "pinyin": "beijing"
+    },
+    {
+        "code": "021",
+        "city": "上海",
+        "pinyin": "shanghai"
+    },
+    {
+        "code": "022",
+        "city": "天津",
+        "pinyin": "tianjin"
+    },
+    {
+        "code": "023",
+        "city": "重庆",
+        "pinyin": "chongqing"
+    },
+    {
+        "code": "0551",
+        "city": "合肥",
+        "pinyin": "hefei",
+        "province": "安徽"
+    },
+    {
+        "code": "0553",
+        "city": "芜湖",
+        "pinyin": "wuhu",
+        "province": "安徽"
+    },
+    {
+        "code": "0556",
+        "city": "安庆",
+        "pinyin": "anqing",
+        "province": "安徽"
+    },
+    {
+        "code": "0552",
+        "city": "蚌埠",
+        "pinyin": "bengbu",
+        "province": "安徽"
+    },
+    {
+        "code": "0558",
+        "city": "亳州",
+        "pinyin": "haozhou",
+        "province": "安徽"
+    },
+    {
+        "code": "0565",
+        "city": "巢湖",
+        "pinyin": "chaohu",
+        "province": "安徽"
+    },
+    {
+        "code": "0566",
+        "city": "池州",
+        "pinyin": "chizhou",
+        "province": "安徽"
+    },
+    {
+        "code": "0550",
+        "city": "滁州",
+        "pinyin": "chuzhou",
+        "province": "安徽"
+    },
+    {
+        "code": "1558",
+        "city": "阜阳",
+        "pinyin": "fuyang",
+        "province": "安徽"
+    },
+    {
+        "code": "0559",
+        "city": "黄山",
+        "pinyin": "huangshan",
+        "province": "安徽"
+    },
+    {
+        "code": "0561",
+        "city": "淮北",
+        "pinyin": "huaibei",
+        "province": "安徽"
+    },
+    {
+        "code": "0554",
+        "city": "淮南",
+        "pinyin": "huainan",
+        "province": "安徽"
+    },
+    {
+        "code": "0564",
+        "city": "六安",
+        "pinyin": "liuan",
+        "province": "安徽"
+    },
+    {
+        "code": "0555",
+        "city": "马鞍山",
+        "pinyin": "maanshan",
+        "province": "安徽"
+    },
+    {
+        "code": "0557",
+        "city": "宿州",
+        "pinyin": "suzhou",
+        "province": "安徽"
+    },
+    {
+        "code": "0562",
+        "city": "铜陵",
+        "pinyin": "tongling",
+        "province": "安徽"
+    },
+    {
+        "code": "0563",
+        "city": "宣城",
+        "pinyin": "xuancheng",
+        "province": "安徽"
+    },
+    {
+        "code": "0591",
+        "city": "福州",
+        "pinyin": "fuzhou",
+        "province": "福建"
+    },
+    {
+        "code": "0592",
+        "city": "厦门",
+        "pinyin": "xiamen",
+        "province": "福建"
+    },
+    {
+        "code": "0595",
+        "city": "泉州",
+        "pinyin": "quanzhou",
+        "province": "福建"
+    },
+    {
+        "code": "0597",
+        "city": "龙岩",
+        "pinyin": "longyan",
+        "province": "福建"
+    },
+    {
+        "code": "0593",
+        "city": "宁德",
+        "pinyin": "ningde",
+        "province": "福建"
+    },
+    {
+        "code": "0599",
+        "city": "南平",
+        "pinyin": "nanping",
+        "province": "福建"
+    },
+    {
+        "code": "0594",
+        "city": "莆田",
+        "pinyin": "futian",
+        "province": "福建"
+    },
+    {
+        "code": "0598",
+        "city": "三明",
+        "pinyin": "sanming",
+        "province": "福建"
+    },
+    {
+        "code": "0596",
+        "city": "漳州",
+        "pinyin": "zhangzhou",
+        "province": "福建"
+    },
+    {
+        "code": "0931",
+        "city": "兰州",
+        "pinyin": "lanzhou",
+        "province": "甘肃"
+    },
+    {
+        "code": "0943",
+        "city": "白银",
+        "pinyin": "baiyin",
+        "province": "甘肃"
+    },
+    {
+        "code": "0932",
+        "city": "定西",
+        "pinyin": "dingxi",
+        "province": "甘肃"
+    },
+    {
+        "code": "0935",
+        "city": "金昌",
+        "pinyin": "jinchang",
+        "province": "甘肃"
+    },
+    {
+        "code": "0937",
+        "city": "酒泉",
+        "pinyin": "jiuquan",
+        "province": "甘肃"
+    },
+    {
+        "code": "0933",
+        "city": "平凉",
+        "pinyin": "pingliang",
+        "province": "甘肃"
+    },
+    {
+        "code": "0934",
+        "city": "庆阳",
+        "pinyin": "anyang",
+        "province": "甘肃"
+    },
+    {
+        "code": "1935",
+        "city": "武威",
+        "pinyin": "wuwei",
+        "province": "甘肃"
+    },
+    {
+        "code": "0938",
+        "city": "天水",
+        "pinyin": "tianshui",
+        "province": "甘肃"
+    },
+    {
+        "code": "0936",
+        "city": "张掖",
+        "pinyin": "zhangye",
+        "province": "甘肃"
+    },
+    {
+        "code": "0941",
+        "city": "甘南",
+        "pinyin": "gannan",
+        "province": "甘肃"
+    },
+    {
+        "code": "1937",
+        "city": "嘉峪关",
+        "pinyin": "jiayuguan",
+        "province": "甘肃"
+    },
+    {
+        "code": "0930",
+        "city": "临夏",
+        "pinyin": "linxia",
+        "province": "甘肃"
+    },
+    {
+        "code": "2935",
+        "city": "陇南",
+        "pinyin": "longnan",
+        "province": "甘肃"
+    },
+    {
+        "code": "020",
+        "city": "广州",
+        "pinyin": "guangzhou",
+        "province": "广东"
+    },
+    {
+        "code": "0755",
+        "city": "深圳",
+        "pinyin": "shenzhen",
+        "province": "广东"
+    },
+    {
+        "code": "0756",
+        "city": "珠海",
+        "pinyin": "zhuhai",
+        "province": "广东"
+    },
+    {
+        "code": "0769",
+        "city": "东莞",
+        "pinyin": "dongguan",
+        "province": "广东"
+    },
+    {
+        "code": "0757",
+        "city": "佛山",
+        "pinyin": "fushan",
+        "province": "广东"
+    },
+    {
+        "code": "0752",
+        "city": "惠州",
+        "pinyin": "huizhou",
+        "province": "广东"
+    },
+    {
+        "code": "0750",
+        "city": "江门",
+        "pinyin": "jiangmen",
+        "province": "广东"
+    },
+    {
+        "code": "0760",
+        "city": "中山",
+        "pinyin": "zhongshan",
+        "province": "广东"
+    },
+    {
+        "code": "0754",
+        "city": "汕头",
+        "pinyin": "shantou",
+        "province": "广东"
+    },
+    {
+        "code": "0759",
+        "city": "湛江",
+        "pinyin": "zhanjiang",
+        "province": "广东"
+    },
+    {
+        "code": "0768",
+        "city": "潮州",
+        "pinyin": "chaozhou",
+        "province": "广东"
+    },
+    {
+        "code": "0762",
+        "city": "河源",
+        "pinyin": "heyuan",
+        "province": "广东"
+    },
+    {
+        "code": "0663",
+        "city": "揭阳",
+        "pinyin": "jieyang",
+        "province": "广东"
+    },
+    {
+        "code": "0668",
+        "city": "茂名",
+        "pinyin": "maoming",
+        "province": "广东"
+    },
+    {
+        "code": "0753",
+        "city": "梅州",
+        "pinyin": "meizhou",
+        "province": "广东"
+    },
+    {
+        "code": "0763",
+        "city": "清远",
+        "pinyin": "qingyuan",
+        "province": "广东"
+    },
+    {
+        "code": "0751",
+        "city": "韶关",
+        "pinyin": "shaoguan",
+        "province": "广东"
+    },
+    {
+        "code": "0660",
+        "city": "汕尾",
+        "pinyin": "shanwei",
+        "province": "广东"
+    },
+    {
+        "code": "0662",
+        "city": "阳江",
+        "pinyin": "yangjiang",
+        "province": "广东"
+    },
+    {
+        "code": "0766",
+        "city": "云浮",
+        "pinyin": "yunfu",
+        "province": "广东"
+    },
+    {
+        "code": "0758",
+        "city": "肇庆",
+        "pinyin": "zhaoqing",
+        "province": "广东"
+    },
+    {
+        "code": "0771",
+        "city": "南宁",
+        "pinyin": "nanning",
+        "province": "广西"
+    },
+    {
+        "code": "0779",
+        "city": "北海",
+        "pinyin": "beihai",
+        "province": "广西"
+    },
+    {
+        "code": "0770",
+        "city": "防城港",
+        "pinyin": "fangchenggang",
+        "province": "广西"
+    },
+    {
+        "code": "0773",
+        "city": "桂林",
+        "pinyin": "guilin",
+        "province": "广西"
+    },
+    {
+        "code": "0772",
+        "city": "柳州",
+        "pinyin": "liuzhou",
+        "province": "广西"
+    },
+    {
+        "code": "1771",
+        "city": "崇左",
+        "pinyin": "chongzuo",
+        "province": "广西"
+    },
+    {
+        "code": "1772",
+        "city": "来宾",
+        "pinyin": "laibin",
+        "province": "广西"
+    },
+    {
+        "code": "0774",
+        "city": "梧州",
+        "pinyin": "wuzhou",
+        "province": "广西"
+    },
+    {
+        "code": "0778",
+        "city": "河池",
+        "pinyin": "hechi",
+        "province": "广西"
+    },
+    {
+        "code": "0775",
+        "city": "玉林",
+        "pinyin": "yulin",
+        "province": "广西"
+    },
+    {
+        "code": "1755",
+        "city": "贵港",
+        "pinyin": "guigang",
+        "province": "广西"
+    },
+    {
+        "code": "1774",
+        "city": "贺州",
+        "pinyin": "hezhou",
+        "province": "广西"
+    },
+    {
+        "code": "0777",
+        "city": "钦州",
+        "pinyin": "qinzhou",
+        "province": "广西"
+    },
+    {
+        "code": "0776",
+        "city": "百色",
+        "pinyin": "baise",
+        "province": "广西"
+    },
+    {
+        "code": "0851",
+        "city": "贵阳",
+        "pinyin": "guiyang",
+        "province": "贵州"
+    },
+    {
+        "code": "0853",
+        "city": "安顺",
+        "pinyin": "anshun",
+        "province": "贵州"
+    },
+    {
+        "code": "0852",
+        "city": "遵义",
+        "pinyin": "zunyi",
+        "province": "贵州"
+    },
+    {
+        "code": "0858",
+        "city": "六盘水",
+        "pinyin": "liupanshui",
+        "province": "贵州"
+    },
+    {
+        "code": "0857",
+        "city": "毕节",
+        "pinyin": "bijie",
+        "province": "贵州"
+    },
+    {
+        "code": "0855",
+        "city": "黔东南",
+        "pinyin": "qiandongnan",
+        "province": "贵州"
+    },
+    {
+        "code": "0859",
+        "city": "黔西南",
+        "pinyin": "qianxinan",
+        "province": "贵州"
+    },
+    {
+        "code": "0854",
+        "city": "黔南",
+        "pinyin": "qiannan",
+        "province": "贵州"
+    },
+    {
+        "code": "0856",
+        "city": "铜仁",
+        "pinyin": "tongren",
+        "province": "贵州"
+    },
+    {
+        "code": "0898",
+        "city": "海口",
+        "pinyin": "haikou",
+        "province": "海南"
+    },
+    {
+        "code": "0899",
+        "city": "三亚",
+        "pinyin": "sanya",
+        "province": "海南"
+    },
+    {
+        "code": "0802",
+        "city": "白沙县",
+        "pinyin": "baotingxian",
+        "province": "海南"
+    },
+    {
+        "code": "0801",
+        "city": "保亭县",
+        "pinyin": "baotingxian",
+        "province": "海南"
+    },
+    {
+        "code": "0803",
+        "city": "昌江县",
+        "pinyin": "changjiangxian",
+        "province": "海南"
+    },
+    {
+        "code": "0804",
+        "city": "澄迈县",
+        "pinyin": "chengmaixian",
+        "province": "海南"
+    },
+    {
+        "code": "0806",
+        "city": "定安县",
+        "pinyin": "andingxian",
+        "province": "海南"
+    },
+    {
+        "code": "0807",
+        "city": "东方",
+        "pinyin": "dongfang",
+        "province": "海南"
+    },
+    {
+        "code": "2802",
+        "city": "乐东县",
+        "pinyin": "ledongxian",
+        "province": "海南"
+    },
+    {
+        "code": "1896",
+        "city": "临高县",
+        "pinyin": "lingaoxian",
+        "province": "海南"
+    },
+    {
+        "code": "0809",
+        "city": "陵水县",
+        "pinyin": "lingshuixian",
+        "province": "海南"
+    },
+    {
+        "code": "1894",
+        "city": "琼海",
+        "pinyin": "hainan",
+        "province": "海南"
+    },
+    {
+        "code": "1899",
+        "city": "琼中县",
+        "pinyin": "qiongzhongxian",
+        "province": "海南"
+    },
+    {
+        "code": "1892",
+        "city": "屯昌县",
+        "pinyin": "tunchangxian",
+        "province": "海南"
+    },
+    {
+        "code": "1898",
+        "city": "万宁",
+        "pinyin": "wanning",
+        "province": "海南"
+    },
+    {
+        "code": "1893",
+        "city": "文昌",
+        "pinyin": "wenchang",
+        "province": "海南"
+    },
+    {
+        "code": "1897",
+        "city": "五指山",
+        "pinyin": "wuzhishan",
+        "province": "海南"
+    },
+    {
+        "code": "0805",
+        "city": "儋州",
+        "pinyin": "danzhou",
+        "province": "海南"
+    },
+    {
+        "code": "0311",
+        "city": "石家庄",
+        "pinyin": "shijiazhuang",
+        "province": "河北"
+    },
+    {
+        "code": "0312",
+        "city": "保定",
+        "pinyin": "baoding",
+        "province": "河北"
+    },
+    {
+        "code": "0314",
+        "city": "承德",
+        "pinyin": "chengde",
+        "province": "河北"
+    },
+    {
+        "code": "0310",
+        "city": "邯郸",
+        "pinyin": "handan",
+        "province": "河北"
+    },
+    {
+        "code": "0315",
+        "city": "唐山",
+        "pinyin": "tangshan",
+        "province": "河北"
+    },
+    {
+        "code": "0335",
+        "city": "秦皇岛",
+        "pinyin": "qinhuangdao",
+        "province": "河北"
+    },
+    {
+        "code": "0317",
+        "city": "沧州",
+        "pinyin": "cangzhou",
+        "province": "河北"
+    },
+    {
+        "code": "0318",
+        "city": "衡水",
+        "pinyin": "hengshui",
+        "province": "河北"
+    },
+    {
+        "code": "0316",
+        "city": "廊坊",
+        "pinyin": "langfang",
+        "province": "河北"
+    },
+    {
+        "code": "0319",
+        "city": "邢台",
+        "pinyin": "xingtai",
+        "province": "河北"
+    },
+    {
+        "code": "0313",
+        "city": "张家口",
+        "pinyin": "zhangjiakou",
+        "province": "河北"
+    },
+    {
+        "code": "0371",
+        "city": "郑州",
+        "pinyin": "zhengzhou",
+        "province": "河南"
+    },
+    {
+        "code": "0379",
+        "city": "洛阳",
+        "pinyin": "luoyang",
+        "province": "河南"
+    },
+    {
+        "code": "0378",
+        "city": "开封",
+        "pinyin": "kaifeng",
+        "province": "河南"
+    },
+    {
+        "code": "0374",
+        "city": "许昌",
+        "pinyin": "xuchang",
+        "province": "河南"
+    },
+    {
+        "code": "0372",
+        "city": "安阳",
+        "pinyin": "anyang",
+        "province": "河南"
+    },
+    {
+        "code": "0375",
+        "city": "平顶山",
+        "pinyin": "pingdingshan",
+        "province": "河南"
+    },
+    {
+        "code": "0392",
+        "city": "鹤壁",
+        "pinyin": "hebi",
+        "province": "河南"
+    },
+    {
+        "code": "0391",
+        "city": "焦作",
+        "pinyin": "jiaozuo",
+        "province": "河南"
+    },
+    {
+        "code": "1391",
+        "city": "济源",
+        "pinyin": "jiyuan",
+        "province": "河南"
+    },
+    {
+        "code": "0395",
+        "city": "漯河",
+        "pinyin": "luohe",
+        "province": "河南"
+    },
+    {
+        "code": "0377",
+        "city": "南阳",
+        "pinyin": "nanyang",
+        "province": "河南"
+    },
+    {
+        "code": "0393",
+        "city": "濮阳",
+        "pinyin": "puyang",
+        "province": "河南"
+    },
+    {
+        "code": "0398",
+        "city": "三门峡",
+        "pinyin": "sanmenxia",
+        "province": "河南"
+    },
+    {
+        "code": "0370",
+        "city": "商丘",
+        "pinyin": "shangqiu",
+        "province": "河南"
+    },
+    {
+        "code": "0373",
+        "city": "新乡",
+        "pinyin": "xinxiang",
+        "province": "河南"
+    },
+    {
+        "code": "0376",
+        "city": "信阳",
+        "pinyin": "xinyang",
+        "province": "河南"
+    },
+    {
+        "code": "0396",
+        "city": "驻马店",
+        "pinyin": "zhumadian",
+        "province": "河南"
+    },
+    {
+        "code": "0394",
+        "city": "周口",
+        "pinyin": "zhoukou",
+        "province": "河南"
+    },
+    {
+        "code": "0451",
+        "city": "哈尔滨",
+        "pinyin": "haerbin",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0459",
+        "city": "大庆",
+        "pinyin": "daqing",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0452",
+        "city": "齐齐哈尔",
+        "pinyin": "qiqihaer",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0454",
+        "city": "佳木斯",
+        "pinyin": "jiamusi",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0457",
+        "city": "大兴安岭",
+        "pinyin": "daxinganling",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0456",
+        "city": "黑河",
+        "pinyin": "heihe",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0468",
+        "city": "鹤岗",
+        "pinyin": "hegang",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0467",
+        "city": "鸡西",
+        "pinyin": "jixi",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0453",
+        "city": "牡丹江",
+        "pinyin": "mudanjiang",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0464",
+        "city": "七台河",
+        "pinyin": "xitaihe",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0455",
+        "city": "绥化",
+        "pinyin": "suihua",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0469",
+        "city": "双鸭山",
+        "pinyin": "shuangyashan",
+        "province": "黑龙江"
+    },
+    {
+        "code": "0458",
+        "city": "伊春",
+        "pinyin": "yichun",
+        "province": "黑龙江"
+    },
+    {
+        "code": "027",
+        "city": "武汉",
+        "pinyin": "wuhan",
+        "province": "湖北"
+    },
+    {
+        "code": "0710",
+        "city": "襄阳",
+        "pinyin": "xiangyang",
+        "province": "湖北"
+    },
+    {
+        "code": "0719",
+        "city": "十堰",
+        "pinyin": "shiyan",
+        "province": "湖北"
+    },
+    {
+        "code": "0714",
+        "city": "黄石",
+        "pinyin": "huangshi",
+        "province": "湖北"
+    },
+    {
+        "code": "0711",
+        "city": "鄂州",
+        "pinyin": "ezhou",
+        "province": "湖北"
+    },
+    {
+        "code": "0718",
+        "city": "恩施",
+        "pinyin": "enshi",
+        "province": "湖北"
+    },
+    {
+        "code": "0713",
+        "city": "黄冈",
+        "pinyin": "huanggang",
+        "province": "湖北"
+    },
+    {
+        "code": "0716",
+        "city": "荆州",
+        "pinyin": "jingzhou",
+        "province": "湖北"
+    },
+    {
+        "code": "0724",
+        "city": "荆门",
+        "pinyin": "jingmen",
+        "province": "湖北"
+    },
+    {
+        "code": "0722",
+        "city": "随州",
+        "pinyin": "suizhou",
+        "province": "湖北"
+    },
+    {
+        "code": "0717",
+        "city": "宜昌",
+        "pinyin": "yichang",
+        "province": "湖北"
+    },
+    {
+        "code": "1728",
+        "city": "天门",
+        "pinyin": "tianmen",
+        "province": "湖北"
+    },
+    {
+        "code": "2728",
+        "city": "潜江",
+        "pinyin": "qianjiang",
+        "province": "湖北"
+    },
+    {
+        "code": "0728",
+        "city": "仙桃",
+        "pinyin": "xiantao",
+        "province": "湖北"
+    },
+    {
+        "code": "0712",
+        "city": "孝感",
+        "pinyin": "xiaogan",
+        "province": "湖北"
+    },
+    {
+        "code": "0715",
+        "city": "咸宁",
+        "pinyin": "xianning",
+        "province": "湖北"
+    },
+    {
+        "code": "1719",
+        "city": "神农架",
+        "pinyin": "shennongjia",
+        "province": "湖北"
+    },
+    {
+        "code": "0731",
+        "city": "长沙",
+        "pinyin": "changsha",
+        "province": "湖南"
+    },
+    {
+        "code": "0730",
+        "city": "岳阳",
+        "pinyin": "yueyang",
+        "province": "湖南"
+    },
+    {
+        "code": "0732",
+        "city": "湘潭",
+        "pinyin": "xiangtan",
+        "province": "湖南"
+    },
+    {
+        "code": "0736",
+        "city": "常德",
+        "pinyin": "changde",
+        "province": "湖南"
+    },
+    {
+        "code": "0735",
+        "city": "郴州",
+        "pinyin": "binzhou",
+        "province": "湖南"
+    },
+    {
+        "code": "0734",
+        "city": "衡阳",
+        "pinyin": "hengyang",
+        "province": "湖南"
+    },
+    {
+        "code": "0745",
+        "city": "怀化",
+        "pinyin": "huaihua",
+        "province": "湖南"
+    },
+    {
+        "code": "0738",
+        "city": "娄底",
+        "pinyin": "loudi",
+        "province": "湖南"
+    },
+    {
+        "code": "0739",
+        "city": "邵阳",
+        "pinyin": "shaoyang",
+        "province": "湖南"
+    },
+    {
+        "code": "0737",
+        "city": "益阳",
+        "pinyin": "yiyang",
+        "province": "湖南"
+    },
+    {
+        "code": "0746",
+        "city": "永州",
+        "pinyin": "yongzhou",
+        "province": "湖南"
+    },
+    {
+        "code": "0733",
+        "city": "株洲",
+        "pinyin": "zhuzhou",
+        "province": "湖南"
+    },
+    {
+        "code": "0744",
+        "city": "张家界",
+        "pinyin": "zhangjiajie",
+        "province": "湖南"
+    },
+    {
+        "code": "0743",
+        "city": "湘西",
+        "pinyin": "xiangxi",
+        "province": "湖南"
+    },
+    {
+        "code": "0431",
+        "city": "长春",
+        "pinyin": "changchun",
+        "province": "吉林"
+    },
+    {
+        "code": "0432",
+        "city": "吉林",
+        "pinyin": "jilin",
+        "province": "吉林"
+    },
+    {
+        "code": "1433",
+        "city": "延边",
+        "pinyin": "yanbian",
+        "province": "吉林"
+    },
+    {
+        "code": "0436",
+        "city": "白城",
+        "pinyin": "baicheng",
+        "province": "吉林"
+    },
+    {
+        "code": "0439",
+        "city": "白山",
+        "pinyin": "baishan",
+        "province": "吉林"
+    },
+    {
+        "code": "0437",
+        "city": "辽源",
+        "pinyin": "liaoyuan",
+        "province": "吉林"
+    },
+    {
+        "code": "0434",
+        "city": "四平",
+        "pinyin": "siping",
+        "province": "吉林"
+    },
+    {
+        "code": "0438",
+        "city": "松原",
+        "pinyin": "songyuan",
+        "province": "吉林"
+    },
+    {
+        "code": "0435",
+        "city": "通化",
+        "pinyin": "tonghua",
+        "province": "吉林"
+    },
+    {
+        "code": "025",
+        "city": "南京",
+        "pinyin": "nanjing",
+        "province": "江苏"
+    },
+    {
+        "code": "0512",
+        "city": "苏州",
+        "pinyin": "suzhou",
+        "province": "江苏"
+    },
+    {
+        "code": "0519",
+        "city": "常州",
+        "pinyin": "changzhou",
+        "province": "江苏"
+    },
+    {
+        "code": "0518",
+        "city": "连云港",
+        "pinyin": "lianyungang",
+        "province": "江苏"
+    },
+    {
+        "code": "0523",
+        "city": "泰州",
+        "pinyin": "taizhou",
+        "province": "江苏"
+    },
+    {
+        "code": "0510",
+        "city": "无锡",
+        "pinyin": "wuxi",
+        "province": "江苏"
+    },
+    {
+        "code": "0516",
+        "city": "徐州",
+        "pinyin": "xuzhou",
+        "province": "江苏"
+    },
+    {
+        "code": "0514",
+        "city": "扬州",
+        "pinyin": "yangzhou",
+        "province": "江苏"
+    },
+    {
+        "code": "0511",
+        "city": "镇江",
+        "pinyin": "zhenjiang",
+        "province": "江苏"
+    },
+    {
+        "code": "0517",
+        "city": "淮安",
+        "pinyin": "huaian",
+        "province": "江苏"
+    },
+    {
+        "code": "0513",
+        "city": "南通",
+        "pinyin": "nantong",
+        "province": "江苏"
+    },
+    {
+        "code": "0527",
+        "city": "宿迁",
+        "pinyin": "suqian",
+        "province": "江苏"
+    },
+    {
+        "code": "0515",
+        "city": "盐城",
+        "pinyin": "yancheng",
+        "province": "江苏"
+    },
+    {
+        "code": "0791",
+        "city": "南昌",
+        "pinyin": "nanchang",
+        "province": "江西"
+    },
+    {
+        "code": "0797",
+        "city": "赣州",
+        "pinyin": "ganzhou",
+        "province": "江西"
+    },
+    {
+        "code": "0792",
+        "city": "九江",
+        "pinyin": "jiujiang",
+        "province": "江西"
+    },
+    {
+        "code": "0798",
+        "city": "景德镇",
+        "pinyin": "jingdezhen",
+        "province": "江西"
+    },
+    {
+        "code": "0796",
+        "city": "吉安",
+        "pinyin": "jian",
+        "province": "江西"
+    },
+    {
+        "code": "0799",
+        "city": "萍乡",
+        "pinyin": "pingxiang",
+        "province": "江西"
+    },
+    {
+        "code": "0793",
+        "city": "上饶",
+        "pinyin": "shangrao",
+        "province": "江西"
+    },
+    {
+        "code": "0790",
+        "city": "新余",
+        "pinyin": "xinyu",
+        "province": "江西"
+    },
+    {
+        "code": "0795",
+        "city": "宜春",
+        "pinyin": "yichun",
+        "province": "江西"
+    },
+    {
+        "code": "0701",
+        "city": "鹰潭",
+        "pinyin": "yingtan",
+        "province": "江西"
+    },
+    {
+        "code": "0794",
+        "city": "抚州",
+        "pinyin": "wuzhou",
+        "province": "江西"
+    },
+    {
+        "code": "024",
+        "city": "沈阳",
+        "pinyin": "shenyang",
+        "province": "辽宁"
+    },
+    {
+        "code": "0411",
+        "city": "大连",
+        "pinyin": "dalian",
+        "province": "辽宁"
+    },
+    {
+        "code": "0412",
+        "city": "鞍山",
+        "pinyin": "anshan",
+        "province": "辽宁"
+    },
+    {
+        "code": "0415",
+        "city": "丹东",
+        "pinyin": "dandong",
+        "province": "辽宁"
+    },
+    {
+        "code": "0413",
+        "city": "抚顺",
+        "pinyin": "fushun",
+        "province": "辽宁"
+    },
+    {
+        "code": "0416",
+        "city": "锦州",
+        "pinyin": "jinzhou",
+        "province": "辽宁"
+    },
+    {
+        "code": "0417",
+        "city": "营口",
+        "pinyin": "yingkou",
+        "province": "辽宁"
+    },
+    {
+        "code": "0414",
+        "city": "本溪",
+        "pinyin": "benxi",
+        "province": "辽宁"
+    },
+    {
+        "code": "0421",
+        "city": "朝阳",
+        "pinyin": "zhaoyang",
+        "province": "辽宁"
+    },
+    {
+        "code": "0418",
+        "city": "阜新",
+        "pinyin": "fuxin",
+        "province": "辽宁"
+    },
+    {
+        "code": "0429",
+        "city": "葫芦岛",
+        "pinyin": "huludao",
+        "province": "辽宁"
+    },
+    {
+        "code": "0419",
+        "city": "辽阳",
+        "pinyin": "liaoyang",
+        "province": "辽宁"
+    },
+    {
+        "code": "0427",
+        "city": "盘锦",
+        "pinyin": "panjin",
+        "province": "辽宁"
+    },
+    {
+        "code": "0410",
+        "city": "铁岭",
+        "pinyin": "tieling",
+        "province": "辽宁"
+    },
+    {
+        "code": "0471",
+        "city": "呼和浩特",
+        "pinyin": "huhehaote",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0472",
+        "city": "包头",
+        "pinyin": "baotou",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0476",
+        "city": "赤峰",
+        "pinyin": "chifeng",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0477",
+        "city": "鄂尔多斯",
+        "pinyin": "eerduosi",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0474",
+        "city": "乌兰察布",
+        "pinyin": "wulanchabu",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0473",
+        "city": "乌海",
+        "pinyin": "wuhai",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0482",
+        "city": "兴安盟",
+        "pinyin": "xinganmeng",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0470",
+        "city": "呼伦贝尔",
+        "pinyin": "hulunbeier",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0475",
+        "city": "通辽",
+        "pinyin": "tongliao",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0483",
+        "city": "阿拉善盟",
+        "pinyin": "alishanmeng",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0478",
+        "city": "巴彦淖尔",
+        "pinyin": "bayannuoer",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0479",
+        "city": "锡林郭勒",
+        "pinyin": "xilinguole",
+        "province": "内蒙古"
+    },
+    {
+        "code": "0951",
+        "city": "银川",
+        "pinyin": "yinchuan",
+        "province": "宁夏"
+    },
+    {
+        "code": "0952",
+        "city": "石嘴山",
+        "pinyin": "shizuishan",
+        "province": "宁夏"
+    },
+    {
+        "code": "0954",
+        "city": "固原",
+        "pinyin": "guyuan",
+        "province": "宁夏"
+    },
+    {
+        "code": "0953",
+        "city": "吴忠",
+        "pinyin": "wuzhong",
+        "province": "宁夏"
+    },
+    {
+        "code": "1953",
+        "city": "中卫",
+        "pinyin": "zhongwei",
+        "province": "宁夏"
+    },
+    {
+        "code": "0971",
+        "city": "西宁",
+        "pinyin": "xining",
+        "province": "青海"
+    },
+    {
+        "code": "0973",
+        "city": "黄南",
+        "pinyin": "huangnan",
+        "province": "青海"
+    },
+    {
+        "code": "0976",
+        "city": "玉树",
+        "pinyin": "yushu",
+        "province": "青海"
+    },
+    {
+        "code": "0975",
+        "city": "果洛",
+        "pinyin": "guoluo",
+        "province": "青海"
+    },
+    {
+        "code": "0972",
+        "city": "海东",
+        "pinyin": "haidong",
+        "province": "青海"
+    },
+    {
+        "code": "0977",
+        "city": "海西",
+        "pinyin": "haixi",
+        "province": "青海"
+    },
+    {
+        "code": "0974",
+        "city": "海南",
+        "pinyin": "hainan",
+        "province": "青海"
+    },
+    {
+        "code": "0970",
+        "city": "海北",
+        "pinyin": "haibei",
+        "province": "青海"
+    },
+    {
+        "code": "0531",
+        "city": "济南",
+        "pinyin": "jinan",
+        "province": "山东"
+    },
+    {
+        "code": "0532",
+        "city": "青岛",
+        "pinyin": "qingdao",
+        "province": "山东"
+    },
+    {
+        "code": "0631",
+        "city": "威海",
+        "pinyin": "weihai",
+        "province": "山东"
+    },
+    {
+        "code": "0535",
+        "city": "烟台",
+        "pinyin": "yantai",
+        "province": "山东"
+    },
+    {
+        "code": "0536",
+        "city": "潍坊",
+        "pinyin": "weifang",
+        "province": "山东"
+    },
+    {
+        "code": "0538",
+        "city": "泰安",
+        "pinyin": "taian",
+        "province": "山东"
+    },
+    {
+        "code": "0543",
+        "city": "滨州",
+        "pinyin": "binzhou",
+        "province": "山东"
+    },
+    {
+        "code": "0534",
+        "city": "德州",
+        "pinyin": "dezhou",
+        "province": "山东"
+    },
+    {
+        "code": "0546",
+        "city": "东营",
+        "pinyin": "dongying",
+        "province": "山东"
+    },
+    {
+        "code": "0530",
+        "city": "菏泽",
+        "pinyin": "heze",
+        "province": "山东"
+    },
+    {
+        "code": "0537",
+        "city": "济宁",
+        "pinyin": "jining",
+        "province": "山东"
+    },
+    {
+        "code": "0635",
+        "city": "聊城",
+        "pinyin": "liaocheng",
+        "province": "山东"
+    },
+    {
+        "code": "0539",
+        "city": "临沂",
+        "pinyin": "linze",
+        "province": "山东"
+    },
+    {
+        "code": "0634",
+        "city": "莱芜",
+        "pinyin": "laiwu",
+        "province": "山东"
+    },
+    {
+        "code": "0633",
+        "city": "日照",
+        "pinyin": "rizhao",
+        "province": "山东"
+    },
+    {
+        "code": "0533",
+        "city": "淄博",
+        "pinyin": "zibo",
+        "province": "山东"
+    },
+    {
+        "code": "0632",
+        "city": "枣庄",
+        "pinyin": "zaozhuang",
+        "province": "山东"
+    },
+    {
+        "code": "0351",
+        "city": "太原",
+        "pinyin": "taiyuan",
+        "province": "山西"
+    },
+    {
+        "code": "0355",
+        "city": "长治",
+        "pinyin": "changzhi",
+        "province": "山西"
+    },
+    {
+        "code": "0352",
+        "city": "大同",
+        "pinyin": "datong",
+        "province": "山西"
+    },
+    {
+        "code": "0356",
+        "city": "晋城",
+        "pinyin": "jincheng",
+        "province": "山西"
+    },
+    {
+        "code": "0354",
+        "city": "晋中",
+        "pinyin": "jinzhong",
+        "province": "山西"
+    },
+    {
+        "code": "0357",
+        "city": "临汾",
+        "pinyin": "linfen",
+        "province": "山西"
+    },
+    {
+        "code": "0358",
+        "city": "吕梁",
+        "pinyin": "lvliang",
+        "province": "山西"
+    },
+    {
+        "code": "0349",
+        "city": "朔州",
+        "pinyin": "suzhou",
+        "province": "山西"
+    },
+    {
+        "code": "0350",
+        "city": "忻州",
+        "pinyin": "xinzhou",
+        "province": "山西"
+    },
+    {
+        "code": "0359",
+        "city": "运城",
+        "pinyin": "yuncheng",
+        "province": "山西"
+    },
+    {
+        "code": "0353",
+        "city": "阳泉",
+        "pinyin": "yangquan",
+        "province": "山西"
+    },
+    {
+        "code": "029",
+        "city": "西安",
+        "pinyin": "xian",
+        "province": "陕西"
+    },
+    {
+        "code": "0915",
+        "city": "安康",
+        "pinyin": "ankang",
+        "province": "陕西"
+    },
+    {
+        "code": "0917",
+        "city": "宝鸡",
+        "pinyin": "baoji",
+        "province": "陕西"
+    },
+    {
+        "code": "0916",
+        "city": "汉中",
+        "pinyin": "hanzhong",
+        "province": "陕西"
+    },
+    {
+        "code": "0914",
+        "city": "商洛",
+        "pinyin": "shanglue",
+        "province": "陕西"
+    },
+    {
+        "code": "0919",
+        "city": "铜川",
+        "pinyin": "tongchuan",
+        "province": "陕西"
+    },
+    {
+        "code": "0913",
+        "city": "渭南",
+        "pinyin": "weinan",
+        "province": "陕西"
+    },
+    {
+        "code": "0910",
+        "city": "咸阳",
+        "pinyin": "xianyang",
+        "province": "陕西"
+    },
+    {
+        "code": "0911",
+        "city": "延安",
+        "pinyin": "yanan",
+        "province": "陕西"
+    },
+    {
+        "code": "0912",
+        "city": "榆林",
+        "pinyin": "yulin",
+        "province": "陕西"
+    },
+    {
+        "code": "028",
+        "city": "成都",
+        "pinyin": "chengdu",
+        "province": "四川"
+    },
+    {
+        "code": "0816",
+        "city": "绵阳",
+        "pinyin": "mianyang",
+        "province": "四川"
+    },
+    {
+        "code": "0832",
+        "city": "资阳",
+        "pinyin": "ziyang",
+        "province": "四川"
+    },
+    {
+        "code": "0827",
+        "city": "巴中",
+        "pinyin": "bazhong",
+        "province": "四川"
+    },
+    {
+        "code": "0838",
+        "city": "德阳",
+        "pinyin": "deyang",
+        "province": "四川"
+    },
+    {
+        "code": "0818",
+        "city": "达州",
+        "pinyin": "dazhou",
+        "province": "四川"
+    },
+    {
+        "code": "0826",
+        "city": "广安",
+        "pinyin": "guangan",
+        "province": "四川"
+    },
+    {
+        "code": "0839",
+        "city": "广元",
+        "pinyin": "guangyuan",
+        "province": "四川"
+    },
+    {
+        "code": "0833",
+        "city": "乐山",
+        "pinyin": "leshan",
+        "province": "四川"
+    },
+    {
+        "code": "0830",
+        "city": "泸州",
+        "pinyin": "luzhou",
+        "province": "四川"
+    },
+    {
+        "code": "1833",
+        "city": "眉山",
+        "pinyin": "meishan",
+        "province": "四川"
+    },
+    {
+        "code": "1832",
+        "city": "内江",
+        "pinyin": "neijiang",
+        "province": "四川"
+    },
+    {
+        "code": "0817",
+        "city": "南充",
+        "pinyin": "nanchong",
+        "province": "四川"
+    },
+    {
+        "code": "0812",
+        "city": "攀枝花",
+        "pinyin": "panzhihua",
+        "province": "四川"
+    },
+    {
+        "code": "0825",
+        "city": "遂宁",
+        "pinyin": "suining",
+        "province": "四川"
+    },
+    {
+        "code": "0831",
+        "city": "宜宾",
+        "pinyin": "yibin",
+        "province": "四川"
+    },
+    {
+        "code": "0835",
+        "city": "雅安",
+        "pinyin": "yaan",
+        "province": "四川"
+    },
+    {
+        "code": "0813",
+        "city": "自贡",
+        "pinyin": "zigong",
+        "province": "四川"
+    },
+    {
+        "code": "0837",
+        "city": "阿坝",
+        "pinyin": "anbei",
+        "province": "四川"
+    },
+    {
+        "code": "0836",
+        "city": "甘孜",
+        "pinyin": "ganzi",
+        "province": "四川"
+    },
+    {
+        "code": "0834",
+        "city": "凉山",
+        "pinyin": "liangshan",
+        "province": "四川"
+    },
+    {
+        "code": "0891",
+        "city": "拉萨",
+        "pinyin": "lasa",
+        "province": "西藏"
+    },
+    {
+        "code": "0897",
+        "city": "阿里",
+        "pinyin": "ali",
+        "province": "西藏"
+    },
+    {
+        "code": "0895",
+        "city": "昌都",
+        "pinyin": "changdu",
+        "province": "西藏"
+    },
+    {
+        "code": "0894",
+        "city": "林芝",
+        "pinyin": "linzhi",
+        "province": "西藏"
+    },
+    {
+        "code": "0896",
+        "city": "那曲",
+        "pinyin": "naqu",
+        "province": "西藏"
+    },
+    {
+        "code": "0893",
+        "city": "山南",
+        "pinyin": "shannan",
+        "province": "西藏"
+    },
+    {
+        "code": "0991",
+        "city": "乌鲁木齐",
+        "pinyin": "wulumuqi",
+        "province": "新疆"
+    },
+    {
+        "code": "0993",
+        "city": "石河子",
+        "pinyin": "shihezi",
+        "province": "新疆"
+    },
+    {
+        "code": "0995",
+        "city": "吐鲁番",
+        "pinyin": "tulufan",
+        "province": "新疆"
+    },
+    {
+        "code": "0999",
+        "city": "伊犁",
+        "pinyin": "yili",
+        "province": "新疆"
+    },
+    {
+        "code": "0997",
+        "city": "阿克苏",
+        "pinyin": "akesu",
+        "province": "新疆"
+    },
+    {
+        "code": "0906",
+        "city": "阿勒泰",
+        "pinyin": "aletai",
+        "province": "新疆"
+    },
+    {
+        "code": "0996",
+        "city": "巴音",
+        "pinyin": "bayin",
+        "province": "新疆"
+    },
+    {
+        "code": "0909",
+        "city": "博尔塔拉",
+        "pinyin": "boertala",
+        "province": "新疆"
+    },
+    {
+        "code": "0994",
+        "city": "昌吉",
+        "pinyin": "changji",
+        "province": "新疆"
+    },
+    {
+        "code": "0902",
+        "city": "哈密",
+        "pinyin": "hami",
+        "province": "新疆"
+    },
+    {
+        "code": "0903",
+        "city": "和田",
+        "pinyin": "hetian",
+        "province": "新疆"
+    },
+    {
+        "code": "0998",
+        "city": "喀什",
+        "pinyin": "kashi",
+        "province": "新疆"
+    },
+    {
+        "code": "0990",
+        "city": "克拉玛依",
+        "pinyin": "kelamayi",
+        "province": "新疆"
+    },
+    {
+        "code": "0908",
+        "city": "克孜勒",
+        "pinyin": "kezile",
+        "province": "新疆"
+    },
+    {
+        "code": "0901",
+        "city": "塔城",
+        "pinyin": "tacheng",
+        "province": "新疆"
+    },
+    {
+        "code": "0871",
+        "city": "昆明",
+        "pinyin": "konming",
+        "province": "云南"
+    },
+    {
+        "code": "0877",
+        "city": "玉溪",
+        "pinyin": "yuxi",
+        "province": "云南"
+    },
+    {
+        "code": "0878",
+        "city": "楚雄",
+        "pinyin": "chuxiong",
+        "province": "云南"
+    },
+    {
+        "code": "0872",
+        "city": "大理",
+        "pinyin": "dali",
+        "province": "云南"
+    },
+    {
+        "code": "0873",
+        "city": "红河",
+        "pinyin": "honghe",
+        "province": "云南"
+    },
+    {
+        "code": "0874",
+        "city": "曲靖",
+        "pinyin": "qujing",
+        "province": "云南"
+    },
+    {
+        "code": "0691",
+        "city": "西双版纳",
+        "pinyin": "xishuangbanna",
+        "province": "云南"
+    },
+    {
+        "code": "0870",
+        "city": "昭通",
+        "pinyin": "shaotong",
+        "province": "云南"
+    },
+    {
+        "code": "0875",
+        "city": "保山",
+        "pinyin": "baoshan",
+        "province": "云南"
+    },
+    {
+        "code": "0692",
+        "city": "德宏",
+        "pinyin": "dehong",
+        "province": "云南"
+    },
+    {
+        "code": "0887",
+        "city": "迪庆",
+        "pinyin": "diqing",
+        "province": "云南"
+    },
+    {
+        "code": "0888",
+        "city": "丽江",
+        "pinyin": "lijiang",
+        "province": "云南"
+    },
+    {
+        "code": "0883",
+        "city": "临沧",
+        "pinyin": "lincang",
+        "province": "云南"
+    },
+    {
+        "code": "0886",
+        "city": "怒江",
+        "pinyin": "nujiang",
+        "province": "云南"
+    },
+    {
+        "code": "0879",
+        "city": "普洱",
+        "pinyin": "puer",
+        "province": "云南"
+    },
+    {
+        "code": "0876",
+        "city": "文山",
+        "pinyin": "wenshan",
+        "province": "云南"
+    },
+    {
+        "code": "0571",
+        "city": "杭州",
+        "pinyin": "hangzhou",
+        "province": "浙江"
+    },
+    {
+        "code": "0574",
+        "city": "宁波",
+        "pinyin": "ningbo",
+        "province": "浙江"
+    },
+    {
+        "code": "0573",
+        "city": "嘉兴",
+        "pinyin": "jiaxing",
+        "province": "浙江"
+    },
+    {
+        "code": "0575",
+        "city": "绍兴",
+        "pinyin": "shaoxing",
+        "province": "浙江"
+    },
+    {
+        "code": "0577",
+        "city": "温州",
+        "pinyin": "wenzhou",
+        "province": "浙江"
+    },
+    {
+        "code": "0580",
+        "city": "舟山",
+        "pinyin": "zhoushan",
+        "province": "浙江"
+    },
+    {
+        "code": "0572",
+        "city": "湖州",
+        "pinyin": "huzhou",
+        "province": "浙江"
+    },
+    {
+        "code": "0579",
+        "city": "金华",
+        "pinyin": "jinhua",
+        "province": "浙江"
+    },
+    {
+        "code": "0578",
+        "city": "丽水",
+        "pinyin": "lishui",
+        "province": "浙江"
+    },
+    {
+        "code": "0576",
+        "city": "台州",
+        "pinyin": "taizhou",
+        "province": "浙江"
+    },
+    {
+        "code": "0570",
+        "city": "衢州",
+        "pinyin": "quzhou",
+        "province": "浙江"
+    },
+    {
+        "code": "1852",
+        "city": "香港",
+        "pinyin": "xianggang"
+    },
+    {
+        "code": "1852",
+        "city": "澳门",
+        "pinyin": "aomen"
+    }
+]

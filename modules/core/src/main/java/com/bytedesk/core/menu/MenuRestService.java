@@ -317,11 +317,11 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
     }
 
     public void initMenus() {
-        initMenusBySeeds(MenuInitData.adminMenus(), MenuTypeEnum.ADMIN.name());
-        initMenusBySeeds(MenuInitData.desktopMenus(), MenuTypeEnum.DESKTOP.name());
+        initMenusBySeeds(MenuInitData.adminMenus(), MenuTypeEnum.ADMIN.name(), false);
+        initMenusBySeeds(MenuInitData.desktopMenus(), MenuTypeEnum.DESKTOP.name(), false);
     }
 
-    private void initMenusBySeeds(List<MenuInitData.MenuSeed> seeds, String type) {
+    private void initMenusBySeeds(List<MenuInitData.MenuSeed> seeds, String type, boolean resetEnabled) {
         if (seeds == null || seeds.isEmpty()) {
             return;
         }
@@ -345,7 +345,9 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
                 entity.setIcon(seed.getIcon());
                 entity.setLink(seed.getLink());
                 entity.setOrder(seed.getOrder());
-                entity.setEnabled(seed.getEnabled());
+                if (resetEnabled) {
+                    entity.setEnabled(seed.getEnabled());
+                }
                 entity.setOpenInNewWindow(Boolean.FALSE);
                 entity.setParentUid(parentUid);
                 entity.setOrgUid(null);
@@ -393,7 +395,8 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
     @Transactional
     public void resetMenus(String orgUid) {
         // Reset defaults by upserting seed data instead of deleting existing rows.
-        initMenus();
+        initMenusBySeeds(MenuInitData.adminMenus(), MenuTypeEnum.ADMIN.name(), true);
+        initMenusBySeeds(MenuInitData.desktopMenus(), MenuTypeEnum.DESKTOP.name(), true);
     }
 
     

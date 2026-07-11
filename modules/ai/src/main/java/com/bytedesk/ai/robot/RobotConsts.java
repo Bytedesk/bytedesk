@@ -62,6 +62,8 @@ public class RobotConsts {
 //     public static final String ROBOT_NAME_AFTER_SALE_CUSTOMER_ASSISTANT = "after_sale_customer_assistant"; // 售后客服
 //     public static final String ROBOT_NAME_LOGISTICS_CUSTOMER_ASSISTANT = "logistics_customer_assistant"; // 物流客服
     public static final String ROBOT_NAME_LANGUAGE_TRANSLATION = "language_translation"; // 语言翻译
+    public static final String ROBOT_NAME_KB_TRANSLATION = "kbase_translation"; // 知识库内容翻译
+    public static final String ROBOT_MODEL_KB_TRANSLATION = "qwen-mt-flash";
 //     public static final String ROBOT_NAME_LANGUAGE_RECOGNITION = "language_recognition"; // 语言识别
 //     public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis"; // 语义分析
 //     public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别

@@ -81,18 +81,22 @@ public class RedisConfig {
                 .poolConfig(jedisPoolConfig())
                 .build();
 
+        JedisConnectionFactory connectionFactory;
         if (isClusterEnabled()) {
             RedisClusterConfiguration clusterConfiguration = buildClusterConfiguration();
-            return new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
+            connectionFactory = new JedisConnectionFactory(clusterConfiguration, clientConfiguration);
+        } else {
+            RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(
+                    jedisProperties.getHost(), jedisProperties.getPort());
+            if (StringUtils.hasText(jedisProperties.getPassword())) {
+                standaloneConfiguration.setPassword(RedisPassword.of(jedisProperties.getPassword()));
+            }
+            standaloneConfiguration.setDatabase(jedisProperties.getDatabase());
+            connectionFactory = new JedisConnectionFactory(standaloneConfiguration, clientConfiguration);
         }
 
-        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration(
-                jedisProperties.getHost(), jedisProperties.getPort());
-        if (StringUtils.hasText(jedisProperties.getPassword())) {
-            standaloneConfiguration.setPassword(RedisPassword.of(jedisProperties.getPassword()));
-        }
-        standaloneConfiguration.setDatabase(jedisProperties.getDatabase());
-        return new JedisConnectionFactory(standaloneConfiguration, clientConfiguration);
+        connectionFactory.setConvertPipelineAndTxResults(true);
+        return connectionFactory;
     }
 
     private boolean isClusterEnabled() {

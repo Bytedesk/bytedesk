@@ -33,6 +33,10 @@ import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -55,6 +59,8 @@ public class FaqElasticService {
     private final FaqRestService faqRestService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     public Map<String, Object> queryElasticByUid(FaqRequest request) {
         String uid = request.getUid();
@@ -293,6 +299,7 @@ public class FaqElasticService {
             FaqElastic faqElastic = FaqElastic.fromFaqEntity(faq);
             // 保存到Elasticsearch
             elasticsearchOperations.save(faqElastic);
+            reindexTranslatedFaqs(faq);
             
             // 更新索引状态
             faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.SUCCESS.name());
@@ -359,6 +366,45 @@ public class FaqElasticService {
         }
     }
 
+        private void reindexTranslatedFaqs(FaqEntity faq) {
+        deleteTranslatedFaqDocuments(faq.getUid());
+
+        String kbUid = faq.getKbase() != null ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+            .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                kbUid,
+                faq.getUid(),
+                KbaseTranslationSourceTypeEnum.FAQ.name());
+
+        translations.stream()
+            .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+            .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+            .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+            .filter(translation -> StringUtils.hasText(translation.getTitle())
+                || StringUtils.hasText(translation.getContent())
+                || StringUtils.hasText(translation.getSummary()))
+            .forEach(translation -> elasticsearchOperations.save(FaqElastic.fromTranslation(faq, translation)));
+        }
+
+        private void deleteTranslatedFaqDocuments(String sourceUid) {
+        if (!StringUtils.hasText(sourceUid)) {
+            return;
+        }
+
+        Query query = NativeQuery.builder()
+            .withQuery(QueryBuilders.bool()
+                .filter(QueryBuilders.term().field("sourceUid").value(sourceUid).build()._toQuery())
+                .filter(QueryBuilders.term().field("translated").value(true).build()._toQuery())
+                .build()._toQuery())
+            .build();
+
+        elasticsearchOperations.delete(DeleteQuery.builder(query).build(), FaqElastic.class);
+        }
+
     /**
      * 搜索FAQ内容 - 私有辅助方法，处理两种搜索场景的共同逻辑
      * 
@@ -370,142 +416,142 @@ public class FaqElasticService {
      * @param maxResults 最大结果数，为null则不限制
      * @return 搜索结果列表
      */
-    private List<FaqElasticSearchResult> searchFaqInternal(
-            String query, 
-            String kbUid, 
-            String categoryUid, 
-            String orgUid, 
-            boolean isSuggest,
-            Integer maxResults) {
+    // private List<FaqElasticSearchResult> searchFaqInternal(
+    //         String query, 
+    //         String kbUid, 
+    //         String categoryUid, 
+    //         String orgUid, 
+    //         boolean isSuggest,
+    //         Integer maxResults) {
         
-        if (!StringUtils.hasText(query)) {
-            log.info("查询为空，直接返回空结果");
-            return new ArrayList<>();
-        }
+    //     if (!StringUtils.hasText(query)) {
+    //         log.info("查询为空，直接返回空结果");
+    //         return new ArrayList<>();
+    //     }
         
-        try {
-            // 首先检查索引是否存在
-            boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
-            if (!indexExists) {
-                log.warn("索引不存在: {}，请先创建索引", FaqElastic.class
-                        .getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
-                return new ArrayList<>();
-            }
+    //     try {
+    //         // 首先检查索引是否存在
+    //         boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+    //         if (!indexExists) {
+    //             log.warn("索引不存在: {}，请先创建索引", FaqElastic.class
+    //                     .getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+    //             return new ArrayList<>();
+    //         }
 
-            // 构建查询条件
-            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+    //         // 构建查询条件
+    //         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
             
-            // 根据搜索模式构建不同的查询
-            try {
-                if (isSuggest) {
-                    // 输入联想模式 - 主要匹配问题字段
-                    boolQueryBuilder.should(QueryBuilders.match()
-                            .field("question")
-                            .query(query)
-                            .build()._toQuery());
+    //         // 根据搜索模式构建不同的查询
+    //         try {
+    //             if (isSuggest) {
+    //                 // 输入联想模式 - 主要匹配问题字段
+    //                 boolQueryBuilder.should(QueryBuilders.match()
+    //                         .field("question")
+    //                         .query(query)
+    //                         .build()._toQuery());
                     
-                    // 设置最小匹配数
-                    boolQueryBuilder.minimumShouldMatch("1");
+    //                 // 设置最小匹配数
+    //                 boolQueryBuilder.minimumShouldMatch("1");
                     
-                    log.debug("添加question字段的match查询: {}", query);
-                } else {
-                    // 完整搜索模式 - 在多个字段中搜索
-                    MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
-                            .query(query)
-                            .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5") // 字段权重
-                            .build();
-                    boolQueryBuilder.must(multiMatchQuery._toQuery());
+    //                 log.debug("添加question字段的match查询: {}", query);
+    //             } else {
+    //                 // 完整搜索模式 - 在多个字段中搜索
+    //                 MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
+    //                         .query(query)
+    //                         .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5") // 字段权重
+    //                         .build();
+    //                 boolQueryBuilder.must(multiMatchQuery._toQuery());
                     
-                    // 添加过滤条件：启用状态
-                    boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
-                }
-            } catch (Exception e) {
-                log.warn("添加查询条件时出错: {}", e.getMessage());
-            }
+    //                 // 添加过滤条件：启用状态
+    //                 boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+    //             }
+    //         } catch (Exception e) {
+    //             log.warn("添加查询条件时出错: {}", e.getMessage());
+    //         }
             
-            // 添加可选的过滤条件：知识库、分类、组织
-            try {
-                if (StringUtils.hasText(kbUid)) {
-                    boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
-                    log.debug("添加kbUid过滤条件: {}", kbUid);
-                }
+    //         // 添加可选的过滤条件：知识库、分类、组织
+    //         try {
+    //             if (StringUtils.hasText(kbUid)) {
+    //                 boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
+    //                 log.debug("添加kbUid过滤条件: {}", kbUid);
+    //             }
                 
-                if (StringUtils.hasText(categoryUid) && !isSuggest) {
-                    boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
-                    log.debug("添加categoryUid过滤条件: {}", categoryUid);
-                }
+    //             if (StringUtils.hasText(categoryUid) && !isSuggest) {
+    //                 boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+    //                 log.debug("添加categoryUid过滤条件: {}", categoryUid);
+    //             }
                 
-                if (StringUtils.hasText(orgUid)) {
-                    boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
-                    log.debug("添加orgUid过滤条件: {}", orgUid);
-                }
-            } catch (Exception e) {
-                log.warn("添加过滤条件时出错: {}", e.getMessage());
-            }
+    //             if (StringUtils.hasText(orgUid)) {
+    //                 boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+    //                 log.debug("添加orgUid过滤条件: {}", orgUid);
+    //             }
+    //         } catch (Exception e) {
+    //             log.warn("添加过滤条件时出错: {}", e.getMessage());
+    //         }
 
-            // 构建最终查询
-            var searchQueryBuilder = NativeQuery.builder()
-                    .withQuery(boolQueryBuilder.build()._toQuery());
+    //         // 构建最终查询
+    //         var searchQueryBuilder = NativeQuery.builder()
+    //                 .withQuery(boolQueryBuilder.build()._toQuery());
             
-            // 如果指定了最大结果数，则添加限制
-            if (maxResults != null && maxResults > 0) {
-                searchQueryBuilder.withMaxResults(maxResults);
-            }
+    //         // 如果指定了最大结果数，则添加限制
+    //         if (maxResults != null && maxResults > 0) {
+    //             searchQueryBuilder.withMaxResults(maxResults);
+    //         }
             
-            NativeQuery searchQuery = searchQueryBuilder.build();
-            log.debug("构建查询成功: {}", searchQuery);
+    //         NativeQuery searchQuery = searchQueryBuilder.build();
+    //         log.debug("构建查询成功: {}", searchQuery);
 
-            // 执行搜索
-            SearchHits<FaqElastic> searchHits;
-            try {
-                searchHits = elasticsearchOperations.search(searchQuery, FaqElastic.class);
-                log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
-            } catch (Exception e) {
-                log.error("执行Elasticsearch搜索失败: {}", e.getMessage(), e);
-                if (e.getCause() != null) {
-                    log.error("根本原因: {}", e.getCause().getMessage());
-                }
-                return new ArrayList<>();
-            }
+    //         // 执行搜索
+    //         SearchHits<FaqElastic> searchHits;
+    //         try {
+    //             searchHits = elasticsearchOperations.search(searchQuery, FaqElastic.class);
+    //             log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
+    //         } catch (Exception e) {
+    //             log.error("执行Elasticsearch搜索失败: {}", e.getMessage(), e);
+    //             if (e.getCause() != null) {
+    //                 log.error("根本原因: {}", e.getCause().getMessage());
+    //             }
+    //             return new ArrayList<>();
+    //         }
 
-            // 处理结果
-            List<FaqElasticSearchResult> resultList = new ArrayList<>();
-            for (SearchHit<FaqElastic> hit : searchHits) {
-                try {
-                    FaqElastic faqElastic = hit.getContent();
-                    if (faqElastic == null) {
-                        log.warn("搜索结果包含空内容");
-                        continue;
-                    }
+    //         // 处理结果
+    //         List<FaqElasticSearchResult> resultList = new ArrayList<>();
+    //         for (SearchHit<FaqElastic> hit : searchHits) {
+    //             try {
+    //                 FaqElastic faqElastic = hit.getContent();
+    //                 if (faqElastic == null) {
+    //                     log.warn("搜索结果包含空内容");
+    //                     continue;
+    //                 }
                     
-                    float score = hit.getScore();
+    //                 float score = hit.getScore();
                     
-                    // 创建结果对象
-                    FaqElasticSearchResult result = FaqElasticSearchResult.builder()
-                            .faqElastic(faqElastic)
-                            .score(score)
-                            .build();
+    //                 // 创建结果对象
+    //                 FaqElasticSearchResult result = FaqElasticSearchResult.builder()
+    //                         .faqElastic(faqElastic)
+    //                         .score(score)
+    //                         .build();
                     
-                    // 如果是输入联想模式，添加高亮
-                    if (isSuggest) {
-                        addHighlight(result, query, faqElastic.getQuestion());
-                    }
+    //                 // 如果是输入联想模式，添加高亮
+    //                 if (isSuggest) {
+    //                     addHighlight(result, query, faqElastic.getQuestion());
+    //                 }
                     
-                    resultList.add(result);
-                } catch (Exception e) {
-                    log.warn("处理搜索结果时出错: {}", e.getMessage());
-                }
-            }
+    //                 resultList.add(result);
+    //             } catch (Exception e) {
+    //                 log.warn("处理搜索结果时出错: {}", e.getMessage());
+    //             }
+    //         }
             
-            return resultList;
-        } catch (Exception e) {
-            log.error("FAQ搜索失败: query={}, 错误类型={}, 错误消息={}", 
-                    query, e.getClass().getName(), e.getMessage(), e);
+    //         return resultList;
+    //     } catch (Exception e) {
+    //         log.error("FAQ搜索失败: query={}, 错误类型={}, 错误消息={}", 
+    //                 query, e.getClass().getName(), e.getMessage(), e);
             
-            // 返回空列表而不是抛出异常，避免影响整个服务
-            return new ArrayList<>();
-        }
-    }
+    //         // 返回空列表而不是抛出异常，避免影响整个服务
+    //         return new ArrayList<>();
+    //     }
+    // }
     
     /**
      * 为搜索结果添加高亮
@@ -544,7 +590,7 @@ public class FaqElasticService {
      */
     public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, null);
+        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, null, null);
     }
 
     /**
@@ -554,7 +600,14 @@ public class FaqElasticService {
      */
     public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
         log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
-        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+        return searchFaq(query, kbUid, categoryUid, orgUid, maxResults, null);
+    }
+
+    public List<FaqElasticSearchResult> searchFaq(String query, String kbUid, String categoryUid, String orgUid,
+            Integer maxResults, List<String> preferredLanguages) {
+        log.info("全文搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}, preferredLanguages={}",
+                query, kbUid, categoryUid, orgUid, maxResults, preferredLanguages);
+        return searchFaqInternal(query, kbUid, categoryUid, orgUid, false, maxResults, preferredLanguages);
     }
 
     /**
@@ -569,9 +622,140 @@ public class FaqElasticService {
         String orgUid = request.getOrgUid();
         String categoryUid = request.getCategoryUid();
         
-        List<FaqElasticSearchResult> results = searchFaqInternal(query, kbUid, categoryUid, orgUid, true, 10);
+        List<FaqElasticSearchResult> results = searchFaqInternal(query, kbUid, categoryUid, orgUid, true, 10, null);
         log.info("FAQ输入联想成功，返回结果数: {}", results.size());
         return results;
+    }
+
+    private List<FaqElasticSearchResult> searchFaqInternal(
+            String query,
+            String kbUid,
+            String categoryUid,
+            String orgUid,
+            boolean isSuggest,
+            Integer maxResults,
+            List<String> preferredLanguages) {
+
+        if (!StringUtils.hasText(query)) {
+            log.info("查询为空，直接返回空结果");
+            return new ArrayList<>();
+        }
+
+        try {
+            boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
+            if (!indexExists) {
+                log.warn("索引不存在: {}，请先创建索引", FaqElastic.class
+                        .getAnnotation(org.springframework.data.elasticsearch.annotations.Document.class).indexName());
+                return new ArrayList<>();
+            }
+
+            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
+
+            try {
+                if (isSuggest) {
+                    boolQueryBuilder.should(QueryBuilders.match()
+                            .field("question")
+                            .query(query)
+                            .build()._toQuery());
+                    boolQueryBuilder.minimumShouldMatch("1");
+                    log.debug("添加question字段的match查询: {}", query);
+                } else {
+                    MultiMatchQuery multiMatchQuery = QueryBuilders.multiMatch()
+                            .query(query)
+                            .fields("question^3", "answer", "similarQuestions^2", "tagList^1.5")
+                            .build();
+                    boolQueryBuilder.must(multiMatchQuery._toQuery());
+                    boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
+                }
+            } catch (Exception e) {
+                log.warn("添加查询条件时出错: {}", e.getMessage());
+            }
+
+            try {
+                if (StringUtils.hasText(kbUid)) {
+                    boolQueryBuilder.filter(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery());
+                    log.debug("添加kbUid过滤条件: {}", kbUid);
+                }
+
+                if (StringUtils.hasText(categoryUid) && !isSuggest) {
+                    boolQueryBuilder.filter(QueryBuilders.term().field("categoryUid").value(categoryUid).build()._toQuery());
+                    log.debug("添加categoryUid过滤条件: {}", categoryUid);
+                }
+
+                if (StringUtils.hasText(orgUid)) {
+                    boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+                    log.debug("添加orgUid过滤条件: {}", orgUid);
+                }
+
+                if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+                    BoolQuery.Builder languageQuery = new BoolQuery.Builder();
+                    preferredLanguages.stream()
+                            .filter(StringUtils::hasText)
+                            .map(String::trim)
+                            .map(String::toUpperCase)
+                            .forEach(language -> languageQuery.should(
+                                    QueryBuilders.term().field("language").value(language).build()._toQuery()));
+                    languageQuery.minimumShouldMatch("1");
+                    boolQueryBuilder.filter(languageQuery.build()._toQuery());
+                }
+            } catch (Exception e) {
+                log.warn("添加过滤条件时出错: {}", e.getMessage());
+            }
+
+            var searchQueryBuilder = NativeQuery.builder()
+                    .withQuery(boolQueryBuilder.build()._toQuery());
+
+            if (maxResults != null && maxResults > 0) {
+                searchQueryBuilder.withMaxResults(maxResults);
+            }
+
+            NativeQuery searchQuery = searchQueryBuilder.build();
+            log.debug("构建查询成功: {}", searchQuery);
+
+            SearchHits<FaqElastic> searchHits;
+            try {
+                searchHits = elasticsearchOperations.search(searchQuery, FaqElastic.class);
+                log.debug("搜索完成，命中数: {}", searchHits.getTotalHits());
+            } catch (Exception e) {
+                log.error("执行Elasticsearch搜索失败: {}", e.getMessage(), e);
+                if (e.getCause() != null) {
+                    log.error("根本原因: {}", e.getCause().getMessage());
+                }
+                return new ArrayList<>();
+            }
+
+            List<FaqElasticSearchResult> resultList = new ArrayList<>();
+            for (SearchHit<FaqElastic> hit : searchHits) {
+                try {
+                    FaqElastic faqElastic = hit.getContent();
+                    if (faqElastic == null) {
+                        log.warn("搜索结果包含空内容");
+                        continue;
+                    }
+
+                    float score = hit.getScore();
+
+                    FaqElasticSearchResult result = FaqElasticSearchResult.builder()
+                            .faqElastic(faqElastic)
+                            .score(score)
+                            .build();
+
+                    if (isSuggest) {
+                        addHighlight(result, query, faqElastic.getQuestion());
+                    }
+
+                    resultList.add(result);
+                } catch (Exception e) {
+                    log.warn("处理搜索结果时出错: {}", e.getMessage());
+                }
+            }
+
+            return resultList;
+        } catch (Exception e) {
+            log.error("FAQ搜索失败: query={}, 错误类型={}, 错误消息={}",
+                    query, e.getClass().getName(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
     }
 
 }

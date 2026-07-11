@@ -75,5 +75,9 @@
     <include file="db/changelog/migration/260704_alter_email_template_content_to_text.xml" />
     <include file="db/changelog/migration/260706_rename_wechat_mp_tables.xml" />
     <include file="db/changelog/migration/260707_alter_license_key_to_text.xml" />
+    <include file="db/changelog/migration/260709_add_kbase_i18n_config_fields.xml" />
+    <include file="db/changelog/migration/260709_create_kbase_translation_table.xml" />
+    <include file="db/changelog/migration/260710_alter_kbase_translation_title_summary_to_text.xml" />
+    <include file="db/changelog/migration/260711_add_article_source_fields.xml" />
 
 </databaseChangeLog>

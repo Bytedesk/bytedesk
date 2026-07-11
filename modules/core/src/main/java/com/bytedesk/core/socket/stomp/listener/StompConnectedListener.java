@@ -60,7 +60,7 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
             }
         }
         if (headerAccessor == null) {
-            log.debug("stomp connection without headerAccessor");
+            // log.debug("stomp connection without headerAccessor");
             return;
         }
         String uid = headerAccessor.getLogin();
@@ -69,13 +69,13 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
             uid = headerAccessor.getNativeHeader("login").get(0);
         }
         if (uid == null) {
-            log.info("stomp connection missing login header");
+            // log.info("stomp connection missing login header");
             return;
         }
         String sessionId = headerAccessor.getSessionId();
         String clientId = uid + "/stomp/" + sessionId;
         // 标记连接，仅记录会话；坐席在线布尔状态由上层定时任务/事件统一刷新
         connectionRestService.markConnected(uid, null, clientId, null, "STOMP", "WEB", null, null, 90);
-        log.debug("stomp connected uid {} session {}", uid, sessionId);
+        // log.debug("stomp connected uid {} session {}", uid, sessionId);
     }
 }

@@ -120,6 +120,15 @@ public abstract class AbstractArticleEntity extends BaseEntity {
 
     private String categoryUid; // 文章分类
 
+    @Column(length = 1024)
+    private String sourceUrl;
+
+    private String sourceName;
+
+    @Column(name = "is_show_source")
+    @Builder.Default
+    private Boolean showSource = false;
+
      // 替换kbUid为KbaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     private KbaseEntity kbase;

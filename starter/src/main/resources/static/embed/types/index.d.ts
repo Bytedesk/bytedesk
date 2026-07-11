@@ -97,6 +97,8 @@ declare class BytedeskWeb {
     private hideTimeout;
     private isVisible;
     private isDragging;
+    private isMinimizedBarDragging;
+    private dragDidMove;
     private windowState;
     private loopCount;
     private loopTimer;

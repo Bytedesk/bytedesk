@@ -53,7 +53,7 @@ public class ConnectionEventListener {
         // 用户clientId格式: uid/client/deviceUid
         final String userUid = clientId.split("/")[0];
         final String deviceUid = clientId.contains("/") && clientId.split("/").length > 2 ? clientId.split("/")[2] : null;
-        log.debug("user onMqttConnectedEvent uid {}, clientId {}", userUid, clientId);
+        // log.debug("user onMqttConnectedEvent uid {}, clientId {}", userUid, clientId);
         // 标记连接（使用 ConnectionEntity 支持多端在线）
         // 无法从事件中获取更多上下文，使用协议 MQTT，其它信息置空/默认
         connectionRestService.markConnected(userUid, null, clientId, deviceUid,

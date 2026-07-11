@@ -200,6 +200,42 @@ public class KbaseEntity extends BaseEntity {
     private String language = LanguageEnum.ZH_CN.name();
 
     /**
+     * Source language of the knowledge content itself.
+     */
+    @Builder.Default
+    @Column(name = "source_language")
+    private String sourceLanguage = LanguageEnum.ZH_CN.name();
+
+    /**
+     * Target languages for translated knowledge content.
+     */
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "target_languages", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> targetLanguages = new ArrayList<>();
+
+    /**
+     * Whether automatic translation is enabled for this knowledge base.
+     */
+    @Builder.Default
+    @Column(name = "is_auto_translate_enabled")
+    private Boolean autoTranslateEnabled = false;
+
+    /**
+     * Whether query translation fallback is enabled.
+     */
+    @Builder.Default
+    @Column(name = "is_translate_query_enabled")
+    private Boolean translateQueryEnabled = false;
+
+    /**
+     * Whether answers should prefer the user's language.
+     */
+    @Builder.Default
+    @Column(name = "is_answer_with_user_language")
+    private Boolean answerWithUserLanguage = false;
+
+    /**
      * Start date when the knowledge base becomes active
      */
     private ZonedDateTime startDate;

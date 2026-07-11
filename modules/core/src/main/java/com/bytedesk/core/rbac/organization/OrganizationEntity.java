@@ -31,6 +31,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationIdentityTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyStatusEnum;
 
 @Entity
 @Data

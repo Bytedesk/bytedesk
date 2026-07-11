@@ -30,6 +30,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
@@ -402,6 +403,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 throw OrganizationI18nExceptions.superUserOrganizationDisableDenied();
             }
         }
+        boolean defaultOrganization = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid());
+        if (defaultOrganization) {
+            boolean enabledChanged = request.getEnabled() != null && !Objects.equals(request.getEnabled(), organization.getEnabled());
+            if (enabledChanged && Boolean.FALSE.equals(request.getEnabled())) {
+                throw OrganizationI18nExceptions.defaultOrganizationDisableDenied();
+            }
+        }
         
         // 检查 name 唯一性（排除当前组织）
         if (!organization.getName().equals(request.getName())) {
@@ -514,7 +522,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return convertToResponse(updatedOrganization);
     }
 
-
     public List<OrganizationEntity> findAll() {
         return organizationRepository.findByDeletedFalse();
     }
@@ -540,6 +547,42 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     public Boolean existsByCode(String code) {
         return organizationRepository.existsByCodeAndDeleted(code, false);
+    }
+
+    @Transactional
+    public OrganizationResponse updateEnabledBySuper(OrganizationRequest request) {
+        Optional<OrganizationEntity> organizationOptional = findByUid(request.getUid());
+        if (!organizationOptional.isPresent()) {
+            throw OrganizationI18nExceptions.organizationNotFound(request.getUid());
+        }
+
+        OrganizationEntity organization = organizationOptional.get();
+        Boolean enabled = request.getEnabled();
+        if (enabled == null) {
+            return convertToResponse(organization);
+        }
+
+        boolean enabledChanged = !Objects.equals(enabled, organization.getEnabled());
+        if (!enabledChanged) {
+            return convertToResponse(organization);
+        }
+
+        boolean superUserOrganization = organization.getUser() != null && organization.getUser().isSuperUser();
+        if (superUserOrganization && Boolean.FALSE.equals(enabled)) {
+            throw OrganizationI18nExceptions.superUserOrganizationDisableDenied();
+        }
+
+        boolean defaultOrganization = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid());
+        if (defaultOrganization && Boolean.FALSE.equals(enabled)) {
+            throw OrganizationI18nExceptions.defaultOrganizationDisableDenied();
+        }
+
+        organization.setEnabled(enabled);
+        OrganizationEntity updatedOrganization = save(organization);
+        if (updatedOrganization == null) {
+            throw CommonI18nExceptions.updateFailed();
+        }
+        return convertToResponse(updatedOrganization);
     }
 
     @Cacheable(value = "organization", key = "#organization.uid", unless = "#result == null")
@@ -592,9 +635,13 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     @Override
     public void deleteByUid(String uid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(uid)) {
+            throw OrganizationI18nExceptions.defaultOrganizationDeleteDenied();
+        }
         Optional<OrganizationEntity> organizationOptional = findByUid(uid);
         if (organizationOptional.isPresent()) {
             OrganizationEntity organization = organizationOptional.get();
+            userService.removeAllUsersFromOrganization(uid);
             organization.setDeleted(true); // 逻辑删除
             save(organization);
         } else {
@@ -628,6 +675,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         response.setVipExpireDate(organization.getVipExpireDate());
         response.setVipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled());
         response.setEnabled(organization.getEnabled());
+        response.setDeleted(organization.isDeleted());
         response.setCustomServerEnabled(organization.getCustomServerEnabled());
         response.setCustomServerHost(organization.getCustomServerHost());
         response.setMaxMembers(organization.getMaxMembers());

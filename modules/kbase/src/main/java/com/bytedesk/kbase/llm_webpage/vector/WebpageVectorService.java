@@ -34,6 +34,10 @@ import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -57,6 +61,8 @@ public class WebpageVectorService {
     private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final WebpageRestService webpageRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
@@ -137,17 +143,20 @@ public class WebpageVectorService {
             String tags = String.join(",", currentWebpage.getTagList());
 
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                    "uid", currentWebpage.getUid(),
-                    "title", title,
-                    "url", currentWebpage.getUrl() != null ? currentWebpage.getUrl() : "",
-                    KbaseConst.KBASE_KB_UID, currentWebpage.getKbase() != null ? currentWebpage.getKbase().getUid() : "",
-                    "categoryUid", currentWebpage.getCategoryUid() != null ? currentWebpage.getCategoryUid() : "",
-                    "orgUid", currentWebpage.getOrgUid(),
-                    "enabled", Boolean.toString(currentWebpage.getEnabled()),
-                    "tags", tags,
-                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                    "sourceType", "WEBPAGE");
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("uid", currentWebpage.getUid());
+                metadata.put("sourceUid", currentWebpage.getUid());
+                metadata.put("title", title);
+                metadata.put("url", currentWebpage.getUrl() != null ? currentWebpage.getUrl() : "");
+                metadata.put(KbaseConst.KBASE_KB_UID, currentWebpage.getKbase() != null ? currentWebpage.getKbase().getUid() : "");
+                metadata.put("categoryUid", currentWebpage.getCategoryUid() != null ? currentWebpage.getCategoryUid() : "");
+                metadata.put("orgUid", currentWebpage.getOrgUid());
+                metadata.put("enabled", Boolean.toString(currentWebpage.getEnabled()));
+                metadata.put("tags", tags);
+                metadata.put("language", currentWebpage.getKbase() != null && StringUtils.hasText(currentWebpage.getKbase().getSourceLanguage()) ? currentWebpage.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("sourceLanguage", currentWebpage.getKbase() != null && StringUtils.hasText(currentWebpage.getKbase().getSourceLanguage()) ? currentWebpage.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("translated", Boolean.FALSE.toString());
+                metadata.put("sourceType", "WEBPAGE");
 
             // 创建文档
             Document document = new Document(id, combinedContent, metadata);
@@ -156,6 +165,7 @@ public class WebpageVectorService {
             log.info("向向量存储添加文档: {}", id);
             resolveStoreByWebpage(currentWebpage).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
+            reindexTranslatedWebpageVectors(currentWebpage);
 
             // 3. 更新网页实体中的文档ID列表
             List<String> docIdList = currentWebpage.getDocIdList();
@@ -527,6 +537,11 @@ public class WebpageVectorService {
      */
     public List<WebpageVectorSearchResult> searchWebpageVector(String query, String kbUid, String categoryUid, String orgUid,
             int limit) {
+        return searchWebpageVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<WebpageVectorSearchResult> searchWebpageVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("网页向量搜索: query={}, kbUid={}, categoryUid={}, orgUid={}, limit={}", query, kbUid, categoryUid, orgUid, limit);
 
         if (query == null || query.trim().isEmpty()) {
@@ -559,6 +574,11 @@ public class WebpageVectorService {
         if (orgUid != null && !orgUid.isEmpty()) {
             FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
+        }
+
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
         }
 
         // 构建最终的过滤表达式
@@ -649,9 +669,13 @@ public class WebpageVectorService {
             // 向量库 Document 的 text 是 title + "\n" + content（索引时写入），用于兜底补齐 answer。
             .content(doc.getText())
             .kbUid(kbUid)
+            .sourceUid((String) metadata.getOrDefault("sourceUid", metadata.getOrDefault("uid", "")))
             .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
             .orgUid((String) metadata.getOrDefault("orgUid", ""))
             .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
             .build();
     }
 
@@ -673,5 +697,96 @@ public class WebpageVectorService {
             return vectorStoreResolver.resolveByKbUid(kbUid);
         }
         return vectorStoreResolver.resolveDefault();
+    }
+
+    private void reindexTranslatedWebpageVectors(WebpageEntity webpage) {
+        deleteTranslatedWebpageVectors(webpage);
+
+        String kbUid = webpage.getKbase() != null ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        webpage.getUid(),
+                        KbaseTranslationSourceTypeEnum.WEBPAGE.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            WebpageVector translatedVector = WebpageVector.fromTranslation(webpage, translation);
+            if (!StringUtils.hasText(translatedVector.getTitle()) && !StringUtils.hasText(translatedVector.getContent())) {
+                continue;
+            }
+
+            String docId = "webpage_translation_" + translation.getUid();
+            String combinedContent = (translatedVector.getTitle() != null ? translatedVector.getTitle() : "")
+                    + "\n"
+                    + (translatedVector.getContent() != null ? translatedVector.getContent() : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", webpage.getUid());
+            metadata.put("title", translatedVector.getTitle() != null ? translatedVector.getTitle() : "");
+            metadata.put("url", translatedVector.getUrl() != null ? translatedVector.getUrl() : "");
+            metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+            metadata.put("categoryUid", webpage.getCategoryUid() != null ? webpage.getCategoryUid() : "");
+            metadata.put("orgUid", webpage.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "WEBPAGE");
+
+            documents.add(new Document(docId, combinedContent, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            resolveStoreByWebpage(webpage).add(documents);
+        }
+    }
+
+    private void deleteTranslatedWebpageVectors(WebpageEntity webpage) {
+        if (webpage == null || webpage.getKbase() == null || !StringUtils.hasText(webpage.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+                expressionBuilder.eq("sourceType", "WEBPAGE"),
+                expressionBuilder.eq("sourceUid", webpage.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = resolveStoreByWebpage(webpage).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            resolveStoreByWebpage(webpage).delete(docIds);
+        }
     }
 }

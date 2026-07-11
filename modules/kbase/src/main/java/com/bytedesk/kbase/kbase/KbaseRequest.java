@@ -128,6 +128,23 @@ public class KbaseRequest extends BaseRequest {
     // private LanguageEnum language = LanguageEnum.ZH_CN;
     private String language = LanguageEnum.ZH_CN.name();
 
+    @Builder.Default
+    private String sourceLanguage = LanguageEnum.ZH_CN.name();
+
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "target_languages", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> targetLanguages = new ArrayList<>();
+
+    @Builder.Default
+    private Boolean autoTranslateEnabled = false;
+
+    @Builder.Default
+    private Boolean translateQueryEnabled = false;
+
+    @Builder.Default
+    private Boolean answerWithUserLanguage = false;
+
     // @Builder.Default
     // private String level = LevelEnum.ORGANIZATION.name();
 

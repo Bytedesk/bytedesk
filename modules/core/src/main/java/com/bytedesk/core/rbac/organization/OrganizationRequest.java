@@ -16,6 +16,9 @@ package com.bytedesk.core.rbac.organization;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationIdentityTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

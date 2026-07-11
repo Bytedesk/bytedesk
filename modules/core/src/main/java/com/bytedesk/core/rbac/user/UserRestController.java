@@ -122,6 +122,16 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_UPDATE, description = "user enabled update by super")
+    @PostMapping("/update/enabled/by/super")
+    public ResponseEntity<?> updateEnabledBySuper(@RequestBody UserRequest request) {
+
+        UserResponse userResponse = userRestService.updateEnabledBySuper(request);
+        
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
     @GetMapping("/export")
     public Object export(UserRequest request, HttpServletResponse response) {

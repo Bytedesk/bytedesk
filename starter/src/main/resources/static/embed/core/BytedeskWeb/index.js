@@ -20,6 +20,8 @@ var y = class {
 	hideTimeout = null;
 	isVisible = !1;
 	isDragging = !1;
+	isMinimizedBarDragging = !1;
+	dragDidMove = !1;
 	windowState = "normal";
 	loopCount = 0;
 	loopTimer = null;
@@ -139,8 +141,8 @@ var y = class {
 	}
 	showMinimizedBar() {
 		this.removeMinimizedBar();
-		let e = document.createElement("button"), t = this.getMinimizedBarLabel(), n = window.innerWidth <= 768, r = this.config.theme?.textColor || "#ffffff", i = this.config.theme?.backgroundColor || "#0066FF";
-		e.type = "button", e.setAttribute("aria-label", t), e.style.cssText = n ? `
+		let e = document.createElement("button"), t = this.getMinimizedBarLabel(), n = window.innerWidth <= 768, r = this.config.theme?.textColor || "#ffffff", i = this.config.theme?.backgroundColor || "#0066FF", a = this.config.draggable !== !1;
+		if (e.type = "button", e.setAttribute("aria-label", t), e.style.cssText = n ? `
         position: fixed;
         left: 0;
         right: 0;
@@ -180,12 +182,41 @@ var y = class {
         font-size: 14px;
         font-weight: 600;
         letter-spacing: 0.02em;
-        cursor: pointer;
+        cursor: ${a ? "grab" : "pointer"};
         z-index: 10001;
         box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.18);
-      `, e.appendChild(this.createMinimizedBarIcon()), e.appendChild(this.createMinimizedBarLabelElement(t)), e.addEventListener("click", () => {
+      `, e.appendChild(this.createMinimizedBarIcon()), e.appendChild(this.createMinimizedBarLabelElement(t)), a && !n) {
+			let t = 0, n = 0, r = 0, i = 0, a = !1;
+			e.addEventListener("mousedown", (o) => {
+				if (o.button !== 0) return;
+				this.isMinimizedBarDragging = !0, t = o.clientX, n = o.clientY, a = !1;
+				let s = e.getBoundingClientRect();
+				r = s.left, i = window.innerHeight - s.bottom, e.style.transition = "none", e.style.cursor = "grabbing";
+			}), document.addEventListener("mousemove", (o) => {
+				if (!this.isMinimizedBarDragging) return;
+				o.preventDefault();
+				let s = o.clientX - t, c = o.clientY - n;
+				(Math.abs(s) > 5 || Math.abs(c) > 5) && (a = !0);
+				let l = e.offsetWidth, u = r + s, d = Math.max(0, i - c);
+				if (u + l / 2 <= window.innerWidth / 2) e.style.left = `${Math.max(0, u)}px`, e.style.right = "auto";
+				else {
+					let t = window.innerWidth - u - l;
+					e.style.right = `${Math.max(0, t)}px`, e.style.left = "auto";
+				}
+				e.style.bottom = `${d}px`;
+			}), document.addEventListener("mouseup", () => {
+				this.isMinimizedBarDragging && (this.isMinimizedBarDragging = !1, e.style.transition = "all 0.3s ease", e.style.cursor = "grab");
+			}), e.addEventListener("click", (e) => {
+				if (a) {
+					e.stopPropagation(), e.preventDefault();
+					return;
+				}
+				this.restoreMinimizedWindow();
+			});
+		} else e.addEventListener("click", () => {
 			this.restoreMinimizedWindow();
-		}), document.body.appendChild(e), this.minimizedBar = e;
+		});
+		document.body.appendChild(e), this.minimizedBar = e;
 	}
 	restoreMinimizedWindow() {
 		if (!this.window) {
@@ -369,7 +400,7 @@ var y = class {
 				width: 380,
 				height: 640
 			},
-			draggable: !1,
+			draggable: !0,
 			locale: "zh-cn"
 		};
 	}
@@ -529,7 +560,11 @@ var y = class {
 		}), r.addEventListener("mouseleave", () => {
 			r.style.transform = i ? "translateY(0)" : "scale(1)", i && (r.style.backgroundColor = "transparent"), e.previewImageUrl && this.scheduleHideButtonPreview();
 		}), r.addEventListener("click", () => {
-			this.isDragging || (g.debug("bubble click", e.action || "chat"), t instanceof HTMLElement && this.hideBubbleMessageElement(), this.triggerButtonAction(e));
+			if (this.dragDidMove) {
+				this.dragDidMove = !1;
+				return;
+			}
+			g.debug("bubble click", e.action || "chat"), t instanceof HTMLElement && this.hideBubbleMessageElement(), this.triggerButtonAction(e);
 		}), r.addEventListener("contextmenu", (e) => {
 			this.showContextMenu(e);
 		}), r.messageElement = t, r;
@@ -1043,12 +1078,14 @@ var y = class {
 			let t = 0, n = 0, r = 0, i = 0;
 			this.buttonElements.forEach((a) => {
 				a.addEventListener("mousedown", (a) => {
-					a.button === 0 && (this.isDragging = !0, t = a.clientX, n = a.clientY, r = e.offsetLeft, i = e.offsetTop, e.style.transition = "none");
+					a.button === 0 && (this.isDragging = !0, this.dragDidMove = !1, t = a.clientX, n = a.clientY, r = e.offsetLeft, i = e.offsetTop, e.style.transition = "none");
 				});
 			}), document.addEventListener("mousemove", (a) => {
 				if (!this.isDragging) return;
 				a.preventDefault();
-				let o = a.clientX - t, s = a.clientY - n, c = r + o, l = i + s, u = window.innerHeight - e.offsetHeight;
+				let o = a.clientX - t, s = a.clientY - n;
+				(Math.abs(o) > 5 || Math.abs(s) > 5) && (this.dragDidMove = !0);
+				let c = r + o, l = i + s, u = window.innerHeight - e.offsetHeight;
 				c <= window.innerWidth / 2 ? (e.style.left = `${Math.max(0, c)}px`, e.style.right = "auto", e.style.alignItems = "flex-start", this.config.placement = "bottom-left") : (e.style.right = `${Math.max(0, window.innerWidth - c - e.offsetWidth)}px`, e.style.left = "auto", e.style.alignItems = "flex-end", this.config.placement = "bottom-right"), e.style.bottom = `${Math.min(Math.max(0, window.innerHeight - l - e.offsetHeight), u)}px`;
 			}), document.addEventListener("mouseup", () => {
 				this.isDragging && (this.isDragging = !1, e.style.transition = "all 0.3s ease", this.config.marginSide = parseInt(this.config.placement === "bottom-left" ? e.style.left : e.style.right) || 20, this.config.marginBottom = parseInt(e.style.bottom || "20"));

@@ -200,6 +200,10 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
         quickReplyRepository.saveAll(entities);
     }
 
+    public List<QuickReplyEntity> findAllNotDeleted() {
+        return quickReplyRepository.findByDeleted(false);
+    }
+
     private String normalizeType(String rawType) {
         if (!StringUtils.hasText(rawType)) {
             return rawType;

@@ -99,5 +99,11 @@ public class CityEntity extends BaseEntityNoOrg {
      * Pinyin
      */
     private String pinyin;
+
+    /**
+     * Telephone area code (e.g. 010 for Beijing, 021 for Shanghai)
+     */
+    @Column(name = "tel_code")
+    private String telCode;
     
 }

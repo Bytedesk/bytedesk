@@ -29,5 +29,11 @@ public class McpKnowledgeItem {
 
     private String searchChannel;
 
+    private String language;
+
+    private String sourceLanguage;
+
+    private Boolean translated;
+
     private Double score;
 }

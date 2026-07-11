@@ -114,6 +114,18 @@ public class BlogEntity extends BaseEntity {
     @Builder.Default
     private String editor = BytedeskConsts.EMPTY_STRING;
 
+    // 来源URL（网页抓取）
+    @Column(length = 1024)
+    private String sourceUrl;
+
+    // 来源名称
+    private String sourceName;
+
+    // 是否显示来源
+    @Column(name = "is_show_source")
+    @Builder.Default
+    private Boolean showSource = false;
+
     @PrePersist
     public void prePersist() {
         if (type == null) {

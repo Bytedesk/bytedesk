@@ -29,6 +29,8 @@ import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
 import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,8 @@ public class BlogEventListener {
 
     private final BlogStaticService blogStaticService;
 
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
+
     @EventListener
     public void onBlogCreateEvent(BlogCreateEvent event) {
         BlogEntity blog = event.getBlog();
@@ -53,6 +57,7 @@ public class BlogEventListener {
             return;
         }
         log.info("blog - created: {}", blog.getUid());
+        syncBlogTranslations(blog);
         blogStaticService.updateBlogPost(blog.getUid());
     }
 
@@ -67,6 +72,7 @@ public class BlogEventListener {
             return;
         }
         log.info("blog - updated: {}", blog.getUid());
+        syncBlogTranslations(blog);
         blogStaticService.updateBlogPost(blog.getUid());
     }
 
@@ -124,6 +130,21 @@ public class BlogEventListener {
         if (kbaseOptional.isPresent() && KbaseTypeEnum.BLOG.name().equals(kbaseOptional.get().getType())) {
             blogStaticService.updateBlogKbase(category.getKbUid());
         }
+    }
+
+    private void syncBlogTranslations(BlogEntity blog) {
+        if (blog == null || blog.getKbUid() == null || blog.getKbUid().isBlank()) {
+            return;
+        }
+        kbaseRestService.findByUid(blog.getKbUid()).ifPresent(kbase ->
+            kbaseTranslationSyncService.syncSource(
+                kbase,
+                blog.getUid(),
+                KbaseTranslationSourceTypeEnum.BLOG.name(),
+                blog.getOrgUid(),
+                blog.getUserUid(),
+                Boolean.TRUE)
+        );
     }
 
  

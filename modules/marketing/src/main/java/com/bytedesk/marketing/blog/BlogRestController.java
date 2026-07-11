@@ -30,6 +30,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -130,6 +133,18 @@ public class BlogRestController extends BaseRestController<BlogRequest, BlogRest
             "Blog",
             "blog"
         );
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_BLOG, action = I18Consts.I18N_ACTION_UPDATE, description = "crawl blog content")
+    @Operation(summary = "Crawl Blog Content", description = "Crawl webpage content by source URL for blog editing")
+    @ApiResponse(responseCode = "200", description = "Crawl successful",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = BlogResponse.class)))
+    @PreAuthorize(BlogPermissions.HAS_BLOG_UPDATE)
+    @PostMapping("/crawl")
+    public ResponseEntity<?> crawlContent(@RequestBody BlogRequest request) {
+        BlogResponse blog = blogRestService.crawlContent(request);
+        return ResponseEntity.ok(JsonResult.success(blog));
     }
     
 }

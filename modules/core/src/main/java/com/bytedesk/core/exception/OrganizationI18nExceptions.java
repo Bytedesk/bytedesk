@@ -32,6 +32,18 @@ public final class OrganizationI18nExceptions {
         return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_SUPER_USER_DISABLE_DENIED);
     }
 
+    public static ForbiddenException defaultOrganizationDisableDenied() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_DEFAULT_DISABLE_DENIED);
+    }
+
+    public static ForbiddenException defaultOrganizationDeleteDenied() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_DEFAULT_DELETE_DENIED);
+    }
+
+    public static ForbiddenException superUserDisableDenied() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_USER_SUPER_DISABLE_DENIED);
+    }
+
     public static ExistsException organizationNameExists(String name) {
         return CommonI18nExceptions.exists(I18Consts.I18N_ORGANIZATION_NAME_EXISTS, name);
     }

@@ -81,7 +81,6 @@ services:
       retries: 3
       start_period: 40s
 
-
 volumes:
   freeswitch_data:
     name: bytedesk_freeswitch_data

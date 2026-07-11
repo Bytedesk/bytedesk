@@ -18,6 +18,8 @@ import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WebpageCrawlerService {
 
+    public record CrawlResult(String title, String content) {
+    }
+
     private final WebpageRepository webpageRepository;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     /**
      * 抓取网页内容并更新实体
@@ -81,6 +88,7 @@ public class WebpageCrawlerService {
             
             // 保存更新后的实体
             WebpageEntity savedWebpage = webpageRepository.save(webpage);
+            kbaseTranslationSyncService.syncWebpage(savedWebpage);
             
             log.info("成功抓取并更新网页内容: {} (内容长度: {})", 
                 webpage.getUrl(), content.length());
@@ -100,6 +108,11 @@ public class WebpageCrawlerService {
      * @return 抓取到的内容，失败返回null
      */
     public String crawlContent(String url) {
+        CrawlResult crawlResult = crawlPage(url);
+        return crawlResult != null ? crawlResult.content() : null;
+    }
+
+    public CrawlResult crawlPage(String url) {
         if (!StringUtils.hasText(url)) {
             log.warn("URL为空，无法抓取内容");
             return null;
@@ -114,6 +127,7 @@ public class WebpageCrawlerService {
                     .userAgent("Mozilla/5.0 (compatible; BytedeskBot/1.0; +https://www.bytedesk.com/bot)")
                     .get();
 
+                String title = jsoupDoc.title();
             // 移除script、style等标签，只保留有用的文本
             jsoupDoc.select("script, style, meta, link").remove();
             String content = jsoupDoc.body().text();
@@ -124,7 +138,7 @@ public class WebpageCrawlerService {
             }
             
             log.debug("成功抓取网页内容: {} (内容长度: {})", url, content.length());
-            return content;
+            return new CrawlResult(title, content);
             
         } catch (Exception e) {
             log.error("抓取网页内容失败: {}, 错误: {}", url, e.getMessage(), e);

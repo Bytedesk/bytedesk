@@ -47,6 +47,10 @@ public class CityExcel {
     @ColumnWidth(20)
     private String pinyin;
 
+    @ExcelProperty(index = 5, value = "电话区号")
+    @ColumnWidth(15)
+    private String telCode;
+
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)
     @ColumnWidth(25)

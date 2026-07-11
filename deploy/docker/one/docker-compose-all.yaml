@@ -77,12 +77,12 @@ services:
       memlock:
         soft: -1
         hard: -1
-    entrypoint: ["bash", "-c", "if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; if [ -f /tmp/elasticsearch-analysis-ik-8.18.0.zip ]; then /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; else curl -fsSL -o /tmp/elasticsearch-analysis-ik-8.18.0.zip https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file:///tmp/elasticsearch-analysis-ik-8.18.0.zip; fi; fi; exec /usr/local/bin/docker-entrypoint.sh"]
+    entrypoint: ["bash", "-c", "IK_PLUGIN_DIR=/tmp/ik-plugin-cache; IK_PLUGIN_FILE=$$IK_PLUGIN_DIR/elasticsearch-analysis-ik-8.18.0.zip; IK_PLUGIN_TMP=$$IK_PLUGIN_FILE.tmp; mkdir -p $$IK_PLUGIN_DIR; if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; curl -fsSL -o $$IK_PLUGIN_TMP https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && mv $$IK_PLUGIN_TMP $$IK_PLUGIN_FILE; /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file://$$IK_PLUGIN_FILE; fi; exec /usr/local/bin/docker-entrypoint.sh"]
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
-      # 默认安装 IK 分词插件（本地文件）
-      # 如无本地文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
-      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/elasticsearch-analysis-ik-8.18.0.zip:ro
+      # 默认安装 IK 分词插件（缓存目录中的 zip 文件）
+      # 如缓存目录中无 zip 文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
+      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/ik-plugin-cache
     ports:
       - "19200:9200"
       - "19300:9300"
@@ -455,6 +455,15 @@ services:
       MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
+      # ===============================
+      # Spring Boot Admin Client (bytedesk-monitor)
+      # Uncomment to register this instance with a monitor server. 取消注释以注册到监控服务端。
+      # ===============================
+      # SPRING_BOOT_ADMIN_CLIENT_URL: http://bytedesk-monitor:9103
+      # SPRING_BOOT_ADMIN_CLIENT_USERNAME: admin
+      # SPRING_BOOT_ADMIN_CLIENT_PASSWORD: admin
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_NAME: bytedesk-starter
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL: http://127.0.0.1:9003
       # ai config
       # 默认对话配置
       # https://www.weiyuai.cn/docs/zh-CN/docs/provider/model_text
