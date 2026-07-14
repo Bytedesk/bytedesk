@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -25,12 +26,10 @@ import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class KbaseTranslationIndexBackfillService {
 
     private static final List<String> DEFAULT_SOURCE_TYPES = List.of(
@@ -58,6 +57,29 @@ public class KbaseTranslationIndexBackfillService {
     private final WebpageElasticService webpageElasticService;
 
     private final WebpageVectorService webpageVectorService;
+
+    public KbaseTranslationIndexBackfillService(
+            KbaseRestService kbaseRestService,
+            KbaseTranslationRepository kbaseTranslationRepository,
+            FaqElasticService faqElasticService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider,
+            TextElasticService textElasticService,
+            ObjectProvider<TextVectorService> textVectorServiceProvider,
+            ChunkElasticService chunkElasticService,
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
+            WebpageElasticService webpageElasticService,
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider) {
+        this.kbaseRestService = kbaseRestService;
+        this.kbaseTranslationRepository = kbaseTranslationRepository;
+        this.faqElasticService = faqElasticService;
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
+        this.textElasticService = textElasticService;
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
+        this.chunkElasticService = chunkElasticService;
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
+        this.webpageElasticService = webpageElasticService;
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
+    }
 
     public Map<String, Object> backfill(KbaseTranslationBackfillRequest request) {
         boolean includeFulltext = !Boolean.FALSE.equals(request.getIncludeFulltext());
@@ -182,7 +204,7 @@ public class KbaseTranslationIndexBackfillService {
         if (includeFulltext) {
             faqElasticService.updateAllIndex(request);
         }
-        if (includeVector) {
+        if (includeVector && faqVectorService != null) {
             faqVectorService.updateAllVectorIndex(request);
         }
     }
@@ -192,7 +214,7 @@ public class KbaseTranslationIndexBackfillService {
         if (includeFulltext) {
             textElasticService.updateAllIndex(request);
         }
-        if (includeVector) {
+        if (includeVector && textVectorService != null) {
             textVectorService.updateAllVectorIndex(request);
         }
     }
@@ -202,7 +224,7 @@ public class KbaseTranslationIndexBackfillService {
         if (includeFulltext) {
             chunkElasticService.updateAllIndex(request);
         }
-        if (includeVector) {
+        if (includeVector && chunkVectorService != null) {
             chunkVectorService.updateAllVectorIndex(request);
         }
     }
@@ -212,7 +234,7 @@ public class KbaseTranslationIndexBackfillService {
         if (includeFulltext) {
             webpageElasticService.updateAllIndex(request);
         }
-        if (includeVector) {
+        if (includeVector && webpageVectorService != null) {
             webpageVectorService.updateAllVectorIndex(request);
         }
     }

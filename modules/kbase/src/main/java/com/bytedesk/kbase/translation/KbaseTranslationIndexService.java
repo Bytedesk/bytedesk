@@ -17,6 +17,7 @@ package com.bytedesk.kbase.translation;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
@@ -36,7 +37,6 @@ import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -47,7 +47,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class KbaseTranslationIndexService {
 
     private final FaqRestService faqRestService;
@@ -65,6 +64,33 @@ public class KbaseTranslationIndexService {
     private final WebpageRestService webpageRestService;
     private final WebpageElasticService webpageElasticService;
     private final WebpageVectorService webpageVectorService;
+
+    public KbaseTranslationIndexService(
+            FaqRestService faqRestService,
+            FaqElasticService faqElasticService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider,
+            TextRestService textRestService,
+            TextElasticService textElasticService,
+            ObjectProvider<TextVectorService> textVectorServiceProvider,
+            ChunkRestService chunkRestService,
+            ChunkElasticService chunkElasticService,
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
+            WebpageRestService webpageRestService,
+            WebpageElasticService webpageElasticService,
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider) {
+        this.faqRestService = faqRestService;
+        this.faqElasticService = faqElasticService;
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
+        this.textRestService = textRestService;
+        this.textElasticService = textElasticService;
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
+        this.chunkRestService = chunkRestService;
+        this.chunkElasticService = chunkElasticService;
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
+        this.webpageRestService = webpageRestService;
+        this.webpageElasticService = webpageElasticService;
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
+    }
 
     /**
      * 翻译成功后，自动更新源实体对应的全文索引和向量索引
@@ -106,9 +132,11 @@ public class KbaseTranslationIndexService {
         FaqEntity faq = faqRestService.findByUid(sourceUid)
                 .orElseThrow(() -> new RuntimeException("FAQ not found: " + sourceUid));
         faqElasticService.indexFaq(faq);
-        faqVectorService.indexFaqVector(faq);
+        if (faqVectorService != null) {
+            faqVectorService.indexFaqVector(faq);
+        }
         result.put("fulltextIndexed", true);
-        result.put("vectorIndexed", true);
+        result.put("vectorIndexed", faqVectorService != null);
         log.info("translation reindex completed: faqUid={}", sourceUid);
     }
 
@@ -116,9 +144,11 @@ public class KbaseTranslationIndexService {
         TextEntity text = textRestService.findByUid(sourceUid)
                 .orElseThrow(() -> new RuntimeException("Text not found: " + sourceUid));
         textElasticService.indexText(text);
-        textVectorService.indexTextVector(text);
+        if (textVectorService != null) {
+            textVectorService.indexTextVector(text);
+        }
         result.put("fulltextIndexed", true);
-        result.put("vectorIndexed", true);
+        result.put("vectorIndexed", textVectorService != null);
         log.info("translation reindex completed: textUid={}", sourceUid);
     }
 
@@ -126,9 +156,11 @@ public class KbaseTranslationIndexService {
         ChunkEntity chunk = chunkRestService.findByUid(sourceUid)
                 .orElseThrow(() -> new RuntimeException("Chunk not found: " + sourceUid));
         chunkElasticService.indexChunk(chunk);
-        chunkVectorService.indexChunkVector(chunk);
+        if (chunkVectorService != null) {
+            chunkVectorService.indexChunkVector(chunk);
+        }
         result.put("fulltextIndexed", true);
-        result.put("vectorIndexed", true);
+        result.put("vectorIndexed", chunkVectorService != null);
         log.info("translation reindex completed: chunkUid={}", sourceUid);
     }
 
@@ -136,9 +168,11 @@ public class KbaseTranslationIndexService {
         WebpageEntity webpage = webpageRestService.findByUid(sourceUid)
                 .orElseThrow(() -> new RuntimeException("Webpage not found: " + sourceUid));
         webpageElasticService.indexWebpage(webpage);
-        webpageVectorService.indexWebpageVector(webpage);
+        if (webpageVectorService != null) {
+            webpageVectorService.indexWebpageVector(webpage);
+        }
         result.put("fulltextIndexed", true);
-        result.put("vectorIndexed", true);
+        result.put("vectorIndexed", webpageVectorService != null);
         log.info("translation reindex completed: webpageUid={}", sourceUid);
     }
 }
