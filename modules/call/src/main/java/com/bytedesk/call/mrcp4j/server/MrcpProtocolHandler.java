@@ -25,15 +25,19 @@ package com.bytedesk.call.mrcp4j.server;
 import com.bytedesk.call.mrcp4j.common.MrcpRequestState;
 import com.bytedesk.call.mrcp4j.message.MrcpEvent;
 import com.bytedesk.call.mrcp4j.message.MrcpResponse;
+import com.bytedesk.call.mrcp4j.message.header.IllegalValueException;
 import com.bytedesk.call.mrcp4j.message.request.MrcpRequest;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  *
  * @author Niels Godfredsen {@literal <}<a href="mailto:ngodfredsen@users.sourceforge.net">ngodfredsen@users.sourceforge.net</a>{@literal >}
  */
+@Slf4j
 public class MrcpProtocolHandler extends IoHandlerAdapter {
 
     private MrcpRequestProcessor _requestProcessor;
@@ -42,11 +46,22 @@ public class MrcpProtocolHandler extends IoHandlerAdapter {
         _requestProcessor = requestProcessor;
     }
 
+    @Override
+    public void sessionOpened(IoSession session) {
+        log.info("MRCP transport session opened remote={} local={}", session.getRemoteAddress(), session.getLocalAddress());
+    }
+
+    @Override
+    public void sessionClosed(IoSession session) {
+        log.info("MRCP transport session closed remote={} local={}", session.getRemoteAddress(), session.getLocalAddress());
+    }
+
     /* (non-Javadoc)
      * @see org.apache.mina.protocol.ProtocolHandler#exceptionCaught(org.apache.mina.protocol.ProtocolSession, java.lang.Throwable)
      */
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
+        log.warn("MRCP transport exception remote={} local={}", session.getRemoteAddress(), session.getLocalAddress(), cause);
         // close connection when unexpected exception is caught.
         session.closeNow();
     }
@@ -57,7 +72,23 @@ public class MrcpProtocolHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) {
         MrcpRequest request = (MrcpRequest) message;
+        log.info(
+            "MRCP transport received request remote={} local={} channel={} requestId={} method={}",
+            session.getRemoteAddress(),
+            session.getLocalAddress(),
+            safeChannelIdentifier(request),
+            request.getRequestID(),
+            request.getMethodName()
+        );
         new EventThread(_requestProcessor, session, request).start(); // TODO: move threading down chain
+    }
+
+    private Object safeChannelIdentifier(MrcpRequest request) {
+        try {
+            return request.getChannelIdentifier();
+        } catch (IllegalValueException exception) {
+            return "<invalid-channel-identifier>";
+        }
     }
 
     private static class EventThread extends Thread {

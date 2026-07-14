@@ -30,6 +30,7 @@ public class HttapiController {
 
     private final LlmClient llm;
     private final VoiceAgentHttpClient voiceAgentHttpClient;
+    private final HttapiMrcpProfileResolver mrcpProfileResolver;
 
     // Accept GET and POST and be tolerant about Content-Type so FreeSWITCH requests
     // that don't set exact Content-Type still hit this handler.
@@ -118,10 +119,11 @@ public class HttapiController {
         // 注意：不再做“MRCP 不可达”嘟声兜底，以免与拨号计划/代理时序打架。
         boolean doSpeakHere = !("1".equals(setup) || "true".equals(setup));
         if (doSpeakHere) {
+            String profile = resolveMrcpProfile(vars);
             x.execute("answer", null);
             x.execute("set", "tts_engine=unimrcp");
-            x.execute("set", "tts_profile=baidu");
-            x.execute("set", "unimrcp:profile=baidu");
+            x.execute("set", "tts_profile=" + profile);
+            x.execute("set", "unimrcp:profile=" + profile);
             x.execute("set", "synth-content-type=application/ssml+xml");
             x.execute("set", "unimrcp:header:Speech-Language=zh-CN");
             x.speakSsml("unimrcp", greetSsml);
@@ -181,8 +183,9 @@ public class HttapiController {
                 mode, exitRequested, truncate(userText, 200));
 
         if (userText == null || userText.isBlank()) {
+            String profile = resolveMrcpProfile(vars);
             x.execute("set", "synth-content-type=application/ssml+xml");
-            x.execute("set", "unimrcp:profile=baidu");
+            x.execute("set", "unimrcp:profile=" + profile);
             x.execute("set", "unimrcp:header:Speech-Language=zh-CN");
             x.speakSsml("unimrcp", "<speak version='1.0' xml:lang='zh-CN'><p>若未识别任何内容，请靠近话筒再试。</p></speak>");
             // 使用 export 确保变量在 HTTAPI 返回后在会话级可见
@@ -203,8 +206,9 @@ public class HttapiController {
             answer = userText; // echo
         }
 
+        String profile = resolveMrcpProfile(vars);
         x.execute("set", "synth-content-type=application/ssml+xml");
-        x.execute("set", "unimrcp:profile=baidu");
+        x.execute("set", "unimrcp:profile=" + profile);
         x.execute("set", "unimrcp:header:Speech-Language=zh-CN");
         String ssml = "<speak version='1.0' xml:lang='zh-CN'><p>" + HttapiXml.xmlEscape(answer) + "</p></speak>";
         x.speakSsml("unimrcp", ssml);
@@ -311,6 +315,14 @@ public class HttapiController {
 
     private static String safe(String s) {
         return s == null ? "" : s;
+    }
+
+    private String resolveMrcpProfile(Map<String, String> vars) {
+        String resolved = mrcpProfileResolver.resolveProfile(vars);
+        if (resolved == null || resolved.isBlank()) {
+            return CallConstants.DEFAULT_HTTAPI_MRCP_PROFILE;
+        }
+        return resolved.trim();
     }
 
     private static Map<String, String> flatten(MultiValueMap<String, String> form) {

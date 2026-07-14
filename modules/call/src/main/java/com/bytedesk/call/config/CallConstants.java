@@ -90,4 +90,8 @@ public class CallConstants {
 	public static final String ENV_HTTAPI_MRCP_PORT = "HTTAPI_MRCP_PORT";
 
 	public static final int DEFAULT_HTTAPI_MRCP_PORT = 8060;
+
+	public static final String ENV_HTTAPI_MRCP_PROFILE = "HTTAPI_MRCP_PROFILE";
+
+	public static final String DEFAULT_HTTAPI_MRCP_PROFILE = "baidu";
 }

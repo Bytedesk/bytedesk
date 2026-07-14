@@ -5,28 +5,34 @@
 ## 📁 文件说明
 
 ### 1. SimpleExample.java
+
 最简单的使用示例,适合初学者快速了解 MRCP4J 的基本用法。
 
 **功能:**
+
 - 初始化 MRCP 客户端连接
 - 执行简单的语音识别
 - 执行简单的语音合成
 
 **运行方式:**
+
 ```bash
 java com.bytedesk.call.mrcp4j.example.SimpleExample
 ```
 
 ### 2. BankingIvrExample.java
+
 完整的银行客服 IVR 流程实现,展示如何整合语音识别和合成实现业务流程。
 
 **功能:**
+
 - 播放欢迎语
 - 识别用户意图(查询余额/转账/人工服务)
 - 根据意图执行相应业务逻辑
 - 播放业务响应
 
 **运行方式:**
+
 ```bash
 java com.bytedesk.call.mrcp4j.example.BankingIvrExample
 ```
@@ -36,6 +42,7 @@ java com.bytedesk.call.mrcp4j.example.BankingIvrExample
 ### 前置条件
 
 1. **启动 MRCP 服务器**
+
    ```bash
    # 确保 MRCP 服务器运行在 localhost:1544
    ```
@@ -188,12 +195,14 @@ private void handleTtsEvent(MrcpEvent event) {
 ## 业务场景示例
 
 ### 场景 1: 简单查询
+
 - 用户说:"查询余额"
 - 系统识别意图
 - 查询数据库
 - 播报结果
 
 ### 场景 2: 多轮对话
+
 - 播放欢迎语
 - 识别用户意图
 - 根据意图进入不同分支
@@ -201,6 +210,7 @@ private void handleTtsEvent(MrcpEvent event) {
 - 完成业务或转人工
 
 ### 场景 3: 数字收集
+
 - 播放提示:"请输入卡号"
 - 使用 DTMF 或语音识别
 - 收集 16 位数字
@@ -240,27 +250,35 @@ private void handleTtsEvent(MrcpEvent event) {
 ## 🐛 常见问题
 
 ### Q1: 连接失败怎么办?
-**A:** 
+
+**A:**
+
 1. 检查 MRCP 服务器是否启动
 2. 确认服务器地址和端口正确
 3. 检查防火墙设置
 
 ### Q2: 识别没有结果?
+
 **A:**
+
 1. 确保有音频输入
 2. 检查语法定义是否正确
 3. 调整置信度阈值
 4. 增加超时时间
 
 ### Q3: 合成没有声音?
+
 **A:**
+
 1. 检查 SSML 格式
 2. 确认语音名称支持
 3. 检查音频输出设备
 4. 查看服务器日志
 
 ### Q4: 事件没有触发?
+
 **A:**
+
 1. 确认已添加事件监听器
 2. 检查事件名称大小写
 3. 查看服务器端配置

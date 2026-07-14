@@ -57,6 +57,8 @@ public class CitySqlImportService {
     @Value("${bytedesk.city.import.drop-staging-after:true}")
     private boolean dropStagingAfter;
 
+    private final CityTelCodeInitializer cityTelCodeInitializer;
+
     @Async("applicationTaskExecutor")
     public void importInBackgroundIfNeeded() {
         doImport(true, this.force, this.delayMs);
@@ -142,6 +144,13 @@ public class CitySqlImportService {
 
                 long costMs = (System.nanoTime() - startNs) / 1_000_000L;
                 log.info("city import finished in {} ms", costMs);
+
+                // Populate tel_code from provinces.json after import
+                try {
+                    cityTelCodeInitializer.populateTelCodes();
+                } catch (Exception ex) {
+                    log.warn("city import: telCode population failed (non-fatal): {}", ex.getMessage());
+                }
             } finally {
                 try {
                     jdbcTemplate.queryForObject("SELECT RELEASE_LOCK(?)", Integer.class, lockName);

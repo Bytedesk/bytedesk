@@ -33,12 +33,7 @@ public class WorkflowInitializer implements SmartInitializingSingleton {
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        initDefaultWorkflow();
-    }
-
-    private void initDefaultWorkflow() {
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        workflowRestService.initDefaultWorkflow(orgUid);
+        workflowRestService.initDefaultWorkflow(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
     }
 
     private void initAuthority() {

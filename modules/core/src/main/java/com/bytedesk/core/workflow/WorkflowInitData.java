@@ -44,7 +44,7 @@ public final class WorkflowInitData {
         public static final String DEFAULT_IVR_WORKFLOW_NAME = "默认 IVR 自助服务流程";
 
         /** 默认 IVR 流程描述 */
-        public static final String DEFAULT_IVR_WORKFLOW_DESCRIPTION = "IVRBuilder 示例流程，包含积分/余额查询、订单取消、服务政策播报";
+        public static final String DEFAULT_IVR_WORKFLOW_DESCRIPTION = "热线 IVR 示例流程，包含自助查询、转人工、排队和留言兜底";
 
         /** 默认满意度 IVR 流程名称 */
         public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME = "默认满意度回访 IVR 流程";
@@ -329,355 +329,134 @@ public final class WorkflowInitData {
         }
 
         public static String buildDefaultIvrWorkflowSchemaJson() {
+                return buildDefaultHotlineIvrWorkflowSchemaJson();
+        }
+
+        public static String buildDefaultHotlineIvrWorkflowSchemaJson() {
                 return """
                                 {
-                                  "nodes": [
-                                    {
-                                      "id": "ivr-start-0",
-                                      "type": "start",
-                                      "meta": {
-                                        "position": {
-                                          "x": 27.838312829525478,
-                                          "y": 278.17223198594024
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "来电进入",
-                                        "description": "默认 IVR 演示流程入口"
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-keyboard-main",
-                                      "type": "keyboard",
-                                      "meta": {
-                                        "position": {
-                                          "x": 700,
-                                          "y": 150
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "业务导航",
-                                        "content": "请输入业务按键进行导航。",
-                                        "description": "主菜单按键导航",
-                                        "options": [
-                                          {
-                                            "id": "ivr-option-balance",
-                                            "key": "1",
-                                            "label": "按 1 查询积分/余额",
-                                            "outgoingEdgeId": "ivr-text-balance"
-                                          },
-                                          {
-                                            "id": "ivr-option-order-cancel",
-                                            "key": "2",
-                                            "label": "按 2 查询订单信息",
-                                            "outgoingEdgeId": "ivr-http-order-query"
-                                          },
-                                          {
-                                            "id": "ivr-option-policy",
-                                            "key": "3",
-                                            "label": "按 3 收听服务政策",
-                                            "outgoingEdgeId": "ivr-text-policy"
-                                          },
-                                          {
-                                            "id": "ivr-option-bot",
-                                            "key": "4",
-                                            "label": "按 4 体验机器人对话",
-                                            "outgoingEdgeId": "ivr-text-bot-menu"
-                                          },
-                                          {
-                                            "id": "ivr-option-human",
-                                            "key": "0",
-                                            "label": "按 0 转人工服务",
-                                            "outgoingEdgeId": "ivr-transfer-human"
-                                          }
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": { "position": { "x": 100, "y": 260 } },
+                                                        "data": {
+                                                                "title": "热线来电进入",
+                                                                "description": "热线 IVR 正式入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-text-welcome",
+                                                        "type": "text",
+                                                        "meta": { "position": { "x": 420, "y": 240 } },
+                                                        "data": {
+                                                                "title": "热线欢迎语",
+                                                                "content": "您好，欢迎致电微语客服热线。按 1 查询订单信息，按 2 收听服务政策，按 0 转人工服务。",
+                                                                "description": "热线主菜单欢迎播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": { "position": { "x": 760, "y": 220 } },
+                                                        "data": {
+                                                                "title": "热线主菜单",
+                                                                "content": "请输入业务按键。",
+                                                                "description": "热线主菜单按键导航",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "hotline-option-order",
+                                                                                "key": "1",
+                                                                                "label": "按 1 查询订单信息",
+                                                                                "outgoingEdgeId": "hotline-business-http-order"
+                                                                        },
+                                                                        {
+                                                                                "id": "hotline-option-policy",
+                                                                                "key": "2",
+                                                                                "label": "按 2 收听服务政策",
+                                                                                "outgoingEdgeId": "hotline-text-policy"
+                                                                        },
+                                                                        {
+                                                                                "id": "hotline-option-human",
+                                                                                "key": "0",
+                                                                                "label": "按 0 转人工服务",
+                                                                                "outgoingEdgeId": "hotline-human-handoff"
+                                                                        }
+                                                                ],
+                                                                "submitKey": ""
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-business-http-order",
+                                                        "type": "business_http",
+                                                        "meta": { "position": { "x": 1120, "y": 80 } },
+                                                        "data": {
+                                                                "title": "订单自助查询",
+                                                                "content": "正在为您查询订单信息，请稍候。",
+                                                                "description": "热线业务自助 HTTP 节点",
+                                                                "apiUrl": "/visitor/api/v1/ivr/demo/order?callerIdNumber=${callerIdNumber}",
+                                                                "httpMethod": "GET",
+                                                                "responseTemplate": "为您查询到演示订单 ${orderNumber}，当前状态：${orderStatus}，收件人：${receiverName}。",
+                                                                "failurePrompt": "订单查询服务暂时不可用，请稍后再试。",
+                                                                "timeoutMs": 3000,
+                                                                "requestBody": ""
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-text-policy",
+                                                        "type": "text",
+                                                        "meta": { "position": { "x": 1120, "y": 260 } },
+                                                        "data": {
+                                                                "title": "服务政策播报",
+                                                                "content": "我们的人工服务时间以后台时间策略为准。非服务时间或坐席忙碌时，您可以留言，我们会尽快回访。",
+                                                                "description": "热线服务政策播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-human-handoff",
+                                                        "type": "human_handoff",
+                                                        "meta": { "position": { "x": 1120, "y": 460 } },
+                                                        "data": {
+                                                                "title": "转人工决策",
+                                                                "content": "正在为您转接人工坐席，请稍候。",
+                                                                "description": "根据服务时间和坐席状态决定进入 ACD 或留言",
+                                                                "queueName": "default",
+                                                                "allowQueue": true,
+                                                                "ringTimeoutSeconds": 20,
+                                                                "strategy": "LONGEST_IDLE",
+                                                                "leaveReason": "USER_REQUESTED"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-leave-message",
+                                                        "type": "leave_message",
+                                                        "meta": { "position": { "x": 1480, "y": 460 } },
+                                                        "data": {
+                                                                "title": "热线留言",
+                                                                "prompt": "请在提示音后留言，留言完成后请挂机。",
+                                                                "leaveReason": "USER_REQUESTED",
+                                                                "queueName": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-end-0",
+                                                        "type": "end",
+                                                        "meta": { "position": { "x": 1480, "y": 180 } },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "热线自助流程结束"
+                                                        }
+                                                }
                                         ],
-                                        "submitKey": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-text-balance",
-                                      "type": "text",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1060,
-                                          "y": 10
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "积分/余额查询",
-                                        "content": "这里是积分与余额查询演示节点。后续可对接会员中心接口，播报当前积分、账户余额和最近一次积分变动。",
-                                        "description": "演示自助积分与余额查询"
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-http-order-query",
-                                      "type": "http",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1060,
-                                          "y": 210
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "订单信息查询",
-                                        "content": "正在为您查询订单信息，请稍候。",
-                                        "description": "演示通过 HTTP 接口查询订单信息并播报结果",
-                                        "apiUrl": "/visitor/api/v1/ivr/demo/order?callerIdNumber=${callerIdNumber}",
-                                        "httpMethod": "GET",
-                                        "responseTemplate": "为您查询到演示订单 ${orderNumber}，当前状态：${orderStatus}，收件人：${receiverName}。",
-                                        "failurePrompt": "订单查询服务暂时不可用，请稍后再试。",
-                                        "timeoutMs": 3000,
-                                        "requestBody": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-text-policy",
-                                      "type": "text",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1060,
-                                          "y": 410
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "服务政策播报",
-                                        "content": "这里是服务政策播报演示节点。可用于播报售后政策、服务时间、隐私说明以及节假日服务安排。",
-                                        "description": "演示服务政策自动播报"
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-text-bot-menu",
-                                      "type": "text",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1060,
-                                          "y": 560
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "机器人模式说明",
-                                        "content": "您已进入机器人对话演示。按 1 体验多轮语音机器人，按 2 体验不限轮语音机器人，按 0 转人工服务。",
-                                        "description": "机器人子菜单欢迎语"
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-keyboard-bot-menu",
-                                      "type": "keyboard",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1360,
-                                          "y": 560
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "机器人模式导航",
-                                        "content": "请输入机器人模式按键。",
-                                        "description": "机器人子菜单按键导航",
-                                        "options": [
-                                          {
-                                            "id": "ivr-bot-option-multi",
-                                            "key": "1",
-                                            "label": "按 1 体验多轮语音机器人",
-                                            "outgoingEdgeId": "ivr-bot-node-multi"
-                                          },
-                                          {
-                                            "id": "ivr-bot-option-unlimited",
-                                            "key": "2",
-                                            "label": "按 2 体验不限轮语音机器人",
-                                            "outgoingEdgeId": "ivr-bot-node-unlimited"
-                                          },
-                                          {
-                                            "id": "ivr-bot-option-human",
-                                            "key": "0",
-                                            "label": "按 0 转人工服务",
-                                            "outgoingEdgeId": "ivr-transfer-human"
-                                          }
-                                        ],
-                                        "submitKey": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-bot-node-multi",
-                                      "type": "bot",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1720,
-                                          "y": 420
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "多轮语音机器人",
-                                        "content": "正在为您接入多轮语音机器人，请稍候。",
-                                        "description": "在默认 IVR 内直接接入 9201 多轮语音机器人",
-                                        "transferDestination": "9201",
-                                        "transferContext": "default",
-                                        "transferData": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-bot-node-unlimited",
-                                      "type": "bot",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1720,
-                                          "y": 620
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "不限轮语音机器人",
-                                        "content": "正在为您接入不限轮语音机器人，请稍候。",
-                                        "description": "在默认 IVR 内直接接入 9203 不限轮语音机器人",
-                                        "transferDestination": "9203",
-                                        "transferContext": "default",
-                                        "transferData": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-transfer-human",
-                                      "type": "transfer",
-                                      "meta": {
-                                        "position": {
-                                          "x": 1720,
-                                          "y": 820
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "转人工服务",
-                                        "content": "正在为您转接人工坐席，请稍候。",
-                                        "description": "默认转人工演示节点",
-                                        "transferDestination": "5003",
-                                        "transferContext": "default",
-                                        "transferData": ""
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-end-0",
-                                      "type": "end",
-                                      "meta": {
-                                        "position": {
-                                          "x": 2080,
-                                          "y": 220
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "结束",
-                                        "description": "结束默认 IVR 演示流程"
-                                      }
-                                    },
-                                    {
-                                      "id": "ivr-text-welcome",
-                                      "type": "text",
-                                      "meta": {
-                                        "position": {
-                                          "x": 381.8629173989455,
-                                          "y": 210
-                                        }
-                                      },
-                                      "data": {
-                                        "title": "欢迎语",
-                                        "content": "您好，欢迎致电微语智能语音服务。按 1 可进行积分余额查询，按 2 可查询订单信息，按 3 可收听服务政策播报，按 4 可体验机器人对话，按 0 可转人工服务。",
-                                        "description": "默认 IVR 欢迎播报"
-                                      }
-                                    }
-                                  ],
-                                  "edges": [
-                                    {
-                                      "sourceNodeId": "ivr-start-0",
-                                      "targetNodeId": "ivr-text-welcome",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-text-welcome",
-                                      "targetNodeId": "ivr-keyboard-main",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-main",
-                                      "targetNodeId": "ivr-text-balance",
-                                      "sourcePortId": "keyboard-option-ivr-option-balance",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-main",
-                                      "targetNodeId": "ivr-http-order-query",
-                                      "sourcePortId": "keyboard-option-ivr-option-order-cancel",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-main",
-                                      "targetNodeId": "ivr-text-policy",
-                                      "sourcePortId": "keyboard-option-ivr-option-policy",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-main",
-                                      "targetNodeId": "ivr-text-bot-menu",
-                                      "sourcePortId": "keyboard-option-ivr-option-bot",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-main",
-                                      "targetNodeId": "ivr-transfer-human",
-                                      "sourcePortId": "keyboard-option-ivr-option-human",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-text-balance",
-                                      "targetNodeId": "ivr-end-0",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-http-order-query",
-                                      "targetNodeId": "ivr-end-0",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-text-policy",
-                                      "targetNodeId": "ivr-end-0",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-text-bot-menu",
-                                      "targetNodeId": "ivr-keyboard-bot-menu",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-bot-menu",
-                                      "targetNodeId": "ivr-bot-node-multi",
-                                      "sourcePortId": "keyboard-option-ivr-bot-option-multi",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-bot-menu",
-                                      "targetNodeId": "ivr-bot-node-unlimited",
-                                      "sourcePortId": "keyboard-option-ivr-bot-option-unlimited",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-keyboard-bot-menu",
-                                      "targetNodeId": "ivr-transfer-human",
-                                      "sourcePortId": "keyboard-option-ivr-bot-option-human",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-bot-node-multi",
-                                      "targetNodeId": "ivr-end-0",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    },
-                                    {
-                                      "sourceNodeId": "ivr-bot-node-unlimited",
-                                      "targetNodeId": "ivr-end-0",
-                                      "sourcePortId": "defaultOutput",
-                                      "targetPortId": "defaultInput"
-                                    }
-                                  ]
+                                        "edges": [
+                                                { "sourceNodeId": "%s", "targetNodeId": "hotline-text-welcome", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-text-welcome", "targetNodeId": "hotline-keyboard-main", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-business-http-order", "sourcePortId": "keyboard-option-hotline-option-order", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-text-policy", "sourcePortId": "keyboard-option-hotline-option-policy", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-human-handoff", "sourcePortId": "keyboard-option-hotline-option-human", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-business-http-order", "targetNodeId": "hotline-end-0", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-text-policy", "targetNodeId": "hotline-end-0", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" }
+                                        ]
                                 }
                                 """
                                 .formatted(DEFAULT_IVR_START_NODE_ID, DEFAULT_IVR_START_NODE_ID);

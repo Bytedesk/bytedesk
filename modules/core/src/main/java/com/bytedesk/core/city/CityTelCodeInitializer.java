@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "bytedesk.city.import", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class CityTelCodeInitializer {
 
     private final JdbcTemplate jdbcTemplate;
@@ -71,24 +69,45 @@ public class CityTelCodeInitializer {
 
             int updated = 0;
             int skipped = 0;
+            // SQL dump names may include various suffixes that provinces.json omits:
+            //   '市' (e.g. 北京→北京市), '地区' (那曲→那曲地区),
+            //   '自治州' (甘南→甘南藏族自治州), '盟' (锡林郭勒→锡林郭勒盟),
+            //   '特别行政区' (香港→香港特别行政区), etc.
+            // Strategy: exact on original + '市', then LIKE 'name%' as fallback.
+            // Some cities are county-level in the dump (e.g. 东方市/万宁市)
+            // so also try county type as a second pass.
             for (ProvinceEntry entry : entries) {
                 if (entry.getCode() == null || entry.getCity() == null) {
                     continue;
                 }
-                // Match by city name at city level
+                String cityName = entry.getCity();
+                String cityNameWithShi = cityName + "市";
+                String cityNameWildcard = cityName + "%";
+
+                // Pass 1: match by_type = 'city'
                 int rows = jdbcTemplate.update(
-                        "UPDATE bytedesk_core_city SET tel_code = ? WHERE name = ? AND by_type = 'city'",
-                        entry.getCode(), entry.getCity());
+                        "UPDATE bytedesk_core_city SET tel_code = ?"
+                                + " WHERE (name = ? OR name = ? OR name LIKE ?) AND by_type = 'city'",
+                        entry.getCode(), cityName, cityNameWithShi, cityNameWildcard);
+
+                // Pass 2: if no city-level match, try county-level (e.g. 东方市/万宁市 may be county)
+                if (rows == 0) {
+                    rows = jdbcTemplate.update(
+                            "UPDATE bytedesk_core_city SET tel_code = ?"
+                                    + " WHERE (name = ? OR name = ? OR name LIKE ?) AND by_type = 'county'",
+                            entry.getCode(), cityName, cityNameWithShi, cityNameWildcard);
+                }
+
                 if (rows > 0) {
                     updated += rows;
                 } else {
                     skipped++;
-                    log.debug("telCode init: no city-level match for name='{}'", entry.getCity());
+                    log.debug("telCode init: no match for name='{}'", cityName);
                 }
             }
 
-            // Also match the 4 direct municipalities (北京/上海/天津/重庆) which are
-            // province level but have tel codes
+            // Also match direct municipalities (北京/上海/天津/重庆) which are
+            // province level but have tel codes — same suffix + LIKE strategy
             List<ProvinceEntry> directCities = new ArrayList<>();
             for (ProvinceEntry entry : entries) {
                 if (entry.getProvince() == null) {
@@ -96,9 +115,20 @@ public class CityTelCodeInitializer {
                 }
             }
             for (ProvinceEntry entry : directCities) {
-                jdbcTemplate.update(
-                        "UPDATE bytedesk_core_city SET tel_code = ? WHERE name = ? AND by_type = 'province'",
-                        entry.getCode(), entry.getCity());
+                String cityName = entry.getCity();
+                String cityNameWithShi = cityName + "市";
+                String cityNameWildcard = cityName + "%";
+                int rows = jdbcTemplate.update(
+                        "UPDATE bytedesk_core_city SET tel_code = ?"
+                                + " WHERE (name = ? OR name = ? OR name LIKE ?) AND by_type = 'province'",
+                        entry.getCode(), cityName, cityNameWithShi, cityNameWildcard);
+                // Fallback: province-level direct cities may also exist as city-level
+                if (rows == 0) {
+                    jdbcTemplate.update(
+                            "UPDATE bytedesk_core_city SET tel_code = ?"
+                                    + " WHERE (name = ? OR name = ? OR name LIKE ?) AND by_type = 'city'",
+                            entry.getCode(), cityName, cityNameWithShi, cityNameWildcard);
+                }
             }
 
             log.info("telCode init finished: updated={} city rows, skipped={} unmatched entries",

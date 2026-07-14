@@ -210,6 +210,14 @@ services:
       BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
       BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
       BYTEDESK_CALL_FREESWITCH_DOMAIN: example.com
+      BYTEDESK_CALL_MRCP_ENABLED: "false"
+      BYTEDESK_CALL_MRCP_PROFILE: java-mrcp
+      BYTEDESK_CALL_MRCP_HOST: 0.0.0.0
+      BYTEDESK_CALL_MRCP_PORT: 1544
+      BYTEDESK_CALL_MRCP_TTS_PROVIDER: dashscope
+      BYTEDESK_CALL_MRCP_ASR_PROVIDER: dashscope
+      BYTEDESK_CALL_MRCP_ASR_MODE: recording-file
+      BYTEDESK_CALL_MRCP_TTS_VOICE: longanhuan
       # ===============================
       # WebRTC / Janus config
       # Use service names on the Docker network instead of 127.0.0.1. 容器内请使用 Docker 网络服务名，而不是 127.0.0.1。

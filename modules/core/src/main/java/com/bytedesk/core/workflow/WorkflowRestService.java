@@ -101,7 +101,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 "demo-default",
                 WorkflowInitData.DEFAULT_IVR_WORKFLOW_NAME,
                 WorkflowInitData.DEFAULT_IVR_WORKFLOW_DESCRIPTION,
-                WorkflowInitData.buildDefaultIvrWorkflowSchemaJson()),
+                WorkflowInitData.buildDefaultHotlineIvrWorkflowSchemaJson()),
             createTemplateOption(
                 "demo-satisfaction",
                 WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME,
@@ -348,7 +348,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
                 resolveDefaultIvrWorkflowUid(orgUid),
                 DEFAULT_IVR_NICKNAME,
                 DEFAULT_IVR_DESCRIPTION,
-                WorkflowInitData.buildDefaultIvrWorkflowSchemaJson(),
+                WorkflowInitData.buildDefaultHotlineIvrWorkflowSchemaJson(),
                 WorkflowInitData.DEFAULT_IVR_START_NODE_ID);
 
         initDefaultIvrWorkflowDefinition(
@@ -680,7 +680,7 @@ public class WorkflowRestService extends BaseRestService<WorkflowEntity, Workflo
             return WorkflowInitData.buildDefaultLeadCollectionWorkflowSchemaJson();
         }
         if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_WORKFLOW_UID_SUFFIX)) {
-            return WorkflowInitData.buildDefaultIvrWorkflowSchemaJson();
+            return WorkflowInitData.buildDefaultHotlineIvrWorkflowSchemaJson();
         }
         if (matchesResetUid(uid, orgUid, WorkflowInitData.DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX)) {
             return WorkflowInitData.buildDefaultSatisfactionIvrWorkflowSchemaJson();

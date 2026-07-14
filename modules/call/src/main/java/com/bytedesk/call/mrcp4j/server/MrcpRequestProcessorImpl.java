@@ -65,6 +65,13 @@ public class MrcpRequestProcessorImpl implements MrcpRequestProcessor {
 
         try {
             ChannelIdentifier channelIdentifier = request.getChannelIdentifier();
+            log.info(
+                "MRCP request processing channel={} requestId={} method={} hasHandler={}",
+                channelIdentifier,
+                request.getRequestID(),
+                request.getMethodName(),
+                channelIdentifier != null && _requestHandlers.containsKey(channelIdentifier.toString())
+            );
             if (channelIdentifier == null) { // channel-identifier header missing
                 response = session.createResponse(MrcpResponse.STATUS_MANDATORY_HEADER_MISSING, MrcpRequestState.COMPLETE);
             } else {

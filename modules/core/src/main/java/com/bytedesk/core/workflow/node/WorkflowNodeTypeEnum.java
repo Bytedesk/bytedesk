@@ -98,7 +98,14 @@ public enum WorkflowNodeTypeEnum {
     SIGNAL_EVENT("signalEvent"),
 
     // === 新增：DMN 决策 ===
-    DECISION_DMN("decisionDmn");
+    DECISION_DMN("decisionDmn"),
+
+    // === 热线 IVR 节点 ===
+    HUMAN_HANDOFF("human_handoff"),
+    ACD_ENQUEUE("acd_enqueue"),
+    LEAVE_MESSAGE("leave_message"),
+    VOICE_BOT("voice_bot"),
+    BUSINESS_HTTP("business_http");
     
     private final String value;
     

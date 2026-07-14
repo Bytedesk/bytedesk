@@ -2,7 +2,8 @@
 
 MRCP4J 是一个完整的 Media Resource Control Protocol Version 2 (MRCPv2) Java 实现库,用于构建语音识别(ASR)和语音合成(TTS)应用。
 
-[Github Mrcp4j](https://github.com/JVoiceXML/mrcp4j)
+- [Github Mrcp4j](https://github.com/JVoiceXML/mrcp4j)
+- [mod_unimrcp](https://github.com/freeswitch/mod_unimrcp)
 
 ## 📋 目录
 
@@ -206,7 +207,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 核心接口
 
 | 类/接口 | 说明 |
-|--------|------|
+| -------- | ------ |
 | `MrcpFactory` | 客户端工厂类,用于创建通道 |
 | `MrcpChannel` | MRCP 通道,管理与服务器的连接 |
 | `MrcpServerSocket` | MRCP 服务器实现 |
@@ -217,7 +218,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 资源类型
 
 | 类型 | 常量 | 说明 |
-|-----|------|------|
+| ----- | ------ | ------ |
 | 语音识别 | `MrcpResourceType.SPEECHRECOG` | ASR 服务 |
 | 语音合成 | `MrcpResourceType.SPEECHSYNTH` | TTS 服务 |
 | 录音 | `MrcpResourceType.RECORDER` | 录音服务 |
@@ -226,7 +227,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 方法名称
 
 | 方法 | 适用资源 | 说明 |
-|-----|---------|------|
+| ----- | --------- | ------ |
 | `RECOGNIZE` | SPEECHRECOG | 启动语音识别 |
 | `SPEAK` | SPEECHSYNTH | 启动语音合成 |
 | `STOP` | 所有 | 停止当前操作 |

@@ -79,5 +79,7 @@
     <include file="db/changelog/migration/260709_create_kbase_translation_table.xml" />
     <include file="db/changelog/migration/260710_alter_kbase_translation_title_summary_to_text.xml" />
     <include file="db/changelog/migration/260711_add_article_source_fields.xml" />
+    <include file="db/changelog/migration/260713_add_voicemail_hotline_fields.xml" />
+    <include file="db/changelog/migration/260713_add_ivr_record_hotline_trace_fields.xml" />
 
 </databaseChangeLog>
