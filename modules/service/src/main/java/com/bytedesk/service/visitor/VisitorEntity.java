@@ -119,5 +119,15 @@ public class VisitorEntity extends BaseEntity {
 	// 会员等级，tier层级
 	@Builder.Default
 	private Integer vipLevel = 0;
+
+	// heartbeat 节流用 epoch 毫秒，避免跨数据库时区歧义
+	private Long heartbeatAtMillis;
+
+	// 本地/测试环境可直接绑定已有 FreeSWITCH 静态分机，避免依赖动态 directory
+	@Column(name = "sip_extension")
+	private String sipExtension;
+
+	@Column(name = "sip_password")
+	private String sipPassword;
 	
 }

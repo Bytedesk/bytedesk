@@ -34,6 +34,15 @@ public class MediaStreamBridge {
         return payloadRouter.routeToFile(filePath, contentType, control);
     }
 
+    public RtpCaptureRoute openRtpToFileCapture(
+            String filePath,
+            String contentType,
+            String codec,
+            int sampleRate,
+            RtpCaptureControl control) {
+        return payloadRouter.routeToFile(filePath, contentType, codec, sampleRate, control);
+    }
+
     public void writeRtpPayload(RtpCaptureRoute captureRoute, byte[] payload) {
         payloadRouter.writePayload(captureRoute, payload);
     }

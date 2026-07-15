@@ -218,6 +218,14 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
 
     private void mergeBestEffortFields(QueueMemberEntity target, QueueMemberEntity source) {
+        if (source.getAgentQueue() != null && target.getAgentQueue() == null) {
+            target.setAgentQueue(source.getAgentQueue());
+        }
+
+        if (source.getRobotQueue() != null && target.getRobotQueue() == null) {
+            target.setRobotQueue(source.getRobotQueue());
+        }
+
         if (source.getVisitorMessageCount() > target.getVisitorMessageCount()) {
             target.setVisitorMessageCount(source.getVisitorMessageCount());
         }
@@ -293,6 +301,15 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
 
         if (StringUtils.hasText(source.getAgentAcceptType()) && !StringUtils.hasText(target.getAgentAcceptType())) {
             target.setAgentAcceptType(source.getAgentAcceptType());
+        }
+
+        if (source.getRobotAcceptedAt() != null
+                && (target.getRobotAcceptedAt() == null || source.getRobotAcceptedAt().isBefore(target.getRobotAcceptedAt()))) {
+            target.setRobotAcceptedAt(source.getRobotAcceptedAt());
+        }
+
+        if (StringUtils.hasText(source.getRobotAcceptType()) && !StringUtils.hasText(target.getRobotAcceptType())) {
+            target.setRobotAcceptType(source.getRobotAcceptType());
         }
     }
 

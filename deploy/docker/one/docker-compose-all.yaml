@@ -201,6 +201,8 @@ services:
     volumes:
       # 配置文件目录 - 使用本地配置文件覆盖容器内的配置（经验证实际使用 /usr/local/freeswitch/etc/freeswitch）
       - ../freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
+      # Lua 脚本目录 - 92-ai-bot 等拨号计划依赖 nlsml_to_text.lua
+      - ../freeswitch/scripts:/usr/local/freeswitch/share/freeswitch/scripts
       # 数据持久化目录
       - freeswitch_data:/usr/local/freeswitch/db
       # 日志目录

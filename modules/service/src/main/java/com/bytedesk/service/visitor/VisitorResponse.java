@@ -85,5 +85,8 @@ public class VisitorResponse extends BaseResponse {
 
 	// 会员等级
 	private Integer vipLevel;
+
+	private String sipExtension;
+	private String sipPassword;
 	
 }

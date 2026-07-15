@@ -81,5 +81,6 @@
     <include file="db/changelog/migration/260711_add_article_source_fields.xml" />
     <include file="db/changelog/migration/260713_add_voicemail_hotline_fields.xml" />
     <include file="db/changelog/migration/260713_add_ivr_record_hotline_trace_fields.xml" />
+    <include file="db/changelog/migration/260715_add_visitor_sip_profile_fields.xml" />
 
 </databaseChangeLog>

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.service.visitor;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -54,6 +55,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Description("Visitor Management Service - Visitor information and interaction management service")
 public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity, VisitorRequest, VisitorResponse, VisitorExcel> {
+
+    private static final Duration ONLINE_HEARTBEAT_UPDATE_INTERVAL = Duration.ofSeconds(60);
 
     private final VisitorRepository visitorRepository;
 
@@ -161,6 +164,12 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
             visitor.setIpLocation(request.getIpLocation());
         }
         visitor.setVipLevel(request.getVipLevel());
+        if (StringUtils.hasText(request.getSipExtension())) {
+            visitor.setSipExtension(request.getSipExtension().trim());
+        }
+        if (StringUtils.hasText(request.getSipPassword())) {
+            visitor.setSipPassword(request.getSipPassword().trim());
+        }
         if (visitor.getDeviceInfo() == null) {
             visitor.setDeviceInfo(new VisitorDevice());
         }
@@ -201,6 +210,8 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         visitor.setEmail(request.getEmail());
         visitor.setNote(request.getNote());
 		visitor.setCustomFieldList(request.getCustomFieldList());
+        visitor.setSipExtension(request.getSipExtension());
+        visitor.setSipPassword(request.getSipPassword());
         // visitor.setTagList(request.getTagList()); // 标签列表不在这里更新，使用 updateTagList 方法更新
         // 
         VisitorEntity savedVisitor = save(visitor);
@@ -242,7 +253,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.findByUidAndDeleted(uid, false);
     }
     
-    @Transactional
+    @Transactional(readOnly = true)
     @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
     public Optional<VisitorEntity> findByVisitorUidAndOrgUid(@NonNull String visitorUid, @NonNull String orgUid) {
         // 如果参数为空，则返回空
@@ -269,12 +280,36 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.findByStatusAndDeleted(status, false);
     }
 
+    @Transactional
     public int updateStatus(@NonNull String uid, @NonNull String newStatus) {
         if (!StringUtils.hasText(uid) || !StringUtils.hasText(newStatus)) {
             log.warn("skip visitor status update because uid or status is blank, uid: {}, status: {}", uid, newStatus);
             return 0;
         }
-        return visitorRepository.updateStatusByUid(uid, newStatus);
+
+        Optional<VisitorEntity> visitorOptional = visitorRepository.findByUidAndDeleted(uid, false);
+        if (visitorOptional.isEmpty()) {
+            log.warn("skip visitor status update because visitor not found, uid: {}", uid);
+            return 0;
+        }
+
+        VisitorEntity visitor = visitorOptional.get();
+
+        // epoch-millis heartbeat 节流，跨数据库、零时区歧义
+        if (VisitorStatusEnum.ONLINE.name().equals(newStatus)) {
+            long nowMs = System.currentTimeMillis();
+            Long lastHbMs = visitor.getHeartbeatAtMillis();
+            if (VisitorStatusEnum.ONLINE.name().equals(visitor.getStatus())
+                    && lastHbMs != null
+                    && (nowMs - lastHbMs) < ONLINE_HEARTBEAT_UPDATE_INTERVAL.toMillis()) {
+                return 0;
+            }
+            visitor.setHeartbeatAtMillis(nowMs);
+        }
+
+        visitor.setStatus(newStatus);
+        save(visitor);
+        return 1;
     }
 
     @Caching(put = {
@@ -329,6 +364,8 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
                 latestEntity.setExtra(entity.getExtra());
                 latestEntity.setDeviceInfo(entity.getDeviceInfo());
 				latestEntity.setCustomFieldList(entity.getCustomFieldList());
+                latestEntity.setSipExtension(entity.getSipExtension());
+                latestEntity.setSipPassword(entity.getSipPassword());
                 return visitorRepository.save(latestEntity);
             }
         } catch (Exception ex) {

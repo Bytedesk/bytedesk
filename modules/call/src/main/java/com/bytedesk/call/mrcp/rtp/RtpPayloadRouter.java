@@ -25,7 +25,16 @@ public class RtpPayloadRouter {
     }
 
     public RtpCaptureRoute routeToFile(String filePath, String contentType, RtpCaptureControl control) {
-        return captureFileWriter.openFileCapture(filePath, contentType, control);
+        return routeToFile(filePath, contentType, null, 0, control);
+    }
+
+    public RtpCaptureRoute routeToFile(
+            String filePath,
+            String contentType,
+            String codec,
+            int sampleRate,
+            RtpCaptureControl control) {
+        return captureFileWriter.openFileCapture(filePath, contentType, codec, sampleRate, control);
     }
 
     public void writePayload(RtpCaptureRoute captureRoute, byte[] payload) {

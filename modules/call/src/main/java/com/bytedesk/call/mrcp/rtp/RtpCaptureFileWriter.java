@@ -8,5 +8,14 @@ import com.bytedesk.call.mrcp.media.RtpCaptureRoute;
  */
 public interface RtpCaptureFileWriter {
 
-    RtpCaptureRoute openFileCapture(String filePath, String contentType, RtpCaptureControl control);
+    default RtpCaptureRoute openFileCapture(String filePath, String contentType, RtpCaptureControl control) {
+        return openFileCapture(filePath, contentType, null, 0, control);
+    }
+
+    RtpCaptureRoute openFileCapture(
+            String filePath,
+            String contentType,
+            String codec,
+            int sampleRate,
+            RtpCaptureControl control);
 }

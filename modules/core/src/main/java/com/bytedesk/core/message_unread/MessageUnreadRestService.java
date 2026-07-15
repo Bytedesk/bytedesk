@@ -66,6 +66,19 @@ public class MessageUnreadRestService
 
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
+        if (StringUtils.hasText(request.getThreadTopic())
+                && StringUtils.hasText(request.getUid())
+                && StringUtils.hasText(request.getOrgUid())) {
+            Pageable pageable = request.getPageable();
+            Page<MessageUnreadEntity> page = messageUnreadRepository
+                    .findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                            request.getThreadTopic(),
+                            request.getOrgUid(),
+                            request.getUid(),
+                            pageable);
+            return page.map(this::convertToResponse);
+        }
+
         Pageable pageable = request.getPageable();
         Specification<MessageUnreadEntity> specs = MessageUnreadSpecification.search(request, authService);
         Page<MessageUnreadEntity> page = messageUnreadRepository.findAll(specs, pageable);
@@ -242,7 +255,14 @@ public class MessageUnreadRestService
             || !StringUtils.hasText(request.getOrgUid())) {
             return 0;
         }
-        // 
+
+        if (StringUtils.hasText(request.getThreadTopic())) {
+            return messageUnreadRepository.countByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                    request.getThreadTopic(),
+                    request.getOrgUid(),
+                    request.getUid());
+        }
+
         Page<MessageUnreadResponse> page = queryByOrg(request);
         return page.getTotalElements();
     }
@@ -255,9 +275,16 @@ public class MessageUnreadRestService
             log.info("Clearing unread messages for uid: {}", uid);
             
             redisService.removeMessageExists(uid);
-            
-            // 删除符合条件的未读消息
-            messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+
+            if (StringUtils.hasText(request.getThreadTopic()) && StringUtils.hasText(request.getOrgUid())) {
+                messageUnreadRepository.softDeleteByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                        request.getThreadTopic(),
+                        request.getOrgUid(),
+                        uid);
+            } else {
+                // 删除符合条件的未读消息
+                messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+            }
             
             // 同步更新相关会话的未读消息数为0
             // 对于访客uid，通常会话的topic会包含这个uid，我们需要找到所有相关的会话并清零未读数

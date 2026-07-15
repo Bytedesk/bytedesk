@@ -137,6 +137,10 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Integer vipLevel = 0;
 
+	// 本地/测试环境可直接绑定已有 FreeSWITCH 静态分机账号
+	private String sipExtension;
+	private String sipPassword;
+
 	// 用于区分本地测试还是线上环境
 	@Builder.Default
 	private Boolean debug = false;

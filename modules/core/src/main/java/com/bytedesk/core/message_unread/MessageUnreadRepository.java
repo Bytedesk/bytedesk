@@ -13,11 +13,16 @@
  */
 package com.bytedesk.core.message_unread;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEntity, Long>, JpaSpecificationExecutor<MessageUnreadEntity> {
@@ -29,6 +34,33 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteByThreadTopicContainsAndUserNotContains(String threadTopic, String userUid);
+
+        @Query("SELECT COUNT(mu) FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        long countByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+            @Param("threadTopic") String threadTopic,
+            @Param("orgUid") String orgUid,
+            @Param("userUid") String userUid);
+
+        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false ORDER BY mu.createdAt ASC")
+        Page<MessageUnreadEntity> findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+            @Param("threadTopic") String threadTopic,
+            @Param("orgUid") String orgUid,
+            @Param("userUid") String userUid,
+            Pageable pageable);
+
+        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        List<MessageUnreadEntity> findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+            @Param("threadTopic") String threadTopic,
+            @Param("orgUid") String orgUid,
+            @Param("userUid") String userUid);
+
+        @Transactional
+        @Modifying(clearAutomatically = true, flushAutomatically = true)
+        @Query("UPDATE MessageUnreadEntity mu SET mu.deleted = true WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        int softDeleteByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+            @Param("threadTopic") String threadTopic,
+            @Param("orgUid") String orgUid,
+            @Param("userUid") String userUid);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)

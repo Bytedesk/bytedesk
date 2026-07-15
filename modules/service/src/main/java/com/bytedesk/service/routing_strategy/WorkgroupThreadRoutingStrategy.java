@@ -152,8 +152,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 1. 验证和获取工作组信息
         log.debug("步骤1: 开始获取工作组信息 - workgroupUid: {}", visitorRequest.getSid());
         WorkgroupEntity workgroup = getWorkgroupEntity(visitorRequest.getSid());
-        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 在线客服数(presence): {}",
-                workgroup.getUid(), presenceFacadeService.countOnlineAgents(workgroup));
+        log.info("步骤1完成: 成功获取工作组信息 - workgroupUid: {}, 可接待客服数(presence): {}",
+            workgroup.getUid(), presenceFacadeService.countAvailableAgents(workgroup));
 
         // 2. 生成会话主题并检查现有会话
         log.debug("步骤2: 开始处理线程创建或获取");
@@ -198,8 +198,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         WorkgroupEntity workgroup = workgroupOptional.get();
-        log.info("工作组实体获取完成 - workgroupUid: {}, 在线客服数量(presence): {}, 耗时: {}ms",
-                workgroup.getUid(), presenceFacadeService.countOnlineAgents(workgroup),
+        log.info("工作组实体获取完成 - workgroupUid: {}, 可接待客服数量(presence): {}, 耗时: {}ms",
+            workgroup.getUid(), presenceFacadeService.countAvailableAgents(workgroup),
                 System.currentTimeMillis() - startTime);
         return workgroup;
     }
@@ -429,18 +429,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // 决定路由方向：机器人 or 人工
         boolean shouldUseRobot = shouldRouteToRobot(visitorRequest, workgroup, callType);
         if (shouldUseRobot) {
-            // 规则：无客服在线时优先使用留言设置中的备选客服/备选工作组，仅当备选都不可用时才启用机器人
-            boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
-            if (isOffline) {
-                MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup, callType);
-                if (backupResult != null) {
-                    log.info("Robot routing eligible but diverted to backup first - workgroupUid: {}",
-                            workgroup.getUid());
-                    return backupResult;
-                }
-            }
-
-            log.info("路由到机器人处理");
+            log.info("命中机器人路由条件，直接路由到机器人 - workgroupUid: {}", workgroup.getUid());
             return routeToRobot(visitorRequest, thread, workgroup);
         } else {
             log.info("路由到人工客服处理");
@@ -467,24 +456,33 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         // 检查机器人配置和服务时间
-        boolean isOffline = !presenceFacadeService.isWorkgroupOnline(workgroup);
+        boolean isOffline = !presenceFacadeService.hasAvailableAgents(workgroup);
         boolean isInServiceTime = resolveIsInServiceTime(visitorRequest, workgroup);
 
         log.debug("路由决策参数 - 工作组离线状态: {}, 在服务时间内: {}",
                 isOffline, isInServiceTime);
 
-        boolean transferToRobot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
-                ? workgroup.getSettings().getRobotSettings().shouldTransferToRobot(isOffline, isInServiceTime)
-                : false;
-        log.debug("机器人设置决策结果: {}", transferToRobot);
+        boolean transferToRobot = false;
+        if (workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null) {
+            boolean defaultRobot = Boolean.TRUE.equals(workgroup.getSettings().getRobotSettings().getDefaultRobot());
+            boolean offlineRobot = !defaultRobot
+                && Boolean.TRUE.equals(workgroup.getSettings().getRobotSettings().getOfflineRobot());
+            boolean nonWorktimeRobot = Boolean.TRUE
+                .equals(workgroup.getSettings().getRobotSettings().getNonWorktimeRobot());
+
+            transferToRobot = defaultRobot || (offlineRobot && isOffline);
+            log.debug(
+                "机器人设置决策结果: {}, defaultRobot: {}, offlineRobot: {}, nonWorktimeRobot(ignored): {}",
+                transferToRobot, defaultRobot, offlineRobot, nonWorktimeRobot);
+        }
 
         if (transferToRobot) {
             RobotEntity robot = workgroup.getSettings() != null && workgroup.getSettings().getRobotSettings() != null
                     ? workgroup.getSettings().getRobotSettings().getRobot()
                     : null;
             if (robot != null) {
-                log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}",
-                        robot.getUid(), isOffline, isInServiceTime);
+            log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}",
+                robot.getUid(), isOffline, isInServiceTime);
                 return true;
             } else {
                 log.warn("机器人路由条件满足但未找到机器人实体 - workgroupUid: {}", workgroup.getUid());
@@ -1520,6 +1518,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
      */
     private void updateQueueMemberForRobotAccept(QueueMemberEntity queueMemberEntity) {
         try {
+            if (queueMemberEntity.getRobotAcceptedAt() != null
+                    && StringUtils.hasText(queueMemberEntity.getRobotAcceptType())) {
+                log.debug("Skip duplicate robot auto-accept update for queue member: {}", queueMemberEntity.getUid());
+                return;
+            }
             queueMemberEntity.robotAutoAcceptThread();
             queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
             log.debug("Queued async queue member update for robot auto-accept: {}", queueMemberEntity.getUid());

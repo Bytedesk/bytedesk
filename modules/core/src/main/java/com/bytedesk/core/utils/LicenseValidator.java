@@ -106,7 +106,7 @@ public final class LicenseValidator {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                 cachedPublicKey = keyFactory.generatePublic(spec);
-                log.info("RSA public key loaded successfully");
+                // log.info("RSA public key loaded successfully");
             } catch (Exception e) {
                 log.error("Failed to load RSA public key", e);
                 throw new RuntimeException("License public key initialization failed", e);
@@ -410,7 +410,7 @@ public final class LicenseValidator {
                 info.setFormat("RSA_SIGNED");
                 info.setValid(true);
             }
-            log.debug("RSA signature verified successfully");
+            // log.debug("RSA signature verified successfully");
             return info;
         } catch (Exception e) {
             log.error("License validation error", e);

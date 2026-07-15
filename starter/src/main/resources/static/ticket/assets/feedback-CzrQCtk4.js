@@ -1,1 +1,0 @@
-import e from"./request-Dl8-SUeG.js";function t(t){return e({url:`/visitor/api/feedback/submit`,method:`post`,data:t})}export{t as submitFeedback};

@@ -43,7 +43,7 @@ public class CityTelCodeInitializer {
         try {
             Resource resource = resourceLoader.getResource(PROVINCES_JSON);
             if (!resource.exists()) {
-                log.info("telCode init skipped: provinces.json not found at {}", PROVINCES_JSON);
+                // log.info("telCode init skipped: provinces.json not found at {}", PROVINCES_JSON);
                 return;
             }
 
@@ -54,7 +54,7 @@ public class CityTelCodeInitializer {
             }
 
             if (entries == null || entries.isEmpty()) {
-                log.info("telCode init skipped: provinces.json is empty");
+                // log.info("telCode init skipped: provinces.json is empty");
                 return;
             }
 
@@ -63,7 +63,7 @@ public class CityTelCodeInitializer {
                     "SELECT COUNT(1) FROM bytedesk_core_city WHERE tel_code IS NOT NULL AND by_type = 'city'",
                     Long.class);
             if (populated != null && populated > 0) {
-                log.info("telCode init skipped: {} city rows already have tel_code", populated);
+                // log.info("telCode init skipped: {} city rows already have tel_code", populated);
                 return;
             }
 
