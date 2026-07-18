@@ -345,6 +345,8 @@ services:
       # ===============================
       BYTEDESK_AI_TTS_LANGUAGE: zh-CN
       BYTEDESK_AI_TTS_AUDIO_FORMAT: mp3
+      # TTS Realtime WebSocket（Qwen-Audio Realtime 中继地址）
+      BYTEDESK_AI_TTS_REALTIME_WS_URL: ${BYTEDESK_AI_TTS_REALTIME_WS_URL:-wss://dashscope.aliyuncs.com/api-ws/v1/realtime}
       BYTEDESK_AI_ASR_SOURCE_FORMAT: mp3
       BYTEDESK_AI_ASR_TIMEOUT_MS: 180000
       BYTEDESK_AI_ASR_POLL_INTERVAL_MS: 1500

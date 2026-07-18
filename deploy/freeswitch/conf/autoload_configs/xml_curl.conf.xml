@@ -1,0 +1,16 @@
+<configuration name="xml_curl.conf" description="cURL XML Gateway">
+  <bindings>
+    <binding name="bytedesk-ngrok">
+      <!-- 远程 FreeSWITCH 通过 ngrok 回调本地应用的 xmlcurl 接口。 -->
+      <!-- 本地分机目录由静态 conf 接管，避免动态 directory 缺少 dial-string 导致分机不响铃。 -->
+      <param name="gateway-url"
+        value="$${ai_bot_base_url}/visitor/api/v1/xmlcurl?token=$${xml_curl_token}"
+        bindings="dialplan" />
+      <!-- ngrok 使用公开可信证书，可以开启证书校验。 -->
+      <param name="enable-cacert-check" value="true" />
+      <param name="enable-ssl-verifyhost" value="true" />
+      <!-- 避免远程注册长时间阻塞。 -->
+      <param name="timeout" value="10" />
+    </binding>
+  </bindings>
+</configuration>

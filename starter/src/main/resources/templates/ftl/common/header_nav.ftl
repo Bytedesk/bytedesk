@@ -74,9 +74,9 @@
 						<li><a class="dropdown-item" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
 						<li><a class="dropdown-item" href="${helpCenterUrl}" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
 						<li><a class="dropdown-item" href="${aiAgentDemoUrl}" target="_blank">AI Agent 演示</a></li>
-						<li><a class="dropdown-item" href="${visitorDemoUrl}" target="_blank">访客对接演示</a></li>
 					</ul>
 				</li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${visitorDemoUrl}" target="_blank"><@t key="nav.visitor.demo">访客对接演示</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
 				

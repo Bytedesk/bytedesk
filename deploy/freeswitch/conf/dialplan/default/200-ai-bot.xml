@@ -1,0 +1,20 @@
+<include>
+  <extension name="ai-bot" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=${unimrcp:profile}"/>
+    </condition>
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=baidu"/>
+    </condition>
+    <condition field="destination_number" expression="^200\d+$">
+      <action application="set" data="hangup_after_bridge=true"/>
+      <action application="log" data="INFO [AI-BOT] incoming call from ${caller_id_number} (${network_addr}) to ${destination_number}"/>
+      <!-- 将被叫号码作为参数传给 HTTAPI（自定义 bot_did） -->
+      <action application="set" data="bot_did=${destination_number}"/>
+      <action application="set" data="unimrcp:profile=${mrcp_profile}"/>
+      <action application="log" data="INFO [AI-BOT] using profile=${mrcp_profile} for ${destination_number}"/>
+      <!-- 直接进入 HTTAPI，服务端负责 answer/playback/hangup；通过 querystring 传参，或也可依赖 POST 表单里的 channel 变量 -->
+      <action application="httapi" data="{url=$${ai_bot_base_url}/ai-bot?bot_did=${destination_number}&amp;mrcp_profile=${mrcp_profile},method=POST}"/>
+    </condition>
+  </extension>
+</include>

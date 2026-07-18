@@ -228,6 +228,10 @@ public class BasicRtpCaptureFileWriter implements RtpCaptureFileWriter {
         private static WavFormat resolve(String codec, int sampleRate) {
             int resolvedSampleRate = sampleRate > 0 ? sampleRate : 8000;
             String normalizedCodec = StringUtils.hasText(codec) ? codec.trim().toLowerCase() : "pcm_s16le";
+            int rateSeparator = normalizedCodec.indexOf('/');
+            if (rateSeparator > 0) {
+                normalizedCodec = normalizedCodec.substring(0, rateSeparator);
+            }
             return switch (normalizedCodec) {
                 case "pcm", "pcm_s16le", "l16", "linear16" -> new WavFormat(1, resolvedSampleRate, 16);
                 case "pcmu", "g711_ulaw", "mulaw", "ulaw" -> new WavFormat(7, resolvedSampleRate, 8);

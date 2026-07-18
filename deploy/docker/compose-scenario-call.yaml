@@ -7,9 +7,10 @@ services:
   bytedesk-mrcp-server:
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/mrcp:latest
     platform: ${MRCP_PLATFORM:-linux/amd64}
-    pull_policy: always
+    # pull_policy: always
     container_name: ${MRCP_CONTAINER_NAME:-mrcp-server-bytedesk}
-    restart: unless-stopped
+    # restart: unless-stopped
+    # restart: always
     ports:
       - "${MRCP_HOST_PORT:-11544}:1544"
       - "${MRCP_RTSP_HOST_PORT:-11554}:1554"
@@ -31,7 +32,7 @@ services:
   bytedesk-freeswitch:
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
     container_name: freeswitch-bytedesk
-    restart: always
+    # restart: always
     entrypoint: ["/usr/local/bin/bytedesk-entrypoint.sh"]
     # FreeSWITCH 要求 -conf、-log、-db 同时指定；log 目录已挂载到宿主机 deploy/freeswitch/log
     command: ["freeswitch", "-nf", "-conf", "/usr/local/freeswitch/conf", "-log", "/usr/local/freeswitch/log", "-db", "/usr/local/freeswitch/db"]
@@ -44,26 +45,31 @@ services:
       # 默认分机密码（对应 vars.xml 的 default_password）
       FREESWITCH_DEFAULT_PASSWORD: ${FREESWITCH_DEFAULT_PASSWORD:-123456}
       # SIP 注册/鉴权默认域名（对应 vars.xml 的 domain）
-      FREESWITCH_DOMAIN: ${FREESWITCH_DOMAIN:-192.168.0.196}
+      FREESWITCH_DOMAIN: ${FREESWITCH_DOMAIN}
       # 本地 Docker 联调时，通过 entrypoint 覆盖 vars.xml，避免修改同一份 conf 后再推远端
       # host.docker.internal 用于容器访问宿主机 HTTP；MRCP/RTP 建议填写宿主机真实可达 IP
       FREESWITCH_AI_BOT_BASE_URL: ${FREESWITCH_AI_BOT_BASE_URL:-http://host.docker.internal:9003}
-      FREESWITCH_MRCP_SERVER_HOST: ${FREESWITCH_MRCP_SERVER_HOST:-192.168.0.196}
+      # Qwen-Audio-Realtime 电话实时媒体桥：当前默认关闭；启用前需确认镜像已安装/加载 mod_audio_stream
+      FREESWITCH_QWEN_REALTIME_MEDIA_BRIDGE_ENABLED: ${FREESWITCH_QWEN_REALTIME_MEDIA_BRIDGE_ENABLED:-false}
+      FREESWITCH_QWEN_REALTIME_MEDIA_WS_URL: ${FREESWITCH_QWEN_REALTIME_MEDIA_WS_URL:-ws://host.docker.internal:9003/visitor/api/v1/call/voice-agent/qwen-realtime/media?output=mod_audio_stream&events=false&model=qwen-audio-3.0-realtime-plus&voice=longanqian&outputSampleRate=24000}
+      FREESWITCH_MRCP_SERVER_HOST: ${FREESWITCH_MRCP_SERVER_HOST}
       FREESWITCH_MRCP_SERVER_PORT: ${FREESWITCH_MRCP_SERVER_PORT:-1544}
-      FREESWITCH_MRCP_RTP_IP: ${FREESWITCH_MRCP_RTP_IP:-192.168.0.196}
+      FREESWITCH_MRCP_RTP_IP: ${FREESWITCH_MRCP_RTP_IP}
       # 百度 MRCP Server 容器地址（用于 9295/9296/9299 等 baidu profile 测试分机）
       FREESWITCH_BAIDU_MRCP_SERVER_HOST: ${FREESWITCH_BAIDU_MRCP_SERVER_HOST:-bytedesk-mrcp-server}
       FREESWITCH_BAIDU_MRCP_SIP_PORT: ${FREESWITCH_BAIDU_MRCP_SIP_PORT:-5060}
-      FREESWITCH_RECORDINGS_PUBLIC_BASE: ${FREESWITCH_RECORDINGS_PUBLIC_BASE:-http://192.168.0.196:15080/freeswitch-recordings}
+      FREESWITCH_RECORDINGS_PUBLIC_BASE: ${FREESWITCH_RECORDINGS_PUBLIC_BASE}
       # 对外宣告给 SIP/SDP 的地址。局域网硬话机场景应固定为宿主机可达地址，避免容器 NAT/STUN 误判。
-      FREESWITCH_EXTERNAL_SIP_IP: ${FREESWITCH_EXTERNAL_SIP_IP:-192.168.0.196}
-      FREESWITCH_EXTERNAL_RTP_IP: ${FREESWITCH_EXTERNAL_RTP_IP:-192.168.0.196}
+      FREESWITCH_EXTERNAL_SIP_IP: ${FREESWITCH_EXTERNAL_SIP_IP}
+      FREESWITCH_EXTERNAL_RTP_IP: ${FREESWITCH_EXTERNAL_RTP_IP}
       # ESL 入站口令（与 vars.xml 的 esl_password 对应）
       FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD:-123456}
       # xml_cdr Basic 凭据密码
       FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-123456}
       # mod_xml_curl 鉴权 token（需与应用侧配置一致）
       FREESWITCH_XML_CURL_TOKEN: ${FREESWITCH_XML_CURL_TOKEN:-change_me_in_production}
+      # Kamailio 中继 IP（写入 ACL 白名单）
+      FREESWITCH_KAMAILIO_IP: ${FREESWITCH_KAMAILIO_IP:-}
       # mod_xml_curl 回源地址（与 XmlCurlController 统一：/visitor/api/v1/xmlcurl）
       FREESWITCH_XML_CURL_GATEWAY_URL: ${FREESWITCH_XML_CURL_GATEWAY_URL:-http://host.docker.internal:9003/visitor/api/v1/xmlcurl}
       # 应用基础地址（用于 cdr_url/user_lookup_url 等派生）

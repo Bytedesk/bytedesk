@@ -402,7 +402,12 @@ public class CallEventListener implements IEslEventListener {
         String infoState = headers.get("presence-call-info-state");
         String status = headers.get("status");
 
-        log.info("Presence: {} direction={} infoState={} status={}", presenceId, direction, infoState, status);
+        // 避免打印大量 null 字段的 INFO 日志
+        if (presenceId == null && direction == null && infoState == null) {
+            log.debug("Presence: status={}", status);
+        } else {
+            log.info("Presence: {} direction={} infoState={} status={}", presenceId, direction, infoState, status);
+        }
 
         // 可在此更新坐席/用户实时状态
         // presenceService.update(presenceId, direction, infoState, status);

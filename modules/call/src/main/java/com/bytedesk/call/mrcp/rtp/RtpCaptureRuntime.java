@@ -16,6 +16,7 @@ public class RtpCaptureRuntime implements AutoCloseable {
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     private volatile Thread workerThread;
+    private volatile boolean receivedAnyData;
 
     public RtpCaptureRuntime(UdpRtpCaptureListener listener) {
         this(listener, DEFAULT_IDLE_COMPLETE_THRESHOLD_MS);
@@ -88,8 +89,9 @@ public class RtpCaptureRuntime implements AutoCloseable {
                     break;
                 }
                 if (received > 0) {
+                    receivedAnyData = true;
                     lastDataTimestamp = System.currentTimeMillis();
-                } else if (System.currentTimeMillis() - lastDataTimestamp >= idleCompleteThresholdMs) {
+                } else if (receivedAnyData && System.currentTimeMillis() - lastDataTimestamp >= idleCompleteThresholdMs) {
                     listener.complete();
                     break;
                 }

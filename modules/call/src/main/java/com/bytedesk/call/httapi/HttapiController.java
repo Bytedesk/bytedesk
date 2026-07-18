@@ -227,6 +227,14 @@ public class HttapiController {
         String mode = Optional.ofNullable(vars.get("mode"))
                 .orElse(Optional.ofNullable(vars.get("variable_mode")).orElse("single"))
                 .trim().toLowerCase(Locale.ROOT);
+        String botDid = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did", "destination_number", "variable_destination_number");
+        String orgUid = pickFirstNonEmpty(vars, "org_uid", "variable_org_uid");
+        String provider = pickFirstNonEmpty(vars, "voice_agent_provider", "variable_voice_agent_provider");
+        String instructions = pickFirstNonEmpty(vars, "voice_agent_instructions", "variable_voice_agent_instructions");
+        String realtimeModel = pickFirstNonEmpty(vars, "voice_agent_realtime_model", "variable_voice_agent_realtime_model");
+        String realtimeVoice = pickFirstNonEmpty(vars, "voice_agent_realtime_voice", "variable_voice_agent_realtime_voice");
+        String ttsModel = pickFirstNonEmpty(vars, "voice_agent_tts_model", "variable_voice_agent_tts_model");
+        String ttsVoice = pickFirstNonEmpty(vars, "voice_agent_tts_voice", "variable_voice_agent_tts_voice");
         String fileUrl = pickFirstNonEmpty(vars,
                 "file_url", "turn_record_url", "record_url",
                 "variable_file_url", "variable_turn_record_url", "variable_record_url");
@@ -240,9 +248,23 @@ public class HttapiController {
 
         try {
             VoiceAgentHttpClient.VoiceAgentChatResult result = voiceAgentHttpClient.chat(
-                    resolveAppBaseUrl(request), fileUrl, conversationId, null);
+            resolveAppBaseUrl(request),
+            fileUrl,
+            conversationId,
+            null,
+            orgUid,
+            botDid,
+            provider,
+            instructions,
+            realtimeModel,
+            realtimeVoice,
+            ttsModel,
+            ttsVoice);
             String transcript = result.transcript();
             boolean exitRequested = containsExitIntent(transcript) || containsExitIntent(result.replyText());
+            boolean keepAliveUntilHangup = "qwen-audio-realtime".equalsIgnoreCase(provider)
+                && "9205".equals(botDid)
+                && "unlimited".equals(mode);
             String audioUrl = result.replyAudioUrl();
 
             if (!hasText(audioUrl) && hasText(result.replyText())) {
@@ -255,12 +277,32 @@ public class HttapiController {
             if (hasText(result.replyText())) {
                 x.execute("export", "bot_reply_text=" + result.replyText().trim());
             }
+            if (hasText(result.nextActionType())) {
+                x.execute("export", "bot_route=" + result.nextActionType().trim());
+            }
+            if (hasText(result.queueName())) {
+                x.execute("export", "bot_queue_name=" + result.queueName().trim());
+            }
+            if (hasText(result.queueUid())) {
+                x.execute("export", "bot_queue_uid=" + result.queueUid().trim());
+            }
+            if (hasText(result.leaveReason())) {
+                x.execute("export", "bot_leave_reason=" + result.leaveReason().trim());
+            }
+            if (result.maxRecordSeconds() != null && result.maxRecordSeconds() > 0) {
+                x.execute("export", "bot_leave_max_record_seconds=" + result.maxRecordSeconds());
+            }
+            if (result.ringTimeoutSeconds() != null && result.ringTimeoutSeconds() > 0) {
+                x.execute("export", "bot_ring_timeout_seconds=" + result.ringTimeoutSeconds());
+            }
             if (hasText(audioUrl)) {
                 x.execute("playback", normalizePlaybackUrl(audioUrl, request));
             } else {
                 x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
             }
-            x.execute("export", "bot_continue=" + resolveBotContinue(mode, exitRequested));
+            boolean forceStop = hasText(result.nextActionType())
+                    && !"CONTINUE".equalsIgnoreCase(result.nextActionType());
+            x.execute("export", "bot_continue=" + resolveBotContinue(mode, forceStop || keepAliveUntilHangup ? false : exitRequested));
             x.breakTag();
             return x.build().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ex) {

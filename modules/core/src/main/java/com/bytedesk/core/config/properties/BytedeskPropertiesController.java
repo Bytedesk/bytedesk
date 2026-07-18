@@ -101,8 +101,8 @@ public class BytedeskPropertiesController {
                             licenseInfo.getEdition(), licenseInfo.getExpiryDate());
                 }
                 bytedeskPropertiesResponse.setLicenseKey(LicenseValidator.encryptForFrontend(licenseInfo));
-                log.info("License validated and transformed for frontend: format={}, edition={}, expiry={}",
-                        licenseInfo.getFormat(), licenseInfo.getEdition(), licenseInfo.getExpiryDate());
+                // log.info("License validated and transformed for frontend: format={}, edition={}, expiry={}",
+                //         licenseInfo.getFormat(), licenseInfo.getEdition(), licenseInfo.getExpiryDate());
             } else {
                 stringRedisTemplate.opsForValue().set(cacheKey, "false",
                         java.time.Duration.ofMinutes(30));

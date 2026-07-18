@@ -9,10 +9,12 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Minimal UDP listener that forwards RTP datagrams into a capture receiver.
  */
+@Slf4j
 public class UdpRtpCaptureListener implements Closeable {
 
     static final int DEFAULT_PACKET_BUFFER_SIZE = 2048;
@@ -26,6 +28,8 @@ public class UdpRtpCaptureListener implements Closeable {
     private final InetAddress expectedRemoteAddress;
     private final int expectedRemotePort;
     private volatile boolean closed;
+    private int acceptedPacketLogCount;
+    private int unexpectedRemoteLogCount;
 
     public UdpRtpCaptureListener(BytedeskRtpSessionFactory.RtpSession session, RtpCaptureReceiver captureReceiver) {
         this(session, captureReceiver, DEFAULT_BIND_HOST, -1, DEFAULT_PACKET_BUFFER_SIZE);
@@ -92,9 +96,10 @@ public class UdpRtpCaptureListener implements Closeable {
         try {
             datagramSocket.receive(packet);
             if (!isExpectedRemote(packet)) {
-                return 0;
+                logUnexpectedRemote(packet);
             }
             captureReceiver.acceptPacket(packet.getData(), packet.getOffset(), packet.getLength());
+            logAcceptedPacket(packet);
             return packet.getLength();
         } catch (SocketTimeoutException timeout) {
             return 0;
@@ -165,5 +170,35 @@ public class UdpRtpCaptureListener implements Closeable {
         boolean hostMatches = expectedRemoteAddress == null || expectedRemoteAddress.equals(remoteAddress);
         boolean portMatches = expectedRemotePort <= 0 || expectedRemotePort == packet.getPort();
         return hostMatches && portMatches;
+    }
+
+    private void logAcceptedPacket(DatagramPacket packet) {
+        if (acceptedPacketLogCount >= 3) {
+            return;
+        }
+        acceptedPacketLogCount++;
+        log.info(
+                "MRCP RTP packet accepted local={} remote={}:{} length={} expectedRemote={}:{}",
+                localAddress(),
+                packet.getAddress().getHostAddress(),
+                packet.getPort(),
+                packet.getLength(),
+                expectedRemoteAddress != null ? expectedRemoteAddress.getHostAddress() : "any",
+                expectedRemotePort > 0 ? expectedRemotePort : "any");
+    }
+
+    private void logUnexpectedRemote(DatagramPacket packet) {
+        if (unexpectedRemoteLogCount >= 5) {
+            return;
+        }
+        unexpectedRemoteLogCount++;
+        log.info(
+                "MRCP RTP packet source differs from SDP; accepting for local capture. local={} remote={}:{} length={} expectedRemote={}:{}",
+                localAddress(),
+                packet.getAddress().getHostAddress(),
+                packet.getPort(),
+                packet.getLength(),
+                expectedRemoteAddress != null ? expectedRemoteAddress.getHostAddress() : "any",
+                expectedRemotePort > 0 ? expectedRemotePort : "any");
     }
 }

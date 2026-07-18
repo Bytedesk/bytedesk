@@ -1,0 +1,8 @@
+<include>
+  <!--
+    07138838992 is now controlled by database CallRoute rules through mod_xml_curl.
+    Configure targetType=IVR_MENU/EXTENSION/VOICEMAIL in callAdmin instead of
+    hardcoding transfer 5002 here, otherwise this static XML would win before
+    dynamic routing can decide the destination.
+  -->
+</include>

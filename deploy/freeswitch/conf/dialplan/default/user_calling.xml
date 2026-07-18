@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<include>
+  <context name="default">
+    
+    <!-- User-to-User Calling Extension -->
+    <extension name="user_calling" continue="true">
+      <condition field="destination_number" expression="^(?!9196$|9197$|9198$|9664$)[A-Za-z0-9][A-Za-z0-9_.-]{2,63}$">
+        <action application="log" data="INFO User calling: ${caller_id_number} -> ${destination_number}"/>
+        <action application="set" data="call_timeout=60"/>
+        <action application="set" data="hangup_after_bridge=true"/>
+        <action application="set" data="continue_on_fail=true"/>
+        <action application="set" data="bridge_export" value="rtp_timeout_sec=300"/>
+        <action application="set" data="bridge_export" value="rtp_hold_timeout_sec=1800"/>
+        <action application="bridge" data="user/${destination_number}@${domain_name}"/>
+      </condition>
+    </extension>
+    
+    <!-- Echo Test Extension (9196) -->
+    <extension name="echo_test">
+      <condition field="destination_number" expression="^9196$">
+        <action application="answer"/>
+        <action application="set" data="hangup_after_bridge=false"/>
+        <action application="echo"/>
+      </condition>
+    </extension>
+    
+    <!-- Milliwatt Test Tone (9197) -->
+    <extension name="milliwatt_test">
+      <condition field="destination_number" expression="^9197$">
+        <action application="answer"/>
+        <action application="playback" data="tone_stream://%(1000,0,1004);loops=-1"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    
+    <!-- Tetris Music (9198) -->
+    <extension name="tetris_test">
+      <condition field="destination_number" expression="^9198$">
+        <action application="answer"/>
+        <action application="playback" data="tone_stream://tetris.ttml"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    
+    <!-- Hold Music / Music on Hold (9664) -->
+    <extension name="hold_music">
+      <condition field="destination_number" expression="^9664$">
+        <action application="answer"/>
+        <action application="playback" data="local_stream://moh"/>
+        <action application="hangup"/>
+      </condition>
+    </extension>
+    
+  </context>
+</include>

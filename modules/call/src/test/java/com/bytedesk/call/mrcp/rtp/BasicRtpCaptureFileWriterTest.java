@@ -50,4 +50,35 @@ class BasicRtpCaptureFileWriterTest {
         assertEquals(4, header.getInt(40));
         assertArrayEquals(payload, java.util.Arrays.copyOfRange(bytes, 44, 48));
     }
+
+    @Test
+    void writesWaveHeaderForPcmuCapture() throws Exception {
+        Path captureFile = tempDir.resolve("capture-pcmu.wav");
+        BasicRtpCaptureFileWriter writer = new BasicRtpCaptureFileWriter();
+
+        RtpCaptureRoute route = writer.openFileCapture(
+                captureFile.toString(),
+                "audio/wav",
+                "PCMU/8000",
+                8000,
+                null);
+
+        byte[] payload = new byte[] {0x11, 0x22, 0x33, 0x44};
+        route.output().write(payload);
+        route.output().complete();
+
+        byte[] bytes = Files.readAllBytes(captureFile);
+        assertEquals(48, bytes.length);
+
+        ByteBuffer header = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+        assertEquals(40, header.getInt(4));
+        assertEquals(7, header.getShort(20));
+        assertEquals(1, header.getShort(22));
+        assertEquals(8000, header.getInt(24));
+        assertEquals(8000, header.getInt(28));
+        assertEquals(1, header.getShort(32));
+        assertEquals(8, header.getShort(34));
+        assertEquals(4, header.getInt(40));
+        assertArrayEquals(payload, java.util.Arrays.copyOfRange(bytes, 44, 48));
+    }
 }

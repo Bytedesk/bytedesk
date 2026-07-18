@@ -33,7 +33,54 @@ public class VoiceAgentHttpClient {
                 textValue(data, "conversationId"),
                 textValue(data, "transcript"),
                 textValue(data, "replyText"),
-                textValue(data, "replyAudioUrl"));
+            textValue(data, "replyAudioUrl"),
+            textValue(data, "nextActionType"),
+            textValue(data, "queueName"),
+            textValue(data, "queueUid"),
+            textValue(data, "leaveReason"),
+            textValue(data, "promptText"),
+            integerValue(data, "maxRecordSeconds"),
+            integerValue(data, "ringTimeoutSeconds"));
+    }
+
+    public VoiceAgentChatResult chat(String appBaseUrl,
+            String fileUrl,
+            String conversationId,
+            String prompt,
+            String orgUid,
+            String botDid,
+            String provider,
+            String instructions,
+            String realtimeModel,
+            String realtimeVoice,
+            String ttsModel,
+            String ttsVoice) {
+        String requestBody = "{" +
+                jsonField("fileUrl", fileUrl) + "," +
+                jsonField("conversationId", conversationId) + "," +
+                jsonField("prompt", prompt) + "," +
+                jsonField("orgUid", orgUid) + "," +
+                jsonField("botDid", botDid) + "," +
+                jsonField("provider", provider) + "," +
+                jsonField("instructions", instructions) + "," +
+                jsonField("realtimeModel", realtimeModel) + "," +
+                jsonField("realtimeVoice", realtimeVoice) + "," +
+                jsonField("ttsModel", ttsModel) + "," +
+                jsonField("ttsVoice", ttsVoice) +
+                "}";
+        JsonNode data = post(appBaseUrl, "/visitor/api/v1/call/voice-agent/turn", requestBody);
+        return new VoiceAgentChatResult(
+                textValue(data, "conversationId"),
+                textValue(data, "transcript"),
+                textValue(data, "replyText"),
+                textValue(data, "replyAudioUrl"),
+                textValue(data, "nextActionType"),
+                textValue(data, "queueName"),
+                textValue(data, "queueUid"),
+                textValue(data, "leaveReason"),
+                textValue(data, "promptText"),
+                integerValue(data, "maxRecordSeconds"),
+                integerValue(data, "ringTimeoutSeconds"));
     }
 
     public VoiceAgentSpeakResult speak(String appBaseUrl, String text) {
@@ -50,14 +97,16 @@ public class VoiceAgentHttpClient {
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                     .build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+            HttpResponse<String> response = httpClient.send(request,
+                    HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
             if (response.statusCode() < 200 || response.statusCode() >= 300) {
                 throw new IllegalStateException("voice agent http status=" + response.statusCode());
             }
             JsonNode root = objectMapper.readTree(response.body());
             int code = root.path("code").asInt(500);
             if (code != 200) {
-                throw new IllegalStateException("voice agent business code=" + code + ", message=" + root.path("message").asText());
+                throw new IllegalStateException(
+                        "voice agent business code=" + code + ", message=" + root.path("message").asText());
             }
             JsonNode data = root.path("data");
             if (data.isMissingNode() || data.isNull()) {
@@ -84,16 +133,33 @@ public class VoiceAgentHttpClient {
         return value.isMissingNode() || value.isNull() ? null : value.asText(null);
     }
 
+    private static Integer integerValue(JsonNode node, String field) {
+        JsonNode value = node.path(field);
+        return value.isMissingNode() || value.isNull() ? null : value.asInt();
+    }
+
     private static String jsonField(String key, String value) {
-        String escaped = value == null ? "" : value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r");
+        String escaped = value == null ? ""
+                : value
+                        .replace("\\", "\\\\")
+                        .replace("\"", "\\\"")
+                        .replace("\n", "\\n")
+                        .replace("\r", "\\r");
         return "\"" + key + "\":\"" + escaped + "\"";
     }
 
-    public record VoiceAgentChatResult(String conversationId, String transcript, String replyText, String replyAudioUrl) {
+    public record VoiceAgentChatResult(
+            String conversationId,
+            String transcript,
+            String replyText,
+            String replyAudioUrl,
+            String nextActionType,
+            String queueName,
+            String queueUid,
+            String leaveReason,
+            String promptText,
+            Integer maxRecordSeconds,
+            Integer ringTimeoutSeconds) {
     }
 
     public record VoiceAgentSpeakResult(String replyText, String replyAudioUrl) {
