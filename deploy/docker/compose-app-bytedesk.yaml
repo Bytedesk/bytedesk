@@ -210,6 +210,32 @@ services:
       BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
       BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
       BYTEDESK_CALL_FREESWITCH_DOMAIN: example.com
+      # AI 会话并发守护（每个组织最大并发 AI 语音会话数，超限返回忙线）
+      BYTEDESK_CALL_AI_SESSION_MAX_CONCURRENCY_PER_ORG: 10
+      # 僵死会话 TTL（分钟），超时未释放的会话会被定时清理
+      BYTEDESK_CALL_AI_SESSION_STALE_TTL_MINUTES: 30
+      # 僵死会话清理间隔（毫秒）
+      BYTEDESK_CALL_AI_SESSION_SWEEP_INTERVAL_MS: 60000
+      # 分机导入来源：esl 或 directory。默认优先通过 ESL list_users 读取 FreeSWITCH 目录分机。
+      BYTEDESK_CALL_FREESWITCH_EXTENSION_IMPORT_SOURCE: esl
+      # 当 ESL list_users 不可用或返回空时，是否回退扫描应用容器内挂载的 FreeSWITCH conf/directory。
+      BYTEDESK_CALL_FREESWITCH_EXTENSION_IMPORT_DIRECTORY_FALLBACK_ENABLED: "false"
+      # AI hotline 动态入口路由同步：为已发布的 AI 分机自动创建/回填 CallRoute。
+      BYTEDESK_CALL_AI_HOTLINE_ROUTE_SYNC_ENABLED: "true"
+      # 调试开关：开启后仅记录将要同步的路由，不真正写入数据库。
+      BYTEDESK_CALL_AI_HOTLINE_ROUTE_SYNC_DRY_RUN: "false"
+      # xml_curl 功能开关：dialplan/directory/configuration/phrases 后备处理
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIALPLAN_ENABLED: "true"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIRECTORY_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_CONFIGURATION_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_PHRASES_ENABLED: "false"
+      # xml_curl directory 用户列表：user1@domain:password,...
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIRECTORY_USERS: "1000@default:1234"
+      # xml_curl configuration 白名单，逗号分隔（支持 100-200 范围写法）
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_CONFIG_WHITELIST:
+      # 目录回退时扫描的 FreeSWITCH conf 根目录；需与下方 volumes 中的宿主机挂载保持一致。
+      BYTEDESK_CALL_FREESWITCH_CONF_DIR: /app/freeswitch/conf
+      # 
       BYTEDESK_CALL_MRCP_ENABLED: "false"
       BYTEDESK_CALL_MRCP_PROFILE: java-mrcp
       BYTEDESK_CALL_MRCP_HOST: 0.0.0.0
@@ -437,6 +463,7 @@ services:
       - helpcenter_data:/app/helpcenter
       - blog_data:/app/blog
       - log_data:/app/logs
+      - ../freeswitch/conf:/app/freeswitch/conf:ro
     networks:
       - bytedesk-network
 

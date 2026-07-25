@@ -24,8 +24,8 @@
 
       <action application="set"
         data="turn_record_name=ai-bot-9201-r1_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="turn_record_file=$${recordings_dir}/${turn_record_name}" />
-      <action application="set" data="turn_record_url=$${recordings_public_base}/${turn_record_name}" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
       <action application="log" data="INFO [AI-BOT-MULTI] R1 start record file=${turn_record_file}" />
       <action application="record" data="${turn_record_file} 8 200 3" />
       <action application="sleep" data="200" />
@@ -41,8 +41,8 @@
     <condition field="destination_number" expression="^92111$">
       <action application="set"
         data="turn_record_name=ai-bot-9201-r2_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="turn_record_file=$${recordings_dir}/${turn_record_name}" />
-      <action application="set" data="turn_record_url=$${recordings_public_base}/${turn_record_name}" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
       <action application="log" data="INFO [AI-BOT-MULTI] R2 start record file=${turn_record_file}" />
       <action application="record" data="${turn_record_file} 8 200 3" />
       <action application="sleep" data="200" />
@@ -65,8 +65,8 @@
     <condition field="destination_number" expression="^92121$">
       <action application="set"
         data="turn_record_name=ai-bot-9201-r3_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="turn_record_file=$${recordings_dir}/${turn_record_name}" />
-      <action application="set" data="turn_record_url=$${recordings_public_base}/${turn_record_name}" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
       <action application="log" data="INFO [AI-BOT-MULTI] R3 start record file=${turn_record_file}" />
       <action application="record" data="${turn_record_file} 8 200 3" />
       <action application="sleep" data="200" />
@@ -115,8 +115,8 @@
     <condition field="destination_number" expression="^92030$">
       <action application="set"
         data="turn_record_name=ai-bot-9203_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="turn_record_file=$${recordings_dir}/${turn_record_name}" />
-      <action application="set" data="turn_record_url=$${recordings_public_base}/${turn_record_name}" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
       <action application="log" data="INFO [AI-BOT-9203] loop start record file=${turn_record_file}" />
       <action application="record" data="${turn_record_file} 8 200 3" />
       <action application="sleep" data="200" />
@@ -167,7 +167,6 @@
     <condition field="destination_number" expression="^9205$">
       <action application="set" data="hangup_after_bridge=true" />
       <action application="answer" />
-      <action application="set" data="org_uid=df_org_uid" />
       <action application="set" data="voice_agent=true" />
       <action application="set" data="voice_agent_provider=qwen-audio-realtime" />
       <action application="set" data="voice_agent_realtime_model=qwen-audio-3.0-realtime-plus" />
@@ -178,7 +177,7 @@
       <action application="log" data="INFO [AI-BOT-9205] qwen realtime entry caller=${caller_id_number} uuid=${uuid}" />
       <action application="playback" data="tone_stream://%(300,1000,440);loops=1" />
       <action application="httapi"
-        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true&amp;org_uid=${org_uid},method=POST}" />
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true,method=POST}" />
       <action application="sleep" data="200" />
       <action application="transfer" data="92050 XML default" />
     </condition>
@@ -186,66 +185,17 @@
 
   <extension name="92-ai-bot-qwen-realtime-loop" continue="false">
     <condition field="destination_number" expression="^92050$">
-      <action application="unset" data="bot_route" />
-      <action application="unset" data="bot_queue_name" />
-      <action application="unset" data="bot_queue_uid" />
-      <action application="unset" data="bot_leave_reason" />
-      <action application="unset" data="bot_leave_record_file" />
-      <action application="unset" data="bot_leave_record_url" />
-      <action application="unset" data="bot_ring_timeout_seconds" />
-      <action application="set" data="bot_leave_max_record_seconds=120" />
       <action application="set"
         data="turn_record_name=ai-bot-9205_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="turn_record_file=$${recordings_dir}/${turn_record_name}" />
-      <action application="set" data="turn_record_url=$${recordings_public_base}/${turn_record_name}" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
       <action application="log" data="INFO [AI-BOT-9205] record file=${turn_record_file}" />
       <action application="record" data="${turn_record_file} 8 200 3" />
       <action application="sleep" data="200" />
       <action application="httapi"
-        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true&amp;org_uid=${org_uid}&amp;file_url=${turn_record_url}&amp;conversation_id=${uuid},method=POST}" />
-      <action application="log" data="INFO [AI-BOT-9205] bot_continue='${bot_continue}' bot_route='${bot_route}' queue='${bot_queue_name}' leave='${bot_leave_reason}'" />
-      <action application="transfer" data="92052${bot_route} XML default" />
-    </condition>
-  </extension>
-
-  <extension name="92-ai-bot-qwen-realtime-route-continue" continue="false">
-    <condition field="destination_number" expression="^92052CONTINUE$">
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true&amp;file_url=${turn_record_url}&amp;conversation_id=${uuid},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-9205] bot_continue='${bot_continue}'" />
       <action application="transfer" data="92051${bot_continue} XML default" />
-    </condition>
-  </extension>
-
-  <extension name="92-ai-bot-qwen-realtime-route-enqueue" continue="false">
-    <condition field="destination_number" expression="^92052ACD_ENQUEUE$">
-      <action application="set" data="call_timeout=${bot_ring_timeout_seconds}" />
-      <action application="fifo" data="${bot_queue_name}@${domain_name} in undef $${hold_music}" />
-    </condition>
-  </extension>
-
-  <extension name="92-ai-bot-qwen-realtime-route-leave-message" continue="false">
-    <condition field="destination_number" expression="^92052LEAVE_MESSAGE$">
-      <action application="transfer" data="92053 XML default" />
-    </condition>
-  </extension>
-
-  <extension name="92-ai-bot-qwen-realtime-route-stop" continue="false">
-    <condition field="destination_number" expression="^92052$|^92052HANGUP$">
-      <action application="hangup" />
-    </condition>
-  </extension>
-
-  <extension name="92-ai-bot-qwen-realtime-save-leave-message" continue="false">
-    <condition field="destination_number" expression="^92053$">
-      <action application="set"
-        data="bot_leave_record_name=ai-bot-9205-voicemail_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
-      <action application="set" data="bot_leave_record_file=$${recordings_dir}/${bot_leave_record_name}" />
-      <action application="set" data="bot_leave_record_url=$${recordings_public_base}/${bot_leave_record_name}" />
-      <action application="playback" data="tone_stream://%(200,0,880);loops=1" />
-      <action application="sleep" data="150" />
-      <action application="log" data="INFO [AI-BOT-9205] leave-message record file=${bot_leave_record_file} maxSeconds=${bot_leave_max_record_seconds}" />
-      <action application="record" data="${bot_leave_record_file} ${bot_leave_max_record_seconds} 200 3" />
-      <action application="sleep" data="200" />
-      <action application="httapi"
-        data="{url=$${ai_bot_base_url}/visitor/api/v1/leave-message/save?orgUid=${org_uid}&amp;callUuid=${uuid}&amp;callerIdNumber=${caller_id_number}&amp;destinationNumber=${destination_number}&amp;didNumber=9205&amp;queueUid=${bot_queue_uid}&amp;leaveReason=${bot_leave_reason}&amp;recordingUrl=${bot_leave_record_url},method=GET}" />
     </condition>
   </extension>
 

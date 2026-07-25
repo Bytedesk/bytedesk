@@ -20,6 +20,7 @@
 	<properties>
 		<ollama4j.version>1.0.100</ollama4j.version>
 		<jsonp.version>1.18.3</jsonp.version>
+		<okhttp.version>4.12.0</okhttp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<zai-sdk.version>0.3.3</zai-sdk.version>
@@ -232,17 +233,17 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>3.14.9</version>
+			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp-sse</artifactId>
-			<version>3.14.9</version>
+			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>logging-interceptor</artifactId>
-			<version>3.14.9</version>
+			<version>${okhttp.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.auth0</groupId>

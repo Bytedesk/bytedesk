@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,7 +59,7 @@ public class HttapiController {
 
         // -- Incoming request trace for troubleshooting no-audio/hangup on 9201
         try {
-            String botDid = Optional.ofNullable(vars.get("bot_did")).orElse(vars.getOrDefault("variable_bot_did", ""));
+            String did = Optional.ofNullable(vars.get("bot_did")).orElse(vars.getOrDefault("variable_bot_did", ""));
             String modeReq = Optional.ofNullable(vars.get("mode")).orElse(vars.getOrDefault("variable_mode", ""));
             String remote = safe(request.getRemoteAddr()) + ":" + request.getRemotePort();
             String xff = safe(request.getHeader("X-Forwarded-For"));
@@ -68,8 +69,8 @@ public class HttapiController {
             String ct = safe(request.getContentType());
             String qs = safe(request.getQueryString());
             log.info(
-                    "HTTAPI /ai-bot turn={} mode='{}' bot_did='{}' mrcpReady={} (probe={}) remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}' paramKeys={}",
-                    turn, modeReq, botDid, mrcpReady, probe, remote, xff, xfp, xfh, truncate(ua, 120), ct, qs,
+                "HTTAPI /ai-bot turn={} mode='{}' did='{}' mrcpReady={} (probe={}) remote={} xff='{}' proto='{}' host='{}' ua='{}' ct='{}' qs='{}' paramKeys={}",
+                turn, modeReq, did, mrcpReady, probe, remote, xff, xfp, xfh, truncate(ua, 120), ct, qs,
                     vars.keySet());
             // Key recognition variables snapshot (shortened)
             String recog = Optional.ofNullable(vars.get("RECOG_RESULT"))
@@ -135,15 +136,28 @@ public class HttapiController {
 
     private byte[] firstTurnVoiceAgent(Map<String, String> vars, HttpServletRequest request) {
         HttapiXml x = new HttapiXml();
+        String did = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did", "destination_number", "variable_destination_number");
+        String orgUid = pickFirstNonEmpty(vars, "org_uid", "variable_org_uid");
         String greetText = Optional.ofNullable(vars.get("greet"))
                 .orElse(vars.getOrDefault("variable_greet", "您好，我是微语智能助手，请问您有什么可以帮您？"));
         try {
-            VoiceAgentHttpClient.VoiceAgentSpeakResult speakResult = voiceAgentHttpClient
-                    .speak(resolveAppBaseUrl(request), greetText);
-            if (hasText(speakResult.replyAudioUrl())) {
-                x.execute("playback", normalizePlaybackUrl(speakResult.replyAudioUrl(), request));
+            VoiceAgentHttpClient.VoiceAgentWelcomeResult welcomeResult = null;
+            if (StringUtils.hasText(did)) {
+                welcomeResult = voiceAgentHttpClient.welcome(resolveAppBaseUrl(request), orgUid, did);
+            }
+            if (welcomeResult != null && hasText(welcomeResult.welcomeAudioUrl())) {
+                x.execute("playback", normalizePlaybackUrl(welcomeResult.welcomeAudioUrl(), request));
             } else {
-                x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+                String resolvedGreetText = hasText(welcomeResult != null ? welcomeResult.welcomeText() : null)
+                        ? welcomeResult.welcomeText()
+                        : greetText;
+                VoiceAgentHttpClient.VoiceAgentSpeakResult speakResult = voiceAgentHttpClient
+                        .speak(resolveAppBaseUrl(request), resolvedGreetText);
+                if (hasText(speakResult.replyAudioUrl())) {
+                    x.execute("playback", normalizePlaybackUrl(speakResult.replyAudioUrl(), request));
+                } else {
+                    x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
+                }
             }
         } catch (Exception ex) {
             log.warn("voice-agent firstTurn speak failed: {}", ex.toString());
@@ -227,7 +241,7 @@ public class HttapiController {
         String mode = Optional.ofNullable(vars.get("mode"))
                 .orElse(Optional.ofNullable(vars.get("variable_mode")).orElse("single"))
                 .trim().toLowerCase(Locale.ROOT);
-        String botDid = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did", "destination_number", "variable_destination_number");
+        String did = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did", "destination_number", "variable_destination_number");
         String orgUid = pickFirstNonEmpty(vars, "org_uid", "variable_org_uid");
         String provider = pickFirstNonEmpty(vars, "voice_agent_provider", "variable_voice_agent_provider");
         String instructions = pickFirstNonEmpty(vars, "voice_agent_instructions", "variable_voice_agent_instructions");
@@ -238,6 +252,8 @@ public class HttapiController {
         String fileUrl = pickFirstNonEmpty(vars,
                 "file_url", "turn_record_url", "record_url",
                 "variable_file_url", "variable_turn_record_url", "variable_record_url");
+        String callUuid = pickFirstNonEmpty(vars,
+            "uuid", "variable_uuid");
         String conversationId = pickFirstNonEmpty(vars,
                 "conversation_id", "variable_conversation_id",
                 "uuid", "variable_uuid");
@@ -246,14 +262,19 @@ public class HttapiController {
             return buildVoiceAgentRetryReply(x, mode, request, "我还没有收到本轮录音，请您再说一次。", true);
         }
 
+        // host.docker.internal 仅在 Docker 容器内可解析；Java 应用运行在宿主机上，
+        // 下载录音文件时需要替换为 127.0.0.1
+        String resolvedFileUrl = normalizeFileDownloadUrl(fileUrl);
+
         try {
             VoiceAgentHttpClient.VoiceAgentChatResult result = voiceAgentHttpClient.chat(
             resolveAppBaseUrl(request),
-            fileUrl,
+            resolvedFileUrl,
             conversationId,
+            callUuid,
             null,
             orgUid,
-            botDid,
+            did,
             provider,
             instructions,
             realtimeModel,
@@ -263,7 +284,7 @@ public class HttapiController {
             String transcript = result.transcript();
             boolean exitRequested = containsExitIntent(transcript) || containsExitIntent(result.replyText());
             boolean keepAliveUntilHangup = "qwen-audio-realtime".equalsIgnoreCase(provider)
-                && "9205".equals(botDid)
+                && "9205".equals(did)
                 && "unlimited".equals(mode);
             String audioUrl = result.replyAudioUrl();
 
@@ -277,9 +298,6 @@ public class HttapiController {
             if (hasText(result.replyText())) {
                 x.execute("export", "bot_reply_text=" + result.replyText().trim());
             }
-            if (hasText(result.nextActionType())) {
-                x.execute("export", "bot_route=" + result.nextActionType().trim());
-            }
             if (hasText(result.queueName())) {
                 x.execute("export", "bot_queue_name=" + result.queueName().trim());
             }
@@ -288,6 +306,12 @@ public class HttapiController {
             }
             if (hasText(result.leaveReason())) {
                 x.execute("export", "bot_leave_reason=" + result.leaveReason().trim());
+            }
+            if (hasText(result.ivrMenuUid())) {
+                x.execute("export", "bot_ivr_menu_uid=" + result.ivrMenuUid().trim());
+            }
+            if (hasText(result.ivrExtensionNumber())) {
+                x.execute("export", "bot_ivr_extension_number=" + result.ivrExtensionNumber().trim());
             }
             if (result.maxRecordSeconds() != null && result.maxRecordSeconds() > 0) {
                 x.execute("export", "bot_leave_max_record_seconds=" + result.maxRecordSeconds());
@@ -302,6 +326,10 @@ public class HttapiController {
             }
             boolean forceStop = hasText(result.nextActionType())
                     && !"CONTINUE".equalsIgnoreCase(result.nextActionType());
+                String botRoute = forceStop || !exitRequested
+                    ? (hasText(result.nextActionType()) ? result.nextActionType() : "CONTINUE")
+                    : "HANGUP";
+            x.execute("export", "bot_route=" + botRoute.trim());
             x.execute("export", "bot_continue=" + resolveBotContinue(mode, forceStop || keepAliveUntilHangup ? false : exitRequested));
             x.breakTag();
             return x.build().getBytes(StandardCharsets.UTF_8);
@@ -323,6 +351,7 @@ public class HttapiController {
             log.warn("voice-agent fallback speak failed missingFile={} : {}", missingFile, ex.toString());
             x.execute("playback", "tone_stream://%(300,1000,440);loops=1");
         }
+        x.execute("export", "bot_route=CONTINUE");
         x.execute("export", "bot_continue=" + resolveBotContinue(mode, false));
         x.breakTag();
         return x.build().getBytes(StandardCharsets.UTF_8);
@@ -427,8 +456,8 @@ public class HttapiController {
         if (hasText(explicit)) {
             return "1".equals(explicit) || "true".equalsIgnoreCase(explicit);
         }
-        String botDid = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did");
-        return "9201".equals(botDid) || "9203".equals(botDid);
+        String did = pickFirstNonEmpty(vars, "bot_did", "variable_bot_did");
+        return "9201".equals(did) || "9203".equals(did) || "9205".equals(did);
     }
 
     private String resolveAppBaseUrl(HttpServletRequest request) {
@@ -440,11 +469,62 @@ public class HttapiController {
         }
 
         int port = request.getServerPort();
+        String serverName = normalizeSelfCallHost(request.getServerName());
         boolean defaultPort = ("http".equalsIgnoreCase(scheme) && port == 80)
                 || ("https".equalsIgnoreCase(scheme) && port == 443);
         return defaultPort
-                ? scheme + "://" + request.getServerName()
-                : scheme + "://" + request.getServerName() + ":" + port;
+                ? scheme + "://" + serverName
+                : scheme + "://" + serverName + ":" + port;
+    }
+
+    private String normalizeSelfCallHost(String host) {
+        if (!hasText(host)) {
+            return CallConstants.LOOPBACK_IPV4;
+        }
+        String normalized = host.trim();
+        if ("host.docker.internal".equalsIgnoreCase(normalized) || "0.0.0.0".equals(normalized)) {
+            return CallConstants.LOOPBACK_IPV4;
+        }
+        return normalized;
+    }
+
+    /**
+     * 将录音文件 URL 中的 host.docker.internal 替换为 127.0.0.1，
+     * 因为 Java 应用运行在宿主机上，无法解析 host.docker.internal。
+     */
+    private String normalizeFileDownloadUrl(String fileUrl) {
+        if (!hasText(fileUrl)) {
+            return fileUrl;
+        }
+        return fileUrl.replace("host.docker.internal", CallConstants.LOOPBACK_IPV4);
+    }
+
+    /**
+     * Returns a base URL that FreeSWITCH (or any Docker-side consumer) can reach
+     * to fetch playback files. Unlike {@link #resolveAppBaseUrl}, this preserves
+     * host.docker.internal so the Docker container can route back to the host.
+     */
+    private String resolvePlaybackBaseUrl(HttpServletRequest request) {
+        String forwardedProto = request.getHeader("X-Forwarded-Proto");
+        String scheme = hasText(forwardedProto) ? forwardedProto.trim() : request.getScheme();
+        String forwardedHost = request.getHeader("X-Forwarded-Host");
+        if (hasText(forwardedHost)) {
+            return scheme + "://" + forwardedHost.trim();
+        }
+        int port = request.getServerPort();
+        String serverName = request.getServerName();
+        if (!hasText(serverName)) {
+            serverName = CallConstants.LOOPBACK_IPV4;
+        }
+        // Preserve host.docker.internal so Docker-side consumers (FreeSWITCH) can reach the host
+        if ("0.0.0.0".equals(serverName)) {
+            serverName = CallConstants.LOOPBACK_IPV4;
+        }
+        boolean defaultPort = ("http".equalsIgnoreCase(scheme) && port == 80)
+                || ("https".equalsIgnoreCase(scheme) && port == 443);
+        return defaultPort
+                ? scheme + "://" + serverName
+                : scheme + "://" + serverName + ":" + port;
     }
 
     private String resolveBotContinue(String mode, boolean exitRequested) {
@@ -468,7 +548,7 @@ public class HttapiController {
             if (!"127.0.0.1".equals(host) && !"localhost".equalsIgnoreCase(host) && !"0.0.0.0".equals(host)) {
                 normalizedUrl = audioUrl;
             } else {
-                String publicBaseUrl = resolveAppBaseUrl(request);
+                String publicBaseUrl = resolvePlaybackBaseUrl(request);
                 String path = uri.getRawPath() == null ? "" : uri.getRawPath();
                 String query = uri.getRawQuery();
                 normalizedUrl = publicBaseUrl + path + (hasText(query) ? "?" + query : "");

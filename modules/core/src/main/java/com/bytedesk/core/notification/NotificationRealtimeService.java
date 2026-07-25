@@ -24,6 +24,7 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageSocketService;
 import com.bytedesk.core.message.content.NoticeContent;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.utils.MessageConvertUtils;
@@ -99,10 +100,12 @@ public class NotificationRealtimeService {
     }
 
     private MessageProto.Message buildMqttNotice(NotificationEntity notification, String mqttTopic) {
+        String structuredContent = buildNoticeContent(notification);
+
         NoticeContent noticeContent = NoticeContent.builder()
                 .noticeUid(notification.getUid())
                 .title(notification.getTitle())
-                .content(notification.getContent())
+            .content(structuredContent)
                 .type(notification.getType())
                 .status(notification.getStatus())
                 .level("USER")
@@ -138,5 +141,9 @@ public class NotificationRealtimeService {
                     notification.getUid(), ex.getMessage());
             return null;
         }
+    }
+
+    private String buildNoticeContent(NotificationEntity notification) {
+        return SystemContent.of(MessageTypeEnum.SYSTEM, notification.getContent()).toJson();
     }
 }

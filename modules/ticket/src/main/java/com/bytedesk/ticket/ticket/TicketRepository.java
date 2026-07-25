@@ -14,13 +14,13 @@
 package com.bytedesk.ticket.ticket;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 public interface TicketRepository extends JpaRepository<TicketEntity, Long>, JpaSpecificationExecutor<TicketEntity> {
 
@@ -44,18 +44,17 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     Page<TicketEntity> findByOrgUidAndVisitorThreadTopic(String orgUid, String visitorThreadTopic, Pageable pageable);
 
-    List<TicketEntity> findByWorkgroupUidContainingAndCreatedAtBetween(
-        String workgroupUid, ZonedDateTime startTime, ZonedDateTime endTime);
-        
-    List<TicketEntity> findByDepartmentUidAndCreatedAtBetween(
-            String departmentUid, ZonedDateTime startTime, ZonedDateTime endTime);
+    Slice<TicketStatisticRow> findByOrgUidAndWorkgroupUidContainingAndDeletedFalseAndCreatedAtBetween(
+        String orgUid, String workgroupUid, ZonedDateTime startTime, ZonedDateTime endTime, Pageable pageable);
 
-    List<TicketEntity> findByAssigneeContainingAndCreatedAtBetween(
-        String assigneeUid, ZonedDateTime startTime, ZonedDateTime endTime);
+    Slice<TicketStatisticRow> findByOrgUidAndDepartmentUidAndDeletedFalseAndCreatedAtBetween(
+            String orgUid, String departmentUid, ZonedDateTime startTime, ZonedDateTime endTime, Pageable pageable);
 
-    // orgUid, startTime, endTime
-    List<TicketEntity> findByOrgUidAndCreatedAtBetween(
-        String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
+    Slice<TicketStatisticRow> findByOrgUidAndAssigneeContainingAndDeletedFalseAndCreatedAtBetween(
+        String orgUid, String assigneeUid, ZonedDateTime startTime, ZonedDateTime endTime, Pageable pageable);
+
+    Slice<TicketStatisticRow> findByOrgUidAndDeletedFalseAndCreatedAtBetween(
+        String orgUid, ZonedDateTime startTime, ZonedDateTime endTime, Pageable pageable);
 
     long countByStatus(String status);
     long countByStatusNot(String status);

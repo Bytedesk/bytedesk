@@ -155,7 +155,14 @@
 	<anti-action application="start_dtmf"/>
       </condition>
       -->
-                  <condition field="${rtp_has_crypto}" expression="^($${rtp_sdes_suites})$"
+                  <!--
+                    原表达式 ^($${rtp_sdes_suites})$ 在 $${rtp_sdes_suites} 未定义时
+                    退化为 ^()$，会误匹配 DTLS-SRTP（WebRTC）空 rtp_has_crypto，
+                    导致 rtp_secure_media=true 破坏 DTLS 握手 → 无声音。
+                    改为 ^(.+)$：仅在 rtp_has_crypto 有实际 SDES 内容时才启用 SDES SRTP。
+                    对于 DTLS-SRTP (WebRTC) 调用，rtp_has_crypto 为空，跳过不设置。
+                  -->
+                  <condition field="${rtp_has_crypto}" expression="^(.+)$"
                         break="never">
                         <action application="set" data="rtp_secure_media=true" />
                         <!-- Offer SRTP on outbound legs if we have it on inbound. -->

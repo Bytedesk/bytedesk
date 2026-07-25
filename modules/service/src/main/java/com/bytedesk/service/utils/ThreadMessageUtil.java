@@ -23,6 +23,7 @@ import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.RoutingPoolContent;
 import com.bytedesk.core.message.content.RoutingPoolNotification;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -40,6 +41,10 @@ import lombok.experimental.UtilityClass;
 // 如果该方法不需要被Spring容器管理，则不需要此注解
 @UtilityClass
 public class ThreadMessageUtil {
+
+    private static String buildSystemContent(MessageTypeEnum type, String content) {
+        return SystemContent.of(type, content).toJson();
+    }
 
     /**
      * 结构化 WelcomeContent 的机器人欢迎消息
@@ -352,10 +357,11 @@ public class ThreadMessageUtil {
     public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.LEAVE_MSG, content);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
+            .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -373,10 +379,11 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.LEAVE_MSG, content);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
+            .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -394,10 +401,11 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadSystemMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.SYSTEM, content);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
+            .content(payload)
                 .type(MessageTypeEnum.SYSTEM.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())

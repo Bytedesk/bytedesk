@@ -48,6 +48,16 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             ZonedDateTime start,
             ZonedDateTime end);
 
+    @Query("SELECT m.thread.uid AS threadUid, m.createdAt AS createdAt, m.agentRepliedAt AS agentRepliedAt, "
+            + "m.type AS type, m.user AS user "
+            + "FROM MessageEntity m "
+            + "WHERE m.thread.uid IN :threadUids AND m.createdAt BETWEEN :start AND :end "
+            + "ORDER BY m.thread.uid ASC, m.createdAt ASC")
+    List<MessageStatisticRow> findStatisticRowsByThreadUidInAndCreatedAtBetween(
+            @Param("threadUids") List<String> threadUids,
+            @Param("start") ZonedDateTime start,
+            @Param("end") ZonedDateTime end);
+
     Optional<MessageEntity> findFirstByThread_TopicOrderByCreatedAtDesc(String threadTopic);
 
     List<MessageEntity> findByThread_TopicAndCreatedAtBetweenOrderByCreatedAtAsc(

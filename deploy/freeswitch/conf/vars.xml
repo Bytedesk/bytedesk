@@ -23,24 +23,29 @@
   <!-- 如果 starter 和 FreeSWITCH 同机部署，可回退为 127.0.0.1。 -->
   <!-- 生产部署时请通过 .env 中 FREESWITCH_MRCP_SERVER_HOST / FREESWITCH_MRCP_SERVER_PORT /
   FREESWITCH_MRCP_RTP_IP 覆盖 -->
-  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_reachable_host=192.168.0.196" />
-  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_server_host=192.168.0.196" />
+  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_reachable_host=192.168.0.102" />
+  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_server_host=192.168.0.102" />
   <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_server_port=1544" />
-  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_rtp_ip=192.168.0.196" />
+  <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_rtp_ip=192.168.0.102" />
   <X-PRE-PROCESS cmd="set" data="baidu_mrcp_server_host=bytedesk-mrcp-server" />
   <X-PRE-PROCESS cmd="set" data="baidu_mrcp_sip_port=5060" />
   <!-- 录音公开访问 URL；生产部署时通过 .env 中 FREESWITCH_RECORDINGS_PUBLIC_BASE 覆盖 -->
   <X-PRE-PROCESS cmd="set"
-    data="recordings_public_base=http://192.168.0.196:15080/freeswitch-recordings" />
+    data="recordings_public_base=http://192.168.0.102:15080/freeswitch-recordings" />
   <X-PRE-PROCESS cmd="set" data="core_db_module=mod_mariadb" />
   <X-PRE-PROCESS cmd="set" data="core_db_dsn=mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" />
 <X-PRE-PROCESS cmd="set" data="xml_curl_token=change_me_in_production" />
   <!-- external_rtp_ip / external_sip_ip
        容器启动时由 entrypoint 根据 .env 中 FREESWITCH_EXTERNAL_SIP_IP / FREESWITCH_EXTERNAL_RTP_IP 覆盖；
        此处默认值为 127.0.0.1，仅当未设置 .env 时生效。 -->
-  <X-PRE-PROCESS cmd="set" data="external_rtp_ip=192.168.0.196" />
+  <X-PRE-PROCESS cmd="set" data="external_rtp_ip=192.168.0.102" />
 
-  <X-PRE-PROCESS cmd="set" data="external_sip_ip=192.168.0.196" />
+  <X-PRE-PROCESS cmd="set" data="external_sip_ip=192.168.0.102" />
+
+  <!-- STUN 服务器：用于 WebRTC DTLS-SRTP 的 ICE 候选收集。
+       容器启动时由 entrypoint 根据 .env 中 FREESWITCH_STUN_SERVER 覆盖；
+       格式: stun:host:port，留空则禁用 STUN。 -->
+  <X-PRE-PROCESS cmd="set" data="stun_server=stun:bytedesk-coturn:3478" />
 
   <!-- Did you change it yet? -->
   <!--
@@ -84,8 +89,8 @@
       FreeSWITCH 默认 SIP 域；容器启动时由 entrypoint 根据 .env 中 FREESWITCH_DOMAIN 覆盖。
       不设置时回退为 $${local_ip_v4}。
   -->
-  <X-PRE-PROCESS cmd="set" data="domain=192.168.0.196" />
-  <X-PRE-PROCESS cmd="set" data="domain_name=192.168.0.196" />
+  <X-PRE-PROCESS cmd="set" data="domain=192.168.0.102" />
+  <X-PRE-PROCESS cmd="set" data="domain_name=192.168.0.102" />
   <X-PRE-PROCESS cmd="set" data="hold_music=local_stream://moh/8000" />
   <X-PRE-PROCESS cmd="set" data="use_profile=external" />
   <X-PRE-PROCESS cmd="set"

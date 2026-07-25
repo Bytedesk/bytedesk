@@ -103,6 +103,8 @@ declare class BytedeskWeb {
     private loopCount;
     private loopTimer;
     private isDestroyed;
+    private isWindowDragging;
+    private windowDragState;
     private initVisitorPromise;
     private getUnreadMessageCountPromise;
     private clearUnreadMessagesPromise;
@@ -212,6 +214,9 @@ declare class BytedeskWeb {
     showTicket(config?: Partial<BytedeskConfig>): void;
     private minimizeWindow;
     private toggleMaximize;
+    private handleWindowDragStart;
+    private handleWindowDragMove;
+    private handleWindowDragEnd;
     private setupResizeListener;
     destroy(): void;
     private createInviteDialog;

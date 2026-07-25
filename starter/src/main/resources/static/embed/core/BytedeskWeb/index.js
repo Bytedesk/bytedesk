@@ -1,10 +1,10 @@
-import { BYTEDESK_BROWSE_FAILED_TIMESTAMP as e, BYTEDESK_BROWSE_LAST_TIMESTAMP as t, BYTEDESK_UID as n, BYTEDESK_VISITOR_UID as r, POST_MESSAGE_CLOSE_CHAT_WINDOW as i, POST_MESSAGE_INVITE_VISITOR as a, POST_MESSAGE_INVITE_VISITOR_ACCEPT as o, POST_MESSAGE_INVITE_VISITOR_REJECT as s, POST_MESSAGE_LOCALSTORAGE_RESPONSE as c, POST_MESSAGE_MAXIMIZE_WINDOW as l, POST_MESSAGE_MESSAGE_BUBBLE_CLICK as u, POST_MESSAGE_MINIMIZE_WINDOW as d, POST_MESSAGE_RECEIVE_MESSAGE as f, POST_MESSAGE_RESET_ANONYMOUS_VISITOR as p } from "../../utils/constants/index.js";
-import { logBizMessageCallbackDebug as m } from "../../utils/bizMessageCallbackDebug/index.js";
-import { getLocaleMessages as h } from "../../locales/index/index.js";
-import g, { setGlobalConfig as _ } from "../../utils/logger/index.js";
-import { serializeBrowseConfig as v } from "../browseUrl/index.js";
+import { BYTEDESK_BROWSE_FAILED_TIMESTAMP as e, BYTEDESK_BROWSE_LAST_TIMESTAMP as t, BYTEDESK_UID as n, BYTEDESK_VISITOR_UID as r, POST_MESSAGE_CLOSE_CHAT_WINDOW as i, POST_MESSAGE_INVITE_VISITOR as a, POST_MESSAGE_INVITE_VISITOR_ACCEPT as o, POST_MESSAGE_INVITE_VISITOR_REJECT as s, POST_MESSAGE_LOCALSTORAGE_RESPONSE as c, POST_MESSAGE_MAXIMIZE_WINDOW as l, POST_MESSAGE_MESSAGE_BUBBLE_CLICK as u, POST_MESSAGE_MINIMIZE_WINDOW as d, POST_MESSAGE_RECEIVE_MESSAGE as f, POST_MESSAGE_RESET_ANONYMOUS_VISITOR as p, POST_MESSAGE_WINDOW_DRAG_END as m, POST_MESSAGE_WINDOW_DRAG_MOVE as h, POST_MESSAGE_WINDOW_DRAG_START as g } from "../../utils/constants/index.js";
+import { logBizMessageCallbackDebug as _ } from "../../utils/bizMessageCallbackDebug/index.js";
+import { getLocaleMessages as v } from "../../locales/index/index.js";
+import y, { setGlobalConfig as b } from "../../utils/logger/index.js";
+import { serializeBrowseConfig as x } from "../browseUrl/index.js";
 //#region src/core/BytedeskWeb.ts
-var y = class {
+var S = class {
 	config;
 	unreadBadgeMode = "hidden";
 	unreadBadgeCount = 0;
@@ -26,6 +26,8 @@ var y = class {
 	loopCount = 0;
 	loopTimer = null;
 	isDestroyed = !1;
+	isWindowDragging = !1;
+	windowDragState = null;
 	initVisitorPromise = null;
 	getUnreadMessageCountPromise = null;
 	clearUnreadMessagesPromise = null;
@@ -53,14 +55,14 @@ var y = class {
 		this.config = {
 			...this.getDefaultConfig(),
 			...e
-		}, _(this.config), this.setupApiUrl();
+		}, b(this.config), this.setupApiUrl();
 	}
 	async setupApiUrl() {
 		try {
 			let { setApiUrl: e } = await import("../../apis/request/index.js"), t = this.config.apiUrl || "https://api.weiyuai.cn";
-			e(t), g.info("API URL 已设置为:", t);
+			e(t), y.info("API URL 已设置为:", t);
 		} catch (e) {
-			g.error("设置API URL时出错:", e);
+			y.error("设置API URL时出错:", e);
 		}
 	}
 	mergeConfig(e, t) {
@@ -120,7 +122,7 @@ var y = class {
 		this.stopBubbleMessageRotation(), this.stopBubbleMessageTransition(), this.destroyBubbleTicker(), this.hideButtonPreview(), this.bubbleContainer && document.body.contains(this.bubbleContainer) && this.bubbleContainer.remove(), this.bubbleContainer = null, this.bubble = null, this.buttonElements = [], this.bubbleMessageViewportElement = null, this.bubbleMessageContentElement = null, this.bubblePendingMessageElement = null, this.bubbleTickerTrackElement = null, this.bubbleTickerStyleElement = null, this.bubbleIconElement = null, this.bubbleTitleElement = null, this.bubbleSubtitleElement = null, this.bubbleMessages = [], this.bubbleMessageIndex = 0, this.inviteDialog && document.body.contains(this.inviteDialog) && this.inviteDialog.remove(), this.inviteDialog = null, this.createBubble(), this.createInviteDialog(), this.windowState === "minimized" && (this.hideDefaultFloatingUi(), this.showMinimizedBar()), e && this.showInviteDialog();
 	}
 	getMinimizedBarLabel() {
-		return this.config.minimizedBarConfig?.text?.trim() || h(this.config.locale).actions.continueChat;
+		return this.config.minimizedBarConfig?.text?.trim() || v(this.config.locale).actions.continueChat;
 	}
 	createMinimizedBarIcon() {
 		let e = document.createElement("span");
@@ -282,7 +284,7 @@ var y = class {
 		let n = this.config;
 		this.config = this.mergeConfig(e, t);
 		let r = this.getPrimaryActionFromConfig(e), i = Object.prototype.hasOwnProperty.call(e, "chatPath"), a = Object.prototype.hasOwnProperty.call(e, "buttonConfig");
-		if (i || (r ? this.syncChatPathByAction(r) : a && this.syncChatPathByAction("chat")), _(this.config), e.apiUrl && e.apiUrl !== n.apiUrl && this.setupApiUrl(), (this.bubbleContainer && document.body.contains(this.bubbleContainer) || this.inviteDialog && document.body.contains(this.inviteDialog)) && this.refreshFloatingUi(), this.windowState === "minimized" && this.minimizedBar && this.showMinimizedBar(), this.window && document.body.contains(this.window) && e.tabsConfig) {
+		if (i || (r ? this.syncChatPathByAction(r) : a && this.syncChatPathByAction("chat")), b(this.config), e.apiUrl && e.apiUrl !== n.apiUrl && this.setupApiUrl(), (this.bubbleContainer && document.body.contains(this.bubbleContainer) || this.inviteDialog && document.body.contains(this.inviteDialog)) && this.refreshFloatingUi(), this.windowState === "minimized" && this.minimizedBar && this.showMinimizedBar(), this.window && document.body.contains(this.window) && e.tabsConfig) {
 			let e = this.window.style.display !== "none";
 			if (document.body.removeChild(this.window), this.window = null, e) {
 				this.createChatWindow();
@@ -290,7 +292,7 @@ var y = class {
 				e && (e.style.display = "block");
 			}
 		}
-		this.window && document.body.contains(this.window) && (this.updateChatWindowLayout(), (e.theme || e.locale || e.chatConfig || e.htmlUrl || e.chatPath || e.threadPath || e.webrtcPath || e.callPath || e.ticketPath || e.tabsConfig) && this.refreshChatIframeUrl()), this.config.onConfigChange?.(this.config);
+		this.window && document.body.contains(this.window) && (this.updateChatWindowLayout(), (e.theme || e.locale || e.chatConfig || e.htmlUrl || e.chatPath || e.threadPath || e.webrtcPath || e.callPath || e.ticketPath || e.tabsConfig || Object.prototype.hasOwnProperty.call(e, "draggable")) && this.refreshChatIframeUrl()), this.config.onConfigChange?.(this.config);
 	}
 	getPrimaryActionFromConfig(e) {
 		let t = e.buttonConfig?.action;
@@ -504,7 +506,7 @@ var y = class {
 		}), document.body.appendChild(n), this.buttonPreviewElement = n;
 	}
 	createButtonElement(e, t, n) {
-		let r = document.createElement("button"), i = n?.isMultiLayout === !0, a = e.width || 60, o = e.height || 60, s = !!e.text, c = Math.max(a, o), l = i ? c : a, u = i ? c : o, d = i ? 0 : u / 2, f = !i && s ? Math.max(14, Math.round(u * .3)) : 0, p = this.config.theme?.mode === "dark", m = p ? "#3B82F6" : "#0066FF", h = this.config.theme?.backgroundColor || m, _ = this.config.theme?.textColor || "#ffffff", v = i ? "none" : `0 4px 16px rgba(0, 0, 0, ${p ? "0.3" : "0.12"})`, y = i && !n?.isLastButton ? `1px solid rgba(255, 255, 255, ${p ? "0.14" : "0.28"})` : "none", b = i ? "translateY(-1px)" : "scale(1.1)";
+		let r = document.createElement("button"), i = n?.isMultiLayout === !0, a = e.width || 60, o = e.height || 60, s = !!e.text, c = Math.max(a, o), l = i ? c : a, u = i ? c : o, d = i ? 0 : u / 2, f = !i && s ? Math.max(14, Math.round(u * .3)) : 0, p = this.config.theme?.mode === "dark", m = p ? "#3B82F6" : "#0066FF", h = this.config.theme?.backgroundColor || m, g = this.config.theme?.textColor || "#ffffff", _ = i ? "none" : `0 4px 16px rgba(0, 0, 0, ${p ? "0.3" : "0.12"})`, v = i && !n?.isLastButton ? `1px solid rgba(255, 255, 255, ${p ? "0.14" : "0.28"})` : "none", b = i ? "translateY(-1px)" : "scale(1.1)";
 		r.style.cssText = `
       background-color: ${i ? "transparent" : h};
       width: ${!i && s ? "auto" : `${l}px`};
@@ -512,12 +514,12 @@ var y = class {
       height: ${u}px;
       border-radius: ${d}px;
       border: none;
-      border-bottom: ${y};
+      border-bottom: ${v};
       cursor: ${this.config.draggable ? "move" : "pointer"};
       display: ${e.show === !1 ? "none" : "flex"};
       align-items: center;
       justify-content: center;
-      box-shadow: ${v};
+      box-shadow: ${_};
       transition: all 0.3s ease;
       outline: none;
       position: relative;
@@ -545,7 +547,7 @@ var y = class {
 		if (e.text) {
 			let t = document.createElement("span");
 			t.textContent = e.text, t.style.cssText = `
-        color: ${_};
+        color: ${g};
         font-size: ${u * (i ? .16 : .25)}px;
         white-space: nowrap;
         line-height: 1.1;
@@ -564,36 +566,36 @@ var y = class {
 				this.dragDidMove = !1;
 				return;
 			}
-			g.debug("bubble click", e.action || "chat"), t instanceof HTMLElement && this.hideBubbleMessageElement(), this.triggerButtonAction(e);
+			y.debug("bubble click", e.action || "chat"), t instanceof HTMLElement && this.hideBubbleMessageElement(), this.triggerButtonAction(e);
 		}), r.addEventListener("contextmenu", (e) => {
 			this.showContextMenu(e);
 		}), r.messageElement = t, r;
 	}
 	async init() {
 		if (this.isDestroyed) {
-			g.warn("BytedeskWeb 已销毁，跳过初始化");
+			y.warn("BytedeskWeb 已销毁，跳过初始化");
 			return;
 		}
 		let e = this.hasVisibleButtons();
 		if (await this._initVisitor(), !this.isDestroyed) {
 			if (e) {
 				if (await this._browseVisitor(), this.isDestroyed) return;
-			} else g.debug("buttonConfig.show=false，跳过自动发送浏览记录");
+			} else y.debug("buttonConfig.show=false，跳过自动发送浏览记录");
 			if (this.createBubble(), !this.isDestroyed && (this.createInviteDialog(), !this.isDestroyed && (this.setupMessageListener(), this.setupResizeListener(), !this.isDestroyed))) {
-				if (this.config.feedbackConfig?.enabled && (this.config.isDebug && g.debug("BytedeskWeb: 开始初始化文档反馈功能，document.readyState:", document.readyState), this.initFeedbackFeature(), document.readyState !== "complete")) {
-					this.config.isDebug && g.debug("BytedeskWeb: DOM未完全加载，设置备用初始化");
+				if (this.config.feedbackConfig?.enabled && (this.config.isDebug && y.debug("BytedeskWeb: 开始初始化文档反馈功能，document.readyState:", document.readyState), this.initFeedbackFeature(), document.readyState !== "complete")) {
+					this.config.isDebug && y.debug("BytedeskWeb: DOM未完全加载，设置备用初始化");
 					let e = () => {
-						this.config.isDebug && g.debug("BytedeskWeb: window load事件触发，重新初始化反馈功能"), this.initFeedbackFeature(), window.removeEventListener("load", e);
+						this.config.isDebug && y.debug("BytedeskWeb: window load事件触发，重新初始化反馈功能"), this.initFeedbackFeature(), window.removeEventListener("load", e);
 					};
 					window.addEventListener("load", e);
 					let t = () => {
-						this.config.isDebug && g.debug("BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能"), setTimeout(() => this.initFeedbackFeature(), 100), document.removeEventListener("DOMContentLoaded", t);
+						this.config.isDebug && y.debug("BytedeskWeb: DOMContentLoaded事件触发，重新初始化反馈功能"), setTimeout(() => this.initFeedbackFeature(), 100), document.removeEventListener("DOMContentLoaded", t);
 					};
 					document.readyState === "loading" && document.addEventListener("DOMContentLoaded", t);
 				}
 				if (e) {
 					if (this._getUnreadMessageCount(), this.isDestroyed) return;
-				} else g.debug("buttonConfig.show=false，跳过自动获取未读消息数");
+				} else y.debug("buttonConfig.show=false，跳过自动获取未读消息数");
 				if (this.config.autoPopup) {
 					if (this.isDestroyed) return;
 					setTimeout(() => {
@@ -610,14 +612,14 @@ var y = class {
 		}
 	}
 	async _initVisitor() {
-		if (this.initVisitorPromise) return g.debug("访客初始化请求正在进行中，返回现有Promise"), this.initVisitorPromise;
+		if (this.initVisitorPromise) return y.debug("访客初始化请求正在进行中，返回现有Promise"), this.initVisitorPromise;
 		let e = localStorage.getItem(n), t = localStorage.getItem(r);
-		g.debug("localUid: ", e), g.debug("localVisitorUid: ", t);
+		y.debug("localUid: ", e), y.debug("localVisitorUid: ", t);
 		let i = this.config.chatConfig?.visitorUid && t ? this.config.chatConfig?.visitorUid === t : !0;
-		return e && t && i ? (g.debug("访客信息相同，直接返回本地访客信息"), this.config.onVisitorInfo?.(e || "", t || ""), {
+		return e && t && i ? (y.debug("访客信息相同，直接返回本地访客信息"), this.config.onVisitorInfo?.(e || "", t || ""), {
 			uid: e,
 			visitorUid: t
-		}) : (g.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(async ({ initVisitor: i }) => {
+		}) : (y.debug("开始创建访客初始化Promise"), this.initVisitorPromise = import("../../apis/visitor/index.js").then(async ({ initVisitor: i }) => {
 			try {
 				let a = {
 					uid: String(this.config.chatConfig?.uid || e || ""),
@@ -635,11 +637,11 @@ var y = class {
 					settingsUid: this.config.chatConfig?.settingsUid || "",
 					loadHistory: this.config.chatConfig?.loadHistory || !1
 				}, o = await i(a);
-				return g.debug("访客初始化API响应:", o.data, a), o.data?.code === 200 ? (o.data?.data?.uid && (localStorage.setItem(n, o.data.data.uid), g.debug("已保存uid到localStorage:", o.data.data.uid)), o.data?.data?.visitorUid && (localStorage.setItem(r, o.data.data.visitorUid), g.debug("已保存visitorUid到localStorage:", o.data.data.visitorUid)), o.data?.data && (g.debug("触发onVisitorInfo回调"), this.config.onVisitorInfo?.(o.data.data.uid || "", o.data.data.visitorUid || "")), o.data.data) : (g.error("访客初始化失败:", o.data?.message), null);
+				return y.debug("访客初始化API响应:", o.data, a), o.data?.code === 200 ? (o.data?.data?.uid && (localStorage.setItem(n, o.data.data.uid), y.debug("已保存uid到localStorage:", o.data.data.uid)), o.data?.data?.visitorUid && (localStorage.setItem(r, o.data.data.visitorUid), y.debug("已保存visitorUid到localStorage:", o.data.data.visitorUid)), o.data?.data && (y.debug("触发onVisitorInfo回调"), this.config.onVisitorInfo?.(o.data.data.uid || "", o.data.data.visitorUid || "")), o.data.data) : (y.error("访客初始化失败:", o.data?.message), null);
 			} catch (e) {
-				return g.error("访客初始化出错:", e), null;
+				return y.error("访客初始化出错:", e), null;
 			} finally {
-				g.debug("访客初始化Promise完成，清除引用"), this.initVisitorPromise = null;
+				y.debug("访客初始化Promise完成，清除引用"), this.initVisitorPromise = null;
 			}
 		}), this.initVisitorPromise);
 	}
@@ -650,7 +652,7 @@ var y = class {
 				let e = parseInt(r), t = Date.now(), n = 3600 * 1e3;
 				if (!Number.isNaN(e) && t - e < n) {
 					let r = Math.ceil((n - (t - e)) / 1e3 / 60);
-					g.warn(`浏览记录1小时内最多发送一次，还需等待 ${r} 分钟`);
+					y.warn(`浏览记录1小时内最多发送一次，还需等待 ${r} 分钟`);
 					return;
 				}
 			}
@@ -659,11 +661,11 @@ var y = class {
 				let t = parseInt(i), n = Date.now(), r = 3600 * 1e3;
 				if (n - t < r) {
 					let e = Math.ceil((r - (n - t)) / 1e3 / 60);
-					g.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${e} 分钟`);
+					y.warn(`浏览记录发送失败后1小时内禁止发送，还需等待 ${e} 分钟`);
 					return;
 				} else localStorage.removeItem(e);
 			}
-			let a = window.location.href, o = document.title, s = document.referrer, c = navigator.userAgent, l = this.getBrowserInfo(c), u = this.getOSInfo(c), d = this.getDeviceInfo(c), f = `${screen.width}x${screen.height}`, p = new URLSearchParams(window.location.search), m = p.get("utm_source") || void 0, h = p.get("utm_medium") || void 0, _ = p.get("utm_campaign") || void 0, v = localStorage.getItem(n), y = {
+			let a = window.location.href, o = document.title, s = document.referrer, c = navigator.userAgent, l = this.getBrowserInfo(c), u = this.getOSInfo(c), d = this.getDeviceInfo(c), f = `${screen.width}x${screen.height}`, p = new URLSearchParams(window.location.search), m = p.get("utm_source") || void 0, h = p.get("utm_medium") || void 0, g = p.get("utm_campaign") || void 0, _ = localStorage.getItem(n), v = {
 				url: a,
 				title: o,
 				referrer: s,
@@ -674,21 +676,21 @@ var y = class {
 				screenResolution: f,
 				utmSource: m,
 				utmMedium: h,
-				utmCampaign: _,
+				utmCampaign: g,
 				status: "ONLINE",
-				visitorUid: String(this.config.chatConfig?.uid || v || ""),
+				visitorUid: String(this.config.chatConfig?.uid || _ || ""),
 				orgUid: this.config.chatConfig?.org || "",
 				channel: String(this.config.chatConfig?.channel || "")
 			};
-			if (!y.visitorUid) {
-				g.warn("访客uid为空，跳过browse操作");
+			if (!v.visitorUid) {
+				y.warn("访客uid为空，跳过browse操作");
 				return;
 			}
 			localStorage.setItem(t, Date.now().toString());
-			let { browse: b } = await import("../../apis/visitor/index.js"), x = await b(y);
-			x.data?.code === 200 ? localStorage.removeItem(e) : (g.error("浏览记录发送失败:", x.data?.message), localStorage.setItem(e, Date.now().toString()), g.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
+			let { browse: b } = await import("../../apis/visitor/index.js"), x = await b(v);
+			x.data?.code === 200 ? localStorage.removeItem(e) : (y.error("浏览记录发送失败:", x.data?.message), localStorage.setItem(e, Date.now().toString()), y.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送"));
 		} catch (t) {
-			g.error("发送浏览记录时出错:", t), localStorage.setItem(e, Date.now().toString()), g.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
+			y.error("发送浏览记录时出错:", t), localStorage.setItem(e, Date.now().toString()), y.warn("已记录浏览记录发送失败时间，1小时内将禁止再次发送");
 		}
 	}
 	getBrowserInfo(e) {
@@ -701,7 +703,7 @@ var y = class {
 		return e.includes("Mobile") ? "Mobile" : e.includes("Tablet") ? "Tablet" : "Desktop";
 	}
 	async _getUnreadMessageCount() {
-		return this.getUnreadMessageCountPromise ? (g.debug("获取未读消息数请求正在进行中，返回现有Promise"), this.getUnreadMessageCountPromise) : (this.getUnreadMessageCountPromise = import("../../apis/message/index.js").then(async ({ getUnreadMessageCount: e }) => {
+		return this.getUnreadMessageCountPromise ? (y.debug("获取未读消息数请求正在进行中，返回现有Promise"), this.getUnreadMessageCountPromise) : (this.getUnreadMessageCountPromise = import("../../apis/message/index.js").then(async ({ getUnreadMessageCount: e }) => {
 			try {
 				let t = String(this.config.chatConfig?.visitorUid || ""), i = localStorage.getItem(n), a = localStorage.getItem(r), o = {
 					uid: i || "",
@@ -712,7 +714,7 @@ var y = class {
 				let s = await e(o);
 				return s.data?.code === 200 ? (this.setUnreadMessageCount(s.data.data || 0), s.data.data || 0) : 0;
 			} catch (e) {
-				return g.error("获取未读消息数出错:", e), 0;
+				return y.error("获取未读消息数出错:", e), 0;
 			} finally {
 				this.getUnreadMessageCountPromise = null;
 			}
@@ -728,10 +730,10 @@ var y = class {
 		return this._browseVisitor();
 	}
 	clearBrowseFailedLimit() {
-		localStorage.removeItem(e), localStorage.removeItem(t), g.info("已清除浏览记录发送失败的限制");
+		localStorage.removeItem(e), localStorage.removeItem(t), y.info("已清除浏览记录发送失败的限制");
 	}
 	clearVisitorInfo() {
-		localStorage.removeItem(n), localStorage.removeItem(r), g.info("已清除本地访客信息");
+		localStorage.removeItem(n), localStorage.removeItem(r), y.info("已清除本地访客信息");
 	}
 	async forceInitVisitor() {
 		return this.clearVisitorInfo(), this.initVisitorPromise = null, this._initVisitor();
@@ -742,15 +744,15 @@ var y = class {
 		e && e.remove();
 	}
 	renderUnreadBadge() {
-		if (g.debug("renderUnreadBadge() 被调用", {
+		if (y.debug("renderUnreadBadge() 被调用", {
 			mode: this.unreadBadgeMode,
 			count: this.unreadBadgeCount
 		}), !this.hasVisibleButtons()) {
-			this.removeUnreadBadgeElement(), g.debug("renderUnreadBadge: 当前没有可见按钮，不显示角标");
+			this.removeUnreadBadgeElement(), y.debug("renderUnreadBadge: 当前没有可见按钮，不显示角标");
 			return;
 		}
 		if (!this.bubble) {
-			g.debug("renderUnreadBadge: bubble 不存在");
+			y.debug("renderUnreadBadge: bubble 不存在");
 			return;
 		}
 		if (this.unreadBadgeMode === "hidden") {
@@ -795,16 +797,16 @@ var y = class {
 		this.unreadBadgeCount = 0, this.unreadBadgeMode = "hidden", this.removeUnreadBadgeElement();
 	}
 	async clearUnreadMessages() {
-		return this.clearUnreadMessagesPromise ? (g.debug("清空未读消息请求正在进行中，返回现有Promise"), this.clearUnreadMessagesPromise) : (this.clearUnreadMessagesPromise = import("../../apis/message/index.js").then(async ({ clearUnreadMessages: e }) => {
+		return this.clearUnreadMessagesPromise ? (y.debug("清空未读消息请求正在进行中，返回现有Promise"), this.clearUnreadMessagesPromise) : (this.clearUnreadMessagesPromise = import("../../apis/message/index.js").then(async ({ clearUnreadMessages: e }) => {
 			try {
 				let t = String(this.config.chatConfig?.visitorUid || ""), i = localStorage.getItem(n), a = localStorage.getItem(r), o = {
 					uid: i || "",
 					visitorUid: t || a || "",
 					orgUid: this.config.chatConfig?.org || ""
 				}, s = await e(o);
-				return g.debug("清空未读消息数:", s.data, o), s.data.code === 200 ? (g.info("清空未读消息数成功:", s.data), this.clearUnreadBadge(), s.data.data || 0) : (g.error("清空未读消息数失败:", s.data.message), 0);
+				return y.debug("清空未读消息数:", s.data, o), s.data.code === 200 ? (y.info("清空未读消息数成功:", s.data), this.clearUnreadBadge(), s.data.data || 0) : (y.error("清空未读消息数失败:", s.data.message), 0);
 			} catch (e) {
-				return g.error("清空未读消息数出错:", e), 0;
+				return y.error("清空未读消息数出错:", e), 0;
 			} finally {
 				this.clearUnreadMessagesPromise = null;
 			}
@@ -990,10 +992,10 @@ var y = class {
 	}
 	createBubble() {
 		if (this.bubble && document.body.contains(this.bubble)) {
-			g.debug("createBubble: 气泡已存在，不重复创建");
+			y.debug("createBubble: 气泡已存在，不重复创建");
 			return;
 		}
-		this.bubble && !document.body.contains(this.bubble) && (g.debug("createBubble: 清理已存在的 bubble 引用"), this.bubble = null), this.bubbleContainer && !document.body.contains(this.bubbleContainer) && (g.debug("createBubble: 清理已存在的 bubbleContainer 引用"), this.bubbleContainer = null), this.buttonElements = [];
+		this.bubble && !document.body.contains(this.bubble) && (y.debug("createBubble: 清理已存在的 bubble 引用"), this.bubble = null), this.bubbleContainer && !document.body.contains(this.bubbleContainer) && (y.debug("createBubble: 清理已存在的 bubbleContainer 引用"), this.bubbleContainer = null), this.buttonElements = [];
 		let e = document.createElement("div");
 		e.style.cssText = `
       position: fixed;
@@ -1097,10 +1099,10 @@ var y = class {
 	}
 	createChatWindow() {
 		if (this.window && document.body.contains(this.window)) {
-			g.debug("createChatWindow: 聊天窗口已存在，不重复创建");
+			y.debug("createChatWindow: 聊天窗口已存在，不重复创建");
 			return;
 		}
-		this.window && !document.body.contains(this.window) && (g.debug("createChatWindow: 清理已存在的 window 引用"), this.window = null), this.window = document.createElement("div");
+		this.window && !document.body.contains(this.window) && (y.debug("createChatWindow: 清理已存在的 window 引用"), this.window = null), this.window = document.createElement("div");
 		let e = window.innerWidth <= 768, t = window.innerWidth, n = window.innerHeight, r = Math.min(this.config.window?.width || t * .9, t * .9), i = Math.min(this.config.window?.height || n * .9, n * .9);
 		e ? this.window.style.cssText = `
         position: fixed;
@@ -1140,7 +1142,7 @@ var y = class {
       background: ${this.config.theme?.mode === "dark" ? "#111827" : "#ffffff"};
     `;
 		let o = document.createElement("iframe");
-		o.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *"), o.style.cssText = "\n      width: 100%;\n      height: 100%;\n      border: none;\n      display: block;\n      vertical-align: bottom;\n    ", o.src = this.generateChatUrl(), g.debug("iframe.src: ", o.src), a.appendChild(o), this.window.appendChild(a), document.body.appendChild(this.window);
+		o.setAttribute("allow", "microphone *; camera *; autoplay *; clipboard-write *"), o.style.cssText = "\n      width: 100%;\n      height: 100%;\n      border: none;\n      display: block;\n      vertical-align: bottom;\n    ", o.src = this.generateChatUrl(), y.debug("iframe.src: ", o.src), a.appendChild(o), this.window.appendChild(a), document.body.appendChild(this.window);
 	}
 	getEnabledEmbeddedTabs() {
 		let e = {
@@ -1159,7 +1161,7 @@ var y = class {
 		return e[0] || "messages";
 	}
 	generateChatUrl(e = "") {
-		g.debug("this.config: ", this.config, e);
+		y.debug("this.config: ", this.config, e);
 		let t = new URLSearchParams();
 		Object.entries(this.config.chatConfig || {}).forEach(([e, n]) => {
 			if (!(n == null || String(n).trim() === "")) if (e === "debug" && n === !0) t.append("debug", "1");
@@ -1168,24 +1170,24 @@ var y = class {
 			else if (e === "goodsInfo" || e === "orderInfo") try {
 				typeof n == "string" ? t.append(e, n) : t.append(e, JSON.stringify(n));
 			} catch (t) {
-				g.error(`Error processing ${e}:`, t);
+				y.error(`Error processing ${e}:`, t);
 			}
 			else if (e === "extra") try {
 				let r = typeof n == "string" ? JSON.parse(n) : n;
 				r.goodsInfo && delete r.goodsInfo, r.orderInfo && delete r.orderInfo, Object.keys(r).length > 0 && t.append(e, JSON.stringify(r));
 			} catch (e) {
-				g.error("Error processing extra parameter:", e);
+				y.error("Error processing extra parameter:", e);
 			}
 			else e !== "debug" && e !== "draft" && e !== "loadHistory" && t.append(e, String(n));
 		});
-		let n = v(this.config.browseConfig);
+		let n = x(this.config.browseConfig);
 		n && t.append("browse", n), Object.entries(this.config.theme || {}).forEach(([e, n]) => {
 			t.append(e, String(n));
-		}), t.append("lang", this.config.locale || "zh-cn");
+		}), t.append("lang", this.config.locale || "zh-cn"), this.config.draggable !== !1 && t.append("draggable", "1");
 		let r = this.getEnabledEmbeddedTabs(), i = e && r.includes(e) ? e : this.getDefaultEmbeddedTab(r);
 		t.append("tab", i), r.length > 1 && t.append("tabs", r.join(","));
 		let a = `${this.getChatPageBaseUrl(r.length > 1 ? "home" : i)}?${t.toString()}`;
-		return g.debug("chat url: ", a), a;
+		return y.debug("chat url: ", a), a;
 	}
 	normalizePath(e, t = "/chat") {
 		let n = (e || "").trim();
@@ -1224,10 +1226,10 @@ var y = class {
 					this.minimizeWindow();
 					break;
 				case f:
-					g.debug("RECEIVE_MESSAGE");
+					y.debug("RECEIVE_MESSAGE");
 					break;
 				case u:
-					m("host-receive.web-sdk", {
+					_("host-receive.web-sdk", {
 						messageType: e.data.clickedMessageType,
 						uid: e.data.uid,
 						navigateToPath: e.data.navigateToPath
@@ -1242,29 +1244,38 @@ var y = class {
 					});
 					break;
 				case a:
-					g.debug("INVITE_VISITOR");
+					y.debug("INVITE_VISITOR");
 					break;
 				case o:
-					g.debug("INVITE_VISITOR_ACCEPT");
+					y.debug("INVITE_VISITOR_ACCEPT");
 					break;
 				case s:
-					g.debug("INVITE_VISITOR_REJECT");
+					y.debug("INVITE_VISITOR_REJECT");
 					break;
 				case c:
 					this.handleLocalStorageData(e);
+					break;
+				case g:
+					this.handleWindowDragStart(e.data.screenX, e.data.screenY);
+					break;
+				case h:
+					this.handleWindowDragMove(e.data.screenX, e.data.screenY);
+					break;
+				case m:
+					this.handleWindowDragEnd();
 					break;
 			}
 		});
 	}
 	handleLocalStorageData(e) {
 		let { uid: t, visitorUid: i } = e.data;
-		g.debug("handleLocalStorageData 被调用", t, i, e.data);
+		y.debug("handleLocalStorageData 被调用", t, i, e.data);
 		let a = localStorage.getItem(n), o = localStorage.getItem(r);
 		if (a === t && o === i) {
-			g.debug("handleLocalStorageData: 值相同，跳过设置");
+			y.debug("handleLocalStorageData: 值相同，跳过设置");
 			return;
 		}
-		localStorage.setItem(n, t), localStorage.setItem(r, i), g.debug("handleLocalStorageData: 已更新localStorage", {
+		localStorage.setItem(n, t), localStorage.setItem(r, i), y.debug("handleLocalStorageData: 已更新localStorage", {
 			uid: t,
 			visitorUid: i
 		}), this.config.onVisitorInfo?.(t, i);
@@ -1336,6 +1347,24 @@ var y = class {
 	toggleMaximize() {
 		this.window && window.open(this.generateChatUrl(), "_blank");
 	}
+	handleWindowDragStart(e, t) {
+		if (!this.window || this.isWindowDragging || window.innerWidth <= 768) return;
+		let n = this.window.getBoundingClientRect();
+		this.windowDragState = {
+			startScreenX: e,
+			startScreenY: t,
+			startLeft: n.left,
+			startTop: n.top
+		}, this.isWindowDragging = !0, this.window.style.left = `${n.left}px`, this.window.style.top = `${n.top}px`, this.window.style.right = "auto", this.window.style.bottom = "auto", this.window.style.transition = "none";
+	}
+	handleWindowDragMove(e, t) {
+		if (!this.window || !this.windowDragState) return;
+		let n = e - this.windowDragState.startScreenX, r = t - this.windowDragState.startScreenY;
+		this.window.style.left = `${this.windowDragState.startLeft + n}px`, this.window.style.top = `${this.windowDragState.startTop + r}px`;
+	}
+	handleWindowDragEnd = () => {
+		this.isWindowDragging = !1, this.windowDragState = null, this.window && (this.window.style.transition = `all ${this.config.animation?.duration || 300}ms ${this.config.animation?.type || "ease"}`);
+	};
 	setupResizeListener() {
 		let e = () => {
 			if (!this.window || !this.isVisible) return;
@@ -1370,14 +1399,14 @@ var y = class {
 		}), e();
 	}
 	destroy() {
-		this.isDestroyed = !0, this.stopBubbleMessageRotation(), this.stopBubbleMessageTransition(), this.destroyBubbleTicker(), this.bubbleMessageViewportElement = null, this.bubbleMessageContentElement = null, this.bubblePendingMessageElement = null, this.bubbleTickerTrackElement = null, this.bubbleTickerStyleElement = null, this.bubbleIconElement = null, this.bubbleTitleElement = null, this.bubbleSubtitleElement = null, this.bubbleMessages = [], this.bubbleMessageIndex = 0, this.bubbleContainer && document.body.contains(this.bubbleContainer) && document.body.removeChild(this.bubbleContainer), this.hideButtonPreview(), this.removeMinimizedBar(), this.bubbleContainer = null, this.bubble = null, this.buttonElements = [], this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer &&= (window.clearTimeout(this.loopTimer), null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null), this.contextMenu && document.body.contains(this.contextMenu) && (document.body.removeChild(this.contextMenu), this.contextMenu = null), this.hideTimeout &&= (clearTimeout(this.hideTimeout), null), this.selectionDebounceTimer &&= (clearTimeout(this.selectionDebounceTimer), null), this.destroyFeedbackFeature();
+		this.isDestroyed = !0, this.stopBubbleMessageRotation(), this.stopBubbleMessageTransition(), this.destroyBubbleTicker(), this.bubbleMessageViewportElement = null, this.bubbleMessageContentElement = null, this.bubblePendingMessageElement = null, this.bubbleTickerTrackElement = null, this.bubbleTickerStyleElement = null, this.bubbleIconElement = null, this.bubbleTitleElement = null, this.bubbleSubtitleElement = null, this.bubbleMessages = [], this.bubbleMessageIndex = 0, this.bubbleContainer && document.body.contains(this.bubbleContainer) && document.body.removeChild(this.bubbleContainer), this.hideButtonPreview(), this.removeMinimizedBar(), this.bubbleContainer = null, this.bubble = null, this.buttonElements = [], this.window && document.body.contains(this.window) && (document.body.removeChild(this.window), this.window = null), window.removeEventListener("resize", this.setupResizeListener.bind(this)), this.loopTimer &&= (window.clearTimeout(this.loopTimer), null), this.inviteDialog && document.body.contains(this.inviteDialog) && (document.body.removeChild(this.inviteDialog), this.inviteDialog = null), this.contextMenu && document.body.contains(this.contextMenu) && (document.body.removeChild(this.contextMenu), this.contextMenu = null), this.hideTimeout &&= (clearTimeout(this.hideTimeout), null), this.selectionDebounceTimer &&= (clearTimeout(this.selectionDebounceTimer), null), this.handleWindowDragEnd(), this.destroyFeedbackFeature();
 	}
 	createInviteDialog() {
 		if (this.inviteDialog && document.body.contains(this.inviteDialog)) {
-			g.debug("createInviteDialog: 邀请框已存在，不重复创建");
+			y.debug("createInviteDialog: 邀请框已存在，不重复创建");
 			return;
 		}
-		this.inviteDialog && !document.body.contains(this.inviteDialog) && (g.debug("createInviteDialog: 清理已存在的 inviteDialog 引用"), this.inviteDialog = null);
+		this.inviteDialog && !document.body.contains(this.inviteDialog) && (y.debug("createInviteDialog: 清理已存在的 inviteDialog 引用"), this.inviteDialog = null);
 		let e = this.config.theme?.mode === "dark";
 		if (this.inviteDialog = document.createElement("div"), this.inviteDialog.style.cssText = `
       position: fixed;
@@ -1436,7 +1465,7 @@ var y = class {
 		this.inviteDialog && (this.inviteDialog.style.display = "block", this.config.inviteConfig?.onOpen?.());
 	}
 	hideInviteDialog() {
-		g.debug("hideInviteDialog before"), this.inviteDialog && (this.inviteDialog.style.display = "none", this.config.inviteConfig?.onClose?.(), g.debug("hideInviteDialog after"));
+		y.debug("hideInviteDialog before"), this.inviteDialog && (this.inviteDialog.style.display = "none", this.config.inviteConfig?.onClose?.(), y.debug("hideInviteDialog after"));
 	}
 	handleInviteLoop() {
 		let { loop: e, loopDelay: t = 3e3, loopCount: n = Infinity } = this.config.inviteConfig || {};
@@ -1446,12 +1475,12 @@ var y = class {
 	}
 	showButton() {
 		if (this.buttonElements.length > 0 && this.buttonElements.every((e) => e.style.display !== "none")) {
-			g.debug("showButton: 按钮已经显示，无需重复显示");
+			y.debug("showButton: 按钮已经显示，无需重复显示");
 			return;
 		}
 		this.buttonElements.length > 0 ? (this.buttonElements.forEach((e) => {
 			e.style.display = "flex";
-		}), g.debug("showButton: 按钮已显示")) : g.debug("showButton: bubble 不存在，需要先创建");
+		}), y.debug("showButton: 按钮已显示")) : y.debug("showButton: bubble 不存在，需要先创建");
 	}
 	hideButton() {
 		this.buttonElements.length > 0 && this.buttonElements.forEach((e) => {
@@ -1463,14 +1492,14 @@ var y = class {
 			let e = this.bubble.messageElement;
 			if (e instanceof HTMLElement) {
 				if (e.style.display !== "none" && e.style.opacity !== "0") {
-					g.debug("showBubble: 气泡已经显示，无需重复显示");
+					y.debug("showBubble: 气泡已经显示，无需重复显示");
 					return;
 				}
 				e.style.display = "block", setTimeout(() => {
 					e.style.opacity = "1", e.style.transform = "translateY(0)", this.startBubbleMessageRotation();
-				}, 100), g.debug("showBubble: 气泡已显示");
-			} else g.debug("showBubble: messageElement 不存在");
-		} else g.debug("showBubble: bubble 不存在");
+				}, 100), y.debug("showBubble: 气泡已显示");
+			} else y.debug("showBubble: messageElement 不存在");
+		} else y.debug("showBubble: bubble 不存在");
 	}
 	hideBubble() {
 		if (this.bubble) {
@@ -1520,21 +1549,21 @@ var y = class {
 		e && (e.style.left = this.config.placement === "bottom-left" ? `${this.config.marginSide}px` : "auto", e.style.right = this.config.placement === "bottom-right" ? `${this.config.marginSide}px` : "auto", e.style.alignItems = this.config.placement === "bottom-left" ? "flex-start" : "flex-end", this.window && this.isVisible && (this.window.style.left = this.config.placement === "bottom-left" ? `${this.config.marginSide}px` : "auto", this.window.style.right = this.config.placement === "bottom-right" ? `${this.config.marginSide}px` : "auto"), this.config.onConfigChange?.({ placement: this.config.placement }));
 	}
 	initFeedbackFeature() {
-		if (g.debug("BytedeskWeb: 初始化文档反馈功能开始"), g.debug("BytedeskWeb: feedbackConfig:", this.config.feedbackConfig), g.debug("BytedeskWeb: feedbackConfig.enabled:", this.config.feedbackConfig?.enabled), !this.config.feedbackConfig?.enabled) {
-			g.debug("BytedeskWeb: 文档反馈功能未启用，退出初始化");
+		if (y.debug("BytedeskWeb: 初始化文档反馈功能开始"), y.debug("BytedeskWeb: feedbackConfig:", this.config.feedbackConfig), y.debug("BytedeskWeb: feedbackConfig.enabled:", this.config.feedbackConfig?.enabled), !this.config.feedbackConfig?.enabled) {
+			y.debug("BytedeskWeb: 文档反馈功能未启用，退出初始化");
 			return;
 		}
-		(this.feedbackTooltip || this.feedbackDialog) && (g.debug("BytedeskWeb: 反馈功能已存在，先销毁再重新创建"), this.destroyFeedbackFeature()), this.config.feedbackConfig.trigger === "selection" || this.config.feedbackConfig.trigger === "both" ? (g.debug("BytedeskWeb: 触发器匹配，设置文本选择监听器"), g.debug("BytedeskWeb: 触发器类型:", this.config.feedbackConfig.trigger), this.setupTextSelectionListener()) : (g.debug("BytedeskWeb: 触发器不匹配，跳过文本选择监听器"), g.debug("BytedeskWeb: 触发器类型:", this.config.feedbackConfig.trigger)), g.debug("BytedeskWeb: 开始创建反馈提示框"), this.createFeedbackTooltip(), g.debug("BytedeskWeb: 开始创建反馈对话框"), this.createFeedbackDialog(), g.debug("BytedeskWeb: 文档反馈功能初始化完成"), g.debug("BytedeskWeb: 反馈提示框存在:", !!this.feedbackTooltip), g.debug("BytedeskWeb: 反馈对话框存在:", !!this.feedbackDialog);
+		(this.feedbackTooltip || this.feedbackDialog) && (y.debug("BytedeskWeb: 反馈功能已存在，先销毁再重新创建"), this.destroyFeedbackFeature()), this.config.feedbackConfig.trigger === "selection" || this.config.feedbackConfig.trigger === "both" ? (y.debug("BytedeskWeb: 触发器匹配，设置文本选择监听器"), y.debug("BytedeskWeb: 触发器类型:", this.config.feedbackConfig.trigger), this.setupTextSelectionListener()) : (y.debug("BytedeskWeb: 触发器不匹配，跳过文本选择监听器"), y.debug("BytedeskWeb: 触发器类型:", this.config.feedbackConfig.trigger)), y.debug("BytedeskWeb: 开始创建反馈提示框"), this.createFeedbackTooltip(), y.debug("BytedeskWeb: 开始创建反馈对话框"), this.createFeedbackDialog(), y.debug("BytedeskWeb: 文档反馈功能初始化完成"), y.debug("BytedeskWeb: 反馈提示框存在:", !!this.feedbackTooltip), y.debug("BytedeskWeb: 反馈对话框存在:", !!this.feedbackDialog);
 	}
 	setupTextSelectionListener() {
-		g.debug("BytedeskWeb: 设置文本选择监听器"), document.addEventListener("mouseup", (e) => {
-			this.lastMouseEvent = e, g.debug("BytedeskWeb: mouseup事件触发", e), this.handleTextSelectionWithDebounce(e);
+		y.debug("BytedeskWeb: 设置文本选择监听器"), document.addEventListener("mouseup", (e) => {
+			this.lastMouseEvent = e, y.debug("BytedeskWeb: mouseup事件触发", e), this.handleTextSelectionWithDebounce(e);
 		}, {
 			capture: !0,
 			passive: !0
 		}), document.addEventListener("selectionchange", () => {
 			if (!this.lastMouseEvent) {
-				g.debug("BytedeskWeb: selectionchange事件触发（无鼠标事件）");
+				y.debug("BytedeskWeb: selectionchange事件触发（无鼠标事件）");
 				let e = new MouseEvent("mouseup", {
 					clientX: window.innerWidth / 2,
 					clientY: window.innerHeight / 2
@@ -1542,77 +1571,77 @@ var y = class {
 				this.handleTextSelectionWithDebounce(e);
 			}
 		}), document.addEventListener("keyup", (e) => {
-			(e.shiftKey || e.ctrlKey || e.metaKey) && (g.debug("BytedeskWeb: keyup事件触发（带修饰键）", e), this.handleTextSelectionWithDebounce(e));
+			(e.shiftKey || e.ctrlKey || e.metaKey) && (y.debug("BytedeskWeb: keyup事件触发（带修饰键）", e), this.handleTextSelectionWithDebounce(e));
 		}, {
 			capture: !0,
 			passive: !0
 		}), document.addEventListener("click", (e) => {
 			e.target?.closest("[data-bytedesk-feedback]") || this.hideFeedbackTooltip();
-		}), g.debug("BytedeskWeb: 文本选择监听器设置完成");
+		}), y.debug("BytedeskWeb: 文本选择监听器设置完成");
 	}
 	handleTextSelectionWithDebounce(e) {
-		this.config.isDebug && g.debug("BytedeskWeb: handleTextSelectionWithDebounce被调用 - 防抖机制生效"), this.selectionDebounceTimer && (clearTimeout(this.selectionDebounceTimer), this.config.isDebug && g.debug("BytedeskWeb: 清除之前的防抖定时器")), this.selectionDebounceTimer = setTimeout(() => {
-			this.config.isDebug && g.debug("BytedeskWeb: 防抖延迟结束，开始处理文本选择"), this.handleTextSelection(e);
+		this.config.isDebug && y.debug("BytedeskWeb: handleTextSelectionWithDebounce被调用 - 防抖机制生效"), this.selectionDebounceTimer && (clearTimeout(this.selectionDebounceTimer), this.config.isDebug && y.debug("BytedeskWeb: 清除之前的防抖定时器")), this.selectionDebounceTimer = setTimeout(() => {
+			this.config.isDebug && y.debug("BytedeskWeb: 防抖延迟结束，开始处理文本选择"), this.handleTextSelection(e);
 		}, 200);
 	}
 	handleTextSelection(e) {
-		this.config.isDebug && g.debug("BytedeskWeb: handleTextSelection被调用");
+		this.config.isDebug && y.debug("BytedeskWeb: handleTextSelection被调用");
 		let t = window.getSelection();
-		if (this.config.isDebug && (g.debug("BytedeskWeb: window.getSelection()结果:", t), g.debug("BytedeskWeb: selection.rangeCount:", t?.rangeCount)), !t || t.rangeCount === 0) {
-			this.config.isDebug && g.debug("BytedeskWeb: 没有选择或范围为0，隐藏提示"), this.hideFeedbackTooltip();
+		if (this.config.isDebug && (y.debug("BytedeskWeb: window.getSelection()结果:", t), y.debug("BytedeskWeb: selection.rangeCount:", t?.rangeCount)), !t || t.rangeCount === 0) {
+			this.config.isDebug && y.debug("BytedeskWeb: 没有选择或范围为0，隐藏提示"), this.hideFeedbackTooltip();
 			return;
 		}
 		let n = t.toString().trim();
-		if (this.config.isDebug && (g.debug("BytedeskWeb: 检测到文本选择:", `"${n}"`), g.debug("BytedeskWeb: 选中文本长度:", n.length)), n === this.lastSelectionText && this.isTooltipVisible) {
-			this.config.isDebug && g.debug("BytedeskWeb: 文本选择未变化且提示框已显示，跳过处理");
+		if (this.config.isDebug && (y.debug("BytedeskWeb: 检测到文本选择:", `"${n}"`), y.debug("BytedeskWeb: 选中文本长度:", n.length)), n === this.lastSelectionText && this.isTooltipVisible) {
+			this.config.isDebug && y.debug("BytedeskWeb: 文本选择未变化且提示框已显示，跳过处理");
 			return;
 		}
 		if (n.length === 0) {
-			this.config.isDebug && g.debug("BytedeskWeb: 选中文本为空，隐藏提示"), this.hideFeedbackTooltip();
+			this.config.isDebug && y.debug("BytedeskWeb: 选中文本为空，隐藏提示"), this.hideFeedbackTooltip();
 			return;
 		}
 		if (n.length < 3) {
-			this.config.isDebug && g.debug("BytedeskWeb: 选中文本太短，忽略:", `"${n}"`), this.hideFeedbackTooltip();
+			this.config.isDebug && y.debug("BytedeskWeb: 选中文本太短，忽略:", `"${n}"`), this.hideFeedbackTooltip();
 			return;
 		}
 		this.selectedText = n, this.lastSelectionText = n;
 		try {
 			let e = t.getRangeAt(0);
-			this.lastSelectionRect = e.getBoundingClientRect(), this.config.isDebug && g.debug("BytedeskWeb: 存储选中文本位置:", this.lastSelectionRect);
+			this.lastSelectionRect = e.getBoundingClientRect(), this.config.isDebug && y.debug("BytedeskWeb: 存储选中文本位置:", this.lastSelectionRect);
 		} catch (e) {
-			this.config.isDebug && g.warn("BytedeskWeb: 获取选中文本位置失败:", e), this.lastSelectionRect = null;
+			this.config.isDebug && y.warn("BytedeskWeb: 获取选中文本位置失败:", e), this.lastSelectionRect = null;
 		}
-		this.config.isDebug && g.debug("BytedeskWeb: 设置selectedText为:", `"${n}"`), this.config.feedbackConfig?.showOnSelection ? (this.config.isDebug && g.debug("BytedeskWeb: 配置允许显示选择提示，调用showFeedbackTooltip"), this.showFeedbackTooltip(this.lastMouseEvent || void 0)) : this.config.isDebug && (g.debug("BytedeskWeb: 配置不允许显示选择提示"), g.debug("BytedeskWeb: feedbackConfig.showOnSelection:", this.config.feedbackConfig?.showOnSelection));
+		this.config.isDebug && y.debug("BytedeskWeb: 设置selectedText为:", `"${n}"`), this.config.feedbackConfig?.showOnSelection ? (this.config.isDebug && y.debug("BytedeskWeb: 配置允许显示选择提示，调用showFeedbackTooltip"), this.showFeedbackTooltip(this.lastMouseEvent || void 0)) : this.config.isDebug && (y.debug("BytedeskWeb: 配置不允许显示选择提示"), y.debug("BytedeskWeb: feedbackConfig.showOnSelection:", this.config.feedbackConfig?.showOnSelection));
 	}
 	createFeedbackTooltip() {
-		if (this.config.isDebug && g.debug("BytedeskWeb: createFeedbackTooltip被调用"), this.feedbackTooltip && document.body.contains(this.feedbackTooltip)) {
-			this.config.isDebug && g.debug("BytedeskWeb: 反馈提示框已存在且在DOM中，跳过创建");
+		if (this.config.isDebug && y.debug("BytedeskWeb: createFeedbackTooltip被调用"), this.feedbackTooltip && document.body.contains(this.feedbackTooltip)) {
+			this.config.isDebug && y.debug("BytedeskWeb: 反馈提示框已存在且在DOM中，跳过创建");
 			return;
 		}
-		this.feedbackTooltip && !document.body.contains(this.feedbackTooltip) && (this.config.isDebug && g.debug("BytedeskWeb: 提示框变量存在但不在DOM中，重置变量"), this.feedbackTooltip = null), this.feedbackTooltip = document.createElement("div"), this.feedbackTooltip.setAttribute("data-bytedesk-feedback", "tooltip"), this.feedbackTooltip.style.cssText = "\n      position: fixed;\n      background: #2e88ff;\n      color: white;\n      padding: 8px 16px;\n      border-radius: 6px;\n      font-size: 14px;\n      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;\n      cursor: pointer;\n      z-index: 999999;\n      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n      transform: translateY(-100%);\n      margin-top: -8px;\n      user-select: none;\n      opacity: 0;\n      transition: opacity 0.2s ease;\n      display: none;\n    ";
+		this.feedbackTooltip && !document.body.contains(this.feedbackTooltip) && (this.config.isDebug && y.debug("BytedeskWeb: 提示框变量存在但不在DOM中，重置变量"), this.feedbackTooltip = null), this.feedbackTooltip = document.createElement("div"), this.feedbackTooltip.setAttribute("data-bytedesk-feedback", "tooltip"), this.feedbackTooltip.style.cssText = "\n      position: fixed;\n      background: #2e88ff;\n      color: white;\n      padding: 8px 16px;\n      border-radius: 6px;\n      font-size: 14px;\n      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;\n      cursor: pointer;\n      z-index: 999999;\n      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);\n      transform: translateY(-100%);\n      margin-top: -8px;\n      user-select: none;\n      opacity: 0;\n      transition: opacity 0.2s ease;\n      display: none;\n    ";
 		let e = this.config.feedbackConfig?.selectionText || "文档反馈";
-		this.config.isDebug && g.debug("BytedeskWeb: 提示框文本:", e), this.feedbackTooltip.innerHTML = `
+		this.config.isDebug && y.debug("BytedeskWeb: 提示框文本:", e), this.feedbackTooltip.innerHTML = `
       <span style="margin-right: 4px;">📝</span>
       ${e}
     `, this.feedbackTooltip.addEventListener("click", async (e) => {
-			this.config.isDebug && (g.debug("BytedeskWeb: 反馈提示框被点击"), g.debug("BytedeskWeb: 点击时选中文字:", this.selectedText)), e.stopPropagation(), e.preventDefault();
+			this.config.isDebug && (y.debug("BytedeskWeb: 反馈提示框被点击"), y.debug("BytedeskWeb: 点击时选中文字:", this.selectedText)), e.stopPropagation(), e.preventDefault();
 			try {
-				await this.showFeedbackDialog(), this.config.isDebug && g.debug("BytedeskWeb: 对话框显示完成，现在隐藏提示框"), this.hideFeedbackTooltip();
+				await this.showFeedbackDialog(), this.config.isDebug && y.debug("BytedeskWeb: 对话框显示完成，现在隐藏提示框"), this.hideFeedbackTooltip();
 			} catch (e) {
-				this.config.isDebug && g.error("BytedeskWeb: 显示对话框时出错:", e);
+				this.config.isDebug && y.error("BytedeskWeb: 显示对话框时出错:", e);
 			}
-		}), document.body.appendChild(this.feedbackTooltip), this.config.isDebug && (g.debug("BytedeskWeb: 反馈提示框已创建并添加到页面"), g.debug("BytedeskWeb: 提示框元素:", this.feedbackTooltip));
+		}), document.body.appendChild(this.feedbackTooltip), this.config.isDebug && (y.debug("BytedeskWeb: 反馈提示框已创建并添加到页面"), y.debug("BytedeskWeb: 提示框元素:", this.feedbackTooltip));
 	}
 	showFeedbackTooltip(e) {
-		this.config.isDebug && (g.debug("BytedeskWeb: showFeedbackTooltip被调用"), g.debug("BytedeskWeb: feedbackTooltip存在:", !!this.feedbackTooltip), g.debug("BytedeskWeb: selectedText存在:", !!this.selectedText));
+		this.config.isDebug && (y.debug("BytedeskWeb: showFeedbackTooltip被调用"), y.debug("BytedeskWeb: feedbackTooltip存在:", !!this.feedbackTooltip), y.debug("BytedeskWeb: selectedText存在:", !!this.selectedText));
 		let t = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
-		if (this.config.isDebug && g.debug("BytedeskWeb: feedbackTooltip在DOM中:", t), (!this.feedbackTooltip || !t) && (this.config.isDebug && g.debug("BytedeskWeb: 提示框不存在或已从DOM中移除，重新创建"), this.createFeedbackTooltip()), !this.feedbackTooltip || !this.selectedText) {
-			this.config.isDebug && g.debug("BytedeskWeb: 提示框或选中文本不存在，退出显示");
+		if (this.config.isDebug && y.debug("BytedeskWeb: feedbackTooltip在DOM中:", t), (!this.feedbackTooltip || !t) && (this.config.isDebug && y.debug("BytedeskWeb: 提示框不存在或已从DOM中移除，重新创建"), this.createFeedbackTooltip()), !this.feedbackTooltip || !this.selectedText) {
+			this.config.isDebug && y.debug("BytedeskWeb: 提示框或选中文本不存在，退出显示");
 			return;
 		}
 		let n = window.getSelection();
 		if (!n || n.rangeCount === 0) {
-			this.config.isDebug && g.debug("BytedeskWeb: 无有效选择，无法计算位置");
+			this.config.isDebug && y.debug("BytedeskWeb: 无有效选择，无法计算位置");
 			return;
 		}
 		let r = n.getRangeAt(0), i;
@@ -1631,9 +1660,9 @@ var y = class {
 				e.setEnd(r.startContainer, Math.max(t, r.startOffset + 1)), i = e.getBoundingClientRect();
 			} else i = r.getBoundingClientRect();
 		} catch (e) {
-			this.config.isDebug && g.debug("BytedeskWeb: 获取第一行位置失败，使用整个选择区域:", e), i = r.getBoundingClientRect();
+			this.config.isDebug && y.debug("BytedeskWeb: 获取第一行位置失败，使用整个选择区域:", e), i = r.getBoundingClientRect();
 		}
-		this.config.isDebug && g.debug("BytedeskWeb: 选中文本第一行位置信息:", {
+		this.config.isDebug && y.debug("BytedeskWeb: 选中文本第一行位置信息:", {
 			left: i.left,
 			top: i.top,
 			right: i.right,
@@ -1642,7 +1671,7 @@ var y = class {
 			height: i.height
 		});
 		let a = i.left + 5, o = i.top - 40 - 15, s = window.innerWidth, c = window.innerHeight, l = window.scrollX, u = window.scrollY;
-		a < 10 && (a = 10), a + 120 > s - 10 && (a = s - 120 - 10), o < u + 10 && (o = i.bottom + 15, this.config.isDebug && g.debug("BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方")), a += l, o += u, this.config.isDebug && g.debug("BytedeskWeb: 最终提示框位置:", {
+		a < 10 && (a = 10), a + 120 > s - 10 && (a = s - 120 - 10), o < u + 10 && (o = i.bottom + 15, this.config.isDebug && y.debug("BytedeskWeb: 上方空间不足，调整为显示在选中文字第一行下方")), a += l, o += u, this.config.isDebug && y.debug("BytedeskWeb: 最终提示框位置:", {
 			x: a,
 			y: o,
 			说明: "显示在选中文字第一行左上角上方，增加间距避免遮挡",
@@ -1655,7 +1684,7 @@ var y = class {
 				scrollX: l,
 				scrollY: u
 			}
-		}), this.feedbackTooltip.style.position = "absolute", this.feedbackTooltip.style.left = a + "px", this.feedbackTooltip.style.top = o + "px", this.feedbackTooltip.style.display = "block", this.feedbackTooltip.style.visibility = "visible", this.feedbackTooltip.style.opacity = "0", this.feedbackTooltip.style.zIndex = "999999", this.config.isDebug && g.debug("BytedeskWeb: 提示框位置已设置，样式:", {
+		}), this.feedbackTooltip.style.position = "absolute", this.feedbackTooltip.style.left = a + "px", this.feedbackTooltip.style.top = o + "px", this.feedbackTooltip.style.display = "block", this.feedbackTooltip.style.visibility = "visible", this.feedbackTooltip.style.opacity = "0", this.feedbackTooltip.style.zIndex = "999999", this.config.isDebug && y.debug("BytedeskWeb: 提示框位置已设置，样式:", {
 			position: this.feedbackTooltip.style.position,
 			left: this.feedbackTooltip.style.left,
 			top: this.feedbackTooltip.style.top,
@@ -1664,25 +1693,25 @@ var y = class {
 			opacity: this.feedbackTooltip.style.opacity,
 			zIndex: this.feedbackTooltip.style.zIndex
 		}), this.isTooltipVisible = !0, setTimeout(() => {
-			this.feedbackTooltip && this.isTooltipVisible && (this.feedbackTooltip.style.opacity = "1", this.config.isDebug && g.debug("BytedeskWeb: 提示框透明度设置为1，应该可见了"));
+			this.feedbackTooltip && this.isTooltipVisible && (this.feedbackTooltip.style.opacity = "1", this.config.isDebug && y.debug("BytedeskWeb: 提示框透明度设置为1，应该可见了"));
 		}, 10);
 	}
 	hideFeedbackTooltip() {
 		let e = this.feedbackTooltip && document.body.contains(this.feedbackTooltip);
-		if (this.config.isDebug && (g.debug("BytedeskWeb: hideFeedbackTooltip被调用"), g.debug("BytedeskWeb: feedbackTooltip存在:", !!this.feedbackTooltip), g.debug("BytedeskWeb: feedbackTooltip在DOM中:", e)), !this.feedbackTooltip || !e) {
-			this.isTooltipVisible = !1, this.lastSelectionText = "", this.config.isDebug && g.debug("BytedeskWeb: 提示框不存在或不在DOM中，仅重置状态");
+		if (this.config.isDebug && (y.debug("BytedeskWeb: hideFeedbackTooltip被调用"), y.debug("BytedeskWeb: feedbackTooltip存在:", !!this.feedbackTooltip), y.debug("BytedeskWeb: feedbackTooltip在DOM中:", e)), !this.feedbackTooltip || !e) {
+			this.isTooltipVisible = !1, this.lastSelectionText = "", this.config.isDebug && y.debug("BytedeskWeb: 提示框不存在或不在DOM中，仅重置状态");
 			return;
 		}
 		this.isTooltipVisible = !1, this.lastSelectionText = "", this.feedbackTooltip.style.opacity = "0", setTimeout(() => {
-			this.feedbackTooltip && document.body.contains(this.feedbackTooltip) && !this.isTooltipVisible ? (this.feedbackTooltip.style.display = "none", this.feedbackTooltip.style.visibility = "hidden", this.config.isDebug && g.debug("BytedeskWeb: 提示框已隐藏")) : this.config.isDebug && this.isTooltipVisible && g.debug("BytedeskWeb: 跳过隐藏操作，提示框状态已改变为可见");
+			this.feedbackTooltip && document.body.contains(this.feedbackTooltip) && !this.isTooltipVisible ? (this.feedbackTooltip.style.display = "none", this.feedbackTooltip.style.visibility = "hidden", this.config.isDebug && y.debug("BytedeskWeb: 提示框已隐藏")) : this.config.isDebug && this.isTooltipVisible && y.debug("BytedeskWeb: 跳过隐藏操作，提示框状态已改变为可见");
 		}, 100);
 	}
 	createFeedbackDialog() {
-		if (this.config.isDebug && g.debug("BytedeskWeb: createFeedbackDialog被调用"), this.feedbackDialog && document.body.contains(this.feedbackDialog)) {
-			this.config.isDebug && g.debug("BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建");
+		if (this.config.isDebug && y.debug("BytedeskWeb: createFeedbackDialog被调用"), this.feedbackDialog && document.body.contains(this.feedbackDialog)) {
+			this.config.isDebug && y.debug("BytedeskWeb: 反馈对话框已存在且在DOM中，跳过创建");
 			return;
 		}
-		this.feedbackDialog && !document.body.contains(this.feedbackDialog) && (this.config.isDebug && g.debug("BytedeskWeb: 对话框变量存在但不在DOM中，重置变量"), this.feedbackDialog = null), this.feedbackDialog = document.createElement("div"), this.feedbackDialog.setAttribute("data-bytedesk-feedback", "dialog"), this.feedbackDialog.style.cssText = "\n      position: fixed;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      background: rgba(0, 0, 0, 0.5);\n      z-index: 1000000;\n      display: none;\n      justify-content: center;\n      align-items: center;\n      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;\n    ";
+		this.feedbackDialog && !document.body.contains(this.feedbackDialog) && (this.config.isDebug && y.debug("BytedeskWeb: 对话框变量存在但不在DOM中，重置变量"), this.feedbackDialog = null), this.feedbackDialog = document.createElement("div"), this.feedbackDialog.setAttribute("data-bytedesk-feedback", "dialog"), this.feedbackDialog.style.cssText = "\n      position: fixed;\n      top: 0;\n      left: 0;\n      right: 0;\n      bottom: 0;\n      background: rgba(0, 0, 0, 0.5);\n      z-index: 1000000;\n      display: none;\n      justify-content: center;\n      align-items: center;\n      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;\n    ";
 		let e = document.createElement("div");
 		e.style.cssText = "\n      background: white;\n      border-radius: 12px;\n      padding: 24px;\n      width: 90%;\n      max-width: 600px;\n      max-height: 80vh;\n      overflow-y: auto;\n      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);\n      position: relative;\n    ", e.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -1821,25 +1850,25 @@ var y = class {
 		}), document.body.appendChild(this.feedbackDialog);
 	}
 	async showFeedbackDialog() {
-		this.config.isDebug && (g.debug("BytedeskWeb: showFeedbackDialog被调用"), g.debug("BytedeskWeb: feedbackDialog存在:", !!this.feedbackDialog));
+		this.config.isDebug && (y.debug("BytedeskWeb: showFeedbackDialog被调用"), y.debug("BytedeskWeb: feedbackDialog存在:", !!this.feedbackDialog));
 		let e = this.feedbackDialog && document.body.contains(this.feedbackDialog);
-		if (this.config.isDebug && g.debug("BytedeskWeb: feedbackDialog在DOM中:", e), (!this.feedbackDialog || !e) && (this.config.isDebug && g.debug("BytedeskWeb: 对话框不存在或已从DOM中移除，重新创建"), this.createFeedbackDialog()), !this.feedbackDialog) {
-			this.config.isDebug && g.debug("BytedeskWeb: 对话框创建失败，退出显示");
+		if (this.config.isDebug && y.debug("BytedeskWeb: feedbackDialog在DOM中:", e), (!this.feedbackDialog || !e) && (this.config.isDebug && y.debug("BytedeskWeb: 对话框不存在或已从DOM中移除，重新创建"), this.createFeedbackDialog()), !this.feedbackDialog) {
+			this.config.isDebug && y.debug("BytedeskWeb: 对话框创建失败，退出显示");
 			return;
 		}
-		this.config.isDebug && g.debug("BytedeskWeb: 开始填充对话框内容");
+		this.config.isDebug && y.debug("BytedeskWeb: 开始填充对话框内容");
 		let t = this.feedbackDialog.querySelector("#bytedesk-selected-text");
-		t && (t.textContent = this.selectedText || "", this.config.isDebug && g.debug("BytedeskWeb: 已填充选中文字:", this.selectedText));
+		t && (t.textContent = this.selectedText || "", this.config.isDebug && y.debug("BytedeskWeb: 已填充选中文字:", this.selectedText));
 		let n = this.feedbackDialog.querySelector("#bytedesk-feedback-text");
-		n && (n.value = ""), this.feedbackDialog.style.display = "flex", this.config.isDebug && (g.debug("BytedeskWeb: 对话框已设置为显示状态"), g.debug("BytedeskWeb: 对话框样式:", {
+		n && (n.value = ""), this.feedbackDialog.style.display = "flex", this.config.isDebug && (y.debug("BytedeskWeb: 对话框已设置为显示状态"), y.debug("BytedeskWeb: 对话框样式:", {
 			display: this.feedbackDialog.style.display,
 			visibility: this.feedbackDialog.style.visibility,
 			zIndex: this.feedbackDialog.style.zIndex
 		}));
 		try {
-			await this.generateScreenshotPreview(), this.config.isDebug && g.debug("BytedeskWeb: 截图预览生成完成");
+			await this.generateScreenshotPreview(), this.config.isDebug && y.debug("BytedeskWeb: 截图预览生成完成");
 		} catch (e) {
-			this.config.isDebug && g.error("BytedeskWeb: 截图预览生成失败:", e);
+			this.config.isDebug && y.error("BytedeskWeb: 截图预览生成失败:", e);
 		}
 	}
 	hideFeedbackDialog() {
@@ -1848,11 +1877,11 @@ var y = class {
 	async generateAndUploadScreenshot() {
 		try {
 			let e, t = this.feedbackDialog?.screenshotCanvas;
-			if (t) this.config.isDebug && g.debug("BytedeskWeb: 使用已生成的截图canvas"), e = t;
+			if (t) this.config.isDebug && y.debug("BytedeskWeb: 使用已生成的截图canvas"), e = t;
 			else {
 				let t = await this.loadHtml2Canvas();
-				if (!t) return this.config.isDebug && g.debug("BytedeskWeb: html2canvas加载失败，跳过截图"), null;
-				this.config.isDebug && g.debug("BytedeskWeb: 重新生成截图");
+				if (!t) return this.config.isDebug && y.debug("BytedeskWeb: html2canvas加载失败，跳过截图"), null;
+				this.config.isDebug && y.debug("BytedeskWeb: 重新生成截图");
 				let n = this.calculateScreenshotArea();
 				e = await t(document.body, {
 					height: n.height,
@@ -1869,24 +1898,24 @@ var y = class {
 			return new Promise((t) => {
 				e.toBlob(async (e) => {
 					if (!e) {
-						g.error("无法生成截图blob"), t(null);
+						y.error("无法生成截图blob"), t(null);
 						return;
 					}
 					try {
 						let n = `screenshot_${Date.now()}.jpg`, r = new File([e], n, { type: "image/jpeg" });
-						this.config.isDebug && g.debug("BytedeskWeb: 截图生成成功，文件大小:", Math.round(e.size / 1024), "KB");
+						this.config.isDebug && y.debug("BytedeskWeb: 截图生成成功，文件大小:", Math.round(e.size / 1024), "KB");
 						let { uploadScreenshot: i } = await import("../../apis/upload/index.js"), a = await i(r, {
 							orgUid: this.config.chatConfig?.org || "",
 							isDebug: this.config.isDebug
 						});
-						this.config.isDebug && g.debug("BytedeskWeb: 截图上传成功，URL:", a), t(a);
+						this.config.isDebug && y.debug("BytedeskWeb: 截图上传成功，URL:", a), t(a);
 					} catch (e) {
-						g.error("截图上传失败:", e), t(null);
+						y.error("截图上传失败:", e), t(null);
 					}
 				}, "image/jpeg", .8);
 			});
 		} catch (e) {
-			return g.error("生成截图失败:", e), null;
+			return y.error("生成截图失败:", e), null;
 		}
 	}
 	async generateScreenshotPreview() {
@@ -1897,7 +1926,7 @@ var y = class {
 				e.innerHTML = "\n          <div style=\"color: #999; text-align: center; padding: 20px; flex-direction: column; gap: 8px; display: flex; align-items: center;\">\n            <div style=\"font-size: 24px;\">📷</div>\n            <div>截图功能暂时不可用</div>\n            <div style=\"font-size: 12px; color: #666;\">网络连接问题或资源加载失败</div>\n          </div>\n        ";
 				return;
 			}
-			e.innerHTML = "正在生成截图预览...", this.config.isDebug && g.debug("BytedeskWeb: 开始生成截图预览");
+			e.innerHTML = "正在生成截图预览...", this.config.isDebug && y.debug("BytedeskWeb: 开始生成截图预览");
 			let n = this.calculateScreenshotArea(), r = await t(document.body, {
 				height: n.height,
 				width: n.width,
@@ -1920,9 +1949,9 @@ var y = class {
 			let a = document.createElement("div");
 			a.style.cssText = "\n        display: flex;\n        flex-direction: column;\n        align-items: center;\n        gap: 8px;\n      ", a.appendChild(i);
 			let o = document.createElement("div");
-			o.style.cssText = "\n        font-size: 12px;\n        color: #666;\n        text-align: center;\n      ", o.innerHTML = "点击图片可放大查看<br/>提交时将自动上传此截图", a.appendChild(o), e.innerHTML = "", e.appendChild(a), this.feedbackDialog.screenshotCanvas = r, this.config.isDebug && g.debug("BytedeskWeb: 截图预览生成成功");
+			o.style.cssText = "\n        font-size: 12px;\n        color: #666;\n        text-align: center;\n      ", o.innerHTML = "点击图片可放大查看<br/>提交时将自动上传此截图", a.appendChild(o), e.innerHTML = "", e.appendChild(a), this.feedbackDialog.screenshotCanvas = r, this.config.isDebug && y.debug("BytedeskWeb: 截图预览生成成功");
 		} catch (t) {
-			g.error("生成截图预览失败:", t), e.innerHTML = "\n        <div style=\"color: #ff6b6b; text-align: center; flex-direction: column; gap: 8px; display: flex; align-items: center;\">\n          <div style=\"font-size: 24px;\">⚠️</div>\n          <div>截图预览生成失败</div>\n          <div style=\"font-size: 12px; margin-top: 4px; color: #999;\">请检查页面权限或网络连接</div>\n        </div>\n      ";
+			y.error("生成截图预览失败:", t), e.innerHTML = "\n        <div style=\"color: #ff6b6b; text-align: center; flex-direction: column; gap: 8px; display: flex; align-items: center;\">\n          <div style=\"font-size: 24px;\">⚠️</div>\n          <div>截图预览生成失败</div>\n          <div style=\"font-size: 12px; margin-top: 4px; color: #999;\">请检查页面权限或网络连接</div>\n        </div>\n      ";
 		}
 	}
 	calculateScreenshotArea() {
@@ -1949,7 +1978,7 @@ var y = class {
 					y: l,
 					scrollX: 0,
 					scrollY: 0
-				}, this.config.isDebug && g.debug("BytedeskWeb: 选中文本截图区域:", {
+				}, this.config.isDebug && y.debug("BytedeskWeb: 选中文本截图区域:", {
 					selectedRect: t,
 					absolutePosition: {
 						left: i,
@@ -1975,7 +2004,7 @@ var y = class {
 					y: c,
 					scrollX: 0,
 					scrollY: 0
-				}, this.config.isDebug && g.debug("BytedeskWeb: 鼠标位置截图区域:", {
+				}, this.config.isDebug && y.debug("BytedeskWeb: 鼠标位置截图区域:", {
 					mousePosition: {
 						x: this.lastMouseEvent.clientX,
 						y: this.lastMouseEvent.clientY
@@ -1993,7 +2022,7 @@ var y = class {
 				});
 			}
 		} catch (e) {
-			this.config.isDebug && g.warn("BytedeskWeb: 计算截图区域失败，使用默认区域:", e);
+			this.config.isDebug && y.warn("BytedeskWeb: 计算截图区域失败，使用默认区域:", e);
 		}
 		return e;
 	}
@@ -2001,7 +2030,7 @@ var y = class {
 		try {
 			return window.html2canvas ? window.html2canvas : await this.loadHtml2CanvasFromCDN();
 		} catch (e) {
-			return this.config.isDebug && g.warn("html2canvas 加载失败:", e), null;
+			return this.config.isDebug && y.warn("html2canvas 加载失败:", e), null;
 		}
 	}
 	async loadHtml2CanvasFromCDN() {
@@ -2036,9 +2065,9 @@ var y = class {
 		try {
 			let e = this.feedbackDialog?.querySelector("#bytedesk-submit-screenshot")?.checked !== !1, r = [];
 			if (e) {
-				this.config.isDebug && g.debug("BytedeskWeb: 开始生成和上传截图"), i && (i.textContent = "正在生成截图...");
+				this.config.isDebug && y.debug("BytedeskWeb: 开始生成和上传截图"), i && (i.textContent = "正在生成截图...");
 				let e = await this.generateAndUploadScreenshot();
-				e && (r.push(e), this.config.isDebug && g.debug("BytedeskWeb: 截图上传成功:", e)), i && (i.textContent = "正在提交反馈...");
+				e && (r.push(e), this.config.isDebug && y.debug("BytedeskWeb: 截图上传成功:", e)), i && (i.textContent = "正在提交反馈...");
 			}
 			let a = {
 				selectedText: this.selectedText,
@@ -2055,7 +2084,7 @@ var y = class {
 				this.hideFeedbackDialog();
 			}, 2e3);
 		} catch (e) {
-			g.error("提交反馈失败:", e), alert("提交失败，请稍后重试");
+			y.error("提交反馈失败:", e), alert("提交失败，请稍后重试");
 		} finally {
 			i && (i.disabled = !1, i.textContent = a, i.style.opacity = "1");
 		}
@@ -2063,9 +2092,9 @@ var y = class {
 	async submitFeedbackToServer(e) {
 		try {
 			let { submitFeedback: t } = await import("../../apis/feedback/index.js"), n = await t(e);
-			return this.config.isDebug && g.debug("反馈提交响应:", n), n;
+			return this.config.isDebug && y.debug("反馈提交响应:", n), n;
 		} catch (e) {
-			throw g.error("提交反馈到服务器失败:", e), e;
+			throw y.error("提交反馈到服务器失败:", e), e;
 		}
 	}
 	showFeedbackSuccess() {
@@ -2085,16 +2114,16 @@ var y = class {
 	}
 	showDocumentFeedback(e) {
 		if (!this.config.feedbackConfig?.enabled) {
-			g.warn("文档反馈功能未启用");
+			y.warn("文档反馈功能未启用");
 			return;
 		}
 		e && (this.selectedText = e), this.showFeedbackDialog();
 	}
 	reinitFeedbackFeature() {
-		this.config.isDebug && g.debug("BytedeskWeb: 重新初始化反馈功能"), this.destroyFeedbackFeature(), this.initFeedbackFeature();
+		this.config.isDebug && y.debug("BytedeskWeb: 重新初始化反馈功能"), this.destroyFeedbackFeature(), this.initFeedbackFeature();
 	}
 	forceInitFeedbackFeature() {
-		return g.debug("BytedeskWeb: 强制初始化反馈功能被调用"), g.debug("BytedeskWeb: 当前配置:", this.config.feedbackConfig), g.debug("BytedeskWeb: isDebug:", this.config.isDebug), this.config.feedbackConfig || (g.debug("BytedeskWeb: 创建默认反馈配置"), this.config.feedbackConfig = {
+		return y.debug("BytedeskWeb: 强制初始化反馈功能被调用"), y.debug("BytedeskWeb: 当前配置:", this.config.feedbackConfig), y.debug("BytedeskWeb: isDebug:", this.config.isDebug), this.config.feedbackConfig || (y.debug("BytedeskWeb: 创建默认反馈配置"), this.config.feedbackConfig = {
 			enabled: !0,
 			trigger: "selection",
 			showOnSelection: !0,
@@ -2104,7 +2133,7 @@ var y = class {
 			submitText: "提交反馈",
 			cancelText: "取消",
 			successMessage: "感谢您的反馈！我们会认真处理您的意见。"
-		}), this.config.feedbackConfig.enabled || (g.debug("BytedeskWeb: 启用反馈配置"), this.config.feedbackConfig.enabled = !0), g.debug("BytedeskWeb: 销毁现有反馈功能"), this.destroyFeedbackFeature(), g.debug("BytedeskWeb: 重新初始化反馈功能"), this.initFeedbackFeature(), g.debug("BytedeskWeb: 强制初始化完成，检查结果:"), g.debug("- showDocumentFeedback方法存在:", typeof this.showDocumentFeedback == "function"), g.debug("- testTextSelection方法存在:", typeof this.testTextSelection == "function"), g.debug("- 反馈提示框存在:", !!this.feedbackTooltip), g.debug("- 反馈对话框存在:", !!this.feedbackDialog), g.debug("- 反馈提示框DOM存在:", !!document.querySelector("[data-bytedesk-feedback=\"tooltip\"]")), g.debug("- 反馈对话框DOM存在:", !!document.querySelector("[data-bytedesk-feedback=\"dialog\"]")), {
+		}), this.config.feedbackConfig.enabled || (y.debug("BytedeskWeb: 启用反馈配置"), this.config.feedbackConfig.enabled = !0), y.debug("BytedeskWeb: 销毁现有反馈功能"), this.destroyFeedbackFeature(), y.debug("BytedeskWeb: 重新初始化反馈功能"), this.initFeedbackFeature(), y.debug("BytedeskWeb: 强制初始化完成，检查结果:"), y.debug("- showDocumentFeedback方法存在:", typeof this.showDocumentFeedback == "function"), y.debug("- testTextSelection方法存在:", typeof this.testTextSelection == "function"), y.debug("- 反馈提示框存在:", !!this.feedbackTooltip), y.debug("- 反馈对话框存在:", !!this.feedbackDialog), y.debug("- 反馈提示框DOM存在:", !!document.querySelector("[data-bytedesk-feedback=\"tooltip\"]")), y.debug("- 反馈对话框DOM存在:", !!document.querySelector("[data-bytedesk-feedback=\"dialog\"]")), {
 			success: !!(this.feedbackTooltip && this.feedbackDialog),
 			methods: {
 				showDocumentFeedback: typeof this.showDocumentFeedback == "function",
@@ -2119,18 +2148,18 @@ var y = class {
 		};
 	}
 	testTextSelection(e = "测试选中文字") {
-		this.config.isDebug && g.debug("BytedeskWeb: 测试文本选择功能，模拟选中文字:", `"${e}"`), this.selectedText = e;
+		this.config.isDebug && y.debug("BytedeskWeb: 测试文本选择功能，模拟选中文字:", `"${e}"`), this.selectedText = e;
 		try {
 			let t = document.createElement("div");
 			t.textContent = e, t.style.cssText = "\n        position: absolute;\n        left: 50%;\n        top: 50%;\n        transform: translate(-50%, -50%);\n        padding: 20px;\n        background: #f0f0f0;\n        border: 2px dashed #ccc;\n        border-radius: 8px;\n        font-size: 16px;\n        z-index: 1000;\n        pointer-events: none;\n      ", document.body.appendChild(t);
 			let n = document.createRange();
 			n.selectNodeContents(t);
 			let r = window.getSelection();
-			r && (r.removeAllRanges(), r.addRange(n), this.config.isDebug && g.debug("BytedeskWeb: 已创建模拟文本选择"), this.feedbackTooltip ? this.showFeedbackTooltip() : g.error("BytedeskWeb: 反馈提示框不存在，无法测试"), setTimeout(() => {
+			r && (r.removeAllRanges(), r.addRange(n), this.config.isDebug && y.debug("BytedeskWeb: 已创建模拟文本选择"), this.feedbackTooltip ? this.showFeedbackTooltip() : y.error("BytedeskWeb: 反馈提示框不存在，无法测试"), setTimeout(() => {
 				r && r.removeAllRanges(), document.body.contains(t) && document.body.removeChild(t), this.hideFeedbackTooltip();
 			}, 5e3));
 		} catch (e) {
-			g.error("BytedeskWeb: 创建测试选择失败:", e);
+			y.error("BytedeskWeb: 创建测试选择失败:", e);
 		}
 	}
 	getDebugInfo() {
@@ -2152,4 +2181,4 @@ var y = class {
 	}
 };
 //#endregion
-export { y as default };
+export { S as default };

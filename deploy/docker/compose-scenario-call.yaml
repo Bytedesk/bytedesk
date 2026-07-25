@@ -31,6 +31,7 @@ services:
   # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
   bytedesk-freeswitch:
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
+    # image: bytedesk/freeswitch:latest
     container_name: freeswitch-bytedesk
     # restart: always
     entrypoint: ["/usr/local/bin/bytedesk-entrypoint.sh"]

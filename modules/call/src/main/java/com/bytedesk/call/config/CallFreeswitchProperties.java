@@ -128,9 +128,25 @@ public class CallFreeswitchProperties {
     private int wsPort = 15066;
 
     /**
+     * WebSocket Secure 信令端口（WSS，用于 HTTPS 页面下的 SIP 信令）
+     */
+    private int wssPort = 17443;
+
+    /**
      * 默认呼叫超时时间(秒)
      */
     private int callTimeout = 60;
+
+    /**
+     * 分机导入来源：esl 或 directory。
+     * esl 模式优先通过 FreeSWITCH API list_users 读取目录配置分机。
+     */
+    private String extensionImportSource = "esl";
+
+    /**
+     * 当 ESL 读取目录配置分机失败或返回空时，是否回退扫描本地 conf/directory。
+     */
+    private boolean extensionImportDirectoryFallbackEnabled = false;
 
     /**
      * RTP媒体端口范围开始

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        分机号码全局唯一约束。
+        (extension_number, is_deleted) 复合唯一索引：
+        - 同一非删除分机号只允许存在一条记录 (is_deleted = false)
+        - 软删除后 extension_number 被追加 _DEL_<uid> 后缀，释放原号码
+        - 兼容 MySQL（不支持 WHERE 条件部分唯一索引）
+
+        去重策略（对每个 (extension_number, is_deleted) 重复组）：
+        - 保留 id 最小的那条记录
+        - 其余记录：extension_number → extension_number + '_DEDUP_' + id（释放原号码）
+    -->
+    <changeSet id="260720-add-extension-number-unique-index" author="githubcopilot">
+        <!-- 兼容已执行旧版本 changeset 的本地/测试环境，防止 checksum 校验失败 -->
+        <validCheckSum>9:80a8146c0fd548f724854d263ddec6ea</validCheckSum>
+
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension" />
+            <columnExists tableName="bytedesk_call_extension" columnName="extension_number" />
+            <columnExists tableName="bytedesk_call_extension" columnName="is_deleted" />
+            <columnExists tableName="bytedesk_call_extension" columnName="id" />
+            <not>
+                <indexExists indexName="uk_extension_number_deleted" />
+            </not>
+        </preConditions>
+
+        <!-- Step 1: 去重 —— 对重复的 (extension_number, is_deleted)，
+             保留 id 最小的记录，其余记录的 extension_number 追加 _DEDUP_<id> 后缀 -->
+
+        <!-- MySQL / MariaDB: UPDATE ... INNER JOIN ... SET -->
+        <sql dbms="mysql, mariadb">
+            UPDATE bytedesk_call_extension t1
+            INNER JOIN (
+                SELECT extension_number, is_deleted, MIN(id) AS keep_id
+                FROM bytedesk_call_extension
+                GROUP BY extension_number, is_deleted
+                HAVING COUNT(*) > 1
+            ) t2 ON t1.extension_number = t2.extension_number
+                AND t1.is_deleted = t2.is_deleted
+                AND t1.id != t2.keep_id
+            SET t1.extension_number = CONCAT(t1.extension_number, '_DEDUP_', t1.id)
+        </sql>
+
+        <!-- PostgreSQL / H2: UPDATE ... FROM ... WHERE + || 拼接 -->
+        <sql dbms="postgresql, h2">
+            UPDATE bytedesk_call_extension t1
+            SET extension_number = t1.extension_number || '_DEDUP_' || t1.id
+            FROM (
+                SELECT extension_number, is_deleted, MIN(id) AS keep_id
+                FROM bytedesk_call_extension
+                GROUP BY extension_number, is_deleted
+                HAVING COUNT(*) > 1
+            ) t2
+            WHERE t1.extension_number = t2.extension_number
+                AND t1.is_deleted = t2.is_deleted
+                AND t1.id != t2.keep_id
+        </sql>
+
+        <!-- Oracle: 使用 ROW_NUMBER 窗口函数定位重复行 -->
+        <sql dbms="oracle">
+            UPDATE bytedesk_call_extension
+            SET extension_number = extension_number || '_DEDUP_' || id
+            WHERE id IN (
+                SELECT ranked_id FROM (
+                    SELECT id AS ranked_id,
+                           ROW_NUMBER() OVER (PARTITION BY extension_number, is_deleted ORDER BY id) AS rn
+                    FROM bytedesk_call_extension
+                ) ranked
+                WHERE rn > 1
+            )
+        </sql>
+
+        <!-- Step 2: 添加唯一约束（所有数据库通用标准 SQL） -->
+        <sql>
+            ALTER TABLE bytedesk_call_extension
+            ADD CONSTRAINT uk_extension_number_deleted
+            UNIQUE (extension_number, is_deleted)
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

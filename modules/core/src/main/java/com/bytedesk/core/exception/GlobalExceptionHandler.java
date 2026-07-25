@@ -277,6 +277,14 @@ public class GlobalExceptionHandler {
                     .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
         }
 
+        // 无可用测试分机号，属于已知业务异常
+        // 类在 enterprise/call 模块，此处通过类名匹配避免跨模块依赖
+        if ("com.bytedesk.call.extension.exception.NoAvailableExtensionException"
+                .equals(e.getClass().getName())) {
+            log.warn("No available extension: {}", rawMessage);
+            return ResponseEntity.ok().body(JsonResult.error(resolvedMessage));
+        }
+
         // 对于已知的业务异常类型，使用debug级别而不是error级别
         if (e instanceof org.springframework.security.access.AccessDeniedException) {
             log.debug("Access denied: {}", rawMessage);

@@ -15,6 +15,7 @@ package com.bytedesk.core.message.enums;
 
 public enum MessageNoticeTypeEnum {
     GENERAL,
+    ACD_CALL_INCOMING,
     LOGIN,
     TRANSFER,
     TRANSFER_REJECT,

@@ -7,15 +7,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -77,6 +81,19 @@ class TicketEventListenerTest {
                                 argThat(request -> "user-a".equals(request.getUserUid())));
                 verify(notificationService).dispatchSystemNotificationToUser(
                                 argThat(request -> "user-b".equals(request.getUserUid())));
+
+                ArgumentCaptor<NotificationRequest> requestCaptor = ArgumentCaptor.forClass(NotificationRequest.class);
+                verify(notificationService, times(3)).dispatchSystemNotificationToUser(requestCaptor.capture());
+
+                NotificationRequest reporterRequest = requestCaptor.getAllValues().stream()
+                                .filter(request -> "visitor-1".equals(request.getUserUid()))
+                                .findFirst()
+                                .orElseThrow();
+                SystemContent content = SystemContent.of(com.bytedesk.core.message.enums.MessageTypeEnum.SYSTEM,
+                                reporterRequest.getContent());
+
+                assertThat(content.getType()).isEqualTo(com.bytedesk.core.message.enums.MessageTypeEnum.SYSTEM.name());
+                assertThat(content.getContent()).isEqualTo(reporterRequest.getContent());
         }
 
         private static TicketEntity buildTicket(String workgroupUid) {

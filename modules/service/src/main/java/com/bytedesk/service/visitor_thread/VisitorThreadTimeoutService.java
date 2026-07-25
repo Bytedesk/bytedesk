@@ -66,11 +66,20 @@ public class VisitorThreadTimeoutService {
     private final MessageRestService messageRestService;
 
     /**
-     * 自动提醒客服或关闭会话
+     * 自动提醒客服或关闭会话（异步批量处理）
      */
     @Async
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         threads.forEach(this::processThreadTimeout);
+    }
+
+    /**
+     * 处理单个会话的超时逻辑（同步方法）
+     * 用于 quartz 每分钟定时任务中逐个处理，避免一次性将所有 ThreadEntity 加载到内存导致 OOM。
+     * 处理完返回后，调用方可以立即释放对 ThreadEntity 的引用。
+     */
+    public void processSingleThreadTimeout(ThreadEntity thread) {
+        processThreadTimeout(thread);
     }
 
     /**

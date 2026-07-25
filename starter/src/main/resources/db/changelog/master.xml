@@ -83,5 +83,22 @@
     <include file="db/changelog/migration/260713_add_ivr_record_hotline_trace_fields.xml" />
     <include file="db/changelog/migration/260715_add_visitor_sip_profile_fields.xml" />
     <include file="db/changelog/migration/260718_rename_extension_name_to_extension_number.xml" />
+    <include file="db/changelog/migration/260720_drop_extension_legacy_columns.xml" />
+    <include file="db/changelog/migration/260720_add_extension_number_unique_index.xml" />
+    <include file="db/changelog/migration/260721_add_call_route_source_fields.xml" />
+    <include file="db/changelog/migration/260722_add_call_queue_agent_member_fields.xml" />
+    <include file="db/changelog/migration/260722_add_acd_agent_wrap_up_until.xml" />
+    <include file="db/changelog/migration/260722_add_cdr_queue_agent_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_knowledge_welcome_type.xml" />
+    <include file="db/changelog/migration/260722_refactor_voice_voicemail_knowledge_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_ivr_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_routing_time_condition_switch.xml" />
+    <include file="db/changelog/migration/260722_fix_extension_settings_uuid_unique.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_tables.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_relation_fields.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_indexes.xml" />
+    <include file="db/changelog/migration/260724_add_acd_queue_entry_destination_number.xml" />
+    <include file="db/changelog/migration/260725_add_kb_interim_prompt.xml" />
+    <include file="db/changelog/migration/260725_add_kb_intent_classification.xml" />
     
 </databaseChangeLog>

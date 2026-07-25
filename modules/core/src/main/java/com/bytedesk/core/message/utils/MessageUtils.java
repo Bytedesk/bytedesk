@@ -18,6 +18,7 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -34,6 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 @Slf4j
 public class MessageUtils {
+
+    private static String buildSystemContent(MessageTypeEnum type, String content) {
+        return SystemContent.of(type, content).toJson();
+    }
 
     public static MessageProtobuf createLoginNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
@@ -114,14 +119,14 @@ public class MessageUtils {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AUTO_CLOSED,
-                content);
+                buildSystemContent(MessageTypeEnum.AUTO_CLOSED, content));
     }
 
     public static MessageProtobuf createAgentCloseMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AGENT_CLOSED,
-                content);
+                buildSystemContent(MessageTypeEnum.AGENT_CLOSED, content));
     }
 
     public static MessageProtobuf createAgentReplyTimeoutMessage(ThreadEntity thread, String content) {

@@ -99,10 +99,12 @@ public class VisitorThreadEventListener {
     /**
      * 优化：从 Redis 缓存查询活跃会话，避免频繁查询数据库
      * 缓存在会话创建时写入，会话关闭时移除
+     * 
+     * OOM 修复：不再一次性将所有 ThreadEntity 加载到 List 中，改为逐个流式处理，
+     * 处理完一个立即释放引用，避免大量 TEXT 列实体同时驻留内存导致 OOM。
      */
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // log.info("visitor_thread quartz one min event: " + event);        
         // 从缓存获取活跃会话列表
         List<ActiveThreadCache> cachedThreads = activeThreadCacheService.getAllActiveServiceThreads();
         
@@ -112,8 +114,8 @@ public class VisitorThreadEventListener {
             if (!dbThreads.isEmpty()) {
                 log.info("Rebuilding active thread cache from database, count: {}", dbThreads.size());
                 activeThreadCacheService.rebuildCacheFromDatabase(dbThreads);
-                // 使用数据库数据处理
-                visitorThreadTimeoutService.autoRemindAgentOrCloseThread(dbThreads);
+                // 使用数据库数据逐个处理，避免 OOM
+                dbThreads.forEach(visitorThreadTimeoutService::processSingleThreadTimeout);
                 dbThreads.forEach(visitorThreadTriggerService::processProactiveTrigger);
             }
             return;
@@ -122,17 +124,21 @@ public class VisitorThreadEventListener {
         List<ActiveThreadCache> validCachedThreads = cachedThreads.stream()
             .filter(cache -> StringUtils.hasText(cache.getUid()))
             .toList();
-        
-        // 从缓存获取完整的 ThreadEntity 列表用于处理（需要完整的 ThreadEntity 信息）
-        List<ThreadEntity> threads = validCachedThreads.stream()
-                .map(cache -> threadRestService.findByUid(cache.getUid()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(thread -> !thread.isClosed()) // 再次过滤确保未关闭
-                .toList();
 
-        // 自动关闭线程
-        visitorThreadTimeoutService.autoRemindAgentOrCloseThread(threads);
+        log.debug("Processing {} active service threads for timeout check", validCachedThreads.size());
+
+        // OOM 修复：逐个加载 ThreadEntity 并处理，处理完立即释放引用，
+        // 而不是用 .toList() 将所有实体一次性全部加载到内存中
+        for (ActiveThreadCache cache : validCachedThreads) {
+            try {
+                threadRestService.findByUid(cache.getUid())
+                    .filter(thread -> !thread.isClosed())
+                    .ifPresent(visitorThreadTimeoutService::processSingleThreadTimeout);
+            } catch (Exception e) {
+                // 单个线程处理失败不影响其他线程的处理
+                log.warn("Failed to process thread timeout for uid: {}", cache.getUid(), e);
+            }
+        }
 
         // 处理主动触发逻辑（使用缓存数据进行时间判断，减少数据库查询）
         validCachedThreads.forEach(visitorThreadTriggerService::processProactiveTriggerFromCache);

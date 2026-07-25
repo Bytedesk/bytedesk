@@ -39,6 +39,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.content.WelcomeContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -472,7 +473,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(tip)
+            .content(SystemContent.of(MessageTypeEnum.AGENT_CLOSED, tip).toJson())
                 .type(MessageTypeEnum.AGENT_CLOSED.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())

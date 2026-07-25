@@ -14,6 +14,8 @@
 //  */
 package com.bytedesk.core.config;
 
+import java.nio.file.Paths;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -24,6 +26,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 @Description("Core Web MVC Configuration - 核心Web MVC配置类，配置静态资源等基础功能")
 public class WebMvcConfig implements WebMvcConfigurer {
+
+        private static final String FREESWITCH_RECORDINGS_RESOURCE_LOCATION = Paths
+                        .get("..", "deploy", "freeswitch", "recordings")
+                        .toAbsolutePath()
+                        .normalize()
+                        .toUri()
+                        .toString();
 
     // @Autowired(required = false)
     // private IdempotencyInterceptor idempotencyInterceptor;
@@ -46,6 +55,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/**")
                 .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+        // 为 FreeSWITCH 录音文件提供 HTTP 访问（供语音代理下载录音进行 ASR）
+        registry.addResourceHandler("/freeswitch-recordings/**")
+                .addResourceLocations(FREESWITCH_RECORDINGS_RESOURCE_LOCATION);
     }
 
     // @Override

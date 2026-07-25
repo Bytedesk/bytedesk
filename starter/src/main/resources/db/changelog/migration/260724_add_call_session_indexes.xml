@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260724-add-call-session-indexes" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_session"/>
+        </preConditions>
+
+        <addUniqueConstraint tableName="bytedesk_call_session"
+            columnNames="call_uuid"
+            constraintName="uk_call_session_call_uuid"/>
+
+        <createIndex tableName="bytedesk_call_session" indexName="idx_call_session_org_uid">
+            <column name="org_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_session" indexName="idx_call_session_queue_uid">
+            <column name="queue_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_session" indexName="idx_call_session_agent_uid">
+            <column name="agent_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_session" indexName="idx_call_session_started_at">
+            <column name="started_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260724-add-call-lifecycle-event-indexes" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_lifecycle_event"/>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_call_lifecycle_event" indexName="idx_call_lifecycle_event_session_occurred_at">
+            <column name="session_uid"/>
+            <column name="occurred_at"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_lifecycle_event" indexName="idx_call_lifecycle_event_call_occurred_at">
+            <column name="call_uuid"/>
+            <column name="occurred_at"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_lifecycle_event" indexName="idx_call_lifecycle_event_code_occurred_at">
+            <column name="event_code"/>
+            <column name="occurred_at"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_lifecycle_event" indexName="idx_call_lifecycle_event_org_uid">
+            <column name="org_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260724-add-call-relation-indexes" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_cdr"/>
+            <tableExists tableName="bytedesk_call_acd_queue_entry"/>
+            <tableExists tableName="bytedesk_call_voicemail"/>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_call_cdr" indexName="idx_call_cdr_call_uuid">
+            <column name="call_uuid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_call_acd_queue_entry" indexName="idx_call_acd_queue_entry_call_uuid">
+            <column name="call_uuid"/>
+        </createIndex>
+        <addUniqueConstraint tableName="bytedesk_call_voicemail"
+            columnNames="call_uuid"
+            constraintName="uk_call_voicemail_call_uuid"/>
+    </changeSet>
+
+</databaseChangeLog>

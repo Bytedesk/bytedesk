@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="260722-add-acd-agent-wrap-up-until" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_acd_agent_state"/>
+                <not>
+                    <columnExists tableName="bytedesk_call_acd_agent_state" columnName="wrap_up_until"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_acd_agent_state">
+            <column name="wrap_up_until" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

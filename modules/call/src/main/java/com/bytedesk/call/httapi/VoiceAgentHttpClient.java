@@ -14,6 +14,9 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class VoiceAgentHttpClient {
 
@@ -22,10 +25,11 @@ public class VoiceAgentHttpClient {
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public VoiceAgentChatResult chat(String appBaseUrl, String fileUrl, String conversationId, String prompt) {
+    public VoiceAgentChatResult chat(String appBaseUrl, String fileUrl, String conversationId, String callUuid, String prompt) {
         String requestBody = "{" +
                 jsonField("fileUrl", fileUrl) + "," +
                 jsonField("conversationId", conversationId) + "," +
+                jsonField("callUuid", callUuid) + "," +
                 jsonField("prompt", prompt) +
                 "}";
         JsonNode data = post(appBaseUrl, "/visitor/api/v1/call/voice-agent/turn", requestBody);
@@ -33,22 +37,25 @@ public class VoiceAgentHttpClient {
                 textValue(data, "conversationId"),
                 textValue(data, "transcript"),
                 textValue(data, "replyText"),
-            textValue(data, "replyAudioUrl"),
-            textValue(data, "nextActionType"),
-            textValue(data, "queueName"),
-            textValue(data, "queueUid"),
-            textValue(data, "leaveReason"),
-            textValue(data, "promptText"),
-            integerValue(data, "maxRecordSeconds"),
-            integerValue(data, "ringTimeoutSeconds"));
+                textValue(data, "replyAudioUrl"),
+                textValue(data, "nextActionType"),
+                textValue(data, "queueName"),
+                textValue(data, "queueUid"),
+                textValue(data, "leaveReason"),
+                textValue(data, "promptText"),
+                integerValue(data, "maxRecordSeconds"),
+                integerValue(data, "ringTimeoutSeconds"),
+                textValue(data, "ivrMenuUid"),
+                textValue(data, "ivrExtensionNumber"));
     }
 
     public VoiceAgentChatResult chat(String appBaseUrl,
             String fileUrl,
             String conversationId,
+            String callUuid,
             String prompt,
             String orgUid,
-            String botDid,
+            String did,
             String provider,
             String instructions,
             String realtimeModel,
@@ -58,9 +65,10 @@ public class VoiceAgentHttpClient {
         String requestBody = "{" +
                 jsonField("fileUrl", fileUrl) + "," +
                 jsonField("conversationId", conversationId) + "," +
+            jsonField("callUuid", callUuid) + "," +
                 jsonField("prompt", prompt) + "," +
                 jsonField("orgUid", orgUid) + "," +
-                jsonField("botDid", botDid) + "," +
+                jsonField("did", did) + "," +
                 jsonField("provider", provider) + "," +
                 jsonField("instructions", instructions) + "," +
                 jsonField("realtimeModel", realtimeModel) + "," +
@@ -80,7 +88,9 @@ public class VoiceAgentHttpClient {
                 textValue(data, "leaveReason"),
                 textValue(data, "promptText"),
                 integerValue(data, "maxRecordSeconds"),
-                integerValue(data, "ringTimeoutSeconds"));
+                integerValue(data, "ringTimeoutSeconds"),
+                textValue(data, "ivrMenuUid"),
+                textValue(data, "ivrExtensionNumber"));
     }
 
     public VoiceAgentSpeakResult speak(String appBaseUrl, String text) {
@@ -89,11 +99,24 @@ public class VoiceAgentHttpClient {
         return new VoiceAgentSpeakResult(textValue(data, "replyText"), textValue(data, "replyAudioUrl"));
     }
 
+    public VoiceAgentWelcomeResult welcome(String appBaseUrl, String orgUid, String did) {
+        String requestBody = "{" +
+                jsonField("orgUid", orgUid) + "," +
+                jsonField("did", did) +
+                "}";
+        JsonNode data = post(appBaseUrl, "/visitor/api/v1/call/voice-agent/welcome", requestBody);
+        return new VoiceAgentWelcomeResult(
+                textValue(data, "welcomeType"),
+                textValue(data, "welcomeText"),
+                textValue(data, "welcomeAudioUrl"));
+    }
+
     private JsonNode post(String appBaseUrl, String path, String requestBody) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(normalizeBaseUrl(appBaseUrl) + path))
                     .timeout(Duration.ofSeconds(60))
+                    .header("Accept", "application/json")
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody, StandardCharsets.UTF_8))
                     .build();
@@ -114,7 +137,8 @@ public class VoiceAgentHttpClient {
             }
             return data;
         } catch (IOException e) {
-            throw new IllegalStateException("voice agent response parse failed", e);
+            log.warn("voice agent request failed path={} baseUrl={} error={}", path, appBaseUrl, e.toString());
+            throw new IllegalStateException("voice agent request failed: " + e.getMessage(), e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("voice agent request interrupted", e);
@@ -159,9 +183,14 @@ public class VoiceAgentHttpClient {
             String leaveReason,
             String promptText,
             Integer maxRecordSeconds,
-            Integer ringTimeoutSeconds) {
+            Integer ringTimeoutSeconds,
+            String ivrMenuUid,
+            String ivrExtensionNumber) {
     }
 
     public record VoiceAgentSpeakResult(String replyText, String replyAudioUrl) {
+    }
+
+    public record VoiceAgentWelcomeResult(String welcomeType, String welcomeText, String welcomeAudioUrl) {
     }
 }

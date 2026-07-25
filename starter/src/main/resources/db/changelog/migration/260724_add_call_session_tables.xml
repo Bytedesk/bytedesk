@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260724-add-call-session-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_session"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_call_session">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_call_session" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_call_session_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="call_uuid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_uid" type="VARCHAR(64)"/>
+            <column name="queue_uid" type="VARCHAR(64)"/>
+            <column name="queue_entry_uid" type="VARCHAR(64)"/>
+            <column name="agent_uid" type="VARCHAR(64)"/>
+            <column name="agent_extension" type="VARCHAR(64)"/>
+            <column name="source_extension_number" type="VARCHAR(64)"/>
+            <column name="did_number" type="VARCHAR(64)"/>
+            <column name="session_stage" type="VARCHAR(64)"/>
+            <column name="session_result" type="VARCHAR(64)"/>
+            <column name="handoff_source" type="VARCHAR(64)"/>
+            <column name="voicemail_uid" type="VARCHAR(64)"/>
+            <column name="cdr_uid" type="VARCHAR(64)"/>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="ended_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="260724-add-call-lifecycle-event-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_lifecycle_event"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_call_lifecycle_event">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_call_lifecycle_event" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_call_lifecycle_event_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="session_uid" type="VARCHAR(64)"/>
+            <column name="call_uuid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_uid" type="VARCHAR(64)"/>
+            <column name="queue_uid" type="VARCHAR(64)"/>
+            <column name="queue_entry_uid" type="VARCHAR(64)"/>
+            <column name="agent_uid" type="VARCHAR(64)"/>
+            <column name="agent_extension" type="VARCHAR(64)"/>
+            <column name="event_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_stage" type="VARCHAR(64)"/>
+            <column name="event_source" type="VARCHAR(64)"/>
+            <column name="idempotency_key" type="VARCHAR(128)"/>
+            <column name="occurred_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload_version" type="VARCHAR(32)"/>
+            <column name="event_payload" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

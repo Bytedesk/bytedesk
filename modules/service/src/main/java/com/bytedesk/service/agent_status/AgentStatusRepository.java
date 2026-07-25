@@ -23,8 +23,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface AgentStatusRepository extends JpaRepository<AgentStatusEntity, Long>, JpaSpecificationExecutor<AgentStatusEntity> {
 
     Optional<AgentStatusEntity> findByUid(String uid);
-    
-    List<AgentStatusEntity> findByOrgUidAndCreatedAtBetween(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
+
+    List<AgentStatusDashboardRow> findByOrgUidAndDeletedFalseAndCreatedAtBetween(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
     // 修改为根据agent中是否含有uid进行查询
     List<AgentStatusEntity> findByAgentContainsAndCreatedAtBetween(String agentUid, ZonedDateTime startTime, ZonedDateTime endTime);

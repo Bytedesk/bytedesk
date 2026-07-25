@@ -30,6 +30,7 @@
 				<#assign docBaseUrl = 'https://www.weiyuai.cn/docs/zh-TW/'>
 			</#if>
 			<#assign pricingUrl = docBaseUrl + 'docs/payment'>
+			<#assign privateDeployUrl = docBaseUrl + 'docs/category/private-deployment'>
 			<#assign helpCenterUrl = 'https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html'>
 			<#assign aiAgentDemoUrl = 'https://www.weiyuai.cn/demos/'>
 			<#assign visitorDemoUrl = 'https://www.weiyuai.cn/reactdemo/'>
@@ -73,6 +74,7 @@
 					<ul class="dropdown-menu" aria-labelledby="docsMenu">
 						<li><a class="dropdown-item" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
 						<li><a class="dropdown-item" href="${helpCenterUrl}" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
+						<li><a class="dropdown-item" href="${privateDeployUrl}" target="_blank"><@t key="nav.private.deploy">私有部署文档</@t></a></li>
 						<li><a class="dropdown-item" href="${aiAgentDemoUrl}" target="_blank">AI Agent 演示</a></li>
 					</ul>
 				</li>

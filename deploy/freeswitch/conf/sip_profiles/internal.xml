@@ -102,6 +102,10 @@
     <param name="apply-nat-acl" value="docker_nat"/>
 
 
+    <!-- STUN 服务器：用于 WebRTC ICE 候选收集，帮助 DTLS-SRTP 完成 NAT 穿透 -->
+    <!-- 留空则禁用；生产环境建议填写: stun:stun.example.com:3478 -->
+    <param name="stun-server" value="$${stun_server}"/>
+
     <!-- (default true) set to false if you do not wish to have called party info in 1XX responses -->
     <!-- <param name="cid-in-1xx" value="false"/> -->
 

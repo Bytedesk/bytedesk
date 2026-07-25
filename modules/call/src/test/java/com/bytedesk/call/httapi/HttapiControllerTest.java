@@ -2,6 +2,8 @@ package com.bytedesk.call.httapi;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +45,91 @@ class HttapiControllerTest {
 
         assertTrue(xml.contains("application=\"set\" data=\"tts_profile=java-mrcp\""));
         assertTrue(xml.contains("application=\"set\" data=\"unimrcp:profile=java-mrcp\""));
+    }
+
+    @Test
+    void firstTurnShouldUseVoiceAgentGreetingForImplicit9205Did() {
+        HttapiController controller = new HttapiController(
+                llmClient,
+                voiceAgentHttpClient,
+                vars -> "java-mrcp");
+
+        LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("turn", "1");
+        form.add("bot_did", "9205");
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/ai-bot");
+        request.setScheme("http");
+        request.setServerName("api.weiyuai.cn");
+        request.setServerPort(9003);
+
+        when(voiceAgentHttpClient.welcome(eq("http://api.weiyuai.cn:9003"), eq(null), eq("9205")))
+            .thenReturn(new VoiceAgentHttpClient.VoiceAgentWelcomeResult("TTS", "您好，我是微语智能助手，请问您有什么可以帮您？", null));
+
+        when(voiceAgentHttpClient.speak(eq("http://api.weiyuai.cn:9003"), eq("您好，我是微语智能助手，请问您有什么可以帮您？")))
+                .thenReturn(new VoiceAgentHttpClient.VoiceAgentSpeakResult("您好，我是微语智能助手，请问您有什么可以帮您？", "https://cdn.example.com/greet.wav"));
+
+        String xml = new String(controller.aiBot(form, request), StandardCharsets.UTF_8);
+
+        verify(voiceAgentHttpClient).speak("http://api.weiyuai.cn:9003", "您好，我是微语智能助手，请问您有什么可以帮您？");
+        assertTrue(xml.contains("application=\"playback\" data=\"https://cdn.example.com/greet.wav\""));
+        assertTrue(xml.contains("application=\"export\" data=\"bot_continue=1\""));
+    }
+
+    @Test
+    void firstTurnShouldNormalizeHostDockerInternalForSelfCall() {
+        HttapiController controller = new HttapiController(
+                llmClient,
+                voiceAgentHttpClient,
+                vars -> "java-mrcp");
+
+        LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("turn", "1");
+        form.add("voice_agent", "true");
+        form.add("bot_did", "9205");
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/ai-bot");
+        request.setScheme("http");
+        request.setServerName("host.docker.internal");
+        request.setServerPort(9003);
+
+        when(voiceAgentHttpClient.welcome(eq("http://127.0.0.1:9003"), eq(null), eq("9205")))
+                .thenReturn(new VoiceAgentHttpClient.VoiceAgentWelcomeResult("TTS", "您好", null));
+        when(voiceAgentHttpClient.speak(eq("http://127.0.0.1:9003"), eq("您好")))
+                .thenReturn(new VoiceAgentHttpClient.VoiceAgentSpeakResult("您好", "https://cdn.example.com/greet.wav"));
+
+        String xml = new String(controller.aiBot(form, request), StandardCharsets.UTF_8);
+
+        verify(voiceAgentHttpClient).welcome("http://127.0.0.1:9003", null, "9205");
+        verify(voiceAgentHttpClient).speak("http://127.0.0.1:9003", "您好");
+        assertTrue(xml.contains("application=\"playback\" data=\"https://cdn.example.com/greet.wav\""));
+    }
+
+    @Test
+    void firstTurnShouldPlaybackConfiguredWelcomeAudioDirectly() {
+        HttapiController controller = new HttapiController(
+                llmClient,
+                voiceAgentHttpClient,
+                vars -> "java-mrcp");
+
+        LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("turn", "1");
+        form.add("voice_agent", "true");
+        form.add("bot_did", "9205");
+        form.add("org_uid", "org-1");
+
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/ai-bot");
+        request.setScheme("http");
+        request.setServerName("api.weiyuai.cn");
+        request.setServerPort(9003);
+
+        when(voiceAgentHttpClient.welcome(eq("http://api.weiyuai.cn:9003"), eq("org-1"), eq("9205")))
+                .thenReturn(new VoiceAgentHttpClient.VoiceAgentWelcomeResult("AUDIO", null, "https://cdn.example.com/welcome.wav"));
+
+        String xml = new String(controller.aiBot(form, request), StandardCharsets.UTF_8);
+
+        assertTrue(xml.contains("application=\"playback\" data=\"https://cdn.example.com/welcome.wav\""));
+        assertTrue(xml.contains("application=\"export\" data=\"bot_continue=1\""));
     }
 
     @Test
@@ -100,6 +187,7 @@ class HttapiControllerTest {
             "https://cdn.example.com/call.wav",
             "uuid-1",
             null,
+            null,
             "org-1",
             "9205",
             "qwen-audio-realtime",
@@ -119,7 +207,9 @@ class HttapiControllerTest {
                     null,
                     "正在为您转接人工坐席",
                     null,
-                    20));
+                    20,
+                    null,
+                    null));
 
         String xml = new String(controller.aiBot(form, request), StandardCharsets.UTF_8);
 
@@ -160,6 +250,7 @@ class HttapiControllerTest {
             "https://cdn.example.com/call-2.wav",
             "uuid-2",
             null,
+            null,
             "org-1",
             "9205",
             "qwen-audio-realtime",
@@ -179,6 +270,8 @@ class HttapiControllerTest {
                     "OFF_HOURS",
                     "当前非服务时间，请在提示音后留言。",
                     90,
+                    null,
+                    null,
                     null));
 
         String xml = new String(controller.aiBot(form, request), StandardCharsets.UTF_8);

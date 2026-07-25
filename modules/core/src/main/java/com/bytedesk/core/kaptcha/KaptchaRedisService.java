@@ -69,7 +69,7 @@ public class KaptchaRedisService {
         }
         // log.info("checkKaptcha key: " + key + ", value: " + value);
         String cachedValue = stringRedisTemplate.opsForValue().get(RedisConsts.KAPTCHA_PREFIX + key);
-        return cachedValue != null && cachedValue.equals(value);
+        return cachedValue != null && value != null && cachedValue.equalsIgnoreCase(value);
     }
 
     public void removeKaptcha(String key) {
