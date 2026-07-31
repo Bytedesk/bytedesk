@@ -36,9 +36,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingModel;
+import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingOptions;
 import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.enums.LevelEnum;
@@ -171,14 +170,16 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
     }
 
     private EmbeddingModel buildDashscopeEmbeddingModel(EmbeddingSettingsEntity settings) {
-        DashScopeApi api = DashScopeApi.builder()
-                .baseUrl(resolveBaseUrl(settings, "https://dashscope.aliyuncs.com"))
-                .apiKey(resolveApiKey(settings))
-                .build();
-        DashScopeEmbeddingOptions options = DashScopeEmbeddingOptions.builder()
-                .model(resolveModel(settings, "text-embedding-v4"))
-                .build();
-        return new DashScopeEmbeddingModel(api, MetadataMode.EMBED, options);
+        BytedeskDashScopeEmbeddingOptions.BytedeskDashScopeEmbeddingOptionsBuilder optionsBuilder = BytedeskDashScopeEmbeddingOptions.builder()
+            .model(resolveModel(settings, "text-embedding-v4"));
+        Integer dimensions = resolveModelDimensions(settings);
+        if (dimensions != null && dimensions > 0) {
+            optionsBuilder.dimensions(dimensions);
+        }
+        return new BytedeskDashScopeEmbeddingModel(
+            resolveBaseUrl(settings, "https://dashscope.aliyuncs.com"),
+            resolveApiKey(settings),
+            optionsBuilder.build());
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {

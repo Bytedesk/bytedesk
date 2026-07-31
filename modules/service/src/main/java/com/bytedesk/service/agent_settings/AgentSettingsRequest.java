@@ -15,6 +15,8 @@ package com.bytedesk.service.agent_settings;
 
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButton;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTab;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;

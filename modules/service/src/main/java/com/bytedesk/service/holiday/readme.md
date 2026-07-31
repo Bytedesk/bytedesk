@@ -4,7 +4,7 @@
 
 HolidayEntity is the shared date model for holidays, makeup workdays, and custom special dates at platform or organization scope.
 
-It is already connected to the enterprise/call time-condition holiday rule, where it is used to decide whether a specific day is an official holiday or a named holiday.
+It is already connected to the unified WorktimeService holiday evaluation path, where it is used to decide whether a specific day is an official holiday, a makeup workday, or an organization-specific special date.
 
 ## Core Entity
 
@@ -23,7 +23,7 @@ HolidayEntity maps to the bytedesk_service_holiday table. The current model focu
 
 ## Current Modeling Boundary
 
-HolidayEntity has been narrowed from a template-like entity into a runnable date-based model, primarily to support call-center time-condition evaluation.
+HolidayEntity has been narrowed from a template-like entity into a runnable date-based model, primarily to support unified worktime evaluation across service and call-center scenarios.
 
 The current focus is:
 
@@ -46,40 +46,31 @@ The current seed source is defined in HolidayInitData, with sourceUrl pointing t
 
 Initialization skips any existing countryCode + holidayDate row to avoid duplicates.
 
-## Relationship To Time Conditions
+## Relationship To Unified Worktime
 
-ChinaHolidayProvider in enterprise/call reads HolidayEntity through HolidayRepository and provides holiday matching support to TimeConditionMatcher.
+HolidayService reads HolidayEntity through HolidayRepository and resolves the effective holiday set for platform and organization scope. WorktimeService then uses that result to decide whether the current date should follow regular worktimes or special holiday worktimes.
 
 The current convention is:
 
-- blank holiday value, CN, CN-OFFICIAL, and CN-NATIONAL all mean any official Chinese off-day,
-- the pattern CN:{holiday-name} means a specific holiday in China, for example CN:Spring Festival.
+- offDay=true means the date should be treated as a holiday or rest day,
+- offDay=false means the date is a makeup workday and should not automatically switch into holiday hours,
+- organization-level rows override same-day platform rows when holiday scope includes both.
 
-So HolidayEntity is not only admin-side reference data. It is also a direct runtime input for time-based call routing.
+So HolidayEntity is not only admin-side reference data. It is a direct runtime input for unified service-time evaluation.
 
 ## Typical Use Cases
 
-### Switch Call Flow On Holidays
+### Switch To Holiday Hours
 
-Configure the following rule in TimeCondition:
+Configure WorktimeSettingEntity with holiday-aware specialWorktimes.
 
-- field=holiday, value=CN
-
-This lets the system match official holidays and route calls to a holiday IVR, announcement, or voicemail flow.
-
-### Special Behavior For One Holiday
-
-Configure the following rule in TimeCondition:
-
-- field=holiday, value=CN:Spring Festival
-
-This enables special greetings or routing only during Spring Festival.
+This lets the system switch to holiday-specific service hours and route calls or chats to holiday IVR, announcement, voicemail, or non-worktime handling.
 
 ### Keep Working On Makeup Workdays
 
 For dates defined by the government as makeup workdays, HolidayEntity stores offDay=false.
 
-That prevents the date from being treated as a holiday and allows normal working-hours rules to continue matching.
+That prevents the date from being treated as a holiday and allows normal regularWorktimes to continue matching.
 
 ## Recommendations
 

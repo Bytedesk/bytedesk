@@ -100,5 +100,18 @@
     <include file="db/changelog/migration/260724_add_acd_queue_entry_destination_number.xml" />
     <include file="db/changelog/migration/260725_add_kb_interim_prompt.xml" />
     <include file="db/changelog/migration/260725_add_kb_intent_classification.xml" />
+    <include file="db/changelog/migration/260727_add_ticket_auto_create_settings.xml" />
+    <include file="db/changelog/migration/260728_fix_ticket_auto_create_settings_columns.xml" />
+    <include file="db/changelog/migration/260727_add_ticket_visibility_settings.xml" />
+    <include file="db/changelog/migration/260727_refactor_unified_worktime_schema.xml" />
+    <include file="db/changelog/migration/260728_add_thread_resolved_tracking_fields.xml" />
+    <include file="db/changelog/migration/260728_add_auto_resolved_settings.xml" />
+    <include file="db/changelog/migration/260728_add_ticket_assignment_log.xml" />
+    <include file="db/changelog/migration/260728_add_member_manager_uid.xml" />
+    <include file="db/changelog/migration/260728_add_ivr_record_context_json.xml" />
+    <include file="db/changelog/migration/260729_add_voice_clone_fields.xml" />
+    <include file="db/changelog/migration/260729_add_asr_hotword_vocabulary_fields.xml" />
+    <include file="db/changelog/migration/260729_add_ticket_sla_record_node_fields.xml" />
+    <include file="db/changelog/migration/260730_drop_ticket_basic_settings_unused_timeout_tips.xml" />
     
 </databaseChangeLog>

@@ -53,8 +53,7 @@
       "data": {
         "title": "工单待认领",
         "description": "成员认领工单，或由负责人指派处理人。",
-        "assigneeType": "role",
-        "roleUid": "${departmentUid}",
+        "assigneeType": "department",
         "timeoutMinutes": 0,
         "timeoutAction": "remind",
         "slaType": "CLAIM",

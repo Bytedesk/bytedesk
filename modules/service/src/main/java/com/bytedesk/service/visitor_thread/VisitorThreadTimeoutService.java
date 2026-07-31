@@ -154,7 +154,12 @@ public class VisitorThreadTimeoutService {
             ZonedDateTime agentLastResponseAt = queueMember.getAgentLastResponseAt();
             ZonedDateTime visitorLastMessageAt = queueMember.getVisitorLastMessageAt();
 
-            // 未有客服回复，不开启自动关闭计时
+            // 机器人接待中（ROBOTING）的会话：使用机器人最后回复时间作为自动关闭计时基准
+            if (agentLastResponseAt == null && thread.isRoboting()) {
+                agentLastResponseAt = queueMember.getRobotLastResponseAt();
+            }
+
+            // 未有客服回复（且非机器人接待），不开启自动关闭计时
             if (agentLastResponseAt == null) {
                 return;
             }

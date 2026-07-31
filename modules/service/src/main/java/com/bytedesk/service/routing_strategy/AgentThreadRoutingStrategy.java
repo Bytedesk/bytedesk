@@ -54,7 +54,9 @@ import com.bytedesk.webrtc.webrtc.dto.WebrtcInviteRequest;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
+import com.bytedesk.service.worktime_settings.WorktimeService;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.service.worktime_settings.WorktimeSettingsResolver;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
@@ -93,6 +95,8 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final ObjectProvider<ThreadRoutingContext> threadRoutingContextProvider;
     private final IWebrtcService webrtcService;
+    private final WorktimeService worktimeService;
+    private final WorktimeSettingsResolver worktimeSettingsResolver;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -866,28 +870,14 @@ public class AgentThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     }
 
     private boolean resolveIsInServiceTime(VisitorRequest visitorRequest, AgentEntity agentEntity) {
-        WorktimeSettingEntity effective = resolveEffectiveWorktimeSettings(visitorRequest, agentEntity);
-        if (effective != null) {
-            return Boolean.TRUE.equals(effective.isInWorktime());
-        }
-        return true;
+        WorktimeSettingEntity effective = worktimeSettingsResolver.resolve(visitorRequest,
+                agentEntity.getSettings());
+        return worktimeService.isInServiceTime(effective);
     }
 
     private WorktimeSettingEntity resolveEffectiveWorktimeSettings(VisitorRequest visitorRequest,
             AgentEntity agentEntity) {
-        if (agentEntity == null || agentEntity.getSettings() == null) {
-            return null;
-        }
-        boolean useDraft = isDraftEnabled(visitorRequest);
-        WorktimeSettingEntity draft = agentEntity.getSettings().getDraftWorktimeSettings();
-        WorktimeSettingEntity published = agentEntity.getSettings().getWorktimeSettings();
-        if (useDraft && draft != null) {
-            return draft;
-        }
-        if (published != null) {
-            return published;
-        }
-        return draft;
+        return worktimeSettingsResolver.resolve(visitorRequest, agentEntity.getSettings());
     }
 
     /**

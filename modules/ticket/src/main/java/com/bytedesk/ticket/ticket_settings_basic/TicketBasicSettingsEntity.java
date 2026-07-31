@@ -77,20 +77,6 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Column(name = "close_tip", length = 2048)
     private String closeTip = I18Consts.I18N_TICKET_CLOSE_TIP;
 
-    /**
-     * 工单客服超时未回复提示语（预留给超时触发器/定时任务使用）
-     */
-    @Builder.Default
-    @Column(name = "agent_timeout_tip", length = 2048)
-    private String agentTimeoutTip = I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP;
-
-    /**
-     * 工单访客超时未回复提示语（预留给超时触发器/定时任务使用）
-     */
-    @Builder.Default
-    @Column(name = "visitor_timeout_tip", length = 2048)
-    private String visitorTimeoutTip = I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP;
-
     // ============ 联系方式字段显示配置 ============
 
     /**
@@ -183,12 +169,6 @@ public class TicketBasicSettingsEntity extends BaseEntity {
         }
         if (!StringUtils.hasText(entity.getCloseTip())) {
             entity.setCloseTip(I18Consts.I18N_TICKET_CLOSE_TIP);
-        }
-        if (!StringUtils.hasText(entity.getAgentTimeoutTip())) {
-            entity.setAgentTimeoutTip(I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP);
-        }
-        if (!StringUtils.hasText(entity.getVisitorTimeoutTip())) {
-            entity.setVisitorTimeoutTip(I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP);
         }
         return entity;
     }

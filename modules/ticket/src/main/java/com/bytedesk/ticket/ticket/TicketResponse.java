@@ -95,6 +95,9 @@ public class TicketResponse extends BaseResponse {
     // 自定义表单 json schema
     private String schema;
 
+    // 工单处理时长（秒）
+    private Long processingDuration;
+
     private List<TicketSlaRecordResponse> slaRecords;
     
     // 

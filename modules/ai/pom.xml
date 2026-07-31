@@ -282,26 +282,6 @@
 			<version>7.7.0</version>
         </dependency>
 
-		<!-- 暂时使用直接集成源码替代 -->
-		<!-- https://java.agentscope.io/zh/intro.html -->
-		<!-- https://github.com/agentscope-ai/agentscope-java -->
-		<!-- https://mvnrepository.com/artifact/io.agentscope/agentscope-core -->
-		<!-- <dependency>
-            <groupId>io.agentscope</groupId>
-            <artifactId>agentscope-core</artifactId>
-			<version>1.0.12</version>
-        </dependency> -->
-
-		<!-- 暂时使用直接集成源码替代 -->
-		<!-- https://java.agentscope.io/zh/intro.html -->
-		<!-- https://github.com/agentscope-ai/agentscope-java -->
-		<!-- https://mvnrepository.com/artifact/io.agentscope/agentscope-harness -->
-		<!-- <dependency>
-            <groupId>io.agentscope</groupId>
-            <artifactId>agentscope-harness</artifactId>
-			<version>1.1.0-RC2</version>
-        </dependency> -->
-
 		<!-- https://github.com/dashscope/dashscope-sdk-java -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
 		 <dependency>
@@ -329,18 +309,22 @@
 		<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-dashscope -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
+		<!-- 阶段 1：已由 BytedeskDashScopeChatModel / BytedeskDashScopeEmbeddingModel 替代，暂时注释保留便于回滚。
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
+		-->
 		<!-- Spring AI Alibaba Agent Framework -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-agent-framework -->
+		<!-- 阶段 2：Agent Framework 仅服务已停用演示代码，暂时注释保留便于回滚。
 		<dependency>
 			<groupId>com.alibaba.cloud.ai</groupId>
 			<artifactId>spring-ai-alibaba-agent-framework</artifactId>
 			<version>${spring-ai-alibaba.version}</version>
 		</dependency>
+		-->
 		
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
@@ -428,6 +412,7 @@
 				<scope>import</scope>
 			</dependency>
 			<!-- https://github.com/alibaba/spring-ai-alibaba -->
+			<!-- 阶段 2：spring-ai-alibaba 依赖已停用，BOM 暂时注释保留便于回滚。
 			<dependency>
 				<groupId>com.alibaba.cloud.ai</groupId>
 				<artifactId>spring-ai-alibaba-bom</artifactId>
@@ -435,6 +420,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			-->
 			<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
 			<!-- <dependency>
 				<groupId>com.alibaba.cloud.ai</groupId>

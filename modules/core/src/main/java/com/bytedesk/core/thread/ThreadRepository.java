@@ -16,6 +16,7 @@ package com.bytedesk.core.thread;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -100,6 +101,19 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
          */
         @Query("SELECT t.closeType, COUNT(t) FROM ThreadEntity t WHERE t.status = 'CLOSED' AND t.deleted = false AND t.updatedAt BETWEEN :start AND :end GROUP BY t.closeType")
         List<Object[]> countClosedGroupedByCloseType(@Param("start") java.time.ZonedDateTime start, @Param("end") java.time.ZonedDateTime end);
+
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.status = :status AND t.deleted = false AND t.closedAt IS NOT NULL AND t.closedAt <= :closedBefore ORDER BY t.closedAt ASC")
+        Page<ThreadEntity> findClosedCustomerServiceThreadsBefore(
+                        @Param("types") List<String> types,
+                        @Param("status") String status,
+                        @Param("closedBefore") ZonedDateTime closedBefore,
+                        Pageable pageable);
+
+        @Query("SELECT COUNT(t) > 0 FROM ThreadEntity t WHERE t.topic = :topic AND t.uid <> :excludeUid AND t.deleted = false AND t.createdAt > :createdAfter")
+        boolean existsByTopicAndUidNotAndCreatedAtAfter(
+                        @Param("topic") String topic,
+                        @Param("excludeUid") String excludeUid,
+                        @Param("createdAfter") ZonedDateTime createdAfter);
 
         /**
          * 根据访客ID查找最近的客服会话记录

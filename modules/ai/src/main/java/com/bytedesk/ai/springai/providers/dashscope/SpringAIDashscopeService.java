@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.ObjectProvider;
@@ -25,9 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
@@ -48,7 +46,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
     public SpringAIDashscopeService(
             LlmProviderRestService llmProviderRestService,
-            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<DashScopeChatModel> defaultChatModelProvider,
+            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<ChatModel> defaultChatModelProvider,
             TokenUsageHelper tokenUsageHelper) {
         this.llmProviderRestService = llmProviderRestService;
         this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
@@ -57,26 +55,26 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
 
     private final LlmProviderRestService llmProviderRestService;
 
-    private final DashScopeChatModel defaultChatModel;
+    private final ChatModel defaultChatModel;
 
     private final TokenUsageHelper tokenUsageHelper;
 
 
     /**
-     * 根据机器人配置创建动态的DashScopeChatOptions
+        * 根据机器人配置创建动态的BytedeskDashScopeChatOptions
      * 
      * @param llm 机器人LLM配置
      * @return 根据机器人配置创建的选项
      */
-    private DashScopeChatOptions createDashscopeOptions(RobotLlm llm) {
+    private BytedeskDashScopeChatOptions createDashscopeOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
         try {
-            return DashScopeChatOptions.builder()
+                return BytedeskDashScopeChatOptions.builder()
                     .model(llm.getTextModel())
                     .temperature(llm.getTemperature())
-                    .maxToken(llm.getMaxTokens())
+                    .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .build();
         } catch (Exception e) {
@@ -85,20 +83,13 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
     }
 
-    public DashScopeApi createDashscopeApi(String apiUrl, String apiKey) {
-        return DashScopeApi.builder()
-                .baseUrl(apiUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     /**
-     * 根据机器人配置创建动态的DashScopeChatModel
+    * 根据机器人配置创建动态的BytedeskDashScopeChatModel
      * 
      * @param llm 机器人LLM配置
-     * @return 配置了特定模型的DashScopeChatModel
+    * @return 配置了特定模型的ChatModel
      */
-    private DashScopeChatModel createDashscopeChatModel(RobotLlm llm) {
+    private ChatModel createDashscopeChatModel(RobotLlm llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
             return defaultChatModel;
@@ -117,19 +108,14 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
 
         try {
-            log.info("Creating dynamic Dashscope chat model with provider: {} ({})", provider.getType(),
+            log.debug("Creating dynamic Dashscope chat model with provider: {} ({})", provider.getType(),
                     provider.getUid());
-            // 使用动态的DashScopeApi实例
-            DashScopeApi dashscopeApi = createDashscopeApi(provider.getBaseUrl(), provider.getApiKey());
-            DashScopeChatOptions options = createDashscopeOptions(llm);
+            BytedeskDashScopeChatOptions options = createDashscopeOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Dashscope options, using default chat model");
                 return defaultChatModel;
             }
-            return DashScopeChatModel.builder()
-                    .dashScopeApi(dashscopeApi)
-                    .defaultOptions(options)
-                    .build();
+            return new BytedeskDashScopeChatModel(provider.getBaseUrl(), provider.getApiKey(), options);
         } catch (Exception e) {
             log.error("Failed to create dynamic Dashscope chat model for provider {}, using default chat model",
                     provider.getUid(), e);
@@ -150,7 +136,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
     //     }
 
     //     // 获取适当的模型实例
-    //     DashScopeChatModel chatModel = createDashscopeChatModel(llm);
+    //     ChatModel chatModel = createDashscopeChatModel(llm);
     //     if (chatModel == null) {
     //         log.error("Failed to create Dashscope chat model and no default chat model available");
     //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE,
@@ -217,11 +203,8 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
 
-        log.info("Dashscope API sync ");
-
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Dashscope API websocket ");
 
         if (llm == null) {
             log.info("Dashscope API not available");
@@ -229,14 +212,14 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
 
         // 获取适当的模型实例
-        DashScopeChatModel chatModel = createDashscopeChatModel(llm);
+        ChatModel chatModel = createDashscopeChatModel(llm);
 
         try {
             try {
                 // 如果有robot参数，尝试创建自定义选项
                 if (robot != null && robot.getLlm() != null) {
                     // 创建自定义选项
-                    DashScopeChatOptions customOptions = createDashscopeOptions(robot.getLlm());
+                    BytedeskDashScopeChatOptions customOptions = createDashscopeOptions(robot.getLlm());
                     if (customOptions != null) {
                         // 使用自定义选项创建Prompt
                         Prompt prompt = new Prompt(message, customOptions);
@@ -279,7 +262,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
             SseEmitter emitter) {
         // 从robot中获取llm配置
         RobotLlm llm = robot.getLlm();
-        log.info("Dashscope API SSE ");
 
         if (llm == null) {
             log.info("Dashscope API not available");
@@ -290,7 +272,7 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
         }
 
         // 获取适当的模型实例
-        DashScopeChatModel chatModel = createDashscopeChatModel(llm);
+        ChatModel chatModel = createDashscopeChatModel(llm);
 
         if (chatModel == null) {
             log.error("Failed to create Dashscope chat model and no default chat model available");
@@ -319,7 +301,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
                                     String reasonContent = extractReasoningContent(generation, assistantMessage);
-                                    log.info("Dashscope API SSE response text: {}", textContent);
 
                                     sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply,
                                         emitter, textContent, reasonContent, sourceReferences);
@@ -340,7 +321,6 @@ public class SpringAIDashscopeService extends BaseSpringAIService {
                         success[0] = false;
                     },
                     () -> {
-                        log.info("Dashscope API SSE complete");
                         // 发送流结束消息，包含token使用情况和prompt内容
                         sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                                 tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(),

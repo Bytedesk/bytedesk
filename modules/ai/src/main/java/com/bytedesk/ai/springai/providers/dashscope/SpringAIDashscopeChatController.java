@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
@@ -255,7 +254,7 @@ public class SpringAIDashscopeChatController {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    DashScopeChatOptions.builder()
+                    BytedeskDashScopeChatOptions.builder()
                         .model("dashscope-chat")
                         .temperature(0.7)
                         .topP(0.9)

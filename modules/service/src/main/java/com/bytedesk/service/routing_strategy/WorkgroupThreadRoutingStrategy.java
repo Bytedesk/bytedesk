@@ -64,6 +64,8 @@ import com.bytedesk.service.visitor_thread.VisitorThreadService;
 import com.bytedesk.service.visitor_thread.VisitorThreadTimeoutService;
 import com.bytedesk.webrtc.webrtc.IWebrtcService;
 import com.bytedesk.webrtc.webrtc.dto.WebrtcInviteRequest;
+import com.bytedesk.service.worktime_settings.WorktimeService;
+import com.bytedesk.service.worktime_settings.WorktimeSettingsResolver;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
@@ -125,6 +127,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final AgentRestService agentRestService;
     private final RoutingPoolRestService routingPoolRestService;
     private final IWebrtcService webrtcService;
+    private final WorktimeService worktimeService;
+    private final WorktimeSettingsResolver worktimeSettingsResolver;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -470,10 +474,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             boolean nonWorktimeRobot = Boolean.TRUE
                 .equals(workgroup.getSettings().getRobotSettings().getNonWorktimeRobot());
 
-            transferToRobot = defaultRobot || (offlineRobot && isOffline);
+            transferToRobot = defaultRobot || (offlineRobot && isOffline)
+                    || (nonWorktimeRobot && !isInServiceTime);
             log.debug(
-                "机器人设置决策结果: {}, defaultRobot: {}, offlineRobot: {}, nonWorktimeRobot(ignored): {}",
-                transferToRobot, defaultRobot, offlineRobot, nonWorktimeRobot);
+                "机器人设置决策结果: {}, defaultRobot: {}, offlineRobot: {}, nonWorktimeRobot: {}, offWorktime: {}",
+                transferToRobot, defaultRobot, offlineRobot, nonWorktimeRobot, !isInServiceTime);
         }
 
         if (transferToRobot) {
@@ -1533,28 +1538,14 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     }
 
     private boolean resolveIsInServiceTime(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
-        WorktimeSettingEntity effective = resolveEffectiveWorktimeSettings(visitorRequest, workgroup);
-        if (effective != null) {
-            return Boolean.TRUE.equals(effective.isInWorktime());
-        }
-        return true;
+        WorktimeSettingEntity effective = worktimeSettingsResolver.resolve(visitorRequest,
+                workgroup.getSettings());
+        return worktimeService.isInServiceTime(effective);
     }
 
     private WorktimeSettingEntity resolveEffectiveWorktimeSettings(VisitorRequest visitorRequest,
             WorkgroupEntity workgroup) {
-        if (workgroup == null || workgroup.getSettings() == null) {
-            return null;
-        }
-        boolean useDraft = isDraftEnabled(visitorRequest);
-        WorktimeSettingEntity draft = workgroup.getSettings().getDraftWorktimeSettings();
-        WorktimeSettingEntity published = workgroup.getSettings().getWorktimeSettings();
-        if (useDraft && draft != null) {
-            return draft;
-        }
-        if (published != null) {
-            return published;
-        }
-        return draft;
+        return worktimeSettingsResolver.resolve(visitorRequest, workgroup.getSettings());
     }
 
 }

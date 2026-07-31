@@ -2,14 +2,13 @@ package com.bytedesk.ai.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +26,8 @@ public class EmbeddingModelInfoService {
     public EmbeddingModelInfoService(
             ObjectProvider<ZhiPuAiEmbeddingModel> zhipuaiEmbeddingModelProvider,
             ObjectProvider<OllamaEmbeddingModel> ollamaEmbeddingModelProvider,
-            ObjectProvider<DashScopeEmbeddingModel> dashscopeEmbeddingModelProvider,
+            @Qualifier("dashscopeEmbeddingModel")
+            ObjectProvider<EmbeddingModel> dashscopeEmbeddingModelProvider,
             ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.zhipuaiEmbeddingModel = zhipuaiEmbeddingModelProvider.getIfAvailable();
@@ -45,7 +45,7 @@ public class EmbeddingModelInfoService {
 
     private final OllamaEmbeddingModel ollamaEmbeddingModel;
 
-    private final DashScopeEmbeddingModel dashscopeEmbeddingModel;
+    private final EmbeddingModel dashscopeEmbeddingModel;
 
     /**
      * 测试不同的 embedding 模型
@@ -54,7 +54,7 @@ public class EmbeddingModelInfoService {
         Map<String, Object> result = new HashMap<>();
         
         if (dashscopeEmbeddingModel == null) {
-            result.put("error", "DashScopeEmbeddingModel is not available");
+            result.put("error", "BytedeskDashScopeEmbeddingModel is not available");
             return result;
         }
         
@@ -64,7 +64,7 @@ public class EmbeddingModelInfoService {
         for (String model : testModels) {
             try {
                 log.info("Testing DashScope embedding model: {}", model);
-                // 这里需要动态设置模型，但 DashScopeEmbeddingModel 可能不支持动态切换
+                // 这里需要动态设置模型，但 BytedeskDashScopeEmbeddingModel 可能不支持动态切换
          
                     Map<String, Object> modelResult = new HashMap<>();
                     modelResult.put("status", "Not Configured");

@@ -36,11 +36,14 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRestService;
 import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.ticket.constant.I18TicketConsts;
 import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentService;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
@@ -50,6 +53,8 @@ import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.visitor.VisitorEntity;
+import com.bytedesk.service.visitor.VisitorRestService;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -77,12 +82,15 @@ public class TicketService {
     private final TaskService taskService;
     private final HistoryService historyService;
     private final MemberRestService memberRestService;
+    private final UserRestService userRestService;
+    private final VisitorRestService visitorRestService;
     private final ThreadRestService threadRestService;
     private final TopicSubscriptionRestService topicSubscriptionRestService;
     private final TicketRestService ticketRestService;
     private final TicketNotificationService ticketNotificationService;
     private final ProcessRepository processRepository;
     private final TicketSLAService ticketSLAService;
+    private final TicketAssignmentService ticketAssignmentService;
 
     private TicketEntity getTicketOrThrow(String ticketUid) {
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(ticketUid);
@@ -281,100 +289,59 @@ public class TicketService {
                 : null;
         if ((conditions != null && !conditions.isEmpty() && hasVerifiedBranches(conditions))
                 || followedByVerifiedGateway) {
-            actions.add(TicketWorkflowActionResponse.builder()
-                    .key("COMPLETE_VERIFIED")
-                    .label(I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_VERIFIED)
-                    .type("complete")
-                    .taskId(task.getId())
-                    .taskDefinitionKey(task.getTaskDefinitionKey())
-                    .build());
-            actions.add(TicketWorkflowActionResponse.builder()
-                    .key("COMPLETE_REJECTED")
-                    .label(I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_REJECTED)
-                    .type("complete")
-                    .taskId(task.getId())
-                    .taskDefinitionKey(task.getTaskDefinitionKey())
-                    .danger(true)
-                    .build());
-            return actions;
+            return buildVerifiedWorkflowActions(task);
         }
 
-        String completeLabel = TicketConsts.TICKET_USER_TASK_PROCESS_TICKET.equals(task.getTaskDefinitionKey())
-                ? I18TicketConsts.I18N_TICKET_ACTION_COMPLETE
-                : I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_TASK;
+        String nodeType = node != null ? node.getString("type") : null;
+        return buildDefaultWorkflowActions(task, nodeType);
+    }
+
+    private List<TicketWorkflowActionResponse> buildVerifiedWorkflowActions(Task task) {
+        List<TicketWorkflowActionResponse> actions = new ArrayList<>();
         actions.add(TicketWorkflowActionResponse.builder()
-                .key("COMPLETE")
-                .label(completeLabel)
+                .key("COMPLETE_VERIFIED")
+                .label(I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_VERIFIED)
                 .type("complete")
                 .taskId(task.getId())
                 .taskDefinitionKey(task.getTaskDefinitionKey())
                 .build());
         actions.add(TicketWorkflowActionResponse.builder()
-                .key("HOLD")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_HOLD)
-                .type("hold")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("CLOSE")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_CLOSE)
-                .type("close")
+                .key("COMPLETE_REJECTED")
+                .label(I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_REJECTED)
+                .type("complete")
                 .taskId(task.getId())
                 .taskDefinitionKey(task.getTaskDefinitionKey())
                 .danger(true)
                 .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("TRANSFER")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_TRANSFER)
-                .type("transfer")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("TRANSFER_DEPARTMENT")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_TRANSFER_DEPARTMENT)
-                .type("transferDepartment")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("DELEGATE")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_DELEGATE)
-                .type("delegate")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("CC")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_CC)
-                .type("cc")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("ADDSIGN")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_ADDSIGN)
-                .type("addSign")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("ROLLBACK")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_ROLLBACK)
-                .type("rollback")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .danger(true)
-                .build());
-        actions.add(TicketWorkflowActionResponse.builder()
-                .key("REVOKE")
-                .label(I18TicketConsts.I18N_TICKET_ACTION_REVOKE)
-                .type("revoke")
-                .taskId(task.getId())
-                .taskDefinitionKey(task.getTaskDefinitionKey())
-                .danger(true)
-                .build());
+        return actions;
+    }
+
+    private List<TicketWorkflowActionResponse> buildDefaultWorkflowActions(Task task, String nodeType) {
+        List<String> actionKeys = switch (nodeType != null ? nodeType : "approval") {
+            case "countersign" -> List.of("COMPLETE", "HOLD", "CLOSE", "TRANSFER",
+                    "TRANSFER_DEPARTMENT", "CC", "ADDSIGN", "ROLLBACK", "REVOKE");
+            case "approval", "orSign" -> List.of("COMPLETE", "HOLD", "CLOSE", "TRANSFER",
+                    "TRANSFER_DEPARTMENT", "DELEGATE", "CC", "ADDSIGN", "ROLLBACK", "REVOKE");
+            default -> List.of("COMPLETE", "HOLD", "CLOSE", "TRANSFER",
+                    "TRANSFER_DEPARTMENT", "DELEGATE", "CC", "ADDSIGN", "ROLLBACK", "REVOKE");
+        };
+
+        List<TicketWorkflowActionResponse> actions = new ArrayList<>();
+        for (String actionKey : actionKeys) {
+            boolean danger = "CLOSE".equals(actionKey) || "ROLLBACK".equals(actionKey) || "REVOKE".equals(actionKey);
+            String label = "COMPLETE".equals(actionKey)
+                    && TicketConsts.TICKET_USER_TASK_PROCESS_TICKET.equals(task.getTaskDefinitionKey())
+                            ? I18TicketConsts.I18N_TICKET_ACTION_COMPLETE
+                            : resolveActionLabel(actionKey, null, null);
+            actions.add(TicketWorkflowActionResponse.builder()
+                    .key(actionKey)
+                    .label(label)
+                    .type(resolveActionType(actionKey))
+                    .taskId(task.getId())
+                    .taskDefinitionKey(task.getTaskDefinitionKey())
+                    .danger(danger ? true : null)
+                    .build());
+        }
         return actions;
     }
 
@@ -445,9 +412,16 @@ public class TicketService {
             case "ASSIGN" -> "assign";
             case "TRANSFER" -> "transfer";
             case "TRANSFER_DEPARTMENT" -> "transferDepartment";
+            case "COMPLETE", "COMPLETE_VERIFIED", "COMPLETE_REJECTED" -> "complete";
             case "HOLD" -> "hold";
             case "RESUME" -> "resume";
             case "CLOSE" -> "close";
+            case "DELEGATE" -> "delegate";
+            case "DELEGATE_RESOLVE" -> "delegateResolve";
+            case "CC" -> "cc";
+            case "ADDSIGN" -> "addSign";
+            case "ROLLBACK" -> "rollback";
+            case "REVOKE" -> "revoke";
             default -> "complete";
         };
     }
@@ -593,6 +567,10 @@ public class TicketService {
         }
         addTaskComment(task, ticket, operatorUid, "CLAIMED",
                 StringUtils.hasText(request.getReason()) ? request.getReason() : "流程任务已认领");
+        // Write manual assignment log
+        ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
+                task.getTaskDefinitionKey(), null, "MANUAL_CLAIM",
+                "成员 " + operatorUid + " 认领工单");
     }
 
     private void assignWorkflowTask(TicketEntity ticket, Task task, TicketRequest request, String operatorUid,
@@ -633,6 +611,10 @@ public class TicketService {
                         + (StringUtils.hasText(targetMember.getNickname()) ? targetMember.getNickname()
                                 : targetMember.getUid())
                         + buildCommentSuffix(request));
+        // Write manual assignment log
+        ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
+                task.getTaskDefinitionKey(), null, transfer ? "MANUAL_TRANSFER" : "MANUAL_ASSIGN",
+                (transfer ? "转派给 " : "指派给 ") + targetMember.getUid());
         if (transfer) {
             log.info("[NOTICE-DIAG] assignWorkflowTask transfer: calling notifyTicketTransferred for ticketUid={} assigneeUid={}",
                     ticket.getUid(), targetMember.getUid());
@@ -906,6 +888,8 @@ public class TicketService {
                 StringUtils.hasText(request.getProcessComment()) ? request.getProcessComment()
                         : (StringUtils.hasText(request.getReason()) ? request.getReason() : "流程任务已完成"));
         taskService.complete(task.getId(), variables);
+        // Auto-assign for next active task node
+        ticketAssignmentService.autoAssignForNextNode(ticket, ticket.getProcessInstanceId());
         syncTicketStatusAfterWorkflowComplete(ticket, runtimeContext);
     }
 
@@ -1215,6 +1199,10 @@ public class TicketService {
 
         // 6. 保存工单
         persistAndNotifyStatusChange(ticket, previousStatus);
+        ticketSLAService.completeClaim(ticket, assigneeUid);
+        ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
+            task.getTaskDefinitionKey(), null, "MANUAL_CLAIM",
+            "成员 " + assigneeUid + " 认领工单");
 
         // 7. 返回工单响应
         return TicketConvertUtils.convertToResponse(ticket);
@@ -1321,6 +1309,7 @@ public class TicketService {
         }
         TicketEntity ticket = ticketOptional.get();
         String previousStatus = ticket.getStatus();
+        String previousAssigneeJson = ticket.getAssigneeString();
 
         // 判断状态是否为已认领，如果不是，则不能退回
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
@@ -1354,11 +1343,20 @@ public class TicketService {
         // 退回任务
         taskService.unclaim(task.getId());
 
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, "");
+        variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, "");
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, TicketStatusEnum.UNCLAIMED.name());
+        runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
+
         // 只添加任务评论
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 TicketStatusEnum.UNCLAIMED.name(), "工单被 " + assigneeName + "退回到工作组");
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
+        ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
+            task.getTaskDefinitionKey(), previousAssigneeJson, "MANUAL_UNCLAIM",
+            "成员 " + assigneeUid + " 退回工单到工作组");
 
         // 更新工单状态
         ticket.setAssignee(null);
@@ -1384,9 +1382,9 @@ public class TicketService {
         log.info("开始转派工单: uid={}, assigneeUid={}, orgUid={}",
                 request.getUid(), request.getAssignee().getUid(), request.getOrgUid());
         //
-        String assigneeUid = request.getAssignee().getUid();
-        Assert.notNull(assigneeUid, "处理人uid不能为空");
-        String assigneeName = request.getAssignee().getNickname();
+        String operatorUid = request.getAssignee().getUid();
+        Assert.notNull(operatorUid, "处理人uid不能为空");
+        Assert.hasText(request.getTargetAssigneeUid(), "转派目标处理人不能为空");
 
         // 1. 查询工单
         Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
@@ -1394,16 +1392,17 @@ public class TicketService {
             throw new RuntimeException("工单不存在: " + request.getUid());
         }
         TicketEntity ticket = ticketOptional.get();
-        // String previousStatus = ticket.getStatus();
-        String operatorUid = ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null;
 
         // 2. 判断工单状态
         if (!ticket.getStatus().equals(TicketStatusEnum.CLAIMED.name())) {
             throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能转派: " + request.getUid());
         }
+        if (!StringUtils.hasText(ticket.getAssigneeString()) || !operatorUid.equals(ticket.getAssignee().getUid())) {
+            throw new RuntimeException("非当前工单处理人，不能转派: " + request.getUid());
+        }
 
-        MemberEntity targetMember = memberRestService.findByUid(assigneeUid)
-            .orElseThrow(() -> new RuntimeException("目标处理人不存在: " + assigneeUid));
+        MemberEntity targetMember = memberRestService.findByUid(request.getTargetAssigneeUid())
+            .orElseThrow(() -> new RuntimeException("目标处理人不存在: " + request.getTargetAssigneeUid()));
         UserProtobuf targetAssignee = UserProtobuf.builder()
             .uid(targetMember.getUid())
             .nickname(targetMember.getNickname())
@@ -1423,26 +1422,30 @@ public class TicketService {
         }
 
         // 4. 转派任务
-        taskService.setAssignee(task.getId(), assigneeUid);
-    ticket.setAssignee(targetAssignee.toJson());
-    syncTicketThreadAssignee(ticket, targetAssignee, targetMember);
+        taskService.setAssignee(task.getId(), targetMember.getUid());
+        ticket.setAssignee(targetAssignee.toJson());
+        syncTicketThreadAssignee(ticket, targetAssignee, targetMember);
 
-    Map<String, Object> variables = new HashMap<>();
-    variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssigneeString());
-    variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
-    runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssigneeString());
+        variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, targetMember.getUid());
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+        runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
 
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 TicketStatusEnum.TRANSFERRED.name(),
-                "工单被转派给 " + (StringUtils.hasText(assigneeName) ? assigneeName : assigneeUid));
-    comment.setUserId(StringUtils.hasText(operatorUid) ? operatorUid : assigneeUid);
+                "工单被转派给 " + (StringUtils.hasText(targetMember.getNickname()) ? targetMember.getNickname() : targetMember.getUid()));
+        comment.setUserId(operatorUid);
         taskService.saveComment(comment);
+        ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
+                task.getTaskDefinitionKey(), null, "MANUAL_TRANSFER",
+                "转派给 " + targetMember.getUid());
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLAIMED.name());
-    ticketRestService.save(ticket);
-    ticketNotificationService.notifyTicketTransferred(ticket);
+        ticketRestService.save(ticket);
+        ticketNotificationService.notifyTicketTransferred(ticket);
 
         return TicketConvertUtils.convertToResponse(ticket);
     }
@@ -1776,6 +1779,8 @@ public class TicketService {
             ticket.setStatus(TicketStatusEnum.RESOLVED.name());
             ticket.setResolvedTime(BdDateUtils.now());
             persistAndNotifyStatusChange(ticket, previousStatus);
+            ticketSLAService.completeResolution(ticket, assigneeUid);
+            ticketSLAService.startCustomerVerify(ticket);
 
             return TicketConvertUtils.convertToResponse(ticket);
 
@@ -1849,11 +1854,13 @@ public class TicketService {
                 ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
                 ticket.setVerified(true);
                 ticket.setClosedTime(BdDateUtils.now());
+                ticketSLAService.completeCustomerVerify(ticket, assigneeUid);
             } else {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
                 ticket.setVerified(false);
                 // 重置解决时间
                 ticket.setResolvedTime(null);
+                ticketSLAService.completeCustomerVerify(ticket, assigneeUid);
             }
             persistAndNotifyStatusChange(ticket, previousStatus);
 
@@ -1971,6 +1978,7 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
+        ticketSLAService.cancelOpenRecords(ticket, assigneeUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
@@ -2183,6 +2191,7 @@ public class TicketService {
 
         // 工单侧统一落到 CANCELLED（前端已有该状态）
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
+        ticketSLAService.cancelOpenRecords(ticket, operatorUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
@@ -2326,15 +2335,20 @@ public class TicketService {
      */
     public List<TicketHistoryActivityResponse> queryTicketActivityHistory(TicketRequest request) {
         // processInstanceId不能为空
+        TicketEntity ticket = null;
         if (request.getProcessInstanceId() == null) {
             if (StringUtils.hasText(request.getUid())) {
                 Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
                 if (ticketOptional.isPresent()) {
-                    request.setProcessInstanceId(ticketOptional.get().getProcessInstanceId());
+                    ticket = ticketOptional.get();
+                    request.setProcessInstanceId(ticket.getProcessInstanceId());
                 }
             } else {
                 throw new RuntimeException("processInstanceId不能为空");
             }
+        }
+        if (ticket == null && StringUtils.hasText(request.getUid())) {
+            ticket = ticketRestService.findByUid(request.getUid()).orElse(null);
         }
 
         // 获取活动历史，过滤掉 sequenceFlow
@@ -2348,6 +2362,7 @@ public class TicketService {
 
         // 获取任务评论
         List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
+    Map<String, String> assigneeNameMap = buildTicketAssigneeNameMap(ticket, activities, comments);
 
         // 合并活动和评论信息
         List<TicketHistoryActivityResponse> responses = new ArrayList<>();
@@ -2359,6 +2374,7 @@ public class TicketService {
                         .activityName(activity.getActivityName())
                         .activityType(activity.getActivityType())
                         .assignee(activity.getAssignee())
+                    .assigneeName(assigneeNameMap.get(activity.getAssignee()))
                         .startTime(activity.getStartTime())
                         .endTime(activity.getEndTime())
                         .durationInMillis(activity.getDurationInMillis())
@@ -2374,6 +2390,7 @@ public class TicketService {
                         .description(comment.getFullMessage())
                         .startTime(comment.getTime())
                         .assignee(comment.getUserId())
+                    .assigneeName(assigneeNameMap.get(comment.getUserId()))
                         .build())
                 .collect(Collectors.toList()));
 
@@ -2381,6 +2398,57 @@ public class TicketService {
         return responses.stream()
                 .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, String> buildTicketAssigneeNameMap(TicketEntity ticket,
+            List<HistoricActivityInstance> activities,
+            List<Comment> comments) {
+        Map<String, String> assigneeNameMap = new HashMap<>();
+        Set<String> assigneeUids = activities.stream()
+                .map(HistoricActivityInstance::getAssignee)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toSet());
+        assigneeUids.addAll(comments.stream()
+                .map(Comment::getUserId)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toSet()));
+
+        if (ticket != null) {
+            putDisplayNameIfPresent(assigneeNameMap, ticket.getReporter());
+            putDisplayNameIfPresent(assigneeNameMap, ticket.getAssignee());
+        }
+
+        for (String assigneeUid : assigneeUids) {
+            if (!StringUtils.hasText(assigneeUid) || assigneeNameMap.containsKey(assigneeUid)) {
+                continue;
+            }
+
+            Optional<MemberEntity> memberOptional = memberRestService.findByUid(assigneeUid);
+            if (memberOptional.isPresent() && StringUtils.hasText(memberOptional.get().getNickname())) {
+                assigneeNameMap.put(assigneeUid, memberOptional.get().getNickname());
+                continue;
+            }
+
+            Optional<UserEntity> userOptional = userRestService.findByUid(assigneeUid);
+            if (userOptional.isPresent() && StringUtils.hasText(userOptional.get().getNickname())) {
+                assigneeNameMap.put(assigneeUid, userOptional.get().getNickname());
+                continue;
+            }
+
+            Optional<VisitorEntity> visitorOptional = visitorRestService.findByUid(assigneeUid);
+            if (visitorOptional.isPresent() && StringUtils.hasText(visitorOptional.get().getNickname())) {
+                assigneeNameMap.put(assigneeUid, visitorOptional.get().getNickname());
+            }
+        }
+        return assigneeNameMap;
+    }
+
+    private void putDisplayNameIfPresent(Map<String, String> assigneeNameMap, UserProtobuf userProtobuf) {
+        if (userProtobuf == null || !StringUtils.hasText(userProtobuf.getUid())
+                || !StringUtils.hasText(userProtobuf.getNickname())) {
+            return;
+        }
+        assigneeNameMap.putIfAbsent(userProtobuf.getUid(), userProtobuf.getNickname());
     }
 
 }

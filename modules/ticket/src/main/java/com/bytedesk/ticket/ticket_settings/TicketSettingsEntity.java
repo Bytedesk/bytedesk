@@ -20,10 +20,12 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
+import com.bytedesk.ticket.ticket_settings_auto_create.TicketAutoCreateSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -127,6 +129,18 @@ public class TicketSettingsEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private TicketSlaSettingsEntity draftSlaSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketAutoCreateSettingsEntity autoCreateSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketAutoCreateSettingsEntity draftAutoCreateSettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketVisibilitySettingsEntity visibilitySettings;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private TicketVisibilitySettingsEntity draftVisibilitySettings;
     
     /**
      * Whether there are unpublished changes in draft

@@ -17,14 +17,16 @@ public enum TicketAssignmentModeEnum {
     LLM,
     MANUAL;
 
+    public static final TicketAssignmentModeEnum DEFAULT = ROUND_ROBIN;
+
     public static TicketAssignmentModeEnum fromValue(String value) {
         if (value == null || value.isBlank()) {
-            return ROUND_ROBIN;
+            return DEFAULT;
         }
         try {
             return TicketAssignmentModeEnum.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
-            return ROUND_ROBIN;
+            return DEFAULT;
         }
     }
 

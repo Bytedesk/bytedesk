@@ -127,7 +127,7 @@ public class TokenUsageHelper {
             if (response instanceof ChatResponse) {
                 ChatResponse chatResponse = (ChatResponse) response;
                 var metadata = chatResponse.getMetadata();
-                log.info("TokenUsageHelper extractTokenUsage metadata {}", metadata);
+                log.debug("TokenUsageHelper extractTokenUsage metadata {}", metadata);
 
                 if (metadata != null) {
                     Object promptTokens = metadata.get("prompt_tokens");
@@ -168,6 +168,29 @@ public class TokenUsageHelper {
                             if (usageTotalTokens instanceof Number) {
                                 total = ((Number) usageTotalTokens).longValue();
                             }
+                        } else if (usage != null) {
+                            // Try to extract from TokenUsage-like object via reflection
+                            // (e.g. Spring AI Dashscope TokenUsage with getInputTokens/getOutputTokens/getTotalTokens)
+                            try {
+                                java.lang.reflect.Method getTotalTokens = usage.getClass().getMethod("getTotalTokens");
+                                java.lang.reflect.Method getInputTokens = usage.getClass().getMethod("getInputTokens");
+                                java.lang.reflect.Method getOutputTokens = usage.getClass().getMethod("getOutputTokens");
+
+                                Object totalVal = getTotalTokens.invoke(usage);
+                                Object inputVal = getInputTokens.invoke(usage);
+                                Object outputVal = getOutputTokens.invoke(usage);
+
+                                if (totalVal instanceof Number) total = ((Number) totalVal).longValue();
+                                if (inputVal instanceof Number) prompt = ((Number) inputVal).longValue();
+                                if (outputVal instanceof Number) completion = ((Number) outputVal).longValue();
+
+                                if (total > 0) {
+                                    log.debug("TokenUsageHelper extracted from TokenUsage object: prompt={}, completion={}, total={}",
+                                            prompt, completion, total);
+                                }
+                            } catch (Exception ignored) {
+                                // Fall through to string parsing
+                            }
                         }
 
                         if (total == 0) {
@@ -203,60 +226,23 @@ public class TokenUsageHelper {
                         }
 
                         if (total == 0) {
-                            log.info(
+                            log.debug(
                                     "TokenUsageHelper extractTokenUsage no token info found in metadata, checking response structure");
                             for (String key : metadata.keySet()) {
                                 Object value = metadata.get(key);
-                                log.info("TokenUsageHelper extractTokenUsage metadata [{}]: {} (class: {})",
+                                log.debug("TokenUsageHelper extractTokenUsage metadata [{}]: {} (class: {})",
                                         key, value, value != null ? value.getClass().getName() : "null");
                             }
 
                             String metadataStr = metadata.toString();
-                            log.info("TokenUsageHelper extractTokenUsage parsing metadata string: {}", metadataStr);
+                            log.debug("TokenUsageHelper extractTokenUsage parsing metadata string: {}", metadataStr);
 
                             if (metadataStr.contains("DefaultUsage{") || metadataStr.contains("usage:")) {
-                                int promptStart = metadataStr.indexOf("promptTokens=");
-                                int promptEnd = metadataStr.indexOf(",", promptStart);
-                                if (promptEnd == -1)
-                                    promptEnd = metadataStr.indexOf("}", promptStart);
+                                prompt = extractLongTokenValue(metadataStr, "promptTokens=", "inputTokens=");
+                                completion = extractLongTokenValue(metadataStr, "completionTokens=", "outputTokens=");
+                                total = extractLongTokenValue(metadataStr, "totalTokens=");
 
-                                int completionStart = metadataStr.indexOf("completionTokens=");
-                                int completionEnd = metadataStr.indexOf(",", completionStart);
-                                if (completionEnd == -1)
-                                    completionEnd = metadataStr.indexOf("}", completionStart);
-
-                                int totalStart = metadataStr.indexOf("totalTokens=");
-                                int totalEnd = metadataStr.indexOf("}", totalStart);
-
-                                if (promptStart > 0 && promptEnd > promptStart) {
-                                    try {
-                                        prompt = Long.parseLong(metadataStr.substring(promptStart + 13, promptEnd));
-                                    } catch (NumberFormatException e) {
-                                        log.warn("Could not parse promptTokens from: {}",
-                                                metadataStr.substring(promptStart + 13, promptEnd));
-                                    }
-                                }
-
-                                if (completionStart > 0 && completionEnd > completionStart) {
-                                    try {
-                                        completion = Long
-                                                .parseLong(metadataStr.substring(completionStart + 17, completionEnd));
-                                    } catch (NumberFormatException e) {
-                                        log.warn("Could not parse completionTokens from: {}",
-                                                metadataStr.substring(completionStart + 17, completionEnd));
-                                    }
-                                }
-
-                                if (totalStart > 0 && totalEnd > totalStart) {
-                                    try {
-                                        total = Long.parseLong(metadataStr.substring(totalStart + 12, totalEnd));
-                                    } catch (NumberFormatException e) {
-                                        log.warn("Could not parse totalTokens from: {}",
-                                                metadataStr.substring(totalStart + 12, totalEnd));
-                                    }
-                                }
-
-                                log.info(
+                                log.debug(
                                         "TokenUsageHelper extractTokenUsage parsed from string - prompt: {}, completion: {}, total: {}",
                                         prompt, completion, total);
                             }
@@ -271,7 +257,7 @@ public class TokenUsageHelper {
                         }
                     }
 
-                    log.info(
+            log.debug(
                             "TokenUsageHelper extractTokenUsage extracted tokens - prompt: {}, completion: {}, total: {}",
                             prompt, completion, total);
                     return new ChatTokenUsage(prompt, completion, total);
@@ -294,7 +280,7 @@ public class TokenUsageHelper {
                 for (org.springframework.ai.chat.model.Generation generation : chatResponse.getResults()) {
                     var generationMetadata = generation.getMetadata();
                     if (generationMetadata != null) {
-                        log.info("TokenUsageHelper extractTokenUsageFromResponse generation metadata: {}",
+                        log.debug("TokenUsageHelper extractTokenUsageFromResponse generation metadata: {}",
                                 generationMetadata);
                         Object tokens = generationMetadata.get("tokens");
                         if (tokens instanceof Number) {
@@ -305,6 +291,29 @@ public class TokenUsageHelper {
             }
         } catch (Exception e) {
             log.error("Error extracting token usage from response object", e);
+        }
+        return 0;
+    }
+
+    private long extractLongTokenValue(String metadataStr, String... keys) {
+        for (String key : keys) {
+            int valueStart = metadataStr.indexOf(key);
+            if (valueStart < 0) {
+                continue;
+            }
+
+            valueStart += key.length();
+            int valueEnd = findTokenValueEnd(metadataStr, valueStart);
+            if (valueEnd <= valueStart) {
+                continue;
+            }
+
+            String value = metadataStr.substring(valueStart, valueEnd).trim();
+            try {
+                return Long.parseLong(value);
+            } catch (NumberFormatException e) {
+                log.warn("Could not parse {} from: {}", key, value);
+            }
         }
         return 0;
     }
@@ -324,5 +333,28 @@ public class TokenUsageHelper {
                 "Published AI token usage event: provider={}, model={}, tokens={}+{}={}, success={}, responseTime={}ms",
                 aiProvider, aiModelType, promptTokens, completionTokens, promptTokens + completionTokens, success,
                 responseTime);
+    }
+
+    /**
+     * Find the end of a token value in the metadata string.
+     * The value ends at the next comma, closing bracket, or closing brace
+     * — but skips nested brackets/braces (e.g. PromptTokenDetailed[...]).
+     */
+    private int findTokenValueEnd(String str, int start) {
+        int depth = 0;
+        for (int i = start; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == '[' || c == '{') {
+                depth++;
+            } else if (c == ']' || c == '}') {
+                if (depth == 0) {
+                    return i;
+                }
+                depth--;
+            } else if (c == ',' && depth == 0) {
+                return i;
+            }
+        }
+        return str.length();
     }
 }

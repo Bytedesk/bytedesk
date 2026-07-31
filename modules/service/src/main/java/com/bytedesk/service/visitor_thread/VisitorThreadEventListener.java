@@ -88,11 +88,12 @@ public class VisitorThreadEventListener {
 
         // 获取关闭提示语
         String content = getCloseTip(thread, closeType);
+        String resolvedPromptExtra = buildResolvedPromptExtra(thread);
 
         // 发送消息
         MessageProtobuf messageProtobuf = autoClose
-                ? MessageUtils.createAutoCloseMessage(thread, content)
-                : MessageUtils.createAgentCloseMessage(thread, content);
+            ? MessageUtils.createAutoCloseMessage(thread, content, resolvedPromptExtra)
+            : MessageUtils.createAgentCloseMessage(thread, content, resolvedPromptExtra);
         messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
@@ -254,6 +255,16 @@ public class VisitorThreadEventListener {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
         }
         return "会话已结束";
+    }
+
+    private String buildResolvedPromptExtra(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getUid()) || !StringUtils.hasText(thread.getOrgUid())) {
+            return null;
+        }
+        Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        Boolean resolved = queueMemberOptional.map(QueueMemberEntity::getResolved).orElse(null);
+        boolean submitted = Boolean.TRUE.equals(resolved);
+        return MessageUtils.buildResolvedPromptExtra(thread.getUid(), thread.getOrgUid(), submitted, resolved);
     }
 
 

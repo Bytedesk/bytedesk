@@ -25,6 +25,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_ticket_sla_record", indexes = {
         @Index(name = "idx_ticket_sla_record_ticket_type", columnList = "ticket_uid,sla_type"),
+    @Index(name = "idx_ticket_sla_record_task", columnList = "task_id,task_definition_key"),
         @Index(name = "idx_ticket_sla_record_due_at", columnList = "due_at"),
         @Index(name = "idx_ticket_sla_record_status", columnList = "status")
 })
@@ -43,6 +44,9 @@ public class TicketSlaRecordEntity extends BaseEntity {
     // SLA type (CLAIM/FIRST_RESPONSE/RESOLUTION/CUSTOMER_VERIFY) / SLA类型
     @Column(name = "sla_type", length = 32)
     private String slaType;
+    // SLA source (GLOBAL/NODE) / SLA来源
+    @Column(name = "sla_source", length = 32)
+    private String slaSource;
     // Record status (running/paused/completed/breached) / 记录状态
     @Column(length = 32)
     private String status;
@@ -57,6 +61,12 @@ public class TicketSlaRecordEntity extends BaseEntity {
     // SLA due timestamp / SLA到期时间
     @Column(name = "due_at")
     private ZonedDateTime dueAt;
+    // Flowable task id / 任务实例ID
+    @Column(name = "task_id")
+    private String taskId;
+    // Flowable task definition key / 任务定义key
+    @Column(name = "task_definition_key")
+    private String taskDefinitionKey;
     // Pause timestamp / 暂停时间
     private ZonedDateTime pausedAt;
     // Total paused duration in seconds / 累计暂停时长（秒）

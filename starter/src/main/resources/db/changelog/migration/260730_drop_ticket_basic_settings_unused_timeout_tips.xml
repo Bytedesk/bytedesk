@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260730-drop-ticket-basic-settings-agent-timeout-tip" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_basic_settings" />
+            <columnExists tableName="bytedesk_ticket_basic_settings" columnName="agent_timeout_tip" />
+        </preConditions>
+
+        <dropColumn tableName="bytedesk_ticket_basic_settings" columnName="agent_timeout_tip" />
+    </changeSet>
+
+    <changeSet id="260730-drop-ticket-basic-settings-visitor-timeout-tip" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_basic_settings" />
+            <columnExists tableName="bytedesk_ticket_basic_settings" columnName="visitor_timeout_tip" />
+        </preConditions>
+
+        <dropColumn tableName="bytedesk_ticket_basic_settings" columnName="visitor_timeout_tip" />
+    </changeSet>
+
+</databaseChangeLog>

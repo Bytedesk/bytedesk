@@ -56,6 +56,7 @@ import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
+import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 
 import lombok.AllArgsConstructor;
@@ -81,6 +82,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component("ticketThreadStrategy")
 @AllArgsConstructor
 public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
+
+    private static final String DEFAULT_ASSIGNMENT_MODE = TicketAssignmentModeEnum.DEFAULT.name();
 
     private final ThreadRestService threadRestService;
     private final MessageRestService messageRestService;
@@ -190,10 +193,9 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private String getTicketAssignmentMode(TicketEntity ticket) {
         TicketBasicSettingsResponse basicSettings = resolveBasicSettings(ticket);
         if (basicSettings != null && StringUtils.hasText(basicSettings.getAssignmentMode())) {
-            return basicSettings.getAssignmentMode();
+            return TicketAssignmentModeEnum.normalize(basicSettings.getAssignmentMode());
         }
-        // fallback：未配置时使用 ROUND_ROBIN（与 TicketAssignmentModeEnum 默认值一致）
-        return "ROUND_ROBIN";
+        return DEFAULT_ASSIGNMENT_MODE;
     }
 
     /**

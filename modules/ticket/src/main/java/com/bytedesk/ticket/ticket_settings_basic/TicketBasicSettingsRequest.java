@@ -32,8 +32,6 @@ public class TicketBasicSettingsRequest extends BaseRequest {
     // 工单提示语配置
     private String accessTip;
     private String closeTip;
-    private String agentTimeoutTip;
-    private String visitorTimeoutTip;
 
     // 联系方式字段显示配置
     private Boolean showContactName;

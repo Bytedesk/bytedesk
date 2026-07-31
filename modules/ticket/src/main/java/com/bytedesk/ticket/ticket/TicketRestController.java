@@ -24,9 +24,13 @@ import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentLogEntity;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentLogRepository;
 import com.bytedesk.ticket.ticket.dto.TicketStatusCountResponse;
 
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -37,6 +41,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class TicketRestController extends BaseRestController<TicketRequest, TicketRestService> {
     
     private final TicketRestService ticketRestService;
+
+    private final TicketAssignmentLogRepository assignmentLogRepository;
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org")
@@ -109,6 +115,16 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         Page<TicketResponse> page = ticketRestService.queryByVisitorThreadTopic(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query assignment log by ticket uid")
+    @GetMapping("/query/assignment-log")
+    public ResponseEntity<?> queryAssignmentLog(@RequestParam String ticketUid) {
+
+        List<TicketAssignmentLogEntity> logs = assignmentLogRepository.findByTicketUidOrderByCreatedAtDesc(ticketUid);
+
+        return ResponseEntity.ok(JsonResult.success(logs));
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE)

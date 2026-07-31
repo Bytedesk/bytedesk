@@ -19,13 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.util.StringUtils;
-
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -53,21 +50,38 @@ public class WorktimeSettingEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
+    @Column(name = "is_enabled")
     private Boolean enabled = true;
 
     @Builder.Default
     @Convert(converter = WorktimeSlotListConverter.class)
-    @Column(name = "regular_worktimes", columnDefinition = "text")
-    private List<WorktimeSlotValue> regularWorktimes = new ArrayList<>();
+    @Column(name = "regular_worktimes", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<WorktimeSlotValue> regularWorktimes = defaultRegularWorktimes();
 
     @Builder.Default
     @Convert(converter = WorktimeSlotListConverter.class)
-    @Column(name = "special_worktimes", columnDefinition = "text")
+    @Column(name = "special_worktimes", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<WorktimeSlotValue> specialWorktimes = new ArrayList<>();
 
+    // === 节假日规则 ===
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
-    private String holidays = BytedeskConsts.EMPTY_JSON_STRING;
+    @Column(name = "holiday_settings_enabled")
+    private Boolean holidaySettingsEnabled = false;
+
+    // 暂时不启用，统一使用默认值：国家=CN
+    // @Builder.Default
+    // @Column(name = "holiday_country_code", length = 8)
+    // private String holidayCountryCode = "CN";
+
+    // 暂时不启用 holidayScopeType，统一使用 ORG_ONLY（默认）
+    // @Builder.Default
+    // @Column(name = "holiday_scope_type", length = 32)
+    // private String holidayScopeType = WorktimeHolidayScopeEnum.ORG_ONLY.name();
+
+    // 暂时不启用，统一使用默认值：Asia/Shanghai
+    // @Builder.Default
+    // @Column(name = "timezone", length = 64)
+    // private String timezone = "Asia/Shanghai";
 
     /**
      * 非工作时间提示（用于引导访客留言/等待）
@@ -77,49 +91,30 @@ public class WorktimeSettingEntity extends BaseEntity {
     private String nonWorktimeTip = I18Consts.I18N_DEFAULT_OFFLINE_MESSAGE;
 
     /**
-     * 检查当前时间是否在工作时间内
-     * 
-     * @return true 如果当前时间在工作时间内，false 如果不在
+     * 检查当前时间是否在工作时间内（不使用节假日信息，仅用于兼容旧调用）。
+     * 新代码应通过 {@link WorktimeService#isInServiceTime} 获取统一判定。
      */
     public Boolean isInWorktime() {
-        return isInWorktime(LocalDate.now(), LocalTime.now());
+        return isInWorktime(LocalDate.now(), LocalTime.now(), false);
     }
 
     /**
-     * 指定日期/时间判断是否处于工作时间内。
-     * 语义：
-     * - enabled=false：不限制，恒为 true
-     * - holidays 命中：仅以 specialWorktimes 判定（可用于“节假日上班时段”）
-     * - holidays 未命中：以 regularWorktimes 判定；regular 为空则视为不限制（true）
+     * 仅负责时间段基础判断：
+     * 1. enabled=false → true
+     * 2. holidaySettingsEnabled=true 且 holiday=true → 使用 specialWorktimes
+     * 3. 否则（holidaySettingsEnabled=false 或非节假日）→ 使用 regularWorktimes
      */
-    public Boolean isInWorktime(LocalDate date, LocalTime time) {
+    public Boolean isInWorktime(LocalDate date, LocalTime time, boolean holiday) {
         if (Boolean.FALSE.equals(enabled)) {
             return true;
         }
         if (date == null || time == null) {
             return true;
         }
-
-        if (isHoliday(date)) {
+        if (Boolean.TRUE.equals(holidaySettingsEnabled) && holiday) {
             return isInSpecialWorktime(date, time);
         }
         return isInRegularWorktime(date, time);
-    }
-
-    public boolean isHoliday(LocalDate date) {
-        if (date == null) {
-            return false;
-        }
-        if (!StringUtils.hasText(holidays) || BytedeskConsts.EMPTY_JSON_STRING.equals(holidays)) {
-            return false;
-        }
-        try {
-            JSONObject obj = JSON.parseObject(holidays);
-            return obj != null && obj.containsKey(date.toString());
-        } catch (Exception ignored) {
-            // best-effort：保留旧格式（字符串包含）兼容
-            return holidays.contains(date.toString());
-        }
     }
 
     private Boolean isInSpecialWorktime(LocalDate date, LocalTime now) {
@@ -143,5 +138,19 @@ public class WorktimeSettingEntity extends BaseEntity {
             return WorktimeSettingEntity.builder().build();
         }
         return modelMapper.map(request, WorktimeSettingEntity.class);
+    }
+
+    /**
+     * Default regular worktime: 09:00-18:00, Monday-Friday.
+     * Used as builder default so newly created entities get a sensible initial value.
+     */
+    private static List<WorktimeSlotValue> defaultRegularWorktimes() {
+        List<WorktimeSlotValue> list = new ArrayList<>();
+        list.add(WorktimeSlotValue.builder()
+                .startTime("09:00")
+                .endTime("18:00")
+                .workDays("1,2,3,4,5")
+                .build());
+        return list;
     }
 }

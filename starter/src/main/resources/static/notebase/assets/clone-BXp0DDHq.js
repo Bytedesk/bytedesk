@@ -1,1 +1,0 @@
-import{h as e}from"./index-C2au3vGC.js";var t=4;function n(n){return e(n,t)}export{n as t};

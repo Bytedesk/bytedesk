@@ -15,10 +15,15 @@ package com.bytedesk.core.config;
 
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Description;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.AllArgsConstructor;
+import com.bytedesk.core.exception.HttpRestAccessException;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @AllArgsConstructor
 @Description("HTTP REST Service - Service for making HTTP GET and POST requests using RestTemplate")
@@ -27,10 +32,20 @@ public class HttpRestService {
     private final RestTemplate restTemplate;
 
     public String httpGet(String url) {
-        return restTemplate.getForObject(url, String.class);
+        try {
+            return restTemplate.getForObject(url, String.class);
+        } catch (RestClientException e) {
+            log.warn("HTTP GET {} failed: {}", url, e.getMessage());
+            throw new HttpRestAccessException(url, "GET", e);
+        }
     }
 
     public String httpPost(String url, String requestBody) {
-        return restTemplate.postForObject(url, requestBody, String.class);
+        try {
+            return restTemplate.postForObject(url, requestBody, String.class);
+        } catch (RestClientException e) {
+            log.warn("HTTP POST {} failed: {}", url, e.getMessage());
+            throw new HttpRestAccessException(url, "POST", e);
+        }
     }
 }

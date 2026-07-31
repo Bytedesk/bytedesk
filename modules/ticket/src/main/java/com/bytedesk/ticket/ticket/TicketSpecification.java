@@ -163,6 +163,8 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
 
+            appendVisibilityPredicates(request, root, criteriaBuilder, predicates);
+
             if (StringUtils.hasText(request.getSlaStatus())) {
                 Subquery<String> slaSubquery = query.subquery(String.class);
                 var slaRoot = slaSubquery.from(TicketSlaRecordEntity.class);
@@ -208,5 +210,51 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 .replace("\\\\", "\\\\\\\\")
                 .replace("%", "\\\\%")
                 .replace("_", "\\\\_");
+    }
+
+    private static void appendVisibilityPredicates(TicketRequest request,
+            jakarta.persistence.criteria.Root<TicketEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            List<Predicate> predicates) {
+        if (!Boolean.TRUE.equals(request.getVisibilityRestricted())) {
+            return;
+        }
+        if (!StringUtils.hasText(request.getVisibilityCurrentUserUid())) {
+            return;
+        }
+
+        String assigneePattern = "%\"uid\":\""
+                + escapeLike(request.getVisibilityCurrentUserUid())
+                + "\"%";
+        Predicate reporterSelf = criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserUid());
+        Predicate assigneeSelf = criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR);
+        Predicate noDepartmentAssigned = criteriaBuilder.or(
+                criteriaBuilder.isNull(root.get("departmentUid")),
+                criteriaBuilder.equal(root.get("departmentUid"), ""));
+        Predicate sameDepartment = StringUtils.hasText(request.getVisibilityCurrentUserDepartmentUid())
+                ? criteriaBuilder.equal(root.get("departmentUid"), request.getVisibilityCurrentUserDepartmentUid())
+                : criteriaBuilder.disjunction();
+
+        if ("DEPARTMENT_ONLY".equalsIgnoreCase(request.getVisibilityMode())) {
+            predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned, sameDepartment));
+            return;
+        }
+
+        if ("CATEGORY_BASED".equalsIgnoreCase(request.getVisibilityMode())
+                && request.getVisibilityRestrictedCategoryUids() != null
+                && !request.getVisibilityRestrictedCategoryUids().isEmpty()) {
+            List<Predicate> restrictedCategories = new ArrayList<>();
+            for (String categoryUid : request.getVisibilityRestrictedCategoryUids()) {
+                if (StringUtils.hasText(categoryUid)) {
+                    restrictedCategories.add(criteriaBuilder.equal(root.get("categoryUid"), categoryUid));
+                }
+            }
+            if (!restrictedCategories.isEmpty()) {
+                Predicate restrictedCategory = criteriaBuilder.or(restrictedCategories.toArray(new Predicate[0]));
+                Predicate departmentVisible = criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned,
+                        sameDepartment);
+                predicates.add(criteriaBuilder.or(criteriaBuilder.not(restrictedCategory), departmentVisible));
+            }
+        }
     }
 }

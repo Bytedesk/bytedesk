@@ -64,6 +64,7 @@ import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
 import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -802,6 +803,7 @@ public class ThreadRestService
             thread.setCloseType(request.getCloseType());
         }
         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+        markClosedAtIfAbsent(thread);
         // 发布关闭消息, 通知用户
         String content;
         String closeType = thread.getCloseType();
@@ -865,6 +867,7 @@ public class ThreadRestService
                 thread.setCloseType(request.getCloseType());
             }
             thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+            markClosedAtIfAbsent(thread);
 
             // 发布关闭消息, 通知用户
             String closeType = thread.getCloseType();
@@ -1014,6 +1017,9 @@ public class ThreadRestService
                 if (entity.getCloseType() != null) {
                     latestEntity.setCloseType(entity.getCloseType());
                 }
+                if (entity.getClosedAt() != null && latestEntity.getClosedAt() == null) {
+                    latestEntity.setClosedAt(entity.getClosedAt());
+                }
 
                 // Preserve metadata
                 if (entity.getNote() != null) {
@@ -1079,6 +1085,16 @@ public class ThreadRestService
             throw new RuntimeException("Failed to handle optimistic locking conflict: " + ex.getMessage(), ex);
         }
         return null;
+    }
+
+    private void markClosedAtIfAbsent(ThreadEntity thread) {
+        if (thread == null || thread.getClosedAt() != null) {
+            return;
+        }
+        if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())
+                || ThreadProcessStatusEnum.TIMEOUT.name().equals(thread.getStatus())) {
+            thread.setClosedAt(BdDateUtils.now());
+        }
     }
 
     @CacheEvict(value = "thread", key = "#topic")

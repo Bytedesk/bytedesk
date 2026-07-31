@@ -13,8 +13,10 @@
  */
 package com.bytedesk.ticket.ticket;
 
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
+import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -91,6 +93,14 @@ public class TicketRequest extends BaseRequest {
     private String slaStatus;
     // 自定义表单 json schema
     private String schema;
+
+    private Boolean visibilityRestricted;
+    private String visibilityMode;
+    private String visibilityCurrentUserUid;
+    private String visibilityCurrentUserDepartmentUid;
+    private Boolean visibilityOrgAdmin;
+    @Builder.Default
+    private List<String> visibilityRestrictedCategoryUids = new ArrayList<>();
 
     // ===================== 工作流增强操作参数（Flowable） =====================
     // 当一个流程实例可能存在多个并行任务（如会签/或签）时，建议明确传入 taskId

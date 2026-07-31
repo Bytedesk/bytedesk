@@ -218,6 +218,8 @@ public class I18Consts {
     public static final String I18N_ESL_EVENT = I18N_PREFIX + "esl.event";
     public static final String I18N_CUSTOMER_COMPANY = I18N_PREFIX + "customer.company";
     public static final String I18N_VISITOR_TOKEN = I18N_PREFIX + "visitor.token";
+    public static final String I18N_VOICE_CLONE = I18N_PREFIX + "voice.clone";
+    public static final String I18N_ASR_HOTWORD = I18N_PREFIX + "asr.hotword";
     public static final String I18N_AUTH = I18N_PREFIX + "auth";
     public static final String I18N_ACTION_QUERY_ORG = I18N_PREFIX + "action.query.org";
     public static final String I18N_ACTION_QUERY_USER = I18N_PREFIX + "action.query.user";
@@ -507,6 +509,7 @@ public class I18Consts {
     // 评价提示
     public static final String I18N_INVITE_RATE_TIP = I18N_PREFIX + "invite.rate.tip"; // 邀请评价提示
     public static final String I18N_RATE_SUBMITTED_NOTICE = I18N_PREFIX + "rate.submitted.notice"; // 访客已提交评价
+        public static final String I18N_AUTO_RESOLVED_NOTICE = I18N_PREFIX + "auto.resolved.notice"; // 自动判定已解决通知
 
     // VOC 评价设置默认文案（FeedbackSettingsEntity 默认值）
     public static final String I18N_FEEDBACK_SETTINGS_TITLE_DEFAULT = I18N_PREFIX + "feedback.settings.title.default";

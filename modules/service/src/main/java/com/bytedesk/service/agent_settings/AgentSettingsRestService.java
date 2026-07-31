@@ -25,6 +25,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsHelper;
@@ -38,6 +39,8 @@ import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButton;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTab;
 import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
 
@@ -236,6 +239,18 @@ public class AgentSettingsRestService
         syncOrgUser(sumDraft, orgUid, userUid);
         entity.setDraftSummarySettings(sumDraft);
 
+        // 发布与草稿：自动解决配置（统一使用 fromRequest，内部已处理 null）
+        AutoResolvedSettingsEntity autoResolved = AutoResolvedSettingsEntity.fromRequest(request.getAutoResolvedSettings(),
+            modelMapper);
+        autoResolved.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolved, orgUid, userUid);
+        entity.setAutoResolvedSettings(autoResolved);
+        AutoResolvedSettingsEntity autoResolvedDraft = AutoResolvedSettingsEntity
+            .fromRequest(request.getAutoResolvedSettings(), modelMapper);
+        autoResolvedDraft.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolvedDraft, orgUid, userUid);
+        entity.setDraftAutoResolvedSettings(autoResolvedDraft);
+
         // 发布与草稿：留言、自动回复、排队
         MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(request.getMessageLeaveSettings(),
                 modelMapper);
@@ -378,6 +393,25 @@ public class AgentSettingsRestService
             }
             // 根据 request 中的 Faq uids 映射关联
             serviceSettingsHelper.updateFaqAssociationsIfPresent(draft, request.getServiceSettings());
+            entity.setHasUnpublishedChanges(true);
+        }
+
+        if (request.getAutoResolvedSettings() != null) {
+            AutoResolvedSettingsEntity draft = entity.getDraftAutoResolvedSettings();
+            if (draft == null) {
+                draft = AutoResolvedSettingsEntity.fromRequest(request.getAutoResolvedSettings(), modelMapper);
+                draft.setUid(uidUtils.getUid());
+                entity.setDraftAutoResolvedSettings(draft);
+
+                AutoResolvedSettingsEntity settings = AutoResolvedSettingsEntity
+                        .fromRequest(request.getAutoResolvedSettings(), modelMapper);
+                settings.setUid(uidUtils.getUid());
+                entity.setAutoResolvedSettings(settings);
+            } else {
+                String originalUid = draft.getUid();
+                modelMapper.map(request.getAutoResolvedSettings(), draft);
+                draft.setUid(originalUid);
+            }
             entity.setHasUnpublishedChanges(true);
         }
 
@@ -742,6 +776,16 @@ public class AgentSettingsRestService
             syncOrgUser(sumDraft, orgUid, userUid);
             settings.setDraftSummarySettings(sumDraft);
 
+            // 自动解决配置（发布 + 草稿）
+            AutoResolvedSettingsEntity autoResolved = AutoResolvedSettingsEntity.fromRequest(null, modelMapper);
+            autoResolved.setUid(uidUtils.getUid());
+            syncOrgUser(autoResolved, orgUid, userUid);
+            settings.setAutoResolvedSettings(autoResolved);
+            AutoResolvedSettingsEntity autoResolvedDraft = AutoResolvedSettingsEntity.fromRequest(null, modelMapper);
+            autoResolvedDraft.setUid(uidUtils.getUid());
+            syncOrgUser(autoResolvedDraft, orgUid, userUid);
+            settings.setDraftAutoResolvedSettings(autoResolvedDraft);
+
             // 留言设置（发布 + 草稿）
             MessageLeaveSettingsEntity mls = MessageLeaveSettingsEntity.fromRequest(null, modelMapper);
             mls.setUid(uidUtils.getUid());
@@ -980,6 +1024,18 @@ public class AgentSettingsRestService
             }
         }
 
+        if (entity.getDraftAutoResolvedSettings() != null) {
+            AutoResolvedSettingsEntity published = entity.getAutoResolvedSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftAutoResolvedSettings(), published);
+            } else {
+                AutoResolvedSettingsEntity newPublished = new AutoResolvedSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftAutoResolvedSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setAutoResolvedSettings(newPublished);
+            }
+        }
+
         if (entity.getDraftAgentStatusSettings() != null) {
             AgentStatusSettingEntity published = entity.getAgentStatusSettings();
             if (published != null) {
@@ -1115,6 +1171,12 @@ public class AgentSettingsRestService
         AgentSettingsResponse resp = modelMapper.map(entity, AgentSettingsResponse.class);
         resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
         resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
+        resp.setAutoResolvedSettings(
+            com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsResponse.fromEntity(
+                entity.getAutoResolvedSettings()));
+        resp.setDraftAutoResolvedSettings(
+            com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsResponse.fromEntity(
+                entity.getDraftAutoResolvedSettings()));
         // Backward compatibility: old rows might be null
         if (resp.getAllowAgentCloseThread() == null) {
             resp.setAllowAgentCloseThread(true);

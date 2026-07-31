@@ -8,6 +8,7 @@ package com.bytedesk.kbase.settings;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings_summary.SummarySettingsEntity;
@@ -173,6 +174,20 @@ public abstract class BaseSettingsEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
             CascadeType.REMOVE })
     private SummarySettingsEntity draftSummarySettings;
+
+    /**
+     * Auto resolved timeout settings (published)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private AutoResolvedSettingsEntity autoResolvedSettings;
+
+    /**
+     * Auto resolved timeout settings (draft)
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+            CascadeType.REMOVE })
+    private AutoResolvedSettingsEntity draftAutoResolvedSettings;
 
     /**
      * Whether there are unpublished changes in draft

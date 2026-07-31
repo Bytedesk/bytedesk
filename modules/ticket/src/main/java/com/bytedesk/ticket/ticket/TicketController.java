@@ -26,10 +26,15 @@ import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ticket")
 @AllArgsConstructor
+@Tag(name = "Ticket Workflow", description = "Ticket workflow APIs")
 public class TicketController {
     
     private final TicketService ticketService;
@@ -38,6 +43,7 @@ public class TicketController {
      * 查询当前流程实例的活动任务和可执行操作。
      */
     @GetMapping("/workflow/actions")
+    @Operation(summary = "查询工单工作流可执行动作")
     public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
 
         List<TicketWorkflowTaskResponse> actions = ticketService.queryWorkflowActions(request);
@@ -49,6 +55,7 @@ public class TicketController {
      * 按当前 Flowable 活动任务执行流程动作。
      */
     @PostMapping("/workflow/action")
+    @Operation(summary = "执行工单工作流动作")
     public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.executeWorkflowAction(request);
@@ -59,7 +66,10 @@ public class TicketController {
     /**
      * 认领工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/claim")
+    @Operation(summary = "认领工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> claimTicket(@RequestBody TicketRequest request) {
         
         TicketResponse response = ticketService.claimTicket(request);
@@ -70,7 +80,10 @@ public class TicketController {
     /**
      * 开始处理工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/start")
+    @Operation(summary = "开始处理工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> startTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.startTicket(request);
@@ -81,7 +94,10 @@ public class TicketController {
     /**
      * 退回工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/unclaim")
+    @Operation(summary = "退回工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> unclaimTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.unclaimTicket(request);
@@ -92,7 +108,10 @@ public class TicketController {
     /**
      * 转派工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/transfer")
+    @Operation(summary = "转派工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> transferTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.transferTicket(request);
@@ -103,7 +122,10 @@ public class TicketController {
     /**
      * 挂起工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/hold")
+    @Operation(summary = "挂起工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> holdTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.holdTicket(request);
@@ -114,7 +136,10 @@ public class TicketController {
     /**
      * 恢复工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/resume")
+    @Operation(summary = "恢复工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> resumeTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.resumeTicket(request);
@@ -125,7 +150,10 @@ public class TicketController {
     /**
      * 待回应工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/pend")
+    @Operation(summary = "待回应工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> pendTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.pendTicket(request);
@@ -136,7 +164,10 @@ public class TicketController {
     /**
      * 重新打开工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/reopen")
+    @Operation(summary = "重新打开工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> reopenTicket(@RequestBody TicketRequest request) {
         
         TicketResponse response = ticketService.reopenTicket(request);
@@ -147,7 +178,10 @@ public class TicketController {
     /**
      * 升级工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/escalate")
+    @Operation(summary = "升级工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> escalateTicket(@RequestBody TicketRequest request) {
         
         TicketResponse response = ticketService.escalateTicket(request);
@@ -158,7 +192,10 @@ public class TicketController {
     /**
      * 完成工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/resolve")
+    @Operation(summary = "完成工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> resolveTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.resolveTicket(request);
@@ -169,7 +206,10 @@ public class TicketController {
     /**
      * 客户验证工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/verify")
+    @Operation(summary = "客户验证工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> verifyTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.verifyTicket(request);
@@ -180,7 +220,10 @@ public class TicketController {
     /**
      * 关闭工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/close")
+    @Operation(summary = "关闭工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> closeTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.closeTicket(request);
@@ -191,7 +234,10 @@ public class TicketController {
     /**
      * 取消工单
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/cancel")
+    @Operation(summary = "取消工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> cancelTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.cancelTicket(request);
@@ -202,7 +248,10 @@ public class TicketController {
     /**
      * 委托工单任务
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/delegate")
+    @Operation(summary = "委托工单任务（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> delegateTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.delegateTicket(request);
@@ -213,7 +262,10 @@ public class TicketController {
     /**
      * 解决委托任务（被委托人处理完成后，归还给委托人）
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/delegate/resolve")
+    @Operation(summary = "解决委托任务（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> resolveDelegatedTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.resolveDelegatedTicket(request);
@@ -224,7 +276,10 @@ public class TicketController {
     /**
      * 抄送工单（知会相关人员，不参与流转）
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/cc")
+    @Operation(summary = "抄送工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> ccTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.ccTicket(request);
@@ -235,7 +290,10 @@ public class TicketController {
     /**
      * 加签（最小实现：为当前任务追加候选人）
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/addsign")
+    @Operation(summary = "加签工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> addSignTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.addSignTicket(request);
@@ -246,7 +304,10 @@ public class TicketController {
     /**
      * 退回（跳转回指定节点）
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/rollback")
+    @Operation(summary = "退回工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> rollbackTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.rollbackTicket(request);
@@ -257,7 +318,10 @@ public class TicketController {
     /**
      * 撤销（终止流程实例）
      */
+    @Deprecated(since = "2026-07-29", forRemoval = false)
+    @Hidden
     @PostMapping("/revoke")
+    @Operation(summary = "撤销工单（旧兼容入口，建议改用 /workflow/action）")
     public ResponseEntity<?> revokeTicket(@RequestBody TicketRequest request) {
 
         TicketResponse response = ticketService.revokeTicket(request);
@@ -269,6 +333,7 @@ public class TicketController {
      * 查询工单任务历史
      */
     @GetMapping("/history/task")
+    @Operation(summary = "查询工单任务历史")
     public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
 
         List<TicketHistoryTaskResponse> histories = ticketService.queryTicketTaskHistory(request);
@@ -280,6 +345,7 @@ public class TicketController {
      * 查询工单流程实例历史
      */
     @GetMapping("/history/process")
+    @Operation(summary = "查询工单流程实例历史")
     public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
 
         List<TicketHistoryProcessResponse> histories = ticketService.queryTicketProcessHistory(request);
@@ -291,6 +357,7 @@ public class TicketController {
      * 查询工单活动历史
      */
     @GetMapping("/history/activity")
+    @Operation(summary = "查询工单活动历史")
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
 
         List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);

@@ -22,6 +22,7 @@
         <flowable:taskListener event="create" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
         <flowable:taskListener event="assignment" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
         <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="delete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
       </extensionElements>
     </userTask>
     <boundaryEvent id="waitClaimSlaTimer" name="认领 SLA 超时" attachedToRef="waitClaim" cancelActivity="false">
@@ -39,6 +40,7 @@
         <flowable:taskListener event="create" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
         <flowable:taskListener event="assignment" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
         <flowable:taskListener event="complete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
+        <flowable:taskListener event="delete" delegateExpression="${ticketTaskListener}"></flowable:taskListener>
       </extensionElements>
     </userTask>
     <boundaryEvent id="processTicketSlaTimer" name="处理 SLA 超时" attachedToRef="processTicket" cancelActivity="false">

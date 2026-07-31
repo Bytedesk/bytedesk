@@ -677,29 +677,26 @@ public final class WorkflowInitData {
                                                         }
                                                 },
                                                 {
-                                                        "id": "ivr-password-collect-main",
-                                                        "type": "keyboard",
+                                                        "id": "ivr-password-verify-main",
+                                                        "type": "verify",
                                                         "meta": {
                                                                 "position": { "x": 700, "y": 200 }
                                                         },
                                                         "data": {
-                                                                "title": "输入服务密码",
-                                                                "content": "请输入 6 位服务密码。",
-                                                                "description": "收集密码并分流到验证结果",
-                                                                "options": [
-                                                                        {
-                                                                                "id": "ivr-password-option-success",
-                                                                                "key": "1",
-                                                                                "label": "演示验证成功",
-                                                                                "outgoingEdgeId": "ivr-password-text-success"
-                                                                        },
-                                                                        {
-                                                                                "id": "ivr-password-option-failure",
-                                                                                "key": "2",
-                                                                                "label": "演示验证失败",
-                                                                                "outgoingEdgeId": "ivr-password-transfer-human"
-                                                                        }
-                                                                ]
+                                                                "title": "身份验证",
+                                                                "content": "您好，为保障账户安全，请先完成身份验证。",
+                                                                "description": "收集账号和密码，并调用演示验证接口。",
+                                                                "verifyType": "account",
+                                                                "accountPrompt": "请输入账号，按井号键结束。",
+                                                                "passwordPrompt": "请输入 6 位服务密码，按井号键结束。",
+                                                                "verifyApiUrl": "/visitor/api/v1/ivr/demo/verify",
+                                                                "verifyHttpMethod": "POST",
+                                                                "verifyRequestBody": "{\"account\":\"${account}\",\"password\":\"${password}\",\"callerIdNumber\":\"${callerIdNumber}\"}",
+                                                                "verifyTimeoutMs": 3000,
+                                                                "successPrompt": "验证成功。",
+                                                                "customerInfoTemplate": "${customer.name}，您的账户余额为 ${customer.balance} 元，会员等级 ${customer.level}。",
+                                                                "failurePrompt": "验证失败，请重试。",
+                                                                "maxRetries": 3
                                                         }
                                                 },
                                                 {
@@ -749,20 +746,20 @@ public final class WorkflowInitData {
                                                 },
                                                 {
                                                         "sourceNodeId": "ivr-password-text-welcome",
-                                                        "targetNodeId": "ivr-password-collect-main",
+                                                        "targetNodeId": "ivr-password-verify-main",
                                                         "sourcePortId": "defaultOutput",
                                                         "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeId": "ivr-password-collect-main",
+                                                        "sourceNodeId": "ivr-password-verify-main",
                                                         "targetNodeId": "ivr-password-text-success",
-                                                        "sourcePortId": "keyboard-option-ivr-password-option-success",
+                                                        "sourcePortId": "verifySuccess",
                                                         "targetPortId": "defaultInput"
                                                 },
                                                 {
-                                                        "sourceNodeId": "ivr-password-collect-main",
+                                                        "sourceNodeId": "ivr-password-verify-main",
                                                         "targetNodeId": "ivr-password-transfer-human",
-                                                        "sourcePortId": "keyboard-option-ivr-password-option-failure",
+                                                        "sourcePortId": "verifyFailure",
                                                         "targetPortId": "defaultInput"
                                                 },
                                                 {

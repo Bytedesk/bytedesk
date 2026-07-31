@@ -15,5 +15,7 @@ public interface TicketSlaRecordRepository extends JpaRepository<TicketSlaRecord
     List<TicketSlaRecordEntity> findTop200BySlaTypeAndStatusAndDeletedFalseOrderByBreachedAtAsc(String slaType, String status);
     Optional<TicketSlaRecordEntity> findFirstByTicketUidAndSlaTypeAndDeletedFalseOrderByCreatedAtDesc(String ticketUid, String slaType);
     Optional<TicketSlaRecordEntity> findFirstByProcessInstanceIdAndSlaTypeAndDeletedFalseOrderByCreatedAtDesc(String processInstanceId, String slaType);
+    Optional<TicketSlaRecordEntity> findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc(String taskId);
+    Optional<TicketSlaRecordEntity> findFirstByProcessInstanceIdAndTaskDefinitionKeyAndDeletedFalseOrderByCreatedAtDesc(String processInstanceId, String taskDefinitionKey);
     List<TicketSlaRecordEntity> findByTicketUidInAndDeletedFalse(List<String> ticketUids);
 }

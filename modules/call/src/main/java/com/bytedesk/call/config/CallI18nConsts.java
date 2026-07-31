@@ -133,10 +133,5 @@ public class CallI18nConsts {
 	public static final String I18N_CALL_ROUTE_INBOUND_DID_DEFAULT_DESCRIPTION = "i18n.call.callRoute.inboundDid.default.description";
 	public static final String I18N_CALL_ROUTE_OUTBOUND_MOBILE_DEFAULT_NAME = "i18n.call.callRoute.outboundMobile.default.name";
 	public static final String I18N_CALL_ROUTE_OUTBOUND_MOBILE_DEFAULT_DESCRIPTION = "i18n.call.callRoute.outboundMobile.default.description";
-	public static final String I18N_TIME_CONDITION_WORKING_HOURS_DEFAULT_NAME = "i18n.call.timeCondition.workingHours.default.name";
-	public static final String I18N_TIME_CONDITION_WORKING_HOURS_DEFAULT_DESCRIPTION = "i18n.call.timeCondition.workingHours.default.description";
-	public static final String I18N_TIME_CONDITION_HOLIDAY_DEFAULT_NAME = "i18n.call.timeCondition.holiday.default.name";
-	public static final String I18N_TIME_CONDITION_HOLIDAY_DEFAULT_DESCRIPTION = "i18n.call.timeCondition.holiday.default.description";
-
 	public static final String I18N_XML_CURL_TRACE = "i18n.xml_curl_trace";
 }

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260729-create-asr-hotword-table" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_asr_hotword" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_asr_hotword">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_ai_asr_hotword" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_asr_hotword_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(64)" defaultValue="ORGANIZATION" />
+            <column name="platform_type" type="VARCHAR(64)" defaultValue="BYTEDESK" />
+            <column name="name" type="VARCHAR(255)" />
+            <column name="description" type="TEXT" />
+            <column name="asr_hotword_type" type="VARCHAR(64)" defaultValue="CUSTOMER" />
+            <column name="provider" type="VARCHAR(64)" defaultValue="dashscope" />
+            <column name="target_model" type="VARCHAR(128)" />
+            <column name="prefix" type="VARCHAR(128)" />
+            <column name="vocabulary_id" type="VARCHAR(256)" />
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING" />
+            <column name="vocabulary_json" type="TEXT" />
+            <column name="request_id" type="VARCHAR(128)" />
+            <column name="error_message" type="TEXT" />
+            <column name="raw_response" type="TEXT" />
+            <column name="remote_gmt_create" type="VARCHAR(64)" />
+            <column name="remote_gmt_modified" type="VARCHAR(64)" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-provider" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="provider" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="provider" type="VARCHAR(64)" defaultValue="dashscope" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-target-model" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="target_model" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="target_model" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-prefix" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="prefix" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="prefix" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-vocabulary-id" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="vocabulary_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="vocabulary_id" type="VARCHAR(256)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-status" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="status" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-vocabulary-json" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="vocabulary_json" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="vocabulary_json" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-request-id" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="request_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="request_id" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-error-message" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="error_message" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="error_message" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-raw-response" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="raw_response" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="raw_response" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-remote-gmt-create" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="remote_gmt_create" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="remote_gmt_create" type="VARCHAR(64)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-asr-hotword-remote-gmt-modified" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <columnExists tableName="bytedesk_ai_asr_hotword" columnName="remote_gmt_modified" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_asr_hotword">
+            <column name="remote_gmt_modified" type="VARCHAR(64)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-asr-hotword-index-org-deleted" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <indexExists tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_org_deleted" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_org_deleted">
+            <column name="org_uid" />
+            <column name="is_deleted" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260729-asr-hotword-index-vocabulary-id" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <indexExists tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_vocabulary_id" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_vocabulary_id">
+            <column name="vocabulary_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260729-asr-hotword-index-prefix-model" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_asr_hotword" />
+            <not>
+                <indexExists tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_org_prefix_model" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_ai_asr_hotword" indexName="idx_asr_hotword_org_prefix_model">
+            <column name="org_uid" />
+            <column name="prefix" />
+            <column name="target_model" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -18,6 +18,12 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.ticket.ticket.TicketEntity;
+import com.bytedesk.ticket.ticket.TicketRepository;
+import com.bytedesk.ticket.ticket.TicketSLAService;
+
+import lombok.RequiredArgsConstructor;
+
 /**
  * TaskListener (任务监听器):
  * 监听任务相关事件
@@ -35,9 +41,13 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component("ticketTaskListener")
+@RequiredArgsConstructor
 public class TicketTaskListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
+
+    private final TicketRepository ticketRepository;
+    private final TicketSLAService ticketSLAService;
 
     @Override
     public void notify(DelegateTask delegateTask) {
@@ -74,6 +84,7 @@ public class TicketTaskListener implements TaskListener {
 
     private void handleTaskCreate(DelegateTask task) {
         log.info("Task created: {}, name: {}", task.getId(), task.getName());
+        resolveTicket(task).ifPresent(ticket -> ticketSLAService.ensureNodeSlaRecord(ticket, task));
     }
 
     private void handleTaskAssignment(DelegateTask task) {
@@ -82,9 +93,19 @@ public class TicketTaskListener implements TaskListener {
 
     private void handleTaskComplete(DelegateTask task) {
         log.info("Task completed: {}, assignee: {}", task.getId(), task.getAssignee());
+        ticketSLAService.completeNodeSlaRecord(task.getId(), task.getAssignee());
     }
 
     private void handleTaskDelete(DelegateTask task) {
         log.info("Task deleted: {}", task.getId());
+        ticketSLAService.cancelNodeSlaRecord(task.getId(), task.getAssignee(), "task deleted");
+    }
+
+    private java.util.Optional<TicketEntity> resolveTicket(DelegateTask task) {
+        String processInstanceId = task.getProcessInstanceId();
+        if (processInstanceId == null || processInstanceId.isBlank()) {
+            return java.util.Optional.empty();
+        }
+        return ticketRepository.findByProcessInstanceId(processInstanceId);
     }
 }

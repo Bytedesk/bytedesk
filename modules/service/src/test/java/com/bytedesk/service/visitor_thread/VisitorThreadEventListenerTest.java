@@ -1,6 +1,5 @@
 package com.bytedesk.service.visitor_thread;
 
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,7 +96,7 @@ class VisitorThreadEventListenerTest {
 
         verify(threadRestService, never()).findByUid((String) null);
         verify(threadRestService).findByUid("thread-1");
-        verify(visitorThreadTimeoutService).autoRemindAgentOrCloseThread(anyList());
+        verify(visitorThreadTimeoutService).processSingleThreadTimeout(thread);
         verify(visitorThreadTriggerService).processProactiveTriggerFromCache(validCache);
         verify(visitorThreadTriggerService, times(1)).processProactiveTriggerFromCache(validCache);
         verify(visitorThreadTriggerService, never()).processProactiveTriggerFromCache(invalidCache);

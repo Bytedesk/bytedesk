@@ -18,10 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.flowable.engine.TaskService;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.ticket.process.ProcessEntity;
+import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.service.holiday.HolidayRestService;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.enums.TicketPriorityEnum;
@@ -71,6 +75,96 @@ class TicketSLAServiceTest {
         assertTrue(record.getDueAt().isAfter(dueAt.plusSeconds(120)));
         verify(fixture.slaRecordRepository).save(record);
     }
+
+        @Test
+        void pauseOpenRecordsShouldSkipInactiveNodeRecords() {
+                Fixture fixture = new Fixture();
+                TicketEntity ticket = buildTicket();
+                ticket.setProcessInstanceId("process-1");
+                TicketSlaRecordEntity globalRecord = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().plusMinutes(30));
+                globalRecord.setSlaSource("GLOBAL");
+                TicketSlaRecordEntity nodeRecord = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().plusMinutes(20));
+                nodeRecord.setUid("sla-record-node");
+                nodeRecord.setSlaSource("NODE");
+                nodeRecord.setTaskId("task-inactive");
+                nodeRecord.setTaskDefinitionKey("processTicket");
+                fixture.enablePauseOnHold(ticket);
+                fixture.mockActiveTasks(ticket.getProcessInstanceId(), List.of());
+                when(fixture.slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid()))
+                                .thenReturn(List.of(globalRecord, nodeRecord));
+
+                fixture.service.pauseOpenRecords(ticket, "agent-1");
+
+                assertEquals(TicketSlaStatusEnum.PAUSED.name(), globalRecord.getStatus());
+                assertEquals(TicketSlaStatusEnum.RUNNING.name(), nodeRecord.getStatus());
+                verify(fixture.slaRecordRepository).save(globalRecord);
+                verify(fixture.slaRecordRepository, never()).save(nodeRecord);
+        }
+
+        @Test
+        void resumePausedRecordsShouldSkipInactiveNodeRecords() {
+                Fixture fixture = new Fixture();
+                TicketEntity ticket = buildTicket();
+                ticket.setProcessInstanceId("process-1");
+                TicketSlaRecordEntity globalRecord = buildRecord(TicketSlaStatusEnum.PAUSED, BdDateUtils.now().plusMinutes(30));
+                globalRecord.setSlaSource("GLOBAL");
+                globalRecord.setPausedAt(BdDateUtils.now().minusSeconds(120));
+                TicketSlaRecordEntity nodeRecord = buildRecord(TicketSlaStatusEnum.PAUSED, BdDateUtils.now().plusMinutes(20));
+                nodeRecord.setUid("sla-record-node");
+                nodeRecord.setSlaSource("NODE");
+                nodeRecord.setTaskId("task-inactive");
+                nodeRecord.setTaskDefinitionKey("processTicket");
+                nodeRecord.setPausedAt(BdDateUtils.now().minusSeconds(120));
+                fixture.enablePauseOnHold(ticket);
+                fixture.mockActiveTasks(ticket.getProcessInstanceId(), List.of());
+                when(fixture.slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid()))
+                                .thenReturn(List.of(globalRecord, nodeRecord));
+
+                fixture.service.resumePausedRecords(ticket, "agent-1");
+
+                assertEquals(TicketSlaStatusEnum.RUNNING.name(), globalRecord.getStatus());
+                assertEquals(TicketSlaStatusEnum.PAUSED.name(), nodeRecord.getStatus());
+                verify(fixture.slaRecordRepository).save(globalRecord);
+                verify(fixture.slaRecordRepository, never()).save(nodeRecord);
+        }
+
+        @Test
+        void cancelOpenRecordsShouldCancelPausedRecordsToo() {
+                Fixture fixture = new Fixture();
+                TicketEntity ticket = buildTicket();
+                TicketSlaRecordEntity pausedRecord = buildRecord(TicketSlaStatusEnum.PAUSED, BdDateUtils.now().plusMinutes(20));
+                pausedRecord.setPausedAt(BdDateUtils.now().minusSeconds(90));
+                when(fixture.slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid()))
+                                .thenReturn(List.of(pausedRecord));
+
+                fixture.service.cancelOpenRecords(ticket, "agent-1");
+
+                assertEquals(TicketSlaStatusEnum.CANCELED.name(), pausedRecord.getStatus());
+                assertEquals("agent-1", pausedRecord.getCompletedBy());
+                assertNull(pausedRecord.getPausedAt());
+                assertTrue(pausedRecord.getCompletedAt() != null);
+                verify(fixture.slaRecordRepository).save(pausedRecord);
+        }
+
+        @Test
+        void cancelNodeSlaRecordShouldCancelPausedNodeRecord() {
+                Fixture fixture = new Fixture();
+                TicketSlaRecordEntity nodeRecord = buildRecord(TicketSlaStatusEnum.PAUSED, BdDateUtils.now().plusMinutes(10));
+                nodeRecord.setSlaSource("NODE");
+                nodeRecord.setTaskId("task-1");
+                nodeRecord.setTaskDefinitionKey("processTicket");
+                nodeRecord.setPausedAt(BdDateUtils.now().minusSeconds(30));
+                when(fixture.slaRecordRepository.findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc("task-1"))
+                                .thenReturn(Optional.of(nodeRecord));
+
+                fixture.service.cancelNodeSlaRecord("task-1", "agent-1", "task deleted");
+
+                assertEquals(TicketSlaStatusEnum.CANCELED.name(), nodeRecord.getStatus());
+                assertEquals("agent-1", nodeRecord.getCompletedBy());
+                assertNull(nodeRecord.getPausedAt());
+                assertTrue(nodeRecord.getCompletedAt() != null);
+                verify(fixture.slaRecordRepository).save(nodeRecord);
+        }
 
     @Test
     void markBreachedByProcessInstanceShouldSkipWhenDueAtWasExtendedIntoFuture() {
@@ -223,6 +317,55 @@ class TicketSLAServiceTest {
         verify(fixture.ticketRepository).save(ticket);
     }
 
+    @Test
+    void ensureNodeSlaRecordShouldCreateNodeScopedRecordWhenNodeHasExplicitDuration() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setProcessEntityUid("process-1");
+        Task task = mock(Task.class);
+        when(task.getId()).thenReturn("task-1");
+        when(task.getTaskDefinitionKey()).thenReturn("processTicket");
+        when(fixture.processRepository.findByUid("process-1")).thenReturn(Optional.of(ProcessEntity.builder()
+                .uid("process-1")
+                .flowgramSchema("""
+                        {"nodes":[{"id":"processTicket","type":"approval","data":{"ticketStage":"PROCESSING","slaType":"RESOLUTION","slaDurationMinutes":30}}],"edges":[]}
+                        """)
+                .build()));
+        when(fixture.slaRecordRepository.findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc("task-1"))
+                .thenReturn(Optional.empty());
+        when(fixture.uidUtils.getUid()).thenReturn("node-sla-1");
+
+        fixture.service.ensureNodeSlaRecord(ticket, task);
+
+        org.mockito.ArgumentCaptor<TicketSlaRecordEntity> captor = org.mockito.ArgumentCaptor
+                .forClass(TicketSlaRecordEntity.class);
+        verify(fixture.slaRecordRepository).save(captor.capture());
+        TicketSlaRecordEntity record = captor.getValue();
+        assertEquals("task-1", record.getTaskId());
+        assertEquals("processTicket", record.getTaskDefinitionKey());
+        assertEquals("NODE", record.getSlaSource());
+        assertEquals(TicketSlaTypeEnum.RESOLUTION.name(), record.getSlaType());
+        assertEquals(30L, record.getDurationMinutes());
+    }
+
+    @Test
+    void completeNodeSlaRecordShouldCompleteOpenNodeRecord() {
+        Fixture fixture = new Fixture();
+        TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().plusMinutes(10));
+        record.setTaskId("task-1");
+        record.setTaskDefinitionKey("processTicket");
+        record.setSlaSource("NODE");
+        when(fixture.slaRecordRepository.findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc("task-1"))
+                .thenReturn(Optional.of(record));
+
+        fixture.service.completeNodeSlaRecord("task-1", "member-1");
+
+        assertEquals(TicketSlaStatusEnum.COMPLETED.name(), record.getStatus());
+        assertEquals("member-1", record.getCompletedBy());
+        assertTrue(record.getCompletedAt() != null);
+        verify(fixture.slaRecordRepository).save(record);
+    }
+
     private static TicketEntity buildTicket() {
         return TicketEntity.builder()
                 .uid("ticket-1")
@@ -252,11 +395,23 @@ class TicketSLAServiceTest {
         private final TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
         private final TicketSlaRecordRepository slaRecordRepository = mock(TicketSlaRecordRepository.class);
         private final TicketRepository ticketRepository = mock(TicketRepository.class);
+        private final ProcessRepository processRepository = mock(ProcessRepository.class);
         private final UidUtils uidUtils = mock(UidUtils.class);
         private final TaskService taskService = mock(TaskService.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+                private final TaskQuery taskQuery = mock(TaskQuery.class, org.mockito.Mockito.RETURNS_SELF);
         private final HolidayRestService holidayRestService = mock(HolidayRestService.class);
         private final TicketSLAService service = new TicketSLAService(notificationService, ticketSettingsRepository,
-                slaRecordRepository, ticketRepository, uidUtils, taskService, holidayRestService);
+                slaRecordRepository, ticketRepository, processRepository, uidUtils, taskService, holidayRestService);
+
+                private Fixture() {
+                        when(taskService.createTaskQuery()).thenReturn(taskQuery);
+                        when(taskQuery.active()).thenReturn(taskQuery);
+                }
+
+                private void mockActiveTasks(String processInstanceId, List<Task> tasks) {
+                        when(taskQuery.processInstanceId(processInstanceId)).thenReturn(taskQuery);
+                        when(taskQuery.list()).thenReturn(tasks);
+                }
 
         private void enablePauseOnHold(TicketEntity ticket) {
             TicketSlaSettingsEntity slaSettings = TicketSlaSettingsEntity.builder()

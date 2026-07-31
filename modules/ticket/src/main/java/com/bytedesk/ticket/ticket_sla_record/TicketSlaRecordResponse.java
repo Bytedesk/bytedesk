@@ -17,12 +17,15 @@ public class TicketSlaRecordResponse {
     private String ticketUid;
     private String processInstanceId;
     private String slaType;
+    private String slaSource;
     private String status;
     private String priority;
     private String categoryUid;
     private Long durationMinutes;
     private ZonedDateTime startedAt;
     private ZonedDateTime dueAt;
+    private String taskId;
+    private String taskDefinitionKey;
     private ZonedDateTime pausedAt;
     private Long pausedDurationSeconds;
     private ZonedDateTime completedAt;
@@ -40,12 +43,15 @@ public class TicketSlaRecordResponse {
                 .ticketUid(entity.getTicketUid())
                 .processInstanceId(entity.getProcessInstanceId())
                 .slaType(entity.getSlaType())
+                .slaSource(entity.getSlaSource())
                 .status(entity.getStatus())
                 .priority(entity.getPriority())
                 .categoryUid(entity.getCategoryUid())
                 .durationMinutes(entity.getDurationMinutes())
                 .startedAt(entity.getStartedAt())
                 .dueAt(entity.getDueAt())
+                .taskId(entity.getTaskId())
+                .taskDefinitionKey(entity.getTaskDefinitionKey())
                 .pausedAt(entity.getPausedAt())
                 .pausedDurationSeconds(entity.getPausedDurationSeconds())
                 .completedAt(entity.getCompletedAt())

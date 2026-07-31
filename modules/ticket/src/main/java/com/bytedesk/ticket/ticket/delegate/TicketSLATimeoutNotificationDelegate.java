@@ -65,7 +65,11 @@ public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
         // 设置 SLA 相关变量
         execution.setVariable("slaTimeoutTime", new Date());
         execution.setVariable("slaTimeoutReason", "超过处理时限");
-        boolean breached = ticketSLAService.markBreachedByProcessInstance(processInstanceId, slaType, "超过处理时限");
+        String taskDefinitionKey = resolveTaskDefinitionKey(activityId);
+        boolean breached = ticketSLAService.markBreachedByNode(processInstanceId, taskDefinitionKey, "超过处理时限");
+        if (!breached) {
+            breached = ticketSLAService.markBreachedByProcessInstance(processInstanceId, slaType, "超过处理时限");
+        }
         execution.setVariable("slaBreached", breached);
         execution.setVariable("slaBreachedType", breached ? slaType.name() : null);
         
@@ -135,5 +139,17 @@ public class TicketSLATimeoutNotificationDelegate implements JavaDelegate {
             return TicketSlaTypeEnum.CUSTOMER_VERIFY;
         }
         return TicketSlaTypeEnum.RESOLUTION;
+    }
+
+    private String resolveTaskDefinitionKey(String activityId) {
+        if (!StringUtils.hasText(activityId)) {
+            return activityId;
+        }
+        String marker = "_sla_timer";
+        int markerIndex = activityId.indexOf(marker);
+        if (markerIndex > 0) {
+            return activityId.substring(0, markerIndex);
+        }
+        return activityId;
     }
 }

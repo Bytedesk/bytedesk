@@ -225,21 +225,45 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     @Override
     public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             MessageEntity entity) {
-        try {
-            Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                MessageEntity latestEntity = latest.get();
-                String mergedStatus = mergeRecoverableStatus(latestEntity.getStatus(), entity.getStatus());
-                log.warn(
-                        "message optimistic lock recovery: uid {}, requestedStatus {}, latestStatusBeforeMerge {}, mergedStatus {}",
-                        entity.getUid(), entity.getStatus(), latestEntity.getStatus(), mergedStatus);
-                latestEntity.setStatus(mergedStatus);
-                return messageRepository.save(latestEntity);
+        // Retry up to 3 times with fresh data to resolve concurrent updates
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
+                if (latest.isPresent()) {
+                    MessageEntity latestEntity = latest.get();
+                    String mergedStatus = mergeRecoverableStatus(latestEntity.getStatus(), entity.getStatus());
+                    log.warn(
+                            "message optimistic lock recovery (attempt {}): uid {}, requestedStatus {}, latestStatusBeforeMerge {}, mergedStatus {}",
+                            attempt + 1, entity.getUid(), entity.getStatus(), latestEntity.getStatus(), mergedStatus);
+                    latestEntity.setStatus(mergedStatus);
+                    return messageRepository.save(latestEntity);
+                }
+            } catch (ObjectOptimisticLockingFailureException retryEx) {
+                if (attempt < maxRetries - 1) {
+                    log.warn("Optimistic lock recovery retry {} failed for uid {}, retrying...",
+                            attempt + 1, entity.getUid());
+                    // Brief pause to let concurrent transactions complete
+                    try {
+                        Thread.sleep(50L * (attempt + 1));
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    log.error("Optimistic lock recovery exhausted after {} attempts for uid {}: {}",
+                            maxRetries, entity.getUid(), retryEx.getMessage());
+                }
+            } catch (Exception ex) {
+                log.error("Unexpected error during optimistic lock recovery for uid {}: {}",
+                        entity.getUid(), ex.getMessage());
+                break;
             }
-        } catch (Exception ex) {
-            log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
+        // After exhausting retries, return null to avoid propagating the error.
+        // The caller (Spring Retry @Recover) will receive null, and the original save
+        // operation will not be retried further — the entity state will be reconciled
+        // on the next write.
+        log.warn("Optimistic lock recovery could not save entity uid {}, returning null", entity.getUid());
         return null;
     }
 

@@ -152,6 +152,12 @@ public class MemberEntity extends BaseEntity {
     private String deptUid;
 
     /**
+     * Manager/direct leader member UID for ticket auto-assignment (assigneeType=leader).
+     * Points to another MemberEntity in the same organization.
+     */
+    private String managerMemberUid;
+
+    /**
      * Associated user account for this member
      */
     @ManyToOne(fetch = FetchType.LAZY)

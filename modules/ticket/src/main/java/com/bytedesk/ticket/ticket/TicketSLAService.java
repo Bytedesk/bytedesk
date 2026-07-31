@@ -13,6 +13,9 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import java.time.Duration;
 import java.time.DayOfWeek;
 import java.time.DateTimeException;
@@ -24,13 +27,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
+import org.flowable.task.service.delegate.DelegateTask;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -40,6 +46,8 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.service.holiday.HolidayEntity;
 import com.bytedesk.service.holiday.HolidayRestService;
+import com.bytedesk.ticket.process.ProcessEntity;
+import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
@@ -71,10 +79,14 @@ public class TicketSLAService {
     private final TicketSettingsRepository ticketSettingsRepository;
     private final TicketSlaRecordRepository slaRecordRepository;
     private final TicketRepository ticketRepository;
+    private final ProcessRepository processRepository;
     private final UidUtils uidUtils;
     private final TaskService taskService;
     private final HolidayRestService holidayRestService;
     // private final RuntimeService runtimeService;
+
+    private static final String SLA_SOURCE_GLOBAL = "GLOBAL";
+    private static final String SLA_SOURCE_NODE = "NODE";
 
     public Map<String, Object> determineSLA(String category, String priority) {
         Map<String, Object> sla = new HashMap<>();
@@ -131,17 +143,55 @@ public class TicketSLAService {
         complete(ticket, TicketSlaTypeEnum.CUSTOMER_VERIFY, operatorUid);
     }
 
+    public void ensureNodeSlaRecord(TicketEntity ticket, Task task) {
+        if (ticket == null || task == null || !StringUtils.hasText(task.getId())
+                || !StringUtils.hasText(task.getTaskDefinitionKey())) {
+            return;
+        }
+        resolveNodeSlaConfig(ticket, task.getTaskDefinitionKey())
+                .filter(config -> config.durationMinutes() > 0)
+                .ifPresent(config -> createNodeRecordIfAbsent(ticket, task, config, BdDateUtils.now()));
+    }
+
+    public void ensureNodeSlaRecord(TicketEntity ticket, DelegateTask task) {
+        if (ticket == null || task == null || !StringUtils.hasText(task.getId())
+                || !StringUtils.hasText(task.getTaskDefinitionKey())) {
+            return;
+        }
+        resolveNodeSlaConfig(ticket, task.getTaskDefinitionKey())
+                .filter(config -> config.durationMinutes() > 0)
+                .ifPresent(config -> createNodeRecordIfAbsent(ticket, task.getId(), task.getTaskDefinitionKey(), config,
+                        BdDateUtils.now()));
+    }
+
+    public void completeNodeSlaRecord(String taskId, String operatorUid) {
+        if (!StringUtils.hasText(taskId)) {
+            return;
+        }
+        slaRecordRepository.findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc(taskId)
+                .filter(record -> SLA_SOURCE_NODE.equals(record.getSlaSource()))
+                .filter(this::isOpen)
+                .ifPresent(record -> completeRecord(record, operatorUid));
+    }
+
+    public void cancelNodeSlaRecord(String taskId, String operatorUid, String reason) {
+        if (!StringUtils.hasText(taskId)) {
+            return;
+        }
+        slaRecordRepository.findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc(taskId)
+                .filter(record -> SLA_SOURCE_NODE.equals(record.getSlaSource()))
+                .filter(this::isCancelable)
+                .ifPresent(record -> cancelRecord(record, operatorUid, reason));
+    }
+
     public void cancelOpenRecords(TicketEntity ticket, String operatorUid) {
         if (ticket == null || !StringUtils.hasText(ticket.getUid())) {
             return;
         }
         List<TicketSlaRecordEntity> records = slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid());
         for (TicketSlaRecordEntity record : records) {
-            if (isOpen(record)) {
-                record.setStatus(TicketSlaStatusEnum.CANCELED.name());
-                record.setCompletedAt(BdDateUtils.now());
-                record.setCompletedBy(operatorUid);
-                slaRecordRepository.save(record);
+            if (isCancelable(record)) {
+                cancelRecord(record, operatorUid, "ticket canceled");
             }
         }
     }
@@ -151,9 +201,10 @@ public class TicketSLAService {
             return;
         }
         ZonedDateTime now = BdDateUtils.now();
+        Set<String> activeNodeTaskIds = resolveActiveNodeTaskIds(ticket);
         List<TicketSlaRecordEntity> records = slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid());
         for (TicketSlaRecordEntity record : records) {
-            if (!isOpen(record)) {
+            if (!isOpen(record) || shouldSkipNodeRecord(record, activeNodeTaskIds)) {
                 continue;
             }
             record.setStatus(TicketSlaStatusEnum.PAUSED.name());
@@ -169,9 +220,11 @@ public class TicketSLAService {
             return;
         }
         ZonedDateTime now = BdDateUtils.now();
+        Set<String> activeNodeTaskIds = resolveActiveNodeTaskIds(ticket);
         List<TicketSlaRecordEntity> records = slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid());
         for (TicketSlaRecordEntity record : records) {
-            if (!TicketSlaStatusEnum.PAUSED.name().equals(record.getStatus()) || record.getPausedAt() == null) {
+            if (!TicketSlaStatusEnum.PAUSED.name().equals(record.getStatus()) || record.getPausedAt() == null
+                    || shouldSkipNodeRecord(record, activeNodeTaskIds)) {
                 continue;
             }
             long pausedSeconds = Math.max(0, Duration.between(record.getPausedAt(), now).getSeconds());
@@ -200,6 +253,23 @@ public class TicketSLAService {
             return false;
         }
         return markBreached(recordOptional.get(), reason);
+    }
+
+    public boolean markBreachedByNode(String processInstanceId, String taskDefinitionKey, String reason) {
+        if (!StringUtils.hasText(processInstanceId) || !StringUtils.hasText(taskDefinitionKey)) {
+            return false;
+        }
+        Optional<TicketSlaRecordEntity> recordOptional = slaRecordRepository
+                .findFirstByProcessInstanceIdAndTaskDefinitionKeyAndDeletedFalseOrderByCreatedAtDesc(
+                        processInstanceId, taskDefinitionKey);
+        if (recordOptional.isEmpty()) {
+            return false;
+        }
+        TicketSlaRecordEntity record = recordOptional.get();
+        if (!SLA_SOURCE_NODE.equals(record.getSlaSource())) {
+            return false;
+        }
+        return markBreached(record, reason);
     }
 
     public Boolean isSLABreached(TicketEntity ticket) {
@@ -287,6 +357,7 @@ public class TicketSLAService {
                 .ticketUid(ticket.getUid())
                 .processInstanceId(ticket.getProcessInstanceId())
                 .slaType(slaType.name())
+                .slaSource(SLA_SOURCE_GLOBAL)
                 .status(TicketSlaStatusEnum.RUNNING.name())
                 .priority(ticket.getPriority())
                 .categoryUid(ticket.getCategoryUid())
@@ -304,20 +375,142 @@ public class TicketSLAService {
         }
         slaRecordRepository.findFirstByTicketUidAndSlaTypeAndDeletedFalseOrderByCreatedAtDesc(ticket.getUid(), slaType.name())
                 .filter(this::isOpen)
-                .ifPresent(record -> {
-                    ZonedDateTime now = BdDateUtils.now();
-                    record.setCompletedAt(now);
-                    record.setCompletedBy(operatorUid);
-                    if (record.getDueAt() != null && now.isAfter(record.getDueAt())) {
-                        record.setStatus(TicketSlaStatusEnum.BREACHED.name());
-                        record.setBreached(Boolean.TRUE);
-                        record.setBreachedAt(record.getBreachedAt() != null ? record.getBreachedAt() : now);
-                        record.setBreachReason("completed after SLA due time");
-                    } else {
-                        record.setStatus(TicketSlaStatusEnum.COMPLETED.name());
-                    }
-                    slaRecordRepository.save(record);
-                });
+                .ifPresent(record -> completeRecord(record, operatorUid));
+    }
+
+    private void completeRecord(TicketSlaRecordEntity record, String operatorUid) {
+        ZonedDateTime now = BdDateUtils.now();
+        record.setCompletedAt(now);
+        record.setCompletedBy(operatorUid);
+        if (record.getDueAt() != null && now.isAfter(record.getDueAt())) {
+            record.setStatus(TicketSlaStatusEnum.BREACHED.name());
+            record.setBreached(Boolean.TRUE);
+            record.setBreachedAt(record.getBreachedAt() != null ? record.getBreachedAt() : now);
+            record.setBreachReason("completed after SLA due time");
+        } else {
+            record.setStatus(TicketSlaStatusEnum.COMPLETED.name());
+        }
+        slaRecordRepository.save(record);
+    }
+
+    private void createNodeRecordIfAbsent(TicketEntity ticket, Task task, NodeSlaConfig config, ZonedDateTime startedAt) {
+        Optional<TicketSlaRecordEntity> existing = slaRecordRepository
+                .findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc(task.getId());
+        if (existing.filter(this::isOpen).isPresent()) {
+            return;
+        }
+        createNodeRecordIfAbsent(ticket, task.getId(), task.getTaskDefinitionKey(), config, startedAt);
+        }
+
+        private void createNodeRecordIfAbsent(TicketEntity ticket, String taskId, String taskDefinitionKey,
+            NodeSlaConfig config, ZonedDateTime startedAt) {
+        Optional<TicketSlaRecordEntity> existing = slaRecordRepository
+            .findFirstByTaskIdAndDeletedFalseOrderByCreatedAtDesc(taskId);
+        if (existing.filter(this::isOpen).isPresent()) {
+            return;
+        }
+        TicketSlaRecordEntity record = TicketSlaRecordEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(ticket.getOrgUid())
+                .ticketUid(ticket.getUid())
+                .processInstanceId(ticket.getProcessInstanceId())
+            .taskId(taskId)
+            .taskDefinitionKey(taskDefinitionKey)
+                .slaType(config.slaType().name())
+                .slaSource(SLA_SOURCE_NODE)
+                .status(TicketSlaStatusEnum.RUNNING.name())
+                .priority(ticket.getPriority())
+                .categoryUid(ticket.getCategoryUid())
+                .durationMinutes(config.durationMinutes())
+                .startedAt(startedAt)
+                .dueAt(resolveDueAt(ticket, startedAt, config.durationMinutes()))
+                .breached(Boolean.FALSE)
+                .build();
+        slaRecordRepository.save(record);
+    }
+
+    private Optional<NodeSlaConfig> resolveNodeSlaConfig(TicketEntity ticket, String taskDefinitionKey) {
+        if (ticket == null || !StringUtils.hasText(ticket.getProcessEntityUid()) || !StringUtils.hasText(taskDefinitionKey)) {
+            return Optional.empty();
+        }
+        Optional<ProcessEntity> processOptional = processRepository.findByUid(ticket.getProcessEntityUid());
+        if (processOptional.isEmpty() || !StringUtils.hasText(processOptional.get().getFlowgramSchema())) {
+            return Optional.empty();
+        }
+        try {
+            JSONObject schema = JSON.parseObject(processOptional.get().getFlowgramSchema());
+            JSONObject node = findFlowgramNode(schema, taskDefinitionKey);
+            if (node == null) {
+                return Optional.empty();
+            }
+            JSONObject data = node.getJSONObject("data");
+            if (data == null) {
+                return Optional.empty();
+            }
+            long durationMinutes = resolveNodeSlaDurationMinutes(data);
+            if (durationMinutes <= 0) {
+                return Optional.empty();
+            }
+            TicketSlaTypeEnum slaType = resolveNodeSlaType(data);
+            if (slaType == null) {
+                return Optional.empty();
+            }
+            return Optional.of(new NodeSlaConfig(slaType, durationMinutes));
+        } catch (Exception e) {
+            log.warn("Failed to resolve node SLA config: processEntityUid={}, taskDefinitionKey={}",
+                    ticket.getProcessEntityUid(), taskDefinitionKey, e);
+            return Optional.empty();
+        }
+    }
+
+    private JSONObject findFlowgramNode(JSONObject schema, String nodeId) {
+        if (schema == null || !StringUtils.hasText(nodeId)) {
+            return null;
+        }
+        JSONArray nodes = schema.getJSONArray("nodes");
+        if (nodes == null) {
+            return null;
+        }
+        for (int index = 0; index < nodes.size(); index++) {
+            JSONObject node = nodes.getJSONObject(index);
+            if (nodeId.equals(node.getString("id"))) {
+                return node;
+            }
+        }
+        return null;
+    }
+
+    private TicketSlaTypeEnum resolveNodeSlaType(JSONObject data) {
+        String configured = data.getString("slaType");
+        if (StringUtils.hasText(configured)) {
+            try {
+                return TicketSlaTypeEnum.valueOf(configured.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                log.warn("Unsupported node SLA type: {}", configured);
+            }
+        }
+        String ticketStage = data.getString("ticketStage");
+        if (!StringUtils.hasText(ticketStage)) {
+            return null;
+        }
+        return switch (ticketStage) {
+            case "WAIT_CLAIM" -> TicketSlaTypeEnum.CLAIM;
+            case "PROCESSING" -> TicketSlaTypeEnum.RESOLUTION;
+            case "CUSTOMER_VERIFY" -> TicketSlaTypeEnum.CUSTOMER_VERIFY;
+            default -> null;
+        };
+    }
+
+    private long resolveNodeSlaDurationMinutes(JSONObject data) {
+        long durationMinutes = data.getLongValue("slaDurationMinutes");
+        if (durationMinutes > 0) {
+            return durationMinutes;
+        }
+        long legacyTimeoutMinutes = data.getLongValue("timeoutMinutes");
+        return Math.max(legacyTimeoutMinutes, 0L);
+    }
+
+    private record NodeSlaConfig(TicketSlaTypeEnum slaType, long durationMinutes) {
     }
 
     private boolean markBreached(TicketSlaRecordEntity record, String reason) {
@@ -472,6 +665,47 @@ public class TicketSLAService {
     private boolean isOpen(TicketSlaRecordEntity record) {
         return record != null && (TicketSlaStatusEnum.RUNNING.name().equals(record.getStatus())
                 || TicketSlaStatusEnum.WARNED.name().equals(record.getStatus()));
+    }
+
+    private boolean isCancelable(TicketSlaRecordEntity record) {
+        return record != null && (isOpen(record) || TicketSlaStatusEnum.PAUSED.name().equals(record.getStatus()));
+    }
+
+    private void cancelRecord(TicketSlaRecordEntity record, String operatorUid, String reason) {
+        record.setStatus(TicketSlaStatusEnum.CANCELED.name());
+        record.setCompletedAt(BdDateUtils.now());
+        record.setCompletedBy(operatorUid);
+        record.setPausedAt(null);
+        slaRecordRepository.save(record);
+        addSlaComment(record, "SLA_CANCELED", operatorUid,
+                "SLA 已取消: " + record.getSlaType()
+                        + (StringUtils.hasText(reason) ? ", 原因: " + reason : ""));
+    }
+
+    private Set<String> resolveActiveNodeTaskIds(TicketEntity ticket) {
+        if (ticket == null || !StringUtils.hasText(ticket.getProcessInstanceId())) {
+            return java.util.Collections.emptySet();
+        }
+        try {
+            return taskService.createTaskQuery()
+                    .processInstanceId(ticket.getProcessInstanceId())
+                    .active()
+                    .list()
+                    .stream()
+                    .map(Task::getId)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toCollection(HashSet::new));
+        } catch (Exception exception) {
+            log.warn("Failed to resolve active tasks for ticketUid={}, processInstanceId={}, error={}",
+                    ticket.getUid(), ticket.getProcessInstanceId(), exception.getMessage());
+            return java.util.Collections.emptySet();
+        }
+    }
+
+    private boolean shouldSkipNodeRecord(TicketSlaRecordEntity record, Set<String> activeNodeTaskIds) {
+        return record != null
+                && SLA_SOURCE_NODE.equals(record.getSlaSource())
+                && (!StringUtils.hasText(record.getTaskId()) || !activeNodeTaskIds.contains(record.getTaskId()));
     }
 
     private boolean shouldPauseOnHold(TicketEntity ticket) {
