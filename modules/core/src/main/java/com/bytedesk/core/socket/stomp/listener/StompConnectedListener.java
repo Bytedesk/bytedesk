@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
@@ -53,7 +54,13 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
         // 
         StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
         if (headerAccessor == null) {
-            log.info("stomp connection without headerAccessor");
+            Object connectMessage = event.getMessage().getHeaders().get("simpConnectMessage");
+            if (connectMessage instanceof Message<?> message) {
+                headerAccessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+            }
+        }
+        if (headerAccessor == null) {
+            // log.debug("stomp connection without headerAccessor");
             return;
         }
         String uid = headerAccessor.getLogin();
@@ -62,13 +69,13 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
             uid = headerAccessor.getNativeHeader("login").get(0);
         }
         if (uid == null) {
-            log.info("stomp connection missing login header");
+            // log.info("stomp connection missing login header");
             return;
         }
         String sessionId = headerAccessor.getSessionId();
         String clientId = uid + "/stomp/" + sessionId;
         // 标记连接，仅记录会话；坐席在线布尔状态由上层定时任务/事件统一刷新
         connectionRestService.markConnected(uid, null, clientId, null, "STOMP", "WEB", null, null, 90);
-        log.debug("stomp connected uid {} session {}", uid, sessionId);
+        // log.debug("stomp connected uid {} session {}", uid, sessionId);
     }
 }

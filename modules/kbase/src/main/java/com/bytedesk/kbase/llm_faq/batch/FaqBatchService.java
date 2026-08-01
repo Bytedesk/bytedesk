@@ -19,37 +19,33 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ批量导入服务
  * 用于启动和管理FAQ批量导入作业
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FaqBatchService {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+    private final JobLauncher jobLauncher;
     
-    @Autowired
     @Qualifier("importFaqJob")
-    private Job importFaqJob;
+    private final Job importFaqJob;
     
-    @Autowired
-    private JobExplorer jobExplorer;
+    private final JobExplorer jobExplorer;
     
-    @Autowired
-    private FaqItemProcessor faqItemProcessor;
+    private final FaqItemProcessor faqItemProcessor;
     
-    @Autowired
-    private FaqExcelReader faqExcelReader;
+    private final FaqExcelReader faqExcelReader;
     
     /**
      * 启动FAQ批量导入作业

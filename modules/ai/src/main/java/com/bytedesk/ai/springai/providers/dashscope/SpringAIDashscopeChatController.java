@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.dashscope;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -25,8 +25,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,12 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -50,17 +47,29 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/dashscope")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.dashscope.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDashscopeChatController {
 
+    public SpringAIDashscopeChatController(
+            @Qualifier("bytedeskDashscopeChatModel") ObjectProvider<ChatModel> bytedeskDashscopeChatModelProvider,
+            BytedeskProperties bytedeskProperties,
+            ChatClient bytedeskDashscopeChatClient,
+            SpringAIDashscopeChatService springAIDashscopeService,
+            ExecutorService executorService) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.bytedeskDashscopeChatClient = bytedeskDashscopeChatClient;
+        this.springAIDashscopeService = springAIDashscopeService;
+        this.executorService = executorService;
+        this.bytedeskDashscopeChatModel = bytedeskDashscopeChatModelProvider.getIfAvailable();
+    }
+
+
     private final BytedeskProperties bytedeskProperties;
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatModel")
-    private ChatModel bytedeskDashscopeChatModel;
+    private final ChatModel bytedeskDashscopeChatModel;
     private final ChatClient bytedeskDashscopeChatClient;
     private final SpringAIDashscopeChatService springAIDashscopeService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/dashscope/format?actor=
 	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -245,7 +254,7 @@ public class SpringAIDashscopeChatController {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    DashScopeChatOptions.builder()
+                    BytedeskDashScopeChatOptions.builder()
                         .model("dashscope-chat")
                         .temperature(0.7)
                         .topP(0.9)
@@ -325,8 +334,6 @@ public class SpringAIDashscopeChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

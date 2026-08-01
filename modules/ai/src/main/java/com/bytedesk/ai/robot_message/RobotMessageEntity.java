@@ -19,7 +19,7 @@ import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.message.AbstractMessageEntity;
-import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import jakarta.persistence.Column;

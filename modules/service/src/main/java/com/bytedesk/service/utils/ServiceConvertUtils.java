@@ -13,15 +13,20 @@
  */
 package com.bytedesk.service.utils;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.util.StringUtils;
 import lombok.experimental.UtilityClass;
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.core.thread.ThreadConvertUtils;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
@@ -34,7 +39,12 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentResponse;
+import com.bytedesk.service.agent_seat.AgentSeatEntity;
+import com.bytedesk.service.agent_seat.enums.AgentSeatStatusEnum;
+import com.bytedesk.service.agent_seat.AgentSeatService;
 import com.bytedesk.core.socket.connection.ConnectionRestService;
+import com.bytedesk.service.form.FormEntity;
+import com.bytedesk.service.form.FormRepository;
 import com.bytedesk.service.message_leave.MessageLeaveEntity;
 import com.bytedesk.service.message_leave.MessageLeaveResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
@@ -59,6 +69,10 @@ public class ServiceConvertUtils {
         return ApplicationContextHolder.getBean(ModelMapper.class);
     }
 
+    private static FormRepository getFormRepository() {
+        return ApplicationContextHolder.getBean(FormRepository.class);
+    }
+
     public static VisitorResponse convertToVisitorResponse(VisitorEntity visitor) {
         return getModelMapper().map(visitor, VisitorResponse.class);
     }
@@ -76,6 +90,9 @@ public class ServiceConvertUtils {
     public static VisitorProtobuf convertToVisitorProtobuf(VisitorRequest visitorRequest) {
         VisitorProtobuf userProtobuf = getModelMapper().map(visitorRequest, VisitorProtobuf.class);
         userProtobuf.setType(UserTypeEnum.VISITOR.name());
+        if (!StringUtils.hasText(userProtobuf.getVisitorUid())) {
+            userProtobuf.setVisitorUid(userProtobuf.getUid());
+        }
         return userProtobuf;
     }
 
@@ -107,6 +124,26 @@ public class ServiceConvertUtils {
                 .extra(workflow.getSchema()) // 将 schema 存储在 extra 字段中
                 .build();
         return JSON.toJSONString(userProtobuf);
+    }
+
+    /**
+     * 将工作流 JSON 发送者压缩为消息可安全存储的基础字段。
+     */
+    public static String compactWorkflowProtobufString(String workflowJson) {
+        if (!StringUtils.hasText(workflowJson)) {
+            return workflowJson;
+        }
+        UserProtobuf workflowUser = UserProtobuf.fromJson(workflowJson);
+        if (workflowUser == null) {
+            return workflowJson;
+        }
+        UserProtobuf compactUser = UserProtobuf.builder()
+                .uid(workflowUser.getUid())
+                .nickname(workflowUser.getNickname())
+                .avatar(workflowUser.getAvatar())
+                .type(UserTypeEnum.WORKFLOW.name())
+                .build();
+        return compactUser.toJson();
     }
 
     public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {
@@ -156,6 +193,23 @@ public class ServiceConvertUtils {
     //
     public static AgentResponse convertToAgentResponse(AgentEntity agent) {
         AgentResponse resp = getModelMapper().map(agent, AgentResponse.class);
+        if (!StringUtils.hasText(resp.getCountry()) && agent.getMember() != null && StringUtils.hasText(agent.getMember().getCountry())) {
+            resp.setCountry(agent.getMember().getCountry());
+        }
+        try {
+            AgentSeatService agentSeatDomainService = ApplicationContextHolder.getBean(AgentSeatService.class);
+            AgentSeatEntity seat = agentSeatDomainService.findManagedSeatByAgentUid(agent.getUid()).orElse(null);
+            if (seat != null) {
+                if (AgentSeatStatusEnum.EXPIRED.name().equals(seat.getStatus())) {
+                    resp.setEnabled(false);
+                    resp.setForceLogout(true);
+                    if (!StringUtils.hasText(resp.getForceLogoutReason())) {
+                        resp.setForceLogoutReason("Seat expired");
+                    }
+                }
+            }
+        } catch (Exception ignore) {
+        }
         try {
             ConnectionRestService presence = ApplicationContextHolder.getBean(ConnectionRestService.class);
             boolean online = presence.isUserOnline(agent.getUserUid());
@@ -167,7 +221,7 @@ public class ServiceConvertUtils {
         // 获取客服队列统计信息
         try {
             com.bytedesk.service.queue.QueueService queueService = ApplicationContextHolder.getBean(com.bytedesk.service.queue.QueueService.class);
-            com.bytedesk.service.queue.AgentQueueStatsResponse queueStats = queueService.getAgentQueueStats(agent.getUid());
+            com.bytedesk.service.queue.QueueAgentStatsResponse queueStats = queueService.getAgentQueueStats(agent.getUid());
             resp.setQueueStats(queueStats);
         } catch (Exception ignore) {
             // QueueService not ready; skip queue stats
@@ -221,7 +275,7 @@ public class ServiceConvertUtils {
                     if (isAvailable) available++;
                     if (isOnlineAndAvailable) connectedAndAvailable++;
                     if (agent.isBusy()) busy++;
-                    if (agent.isAway()) away++;
+                    // if (agent.isAway()) away++;
                     agentResponses.add(convertToAgentResponse(agent));
                 }
                 resp.setAgents(agentResponses);
@@ -282,6 +336,15 @@ public class ServiceConvertUtils {
             svc = ServiceSettingsEntity.builder().build();
         }
         ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
+        if (settingsContainer instanceof RobotSettingsEntity robotSettings) {
+            resp.setHideThinkingProcess(Boolean.TRUE.equals(robotSettings.getHideThinkingProcess()));
+        } else {
+            resp.setHideThinkingProcess(false);
+        }
+        resp.setShowPreForm(Boolean.TRUE.equals(svc.getShowPreForm()));
+        resp.setPreFormRequired(Boolean.TRUE.equals(svc.getPreFormRequired()));
+        resp.setPreForm(resolvePreFormSchema(svc));
+        resp.setPreFormUid(resolvePreFormUid(svc));
         resp.setQuickButtons(QuickButtonResponseVisitor.fromEntities(svc.getQuickButtons()));
 
         // 留言方式配置下发（用于 visitor ChatBox 决策：表单留言 vs 对话框留言）
@@ -302,17 +365,121 @@ public class ServiceConvertUtils {
 
         if (messageLeaveSettings != null) {
             resp.setMessageLeaveFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveFormEnabled()));
-            resp.setMessageLeaveForm(messageLeaveSettings.getMessageLeaveForm());
+            resp.setMessageLeaveAllowVisitorSendWhenOffline(!Boolean.FALSE.equals(messageLeaveSettings.getMessageLeaveAllowVisitorSendWhenOffline()));
             resp.setMessageLeaveCustomFormEnabled(Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled()));
             resp.setMessageLeaveFormUid(messageLeaveSettings.getMessageLeaveFormUid());
+            resp.setMessageLeaveForm(resolveMessageLeaveFormSchema(messageLeaveSettings));
         } else {
             resp.setMessageLeaveFormEnabled(false);
             resp.setMessageLeaveForm(null);
+            resp.setMessageLeaveAllowVisitorSendWhenOffline(true);
             resp.setMessageLeaveCustomFormEnabled(false);
             resp.setMessageLeaveFormUid(null);
         }
 
+        // 工作组自动回复设置（用于 visitor 发送前预检）
+        AutoReplySettingsEntity autoReplySettings = null;
+        if (settingsContainer instanceof WorkgroupSettingsEntity workgroupSettings) {
+            if (debug && workgroupSettings.getDraftAutoReplySettings() != null) {
+                autoReplySettings = workgroupSettings.getDraftAutoReplySettings();
+            } else {
+                autoReplySettings = workgroupSettings.getAutoReplySettings();
+            }
+        }
+        if (autoReplySettings != null) {
+            resp.setAutoReplyEnabled(Boolean.TRUE.equals(autoReplySettings.getAutoReplyEnabled()));
+            resp.setAutoReplySettingsUid(autoReplySettings.getUid());
+        } else {
+            resp.setAutoReplyEnabled(false);
+            resp.setAutoReplySettingsUid(null);
+        }
+
         return resp;
+    }
+
+    private static String resolveMessageLeaveFormSchema(MessageLeaveSettingsEntity messageLeaveSettings) {
+        if (messageLeaveSettings == null) {
+            return null;
+        }
+
+        String formSchema = messageLeaveSettings.getMessageLeaveForm();
+        boolean hasInlineSchema = StringUtils.hasText(formSchema)
+                && !BytedeskConsts.EMPTY_JSON_STRING.equals(formSchema.trim());
+        if (hasInlineSchema) {
+            return formSchema;
+        }
+
+        if (!Boolean.TRUE.equals(messageLeaveSettings.getMessageLeaveCustomFormEnabled())) {
+            return formSchema;
+        }
+
+        String formUid = messageLeaveSettings.getMessageLeaveFormUid();
+        if (!StringUtils.hasText(formUid)) {
+            return formSchema;
+        }
+
+        try {
+            Optional<FormEntity> optional = getFormRepository().findByUid(formUid);
+            if (optional.isPresent() && StringUtils.hasText(optional.get().getSchema())) {
+                return optional.get().getSchema();
+            }
+        } catch (Exception e) {
+            // Keep routing response resilient; visitor falls back to built-in form when schema is unavailable.
+        }
+        return formSchema;
+    }
+
+    private static String resolvePreFormSchema(ServiceSettingsEntity serviceSettings) {
+        if (serviceSettings == null) {
+            return null;
+        }
+
+        String rawValue = serviceSettings.getPreFormSchema();
+        if (!StringUtils.hasText(rawValue)) {
+            return rawValue;
+        }
+
+        String trimmedValue = rawValue.trim();
+        if (BytedeskConsts.EMPTY_JSON_STRING.equals(trimmedValue)) {
+            return trimmedValue;
+        }
+
+        if (trimmedValue.startsWith("{") || trimmedValue.startsWith("[")) {
+            return rawValue;
+        }
+
+        try {
+            Optional<FormEntity> optional = getFormRepository().findByUid(trimmedValue);
+            if (optional.isPresent() && StringUtils.hasText(optional.get().getSchema())) {
+                return optional.get().getSchema();
+            }
+        } catch (Exception e) {
+            // Keep visitor response resilient; frontend will handle missing schema gracefully.
+        }
+
+        return rawValue;
+    }
+
+    private static String resolvePreFormUid(ServiceSettingsEntity serviceSettings) {
+        if (serviceSettings == null) {
+            return null;
+        }
+
+        String rawValue = serviceSettings.getPreFormSchema();
+        if (!StringUtils.hasText(rawValue)) {
+            return null;
+        }
+
+        String trimmedValue = rawValue.trim();
+        if (BytedeskConsts.EMPTY_JSON_STRING.equals(trimmedValue)) {
+            return null;
+        }
+
+        if (trimmedValue.startsWith("{") || trimmedValue.startsWith("[")) {
+            return null;
+        }
+
+        return trimmedValue;
     }
 
     /**

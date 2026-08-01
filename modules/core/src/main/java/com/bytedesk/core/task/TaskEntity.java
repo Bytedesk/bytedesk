@@ -15,6 +15,7 @@ package com.bytedesk.core.task;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.JsonStringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -62,7 +63,7 @@ import lombok.experimental.SuperBuilder;
         @Index(name = "idx_task_org_uid", columnList = "org_uid"),
         @Index(name = "idx_task_user_uid", columnList = "user_uid"),
         @Index(name = "idx_task_type", columnList = "task_type"),
-        @Index(name = "idx_task_list_uid", columnList = "task_list_uid"),
+        @Index(name = "idx_task_task_list_uid", columnList = "task_list_uid"),
         @Index(name = "idx_task_due_at", columnList = "due_at")
     }
 )
@@ -129,7 +130,7 @@ public class TaskEntity extends BaseEntity {
      */
     @Builder.Default
     @Convert(converter = JsonStringListConverter.class)
-    @Column(name = "task_images", columnDefinition = "TEXT")
+    @Column(name = "task_images", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private List<String> images = new ArrayList<>();
 
     /**

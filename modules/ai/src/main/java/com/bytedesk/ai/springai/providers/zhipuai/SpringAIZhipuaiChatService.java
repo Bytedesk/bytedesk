@@ -22,7 +22,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.zhipuai.ZhiPuAiChatModel;
 import org.springframework.ai.zhipuai.ZhiPuAiChatOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -52,26 +51,30 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIZhipuaiChatService extends BaseSpringAIService {
 
-    @Autowired
-    @Qualifier("bytedeskZhipuaiChatModel")
-    private ZhiPuAiChatModel bytedeskZhipuaiChatModel;
-
-    @Autowired
-    @Qualifier("bytedeskZhipuaiApi")
-    private ZhiPuAiApi bytedeskZhipuaiApi;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    @Autowired
-    private SseMessageHelper sseMessageHelper;
-
-    @Autowired
-    private PromptHelper promptHelper;
-
-    public SpringAIZhipuaiChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIZhipuaiChatService(
+            @Qualifier("bytedeskZhipuaiChatModel") ZhiPuAiChatModel bytedeskZhipuaiChatModel,
+            @Qualifier("bytedeskZhipuaiApi") ZhiPuAiApi bytedeskZhipuaiApi,
+            TokenUsageHelper tokenUsageHelper,
+            SseMessageHelper sseMessageHelper,
+            PromptHelper promptHelper) {
+        this.bytedeskZhipuaiChatModel = bytedeskZhipuaiChatModel;
+        this.bytedeskZhipuaiApi = bytedeskZhipuaiApi;
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.sseMessageHelper = sseMessageHelper;
+        this.promptHelper = promptHelper;
     }
+
+
+    private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
+
+    private final ZhiPuAiApi bytedeskZhipuaiApi;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
+    private final SseMessageHelper sseMessageHelper;
+
+    private final PromptHelper promptHelper;
+
 
     /**
      * 根据机器人配置创建动态的ZhiPuAiChatOptions
@@ -308,10 +311,11 @@ public class SpringAIZhipuaiChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Zhipuai API SSE generation metadata {}, textContent {}", 
                                     generation.getMetadata(), textContent);
                                 
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                             }
                             success[0] = true;
                         }

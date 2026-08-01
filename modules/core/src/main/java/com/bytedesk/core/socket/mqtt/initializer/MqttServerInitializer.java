@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
+import com.bytedesk.core.socket.mqtt.handler.MqttPipelineExceptionHandler;
 import com.bytedesk.core.socket.mqtt.handler.MqttTransportHandler;
 import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 
@@ -78,6 +79,7 @@ public class MqttServerInitializer extends ChannelInitializer<SocketChannel> {
         pipeline.addLast(MqttEncoder.INSTANCE);
         //
         pipeline.addLast(new MqttTransportHandler(mProtocolProcess));
+        pipeline.addLast(MqttPipelineExceptionHandler.INSTANCE);
     }
 
 }

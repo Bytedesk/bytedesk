@@ -59,7 +59,7 @@ public class TicketBasicSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     @Column(name = "assignment_mode", length = 64)
-    private String assignmentMode = TicketAssignmentModeEnum.ROUND_ROBIN.name();
+    private String assignmentMode = TicketAssignmentModeEnum.MANUAL.name();
 
     // ============ 工单提示语配置 ============
 
@@ -76,20 +76,6 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "close_tip", length = 2048)
     private String closeTip = I18Consts.I18N_TICKET_CLOSE_TIP;
-
-    /**
-     * 工单客服超时未回复提示语（预留给超时触发器/定时任务使用）
-     */
-    @Builder.Default
-    @Column(name = "agent_timeout_tip", length = 2048)
-    private String agentTimeoutTip = I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP;
-
-    /**
-     * 工单访客超时未回复提示语（预留给超时触发器/定时任务使用）
-     */
-    @Builder.Default
-    @Column(name = "visitor_timeout_tip", length = 2048)
-    private String visitorTimeoutTip = I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP;
 
     // ============ 联系方式字段显示配置 ============
 
@@ -149,6 +135,22 @@ public class TicketBasicSettingsEntity extends BaseEntity {
     @Column(name = "require_wechat")
     private Boolean requireWechat = Boolean.FALSE;
 
+    // ============ 智能工单生成 ============
+
+    /**
+     * 是否启用智能工单生成（根据会话内容自动填充工单）
+     */
+    @Builder.Default
+    @Column(name = "enable_smart_ticket_generate")
+    private Boolean enableSmartTicketGenerate = Boolean.FALSE;
+
+    /**
+     * 智能工单生成使用的 RobotEntity.uid。
+     * 为空时默认使用 ROBOT_NAME_TICKET_GENERATE 对应的机器人。
+     */
+    @Column(name = "smart_ticket_robot_uid", length = 64)
+    private String smartTicketRobotUid;
+
     /**
      * 静态工厂：根据请求DTO与可选ModelMapper构建实体。
      * 为空时返回默认配置；非空字段才覆盖默认值。
@@ -167,12 +169,6 @@ public class TicketBasicSettingsEntity extends BaseEntity {
         }
         if (!StringUtils.hasText(entity.getCloseTip())) {
             entity.setCloseTip(I18Consts.I18N_TICKET_CLOSE_TIP);
-        }
-        if (!StringUtils.hasText(entity.getAgentTimeoutTip())) {
-            entity.setAgentTimeoutTip(I18Consts.I18N_TICKET_AGENT_TIMEOUT_TIP);
-        }
-        if (!StringUtils.hasText(entity.getVisitorTimeoutTip())) {
-            entity.setVisitorTimeoutTip(I18Consts.I18N_TICKET_VISITOR_TIMEOUT_TIP);
         }
         return entity;
     }

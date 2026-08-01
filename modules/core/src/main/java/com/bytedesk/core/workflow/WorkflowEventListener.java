@@ -13,15 +13,7 @@
  */
 package com.bytedesk.core.workflow;
 
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import com.bytedesk.core.upload.UploadEntity;
-import com.bytedesk.core.upload.UploadTypeEnum;
-import com.bytedesk.core.upload.event.UploadCreateEvent;
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
-import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,25 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class WorkflowEventListener {
     
-    private final WorkflowRestService workflowRestService;
+    // private final WorkflowRestService workflowRestService;
 
-    @Order(3)
-    @EventListener
-    public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
-        OrganizationEntity organization = (OrganizationEntity) event.getSource();
-        String orgUid = organization.getUid();
-        log.info("workflow - organization created: {}", organization.getName());
-        workflowRestService.initDefaultWorkflow(orgUid);
-    }
+    // @Order(3)
+    // @EventListener
+    // public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
+    //     OrganizationEntity organization = (OrganizationEntity) event.getSource();
+    //     String orgUid = organization.getUid();
+    //     log.info("workflow - organization created: {}", organization.getName());
+    //     workflowRestService.initDefaultWorkflow(orgUid);
+    // }
 
-    // 监听上传工作流
-    @EventListener
-    public void onUploadCreateEvent(UploadCreateEvent event) {
-        UploadEntity upload = event.getUpload();
-        if (UploadTypeEnum.WORKFLOW.name().equalsIgnoreCase(upload.getType())) {
-            log.info("WorkflowEventListener.onUploadCreateEvent, upload: {}", upload.getFileName());
-            
-        }
-    }
 }
 

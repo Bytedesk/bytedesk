@@ -81,7 +81,7 @@ public class EmailTemplateEntity extends BaseEntity {
     @Convert(converter = StringListConverter.class)
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     @Builder.Default
-    private List<String> tagList = new ArrayList<>();
+    private List<String> email_templateList = new ArrayList<>();
 
     @Default
     private Boolean enabled = Boolean.TRUE;
@@ -94,7 +94,5 @@ public class EmailTemplateEntity extends BaseEntity {
 
     @Default
     private Long useCount = 0L;
-
-    
 
 }

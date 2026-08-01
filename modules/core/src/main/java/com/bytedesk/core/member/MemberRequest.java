@@ -67,6 +67,8 @@ public class MemberRequest extends BaseRequest {
     @Email(message = "email format error")
     private String email;
 
+    private String country;
+
     private String jobNo;
 
     private String jobTitle; // 职位
@@ -81,6 +83,9 @@ public class MemberRequest extends BaseRequest {
 
     @Builder.Default
 	private Set<String> roleUids = new HashSet<>(); 
+
+    @Builder.Default
+    private Set<String> allowedLoginPlatforms = new HashSet<>();
 
     @NotBlank
     private String deptUid;

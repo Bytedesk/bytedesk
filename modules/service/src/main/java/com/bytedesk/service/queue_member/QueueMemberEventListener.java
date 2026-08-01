@@ -33,14 +33,15 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadContent;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
@@ -374,6 +375,9 @@ public class QueueMemberEventListener {
         }
 
         targetThread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        if (ThreadTransferStatusEnum.TRANSFER_PENDING.name().equalsIgnoreCase(targetThread.getTransferStatus())) {
+            targetThread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
+        }
         targetThread.setAgent(agentProto.toJson());
         targetThread.setUserUid(agentProto.getUid());
         if (referenceThread != null && referenceThread.getOwner() != null) {
@@ -606,12 +610,12 @@ public class QueueMemberEventListener {
                 return;
             }
 
-            if (message.isFromVisitor()) {
+            if (isVisitorMessageForUnreplied(message)) {
                 // 访客消息：标记为“待客服回复”
                 ensureVisitorMessageUnreplied(message);
                 // 更新访客消息统计
                 updateVisitorMessageStats(message, thread);
-            } else if (message.isFromAgent()) {
+            } else if (isAgentOrRobotReplyMessage(thread, message)) {
                 // 客服消息：先抓取“上一次客服回复时间”作为窗口起点（避免扫描整段历史）
                 ZonedDateTime previousAgentLastResponseAt = null;
                 ZonedDateTime visitorFirstMessageAt = null;
@@ -621,18 +625,18 @@ public class QueueMemberEventListener {
                     visitorFirstMessageAt = queueMemberOpt.get().getVisitorFirstMessageAt();
                 }
 
-                // 客服消息本身不属于“待回复”消息
+                // 回复消息本身不属于“待回复”消息
                 ensureNonVisitorMessageReplied(message);
-                // 更新客服消息统计
-                updateAgentMessageStats(message, thread);
+                if (isHumanReplyMessage(thread, message)) {
+                    // 更新客服消息统计
+                    updateAgentMessageStats(message, thread);
+                } else if (message.isFromRobot()) {
+                    // 处理机器人消息统计
+                    updateRobotMessageStats(message, thread);
+                }
 
-                // 批量标记：将该会话中“上次客服回复之后”的未回复访客消息全部置为已回复
+                // 批量标记：将该会话中“上次回复之后”的未回复访客消息全部置为已回复
                 markVisitorMessagesRepliedByAgent(thread, message, previousAgentLastResponseAt, visitorFirstMessageAt);
-            } else if (message.isFromRobot()) {
-                // 机器人消息本身不属于“待回复”消息（但不清理访客待回复状态）
-                ensureNonVisitorMessageReplied(message);
-                // 处理机器人消息
-                updateRobotMessageStats(message, thread);
             } else if (message.isFromSystem()) {
                 // 系统消息本身不属于“待回复”消息
                 ensureNonVisitorMessageReplied(message);
@@ -645,7 +649,7 @@ public class QueueMemberEventListener {
     }
 
     private void ensureVisitorMessageUnreplied(MessageEntity message) {
-        if (message == null || !message.isFromVisitor()) {
+        if (!isVisitorMessageForUnreplied(message)) {
             return;
         }
 
@@ -681,17 +685,15 @@ public class QueueMemberEventListener {
 
     private void markVisitorMessagesRepliedByAgent(ThreadEntity thread, MessageEntity agentMessage,
             ZonedDateTime previousAgentLastResponseAt, ZonedDateTime visitorFirstMessageAt) {
-        if (thread == null || agentMessage == null || !agentMessage.isFromAgent()) {
+        if (thread == null || agentMessage == null || !isAgentOrRobotReplyMessage(thread, agentMessage)) {
             return;
         }
 
-        Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
-        if (queueMemberOpt.isEmpty()) {
-            // QueueMember 缺失时，暂不做批量标记（避免无窗口起点导致扫描大量历史）
-            return;
+        ZonedDateTime repliedAt = agentMessage.getCreatedAt();
+        if (repliedAt == null) {
+            repliedAt = BdDateUtils.now();
         }
 
-        ZonedDateTime now = BdDateUtils.now();
         ZonedDateTime windowStart = previousAgentLastResponseAt;
         if (windowStart == null) {
             windowStart = visitorFirstMessageAt;
@@ -701,12 +703,16 @@ public class QueueMemberEventListener {
         }
         if (windowStart == null) {
             // 极端兜底
-            windowStart = now.minusDays(1);
+            windowStart = repliedAt.minusDays(1);
+        }
+        if (windowStart.isAfter(repliedAt)) {
+            windowStart = repliedAt;
         }
 
         String agentUid = agentMessage.getUserProtobuf().getUid();
-        List<MessageEntity> candidates = messageRestService.findByThreadUidBetweenCreatedAt(thread.getUid(), windowStart,
-                now);
+        List<MessageEntity> candidates = StringUtils.hasText(thread.getTopic())
+            ? messageRestService.findByThreadTopicBetweenCreatedAt(thread.getTopic(), windowStart, repliedAt)
+            : messageRestService.findByThreadUidBetweenCreatedAt(thread.getUid(), windowStart, repliedAt);
         if (candidates == null || candidates.isEmpty()) {
             return;
         }
@@ -727,16 +733,51 @@ public class QueueMemberEventListener {
             }
 
             m.setAgentReplied(true);
-            m.setAgentRepliedAt(now);
+            m.setAgentRepliedAt(repliedAt);
             m.setAgentRepliedByUid(agentUid);
             messageRestService.save(m);
             updated++;
         }
 
         if (updated > 0) {
-            log.debug("已批量标记访客消息为已回复: threadUid={}, count={}, agentUid={}", thread.getUid(), updated,
-                    agentUid);
+            log.debug("已批量标记访客消息为已回复: threadUid={}, topic={}, count={}, agentUid={}",
+                    thread.getUid(), thread.getTopic(), updated, agentUid);
         }
+    }
+
+    private boolean isHumanReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromRobot() || message.isFromSystem()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isAgentOrRobotReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromSystem()) {
+            return false;
+        }
+        return message.isFromRobot() || isHumanReplyMessage(thread, message);
+    }
+
+    private boolean isVisitorMessageForUnreplied(MessageEntity message) {
+        if (message == null || !message.isFromVisitor()) {
+            return false;
+        }
+
+        MessageTypeEnum messageType = MessageTypeEnum.fromValue(message.getType());
+        return messageType != MessageTypeEnum.SYSTEM && messageType != MessageTypeEnum.NOTICE;
     }
 
     /**
@@ -749,7 +790,7 @@ public class QueueMemberEventListener {
         if (thread == null || message == null) {
             return;
         }
-        if (!message.isFromVisitor()) {
+        if (!isVisitorMessageForUnreplied(message)) {
             return;
         }
 

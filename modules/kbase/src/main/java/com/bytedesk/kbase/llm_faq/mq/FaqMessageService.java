@@ -13,24 +13,32 @@
  */
 package com.bytedesk.kbase.llm_faq.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ消息服务
  * 使用核心模块中的JmsTemplate发送FAQ索引请求
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FaqMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
+
+    @Value("${bytedesk.mq.type:artemis}")
+    private String mqType;
+
+    private boolean isArtemisEnabled() {
+        return "artemis".equalsIgnoreCase(mqType);
+    }
     
     /**
      * 发送FAQ到索引队列，用于创建或更新索引
@@ -39,6 +47,10 @@ public class FaqMessageService {
      * @param faqUid FAQ的唯一标识
      */
     public void sendToIndexQueue(String faqUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS FAQ索引发送: {}", mqType, faqUid);
+            return;
+        }
         try {
             log.debug("发送FAQ到索引队列: {}", faqUid);
             
@@ -83,6 +95,10 @@ public class FaqMessageService {
      * @param faqUid FAQ的唯一标识
      */
     public void sendToDeleteQueue(String faqUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS FAQ删除发送: {}", mqType, faqUid);
+            return;
+        }
         try {
             log.debug("发送FAQ删除请求到索引队列: {}", faqUid);
             
@@ -131,6 +147,10 @@ public class FaqMessageService {
      * @param faqUids FAQ唯一标识列表
      */
     public void batchSendToIndexQueue(Iterable<String> faqUids) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS FAQ批量索引发送", mqType);
+            return;
+        }
         try {
             log.debug("批量发送FAQ到索引队列");
             

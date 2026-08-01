@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_website.service;
 
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +65,7 @@ public class WebsiteCrawlerService {
     private final UidUtils uidUtils;
 
     // 线程池，用于并发抓取
-    private final ExecutorService crawlExecutor = Executors.newFixedThreadPool(5);
+    private final ExecutorService crawlExecutor = Executors.newVirtualThreadPerTaskExecutor();
     
     // 存储正在进行的抓取任务
     private final ConcurrentHashMap<String, WebsiteCrawlTask> activeTasks = new ConcurrentHashMap<>();
@@ -282,8 +282,8 @@ public class WebsiteCrawlerService {
     private void extractLinks(Document doc, String currentUrl, String baseUrl, 
                             Set<String> urlsToVisit, WebsiteCrawlConfig config) {
         try {
-            URL base = new URL(baseUrl);
-            URL current = new URL(currentUrl);
+            URL base = URI.create(baseUrl).toURL();
+            URL current = URI.create(currentUrl).toURL();
             
             Elements links = doc.select("a[href]");
             
@@ -315,9 +315,8 @@ public class WebsiteCrawlerService {
      */
     private String resolveUrl(URL base, String href) {
         try {
-            URL url = new URL(base, href);
-            return url.toString();
-        } catch (MalformedURLException e) {
+            return base.toURI().resolve(href).toString();
+        } catch (Exception e) {
             return null;
         }
     }
@@ -327,7 +326,7 @@ public class WebsiteCrawlerService {
      */
     private boolean shouldCrawlUrl(String url, URL baseUrl, WebsiteCrawlConfig config) {
         try {
-            URL urlObj = new URL(url);
+            URL urlObj = URI.create(url).toURL();
             
             // 只抓取同域名的页面
             if (!urlObj.getHost().equals(baseUrl.getHost())) {

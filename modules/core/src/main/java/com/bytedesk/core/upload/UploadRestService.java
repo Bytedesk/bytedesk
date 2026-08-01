@@ -16,8 +16,8 @@ package com.bytedesk.core.upload;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 // import java.nio.file.Paths;
@@ -30,7 +30,7 @@ import javax.imageio.ImageIO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -38,6 +38,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+
+import com.bytedesk.core.constant.I18Consts;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -55,13 +57,11 @@ import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.BdUploadUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 // https://spring.io/guides/gs/uploading-files
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UploadRestService extends BaseRestService<UploadEntity, UploadRequest, UploadResponse> {
 
 	private final Path uploadDir;
@@ -81,11 +81,31 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final UploadSecurityLogger uploadSecurityLogger;
 
 	// 可选依赖：水印服务（当 bytedesk.watermark.enabled=false 时不加载）
-	@Autowired(required = false)
-	private UploadWatermarkService uploadWatermarkService;
+	private final UploadWatermarkService uploadWatermarkService;
 
-	@Autowired(required = false)
-	private UploadMinioService uploadMinioService;
+	private final UploadMinioService uploadMinioService;
+
+	public UploadRestService(Path uploadDir,
+			UidUtils uidUtils,
+			ModelMapper modelMapper,
+			UploadRepository uploadRepository,
+			BytedeskProperties bytedeskProperties,
+			AuthService authService,
+			UploadSecurityConfig uploadSecurityConfig,
+			UploadSecurityLogger uploadSecurityLogger,
+			ObjectProvider<UploadWatermarkService> uploadWatermarkServiceProvider,
+			ObjectProvider<UploadMinioService> uploadMinioServiceProvider) {
+		this.uploadDir = uploadDir;
+		this.uidUtils = uidUtils;
+		this.modelMapper = modelMapper;
+		this.uploadRepository = uploadRepository;
+		this.bytedeskProperties = bytedeskProperties;
+		this.authService = authService;
+		this.uploadSecurityConfig = uploadSecurityConfig;
+		this.uploadSecurityLogger = uploadSecurityLogger;
+		this.uploadWatermarkService = uploadWatermarkServiceProvider.getIfAvailable();
+		this.uploadMinioService = uploadMinioServiceProvider.getIfAvailable();
+	}
 
 	@Override
 	protected Specification<UploadEntity> createSpecification(UploadRequest request) {
@@ -176,8 +196,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
             }
 
             // 下载并保存图片
-            URL imageUrl = new URL(url);
-            try (InputStream inputStream = imageUrl.openStream()) {
+			try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
             }
 
@@ -269,6 +288,14 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
     // 文件类型白名单校验 - 使用配置化的安全策略
     private boolean isAllowedFileType(String fileName, String contentType) {
         String ext = getFileExt(fileName);
+
+		// 主动内容文件（尤其是 SVG）存在脚本执行风险，禁止通过上传链路直接落盘
+		if ("svg".equalsIgnoreCase(ext) || "svgz".equalsIgnoreCase(ext)) {
+			return false;
+		}
+		if (contentType != null && contentType.toLowerCase().contains("image/svg")) {
+			return false;
+		}
         
         // 检查扩展名
         if (!uploadSecurityConfig.isExtensionAllowed(ext)) {
@@ -368,25 +395,39 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return Resource
 	 */
 	public Resource loadAsResource(String filenameOrPath) {
+		if (filenameOrPath == null || filenameOrPath.trim().isEmpty()) {
+			throw new UploadStorageFileNotFoundException("File path is empty");
+		}
+
+		String normalizedInput = filenameOrPath.trim();
+		// Accept full upload URL input and normalize it to relative storage path.
+		if (normalizedInput.startsWith("http://") || normalizedInput.startsWith("https://")) {
+			String relativePath = extractRelativePathFromUrl(normalizedInput);
+			if (relativePath != null && !relativePath.isEmpty()) {
+				normalizedInput = relativePath;
+				log.info("Normalized file URL to relative path: {} -> {}", filenameOrPath, normalizedInput);
+			}
+		}
+
 		String datePath;
 		String filename;
 		
 		// 判断是否包含路径分隔符
-		if (filenameOrPath.contains("/")) {
+		if (normalizedInput.contains("/")) {
 			// 包含路径分隔符，说明是完整路径格式：2025/09/05/filename.ext
-			int lastSlashIndex = filenameOrPath.lastIndexOf("/");
-			datePath = filenameOrPath.substring(0, lastSlashIndex);
-			filename = filenameOrPath.substring(lastSlashIndex + 1);
-			log.info("Loading file from full path: {}, datePath: {}, filename: {}", filenameOrPath, datePath, filename);
+			int lastSlashIndex = normalizedInput.lastIndexOf("/");
+			datePath = normalizedInput.substring(0, lastSlashIndex);
+			filename = normalizedInput.substring(lastSlashIndex + 1);
+			log.info("Loading file from full path: {}, datePath: {}, filename: {}", normalizedInput, datePath, filename);
 		} else {
 			// 不包含路径分隔符，说明是文件名格式：20240916144702_身份证-背面.jpg
 			// 使用工具类提取日期路径
-			datePath = BdUploadUtils.extractDatePathFromTimestampFileName(filenameOrPath);
+			datePath = BdUploadUtils.extractDatePathFromTimestampFileName(normalizedInput);
 			if (datePath == null) {
-				throw new UploadStorageFileNotFoundException("Invalid filename format: " + filenameOrPath);
+				throw new UploadStorageFileNotFoundException("Invalid filename format: " + normalizedInput);
 			}
-			filename = filenameOrPath;
-			log.info("Loading file from filename: {}, extracted datePath: {}", filenameOrPath, datePath);
+			filename = normalizedInput;
+			log.info("Loading file from filename: {}, extracted datePath: {}", normalizedInput, datePath);
 		}
 		
 		// 构建文件夹路径
@@ -444,7 +485,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				throw new RuntimeException("Failed to delete file: " + filename, e);
 			}
 		} else {
-			throw new RuntimeException("File not found: " + filename);
+			throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_FILE_NOT_FOUND, filename));
 		}
 	}
 

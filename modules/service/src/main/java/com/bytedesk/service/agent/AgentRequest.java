@@ -16,6 +16,7 @@ package com.bytedesk.service.agent;
 import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -48,6 +49,8 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private String avatar = AvatarConsts.getDefaultAgentAvatarUrl();
 
+    private String country;
+
     @NotBlank
     private String mobile;
 
@@ -61,6 +64,8 @@ public class AgentRequest extends BaseRequest {
     @Builder.Default
     private String status = AgentStatusEnum.OFFLINE.name();
 
+    private String restReason;
+
     @Builder.Default
     private Boolean connected = false;
 
@@ -73,10 +78,28 @@ public class AgentRequest extends BaseRequest {
      */
     private String settingsUid;
 
+    /**
+     * Business shop uid, used by open shop create APIs to resolve organization.
+     */
+    private String shopUid;
+
     //
     @NotBlank
     private String memberUid;
+
+    /**
+     * 当为 true 时，即使 superUser 查询也要严格按 orgUid 过滤。
+     * 用于 AgentSeat 等需要精确限定组织范围的下拉选择场景。
+     */
+    @Builder.Default
+    private Boolean exactOrgFilter = false;
     
     // used for client query
     private String componentType;
+
+    /**
+     * Per-agent auto reply settings payload for /api/v1/agent/update/autoreply.
+     */
+    private AutoReplySettingsRequest autoReplySettings;
+
 }

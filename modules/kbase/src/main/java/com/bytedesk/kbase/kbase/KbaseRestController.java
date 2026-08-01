@@ -16,6 +16,7 @@ package com.bytedesk.kbase.kbase;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -35,7 +37,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "知识库管理", description = "知识库管理相关接口")
+import com.bytedesk.kbase.elastic.KbaseElasticIndexUpgradeService;
+import com.bytedesk.kbase.translation.KbaseTranslationBackfillRequest;
+import com.bytedesk.kbase.translation.KbaseTranslationIndexBackfillService;
+
+@Tag(name = "Knowledge Base Management", description = "Knowledge base management APIs")
 @RestController
 @RequestMapping("/api/v1/kbase")
 @AllArgsConstructor
@@ -44,13 +50,18 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
 
     private final KbaseRestService kbaseRestService;
 
-    @Operation(summary = "查询组织下的知识库", description = "根据组织ID查询知识库列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    private final KbaseElasticIndexUpgradeService kbaseElasticIndexUpgradeService;
+
+    private final KbaseTranslationIndexBackfillService kbaseTranslationIndexBackfillService;
+
+    @Operation(summary = "Query Knowledge Bases by Organization", description = "Query the list of knowledge bases by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
-    @ActionAnnotation(title = "知识库", action = "组织查询", description = "query kbase by org")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query kbase by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(KbaseRequest request) {
 
         Page<KbaseResponse> page = kbaseRestService.queryByOrg(request);
@@ -58,13 +69,14 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的知识库", description = "根据用户ID查询知识库列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Knowledge Bases by User", description = "Query the list of knowledge bases by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
-    @ActionAnnotation(title = "知识库", action = "用户查询", description = "query kbase by user")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query kbase by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(KbaseRequest request) {
         
         Page<KbaseResponse> page = kbaseRestService.queryByUser(request);
@@ -72,13 +84,14 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询指定知识库", description = "根据UID查询知识库详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Knowledge Base by UID", description = "Query knowledge base details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize(KbasePermissions.HAS_KBASE_READ)
-    @ActionAnnotation(title = "知识库", action = "查询详情", description = "query kbase by uid")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query kbase by uid")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(KbaseRequest request) {
 
         KbaseResponse kbase = kbaseRestService.queryByUid(request);
@@ -86,13 +99,14 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
-    @Operation(summary = "创建知识库", description = "创建新的知识库")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Knowledge Base", description = "Create a new knowledge base")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize(KbasePermissions.HAS_KBASE_CREATE)
-    @ActionAnnotation(title = "知识库", action = "新建", description = "create kbase")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_CREATE, description = "create kbase")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody KbaseRequest request) {
 
         KbaseResponse kbase = kbaseRestService.create(request);
@@ -100,13 +114,14 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
-    @Operation(summary = "更新知识库", description = "更新知识库信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Knowledge Base", description = "Update knowledge base information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseResponse.class)))
     @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
-    @ActionAnnotation(title = "知识库", action = "更新", description = "update kbase")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "update kbase")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody KbaseRequest request) {
 
         KbaseResponse kbase = kbaseRestService.update(request);
@@ -114,11 +129,12 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success(kbase));
     }
 
-    @Operation(summary = "删除知识库", description = "删除指定的知识库")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Knowledge Base", description = "Delete the specified knowledge base")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(KbasePermissions.HAS_KBASE_DELETE)
-    @ActionAnnotation(title = "知识库", action = "删除", description = "delete kbase")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_DELETE, description = "delete kbase")
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody KbaseRequest request) {
 
         kbaseRestService.delete(request);
@@ -126,15 +142,33 @@ public class KbaseRestController extends BaseRestController<KbaseRequest, KbaseR
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    @Operation(summary = "导出知识库", description = "导出知识库数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Knowledge Bases", description = "Export knowledge base data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(KbasePermissions.HAS_KBASE_EXPORT)
-    @ActionAnnotation(title = "知识库", action = "导出", description = "export kbase")
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_EXPORT, description = "export kbase")
     @GetMapping("/export")
     @Override
     public Object export(KbaseRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
+    }
+
+    @Operation(summary = "Check and upgrade Elasticsearch IK mappings", description = "Check knowledge base Elasticsearch index mappings and automatically rebuild/reindex when IK analyzer mapping is outdated")
+    @ApiResponse(responseCode = "200", description = "Check successful")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "check and upgrade kbase elasticsearch mappings")
+    @PostMapping("/elastic/check-upgrade")
+    public ResponseEntity<?> checkAndUpgradeElasticMappings() {
+        return ResponseEntity.ok(JsonResult.success(kbaseElasticIndexUpgradeService.checkAndUpgradeIkIndexes()));
+    }
+
+    @Operation(summary = "Backfill translated indexes", description = "Rebuild translated fulltext/vector indexes from existing successful translation records")
+    @ApiResponse(responseCode = "200", description = "Backfill successful")
+    @PreAuthorize(KbasePermissions.HAS_KBASE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "backfill translated indexes")
+    @PostMapping("/translation/backfill-indexes")
+    public ResponseEntity<?> backfillTranslatedIndexes(@RequestBody KbaseTranslationBackfillRequest request) {
+        return ResponseEntity.ok(JsonResult.success(kbaseTranslationIndexBackfillService.backfill(request)));
     }
 
 }

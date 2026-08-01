@@ -22,7 +22,9 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_chunk.ChunkEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,10 +45,10 @@ public class ChunkElastic {
     @Id
     private String uid;
     
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String name;
     
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String content;
     
     @Field(type = FieldType.Keyword)
@@ -82,6 +84,21 @@ public class ChunkElastic {
     @Field(type = FieldType.Keyword)
     private String kbUid;
 
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceType;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
+
     /**
      * 将单个 ChunkEntity 转换为 ChunkElastic
      * 
@@ -94,6 +111,7 @@ public class ChunkElastic {
         }
 
         String kbUid = (entity.getKbase() != null) ? entity.getKbase().getUid() : null;
+        String sourceLanguage = resolveSourceLanguage(entity);
         if (!StringUtils.hasText(kbUid)) {
             throw new IllegalArgumentException("kbUid is required for indexing chunk uid=" + entity.getUid());
         }
@@ -113,7 +131,57 @@ public class ChunkElastic {
                 .fileUrl(entity.getFile() != null ? entity.getFile().getFileUrl() : null)
                 .categoryUid(entity.getCategoryUid())
                 .kbUid(kbUid)
+                .language(sourceLanguage)
+                .sourceUid(entity.getUid())
+                .sourceLanguage(sourceLanguage)
+                .sourceType("CHUNK")
+                .translated(false)
                 .build();
+    }
+
+    public static ChunkElastic fromTranslation(ChunkEntity entity, KbaseTranslationEntity translation) {
+        if (entity == null || translation == null) {
+            return null;
+        }
+
+        String kbUid = (entity.getKbase() != null) ? entity.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing translated chunk uid=" + entity.getUid());
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+                ? translation.getTargetLanguage().trim().toUpperCase()
+                : resolveSourceLanguage(entity);
+
+        return ChunkElastic.builder()
+                .uid(translation.getUid())
+                .name(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : entity.getName())
+                .content(StringUtils.hasText(translation.getContent()) ? translation.getContent() : translation.getSummary())
+                .type(entity.getType())
+                .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? entity.getTagList() : translation.getTagList())
+                .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(entity.getEnabled()))
+                .docId(translation.getUid())
+                .fileUid(entity.getFile() != null ? entity.getFile().getUid() : null)
+                .fileName(entity.getFile() != null ? entity.getFile().getFileName() : null)
+                .fileUrl(entity.getFile() != null ? entity.getFile().getFileUrl() : null)
+                .categoryUid(entity.getCategoryUid())
+                .kbUid(kbUid)
+                .language(targetLanguage)
+                .sourceUid(entity.getUid())
+                .sourceLanguage(resolveSourceLanguage(entity))
+                .sourceType("CHUNK")
+                .translated(true)
+                .build();
+    }
+
+    private static String resolveSourceLanguage(ChunkEntity entity) {
+        if (entity.getKbase() != null && StringUtils.hasText(entity.getKbase().getSourceLanguage())) {
+            return entity.getKbase().getSourceLanguage();
+        }
+        if (entity.getKbase() != null && StringUtils.hasText(entity.getKbase().getLanguage())) {
+            return entity.getKbase().getLanguage();
+        }
+        return LanguageEnum.ZH_CN.name();
     }
     
     /**

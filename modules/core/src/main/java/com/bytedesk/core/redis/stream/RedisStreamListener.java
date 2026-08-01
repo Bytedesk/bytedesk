@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.redis.stream;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.stream.ObjectRecord;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,8 +24,10 @@ import com.bytedesk.core.redis.RedisEvent;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 // https://howtodoinjava.com/spring-data/redis-streams-processing/
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class RedisStreamListener implements StreamListener<String, ObjectRecord<String, RedisEvent>> {
@@ -37,8 +38,7 @@ public class RedisStreamListener implements StreamListener<String, ObjectRecord<
     // @Autowired
     // private ObjectMapper objectMapper;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     @SneakyThrows

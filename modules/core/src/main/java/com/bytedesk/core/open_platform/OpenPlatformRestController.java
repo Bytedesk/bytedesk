@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class OpenPlatformRestController extends BaseRestController<OpenPlatformR
 
     private final OpenPlatformRestService openPlatformRestService;
 
-    @ActionAnnotation(title = "Open Platform", action = "组织查询", description = "query openPlatform by org")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query openPlatform by org")
     @Operation(summary = "Query OpenPlatforms by Organization", description = "Retrieve openPlatforms for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(OpenPlatformRequest request) {
         
         Page<OpenPlatformResponse> openPlatforms = openPlatformRestService.queryByOrg(request);
@@ -49,9 +53,10 @@ public class OpenPlatformRestController extends BaseRestController<OpenPlatformR
         return ResponseEntity.ok(JsonResult.success(openPlatforms));
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "用户查询", description = "query openPlatform by user")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query openPlatform by user")
     @Operation(summary = "Query OpenPlatforms by User", description = "Retrieve openPlatforms for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(OpenPlatformRequest request) {
         
         Page<OpenPlatformResponse> openPlatforms = openPlatformRestService.queryByUser(request);
@@ -59,9 +64,10 @@ public class OpenPlatformRestController extends BaseRestController<OpenPlatformR
         return ResponseEntity.ok(JsonResult.success(openPlatforms));
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "查询详情", description = "query openPlatform by uid")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query openPlatform by uid")
     @Operation(summary = "Query OpenPlatform by UID", description = "Retrieve a specific openPlatform by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(OpenPlatformRequest request) {
         
         OpenPlatformResponse openPlatform = openPlatformRestService.queryByUid(request);
@@ -69,40 +75,43 @@ public class OpenPlatformRestController extends BaseRestController<OpenPlatformR
         return ResponseEntity.ok(JsonResult.success(openPlatform));
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "新建", description = "create openPlatform")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_CREATE, description = "create openPlatform")
     @Operation(summary = "Create OpenPlatform", description = "Create a new openPlatform")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(OpenPlatformRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody OpenPlatformRequest request) {
         
         OpenPlatformResponse openPlatform = openPlatformRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(openPlatform));
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "更新", description = "update openPlatform")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_UPDATE, description = "update openPlatform")
     @Operation(summary = "Update OpenPlatform", description = "Update an existing openPlatform")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(OpenPlatformRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody OpenPlatformRequest request) {
         
         OpenPlatformResponse openPlatform = openPlatformRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(openPlatform));
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "删除", description = "delete openPlatform")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_DELETE, description = "delete openPlatform")
     @Operation(summary = "Delete OpenPlatform", description = "Delete a openPlatform")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(OpenPlatformRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody OpenPlatformRequest request) {
         
         openPlatformRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Open Platform", action = "导出", description = "export openPlatform")
+    @ActionAnnotation(title = I18Consts.I18N_OPEN_PLATFORM, action = I18Consts.I18N_ACTION_EXPORT, description = "export openPlatform")
     @Operation(summary = "Export OpenPlatforms", description = "Export openPlatforms to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")

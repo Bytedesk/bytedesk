@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 
+import com.bytedesk.core.constant.I18Consts;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -118,16 +120,17 @@ public class PasswordCryptoUtils {
             String decryptedPassword = new String(unpaddedBytes, StandardCharsets.UTF_8);
 
             if (decryptedPassword.isEmpty()) {
-                throw new RuntimeException("解密失败，可能是密钥错误");
+                throw new RuntimeException(I18Consts.I18N_PASSWORD_DECRYPT_KEY_INVALID);
             }
 
             log.debug("解密成功，密码长度: {}", decryptedPassword.length());
 
             return decryptedPassword;
-            
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             log.error("密码解密失败", e);
-            throw new RuntimeException("密码解密失败: " + e.getMessage());
+            throw new RuntimeException(I18Consts.I18N_PASSWORD_DECRYPT_FAILED);
         }
     }
 

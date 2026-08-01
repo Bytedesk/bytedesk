@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.fixed;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface AutoReplyFixedRepository extends JpaRepository<AutoReplyFixedEntity, Long>, JpaSpecificationExecutor<AutoReplyFixedEntity> {
     
     Optional<AutoReplyFixedEntity> findByUid(String uid);
+
+    List<AutoReplyFixedEntity> findByKbUidAndEnabledTrueAndDeletedFalse(String kbUid);
 }

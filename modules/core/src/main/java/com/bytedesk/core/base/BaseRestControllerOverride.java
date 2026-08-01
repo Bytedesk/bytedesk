@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.alibaba.excel.EasyExcel;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -62,6 +60,14 @@ public abstract class BaseRestControllerOverride<T extends PageableRequest> {
     public abstract ResponseEntity<?> delete(@RequestBody T request);
 
     /**
+     * 恢复
+     */
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody T request) {
+        throw new UnsupportedOperationException("Method restore needs to be implemented in child class");
+    }
+
+    /**
      * 根据组织UID删除
      */
     @PostMapping("/delete/org")
@@ -90,23 +96,9 @@ public abstract class BaseRestControllerOverride<T extends PageableRequest> {
             String sheetName, 
             String filePrefix) {
         try {
-            // 设置响应类型
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            
-            // 生成文件名
-            String fileName = filePrefix + "-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 获取数据并转换为Excel格式
             Object data = invokeMethod(service, "queryByOrgEntity", request);
             List<E> excelList = convertToExcelList(service, data);
-
-            // 写入Excel
-            EasyExcel.write(response.getOutputStream(), excelClass)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet(sheetName)
-                    .doWrite(excelList);
+            ExcelExportUtils.writeExcel(response, request, excelList, excelClass, sheetName, filePrefix);
 
         } catch (Exception e) {
             // 发生异常时重置响应

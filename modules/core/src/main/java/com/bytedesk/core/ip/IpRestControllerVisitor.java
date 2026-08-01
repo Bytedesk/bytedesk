@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.ip.maxmind.MaxMindLocationProvider;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,16 +63,12 @@ public class IpRestControllerVisitor {
      */
     @Operation(summary = "Get IP Location", description = "Get location information for the client's IP address")
     @GetMapping("/location")
-    public JsonResult<?> location(HttpServletRequest request) {
+    public JsonResult<?> location(HttpServletRequest request,
+            @RequestParam(required = false) String provider) {
 
         String ip = IpUtils.getClientIp(request);
-        // location: "中国|0|湖北省|武汉市|联通"
-        String location = ipService.getIpLocation(ip);
-        //
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ip", ip);
-        jsonObject.put("location", location);
-        //
+        IpLocationResult location = ipService.getIpLocationDetail(ip, provider);
+        JSONObject jsonObject = toLocationJson(location, provider);
         return new JsonResult<>("your ip location", 200, jsonObject);
     }
 
@@ -82,16 +80,11 @@ public class IpRestControllerVisitor {
      */
     @Operation(summary = "Get Specific IP Location", description = "Get location information for a specific IP address")
     @GetMapping("/ip/location")
-    public JsonResult<?> ipLocation(@RequestParam String ip) {
+    public JsonResult<?> ipLocation(@RequestParam String ip,
+            @RequestParam(required = false) String provider) {
 
-        // location: "国家|区域|省份|城市|ISP"
-        // location: "中国|0|湖北省|武汉市|联通"
-        String location = ipService.getIpLocation(ip);
-        //
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ip", ip);
-        jsonObject.put("location", location);
-
+        IpLocationResult location = ipService.getIpLocationDetail(ip, provider);
+        JSONObject jsonObject = toLocationJson(location, provider);
         return new JsonResult<>("ip location", 200, jsonObject);
     }
 
@@ -113,12 +106,11 @@ public class IpRestControllerVisitor {
     // http://127.0.0.1:9003/visitor/api/v1/ip/ip/province?ip=202.106.212.226
     @Operation(summary = "Get IP Province", description = "Get province information for a specific IP address")
     @GetMapping("/ip/province")
-    public JsonResult<?> ipProvince(@RequestParam String ip) {
+    public JsonResult<?> ipProvince(@RequestParam String ip,
+            @RequestParam(required = false) String provider) {
 
-        // location: "国家|区域|省份|城市|ISP"
-        // location: "中国|0|湖北省|武汉市|联通"
-        // 0|0|0|内网IP|内网IP
-        String location = ipService.getIpLocation(ip);
+        IpLocationResult result = ipService.getIpLocationDetail(ip, provider);
+        String location = result.getLocation();
         //
         String[] locals = location.split("\\|");
         log.info("location {} locals {}", location, (Object[]) locals); // Cast to Object[] to confirm the non-varargs
@@ -135,8 +127,38 @@ public class IpRestControllerVisitor {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("ip", ip);
         jsonObject.put("province", province);
+        jsonObject.put("provider", result.getProvider());
 
         return new JsonResult<>("ip nickname", 200, jsonObject);
+    }
+
+    @Operation(summary = "Get MaxMind IP Location", description = "Get location information using MaxMind for the client's IP address")
+    @GetMapping("/maxmind/location")
+    public JsonResult<?> maxmindLocation(HttpServletRequest request) {
+        return location(request, MaxMindLocationProvider.PROVIDER_NAME);
+    }
+
+    @Operation(summary = "Get Specific MaxMind IP Location", description = "Get location information using MaxMind for a specific IP address")
+    @GetMapping("/maxmind/ip/location")
+    public JsonResult<?> maxmindIpLocation(@RequestParam String ip) {
+        return ipLocation(ip, MaxMindLocationProvider.PROVIDER_NAME);
+    }
+
+    private JSONObject toLocationJson(IpLocationResult result, String requestedProvider) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("ip", result.getIp());
+        jsonObject.put("location", result.getLocation());
+        jsonObject.put("provider", result.getProvider());
+        jsonObject.put("requestedProvider",
+                StringUtils.hasText(requestedProvider) ? requestedProvider : ipService.getConfiguredProvider());
+        jsonObject.put("country", result.getCountry());
+        jsonObject.put("region", result.getRegion());
+        jsonObject.put("province", result.getProvince());
+        jsonObject.put("city", result.getCity());
+        jsonObject.put("isp", result.getIsp());
+        jsonObject.put("latitude", result.getLatitude());
+        jsonObject.put("longitude", result.getLongitude());
+        return jsonObject;
     }
 
 }

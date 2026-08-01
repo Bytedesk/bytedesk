@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class TaskCommentRestController extends BaseRestController<TaskCommentReq
 
     private final TaskCommentRestService taskCommentRestService;
 
-    @ActionAnnotation(title = "TaskComment", action = "组织查询", description = "query task_comment by org")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query task_comment by org")
     @Operation(summary = "Query TaskComments by Organization", description = "Retrieve taskComments for the current organization")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TaskCommentRequest request) {
         
         Page<TaskCommentResponse> taskComments = taskCommentRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class TaskCommentRestController extends BaseRestController<TaskCommentReq
         return ResponseEntity.ok(JsonResult.success(taskComments));
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "用户查询", description = "query task_comment by user")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query task_comment by user")
     @Operation(summary = "Query TaskComments by User", description = "Retrieve taskComments for the current user")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TaskCommentRequest request) {
         
         Page<TaskCommentResponse> taskComments = taskCommentRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class TaskCommentRestController extends BaseRestController<TaskCommentReq
         return ResponseEntity.ok(JsonResult.success(taskComments));
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "查询详情", description = "query task_comment by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query task_comment by uid")
     @Operation(summary = "Query TaskComment by UID", description = "Retrieve a specific task_comment by its unique identifier")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TaskCommentRequest request) {
         
         TaskCommentResponse task_comment = taskCommentRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class TaskCommentRestController extends BaseRestController<TaskCommentReq
         return ResponseEntity.ok(JsonResult.success(task_comment));
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "新建", description = "create task_comment")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create task_comment")
     @Operation(summary = "Create TaskComment", description = "Create a new task_comment")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_CREATE)
     @Override
-    public ResponseEntity<?> create(TaskCommentRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody TaskCommentRequest request) {
         
         TaskCommentResponse task_comment = taskCommentRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(task_comment));
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "更新", description = "update task_comment")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update task_comment")
     @Operation(summary = "Update TaskComment", description = "Update an existing task_comment")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_UPDATE)
     @Override
-    public ResponseEntity<?> update(TaskCommentRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody TaskCommentRequest request) {
         
         TaskCommentResponse task_comment = taskCommentRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(task_comment));
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "删除", description = "delete task_comment")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete task_comment")
     @Operation(summary = "Delete TaskComment", description = "Delete a task_comment")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_DELETE)
     @Override
-    public ResponseEntity<?> delete(TaskCommentRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody TaskCommentRequest request) {
         
         taskCommentRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "导出", description = "export task_comment")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export task_comment")
     @Operation(summary = "Export TaskComments", description = "Export taskComments to Excel format")
     @Override
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_EXPORT)
@@ -121,7 +130,7 @@ public class TaskCommentRestController extends BaseRestController<TaskCommentReq
         );
     }
 
-    @ActionAnnotation(title = "TaskComment", action = "按任务查询", description = "query task comments by task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK_COMMENT, action = I18Consts.I18N_ACTION_QUERY_TASK, description = "query task comments by task")
     @Operation(summary = "Query TaskComments by Task", description = "Retrieve comments for a given task")
     @PreAuthorize(TaskCommentPermissions.HAS_TASK_COMMENT_READ)
     @GetMapping("/query/task")

@@ -11,6 +11,12 @@
  * 
  * Copyright (c) 2025 by bytedesk.com, All Rights Reserved. 
  */
+/**
+ * Spring AI provider package for Mistral AI model integration.
+ * Mistral AI 提供方包，负责模型客户端接入与调用配置。
+ *
+ * @author bytedesk.com
+ */
 @NonNullApi
 package com.bytedesk.ai.springai.providers.mistralai;
 

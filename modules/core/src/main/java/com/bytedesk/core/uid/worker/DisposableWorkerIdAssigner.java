@@ -13,17 +13,19 @@
  */
 package com.bytedesk.core.uid.worker;
 
+import java.util.Optional;
+
 import com.bytedesk.core.uid.UidGeneratorEntity;
 import com.bytedesk.core.uid.UidGereratorRepository;
 // import com.bytedesk.core.uid.utils.DockerUtils;
 import com.bytedesk.core.uid.utils.NetUtils;
 import com.bytedesk.core.utils.Utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 // import org.apache.commons.lang.math.RandomUtils;
 // import org.slf4j.Logger;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Represents an implementation of {@link WorkerIdAssigner},
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @author yutianbao
  */
+@RequiredArgsConstructor
 public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
 
     // @Value("${server.host}")
@@ -40,8 +43,7 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
     private String port;
 
     // @Resource
-    @Autowired
-    private UidGereratorRepository workerNodeDAO;
+    private final UidGereratorRepository workerNodeDAO;
 
     /**
      * Assign worker id base on database.<p&gt;
@@ -56,10 +58,10 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         // build worker node entity
         UidGeneratorEntity workerNodeEntity = buildWorkerNode();
 
-        UidGeneratorEntity oldWorkerNode = workerNodeDAO
+        Optional<UidGeneratorEntity> oldWorkerNode = workerNodeDAO
                 .findByHostAndPort(workerNodeEntity.getHost(), workerNodeEntity.getPort());
-        if (null != oldWorkerNode) {
-            return oldWorkerNode.getId();
+        if (oldWorkerNode.isPresent()) {
+            return oldWorkerNode.get().getId();
         }
 
         // add worker node for new (ignore the same IP + PORT)

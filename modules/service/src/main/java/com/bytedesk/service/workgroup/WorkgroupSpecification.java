@@ -44,6 +44,7 @@ public class WorkgroupSpecification extends BaseSpecification<WorkgroupEntity, W
                 
                 orPredicates.add(criteriaBuilder.like(root.get("nickname"), "%" + searchText + "%"));
                 orPredicates.add(criteriaBuilder.like(root.get("description"), "%" + searchText + "%"));
+                orPredicates.add(criteriaBuilder.like(root.get("type"), "%" + searchText + "%"));
 
                 predicates.add(criteriaBuilder.or(orPredicates.toArray(new Predicate[0])));
             }

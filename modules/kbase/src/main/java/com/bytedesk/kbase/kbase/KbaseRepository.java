@@ -26,6 +26,8 @@ public interface KbaseRepository
 
     Boolean existsByUid(String uid);
 
+    List<KbaseEntity> findByDeleted(Boolean deleted);
+
     List<KbaseEntity> findByLevelAndTypeAndDeleted(String level, String type, Boolean deleted);
 
     List<KbaseEntity> findByLevelAndTypeAndOrgUidAndDeleted(String level, String type, String orgUid, Boolean deleted);

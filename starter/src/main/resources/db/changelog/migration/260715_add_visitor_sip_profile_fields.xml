@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260715-add-visitor-sip-profile-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_visitor" />
+                <not>
+                    <columnExists tableName="bytedesk_service_visitor" columnName="sip_extension" />
+                </not>
+                <not>
+                    <columnExists tableName="bytedesk_service_visitor" columnName="sip_password" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_visitor">
+            <column name="sip_extension" type="varchar(64)" />
+            <column name="sip_password" type="varchar(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260715-add-visitor-sip-extension-field" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_visitor" />
+                <not>
+                    <columnExists tableName="bytedesk_service_visitor" columnName="sip_extension" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_visitor">
+            <column name="sip_extension" type="varchar(64)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260715-add-visitor-sip-password-field" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_service_visitor" />
+                <not>
+                    <columnExists tableName="bytedesk_service_visitor" columnName="sip_password" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_visitor">
+            <column name="sip_password" type="varchar(128)" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

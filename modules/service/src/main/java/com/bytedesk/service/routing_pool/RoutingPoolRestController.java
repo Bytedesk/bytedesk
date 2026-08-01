@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -42,9 +43,10 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
 
     private final RoutingPoolRestService routingPoolRestService;
 
-    @ActionAnnotation(title = "RoutingPool", action = "组织查询", description = "query routing_pool by org")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query routing_pool by org")
     @Operation(summary = "Query RoutingPools by Organization", description = "Retrieve routing_pools for the current organization")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(RoutingPoolRequest request) {
         
@@ -53,9 +55,10 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
         return ResponseEntity.ok(JsonResult.success(routing_pools));
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "用户查询", description = "query routing_pool by user")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query routing_pool by user")
     @Operation(summary = "Query RoutingPools by User", description = "Retrieve routing_pools for the current user")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(RoutingPoolRequest request) {
         
@@ -64,9 +67,10 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
         return ResponseEntity.ok(JsonResult.success(routing_pools));
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "查询详情", description = "query routing_pool by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query routing_pool by uid")
     @Operation(summary = "Query RoutingPool by UID", description = "Retrieve a specific routing_pool by its unique identifier")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(RoutingPoolRequest request) {
         
@@ -75,40 +79,43 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
         return ResponseEntity.ok(JsonResult.success(routing_pool));
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "新建", description = "create routing_pool")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_CREATE, description = "create routing_pool")
     @Operation(summary = "Create RoutingPool", description = "Create a new routing_pool")
     @Override
+    @PostMapping("/create")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_CREATE)
-    public ResponseEntity<?> create(RoutingPoolRequest request) {
+    public ResponseEntity<?> create(@RequestBody RoutingPoolRequest request) {
         
         RoutingPoolResponse routing_pool = routingPoolRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(routing_pool));
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "更新", description = "update routing_pool")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_UPDATE, description = "update routing_pool")
     @Operation(summary = "Update RoutingPool", description = "Update an existing routing_pool")
     @Override
+    @PostMapping("/update")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_UPDATE)
-    public ResponseEntity<?> update(RoutingPoolRequest request) {
+    public ResponseEntity<?> update(@RequestBody RoutingPoolRequest request) {
         
         RoutingPoolResponse routing_pool = routingPoolRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(routing_pool));
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "删除", description = "delete routing_pool")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_DELETE, description = "delete routing_pool")
     @Operation(summary = "Delete RoutingPool", description = "Delete a routing_pool")
     @Override
+    @PostMapping("/delete")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_DELETE)
-    public ResponseEntity<?> delete(RoutingPoolRequest request) {
+    public ResponseEntity<?> delete(@RequestBody RoutingPoolRequest request) {
         
         routingPoolRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "导出", description = "export routing_pool")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_EXPORT, description = "export routing_pool")
     @Operation(summary = "Export RoutingPools", description = "Export routing_pools to Excel format")
     @Override
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_EXPORT)
@@ -124,7 +131,7 @@ public class RoutingPoolRestController extends BaseRestController<RoutingPoolReq
         );
     }
 
-    @ActionAnnotation(title = "RoutingPool", action = "accept", description = "accept manual routing pool thread")
+    @ActionAnnotation(title = I18Consts.I18N_ROUTING_POOL, action = I18Consts.I18N_ACTION_ACCEPT, description = "accept manual routing pool thread")
     @Operation(summary = "Accept RoutingPool Thread", description = "Claim a manual routing pool item and accept the related thread")
     @PreAuthorize(RoutingPoolPermissions.HAS_ROUTING_POOL_READ)
     @PostMapping("/accept")

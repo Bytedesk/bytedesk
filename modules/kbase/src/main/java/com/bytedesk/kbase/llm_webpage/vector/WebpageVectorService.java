@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -34,6 +34,11 @@ import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +58,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class WebpageVectorService {
 
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final WebpageRestService webpageRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
+
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
     public Map<String, Object> queryVectorByUid(WebpageRequest request) {
         String uid = request.getUid();
@@ -74,7 +83,7 @@ public class WebpageVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -111,6 +120,7 @@ public class WebpageVectorService {
     @Transactional
     public void indexWebpageVector(WebpageEntity webpage) {
         log.info("开始向量索引网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
+        long startMs = System.currentTimeMillis();
 
         // 在处理前先获取最新的网页实体
         Optional<WebpageEntity> currentWebpageOpt = webpageRestService.findByUidWithKbaseNoCache(webpage.getUid());
@@ -133,25 +143,29 @@ public class WebpageVectorService {
             String tags = String.join(",", currentWebpage.getTagList());
 
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                    "uid", currentWebpage.getUid(),
-                    "title", title,
-                    "url", currentWebpage.getUrl() != null ? currentWebpage.getUrl() : "",
-                    KbaseConst.KBASE_KB_UID, currentWebpage.getKbase() != null ? currentWebpage.getKbase().getUid() : "",
-                    "categoryUid", currentWebpage.getCategoryUid() != null ? currentWebpage.getCategoryUid() : "",
-                    "orgUid", currentWebpage.getOrgUid(),
-                    "enabled", Boolean.toString(currentWebpage.getEnabled()),
-                    "tags", tags,
-                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                    "sourceType", "WEBPAGE");
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("uid", currentWebpage.getUid());
+                metadata.put("sourceUid", currentWebpage.getUid());
+                metadata.put("title", title);
+                metadata.put("url", currentWebpage.getUrl() != null ? currentWebpage.getUrl() : "");
+                metadata.put(KbaseConst.KBASE_KB_UID, currentWebpage.getKbase() != null ? currentWebpage.getKbase().getUid() : "");
+                metadata.put("categoryUid", currentWebpage.getCategoryUid() != null ? currentWebpage.getCategoryUid() : "");
+                metadata.put("orgUid", currentWebpage.getOrgUid());
+                metadata.put("enabled", Boolean.toString(currentWebpage.getEnabled()));
+                metadata.put("tags", tags);
+                metadata.put("language", currentWebpage.getKbase() != null && StringUtils.hasText(currentWebpage.getKbase().getSourceLanguage()) ? currentWebpage.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("sourceLanguage", currentWebpage.getKbase() != null && StringUtils.hasText(currentWebpage.getKbase().getSourceLanguage()) ? currentWebpage.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("translated", Boolean.FALSE.toString());
+                metadata.put("sourceType", "WEBPAGE");
 
             // 创建文档
             Document document = new Document(id, combinedContent, metadata);
 
             // 添加新文档到向量存储
             log.info("向向量存储添加文档: {}", id);
-            vectorStore.add(List.of(document));
+            resolveStoreByWebpage(currentWebpage).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
+            reindexTranslatedWebpageVectors(currentWebpage);
 
             // 3. 更新网页实体中的文档ID列表
             List<String> docIdList = currentWebpage.getDocIdList();
@@ -170,6 +184,19 @@ public class WebpageVectorService {
             webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.SUCCESS.name());
             webpageRestService.evictWebpageCacheAllEntries();
 
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentWebpage.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("WEBPAGE", currentWebpage.getUid(), currentWebpage.getOrgUid(),
+                        embProvider, embModel, embDimensions, combinedContent, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录WEBPAGE向量化历史失败: uid={}, error={}", currentWebpage.getUid(), recEx.getMessage());
+            }
+
         } catch (Exception e) {
             log.error("网页向量索引失败: {}, 错误: {}", currentWebpage.getTitle(), e.getMessage(), e);
 
@@ -178,6 +205,21 @@ public class WebpageVectorService {
                 webpageRestService.evictWebpageCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新网页向量索引状态失败: {}, 错误: {}", currentWebpage.getUid(), saveEx.getMessage());
+            }
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentWebpage.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                String errContent = (currentWebpage.getTitle() != null ? currentWebpage.getTitle() : "")
+                        + "\n" + (currentWebpage.getContent() != null ? currentWebpage.getContent() : "");
+                llmEmbeddingRestService.recordEmbedding("WEBPAGE", currentWebpage.getUid(), currentWebpage.getOrgUid(),
+                        embProvider, embModel, embDimensions, errContent, "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录WEBPAGE向量化失败历史失败: uid={}, error={}", currentWebpage.getUid(), recEx.getMessage());
             }
 
             throw new RuntimeException("创建向量索引失败: " + e.getMessage(), e);
@@ -316,6 +358,7 @@ public class WebpageVectorService {
 
         int successCount = 0;
         int errorCount = 0;
+        VectorStore vectorStore = resolveStoreByKbUid(kbUid);
 
         try {
             List<String> sanitizedToDelete = sanitizeDocIds(docIdsToDelete);
@@ -375,6 +418,7 @@ public class WebpageVectorService {
         }
 
         WebpageEntity webpage = webpageOpt.get();
+        VectorStore vectorStore = resolveStoreByWebpage(webpage);
 
         if (webpage.getDocIdList() == null || webpage.getDocIdList().isEmpty()) {
             try {
@@ -408,7 +452,7 @@ public class WebpageVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
 
@@ -423,6 +467,7 @@ public class WebpageVectorService {
     public Boolean deleteWebpageVector(WebpageEntity webpage) {
         log.info("从向量索引中删除网页: {}, ID: {}", webpage.getTitle(), webpage.getUid());
         try {
+            VectorStore vectorStore = resolveStoreByWebpage(webpage);
             // 获取网页文档ID列表
             List<String> docIdList = sanitizeDocIds(webpage.getDocIdList());
             if (docIdList.isEmpty()) {
@@ -492,6 +537,11 @@ public class WebpageVectorService {
      */
     public List<WebpageVectorSearchResult> searchWebpageVector(String query, String kbUid, String categoryUid, String orgUid,
             int limit) {
+        return searchWebpageVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<WebpageVectorSearchResult> searchWebpageVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("网页向量搜索: query={}, kbUid={}, categoryUid={}, orgUid={}, limit={}", query, kbUid, categoryUid, orgUid, limit);
 
         if (query == null || query.trim().isEmpty()) {
@@ -526,6 +576,11 @@ public class WebpageVectorService {
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
         }
 
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
+        }
+
         // 构建最终的过滤表达式
         Expression expression = finalOp.build();
 
@@ -537,7 +592,7 @@ public class WebpageVectorService {
                 .build();
 
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = resolveStoreByKbUid(kbUid).similaritySearch(searchRequest);
 
         // 解析结果
         List<WebpageVectorSearchResult> resultList = new ArrayList<>();
@@ -614,9 +669,124 @@ public class WebpageVectorService {
             // 向量库 Document 的 text 是 title + "\n" + content（索引时写入），用于兜底补齐 answer。
             .content(doc.getText())
             .kbUid(kbUid)
+            .sourceUid((String) metadata.getOrDefault("sourceUid", metadata.getOrDefault("uid", "")))
             .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
             .orgUid((String) metadata.getOrDefault("orgUid", ""))
             .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
             .build();
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return webpageRestService.findByUidWithKbaseNoCache(uid)
+                .map(this::resolveStoreByWebpage)
+                .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
+    private VectorStore resolveStoreByWebpage(WebpageEntity webpage) {
+        if (webpage != null && webpage.getKbase() != null) {
+            return vectorStoreResolver.resolveByKbase(webpage.getKbase());
+        }
+        return vectorStoreResolver.resolveDefault();
+    }
+
+    private VectorStore resolveStoreByKbUid(String kbUid) {
+        if (StringUtils.hasText(kbUid)) {
+            return vectorStoreResolver.resolveByKbUid(kbUid);
+        }
+        return vectorStoreResolver.resolveDefault();
+    }
+
+    private void reindexTranslatedWebpageVectors(WebpageEntity webpage) {
+        deleteTranslatedWebpageVectors(webpage);
+
+        String kbUid = webpage.getKbase() != null ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        webpage.getUid(),
+                        KbaseTranslationSourceTypeEnum.WEBPAGE.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            WebpageVector translatedVector = WebpageVector.fromTranslation(webpage, translation);
+            if (!StringUtils.hasText(translatedVector.getTitle()) && !StringUtils.hasText(translatedVector.getContent())) {
+                continue;
+            }
+
+            String docId = "webpage_translation_" + translation.getUid();
+            String combinedContent = (translatedVector.getTitle() != null ? translatedVector.getTitle() : "")
+                    + "\n"
+                    + (translatedVector.getContent() != null ? translatedVector.getContent() : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", webpage.getUid());
+            metadata.put("title", translatedVector.getTitle() != null ? translatedVector.getTitle() : "");
+            metadata.put("url", translatedVector.getUrl() != null ? translatedVector.getUrl() : "");
+            metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+            metadata.put("categoryUid", webpage.getCategoryUid() != null ? webpage.getCategoryUid() : "");
+            metadata.put("orgUid", webpage.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "WEBPAGE");
+
+            documents.add(new Document(docId, combinedContent, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            resolveStoreByWebpage(webpage).add(documents);
+        }
+    }
+
+    private void deleteTranslatedWebpageVectors(WebpageEntity webpage) {
+        if (webpage == null || webpage.getKbase() == null || !StringUtils.hasText(webpage.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+                expressionBuilder.eq("sourceType", "WEBPAGE"),
+                expressionBuilder.eq("sourceUid", webpage.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = resolveStoreByWebpage(webpage).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            resolveStoreByWebpage(webpage).delete(docIds);
+        }
     }
 }

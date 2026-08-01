@@ -16,6 +16,9 @@ package com.bytedesk.core.rbac.organization;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseRequestNoOrg;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationIdentityTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyStatusEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -67,6 +70,9 @@ public class OrganizationRequest extends BaseRequestNoOrg {
 
     // 是否会员
     private Boolean vip;
+
+    // 会员等级：0=非会员，1及以上为会员等级
+    private Integer vipLevel;
 
     // 会员截止日期
     private ZonedDateTime vipExpireDate;

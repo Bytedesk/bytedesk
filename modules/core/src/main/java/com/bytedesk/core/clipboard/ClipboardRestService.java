@@ -25,6 +25,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -92,11 +93,11 @@ public class ClipboardRestService extends BaseRestService<ClipboardEntity, Clipb
     public ClipboardResponse create(ClipboardRequest request) {
        
         ClipboardEntity Clipboard = modelMapper.map(request, ClipboardEntity.class);
-        Clipboard.setUid(uidUtils.getCacheSerialUid());
+        Clipboard.setUid(uidUtils.getUid());
 
         ClipboardEntity saved = save(Clipboard);
         if (saved == null) {
-            throw new RuntimeException("Create Clipboard failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(saved);
     }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -55,11 +55,12 @@ import reactor.core.publisher.Flux;
 /**
  * @deprecated 使用ZhipuaiController
  * 智谱AI接口
- * https://open.bigmodel.cn/dev/api#sdk_install
- * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * https://docs.bigmodel.cn/cn/guide/models/chat/glm-4.5-flash
+ * https://github.com/zai-org/z-ai-sdk-java
  * https://docs.spring.io/spring-ai/reference/api/chat/zhipuai-chat.html
  */
 @Slf4j
+@Deprecated
 @RestController
 @RequestMapping("/zhipuai")
 @RequiredArgsConstructor
@@ -71,7 +72,8 @@ public class SpringAIZhipuaiChatController {
     private final ChatClient bytedeskZhipuaiChatClient;
     private final ZhiPuAiChatModel bytedeskZhipuaiChatModel;
     private final ZhiPuAiImageModel bytedeskZhipuaiImageModel;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/zhipuai/format?actor=
 	// https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -289,9 +291,7 @@ public class SpringAIZhipuaiChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 
     // http://127.0.0.1:9003/zhipuai/stream-sse

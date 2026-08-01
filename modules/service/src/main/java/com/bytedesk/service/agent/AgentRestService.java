@@ -14,6 +14,7 @@
 package com.bytedesk.service.agent;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -28,6 +29,10 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.AgentCapacityExceededException;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -39,10 +44,15 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
+import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.thread.event.ThreadAcceptEvent;
 import com.bytedesk.core.thread.event.ThreadAddTopicEvent;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
+import com.bytedesk.service.agent_seat.AgentSeatService;
+import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -78,6 +88,10 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     private final OrganizationRestService organizationRestService;
 
+    private final MessageService messageService;
+
+    private final AgentSeatService agentSeatDomainService;
+
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
             throw new IllegalArgumentException("orgUid is required");
@@ -91,6 +105,9 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     }
 
     private void assertAgentCapacityAvailable(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
         UserEntity authUser = authService.getUser();
         if (authUser != null && authUser.isSuperUser()) {
             return;
@@ -98,8 +115,17 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxAgents = resolveMaxAgents(organization);
         long current = agentRepository.countByOrgUidAndDeletedFalse(orgUid);
+        if (agentSeatDomainService.isSeatEnabled()) {
+            if (current >= maxAgents) {
+                throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_LIMIT_EXCEEDED);
+            }
+            if (!agentSeatDomainService.hasAvailableSeat(orgUid)) {
+                throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_SEAT_LIMIT_EXCEEDED);
+            }
+            return;
+        }
         if (current >= maxAgents) {
-            throw new RuntimeException("Organization agent limit exceeded");
+            throw new AgentCapacityExceededException(I18Consts.I18N_AGENT_LIMIT_EXCEEDED);
         }
     }
 
@@ -169,6 +195,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentEntity agent = AgentEntity.builder()
                 .nickname(request.getNickname())
                 .agentNo(request.getAgentNo())
+            .country(StringUtils.hasText(request.getCountry()) ? request.getCountry() : member.getCountry())
                 .email(request.getEmail())
                 .mobile(request.getMobile())
                 .build();
@@ -181,6 +208,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setMember(member);
         agent.setUserUid(user.getUid());
         agent.setAgentNo(agent.getUid()); // 默认工号为uid
+        if (agentSeatDomainService.isSeatEnabled()) {
+            agentSeatDomainService.assignSeatForAgent(
+                request.getOrgUid(),
+                agent.getUid());
+        }
         //
         // 设置客服配置：如果指定了 settingsUid，使用指定的配置；否则使用默认配置
         if (StringUtils.hasText(request.getSettingsUid())) {
@@ -215,6 +247,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentRequest agentRequest = AgentRequest.builder()
                 .uid(uidUtils.getUid())
                 .nickname(member.getNickname())
+            .country(member.getCountry())
                 .email(member.getEmail())
                 .mobile(member.getMobile())
                 .memberUid(member.getUid())
@@ -232,6 +265,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         AgentRequest agentRequest = AgentRequest.builder()
                 .uid(uidUtils.getUid())
                 .nickname(member.getNickname())
+            .country(member.getCountry())
                 .email(member.getEmail())
                 .mobile(member.getMobile())
                 .memberUid(member.getUid())
@@ -255,15 +289,14 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         agent.setNickname(request.getNickname());
         agent.setAgentNo(request.getAgentNo());
         agent.setAvatar(request.getAvatar());
+        agent.setCountry(StringUtils.hasText(request.getCountry()) ? request.getCountry() : agent.getCountry());
         agent.setMobile(request.getMobile());
         agent.setEmail(request.getEmail());
         agent.setDescription(request.getDescription());
+        updateMemberBinding(agent, request);
         // agent.setStatus(request.getStatus()); // 更新接待状态
         // agent.setMaxThreadCount(request.getMaxThreadCount());
         // agent.setTimeoutRemindTime(request.getTimeoutRemindTime());
-        // 暂不允许修改绑定成员
-        // agent.setMember(memberOptional.get());
-        // agent.setUserUid(memberOptional.get().getUser().getUid());
         //
         // 更新客服配置
         if (StringUtils.hasText(request.getSettingsUid())) {
@@ -284,6 +317,71 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         return convertToResponse(updatedAgent);
     }
 
+    /**
+     * 更新座席绑定的成员。
+     *
+     * 处理要点：
+     * 1. 仅当请求明确传入 memberUid 时才处理改绑。
+     * 2. 目标成员必须存在且已关联用户账号。
+     * 3. 同一组织内，同一个用户只能绑定一个未删除座席。
+     * 4. 改绑后同步更新座席自身 userUid，以及依赖 userUid 的配置实体。
+     * 5. 为新绑定用户补齐 agent 角色；旧绑定用户若不再被任何座席占用，则移除该角色。
+     */
+    private void updateMemberBinding(AgentEntity agent, AgentRequest request) {
+        if (!StringUtils.hasText(request.getMemberUid())) {
+            return;
+        }
+
+        Optional<MemberEntity> memberOptional = memberRestService.findByUid(request.getMemberUid());
+        if (memberOptional.isEmpty() || memberOptional.get().getUser() == null) {
+            throw new RuntimeException("member uid: " + request.getMemberUid() + " not found");
+        }
+
+        MemberEntity targetMember = memberOptional.get();
+        UserEntity targetUser = targetMember.getUser();
+        String targetUserUid = targetUser.getUid();
+        String orgUid = agent.getOrgUid();
+
+        MemberEntity currentMember = agent.getMember();
+        UserEntity currentUser = currentMember != null ? currentMember.getUser() : null;
+        String currentUserUid = agent.getUserUid();
+
+        // 若绑定成员和绑定用户都未变化，则无需继续处理。
+        boolean sameBinding = Objects.equals(currentUserUid, targetUserUid)
+                && currentMember != null
+                && Objects.equals(currentMember.getUid(), targetMember.getUid());
+        if (sameBinding) {
+            return;
+        }
+
+        // 目标用户在当前组织下已被其他座席占用时，禁止重复绑定。
+        Optional<AgentEntity> existingAgent = findByUserUidAndOrgUid(targetUserUid, orgUid);
+        if (existingAgent.isPresent() && !Objects.equals(existingAgent.get().getUid(), agent.getUid())) {
+            throw new RuntimeException(I18ServiceConsts.I18N_AGENT_EXISTS);
+        }
+
+        // 为新绑定用户补齐组织上下文与 agent 角色，再切换座席归属。
+        userService.ensureCurrentOrganization(targetUser, orgUid);
+        userService.addRoleAgent(targetUser);
+
+        agent.setMember(targetMember);
+        agent.setUserUid(targetUserUid);
+        agent.setCountry(targetMember.getCountry());
+
+        if (agent.getAutoReplySettings() != null) {
+            agent.getAutoReplySettings().setUserUid(targetUserUid);
+        }
+
+        // 旧绑定用户若在该组织下已无其他座席引用，则回收 agent 角色，避免残留权限。
+        if (currentUser != null
+                && StringUtils.hasText(currentUser.getUid())
+                && !Objects.equals(currentUser.getUid(), targetUserUid)
+                && !agentRepository.existsByUserUidAndOrgUidAndUidNotAndDeletedFalse(currentUser.getUid(), orgUid, agent.getUid())) {
+            userService.ensureCurrentOrganization(currentUser, orgUid);
+            userService.removeRoleAgent(currentUser);
+        }
+    }
+
     @Transactional
     public AgentResponse updateAvatar(AgentRequest request) {
         AgentEntity agent = findByUid(request.getUid())
@@ -299,10 +397,37 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public AgentResponse updateStatus(AgentRequest request) {
-        // agentRepository.updateStatusByUid(request.getStatus(), request.getUid());
-        AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        Optional<AgentEntity> agentOptional = Optional.empty();
+
+        // 优先按 uid 精确更新
+        if (StringUtils.hasText(request.getUid())) {
+            agentOptional = findByUid(request.getUid());
+        }
+
+        // uid 为空时，按 userUid + orgUid 兜底定位当前座席
+        if (agentOptional.isEmpty()) {
+            String orgUid = request.getOrgUid();
+            String userUid = request.getUserUid();
+
+            UserEntity authUser = authService.getUser();
+            if (!StringUtils.hasText(userUid) && authUser != null) {
+                userUid = authUser.getUid();
+            }
+            if (!StringUtils.hasText(orgUid) && authUser != null) {
+                orgUid = authUser.getOrgUid();
+            }
+
+            if (StringUtils.hasText(userUid) && StringUtils.hasText(orgUid)) {
+                agentOptional = findByUserUidAndOrgUid(userUid, orgUid);
+            } else if (StringUtils.hasText(userUid)) {
+                agentOptional = findByUserUid(userUid);
+            }
+        }
+
+        AgentEntity agent = agentOptional
+                .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
         agent.setStatus(request.getStatus()); // 更新接待状态
+        agent.setRestReason(resolveRestReason(request, agent));
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
@@ -315,24 +440,121 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     }
 
     @Transactional
-    public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
-        //
-        UserEntity user = authService.getUser();
-        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(user.getUid());
-        if (!agentOptional.isPresent()) {
-            throw new RuntimeException("agent not found");
+    public AgentResponse forceLogout(AgentRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("agent uid is required");
         }
-        //
+
+        AgentEntity agent = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("agent not found for uid: " + request.getUid()));
+        agent.setForceLogout(true);
+        agent.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
+        agent.setForceLogoutAt(java.time.ZonedDateTime.now());
+        agent.setStatus(AgentStatusEnum.OFFLINE.name());
+        agent.setRestReason(null);
+
+        AgentEntity updatedAgent = save(agent);
+        if (updatedAgent == null) {
+            throw new RuntimeException("Failed to save agent.");
+        }
+
+        if (updatedAgent.getMember() != null && updatedAgent.getMember().getUser() != null) {
+                messageService.sendForceLogoutMessage(
+                    updatedAgent.getMember().getUser(),
+                    updatedAgent.getOrgUid(),
+                    "AGENT",
+                    updatedAgent.getUid(),
+                    updatedAgent.getForceLogoutReason());
+        }
+
+        bytedeskEventPublisher.publishEvent(new AgentUpdateStatusEvent(this, updatedAgent));
+        return convertToResponse(updatedAgent);
+    }
+
+    @Transactional
+    public AgentResponse restoreLogin(AgentRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("agent uid is required");
+        }
+
+        AgentEntity agent = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("agent not found for uid: " + request.getUid()));
+        agent.setForceLogout(false);
+        agent.setForceLogoutReason(null);
+        agent.setForceLogoutAt(null);
+        agent.setRestReason(null);
+
+        AgentEntity updatedAgent = save(agent);
+        if (updatedAgent == null) {
+            throw new RuntimeException("Failed to save agent.");
+        }
+        return convertToResponse(updatedAgent);
+    }
+
+    private String resolveRestReason(AgentRequest request, AgentEntity agent) {
+        if (!AgentStatusEnum.REST.name().equals(request.getStatus())) {
+            return null;
+        }
+
+        String requestedReason = request.getRestReason() == null ? null : request.getRestReason().strip();
+        if (!StringUtils.hasText(requestedReason)) {
+            return null;
+        }
+
+        AgentStatusSettingEntity statusSettings = null;
+        if (agent.getSettings() != null) {
+            statusSettings = agent.getSettings().getAgentStatusSettings();
+            if (statusSettings == null) {
+                statusSettings = agent.getSettings().getDraftAgentStatusSettings();
+            }
+        }
+
+        if (statusSettings == null || statusSettings.getRestReasons() == null || statusSettings.getRestReasons().isEmpty()) {
+            return requestedReason;
+        }
+
+        for (String configuredReason : statusSettings.getRestReasons()) {
+            String normalizedReason = configuredReason == null ? null : configuredReason.strip();
+            if (StringUtils.hasText(normalizedReason) && normalizedReason.equals(requestedReason)) {
+                return normalizedReason;
+            }
+        }
+
+        throw new RuntimeException("invalid rest reason: " + requestedReason);
+    }
+
+    @Transactional
+    public ThreadResponseSimple acceptByAgent(ThreadRequest threadRequest) {
         Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadRequest.getUid());
         if (!threadOptional.isPresent()) {
             throw new RuntimeException("accept thread " + threadRequest.getUid() + " not found");
         }
         ThreadEntity thread = threadOptional.get();
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new IllegalStateException("User not authenticated");
+        }
+        String orgUid = thread.getOrgUid();
+        if (!StringUtils.hasText(orgUid) && user != null) {
+            orgUid = user.getOrgUid();
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            throw new IllegalStateException("orgUid required for accepting thread");
+        }
+
+        Optional<AgentEntity> agentOptional = agentRepository.findByUserUidAndOrgUidAndDeletedFalse(user.getUid(), orgUid);
+        if (agentOptional.isEmpty()) {
+            throw new RuntimeException("agent not found for userUid=" + user.getUid() + ", orgUid=" + orgUid);
+        }
         // 若会话非QUEUING（已存在接待坐席），则不允许重复接入
         if (!ThreadProcessStatusEnum.QUEUING.name().equals(thread.getStatus())) {
             throw new IllegalStateException("thread already accepted: " + thread.getStatus());
         }
         thread.setStatus(ThreadProcessStatusEnum.CHATTING.name());
+        if (ThreadTransferStatusEnum.TRANSFER_PENDING.name().equalsIgnoreCase(thread.getTransferStatus())) {
+            thread.setTransferStatus(ThreadTransferStatusEnum.TRANSFER_ACCEPTED.name());
+        }
         AgentEntity agent = agentOptional.get();
         thread.setAgent(agent.toUserProtobuf().toJson());
         MemberEntity member = agent.getMember();
@@ -351,14 +573,88 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @Transactional
     public AgentResponse updateAutoReply(AgentRequest request) {
-        AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent found with uid: " + request.getUid()));
+        Optional<AgentEntity> agentOptional = Optional.empty();
+
+        // 优先按 uid 精确定位
+        if (StringUtils.hasText(request.getUid())) {
+            agentOptional = findByUid(request.getUid());
+        }
+
+        // uid 缺失或未命中时，按 userUid + orgUid 兜底
+        if (agentOptional.isEmpty()) {
+            String orgUid = request.getOrgUid();
+            String userUid = request.getUserUid();
+
+            UserEntity authUser = authService.getUser();
+            if (!StringUtils.hasText(userUid) && authUser != null) {
+                userUid = authUser.getUid();
+            }
+            if (!StringUtils.hasText(orgUid) && authUser != null) {
+                orgUid = authUser.getOrgUid();
+            }
+
+            if (StringUtils.hasText(userUid) && StringUtils.hasText(orgUid)) {
+                agentOptional = findByUserUidAndOrgUid(userUid, orgUid);
+            } else if (StringUtils.hasText(userUid)) {
+                agentOptional = findByUserUid(userUid);
+            }
+        }
+
+        AgentEntity agent = agentOptional
+                .orElseThrow(() -> new RuntimeException("agent not found for uid/userUid/orgUid"));
+
+        AutoReplySettingsRequest autoReplySettingsRequest = request.getAutoReplySettings();
+        if (autoReplySettingsRequest == null) {
+            throw new RuntimeException("autoReplySettings is required");
+        }
+
+        AutoReplySettingsEntity autoReplySettings = agent.getAutoReplySettings();
+        if (autoReplySettings == null) {
+            autoReplySettings = AutoReplySettingsEntity.fromRequest(autoReplySettingsRequest, modelMapper);
+            autoReplySettings.setUid(uidUtils.getUid());
+            autoReplySettings.setOrgUid(agent.getOrgUid());
+            autoReplySettings.setUserUid(agent.getUserUid());
+            agent.setAutoReplySettings(autoReplySettings);
+        } else {
+            boolean referencedByOtherAgent = autoReplySettings.getId() != null
+                && agentRepository.existsByAutoReplySettings_IdAndUidNotAndDeletedFalse(autoReplySettings.getId(),
+                    agent.getUid());
+
+            // Defensive split: if legacy data points multiple agents to one settings row,
+            // clone it before update so each agent keeps an isolated auto-reply config.
+            if (referencedByOtherAgent) {
+                autoReplySettings = cloneAutoReplySettings(autoReplySettings, agent);
+                agent.setAutoReplySettings(autoReplySettings);
+            }
+            String originalUid = autoReplySettings.getUid();
+            modelMapper.map(autoReplySettingsRequest, autoReplySettings);
+            autoReplySettings.setUid(originalUid);
+            autoReplySettings.setOrgUid(agent.getOrgUid());
+            autoReplySettings.setUserUid(agent.getUserUid());
+        }
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
             throw new RuntimeException("Failed to update agent with uid: " + request.getUid());
         }
         return convertToResponse(updatedAgent);
+    }
+
+    private AutoReplySettingsEntity cloneAutoReplySettings(AutoReplySettingsEntity source, AgentEntity agent) {
+        AutoReplySettingsEntity cloned = AutoReplySettingsEntity.builder()
+                .autoReplyEnabled(source.getAutoReplyEnabled())
+                .autoReplyType(source.getAutoReplyType())
+                .autoReplyContentType(source.getAutoReplyContentType())
+                .autoReplyUid(source.getAutoReplyUid())
+                .autoReplyContent(source.getAutoReplyContent())
+                .kbUid(source.getKbUid())
+                // .takeoverEnabled(source.getTakeoverEnabled())
+                // .robotUid(source.getRobotUid())
+                .build();
+        cloned.setUid(uidUtils.getUid());
+        cloned.setOrgUid(agent.getOrgUid());
+        cloned.setUserUid(agent.getUserUid());
+        return cloned;
     }
 
     @Cacheable(value = "agent", key = "#entity.uid", unless = "#result == null")
@@ -373,6 +669,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     @CacheEvict(value = "agent", key = "#uid")
     public void deleteByUid(String uid) {
+        agentSeatDomainService.releaseSeatForAgent(uid);
         agentRepository.updateDeletedByUid(true, uid);
     }
 
@@ -461,14 +758,24 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     // @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
     public Optional<AgentEntity> findByUserUid(String userUid) {
-        Optional<AgentEntity> agentOptional = agentRepository.findByUserUid(userUid);
-        // 确保所有延迟加载的关联都被初始化，以便正确缓存
-        agentOptional.ifPresent(agent -> {
-            if (agent.getMember() != null) {
-                agent.getMember().getUser(); // 触发加载
-            }
-        });
-        return agentOptional;
+        if (!StringUtils.hasText(userUid)) {
+            return Optional.empty();
+        }
+
+        List<AgentEntity> agents = agentRepository.findAllByUserUidAndDeletedFalse(userUid);
+        if (agents == null || agents.isEmpty()) {
+            return Optional.empty();
+        }
+        if (agents.size() > 1) {
+            throw new IllegalStateException(
+                    "Multiple agents found for userUid=" + userUid + ", please specify orgUid");
+        }
+
+        AgentEntity agent = agents.get(0);
+        if (agent != null && agent.getMember() != null) {
+            agent.getMember().getUser();
+        }
+        return Optional.ofNullable(agent);
     }
 
     // @Cacheable(value = "agent", key = "#mobile", unless = "#result == null")

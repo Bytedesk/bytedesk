@@ -22,7 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -46,19 +46,22 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIGeminiService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired(required = false)
-    @Qualifier("geminiChatModel")
-    private OpenAiChatModel defaultChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIGeminiService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIGeminiService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("geminiChatModel") ObjectProvider<OpenAiChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final OpenAiChatModel defaultChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
@@ -317,10 +320,11 @@ public class SpringAIGeminiService extends BaseSpringAIService {
                                 for (Generation generation : generations) {
                                     AssistantMessage assistantMessage = generation.getOutput();
                                     String textContent = assistantMessage.getText();
+                                    String reasonContent = extractReasoningContent(generation, assistantMessage);
                                     log.info("OpenAI API SSE response text: {}", textContent);
 
                                     sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply,
-                                            emitter, textContent, null, sourceReferences);
+                                        emitter, textContent, reasonContent, sourceReferences);
                                 }
                                 // 提取token使用情况
                                 tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);

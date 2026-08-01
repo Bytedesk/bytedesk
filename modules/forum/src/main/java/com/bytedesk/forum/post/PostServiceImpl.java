@@ -1,6 +1,5 @@
 package com.bytedesk.forum.post;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -11,15 +10,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.bytedesk.core.category.CategoryRepository;
 import com.bytedesk.forum.exception.ForumException;
 import com.bytedesk.core.category.CategoryEntity;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
     
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     @Transactional

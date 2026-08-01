@@ -17,6 +17,7 @@ import org.modelmapper.ModelMapper;
 // import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +36,14 @@ import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.role.RoleConsts;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.message.MessageRepository;
@@ -53,11 +59,19 @@ import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.process.ProcessEntity;
+import com.bytedesk.ticket.ticket.dto.TicketStatusCountResponse;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityModeEnum;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordResponse;
 import com.bytedesk.ticket.utils.TicketConvertUtils;
 import com.bytedesk.core.topic.TopicUtils;
 
@@ -84,6 +98,8 @@ public class TicketRestService
 
     private final MessageRepository messageRepository;
 
+    private final TicketSlaRecordRepository ticketSlaRecordRepository;
+
     private final UploadRestService uploadRestService;
 
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -91,6 +107,8 @@ public class TicketRestService
     private final CategoryRestService categoryRestService;
 
     private final TicketSettingsRestService ticketSettingsRestService;
+
+    private final MemberRepository memberRepository;
 
     // @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
@@ -106,6 +124,7 @@ public class TicketRestService
                 request.setUserUid(reporterUid);
             }
         }
+        enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Specification<TicketEntity> spec = createSpecification(request);
         Page<TicketEntity> page = executePageQuery(spec, pageable);
@@ -120,6 +139,7 @@ public class TicketRestService
                 request.setUserUid(reporterUid);
             }
         }
+        enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Specification<TicketEntity> spec = createSpecification(request);
         Page<TicketEntity> page = executePageQuery(spec, pageable);
@@ -133,6 +153,7 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        assertTicketVisible(ticket);
         return convertToResponse(ticket);
     }
 
@@ -150,7 +171,9 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
 
-        return convertToResponse(ticketOptional.get());
+        TicketEntity ticket = ticketOptional.get();
+        assertTicketVisible(ticket);
+        return convertToResponse(ticket);
     }
 
     /**
@@ -161,10 +184,11 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getThreadTopic(), "thread topic required");
 
+        enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Page<TicketEntity> page = ticketRepository.findByOrgUidAndThreadTopic(request.getOrgUid(),
-                request.getThreadTopic(), pageable);
-        return page.map(this::convertToResponse);
+            request.getThreadTopic(), pageable);
+        return filterVisiblePage(page).map(this::convertToResponse);
     }
 
     /**
@@ -175,10 +199,26 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getVisitorThreadUid(), "visitor thread uid required");
 
+        enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadUid(
-                request.getOrgUid(), request.getVisitorThreadUid(), pageable);
-        return page.map(this::convertToResponse);
+            request.getOrgUid(), request.getVisitorThreadUid(), pageable);
+        return filterVisiblePage(page).map(this::convertToResponse);
+    }
+
+    /**
+     * 按 visitorThreadTopic 查询工单（可能多条，因为多个工单可绑定同一个访客会话topic）。
+     */
+    public Page<TicketResponse> queryByVisitorThreadTopic(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getOrgUid(), "organization uid required");
+        Assert.hasText(request.getVisitorThreadTopic(), "visitor thread topic required");
+
+        enrichVisibilityContext(request);
+        Pageable pageable = request.getPageable();
+        Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadTopic(
+            request.getOrgUid(), request.getVisitorThreadTopic(), pageable);
+        return filterVisiblePage(page).map(this::convertToResponse);
     }
 
     @Transactional
@@ -269,14 +309,15 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getUid(), "ticket uid required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
-        normalizeReporterType(request, false);
-        Assert.hasText(request.getReporterJson(), "reporter info required");
 
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
         if (ticketOptional.isEmpty()) {
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        populateUpdateDefaults(request, ticket);
+        normalizeReporterType(request, false);
+        Assert.hasText(request.getReporterJson(), "reporter info required");
 
         // 预先记录旧值，避免后续 setXXX 覆盖导致事件判断失效
         final String oldAssigneeUid = (ticket.getAssignee() != null) ? ticket.getAssignee().getUid() : null;
@@ -297,6 +338,7 @@ public class TicketRestService
         ticket.setReporter(request.getReporterJson());
         ticket.setDepartmentUid(request.getDepartmentUid());
         ticket.setVisitorThreadUid(request.getVisitorThreadUid());
+        ticket.setVisitorThreadTopic(request.getVisitorThreadTopic());
 
         // 处理附件更新
         if (request.getUploadUids() != null) {
@@ -339,6 +381,21 @@ public class TicketRestService
         }
 
         return convertToResponse(ticket);
+    }
+
+    private void populateUpdateDefaults(TicketRequest request, TicketEntity ticket) {
+        Assert.notNull(request, "ticket request required");
+        Assert.notNull(ticket, "ticket entity required");
+
+        if (!StringUtils.hasText(request.getType())) {
+            request.setType(ticket.getType());
+        }
+        if (!StringUtils.hasText(request.getStatus())) {
+            request.setStatus(ticket.getStatus());
+        }
+        if (request.getReporter() == null && StringUtils.hasText(ticket.getReporterString())) {
+            request.setReporter(ticket.getReporter());
+        }
     }
 
     public TicketEntity updateAttachments(TicketEntity ticket, Set<String> uploadUids) {
@@ -485,6 +542,13 @@ public class TicketRestService
         } else {
             response.setVisitorUnreadCount(0);
         }
+        List<TicketSlaRecordResponse> slaRecords = ticketSlaRecordRepository
+                .findByTicketUidAndDeletedFalse(entity.getUid())
+                .stream()
+                .map(TicketSlaRecordResponse::fromEntity)
+                .sorted(Comparator.comparing(TicketSlaRecordResponse::getDueAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+        response.setSlaRecords(slaRecords);
         return response;
     }
 
@@ -515,6 +579,7 @@ public class TicketRestService
 
     @Override
     protected Specification<TicketEntity> createSpecification(TicketRequest request) {
+        enrichVisibilityContext(request);
         return TicketSpecification.search(request, authService);
     }
 
@@ -526,6 +591,24 @@ public class TicketRestService
     public TicketStatusCountResponse countStatus(TicketRequest request) {
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
+
+        enrichVisibilityContext(request);
+
+        if (Boolean.TRUE.equals(request.getVisibilityRestricted())) {
+            Specification<TicketEntity> baseSpec = createSpecification(request);
+            long processing = ticketRepository
+                .count(baseSpec.and((root, query, cb) -> cb.equal(root.get("status"), TicketStatusEnum.PROCESSING.name())));
+            long pending = ticketRepository
+                .count(baseSpec.and((root, query, cb) -> cb.equal(root.get("status"), TicketStatusEnum.PENDING.name())));
+            long review = ticketRepository
+                .count(baseSpec.and((root, query, cb) -> cb.equal(root.get("status"), TicketStatusEnum.RESOLVED.name())));
+
+            return TicketStatusCountResponse.builder()
+                .processing(processing)
+                .pending(pending)
+                .review(review)
+                .build();
+        }
 
         String orgUid = request.getOrgUid();
         String workgroupUid = request.getWorkgroupUid();
@@ -564,6 +647,136 @@ public class TicketRestService
                 .pending(pending)
                 .review(review)
                 .build();
+    }
+
+    private Page<TicketEntity> filterVisiblePage(Page<TicketEntity> page) {
+        List<TicketEntity> visible = page.getContent().stream()
+                .filter(this::canViewTicket)
+                .collect(Collectors.toList());
+        return new PageImpl<>(visible, page.getPageable(), visible.size());
+    }
+
+    private void enrichVisibilityContext(TicketRequest request) {
+        if (request == null || !StringUtils.hasText(request.getOrgUid())) {
+            return;
+        }
+        if (!TicketTypeEnum.INTERNAL.name().equals(TicketTypeEnum.fromValue(request.getType()).name())) {
+            request.setVisibilityRestricted(false);
+            request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
+            return;
+        }
+
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            request.setVisibilityRestricted(false);
+            return;
+        }
+        request.setVisibilityCurrentUserUid(currentUser.getUid());
+
+        if (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser)) {
+            request.setVisibilityOrgAdmin(true);
+            request.setVisibilityRestricted(false);
+            request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
+            return;
+        }
+
+        request.setVisibilityOrgAdmin(false);
+        memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), request.getOrgUid())
+                .map(MemberEntity::getDeptUid)
+                .ifPresent(request::setVisibilityCurrentUserDepartmentUid);
+
+        TicketVisibilitySettingsData visibilityData = resolveVisibilitySettingsData(request);
+        request.setVisibilityMode(visibilityData.getMode());
+        request.setVisibilityRestrictedCategoryUids(visibilityData.getCategoryRules().stream()
+                .filter(rule -> TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(rule.getVisibility()))
+                .map(rule -> rule.getCategoryUid())
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toList()));
+        request.setVisibilityRestricted(!TicketVisibilityModeEnum.ORG_WIDE.name().equals(visibilityData.getMode()));
+    }
+
+    private TicketVisibilitySettingsData resolveVisibilitySettingsData(TicketRequest request) {
+        TicketVisibilitySettingsEntity visibilitySettings = null;
+        if (StringUtils.hasText(request.getTicketSettingsUid())) {
+            visibilitySettings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
+                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .orElse(null);
+        }
+        if (visibilitySettings == null) {
+            visibilitySettings = ticketSettingsRestService
+                    .findDefaultByOrgUidAndType(request.getOrgUid(), TicketTypeEnum.INTERNAL.name())
+                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .orElse(null);
+        }
+
+        TicketVisibilitySettingsData data = visibilitySettings == null || visibilitySettings.getContent() == null
+                ? TicketVisibilitySettingsData.builder().build()
+                : visibilitySettings.getContent();
+        data.normalize();
+        return data;
+    }
+
+    private boolean hasOrgAdminRole(UserEntity currentUser) {
+        return currentUser.getCurrentRoles() != null && currentUser.getCurrentRoles().stream()
+                .filter(role -> role != null)
+                .anyMatch(role -> RoleConsts.ROLE_ADMIN.equals(role.getName())
+                        || RoleConsts.ROLE_ADMIN.equals(role.getValue())
+                        || RoleConsts.ROLE_SUPER.equals(role.getName())
+                        || RoleConsts.ROLE_SUPER.equals(role.getValue()));
+    }
+
+    private void assertTicketVisible(TicketEntity ticket) {
+        if (!canViewTicket(ticket)) {
+            throw new NotFoundException("ticket not found");
+        }
+    }
+
+    private boolean canViewTicket(TicketEntity ticket) {
+        if (ticket == null) {
+            return false;
+        }
+        if (!TicketTypeEnum.INTERNAL.name().equals(ticket.getType())) {
+            return true;
+        }
+
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser)) {
+            return true;
+        }
+        if (currentUser.getUid().equals(ticket.getUserUid())) {
+            return true;
+        }
+        if (StringUtils.hasText(ticket.getAssigneeString())
+                && ticket.getAssigneeString().contains("\"uid\":\"" + currentUser.getUid() + "\"")) {
+            return true;
+        }
+        if (!StringUtils.hasText(ticket.getDepartmentUid())) {
+            return true;
+        }
+
+        String currentDeptUid = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), ticket.getOrgUid())
+                .map(MemberEntity::getDeptUid)
+                .orElse(null);
+        TicketRequest visibilityRequest = TicketRequest.builder()
+            .ticketSettingsUid(ticket.getTicketSettingsUid())
+            .build();
+        visibilityRequest.setOrgUid(ticket.getOrgUid());
+        visibilityRequest.setType(ticket.getType());
+        TicketVisibilitySettingsData data = resolveVisibilitySettingsData(visibilityRequest);
+
+        if (TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(data.getMode())) {
+            return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
+        }
+        if (TicketVisibilityModeEnum.CATEGORY_BASED.name().equals(data.getMode())) {
+            String categoryVisibility = data.resolveCategoryVisibility(ticket.getCategoryUid());
+            if (TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(categoryVisibility)) {
+                return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
+            }
+        }
+        return true;
     }
 
     /**
@@ -651,10 +864,16 @@ public class TicketRestService
         Assert.notNull(ticket, "ticket required");
         Assert.notNull(request, "ticket request required");
 
-        TicketSettingsEntity settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                .orElseThrow(() -> new NotFoundException(
-                        "ticket settings not found: " + request.getTicketSettingsUid()));
-        ticket.setTicketSettingsUid(request.getTicketSettingsUid());
+        TicketSettingsEntity settings;
+        if (StringUtils.hasText(request.getTicketSettingsUid())) {
+            settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
+                    .orElseThrow(() -> new NotFoundException(
+                            "ticket settings not found: " + request.getTicketSettingsUid()));
+        } else {
+            settings = ticketSettingsRestService.getOrCreateDefault(request.getOrgUid(), request.getType());
+            request.setTicketSettingsUid(settings.getUid());
+        }
+        ticket.setTicketSettingsUid(settings.getUid());
 
         // 优先使用前端明确传入的流程 UID（便于草稿流程/自定义流程创建工单）
         if (StringUtils.hasText(request.getProcessEntityUid())) {

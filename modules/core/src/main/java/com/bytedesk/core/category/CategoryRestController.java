@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +42,11 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
     
     private final CategoryRestService categoryRestService;
     
-    @ActionAnnotation(title = "Category", action = "组织查询", description = "query category by org")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query category by org")
     @Operation(summary = "Query Categories by Organization", description = "Retrieve categories for the current organization")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(CategoryRequest request) {
         
         Page<CategoryResponse> page = categoryRestService.queryByOrg(request);
@@ -51,10 +54,11 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "Category", action = "用户查询", description = "query category by user")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query category by user")
     @Operation(summary = "Query Categories by User", description = "Retrieve categories for the current user")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(CategoryRequest request) {
         
         Page<CategoryResponse> page = categoryRestService.queryByUser(request);
@@ -62,9 +66,10 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "Category", action = "查询详情", description = "query category by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query category by uid")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(CategoryRequest request) {
         
         CategoryResponse response = categoryRestService.queryByUid(request);
@@ -72,10 +77,11 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "Category", action = "新建", description = "create category")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_CREATE, description = "create category")
     @Operation(summary = "Create Category", description = "Create a new category")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_CREATE)
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody CategoryRequest request) {
         
         CategoryResponse response = categoryRestService.create(request);
@@ -83,10 +89,11 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "Category", action = "更新", description = "update category")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_UPDATE, description = "update category")
     @Operation(summary = "Update Category", description = "Update an existing category")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_UPDATE)
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody CategoryRequest request) {
         
         CategoryResponse response = categoryRestService.update(request);
@@ -94,10 +101,11 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @ActionAnnotation(title = "Category", action = "删除", description = "delete category")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_DELETE, description = "delete category")
     @Operation(summary = "Delete Category", description = "Delete a category")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_DELETE)
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody CategoryRequest request) {
         
         categoryRestService.delete(request);
@@ -105,7 +113,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    @ActionAnnotation(title = "Category", action = "导出", description = "export category")
+    @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_EXPORT, description = "export category")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_EXPORT)
     @GetMapping("/export")
     @Override

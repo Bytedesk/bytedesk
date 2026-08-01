@@ -35,6 +35,7 @@ import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.service.form.FormRepository;
@@ -44,19 +45,41 @@ import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.process.ProcessResponse;
 import com.bytedesk.ticket.process.ProcessTypeEnum;
+import com.bytedesk.ticket.ticket.TicketCategories;
 import com.bytedesk.ticket.ticket.TicketConsts;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_auto_create.TicketAutoCreateSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_auto_create.TicketAutoCreateSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_auto_create.TicketAutoCreateSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository;
-import com.bytedesk.ticket.ticket_settings_category.CategoryItemData;
-import com.bytedesk.ticket.ticket_settings_category.CategorySettingsData;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemData;
+import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsData;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsEntity;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsRequest;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsRequest;
+import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsResponse;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRuleData;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRuleResponse;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsRequest;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsResponse;
+import com.bytedesk.ticket.ticket_sla_rule.TicketSlaRuleEntity;
+import com.bytedesk.ticket.ticket_sla_rule.TicketSlaRuleResponse;
+import com.bytedesk.core.email_provider.EmailProviderEntity;
+import com.bytedesk.core.email_provider.EmailProviderRepository;
+import com.bytedesk.core.email_push.EmailPushSendService;
+import com.bytedesk.core.sms_push.SmsPushSendService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +104,12 @@ public class TicketSettingsRestService extends
 
     private final FormRepository formRepository;
 
+    private final EmailProviderRepository emailProviderRepository;
+
+    private final EmailPushSendService emailPushSendService;
+
+    private final SmsPushSendService smsPushSendService;
+
     @Override
     protected Specification<TicketSettingsEntity> createSpecification(TicketSettingsRequest request) {
         return TicketSettingsSpecification.search(request, authService);
@@ -97,7 +126,8 @@ public class TicketSettingsRestService extends
         return ticketSettingsRepository.findByUid(uid);
     }
 
-    // @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' + #type", unless = "#result==null")
+    // @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' +
+    // #type", unless = "#result==null")
     public Optional<TicketSettingsEntity> findByNameAndOrgUid(String name, String orgUid, String type) {
         return ticketSettingsRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
     }
@@ -146,15 +176,29 @@ public class TicketSettingsRestService extends
                 entity.getOrgUid());
         entity.setDraftBasicSettings(draftBasic);
 
-        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request.getCategorySettings(),
-                uidUtils::getUid);
-        category.setUid(uidUtils.getUid());
-        entity.setCategorySettings(category);
+        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings(), entity.getOrgUid()));
 
-        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity
-                .fromRequest(resolveDraftCategoryRequest(request), uidUtils::getUid);
-        draftCategory.setUid(uidUtils.getUid());
-        entity.setDraftCategorySettings(draftCategory);
+        entity.setDraftCategorySettings(
+                createCategorySettingsEntity(resolveDraftCategoryRequest(request), entity.getOrgUid()));
+
+        // 通知设置
+        entity.setNotificationSettings(
+                createNotificationSettingsEntity(request.getNotificationSettings(), entity.getOrgUid()));
+        entity.setDraftNotificationSettings(
+                createNotificationSettingsEntity(resolveDraftNotificationRequest(request), entity.getOrgUid()));
+
+        entity.setSlaSettings(createSlaSettingsEntity(request.getSlaSettings(), entity.getOrgUid()));
+        entity.setDraftSlaSettings(createSlaSettingsEntity(resolveDraftSlaRequest(request), entity.getOrgUid()));
+
+        entity.setAutoCreateSettings(
+                createAutoCreateSettingsEntity(request.getAutoCreateSettings(), entity.getOrgUid()));
+        entity.setDraftAutoCreateSettings(
+                createAutoCreateSettingsEntity(resolveDraftAutoCreateRequest(request), entity.getOrgUid()));
+
+        entity.setVisibilitySettings(
+                createVisibilitySettingsEntity(request.getVisibilitySettings(), entity.getOrgUid()));
+        entity.setDraftVisibilitySettings(
+                createVisibilitySettingsEntity(resolveDraftVisibilityRequest(request), entity.getOrgUid()));
 
         String resolvedProcessUid = resolveProcessUidOrDefault(request, entity.getOrgUid(), normalizedType);
         entity.setProcess(resolveProcessReference(resolvedProcessUid, entity.getOrgUid()));
@@ -222,9 +266,52 @@ public class TicketSettingsRestService extends
                     draftCategory = TicketCategorySettingsEntity.fromRequest(request.getCategorySettings(),
                             uidUtils::getUid);
                     draftCategory.setUid(uidUtils.getUid());
+                    draftCategory.setOrgUid(entity.getOrgUid());
                     entity.setDraftCategorySettings(draftCategory);
                 } else {
                     draftCategory.replaceFromRequest(request.getCategorySettings(), uidUtils::getUid);
+                }
+                draftUpdated = true;
+            }
+
+            TicketVisibilitySettingsRequest draftVisibilityRequest = resolveDraftVisibilityRequest(request);
+            if (draftVisibilityRequest != null) {
+                TicketVisibilitySettingsEntity draftVisibility = entity.getDraftVisibilitySettings();
+                if (draftVisibility == null) {
+                    draftVisibility = createVisibilitySettingsEntity(draftVisibilityRequest, entity.getOrgUid());
+                    entity.setDraftVisibilitySettings(draftVisibility);
+                } else {
+                    TicketVisibilitySettingsEntity.applyRequest(draftVisibility, draftVisibilityRequest);
+                }
+                draftUpdated = true;
+            }
+
+            // 通知设置草稿
+            TicketNotificationSettingsRequest draftNotifRequest = resolveDraftNotificationRequest(request);
+            if (draftNotifRequest != null) {
+                TicketNotificationSettingsEntity draftNotif = entity.getDraftNotificationSettings();
+                if (draftNotif == null) {
+                    draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                    draftNotif.setUid(uidUtils.getUid());
+                    draftNotif.setOrgUid(entity.getOrgUid());
+                    entity.setDraftNotificationSettings(draftNotif);
+                } else {
+                    TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity
+                            .fromRequest(draftNotifRequest);
+                    applyNotificationSettings(draftNotif, updated);
+                }
+                draftUpdated = true;
+            }
+
+            TicketSlaSettingsRequest draftSlaRequest = resolveDraftSlaRequest(request);
+            if (draftSlaRequest != null) {
+                TicketSlaSettingsEntity draftSla = entity.getDraftSlaSettings();
+                if (draftSla == null) {
+                    draftSla = createSlaSettingsEntity(draftSlaRequest, entity.getOrgUid());
+                    entity.setDraftSlaSettings(draftSla);
+                } else {
+                    TicketSlaSettingsEntity.applyRequest(draftSla, draftSlaRequest, uidUtils::getUid,
+                            entity.getOrgUid());
                 }
                 draftUpdated = true;
             }
@@ -236,6 +323,18 @@ public class TicketSettingsRestService extends
 
             if (request.getFormUid() != null) {
                 entity.setDraftForm(resolveFormReference(request.getFormUid(), entity.getOrgUid()));
+                draftUpdated = true;
+            }
+
+            TicketAutoCreateSettingsRequest draftAutoCreateRequest = resolveDraftAutoCreateRequest(request);
+            if (draftAutoCreateRequest != null) {
+                TicketAutoCreateSettingsEntity draftAutoCreate = entity.getDraftAutoCreateSettings();
+                if (draftAutoCreate == null) {
+                    draftAutoCreate = createAutoCreateSettingsEntity(draftAutoCreateRequest, entity.getOrgUid());
+                    entity.setDraftAutoCreateSettings(draftAutoCreate);
+                } else {
+                    applyAutoCreateSettingsRequest(draftAutoCreate, draftAutoCreateRequest, entity.getOrgUid());
+                }
                 draftUpdated = true;
             }
 
@@ -282,8 +381,7 @@ public class TicketSettingsRestService extends
         String normalizedType = resolveSettingsType(rawType);
         // 1) 已绑定则直接返回
         if (TicketTypeEnum.EXTERNAL.name().equals(normalizedType)) {
-            Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
-                    .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+            Optional<TicketSettingsBindingEntity> bindingOpt = findBindingByWorkgroup(orgUid, workgroupUid);
             if (bindingOpt.isPresent()) {
                 Optional<TicketSettingsEntity> settingsOpt = findByUid(bindingOpt.get().getTicketSettingsUid());
                 if (settingsOpt.isPresent()) {
@@ -322,8 +420,7 @@ public class TicketSettingsRestService extends
     public TicketSettingsEntity resolveEntityByWorkgroup(String orgUid, String workgroupUid, String rawType) {
         String normalizedType = resolveSettingsType(rawType);
         if (TicketTypeEnum.EXTERNAL.name().equals(normalizedType)) {
-            Optional<TicketSettingsBindingEntity> bindingOpt = bindingRepository
-                    .findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
+            Optional<TicketSettingsBindingEntity> bindingOpt = findBindingByWorkgroup(orgUid, workgroupUid);
             if (bindingOpt.isPresent()) {
                 Optional<TicketSettingsEntity> entityOpt = ticketSettingsRepository
                         .findByUid(bindingOpt.get().getTicketSettingsUid());
@@ -350,6 +447,13 @@ public class TicketSettingsRestService extends
             return def;
         }
         return getOrCreateDefault(orgUid, normalizedType);
+    }
+
+    private Optional<TicketSettingsBindingEntity> findBindingByWorkgroup(String orgUid, String workgroupUid) {
+        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(workgroupUid)) {
+            return Optional.empty();
+        }
+        return bindingRepository.findByOrgUidAndWorkgroupUidAndDeletedFalse(orgUid, workgroupUid);
     }
 
     /** 获取或创建组织默认 TicketSettings（发布+草稿齐全，保证并发唯一） */
@@ -412,7 +516,7 @@ public class TicketSettingsRestService extends
         // 按 WorkgroupSettingsRestService 模式创建：发布 + 草稿各自独立初始化并分配唯一 UID
         String settingsName;
         String settingsDescription;
-        
+
         // 根据工单类型区分名称和描述
         if (TicketTypeEnum.INTERNAL.name().equals(normalizedType)) {
             settingsName = I18Consts.I18N_TICKET_SETTINGS_INTERNAL_NAME;
@@ -421,7 +525,7 @@ public class TicketSettingsRestService extends
             settingsName = I18Consts.I18N_TICKET_SETTINGS_EXTERNAL_NAME;
             settingsDescription = I18Consts.I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION;
         }
-        
+
         TicketSettingsEntity settings = TicketSettingsEntity.builder()
                 .uid(uidUtils.getUid())
                 .orgUid(orgUid)
@@ -433,13 +537,22 @@ public class TicketSettingsRestService extends
                 .customFormEnabled(false)
                 .build();
 
-        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
-        category.setUid(uidUtils.getUid());
-        settings.setCategorySettings(category);
+        settings.setCategorySettings(createCategorySettingsEntity(null, orgUid));
 
-        TicketCategorySettingsEntity draftCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
-        draftCategory.setUid(uidUtils.getUid());
-        settings.setDraftCategorySettings(draftCategory);
+        settings.setDraftCategorySettings(createCategorySettingsEntity(null, orgUid));
+
+        // 通知设置
+        settings.setNotificationSettings(createNotificationSettingsEntity(null, orgUid));
+        settings.setDraftNotificationSettings(createNotificationSettingsEntity(null, orgUid));
+
+        settings.setSlaSettings(createSlaSettingsEntity(null, orgUid));
+        settings.setDraftSlaSettings(createSlaSettingsEntity(null, orgUid));
+
+        settings.setAutoCreateSettings(createAutoCreateSettingsEntity(null, orgUid));
+        settings.setDraftAutoCreateSettings(createAutoCreateSettingsEntity(null, orgUid));
+
+        settings.setVisibilitySettings(createVisibilitySettingsEntity(null, orgUid));
+        settings.setDraftVisibilitySettings(createVisibilitySettingsEntity(null, orgUid));
 
         TicketBasicSettingsEntity basic = createBasicSettingsEntity(null, orgUid);
         settings.setBasicSettings(basic);
@@ -548,6 +661,7 @@ public class TicketSettingsRestService extends
                 draftCategory = TicketCategorySettingsEntity
                         .fromRequest(draftCategoryRequest, uidUtils::getUid);
                 draftCategory.setUid(uidUtils.getUid());
+                draftCategory.setOrgUid(entity.getOrgUid());
                 entity.setDraftCategorySettings(draftCategory);
             } else {
                 draftCategory.replaceFromRequest(draftCategoryRequest, uidUtils::getUid);
@@ -566,6 +680,35 @@ public class TicketSettingsRestService extends
             draftUpdated = true;
         }
 
+        // 通知设置
+        TicketNotificationSettingsRequest draftNotifRequest = resolveDraftNotificationRequest(request);
+        if (draftNotifRequest != null) {
+            TicketNotificationSettingsEntity draftNotif = entity.getDraftNotificationSettings();
+            if (draftNotif == null) {
+                draftNotif = TicketNotificationSettingsEntity.fromRequest(draftNotifRequest);
+                draftNotif.setUid(uidUtils.getUid());
+                draftNotif.setOrgUid(entity.getOrgUid());
+                entity.setDraftNotificationSettings(draftNotif);
+            } else {
+                TicketNotificationSettingsEntity updated = TicketNotificationSettingsEntity
+                        .fromRequest(draftNotifRequest);
+                applyNotificationSettings(draftNotif, updated);
+            }
+            draftUpdated = true;
+        }
+
+        TicketSlaSettingsRequest draftSlaRequest = resolveDraftSlaRequest(request);
+        if (draftSlaRequest != null) {
+            TicketSlaSettingsEntity draftSla = entity.getDraftSlaSettings();
+            if (draftSla == null) {
+                draftSla = createSlaSettingsEntity(draftSlaRequest, entity.getOrgUid());
+                entity.setDraftSlaSettings(draftSla);
+            } else {
+                TicketSlaSettingsEntity.applyRequest(draftSla, draftSlaRequest, uidUtils::getUid, entity.getOrgUid());
+            }
+            draftUpdated = true;
+        }
+
         if (request.getProcessUid() != null) {
             entity.setDraftProcess(resolveProcessReference(request.getProcessUid(), entity.getOrgUid()));
             draftUpdated = true;
@@ -573,6 +716,30 @@ public class TicketSettingsRestService extends
 
         if (request.getFormUid() != null) {
             entity.setDraftForm(resolveFormReference(request.getFormUid(), entity.getOrgUid()));
+            draftUpdated = true;
+        }
+
+        TicketAutoCreateSettingsRequest draftAutoCreateRequest = resolveDraftAutoCreateRequest(request);
+        if (draftAutoCreateRequest != null) {
+            TicketAutoCreateSettingsEntity draftAutoCreate = entity.getDraftAutoCreateSettings();
+            if (draftAutoCreate == null) {
+                draftAutoCreate = createAutoCreateSettingsEntity(draftAutoCreateRequest, entity.getOrgUid());
+                entity.setDraftAutoCreateSettings(draftAutoCreate);
+            } else {
+                applyAutoCreateSettingsRequest(draftAutoCreate, draftAutoCreateRequest, entity.getOrgUid());
+            }
+            draftUpdated = true;
+        }
+
+        TicketVisibilitySettingsRequest draftVisibilityRequest = resolveDraftVisibilityRequest(request);
+        if (draftVisibilityRequest != null) {
+            TicketVisibilitySettingsEntity draftVisibility = entity.getDraftVisibilitySettings();
+            if (draftVisibility == null) {
+                draftVisibility = createVisibilitySettingsEntity(draftVisibilityRequest, entity.getOrgUid());
+                entity.setDraftVisibilitySettings(draftVisibility);
+            } else {
+                TicketVisibilitySettingsEntity.applyRequest(draftVisibility, draftVisibilityRequest);
+            }
             draftUpdated = true;
         }
 
@@ -612,19 +779,59 @@ public class TicketSettingsRestService extends
             if (publishedCategory == null) {
                 publishedCategory = TicketCategorySettingsEntity.fromRequest(null, uidUtils::getUid);
                 publishedCategory.setUid(uidUtils.getUid());
+                publishedCategory.setOrgUid(entity.getOrgUid());
                 entity.setCategorySettings(publishedCategory);
             }
             if (draftCategory.getContent() != null) {
                 draftCategory.getContent().normalize();
                 publishedCategory.setContent(copyCategorySettings(draftCategory.getContent()));
             } else {
-                publishedCategory.setContent(CategorySettingsData.builder().build());
+                publishedCategory.setContent(TicketCategorySettingsData.builder().build());
             }
         }
 
         // 同步流程及表单引用
         entity.setProcess(entity.getDraftProcess());
         entity.setForm(entity.getDraftForm());
+
+        // 同步通知设置
+        if (entity.getDraftNotificationSettings() != null) {
+            TicketNotificationSettingsEntity publishedNotif = entity.getNotificationSettings();
+            if (publishedNotif == null) {
+                publishedNotif = TicketNotificationSettingsEntity.fromRequest(null);
+                publishedNotif.setUid(uidUtils.getUid());
+                publishedNotif.setOrgUid(entity.getOrgUid());
+                entity.setNotificationSettings(publishedNotif);
+            }
+            copyNotificationSettings(entity.getDraftNotificationSettings(), publishedNotif);
+        }
+
+        if (entity.getDraftSlaSettings() != null) {
+            TicketSlaSettingsEntity publishedSla = entity.getSlaSettings();
+            if (publishedSla == null) {
+                publishedSla = createSlaSettingsEntity(null, entity.getOrgUid());
+                entity.setSlaSettings(publishedSla);
+            }
+            copySlaSettings(entity.getDraftSlaSettings(), publishedSla);
+        }
+
+        if (entity.getDraftAutoCreateSettings() != null) {
+            TicketAutoCreateSettingsEntity publishedAutoCreate = entity.getAutoCreateSettings();
+            if (publishedAutoCreate == null) {
+                publishedAutoCreate = createAutoCreateSettingsEntity(null, entity.getOrgUid());
+                entity.setAutoCreateSettings(publishedAutoCreate);
+            }
+            copyAutoCreateSettings(entity.getDraftAutoCreateSettings(), publishedAutoCreate, entity.getOrgUid());
+        }
+
+        if (entity.getDraftVisibilitySettings() != null) {
+            TicketVisibilitySettingsEntity publishedVisibility = entity.getVisibilitySettings();
+            if (publishedVisibility == null) {
+                publishedVisibility = createVisibilitySettingsEntity(null, entity.getOrgUid());
+                entity.setVisibilitySettings(publishedVisibility);
+            }
+            copyVisibilitySettings(entity.getDraftVisibilitySettings(), publishedVisibility);
+        }
 
         // 发布时间与草稿标记维护
         entity.setPublishedAt(ZonedDateTime.now());
@@ -714,6 +921,94 @@ public class TicketSettingsRestService extends
             return null;
         }
         return request.getCategorySettings();
+    }
+
+    private TicketNotificationSettingsRequest resolveDraftNotificationRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getNotificationSettings();
+    }
+
+    private TicketSlaSettingsRequest resolveDraftSlaRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getSlaSettings();
+    }
+
+    private TicketAutoCreateSettingsRequest resolveDraftAutoCreateRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getAutoCreateSettings();
+    }
+
+    private TicketVisibilitySettingsRequest resolveDraftVisibilityRequest(TicketSettingsRequest request) {
+        if (request == null) {
+            return null;
+        }
+        return request.getVisibilitySettings();
+    }
+
+    private TicketNotificationSettingsEntity createNotificationSettingsEntity(TicketNotificationSettingsRequest request,
+            String orgUid) {
+        TicketNotificationSettingsEntity entity = TicketNotificationSettingsEntity.fromRequest(request);
+        entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(orgUid);
+        return entity;
+    }
+
+    private TicketSlaSettingsEntity createSlaSettingsEntity(TicketSlaSettingsRequest request, String orgUid) {
+        TicketSlaSettingsEntity entity = TicketSlaSettingsEntity.fromRequest(request, uidUtils::getUid, orgUid);
+        entity.setOrgUid(orgUid);
+        return entity;
+    }
+
+    private TicketAutoCreateSettingsEntity createAutoCreateSettingsEntity(TicketAutoCreateSettingsRequest request,
+            String orgUid) {
+        TicketAutoCreateSettingsEntity entity = TicketAutoCreateSettingsEntity.fromRequest(request);
+        entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(orgUid);
+        return entity;
+    }
+
+    private TicketVisibilitySettingsEntity createVisibilitySettingsEntity(TicketVisibilitySettingsRequest request,
+            String orgUid) {
+        TicketVisibilitySettingsEntity entity = TicketVisibilitySettingsEntity.fromRequest(request);
+        entity.setUid(uidUtils.getUid());
+        entity.setOrgUid(orgUid);
+        return entity;
+    }
+
+    private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request,
+            String orgUid) {
+        TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request, uidUtils::getUid);
+        category.setUid(uidUtils.getUid());
+        category.setOrgUid(orgUid);
+        if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+            category.setContent(buildDefaultCategorySettingsData());
+        }
+        return category;
+    }
+
+    private TicketCategorySettingsData buildDefaultCategorySettingsData() {
+        List<TicketCategoryItemData> items = new ArrayList<>();
+        String[] defaultCategories = TicketCategories.getAllCategories();
+        for (int index = 0; index < defaultCategories.length; index++) {
+            items.add(TicketCategoryItemData.builder()
+                    .uid(uidUtils.getUid())
+                    .name(defaultCategories[index])
+                    .enabled(Boolean.TRUE)
+                    .defaultCategory(index == 0)
+                    .orderIndex(index)
+                    .build());
+        }
+        TicketCategorySettingsData data = TicketCategorySettingsData.builder()
+                .items(items)
+                .build();
+        data.normalize();
+        return data;
     }
 
     private TicketBasicSettingsRequest resolveDraftBasicRequest(TicketSettingsRequest request) {
@@ -861,12 +1156,6 @@ public class TicketSettingsRestService extends
         if (request.getCloseTip() != null) {
             target.setCloseTip(request.getCloseTip());
         }
-        if (request.getAgentTimeoutTip() != null) {
-            target.setAgentTimeoutTip(request.getAgentTimeoutTip());
-        }
-        if (request.getVisitorTimeoutTip() != null) {
-            target.setVisitorTimeoutTip(request.getVisitorTimeoutTip());
-        }
 
         // 联系方式字段配置
         if (request.getShowContactName() != null) {
@@ -893,6 +1182,14 @@ public class TicketSettingsRestService extends
         if (request.getRequireWechat() != null) {
             target.setRequireWechat(request.getRequireWechat());
         }
+
+        // 智能工单生成
+        if (request.getEnableSmartTicketGenerate() != null) {
+            target.setEnableSmartTicketGenerate(request.getEnableSmartTicketGenerate());
+        }
+        if (request.getSmartTicketRobotUid() != null || !StringUtils.hasText(target.getSmartTicketRobotUid())) {
+            target.setSmartTicketRobotUid(request.getSmartTicketRobotUid());
+        }
     }
 
     private void copyBasicSettings(TicketBasicSettingsEntity source, TicketBasicSettingsEntity target) {
@@ -911,8 +1208,6 @@ public class TicketSettingsRestService extends
         // 工单提示语配置
         target.setAccessTip(source.getAccessTip());
         target.setCloseTip(source.getCloseTip());
-        target.setAgentTimeoutTip(source.getAgentTimeoutTip());
-        target.setVisitorTimeoutTip(source.getVisitorTimeoutTip());
 
         // 联系方式字段配置
         target.setShowContactName(source.getShowContactName());
@@ -923,6 +1218,10 @@ public class TicketSettingsRestService extends
         target.setRequirePhone(source.getRequirePhone());
         target.setShowWechat(source.getShowWechat());
         target.setRequireWechat(source.getRequireWechat());
+
+        // 智能工单生成
+        target.setEnableSmartTicketGenerate(source.getEnableSmartTicketGenerate());
+        target.setSmartTicketRobotUid(source.getSmartTicketRobotUid());
     }
 
     private TicketBasicSettingsResponse mapBasicSettings(TicketBasicSettingsEntity entity) {
@@ -943,8 +1242,6 @@ public class TicketSettingsRestService extends
                 // 工单提示语配置
                 .accessTip(entity.getAccessTip())
                 .closeTip(entity.getCloseTip())
-                .agentTimeoutTip(entity.getAgentTimeoutTip())
-                .visitorTimeoutTip(entity.getVisitorTimeoutTip())
 
                 // 联系方式字段配置
                 .showContactName(entity.getShowContactName())
@@ -955,19 +1252,23 @@ public class TicketSettingsRestService extends
                 .requirePhone(entity.getRequirePhone())
                 .showWechat(entity.getShowWechat())
                 .requireWechat(entity.getRequireWechat())
+
+                // 智能工单生成
+                .enableSmartTicketGenerate(entity.getEnableSmartTicketGenerate())
+                .smartTicketRobotUid(entity.getSmartTicketRobotUid())
                 .build();
     }
 
-    private CategorySettingsData copyCategorySettings(CategorySettingsData source) {
+    private TicketCategorySettingsData copyCategorySettings(TicketCategorySettingsData source) {
         if (source == null) {
-            CategorySettingsData copy = CategorySettingsData.builder().build();
+            TicketCategorySettingsData copy = TicketCategorySettingsData.builder().build();
             copy.normalize();
             return copy;
         }
-        List<CategoryItemData> copiedItems = source.getItems() == null
+        List<TicketCategoryItemData> copiedItems = source.getItems() == null
                 ? new ArrayList<>()
                 : source.getItems().stream()
-                        .map(item -> CategoryItemData.builder()
+                        .map(item -> TicketCategoryItemData.builder()
                                 .uid(item.getUid())
                                 .name(item.getName())
                                 .description(item.getDescription())
@@ -976,7 +1277,7 @@ public class TicketSettingsRestService extends
                                 .orderIndex(item.getOrderIndex())
                                 .build())
                         .collect(Collectors.toList());
-        CategorySettingsData copy = CategorySettingsData.builder()
+        TicketCategorySettingsData copy = TicketCategorySettingsData.builder()
                 .items(copiedItems)
                 .build();
         copy.normalize();
@@ -987,7 +1288,7 @@ public class TicketSettingsRestService extends
         if (entity == null || entity.getContent() == null) {
             return null;
         }
-        CategorySettingsData content = entity.getContent();
+        TicketCategorySettingsData content = entity.getContent();
         List<TicketCategoryItemResponse> items = content.getItems() == null
                 ? new ArrayList<>()
                 : content.getItems().stream()
@@ -1007,6 +1308,252 @@ public class TicketSettingsRestService extends
                 .disabledCount(content.countDisabled())
                 .updatedAt(entity.getUpdatedAt())
                 .build();
+    }
+
+    private TicketNotificationSettingsResponse mapNotificationSettings(TicketNotificationSettingsEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return TicketNotificationSettingsResponse.builder()
+                .uid(entity.getUid())
+                .emailEnabled(entity.getEmailEnabled())
+                .emailProviderUid(entity.getEmailProviderUid())
+                .emailEvents(entity.getEmailEvents())
+                .emailTemplates(entity.getEmailTemplates())
+                .internalEnabled(entity.getInternalEnabled())
+                .internalEvents(entity.getInternalEvents())
+                .webhookEnabled(entity.getWebhookEnabled())
+                .webhookUrl(entity.getWebhookUrl())
+                .webhookEvents(entity.getWebhookEvents())
+                .smsEnabled(entity.getSmsEnabled())
+                .smsProviderUid(entity.getSmsProviderUid())
+                .smsEvents(entity.getSmsEvents())
+                .smsTemplateIds(entity.getSmsTemplateIds())
+                .emailNotifyWhenOnline(entity.getEmailNotifyWhenOnline())
+                .smsNotifyWhenOnline(entity.getSmsNotifyWhenOnline())
+                .apnsEnabled(entity.getApnsEnabled())
+                .build();
+    }
+
+    private TicketAutoCreateSettingsResponse mapAutoCreateSettings(TicketAutoCreateSettingsEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        return TicketAutoCreateSettingsResponse.builder()
+                .uid(entity.getUid())
+                .enabled(entity.getEnabled())
+                .closeTypes(entity.getCloseTypes() == null
+                        ? TicketAutoCreateSettingsEntity.defaultCloseTypes()
+                        : new ArrayList<>(entity.getCloseTypes()))
+                .minVisitorMessageCount(entity.getMinVisitorMessageCount())
+                .minRobotMessageCount(entity.getMinRobotMessageCount())
+                .requireAiUnresolved(entity.getRequireAiUnresolved())
+                .requireAgentOffline(entity.getRequireAgentOffline())
+                .skipIfTicketExists(entity.getSkipIfTicketExists())
+                .autoTicketRobotUid(entity.getAutoTicketRobotUid())
+                .build();
+    }
+
+    private TicketVisibilitySettingsData copyVisibilitySettingsData(TicketVisibilitySettingsData source) {
+        TicketVisibilitySettingsData copy = source == null
+                ? TicketVisibilitySettingsData.builder().build()
+                : TicketVisibilitySettingsData.builder()
+                        .mode(source.getMode())
+                        .categoryRules(source.getCategoryRules() == null ? new ArrayList<>()
+                                : source.getCategoryRules().stream()
+                                        .map(rule -> TicketVisibilityCategoryRuleData.builder()
+                                                .categoryUid(rule.getCategoryUid())
+                                                .visibility(rule.getVisibility())
+                                                .build())
+                                        .collect(Collectors.toList()))
+                        .build();
+        copy.normalize();
+        return copy;
+    }
+
+    private void copyVisibilitySettings(TicketVisibilitySettingsEntity source, TicketVisibilitySettingsEntity target) {
+        if (source == null || target == null) {
+            return;
+        }
+        target.setContent(copyVisibilitySettingsData(source.getContent()));
+    }
+
+    private TicketVisibilitySettingsResponse mapVisibilitySettings(TicketVisibilitySettingsEntity entity) {
+        if (entity == null || entity.getContent() == null) {
+            return null;
+        }
+        TicketVisibilitySettingsData content = entity.getContent();
+        return TicketVisibilitySettingsResponse.builder()
+                .uid(entity.getUid())
+                .mode(content.getMode())
+                .categoryRules(content.getCategoryRules() == null ? new ArrayList<>()
+                        : content.getCategoryRules().stream()
+                                .map(rule -> TicketVisibilityCategoryRuleResponse.builder()
+                                        .categoryUid(rule.getCategoryUid())
+                                        .visibility(rule.getVisibility())
+                                        .build())
+                                .collect(Collectors.toList()))
+                .build();
+    }
+
+    private TicketSlaSettingsResponse mapSlaSettings(TicketSlaSettingsEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        List<TicketSlaRuleResponse> rules = entity.getRules() == null ? new ArrayList<>()
+                : entity.getRules().stream()
+                        .map(rule -> TicketSlaRuleResponse.builder()
+                                .uid(rule.getUid())
+                                .slaType(rule.getSlaType())
+                                .priority(rule.getPriority())
+                                .categoryUid(rule.getCategoryUid())
+                                .durationMinutes(rule.getDurationMinutes())
+                                .warningMinutes(rule.getWarningMinutes())
+                                .enabled(rule.getEnabled())
+                                .orderIndex(rule.getOrderIndex())
+                                .build())
+                        .collect(Collectors.toList());
+        return TicketSlaSettingsResponse.builder()
+                .uid(entity.getUid())
+                .enabled(entity.getEnabled())
+                .businessHoursEnabled(entity.getBusinessHoursEnabled())
+                .businessHoursStartTime(entity.getBusinessHoursStartTime())
+                .businessHoursEndTime(entity.getBusinessHoursEndTime())
+                .businessHoursTimezone(entity.getBusinessHoursTimezone())
+                .businessHoursCountryCode(entity.getBusinessHoursCountryCode())
+                .pauseOnHold(entity.getPauseOnHold())
+                .notifyOnBreach(entity.getNotifyOnBreach())
+                .autoEscalateEnabled(entity.getAutoEscalateEnabled())
+                .escalateAssigneeUid(entity.getEscalateAssigneeUid())
+                .autoCloseCustomerPendingEnabled(entity.getAutoCloseCustomerPendingEnabled())
+                .customerVerifyAutoCloseHours(entity.getCustomerVerifyAutoCloseHours())
+                .warningPercent(entity.getWarningPercent())
+                .rules(rules)
+                .build();
+    }
+
+    private void applyNotificationSettings(TicketNotificationSettingsEntity target,
+            TicketNotificationSettingsEntity source) {
+        if (target == null || source == null)
+            return;
+        if (source.getEmailEnabled() != null)
+            target.setEmailEnabled(source.getEmailEnabled());
+        if (source.getEmailProviderUid() != null)
+            target.setEmailProviderUid(source.getEmailProviderUid());
+        if (source.getEmailEvents() != null)
+            target.setEmailEvents(source.getEmailEvents());
+        if (source.getEmailTemplates() != null)
+            target.setEmailTemplates(source.getEmailTemplates());
+        if (source.getInternalEnabled() != null)
+            target.setInternalEnabled(source.getInternalEnabled());
+        if (source.getInternalEvents() != null)
+            target.setInternalEvents(source.getInternalEvents());
+        if (source.getWebhookEnabled() != null)
+            target.setWebhookEnabled(source.getWebhookEnabled());
+        if (source.getWebhookUrl() != null)
+            target.setWebhookUrl(source.getWebhookUrl());
+        if (source.getWebhookEvents() != null)
+            target.setWebhookEvents(source.getWebhookEvents());
+        if (source.getSmsEnabled() != null)
+            target.setSmsEnabled(source.getSmsEnabled());
+        if (source.getSmsProviderUid() != null)
+            target.setSmsProviderUid(source.getSmsProviderUid());
+        if (source.getSmsEvents() != null)
+            target.setSmsEvents(source.getSmsEvents());
+        if (source.getSmsTemplateIds() != null)
+            target.setSmsTemplateIds(source.getSmsTemplateIds());
+        if (source.getEmailNotifyWhenOnline() != null)
+            target.setEmailNotifyWhenOnline(source.getEmailNotifyWhenOnline());
+        if (source.getSmsNotifyWhenOnline() != null)
+            target.setSmsNotifyWhenOnline(source.getSmsNotifyWhenOnline());
+    }
+
+    private void copyNotificationSettings(TicketNotificationSettingsEntity source,
+            TicketNotificationSettingsEntity target) {
+        if (source == null || target == null)
+            return;
+        target.setEmailEnabled(source.getEmailEnabled());
+        target.setEmailProviderUid(source.getEmailProviderUid());
+        target.setEmailEvents(source.getEmailEvents() != null ? new java.util.ArrayList<>(source.getEmailEvents())
+                : new java.util.ArrayList<>());
+        target.setEmailTemplates(
+                source.getEmailTemplates() != null ? new java.util.ArrayList<>(source.getEmailTemplates())
+                        : new java.util.ArrayList<>());
+        target.setInternalEnabled(source.getInternalEnabled());
+        target.setInternalEvents(
+                source.getInternalEvents() != null ? new java.util.ArrayList<>(source.getInternalEvents())
+                        : new java.util.ArrayList<>());
+        target.setWebhookEnabled(source.getWebhookEnabled());
+        target.setWebhookUrl(source.getWebhookUrl());
+        target.setWebhookEvents(source.getWebhookEvents() != null ? new java.util.ArrayList<>(source.getWebhookEvents())
+                : new java.util.ArrayList<>());
+        target.setSmsEnabled(source.getSmsEnabled());
+        target.setSmsProviderUid(source.getSmsProviderUid());
+        target.setSmsEvents(source.getSmsEvents() != null ? new java.util.ArrayList<>(source.getSmsEvents())
+                : new java.util.ArrayList<>());
+        target.setSmsTemplateIds(
+                source.getSmsTemplateIds() != null ? new java.util.HashMap<>(source.getSmsTemplateIds())
+                        : new java.util.HashMap<>());
+        target.setEmailNotifyWhenOnline(source.getEmailNotifyWhenOnline());
+        target.setSmsNotifyWhenOnline(source.getSmsNotifyWhenOnline());
+    }
+
+    private void copySlaSettings(TicketSlaSettingsEntity source, TicketSlaSettingsEntity target) {
+        if (source == null || target == null)
+            return;
+        target.setEnabled(source.getEnabled());
+        target.setBusinessHoursEnabled(source.getBusinessHoursEnabled());
+        target.setBusinessHoursStartTime(source.getBusinessHoursStartTime());
+        target.setBusinessHoursEndTime(source.getBusinessHoursEndTime());
+        target.setBusinessHoursTimezone(source.getBusinessHoursTimezone());
+        target.setBusinessHoursCountryCode(source.getBusinessHoursCountryCode());
+        target.setPauseOnHold(source.getPauseOnHold());
+        target.setNotifyOnBreach(source.getNotifyOnBreach());
+        target.setAutoEscalateEnabled(source.getAutoEscalateEnabled());
+        target.setEscalateAssigneeUid(source.getEscalateAssigneeUid());
+        target.setAutoCloseCustomerPendingEnabled(source.getAutoCloseCustomerPendingEnabled());
+        target.setCustomerVerifyAutoCloseHours(source.getCustomerVerifyAutoCloseHours());
+        target.setWarningPercent(source.getWarningPercent());
+        target.getRules().clear();
+        if (source.getRules() != null) {
+            for (TicketSlaRuleEntity rule : source.getRules()) {
+                target.getRules().add(TicketSlaRuleEntity.builder()
+                        .uid(uidUtils.getUid())
+                        .slaType(rule.getSlaType())
+                        .priority(rule.getPriority())
+                        .categoryUid(rule.getCategoryUid())
+                        .durationMinutes(rule.getDurationMinutes())
+                        .warningMinutes(rule.getWarningMinutes())
+                        .enabled(rule.getEnabled())
+                        .orderIndex(rule.getOrderIndex())
+                        .build());
+            }
+        }
+    }
+
+    private void applyAutoCreateSettingsRequest(TicketAutoCreateSettingsEntity target,
+            TicketAutoCreateSettingsRequest request, String orgUid) {
+        if (target == null || request == null) {
+            return;
+        }
+        TicketAutoCreateSettingsEntity.applyRequest(target, request);
+    }
+
+    private void copyAutoCreateSettings(TicketAutoCreateSettingsEntity source,
+            TicketAutoCreateSettingsEntity target, String orgUid) {
+        if (source == null || target == null) {
+            return;
+        }
+        target.setEnabled(source.getEnabled());
+        target.setCloseTypes(source.getCloseTypes() == null
+                ? TicketAutoCreateSettingsEntity.defaultCloseTypes()
+                : new ArrayList<>(source.getCloseTypes()));
+        target.setMinVisitorMessageCount(source.getMinVisitorMessageCount());
+        target.setMinRobotMessageCount(source.getMinRobotMessageCount());
+        target.setRequireAiUnresolved(source.getRequireAiUnresolved());
+        target.setRequireAgentOffline(source.getRequireAgentOffline());
+        target.setSkipIfTicketExists(source.getSkipIfTicketExists());
+        target.setAutoTicketRobotUid(source.getAutoTicketRobotUid());
     }
 
     private ProcessResponse mapProcess(ProcessEntity entity) {
@@ -1054,7 +1601,29 @@ public class TicketSettingsRestService extends
         resp.setForm(mapForm(entity.getForm()));
         resp.setDraftForm(mapForm(entity.getDraftForm()));
 
+        // 通知设置
+        resp.setNotificationSettings(mapNotificationSettings(entity.getNotificationSettings()));
+        resp.setDraftNotificationSettings(mapNotificationSettings(entity.getDraftNotificationSettings()));
+
+        resp.setSlaSettings(mapSlaSettings(entity.getSlaSettings()));
+        resp.setDraftSlaSettings(mapSlaSettings(entity.getDraftSlaSettings()));
+
+        resp.setAutoCreateSettings(mapAutoCreateSettings(entity.getAutoCreateSettings()));
+        resp.setDraftAutoCreateSettings(mapAutoCreateSettings(entity.getDraftAutoCreateSettings()));
+
+        resp.setVisibilitySettings(mapVisibilitySettings(entity.getVisibilitySettings()));
+        resp.setDraftVisibilitySettings(mapVisibilitySettings(entity.getDraftVisibilitySettings()));
+
         return resp;
+    }
+
+    public Optional<TicketSettingsEntity> findDefaultByOrgUidAndType(String orgUid, String type) {
+        List<TicketSettingsEntity> settings = ticketSettingsRepository.findByOrgUidAndTypeAndIsDefaultTrue(orgUid,
+                type);
+        if (settings == null || settings.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(settings.get(0));
     }
 
     @Override
@@ -1096,6 +1665,59 @@ public class TicketSettingsRestService extends
             }
         }
         target.setIsDefault(true);
+    }
+
+    // ========== 测试邮件 / 短信 ==========
+
+    /**
+     * 发送测试邮件，使用指定的邮件供应商。
+     */
+    public JsonResult<Boolean> sendTestEmail(String emailProviderUid, String to) {
+        if (!StringUtils.hasText(emailProviderUid)) {
+            return JsonResult.error("请选择邮件供应商");
+        }
+        if (!StringUtils.hasText(to)) {
+            return JsonResult.error("请输入测试收件邮箱");
+        }
+        Optional<EmailProviderEntity> emailOpt = emailProviderRepository.findByUid(emailProviderUid);
+        if (emailOpt.isEmpty() || emailOpt.get().isDeleted() || !Boolean.TRUE.equals(emailOpt.get().getEnabled())) {
+            return JsonResult.error("邮件供应商不存在或已禁用");
+        }
+        String subject = "【微语客服】测试邮件";
+        String html = "<h3>测试邮件</h3><p>这是一封来自微语客服系统的测试邮件，如果您收到此邮件，说明邮件配置正确。</p>";
+        String orgUid = authService.getCurrentUser().getOrgUid();
+        var result = emailPushSendService.sendEmail(emailOpt.get(), to, subject, html, orgUid);
+        if (result.isSuccess()) {
+            return JsonResult.success("测试邮件发送成功");
+        }
+        return JsonResult.error("测试邮件发送失败: " + (result.getErrorMessage() != null ? result.getErrorMessage() : "未知错误"));
+    }
+
+    /**
+     * 发送测试短信，直接传入模板编码和签名。
+     */
+    public JsonResult<Boolean> sendTestSms(String to, String country, String signName, String templateCode) {
+        if (!StringUtils.hasText(to)) {
+            return JsonResult.error("请输入测试手机号");
+        }
+        if (!StringUtils.hasText(templateCode)) {
+            return JsonResult.error("请选择短信模板");
+        }
+        if (!StringUtils.hasText(signName)) {
+            return JsonResult.error("短信签名缺失");
+        }
+        String mobileCountry = StringUtils.hasText(country) ? country : "86";
+        java.util.Map<String, String> testParams = new java.util.HashMap<>();
+        testParams.put("name", "测试用户");
+        testParams.put("ticketNumber", "TEST001");
+        testParams.put("status", "测试");
+        String orgUid = authService.getCurrentUser().getOrgUid();
+        var result = smsPushSendService.sendSmsWithTemplate(to, mobileCountry, signName, templateCode, testParams,
+                orgUid);
+        if (result.isSuccess()) {
+            return JsonResult.success("测试短信发送成功");
+        }
+        return JsonResult.error("测试短信发送失败: " + (result.getErrorMessage() != null ? result.getErrorMessage() : "未知错误"));
     }
 
 }

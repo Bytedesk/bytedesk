@@ -15,6 +15,7 @@ package com.bytedesk.core.member;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -36,12 +37,16 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
+import com.bytedesk.core.exception.OrgMaxMembersExceededException;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
@@ -55,6 +60,7 @@ import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.department.DepartmentEntity;
 import com.bytedesk.core.department.DepartmentRequest;
 import com.bytedesk.core.department.DepartmentRestService;
@@ -88,12 +94,14 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
     private final OrganizationRestService organizationRestService;
 
+    private final MessageService messageService;
+
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
             throw new IllegalArgumentException("orgUid is required");
         }
         return organizationRestService.findByUid(orgUid)
-                .orElseThrow(() -> new NotFoundException("Organization with UID: " + orgUid + " not found."));
+            .orElseThrow(() -> OrganizationI18nExceptions.organizationNotFound(orgUid));
     }
 
     private int resolveMaxMembers(OrganizationEntity organization) {
@@ -101,22 +109,27 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     }
 
     private void assertMemberCapacityAvailable(String orgUid) {
-        UserEntity authUser = authService.getUser();
-        if (authUser != null && authUser.isSuperUser()) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
             return;
         }
         OrganizationEntity organization = requireOrganization(orgUid);
         int maxMembers = resolveMaxMembers(organization);
         long current = memberRepository.countByOrgUidAndDeletedFalse(orgUid);
         if (current >= maxMembers) {
-            throw new RuntimeException("Organization member limit exceeded");
+            String orgName = StringUtils.hasText(organization.getName()) ? organization.getName() : orgUid;
+            String message = String.format(
+                    "组织【%s】成员数已达上限，当前已使用 %d/%d，无法继续新增成员。请先停用或删除未使用成员，或到组织设置中提高“成员最大数”后重试。",
+                    orgName,
+                    current,
+                    maxMembers);
+            throw new OrgMaxMembersExceededException(orgUid, orgName, maxMembers, current, message);
         }
     }
 
     public MemberResponse query(MemberRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("Login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         if (!StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid is required");
@@ -125,7 +138,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
     }
 
@@ -133,11 +146,12 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (!StringUtils.hasText(request.getUserUid())) {
             throw new IllegalArgumentException("userUid is required");
         }
-        Optional<MemberEntity> memberOptional = findByUserUid(request.getUserUid());
+        String orgUid = resolveOrgUid(request.getOrgUid());
+        Optional<MemberEntity> memberOptional = findByUserUidAndOrgUid(request.getUserUid(), orgUid);
         if (memberOptional.isPresent()) {
             return convertToResponse(memberOptional.get());
         } else {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
     }
 
@@ -161,8 +175,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
             throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
         }
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndOrgUid(request.getMobile(), request.getOrgUid())) {
+            && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, request.getOrgUid())) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         assertMemberCapacityAvailable(request.getOrgUid());
@@ -175,9 +191,15 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         member.setDeptUid(request.getDeptUid());
         member.setOrgUid(request.getOrgUid());
+        member.setAvatar(resolveMemberAvatar(request.getAvatar(), null));
+        member.setDescription(resolveMemberDescription(request.getDescription(), null));
         // 
         Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
         request.setRoleUids(normalizedRoleUids);
+        member.setAllowedLoginPlatforms(resolveAllowedLoginPlatforms(
+            request.getAllowedLoginPlatforms(),
+            normalizedRoleUids,
+            null));
         // 尝试根据邮箱和平台查找用户
         UserRequest userRequest = modelMapper.map(request, UserRequest.class);
         userRequest.setAvatar(AvatarConsts.getDefaultUserAvatarUrl());
@@ -187,6 +209,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         UserEntity user = null;
         if (StringUtils.hasText(request.getMobile())) {
             user = userService.findByMobileAndPlatform(request.getMobile(),
+                    normalizedCountry,
                     PlatformEnum.BYTEDESK.name())
                     .orElseGet(() -> userService.createUserFromMember(userRequest));
         } else if (StringUtils.hasText(request.getEmail())) {
@@ -197,9 +220,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             throw new RuntimeException("mobile and email should not be both null.");
         }
 
-        // 确保 user 处于当前组织上下文，并按请求写入角色
-        userService.ensureCurrentOrganization(user, request.getOrgUid());
-        user = userService.updateUserRoles(user, normalizedRoleUids);
+        if (!StringUtils.hasText(member.getCountry()) && StringUtils.hasText(user.getCountry())) {
+            member.setCountry(user.getCountry());
+        }
+        user = userService.updateUserFromMember(user, request);
         // 设置用户到成员对象中
         member.setUser(user);
         //
@@ -220,28 +244,47 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         //
         MemberEntity member = memberOptional.get();
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
 
         // 保护超级管理员账号：禁止将非超管成员的邮箱/手机号改成超管的
         String targetUserUid = member.getUser() != null ? member.getUser().getUid() : null;
         userService.validateNotUsingSuperCredentials(request.getEmail(), request.getMobile(), targetUserUid);
 
+        if (StringUtils.hasText(request.getMobile())) {
+            boolean mobileChanged = !request.getMobile().equals(member.getMobile());
+            boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(member.getCountry()));
+            if ((mobileChanged || countryChanged)
+                    && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, member.getOrgUid())) {
+                throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+            }
+        }
+
         // modelMapper.map(memberRequest, member);
         member.setDeptUid(request.getDeptUid());
         member.setNickname(request.getNickname());
-        member.setAvatar(request.getAvatar());
-        member.setDescription(request.getDescription());
+        member.setAvatar(resolveMemberAvatar(request.getAvatar(), member.getAvatar()));
+        member.setDescription(resolveMemberDescription(request.getDescription(), member.getDescription()));
         member.setEmail(request.getEmail());
+        member.setCountry(normalizedCountry);
         member.setMobile(request.getMobile());
         member.setJobTitle(request.getJobTitle());
         member.setJobNo(request.getJobNo());
         member.setSeatNo(request.getSeatNo());
         member.setTelephone(request.getTelephone());
-        Set<String> normalizedRoleUids = normalizeRoleUids(request.getRoleUids());
-        request.setRoleUids(normalizedRoleUids);
-        // 
+
         UserEntity user = member.getUser();
-        userService.ensureCurrentOrganization(user, member.getOrgUid());
-        userService.updateUserRoles(user, normalizedRoleUids);
+        Set<String> normalizedRoleUids = request.getRoleUids() == null
+            ? normalizeRoleUids(user != null ? user.getRoleUids() : null)
+            : normalizeRoleUids(request.getRoleUids());
+        request.setRoleUids(normalizedRoleUids);
+        member.setAllowedLoginPlatforms(resolveAllowedLoginPlatforms(
+            request.getAllowedLoginPlatforms(),
+            normalizedRoleUids,
+            member.getAllowedLoginPlatforms()));
+
+        user = userService.updateUserFromMember(user, request);
+        member.setUser(user);
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
@@ -271,6 +314,60 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return normalized;
     }
 
+    private String resolveMemberAvatar(String requestedAvatar, String existingAvatar) {
+        if (StringUtils.hasText(requestedAvatar)) {
+            return requestedAvatar;
+        }
+        if (StringUtils.hasText(existingAvatar)) {
+            return existingAvatar;
+        }
+        return AvatarConsts.getDefaultUserAvatarUrl();
+    }
+
+    private String resolveMemberDescription(String requestedDescription, String existingDescription) {
+        if (StringUtils.hasText(requestedDescription)) {
+            return requestedDescription;
+        }
+        if (StringUtils.hasText(existingDescription)) {
+            return existingDescription;
+        }
+        return I18Consts.I18N_USER_DESCRIPTION;
+    }
+
+    private Set<String> resolveAllowedLoginPlatforms(Set<String> requestedPlatforms,
+            Set<String> normalizedRoleUids,
+            Set<String> existingPlatforms) {
+        Set<String> normalizedRequested = normalizeAllowedLoginPlatforms(requestedPlatforms);
+        if (!normalizedRequested.isEmpty()) {
+            return normalizedRequested;
+        }
+
+        Set<String> normalizedExisting = normalizeAllowedLoginPlatforms(existingPlatforms);
+        if (!normalizedExisting.isEmpty()) {
+            return normalizedExisting;
+        }
+
+        return MemberLoginPlatformEnum.defaultForRoleUids(normalizedRoleUids);
+    }
+
+    private Set<String> normalizeAllowedLoginPlatforms(Set<String> allowedLoginPlatforms) {
+        LinkedHashSet<String> normalized = new LinkedHashSet<>();
+        if (allowedLoginPlatforms == null) {
+            return normalized;
+        }
+
+        for (String platform : allowedLoginPlatforms) {
+            if (!StringUtils.hasText(platform)) {
+                continue;
+            }
+            String normalizedPlatform = platform.trim();
+            if (MemberLoginPlatformEnum.isSupported(normalizedPlatform)) {
+                normalized.add(normalizedPlatform);
+            }
+        }
+        return normalized;
+    }
+
     // activate
     @Transactional
     public MemberResponse activate(MemberRequest request) {
@@ -282,6 +379,54 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = memberOptional.get();
         member.setStatus(MemberStatusEnum.ACTIVE.name());
         // 
+        MemberEntity savedEntity = save(member);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+        return convertToResponse(savedEntity);
+    }
+
+    @Transactional
+    public MemberResponse forceLogout(MemberRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("member uid is required");
+        }
+
+        MemberEntity member = findByUid(request.getUid())
+            .orElseThrow(ResourceI18nExceptions::memberNotFound);
+        member.setForceLogout(true);
+        member.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
+        member.setForceLogoutAt(java.time.ZonedDateTime.now());
+
+        MemberEntity savedEntity = save(member);
+        if (savedEntity == null) {
+            throw new RuntimeException("Failed to save member.");
+        }
+
+        if (savedEntity.getUser() != null) {
+                messageService.sendForceLogoutMessage(
+                    savedEntity.getUser(),
+                    savedEntity.getOrgUid(),
+                    "MEMBER",
+                    savedEntity.getUid(),
+                    savedEntity.getForceLogoutReason());
+        }
+
+        return convertToResponse(savedEntity);
+    }
+
+    @Transactional
+    public MemberResponse restoreLogin(MemberRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new RuntimeException("member uid is required");
+        }
+
+        MemberEntity member = findByUid(request.getUid())
+            .orElseThrow(ResourceI18nExceptions::memberNotFound);
+        member.setForceLogout(false);
+        member.setForceLogoutReason(null);
+        member.setForceLogoutAt(null);
+
         MemberEntity savedEntity = save(member);
         if (savedEntity == null) {
             throw new RuntimeException("Failed to save member.");
@@ -310,9 +455,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#uid", unless = "#result == null")
-    public Optional<MemberEntity> findByUserUid(String uid) {
-        Optional<MemberEntity> memberOptional = memberRepository.findByUser_UidAndDeletedFalse(uid);
+    public Optional<MemberEntity> findByUserUidAndOrgUid(String uid, String orgUid) {
+        Optional<MemberEntity> memberOptional = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(uid, orgUid);
         if (memberOptional.isPresent()) {
             MemberEntity member = memberOptional.get();
             // 预加载user，确保user数据被包含在缓存中
@@ -323,20 +467,25 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#mobile", unless = "#result == null")
+    public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String country, String orgUid) {
+        Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndCountryAndOrgUidAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                orgUid);
+        if (memberOptional.isPresent()) {
+            MemberEntity member = memberOptional.get();
+            // 预加载user，确保user数据被包含在缓存中
+            if (member.getUser() != null) {
+                member.getUser().getUid();
+            }
+        }
+        return memberOptional;
+    }
+
     public Optional<MemberEntity> findByMobileAndOrgUid(String mobile, String orgUid) {
-        Optional<MemberEntity> memberOptional = memberRepository.findByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
-        if (memberOptional.isPresent()) {
-            MemberEntity member = memberOptional.get();
-            // 预加载user，确保user数据被包含在缓存中
-            if (member.getUser() != null) {
-                member.getUser().getUid();
-            }
-        }
-        return memberOptional;
+        return findByMobileAndOrgUid(mobile, CountryCodeUtils.DEFAULT_COUNTRY, orgUid);
     }
 
-    @Cacheable(value = "member", key = "#email", unless = "#result == null")
     public Optional<MemberEntity> findByEmailAndOrgUid(String email, String orgUid) {
         Optional<MemberEntity> memberOptional = memberRepository.findByEmailAndOrgUidAndDeletedFalse(email, orgUid);
         if (memberOptional.isPresent()) {
@@ -349,7 +498,6 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
-    @Cacheable(value = "member", key = "#user.uid", unless = "#result == null")
     public Optional<MemberEntity> findByUserAndOrgUid(UserEntity user, String orgUid) {
         Optional<MemberEntity> memberOptional = memberRepository.findByUserAndOrgUidAndDeletedFalse(user, orgUid);
         if (memberOptional.isPresent()) {
@@ -362,12 +510,30 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         return memberOptional;
     }
 
+    private String resolveOrgUid(String orgUid) {
+        if (StringUtils.hasText(orgUid)) {
+            return orgUid;
+        }
+        UserEntity currentUser = authService.getUser();
+        if (currentUser != null && StringUtils.hasText(currentUser.getOrgUid())) {
+            return currentUser.getOrgUid();
+        }
+        throw new IllegalArgumentException("orgUid is required");
+    }
+
     public Boolean existsByEmailAndOrgUid(String email, String orgUid) {
         return memberRepository.existsByEmailAndOrgUidAndDeletedFalse(email, orgUid);
     }
 
+    public Boolean existsByMobileAndOrgUid(String mobile, String country, String orgUid) {
+        return memberRepository.existsByMobileAndCountryAndOrgUidAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                orgUid);
+    }
+
     public Boolean existsByMobileAndOrgUid(String mobile, String orgUid) {
-        return memberRepository.existsByMobileAndOrgUidAndDeletedFalse(mobile, orgUid);
+        return existsByMobileAndOrgUid(mobile, CountryCodeUtils.DEFAULT_COUNTRY, orgUid);
     }
 
     @CachePut(value = "member", key = "#member.uid")
@@ -425,7 +591,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (StringUtils.hasText(excel.getEmail()) && existsByEmailAndOrgUid(excel.getEmail(), orgUid)) {
             return null;
         }
-        if (StringUtils.hasText(excel.getMobile()) && existsByMobileAndOrgUid(excel.getMobile(), orgUid)) {
+        if (StringUtils.hasText(excel.getMobile())
+            && existsByMobileAndOrgUid(excel.getMobile(), CountryCodeUtils.DEFAULT_COUNTRY, orgUid)) {
             return null;
         }
         assertMemberCapacityAvailable(orgUid);
@@ -435,6 +602,16 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         MemberEntity member = modelMapper.map(excel, MemberEntity.class);
         member.setUid(uidUtils.getUid());
         member.setOrgUid(orgUid);
+        Set<String> importedPlatforms = MemberLoginPlatformEnum.parseImportPlatforms(excel.getAllowedLoginPlatformsText());
+        if (importedPlatforms.isEmpty() && StringUtils.hasText(excel.getAllowedLoginPlatformsText())) {
+            log.warn("Excel导入成员可登录平台无法识别，已回退为全平台: orgUid={}, nickname={}, raw={}",
+                orgUid,
+                excel.getNickname(),
+                excel.getAllowedLoginPlatformsText());
+        }
+        member.setAllowedLoginPlatforms(importedPlatforms.isEmpty()
+            ? MemberLoginPlatformEnum.allCodes()
+            : importedPlatforms);
         // 
         String deptName = normalizeExcelText(excel.getDepartmentName());
         if (StringUtils.hasText(deptName)) {
@@ -476,7 +653,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             // 先尝试查找现有用户，避免创建重复用户
             if (StringUtils.hasText(excel.getMobile())) {
                 Optional<UserEntity> existingUser = userService.findByMobileAndPlatform(
-                        excel.getMobile(), PlatformEnum.BYTEDESK.name());
+                        excel.getMobile(), CountryCodeUtils.DEFAULT_COUNTRY, PlatformEnum.BYTEDESK.name());
                 if (existingUser.isPresent()) {
                     user = existingUser.get();
                 }
@@ -495,6 +672,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                     .nickname(excel.getNickname())
                     .email(excel.getEmail())
                     .mobile(excel.getMobile())
+                    .country(CountryCodeUtils.DEFAULT_COUNTRY)
                     .password(excel.getPassword())
                     .platform(PlatformEnum.BYTEDESK.name())
                     .registerSource(RegisterSource.ADMIN.name())
@@ -510,9 +688,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                 user = userService.createUserFromMember(userRequest);
             }
 
-            // 确保 user 处于当前组织上下文，并写入默认导入角色
-            userService.ensureCurrentOrganization(user, orgUid);
-            user = userService.updateUserRoles(user, roleUids);
+            user = userService.updateUserRoles(user, roleUids, orgUid, true);
             
             // 设置用户到成员对象中
             member.setUser(user);
@@ -613,7 +789,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         Optional<MemberEntity> memberOptional = findByUid(request.getUid());
         if (memberOptional.isEmpty() || memberOptional.get().isDeleted()) {
-            throw new NotFoundException("Member not found");
+            throw ResourceI18nExceptions.memberNotFound();
         }
 
         MemberEntity member = memberOptional.get();
@@ -639,6 +815,9 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             entity.getUser().getUid();
             response.setUser(modelMapper.map(entity.getUser(), UserResponseSimple.class));
             response.setRoles(getRolesForOrg(entity.getUser(), entity.getOrgUid()));
+            if (!StringUtils.hasText(response.getCountry()) && StringUtils.hasText(entity.getUser().getCountry())) {
+                response.setCountry(entity.getUser().getCountry());
+            }
         }
         return response;
     }

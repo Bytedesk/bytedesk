@@ -13,7 +13,8 @@
  */
 package com.bytedesk.voc.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class VocPlugin extends AbstractBytedeskPlugin {
+
+    public VocPlugin(
+            @Qualifier("vocHealthIndicator") ObjectProvider<HealthIndicator> vocHealthIndicatorProvider) {
+        this.vocHealthIndicator = vocHealthIndicatorProvider.getIfAvailable();
+    }
+
     
     @Value("${bytedesk.voc.enabled:true}")
     private boolean enabled;
@@ -36,8 +43,7 @@ public class VocPlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.voc.version:1.0.0}")
     private String version;
     
-    @Autowired(required = false)
-    private HealthIndicator vocHealthIndicator;
+    private final HealthIndicator vocHealthIndicator;
     
     @Override
     protected HealthIndicator getHealthIndicator() {

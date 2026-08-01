@@ -13,22 +13,52 @@
  */
 package com.bytedesk.core.config.properties;
 
+import org.springframework.core.env.Environment;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ApiRateLimiter;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.utils.LicenseValidator;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/config/bytedesk", produces = "application/json;charset=UTF-8")
 @Tag(name = "Configuration Properties", description = "Configuration properties management APIs for system settings")
 public class BytedeskPropertiesController {
+
+    private static final String FALLBACK_TTS_PROVIDER = "dashscope";
+    private static final String FALLBACK_TTS_MODEL = "cosyvoice-v3-flash";
+    private static final String FALLBACK_TTS_VOICE = "longanhuan";
+    private static final String FALLBACK_TTS_LANGUAGE = "zh-CN";
+    private static final String FALLBACK_TTS_AUDIO_FORMAT = "mp3";
+    private static final String FALLBACK_ASR_PROVIDER = "dashscope";
+    private static final String FALLBACK_ASR_MODEL = "paraformer-v2";
+    private static final String FALLBACK_ASR_REALTIME_MODEL = "paraformer-realtime-v2";
+    private static final String FALLBACK_ASR_SOURCE_FORMAT = "mp3";
+    private static final long FALLBACK_ASR_TIMEOUT_MS = 180_000L;
+    private static final long FALLBACK_ASR_POLL_INTERVAL_MS = 1_500L;
+
+    private static final String LICENSE_INVALID_MESSAGE = "LICENSE_INVALID";
+
+    private final Environment environment;
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public BytedeskPropertiesController(Environment environment,
+                                         StringRedisTemplate stringRedisTemplate) {
+        this.environment = environment;
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
 
     // http://127.0.0.1:9003/config/bytedesk/properties
     @ApiRateLimiter(value = 1, timeout = 1)
@@ -37,6 +67,71 @@ public class BytedeskPropertiesController {
     public ResponseEntity<JsonResult<?>> getBytedeskProperties() {
 
         BytedeskPropertiesResponse bytedeskPropertiesResponse = ConvertUtils.convertToBytedeskPropertiesResponse(BytedeskProperties.getInstance());
+        if (bytedeskPropertiesResponse.getCustom() == null) {
+            bytedeskPropertiesResponse.setCustom(new BytedeskPropertiesResponse.Custom());
+        }
+        bytedeskPropertiesResponse.getCustom().setBndEnabled(
+                environment.getProperty("bytedesk.custom.bnd.enabled", Boolean.class, false));
+        if (bytedeskPropertiesResponse.getService() == null) {
+            bytedeskPropertiesResponse.setService(new BytedeskPropertiesResponse.Service());
+        }
+        bytedeskPropertiesResponse.getService().setAgentSeatEnabled(
+            environment.getProperty("bytedesk.service.agent-seat-enabled", Boolean.class, false));
+
+        // 服务端始终验证原始许可证，但只向前端返回提取后的加密摘要，避免暴露原始 licenseKey。
+        String licenseKey = bytedeskPropertiesResponse.getLicenseKey();
+        if (StringUtils.hasText(licenseKey)) {
+            String cacheKey = BytedeskConsts.LICENSE_VALID_CACHE_PREFIX + BytedeskProperties.getInstance().getOriginalAppkey();
+            String cachedResult = stringRedisTemplate.opsForValue().get(cacheKey);
+
+            // 即使 Redis 缓存为 "false"，仍需重新验证许可证。
+            // 原因：Redis 缓存可能来自上一次运行实例的失败记录（30 分钟有效），
+            // 而当前实例启动时验签可能已通过，缓存不应阻断前端获取正确的许可证摘要。
+            boolean cacheSaysInvalid = "false".equalsIgnoreCase(cachedResult);
+
+            LicenseValidator.LicenseInfo licenseInfo = BytedeskProperties.getInstance().validateLicense();
+            if (licenseInfo != null && licenseInfo.isValid()) {
+                // 验签通过：覆盖可能存在的旧缓存（包括将 "false" 刷新为 "true"）
+                if (!"true".equalsIgnoreCase(cachedResult)) {
+                    stringRedisTemplate.opsForValue().set(cacheKey, "true",
+                            java.time.Duration.ofHours(1));
+                }
+                if (cacheSaysInvalid) {
+                    log.info("License re-validated successfully, stale cache cleared: edition={}, expiry={}",
+                            licenseInfo.getEdition(), licenseInfo.getExpiryDate());
+                }
+                bytedeskPropertiesResponse.setLicenseKey(LicenseValidator.encryptForFrontend(licenseInfo));
+                // log.info("License validated and transformed for frontend: format={}, edition={}, expiry={}",
+                //         licenseInfo.getFormat(), licenseInfo.getEdition(), licenseInfo.getExpiryDate());
+            } else {
+                stringRedisTemplate.opsForValue().set(cacheKey, "false",
+                        java.time.Duration.ofMinutes(30));
+                log.warn("License validation FAILED, marking as invalid");
+                bytedeskPropertiesResponse.setLicenseKey(LICENSE_INVALID_MESSAGE);
+            }
+        }
+
+        BytedeskPropertiesResponse.Ai ai = new BytedeskPropertiesResponse.Ai();
+
+        // spring.ai.* 负责供应商/模型能力配置；bytedesk.ai.* 负责系统表单和执行接口共享的默认值。
+        BytedeskPropertiesResponse.Tts tts = new BytedeskPropertiesResponse.Tts();
+        tts.setProvider(environment.getProperty("spring.ai.model.audio", FALLBACK_TTS_PROVIDER));
+        tts.setModel(environment.getProperty("spring.ai.dashscope.audio.synthesis.options.model", FALLBACK_TTS_MODEL));
+        tts.setVoice(environment.getProperty("spring.ai.dashscope.audio.synthesis.options.voice", FALLBACK_TTS_VOICE));
+        tts.setLanguage(environment.getProperty("bytedesk.ai.tts.language", FALLBACK_TTS_LANGUAGE));
+        tts.setAudioFormat(environment.getProperty("bytedesk.ai.tts.audio-format", FALLBACK_TTS_AUDIO_FORMAT));
+        ai.setTts(tts);
+
+        BytedeskPropertiesResponse.Asr asr = new BytedeskPropertiesResponse.Asr();
+        asr.setProvider(environment.getProperty("spring.ai.model.audio", FALLBACK_ASR_PROVIDER));
+        asr.setModel(environment.getProperty("spring.ai.dashscope.audio.transcription.options.model", FALLBACK_ASR_MODEL));
+        asr.setRealtimeModel(environment.getProperty("spring.ai.dashscope.audio.transcription.realtime-model", FALLBACK_ASR_REALTIME_MODEL));
+        asr.setSourceFormat(environment.getProperty("bytedesk.ai.asr.source-format", FALLBACK_ASR_SOURCE_FORMAT));
+        asr.setTimeoutMs(environment.getProperty("bytedesk.ai.asr.timeout-ms", Long.class, FALLBACK_ASR_TIMEOUT_MS));
+        asr.setPollIntervalMs(environment.getProperty("bytedesk.ai.asr.poll-interval-ms", Long.class, FALLBACK_ASR_POLL_INTERVAL_MS));
+        ai.setAsr(asr);
+
+        bytedeskPropertiesResponse.setAi(ai);
         
         return ResponseEntity.ok(JsonResult.success(bytedeskPropertiesResponse));
     }

@@ -18,16 +18,23 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import com.bytedesk.core.category.CategoryResponse;
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.article.ArticleResponse;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import lombok.AllArgsConstructor;
@@ -43,6 +50,8 @@ public class KbaseStaticService {
     private final KbaseProperties kbaseProperties;
 
     private final KbaseRestService kbaseRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     // 更新整个知识库
     public void updateKbase(KbaseEntity kbase) {
@@ -61,6 +70,7 @@ public class KbaseStaticService {
         // 遍历articlesPage
         for (ArticleResponse article : articlesPage.getContent()) {
             toHtmlArticle(kbase, article, categoriesPage.getContent(), new ArrayList<>());
+            toHtmlTranslatedArticles(kbase, article, categoriesPage.getContent(), new ArrayList<>());
         }
     }
 
@@ -149,6 +159,14 @@ public class KbaseStaticService {
             ArticleResponse article,
             List<CategoryResponse> categories,
             List<ArticleResponse> related) {
+        toHtmlArticle(kbase, article, categories, related, null);
+        }
+
+        public void toHtmlArticle(KbaseEntity kbase,
+            ArticleResponse article,
+            List<CategoryResponse> categories,
+            List<ArticleResponse> related,
+            String languageDirectory) {
         //
         try {
             // 设置模板路径: classpath:/templates/ftl/kbase
@@ -162,11 +180,14 @@ public class KbaseStaticService {
             map.put("article", article);
             map.put("categories", categories);
             map.put("related", related);
+            String currentLanguage = resolveCurrentLanguage(kbase, languageDirectory);
+            map.put("currentLanguage", currentLanguage);
+            map.put("languageOptions", buildArticleLanguageOptions(kbase, article.getUid(), currentLanguage));
             // 静态化页面内容
             String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, map);
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
-            String saveHtmlPathWithKbUid = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbase.getUid() + "/article";
+            String saveHtmlPathWithKbUid = resolveArticleHtmlDirectory(kbase.getUid(), languageDirectory);
             log.info("toHtmlArticle saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {
@@ -183,6 +204,138 @@ public class KbaseStaticService {
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
+    }
+
+    private void toHtmlTranslatedArticles(KbaseEntity kbase,
+            ArticleResponse article,
+            List<CategoryResponse> categories,
+            List<ArticleResponse> related) {
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbase.getUid(),
+                        article.getUid(),
+                        KbaseTranslationSourceTypeEnum.ARTICLE.name())
+                .stream()
+                .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+                .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+                .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+                .toList();
+
+        for (KbaseTranslationEntity translation : translations) {
+            ArticleResponse translatedArticle = ArticleResponse.builder()
+                    .title(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : article.getTitle())
+                    .summary(StringUtils.hasText(translation.getSummary()) ? translation.getSummary() : article.getSummary())
+                    .contentHtml(StringUtils.hasText(translation.getContentHtml()) ? translation.getContentHtml() : article.getContentHtml())
+                    .contentMarkdown(StringUtils.hasText(translation.getContentMarkdown()) ? translation.getContentMarkdown() : article.getContentMarkdown())
+                    .coverImageUrl(article.getCoverImageUrl())
+                    .type(article.getType())
+                    .tagList(translation.getTagList() != null && !translation.getTagList().isEmpty() ? translation.getTagList() : article.getTagList())
+                    .top(article.getTop())
+                    .published(article.getPublished())
+                    .readCount(article.getReadCount())
+                    .likeCount(article.getLikeCount())
+                    .editor(article.getEditor())
+                    .needAudit(article.getNeedAudit())
+                    .auditStatus(article.getAuditStatus())
+                    .auditOpinion(article.getAuditOpinion())
+                    .auditUser(article.getAuditUser())
+                    .categoryUid(article.getCategoryUid())
+                    .kbUid(article.getKbUid())
+                    .user(article.getUser())
+                    .elasticStatus(article.getElasticStatus())
+                    .vectorStatus(article.getVectorStatus())
+                    .build();
+            translatedArticle.setUid(article.getUid());
+                    translatedArticle.setCreatedAt(article.getCreatedAtRaw());
+                    translatedArticle.setUpdatedAt(article.getUpdatedAtRaw());
+            translatedArticle.setOrgUid(article.getOrgUid());
+            translatedArticle.setUserUid(article.getUserUid());
+            toHtmlArticle(kbase, translatedArticle, categories, related, translation.getTargetLanguage());
+        }
+    }
+
+    private String resolveArticleHtmlDirectory(String kbUid, String languageDirectory) {
+        String basePath = kbaseProperties.resolveHelpcenterHtmlPath() + "/" + kbUid;
+        if (StringUtils.hasText(languageDirectory)) {
+            return basePath + "/" + languageDirectory.trim().toUpperCase() + "/article";
+        }
+        return basePath + "/article";
+    }
+
+    private String resolveCurrentLanguage(KbaseEntity kbase, String languageDirectory) {
+        if (StringUtils.hasText(languageDirectory)) {
+            return normalizeLanguage(languageDirectory);
+        }
+        if (StringUtils.hasText(kbase.getSourceLanguage())) {
+            return normalizeLanguage(kbase.getSourceLanguage());
+        }
+        return LanguageEnum.ZH_CN.name();
+    }
+
+    private List<Map<String, String>> buildArticleLanguageOptions(KbaseEntity kbase, String articleUid, String currentLanguage) {
+        List<Map<String, String>> options = new ArrayList<>();
+        String sourceLanguage = resolveCurrentLanguage(kbase, null);
+        options.add(createLanguageOption(sourceLanguage, buildArticleLanguageUrl(kbase.getUid(), articleUid, null), currentLanguage));
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbase.getUid(),
+                        articleUid,
+                        KbaseTranslationSourceTypeEnum.ARTICLE.name())
+                .stream()
+                .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+                .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+                .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+                .toList();
+
+        for (KbaseTranslationEntity translation : translations) {
+            String targetLanguage = normalizeLanguage(translation.getTargetLanguage());
+            boolean exists = options.stream().anyMatch(item -> targetLanguage.equals(item.get("code")));
+            if (!exists) {
+                options.add(createLanguageOption(
+                        targetLanguage,
+                        buildArticleLanguageUrl(kbase.getUid(), articleUid, targetLanguage),
+                        currentLanguage));
+            }
+        }
+
+        return options;
+    }
+
+    private Map<String, String> createLanguageOption(String code, String url, String currentLanguage) {
+        Map<String, String> option = new LinkedHashMap<>();
+        option.put("code", code);
+        option.put("label", toLanguageLabel(code));
+        option.put("url", url);
+        option.put("active", String.valueOf(code.equals(currentLanguage)));
+        return option;
+    }
+
+    private String normalizeLanguage(String language) {
+        return LanguageEnum.fromValue(language).name();
+    }
+
+    private String buildArticleLanguageUrl(String kbUid, String articleUid, String language) {
+        if (!StringUtils.hasText(language)) {
+            return "/helpcenter/" + kbUid + "/article/" + articleUid + ".html";
+        }
+        return "/helpcenter/" + kbUid + "/" + normalizeLanguage(language) + "/article/" + articleUid + ".html";
+    }
+
+    private String toLanguageLabel(String code) {
+        return switch (code) {
+            case "ZH_CN" -> "简体中文";
+            case "ZH_TW" -> "繁體中文";
+            case "EN" -> "English";
+            case "JA" -> "日本語";
+            case "KO" -> "한국어";
+            case "FR" -> "Français";
+            case "DE" -> "Deutsch";
+            case "ES" -> "Español";
+            case "PT" -> "Português";
+            case "RU" -> "Русский";
+            default -> code;
+        };
     }
 
     // 生成知识库搜索页

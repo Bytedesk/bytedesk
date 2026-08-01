@@ -106,6 +106,13 @@ public class ArticleRequest extends BaseRequest {
 
     private String categoryUid;
 
+    private String sourceUrl;
+
+    private String sourceName;
+
+    @Builder.Default
+    private Boolean showSource = false;
+
     private String kbUid;
 
     // used for client query

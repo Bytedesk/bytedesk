@@ -13,13 +13,13 @@
  */
 package com.bytedesk.kbase.llm_webpage.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 网页消息服务
@@ -27,12 +27,12 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author jackning
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class WebpageMessageService {
     
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
     
     /**
      * 发送网页到索引队列，用于创建或更新索引

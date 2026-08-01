@@ -33,6 +33,8 @@ public class AgentStatusResponse extends BaseResponse {
 
     private String status;
 
+    private String restReason;
+
     private UserProtobuf agent;
 
     private Long durationSeconds;

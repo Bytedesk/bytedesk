@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -114,10 +115,7 @@ public class CityRestService extends BaseRestServiceWithExport<CityEntity, CityR
             request.setLevel(level);
         }
         
-        // 检查用户是否有权限创建该层级的数据
-        // if (!skipPermissionCheck && !permissionService.canCreateAtLevel(CityPermissions.MODULE_NAME, level)) {
-        //     throw new RuntimeException("无权限创建该层级的标签数据");
-        // }
+        // 权限校验当前未启用，保留创建逻辑。
         
         // 
         CityEntity entity = modelMapper.map(request, CityEntity.class);
@@ -127,7 +125,7 @@ public class CityRestService extends BaseRestServiceWithExport<CityEntity, CityR
         // 
         CityEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create city failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -139,21 +137,18 @@ public class CityRestService extends BaseRestServiceWithExport<CityEntity, CityR
         if (optional.isPresent()) {
             CityEntity entity = optional.get();
             
-            // 检查用户是否有权限更新该实体
-            // if (!permissionService.hasEntityPermission(CityPermissions.MODULE_NAME, "UPDATE", entity)) {
-            //     throw new RuntimeException("无权限更新该标签数据");
-            // }
+            // 权限校验当前未启用，保留更新逻辑。
             
             modelMapper.map(request, entity);
             //
             CityEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update city failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("City not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -188,17 +183,14 @@ public class CityRestService extends BaseRestServiceWithExport<CityEntity, CityR
         if (optional.isPresent()) {
             CityEntity entity = optional.get();
             
-            // 检查用户是否有权限删除该实体
-            // if (!permissionService.hasEntityPermission(CityPermissions.MODULE_NAME, "DELETE", entity)) {
-            //     throw new RuntimeException("无权限删除该标签数据");
-            // }
+            // 权限校验当前未启用，保留删除逻辑。
             
             entity.setDeleted(true);
             save(entity);
             // cityRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("City not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

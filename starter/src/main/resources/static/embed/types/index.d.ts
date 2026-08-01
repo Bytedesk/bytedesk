@@ -1,5 +1,3 @@
-import { FeedbackConfig as FeedbackConfig_2 } from '../types';
-
 declare interface Animation_2 {
     enabled?: boolean;
     duration?: number;
@@ -7,6 +5,7 @@ declare interface Animation_2 {
 }
 
 declare interface BrowseConfig {
+    referer?: string;
     referrer?: string;
     url?: string;
     title?: string;
@@ -18,7 +17,19 @@ declare interface BubbleConfig {
     icon?: string;
     title?: string;
     subtitle?: string;
+    messages?: BubbleMessageItem[];
+    autoRotate?: boolean;
+    rotateInterval?: number;
+    switchMode?: BubbleSwitchMode;
 }
+
+declare interface BubbleMessageItem {
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+}
+
+declare type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 declare interface ButtonConfig {
     show?: boolean;
@@ -26,6 +37,9 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
     onClick?: () => void;
 }
 
@@ -34,6 +48,11 @@ export declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
+    chatPath?: string;
+    threadPath?: string;
+    webrtcPath?: string;
+    callPath?: string;
+    ticketPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -45,33 +64,47 @@ export declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    buttonsConfig?: ButtonConfig[];
     feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
     window?: WindowConfig;
+    minimizedBarConfig?: MinimizedBarConfig;
     theme?: Theme;
     onInit?: () => void;
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
     onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
 
 declare class BytedeskWeb {
     private config;
+    private unreadBadgeMode;
+    private unreadBadgeCount;
     private bubble;
+    private bubbleContainer;
+    private minimizedBar;
+    private buttonElements;
+    private buttonPreviewElement;
+    private buttonPreviewHideTimer;
     private window;
     private inviteDialog;
     private contextMenu;
     private hideTimeout;
     private isVisible;
     private isDragging;
+    private isMinimizedBarDragging;
+    private dragDidMove;
     private windowState;
     private loopCount;
     private loopTimer;
     private isDestroyed;
+    private isWindowDragging;
+    private windowDragState;
     private initVisitorPromise;
     private getUnreadMessageCountPromise;
     private clearUnreadMessagesPromise;
@@ -83,9 +116,49 @@ declare class BytedeskWeb {
     private lastSelectionText;
     private lastMouseEvent;
     private lastSelectionRect;
+    private bubbleMessages;
+    private bubbleMessageIndex;
+    private bubbleMessageTimer;
+    private bubbleMessageTransitionTimer;
+    private bubbleMessageViewportElement;
+    private bubbleMessageContentElement;
+    private bubblePendingMessageElement;
+    private bubbleTickerTrackElement;
+    private bubbleTickerStyleElement;
+    private bubbleIconElement;
+    private bubbleTitleElement;
+    private bubbleSubtitleElement;
     constructor(config: BytedeskConfig);
     private setupApiUrl;
+    private mergeConfig;
+    private refreshFloatingUi;
+    private getMinimizedBarLabel;
+    private createMinimizedBarIcon;
+    private createMinimizedBarLabelElement;
+    private hideDefaultFloatingUi;
+    private restoreDefaultFloatingUi;
+    private removeMinimizedBar;
+    private showMinimizedBar;
+    private restoreMinimizedWindow;
+    private updateChatWindowLayout;
+    private refreshChatIframeUrl;
+    setTheme(themeConfig: Partial<NonNullable<BytedeskConfig["theme"]>>): void;
+    setConfig(nextConfig: Partial<BytedeskConfig>, options?: SetConfigOptions): void;
+    private getPrimaryActionFromConfig;
+    private syncChatPathByAction;
     private getDefaultConfig;
+    private getDefaultTabsConfig;
+    private getEffectiveButtonConfigs;
+    private hasVisibleButtons;
+    private isMultiButtonLayout;
+    private applyConfiguredButtonVisibility;
+    private hideBubbleMessageElement;
+    private triggerButtonAction;
+    private hideButtonPreview;
+    private cancelButtonPreviewHide;
+    private scheduleHideButtonPreview;
+    private showButtonPreview;
+    private createButtonElement;
     init(): Promise<void>;
     _initVisitor(): Promise<any>;
     private _browseVisitor;
@@ -99,19 +172,51 @@ declare class BytedeskWeb {
     clearBrowseFailedLimit(): void;
     clearVisitorInfo(): void;
     forceInitVisitor(): Promise<any>;
-    private showUnreadBadge;
-    private clearUnreadBadge;
+    private removeUnreadBadgeElement;
+    private renderUnreadBadge;
+    setUnreadMessageCount(count: number): number;
+    showUnreadDot(): void;
+    clearUnreadBadge(): void;
     clearUnreadMessages(): Promise<any>;
+    private getBubbleMessages;
+    private getBubbleSwitchMode;
+    private buildBubbleMessageContentNode;
+    private buildBubbleTickerItemNode;
+    private destroyBubbleTicker;
+    private setBubbleTickerRunning;
+    private initBubbleTicker;
+    private renderBubbleMessage;
+    private syncBubbleViewportHeight;
+    private cleanupPendingBubbleMessage;
+    private stopBubbleMessageTransition;
+    private transitionBubbleMessage;
+    private stopBubbleMessageRotation;
+    private startBubbleMessageRotation;
     private createBubble;
     private createChatWindow;
+    private getEnabledEmbeddedTabs;
+    private getDefaultEmbeddedTab;
     private generateChatUrl;
+    private normalizePath;
+    private getChatPageBaseUrl;
+    private getChatPathByTab;
     private setupMessageListener;
     private handleLocalStorageData;
     sendMessageToIframe(message: any): void;
+    resetAnonymousVisitor(): void;
     showChat(config?: Partial<BytedeskConfig>): void;
-    hideChat(): void;
+    hideChat(options?: {
+        preserveFloatingUiHidden?: boolean;
+    }): void;
+    showThread(config?: Partial<BytedeskConfig>): void;
+    showWebrtc(config?: Partial<BytedeskConfig>): void;
+    showCall(config?: Partial<BytedeskConfig>): void;
+    showTicket(config?: Partial<BytedeskConfig>): void;
     private minimizeWindow;
     private toggleMaximize;
+    private handleWindowDragStart;
+    private handleWindowDragMove;
+    private handleWindowDragEnd;
     private setupResizeListener;
     destroy(): void;
     private createInviteDialog;
@@ -232,7 +337,7 @@ declare class BytedeskWeb {
      */
     getDebugInfo(): {
         config: BytedeskConfig;
-        feedbackConfig: FeedbackConfig_2 | undefined;
+        feedbackConfig: FeedbackConfig | undefined;
         feedbackTooltip: boolean;
         feedbackDialog: boolean;
         selectedText: string;
@@ -253,6 +358,7 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    title?: string;
     uid?: string;
     visitorUid?: string;
     nickname?: string;
@@ -260,6 +366,7 @@ declare interface ChatConfig {
     mobile?: string;
     email?: string;
     note?: string;
+    channel?: string;
     goodsInfo?: string;
     orderInfo?: string;
     extra?: string;
@@ -268,6 +375,8 @@ declare interface ChatConfig {
     draft?: boolean;
     settingsUid?: string;
     loadHistory?: boolean;
+    threadDetail?: string | boolean;
+    visitorProfile?: string | boolean;
     [key: string]: string | number | boolean | undefined;
 }
 
@@ -319,11 +428,29 @@ declare interface InviteConfig {
     onOpen?: () => void;
 }
 
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    navigateToPath?: string | null;
+    extra?: unknown;
+    position?: string;
+    status?: string;
+}
+
+declare interface MinimizedBarConfig {
+    text?: string;
+}
+
+declare interface SetConfigOptions {
+    replaceChatConfig?: boolean;
+    replaceTabsConfig?: boolean;
+}
+
 declare interface TabsConfig {
-    home?: boolean;
     messages?: boolean;
+    thread?: boolean;
     help?: boolean;
-    news?: boolean;
 }
 
 declare interface Theme {

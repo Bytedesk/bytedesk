@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
+import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketRestControllerVisitor {
 
     private final TicketRestService ticketRestService;
+    private final TicketService ticketService;
 
     // query by visitor uid
     @GetMapping("/query")
@@ -41,6 +46,14 @@ public class TicketRestControllerVisitor {
         Page<TicketResponse> page = ticketRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @GetMapping("/query/uid")
+    public ResponseEntity<?> queryByUid(TicketRequest request) {
+
+        TicketResponse response = ticketRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     // create ticket by visitor
@@ -58,6 +71,38 @@ public class TicketRestControllerVisitor {
         ticketRestService.deleteByVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success());
+    }
+
+    @GetMapping("/history/activity")
+    public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
+
+        List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);
+
+        return ResponseEntity.ok(JsonResult.success(activities));
+    }
+
+    /**
+     * 访客端查询当前流程实例的活动任务和可执行操作。
+     * 仅当访客是工单报告人时才返回可操作的验证动作（COMPLETE_VERIFIED / COMPLETE_REJECTED）。
+     */
+    @GetMapping("/workflow/actions")
+    public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
+
+        List<TicketWorkflowTaskResponse> actions = ticketService.queryWorkflowActions(request);
+
+        return ResponseEntity.ok(JsonResult.success(actions));
+    }
+
+    /**
+     * 访客端按当前 Flowable 活动任务执行流程动作。
+     * 仅当访客是工单报告人时允许执行验证操作。
+     */
+    @PostMapping("/workflow/action")
+    public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
+
+        TicketResponse response = ticketService.executeWorkflowAction(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     

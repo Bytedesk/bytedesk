@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260704-drop-service-settings-show-rate-btn" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings" />
+            <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_rate_btn" />
+        </preConditions>
+        <comment>Drop show_rate_btn column — this control has been migrated to ToolbarSettings.rate (toolbar_rate).</comment>
+        <dropColumn tableName="bytedesk_kbase_service_settings" columnName="show_rate_btn" />
+    </changeSet>
+
+</databaseChangeLog>

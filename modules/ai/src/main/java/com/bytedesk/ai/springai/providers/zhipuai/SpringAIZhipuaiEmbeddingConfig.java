@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Configuration;
 import lombok.Data;
 
 /**
- * https://open.bigmodel.cn/dev/api#sdk_install
- * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * https://docs.bigmodel.cn/cn/guide/models/embeddings/embedding-3
+ * https://github.com/zai-org/z-ai-sdk-java
  * 
  * https://docs.spring.io/spring-ai/reference/api/embeddings/zhipuai-embeddings.html
  * https://open.bigmodel.cn/overview

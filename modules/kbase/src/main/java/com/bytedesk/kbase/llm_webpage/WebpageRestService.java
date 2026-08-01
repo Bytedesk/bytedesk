@@ -28,9 +28,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 
 import lombok.AllArgsConstructor;
 
@@ -47,10 +49,15 @@ public class WebpageRestService
 
     private final KbaseRestService kbaseRestService;
 
+    private final CategoryRestService categoryRestService;
+
     private final WebpageCrawlerService webpageCrawlerService;
+
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
 
     @Override
     protected Specification<WebpageEntity> createSpecification(WebpageRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return WebpageSpecification.search(request, authService);
     }
 
@@ -108,6 +115,7 @@ public class WebpageRestService
         if (savedEntity == null) {
             throw new RuntimeException("Create webpage failed");
         }
+        kbaseTranslationSyncService.syncWebpage(savedEntity);
         return convertToResponse(savedEntity);
     }
 
@@ -122,6 +130,7 @@ public class WebpageRestService
             if (savedEntity == null) {
                 throw new RuntimeException("Update webpage failed");
             }
+            kbaseTranslationSyncService.syncWebpage(savedEntity);
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Webpage not found");

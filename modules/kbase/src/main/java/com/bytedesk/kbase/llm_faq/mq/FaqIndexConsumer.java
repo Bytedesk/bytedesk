@@ -19,6 +19,7 @@ import java.util.Random;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.ObjectProvider;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
@@ -27,7 +28,6 @@ import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,11 +44,12 @@ public class FaqIndexConsumer {
     private final FaqRestService faqRestService;
     private final Random random = new Random();
 
-    public FaqIndexConsumer(FaqElasticService faqElasticService, FaqRestService faqRestService, 
-                           @Autowired(required = false) FaqVectorService faqVectorService) {
+    public FaqIndexConsumer(FaqElasticService faqElasticService,
+            FaqRestService faqRestService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider) {
         this.faqElasticService = faqElasticService;
         this.faqRestService = faqRestService;
-        this.faqVectorService = faqVectorService;
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
         
         // 在构造函数中检查并记录向量服务状态
         if (faqVectorService == null) {

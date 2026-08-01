@@ -18,6 +18,7 @@ import java.util.Optional;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.topic.TopicUtils;
@@ -87,21 +88,24 @@ public class VisitorThreadEventListener {
 
         // 获取关闭提示语
         String content = getCloseTip(thread, closeType);
+        String resolvedPromptExtra = buildResolvedPromptExtra(thread);
 
         // 发送消息
         MessageProtobuf messageProtobuf = autoClose
-                ? MessageUtils.createAutoCloseMessage(thread, content)
-                : MessageUtils.createAgentCloseMessage(thread, content);
+            ? MessageUtils.createAutoCloseMessage(thread, content, resolvedPromptExtra)
+            : MessageUtils.createAgentCloseMessage(thread, content, resolvedPromptExtra);
         messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
     /**
      * 优化：从 Redis 缓存查询活跃会话，避免频繁查询数据库
      * 缓存在会话创建时写入，会话关闭时移除
+     * 
+     * OOM 修复：不再一次性将所有 ThreadEntity 加载到 List 中，改为逐个流式处理，
+     * 处理完一个立即释放引用，避免大量 TEXT 列实体同时驻留内存导致 OOM。
      */
     @EventListener
     public void onQuartzOneMinEvent(QuartzOneMinEvent event) {
-        // log.info("visitor_thread quartz one min event: " + event);        
         // 从缓存获取活跃会话列表
         List<ActiveThreadCache> cachedThreads = activeThreadCacheService.getAllActiveServiceThreads();
         
@@ -111,26 +115,34 @@ public class VisitorThreadEventListener {
             if (!dbThreads.isEmpty()) {
                 log.info("Rebuilding active thread cache from database, count: {}", dbThreads.size());
                 activeThreadCacheService.rebuildCacheFromDatabase(dbThreads);
-                // 使用数据库数据处理
-                visitorThreadTimeoutService.autoRemindAgentOrCloseThread(dbThreads);
+                // 使用数据库数据逐个处理，避免 OOM
+                dbThreads.forEach(visitorThreadTimeoutService::processSingleThreadTimeout);
                 dbThreads.forEach(visitorThreadTriggerService::processProactiveTrigger);
             }
             return;
         }
-        
-        // 从缓存获取完整的 ThreadEntity 列表用于处理（需要完整的 ThreadEntity 信息）
-        List<ThreadEntity> threads = cachedThreads.stream()
-                .map(cache -> threadRestService.findByUid(cache.getUid()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(thread -> !thread.isClosed()) // 再次过滤确保未关闭
-                .toList();
 
-        // 自动关闭线程
-        visitorThreadTimeoutService.autoRemindAgentOrCloseThread(threads);
+        List<ActiveThreadCache> validCachedThreads = cachedThreads.stream()
+            .filter(cache -> StringUtils.hasText(cache.getUid()))
+            .toList();
+
+        log.debug("Processing {} active service threads for timeout check", validCachedThreads.size());
+
+        // OOM 修复：逐个加载 ThreadEntity 并处理，处理完立即释放引用，
+        // 而不是用 .toList() 将所有实体一次性全部加载到内存中
+        for (ActiveThreadCache cache : validCachedThreads) {
+            try {
+                threadRestService.findByUid(cache.getUid())
+                    .filter(thread -> !thread.isClosed())
+                    .ifPresent(visitorThreadTimeoutService::processSingleThreadTimeout);
+            } catch (Exception e) {
+                // 单个线程处理失败不影响其他线程的处理
+                log.warn("Failed to process thread timeout for uid: {}", cache.getUid(), e);
+            }
+        }
 
         // 处理主动触发逻辑（使用缓存数据进行时间判断，减少数据库查询）
-        cachedThreads.forEach(visitorThreadTriggerService::processProactiveTriggerFromCache);
+        validCachedThreads.forEach(visitorThreadTriggerService::processProactiveTriggerFromCache);
     }
 
     /**
@@ -243,6 +255,16 @@ public class VisitorThreadEventListener {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
         }
         return "会话已结束";
+    }
+
+    private String buildResolvedPromptExtra(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getUid()) || !StringUtils.hasText(thread.getOrgUid())) {
+            return null;
+        }
+        Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
+        Boolean resolved = queueMemberOptional.map(QueueMemberEntity::getResolved).orElse(null);
+        boolean submitted = Boolean.TRUE.equals(resolved);
+        return MessageUtils.buildResolvedPromptExtra(thread.getUid(), thread.getOrgUid(), submitted, resolved);
     }
 
 

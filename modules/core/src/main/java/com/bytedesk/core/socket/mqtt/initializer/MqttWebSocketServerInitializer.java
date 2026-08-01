@@ -27,6 +27,7 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
 import com.bytedesk.core.socket.mqtt.MqttConsts;
+import com.bytedesk.core.socket.mqtt.handler.MqttPipelineExceptionHandler;
 import com.bytedesk.core.socket.mqtt.handler.MqttTransportHandler;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.BinaryWebSocketFrameHandler;
 import com.bytedesk.core.socket.mqtt.initializer.websocket.ByteBufToWebSocketFrameEncoder;
@@ -91,6 +92,7 @@ public class MqttWebSocketServerInitializer extends ChannelInitializer<SocketCha
         pipeline.addLast(MqttEncoder.INSTANCE);
         //
         pipeline.addLast(new MqttTransportHandler(mProtocolProcess));
+        pipeline.addLast(MqttPipelineExceptionHandler.INSTANCE);
     }
 
 }

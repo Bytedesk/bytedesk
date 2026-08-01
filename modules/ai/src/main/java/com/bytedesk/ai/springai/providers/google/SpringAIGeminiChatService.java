@@ -20,7 +20,8 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -42,15 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.gemini.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIGeminiChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel geminiChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIGeminiChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIGeminiChatService(
+            @Qualifier("geminiChatModel") ObjectProvider<OpenAiChatModel> geminiChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.geminiChatModel = geminiChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel geminiChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
@@ -223,11 +227,12 @@ public class SpringAIGeminiChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Openai API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
 
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                        textContent, null, sourceReferences);
+                                    textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);

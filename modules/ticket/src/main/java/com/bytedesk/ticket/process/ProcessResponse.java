@@ -44,6 +44,8 @@ public class ProcessResponse extends BaseResponse {
 
     private String schema;
 
+    private String flowgramSchema;
+
     private String deploymentId;
 
     @JsonProperty("deployed")

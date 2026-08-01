@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,11 @@ import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
 import com.bytedesk.kbase.llm_text.TextRestService;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +56,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class TextVectorService {
     
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
     
     private final TextRestService textRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
+
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
     public Map<String, Object> queryVectorByUid(TextRequest request) {
         String uid = request.getUid();
@@ -72,7 +81,7 @@ public class TextVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -108,6 +117,7 @@ public class TextVectorService {
     @Transactional
     public void indexTextVector(TextEntity text) {
         log.info("向量索引文本: {}", text.getTitle());
+        long startMs = System.currentTimeMillis();
         
         try {
             // 1. 为标题和内容创建文档（带有元数据）
@@ -119,28 +129,32 @@ public class TextVectorService {
             String tags = String.join(",", text.getTagList());
             
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                "uid", text.getUid(),
-                "title", text.getTitle(),
-                KbaseConst.KBASE_KB_UID, text.getKbase() != null ? text.getKbase().getUid() : "",
-                "categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "",
-                "orgUid", text.getOrgUid(),
-                "enabled", Boolean.toString(text.getEnabled()),
-                "tags", tags,
-                "type", text.getType(),
-                // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                "sourceType", "TEXT"
-            );
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", text.getUid());
+            metadata.put("sourceUid", text.getUid());
+            metadata.put("title", text.getTitle());
+            metadata.put(KbaseConst.KBASE_KB_UID, text.getKbase() != null ? text.getKbase().getUid() : "");
+            metadata.put("categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "");
+            metadata.put("orgUid", text.getOrgUid());
+            metadata.put("enabled", Boolean.toString(text.getEnabled()));
+            metadata.put("tags", tags);
+            metadata.put("type", text.getType());
+            metadata.put("language", text.getKbase() != null && StringUtils.hasText(text.getKbase().getSourceLanguage()) ? text.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("sourceLanguage", text.getKbase() != null && StringUtils.hasText(text.getKbase().getSourceLanguage()) ? text.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("translated", Boolean.FALSE.toString());
+            metadata.put("sourceType", "TEXT");
             
             // 创建文档
             Document document = new Document(id, content, metadata);
             
             // 2. 添加到向量存储
             // 检查是否已存在该文档ID
-            checkAndDeleteExistingDoc(id);
+            VectorStore vectorStore = vectorStoreResolver.resolveByKbase(text.getKbase());
+            checkAndDeleteExistingDoc(vectorStore, id);
             
             // 添加新文档
             vectorStore.add(List.of(document));
+            reindexTranslatedTextVectors(text);
             
             // 3. 更新Text实体中的文档ID列表
             List<String> docIdList = text.getDocIdList();
@@ -149,22 +163,46 @@ public class TextVectorService {
             }
             if (!docIdList.contains(id)) {
                 docIdList.add(id);
-                text.setDocIdList(docIdList);
                 
-                // 设置向量索引状态为成功
-                text.setVectorStatus(ChunkStatusEnum.SUCCESS.name());
-                
-                // 更新Text实体
-                textRestService.save(text);
+                // 使用原生SQL直接更新字段，避免触发JPA @PostUpdate监听器
+                // 和防止因updateVectorStatusOnly先更新了版本号导致的版本冲突
+                textRestService.updateDocIdListOnly(text.getUid(), docIdList);
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.SUCCESS.name());
             }
-            
+
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(text.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("TEXT", text.getUid(), text.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录TEXT向量化历史失败: uid={}, error={}", text.getUid(), recEx.getMessage());
+            }
+
             log.info("文本向量索引成功: {}", text.getTitle());
         } catch (Exception e) {
             log.error("文本向量索引失败: {}, 错误: {}", text.getTitle(), e.getMessage());
-            
-            // 设置向量索引状态为失败
-            text.setVectorStatus(ChunkStatusEnum.ERROR.name());
-            textRestService.save(text);
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(text.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                String errContent = text.getTitle() + "\n\n" + (text.getContent() != null ? text.getContent() : "");
+                llmEmbeddingRestService.recordEmbedding("TEXT", text.getUid(), text.getOrgUid(),
+                        embProvider, embModel, embDimensions, errContent, "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录TEXT向量化失败历史失败: uid={}, error={}", text.getUid(), recEx.getMessage());
+            }
+
+            // 设置向量索引状态为失败（使用原生SQL避免版本冲突）
+            textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
             
             throw e;
         }
@@ -318,7 +356,7 @@ public class TextVectorService {
 
         try {
             if (!docIdsToDelete.isEmpty()) {
-                vectorStore.delete(docIdsToDelete);
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
             }
             for (TextEntity text : textList) {
                 textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
@@ -330,7 +368,7 @@ public class TextVectorService {
             for (TextEntity text : textList) {
                 try {
                     if (text.getDocIdList() == null || text.getDocIdList().isEmpty()) {
-                        vectorStore.delete(List.of("text_" + text.getUid()));
+                        vectorStoreResolver.resolveByKbase(text.getKbase()).delete(List.of("text_" + text.getUid()));
                         textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
                         textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
                         successCount++;
@@ -376,7 +414,7 @@ public class TextVectorService {
 
         if (text.getDocIdList() == null || text.getDocIdList().isEmpty()) {
             try {
-                vectorStore.delete(List.of("text_" + text.getUid()));
+                vectorStoreResolver.resolveByKbase(text.getKbase()).delete(List.of("text_" + text.getUid()));
             } catch (Exception e) {
                 log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", text.getUid(), e.getMessage());
             }
@@ -406,7 +444,7 @@ public class TextVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
     
@@ -423,7 +461,7 @@ public class TextVectorService {
             List<String> docIdList = text.getDocIdList();
             if (docIdList != null && !docIdList.isEmpty()) {
                 // 删除所有关联的向量文档
-                vectorStore.delete(docIdList);
+                vectorStoreResolver.resolveByKbase(text.getKbase()).delete(docIdList);
                 
                 // 清空文档ID列表并更新状态
                 text.setDocIdList(new ArrayList<>());
@@ -449,6 +487,11 @@ public class TextVectorService {
      * @return 相似度搜索结果列表
      */
     public List<TextVectorSearchResult> searchTextVector(String query, String kbUid, String categoryUid, String orgUid, int limit) {
+        return searchTextVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<TextVectorSearchResult> searchTextVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("向量搜索文本: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
         
         // 创建过滤表达式构建器
@@ -477,6 +520,11 @@ public class TextVectorService {
             FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
         }
+
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
+        }
         
         // 构建最终的过滤表达式
         Expression expression = finalOp.build();
@@ -489,7 +537,7 @@ public class TextVectorService {
                 .build();
         
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = vectorStoreResolver.resolveByKbUid(kbUid).similaritySearch(searchRequest);
         
         // 解析结果
         List<TextVectorSearchResult> resultList = new ArrayList<>();
@@ -521,8 +569,12 @@ public class TextVectorService {
                 .content(docContent)
                 .type(docType)
                 .kbUid(docKbUid)
+                .sourceUid((String) metadata.getOrDefault("sourceUid", docUid))
                 .categoryUid(docCategoryUid)
                 .orgUid(docOrgUid)
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
                 .tagList(tagList)
                 .build();
             
@@ -545,7 +597,7 @@ public class TextVectorService {
      * 检查并删除已存在的文档
      * @param docId 文档ID
      */
-    private void checkAndDeleteExistingDoc(String docId) {
+    private void checkAndDeleteExistingDoc(VectorStore vectorStore, String docId) {
         try {
             // 使用过滤表达式查询已存在的文档
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -573,6 +625,104 @@ public class TextVectorService {
             } catch (Exception ex) {
                 log.warn("删除可能存在的文档时出错: {}", ex.getMessage());
             }
+        }
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return textRestService.findByUidNoCache(uid)
+                .map(TextEntity::getKbase)
+                .map(vectorStoreResolver::resolveByKbase)
+                .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
+    private void reindexTranslatedTextVectors(TextEntity text) {
+        deleteTranslatedTextVectors(text);
+
+        String kbUid = text.getKbase() != null ? text.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        text.getUid(),
+                        KbaseTranslationSourceTypeEnum.TEXT.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            TextVector translatedVector = TextVector.fromTranslation(text, translation);
+            if (!StringUtils.hasText(translatedVector.getTitle()) && !StringUtils.hasText(translatedVector.getContent())) {
+                continue;
+            }
+
+            String docId = "text_translation_" + translation.getUid();
+            String content = (translatedVector.getTitle() != null ? translatedVector.getTitle() : "")
+                    + "\n\n"
+                    + (translatedVector.getContent() != null ? translatedVector.getContent() : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", text.getUid());
+            metadata.put("title", translatedVector.getTitle());
+            metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+            metadata.put("categoryUid", text.getCategoryUid() != null ? text.getCategoryUid() : "");
+            metadata.put("orgUid", text.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("type", translatedVector.getType());
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "TEXT");
+
+            documents.add(new Document(docId, content, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(text.getKbase()).add(documents);
+        }
+    }
+
+    private void deleteTranslatedTextVectors(TextEntity text) {
+        if (text.getKbase() == null || !StringUtils.hasText(text.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+                expressionBuilder.eq("sourceType", "TEXT"),
+                expressionBuilder.eq("sourceUid", text.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = vectorStoreResolver.resolveByKbase(text.getKbase()).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(text.getKbase()).delete(docIds);
         }
     }
 }

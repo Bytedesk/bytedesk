@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -74,7 +75,7 @@ public class AssistantRestService extends BaseRestService<AssistantEntity, Assis
         // 保存
         AssistantEntity savedAssistant = save(assistant);
         if (savedAssistant == null) {
-            throw new RuntimeException("Create assistant failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
 
         return convertToResponse(savedAssistant);

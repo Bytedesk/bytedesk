@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260729-create-voice-clone-table" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_voice_clone" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_core_voice_clone">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_core_voice_clone" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_voice_clone_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(64)" defaultValue="ORGANIZATION" />
+            <column name="platform_type" type="VARCHAR(64)" defaultValue="BYTEDESK" />
+            <column name="name" type="VARCHAR(255)" />
+            <column name="description" type="TEXT" />
+            <column name="voice_clone_type" type="VARCHAR(64)" defaultValue="CUSTOMER" />
+            <column name="provider" type="VARCHAR(64)" defaultValue="dashscope" />
+            <column name="clone_type" type="VARCHAR(32)" defaultValue="CLONE" />
+            <column name="target_model" type="VARCHAR(128)" />
+            <column name="audio_url" type="TEXT" />
+            <column name="voice_prompt" type="TEXT" />
+            <column name="preview_text" type="VARCHAR(1024)" />
+            <column name="prefix" type="VARCHAR(128)" />
+            <column name="voice_id" type="VARCHAR(256)" />
+            <column name="voice_name" type="VARCHAR(256)" />
+            <column name="preview_audio_url" type="TEXT" />
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING" />
+            <column name="request_id" type="VARCHAR(128)" />
+            <column name="error_message" type="TEXT" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-provider" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="provider" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="provider" type="VARCHAR(64)" defaultValue="dashscope" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-clone-type" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="clone_type" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="clone_type" type="VARCHAR(32)" defaultValue="CLONE" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-target-model" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="target_model" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="target_model" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-audio-url" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="audio_url" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="audio_url" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-voice-prompt" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="voice_prompt" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="voice_prompt" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-preview-text" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="preview_text" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="preview_text" type="VARCHAR(1024)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-prefix" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="prefix" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="prefix" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-voice-id" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="voice_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="voice_id" type="VARCHAR(256)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-voice-name" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="voice_name" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="voice_name" type="VARCHAR(256)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-preview-audio-url" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="preview_audio_url" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="preview_audio_url" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-status" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="status" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-request-id" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="request_id" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="request_id" type="VARCHAR(128)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-add-voice-clone-error-message" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <columnExists tableName="bytedesk_core_voice_clone" columnName="error_message" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_voice_clone">
+            <column name="error_message" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260729-voice-clone-index-org-deleted" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <indexExists tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_deleted" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_deleted">
+            <column name="org_uid" />
+            <column name="is_deleted" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260729-voice-clone-index-clone-type" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <indexExists tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_clone_type" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_clone_type">
+            <column name="org_uid" />
+            <column name="clone_type" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260729-voice-clone-index-status" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_voice_clone" />
+            <not>
+                <indexExists tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_status" />
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_core_voice_clone" indexName="idx_voice_clone_org_status">
+            <column name="org_uid" />
+            <column name="status" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -84,6 +84,12 @@ public class ArticleResponse extends BaseResponse {
 
     private String categoryUid;
 
+    private String sourceUrl;
+
+    private String sourceName;
+
+    private Boolean showSource;
+
     private String kbUid;
 
     private UserProtobuf user;

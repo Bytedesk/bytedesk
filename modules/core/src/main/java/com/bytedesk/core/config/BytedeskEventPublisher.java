@@ -29,9 +29,8 @@ import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
 import com.bytedesk.core.thread.event.ThreadUpdateEvent;
-import com.bytedesk.core.topic.event.TopicCreateEvent;
-import com.bytedesk.core.topic.event.TopicUpdateEvent;
-
+import com.bytedesk.core.topic_subscription.TopicSubscriptionEntity;
+import com.bytedesk.core.topic_subscription.event.TopicSubscriptionCreateEvent;
 import lombok.AllArgsConstructor;
 
 @Async
@@ -41,12 +40,12 @@ public class BytedeskEventPublisher {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void publishTopicCreateEvent(String topic, String userUid) {
-        applicationEventPublisher.publishEvent(new TopicCreateEvent(this, topic, userUid));
-    }
-
-    public void publishTopicUpdateEvent(String topic, String userUid) {
-        applicationEventPublisher.publishEvent(new TopicUpdateEvent(this, topic, userUid));
+    public void publishTopicSubscriptionCreateEvent(String topic, String userUid) {
+        TopicSubscriptionEntity topicSubscription = TopicSubscriptionEntity.builder()
+                .topic(topic)
+                .userUid(userUid)
+                .build();
+        applicationEventPublisher.publishEvent(new TopicSubscriptionCreateEvent(topicSubscription));
     }
 
     public void publishUserCreateEvent(UserEntity user) {

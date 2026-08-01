@@ -38,6 +38,8 @@ public class ProcessRequest extends BaseRequest {
     private String status;
 
     private String schema;
+
+    private String flowgramSchema;
     
     // 部署id
     private String deploymentId;

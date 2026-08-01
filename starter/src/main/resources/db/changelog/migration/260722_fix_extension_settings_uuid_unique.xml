@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Fix: Convert non-unique indexes on uuid to unique constraints.
+        MySQL requires a UNIQUE key on the referenced column for foreign key constraints.
+        Without this, ALTER TABLE ... ADD CONSTRAINT ... FOREIGN KEY ... REFERENCES ... (uuid) fails.
+    -->
+
+    <changeSet id="260722-drop-non-unique-ivr-uuid-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="bytedesk_call_extension_settings_ivr" indexName="idx_ext_ivr_settings_uid"/>
+        </preConditions>
+        <dropIndex tableName="bytedesk_call_extension_settings_ivr" indexName="idx_ext_ivr_settings_uid"/>
+    </changeSet>
+
+    <changeSet id="260722-add-unique-ivr-uuid-constraint" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension_settings_ivr"/>
+            <not>
+                <uniqueConstraintExists tableName="bytedesk_call_extension_settings_ivr" constraintName="uq_ext_ivr_settings_uid"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="bytedesk_call_extension_settings_ivr"
+            columnNames="uuid" constraintName="uq_ext_ivr_settings_uid"/>
+    </changeSet>
+
+    <changeSet id="260722-drop-non-unique-voicemail-uuid-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <indexExists tableName="bytedesk_call_extension_settings_voicemail" indexName="idx_ext_voicemail_settings_uid"/>
+        </preConditions>
+        <dropIndex tableName="bytedesk_call_extension_settings_voicemail" indexName="idx_ext_voicemail_settings_uid"/>
+    </changeSet>
+
+    <changeSet id="260722-add-unique-voicemail-uuid-constraint" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension_settings_voicemail"/>
+            <not>
+                <uniqueConstraintExists tableName="bytedesk_call_extension_settings_voicemail" constraintName="uq_ext_voicemail_settings_uid"/>
+            </not>
+        </preConditions>
+        <addUniqueConstraint tableName="bytedesk_call_extension_settings_voicemail"
+            columnNames="uuid" constraintName="uq_ext_voicemail_settings_uid"/>
+    </changeSet>
+
+</databaseChangeLog>

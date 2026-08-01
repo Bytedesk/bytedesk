@@ -16,6 +16,7 @@ package com.bytedesk.core.thread;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.time.ZonedDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +52,11 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
 
         Optional<ThreadEntity> findFirstByTopicAndStatusNotContainingAndDeleted(String topic, String status, Boolean deleted);
 
-        @Query(value = "select * from bytedesk_core_thread t where t.thread_topic = ?1 and t.thread_status not in ?2 and t.is_deleted = ?3 order by t.updated_at desc, t.created_at desc LIMIT 1", nativeQuery = true)
+        // JPQL to avoid full-session auto-flush triggered by native query (Hibernate 6 flushes all
+        // dirty entities before native SQL; JPQL only flushes entities relevant to the query).
+        // This prevents StaleObjectStateException on unrelated entities (e.g. VisitorEntity) when
+        // concurrent transactions update the same row.
+        @Query("SELECT t FROM ThreadEntity t WHERE t.topic = ?1 AND t.status NOT IN ?2 AND t.deleted = ?3 ORDER BY t.updatedAt DESC, t.createdAt DESC LIMIT 1")
         Optional<ThreadEntity> findTopicAndStatusesNotInAndDeleted(String topic, List<String> statuses, Boolean deleted);
 
         Page<ThreadEntity> findByOwnerAndHideAndDeleted(UserEntity owner, Boolean hide, Boolean deleted, Pageable pageable);
@@ -96,6 +101,19 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
          */
         @Query("SELECT t.closeType, COUNT(t) FROM ThreadEntity t WHERE t.status = 'CLOSED' AND t.deleted = false AND t.updatedAt BETWEEN :start AND :end GROUP BY t.closeType")
         List<Object[]> countClosedGroupedByCloseType(@Param("start") java.time.ZonedDateTime start, @Param("end") java.time.ZonedDateTime end);
+
+        @Query("SELECT t FROM ThreadEntity t WHERE t.type IN :types AND t.status = :status AND t.deleted = false AND t.closedAt IS NOT NULL AND t.closedAt <= :closedBefore ORDER BY t.closedAt ASC")
+        Page<ThreadEntity> findClosedCustomerServiceThreadsBefore(
+                        @Param("types") List<String> types,
+                        @Param("status") String status,
+                        @Param("closedBefore") ZonedDateTime closedBefore,
+                        Pageable pageable);
+
+        @Query("SELECT COUNT(t) > 0 FROM ThreadEntity t WHERE t.topic = :topic AND t.uid <> :excludeUid AND t.deleted = false AND t.createdAt > :createdAfter")
+        boolean existsByTopicAndUidNotAndCreatedAtAfter(
+                        @Param("topic") String topic,
+                        @Param("excludeUid") String excludeUid,
+                        @Param("createdAfter") ZonedDateTime createdAfter);
 
         /**
          * 根据访客ID查找最近的客服会话记录

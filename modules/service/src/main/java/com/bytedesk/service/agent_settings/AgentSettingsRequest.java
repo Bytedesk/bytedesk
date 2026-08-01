@@ -13,13 +13,15 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsRequest;
 import com.bytedesk.kbase.settings.BaseSettingsRequest;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsRequest;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButton;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTab;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingRequest;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsRequest;
 import com.bytedesk.service.queue_settings.QueueSettingsRequest;
 import com.bytedesk.service.worktime_settings.WorktimeSettingRequest;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsRequest;
 
 import java.util.List;
 
@@ -76,11 +78,6 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
     private WorktimeSettingRequest worktimeSettings;
 
     /**
-     * Auto-reply settings (Agent-specific)
-     */
-    private AutoReplySettingsRequest autoReplySettings;
-
-    /**
      * Queue settings (Agent-specific)
      */
     private QueueSettingsRequest queueSettings;
@@ -109,4 +106,9 @@ public class AgentSettingsRequest extends BaseSettingsRequest {
      * Agent uid (used for querying settings by agent)
      */
     private String agentUid;
+
+    /**
+     * WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsRequest webrtcSettings;
 }

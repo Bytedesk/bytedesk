@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestControllerOverride;
-import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
@@ -51,6 +51,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(UserRequest request) {
         
         Page<UserResponse> userResponse = userRestService.queryByOrg(request);
@@ -59,6 +60,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(UserRequest request) {
         
         Page<UserResponse> userResponse = userRestService.queryByUser(request);
@@ -67,6 +69,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(UserRequest request) {
         
         UserResponse userResponse = userRestService.queryByUid(request);
@@ -75,19 +78,21 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
-    @ActionAnnotation(title = "user", action = "新建", description = "create user info")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CREATE, description = "create user info")
     @Override
-    public ResponseEntity<?> create(UserRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody UserRequest request) {
         
         UserResponse userResponse = userRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "user", action = "更新", description = "update user info")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_UPDATE, description = "update user info")
     @PreAuthorize(UserPermissions.HAS_USER_UPDATE + " or " + RolePermissions.ROLE_SUPER)
     @Override
-    public ResponseEntity<?> update(UserRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody UserRequest request) {
 
         UserResponse userResponse = userRestService.update(request);
 
@@ -95,9 +100,10 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
-    @ActionAnnotation(title = "user", action = "删除", description = "delete user info")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_DELETE, description = "delete user info")
     @Override
-    public ResponseEntity<?> delete(UserRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody UserRequest request) {
         
         userRestService.delete(request);
 
@@ -105,7 +111,29 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_UPDATE, description = "restore user info")
     @Override
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody UserRequest request) {
+
+        UserResponse userResponse = userRestService.restore(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_UPDATE, description = "user enabled update by super")
+    @PostMapping("/update/enabled/by/super")
+    public ResponseEntity<?> updateEnabledBySuper(@RequestBody UserRequest request) {
+
+        UserResponse userResponse = userRestService.updateEnabledBySuper(request);
+        
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Override
+    @GetMapping("/export")
     public Object export(UserRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
@@ -142,7 +170,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
      * 切换当前组织（写入 User.currentOrganization，并同步 currentRoles）。
      * 请求体使用 BaseRequest 的 orgUid 字段。
      */
-    @ActionAnnotation(title = "user", action = "switchOrganization", description = "switch current organization")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_SWITCH_ORGANIZATION, description = "switch current organization")
     @PostMapping("/switch/organization")
     @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> switchOrganization(@RequestBody UserRequest userRequest) {
@@ -151,9 +179,19 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
+
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_SWITCH_ORGANIZATION, description = "switch target user current organization by super")
+    @PostMapping("/switch/organization/by/super")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> switchOrganizationBySuper(@RequestBody UserRequest userRequest) {
+
+        UserResponse userResponse = userRestService.switchUserOrganization(userRequest.getUid(), userRequest.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
     
     // 用户自己修改密码
-    @ActionAnnotation(title = "user", action = "changePassword", description = "changePassword")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_PASSWORD, description = "changePassword")
     @PostMapping("/change/password")
     public ResponseEntity<?> changePassword(@RequestBody UserRequest userRequest) {
 
@@ -164,7 +202,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
 
     // 管理员修改子成员用户密码
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "admin", action = "changePassword", description = "changePassword")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_PASSWORD, description = "changePassword")
     @PostMapping("/admin/change/password")
     public ResponseEntity<?> adminChangePassword(@RequestBody UserRequest userRequest) {
 
@@ -173,7 +211,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "user", action = "changeEmail", description = "changeEmail")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_EMAIL, description = "changeEmail")
     @PostMapping("/change/email")
     public ResponseEntity<?> changeEmail(@RequestBody UserRequest userRequest, HttpServletRequest request) {
         // validate email & code
@@ -187,12 +225,12 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "user", action = "changeMobile", description = "changeMobile")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_MOBILE, description = "changeMobile")
     @PostMapping("/change/mobile")
     public ResponseEntity<?> changeMobile(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
         // 验证手机验证码
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCountry(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error("validate code failed", -1, false));
         }
 
@@ -201,7 +239,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    @ActionAnnotation(title = "用户", action = BytedeskConsts.ACTION_LOGOUT, description = "logout")
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_LOGOUT, description = "logout")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
         String accessToken = JwtUtils.parseAccessToken(request);
@@ -214,6 +252,19 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         userService.logout(accessToken);
 
         return ResponseEntity.ok().body(JsonResult.success());
+    }
+
+    /**
+     * 用户主动退出组织（只能退出非当前组织）
+     */
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_LEAVE_ORGANIZATION, description = "leave organization")
+    @PostMapping("/leave/organization")
+    @PreAuthorize(UserPermissions.HAS_USER_READ + " or " + RolePermissions.ROLE_SUPER)
+    public ResponseEntity<?> leaveOrganization(@RequestBody UserRequest userRequest) {
+
+        userRestService.leaveOrganization(userRequest.getOrgUid());
+
+        return ResponseEntity.ok(JsonResult.success());
     }
 
     

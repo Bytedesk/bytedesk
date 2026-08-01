@@ -22,7 +22,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -48,25 +48,30 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SpringAIOpenrouterService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired(required = false)
-    @Qualifier("openrouterChatModel")
-    private OpenAiChatModel defaultChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    @Autowired
-    private SseMessageHelper sseMessageHelper;
-
-    @Autowired
-    private PromptHelper promptHelper;
-
-    public SpringAIOpenrouterService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIOpenrouterService(
+            LlmProviderRestService llmProviderRestService,
+            @Qualifier("openrouterChatModel") ObjectProvider<OpenAiChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper,
+            SseMessageHelper sseMessageHelper,
+            PromptHelper promptHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.sseMessageHelper = sseMessageHelper;
+        this.promptHelper = promptHelper;
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final OpenAiChatModel defaultChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
+    private final SseMessageHelper sseMessageHelper;
+
+    private final PromptHelper promptHelper;
+
     
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
@@ -268,10 +273,11 @@ public class SpringAIOpenrouterService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Openrouter API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);

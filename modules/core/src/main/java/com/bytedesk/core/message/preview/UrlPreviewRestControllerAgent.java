@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.TextContent;
 import com.bytedesk.core.message.content.UrlPreview;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,13 +79,14 @@ public class UrlPreviewRestControllerAgent {
             return ResponseEntity.ok(JsonResult.success(textContent));
         }
 
-        UrlPreviewResponse previewResponse = null;
         boolean hasAnyPreviewField = StringUtils.hasText(request.getTitle())
                 || StringUtils.hasText(request.getDescription())
                 || StringUtils.hasText(request.getImageUrl())
                 || StringUtils.hasText(request.getSiteName());
+        UrlPreviewResponse previewResponse = UrlPreviewResponse.builder().url(normalizedUrl).build();
         if (!hasAnyPreviewField) {
-            previewResponse = urlPreviewService.preview(normalizedUrl);
+            previewResponse = Optional.ofNullable(urlPreviewService.preview(normalizedUrl))
+                .orElseGet(() -> UrlPreviewResponse.builder().url(normalizedUrl).build());
         }
 
         UrlPreview urlPreview = UrlPreview.builder()

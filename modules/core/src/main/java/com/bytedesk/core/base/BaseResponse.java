@@ -48,6 +48,14 @@ public abstract class BaseResponse implements Serializable {
     
     protected ZonedDateTime updatedAt;
 
+    public ZonedDateTime getCreatedAtRaw() {
+        return createdAt;
+    }
+
+    public ZonedDateTime getUpdatedAtRaw() {
+        return updatedAt;
+    }
+
     public String getCreatedAt() {
         return BdDateUtils.formatDatetimeToString(createdAt);
     }

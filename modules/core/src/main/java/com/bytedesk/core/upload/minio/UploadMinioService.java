@@ -15,13 +15,12 @@ package com.bytedesk.core.upload.minio;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +40,7 @@ import io.minio.StatObjectArgs;
 import io.minio.http.Method;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * MinIO 对象存储服务
@@ -48,16 +48,15 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * @author bytedesk.com
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "bytedesk.minio.enabled", havingValue = "true", matchIfMissing = false)
 public class UploadMinioService {
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
-    @Autowired
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
     /**
      * 初始化 MinIO 存储桶和策略
@@ -209,8 +208,7 @@ public class UploadMinioService {
             String contentType = getContentType(fileName);
 
             // 从 URL 下载文件并上传到 MinIO
-            URL fileUrl = new URL(url);
-            try (InputStream inputStream = fileUrl.openStream()) {
+            try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 minioClient.putObject(
                     PutObjectArgs.builder()
                         .bucket(bytedeskProperties.getMinioBucketName())

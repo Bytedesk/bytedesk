@@ -13,13 +13,15 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButton;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTab;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsResponse;
 
 import java.util.List;
 
@@ -84,15 +86,6 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
     private WorktimeSettingResponse draftWorktimeSettings;
 
     /**
-     * Auto-reply settings (Agent-specific)
-     */
-    private AutoReplySettingsResponse autoReplySettings;
-    /**
-     * Draft auto-reply settings (Agent-specific)
-     */
-    private AutoReplySettingsResponse draftAutoReplySettings;
-
-    /**
      * Queue settings (Agent-specific)
      */
     private QueueSettingsResponse queueSettings;
@@ -138,4 +131,14 @@ public class AgentSettingsResponse extends BaseSettingsResponse {
      * Desktop quick reply buttons (draft)
      */
     private List<AgentQuickReplyButton> draftQuickReplies;
+
+    /**
+     * WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsResponse webrtcSettings;
+
+    /**
+     * Draft WebRTC settings (Agent-specific)
+     */
+    private WebrtcSettingsResponse draftWebrtcSettings;
 }

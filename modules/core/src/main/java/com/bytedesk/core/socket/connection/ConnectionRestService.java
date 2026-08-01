@@ -30,12 +30,17 @@ import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.RedisConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -74,6 +79,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     // 最小数据库写入间隔（毫秒）
     private static final long MIN_INTERVAL_MS = 5000L;
+    private static final long INVALID_RECORD_RETENTION_MS = 24L * 60 * 60 * 1000;
     
     @Override
     protected Specification<ConnectionEntity> createSpecification(ConnectionRequest request) {
@@ -115,7 +121,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         // 
         ConnectionEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create connection failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -130,12 +136,12 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             //
             ConnectionEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update connection failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("Connection not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -181,7 +187,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
             // connectionRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("Connection not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -206,11 +212,19 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
      * Mark (or create) a connection as connected.
      * clientId format recommendation: userUid/client/deviceUid
      */
+    @Retryable(
+        retryFor = {
+            CannotAcquireLockException.class,
+            PessimisticLockingFailureException.class
+        },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     @Transactional
     public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
         long now = System.currentTimeMillis();
         String resolvedOrgUid = resolveOrgUid(userUid, orgUid);
-        ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
+        ConnectionEntity entity = fetchConnection(clientId, () -> ConnectionEntity.builder()
             .uid(uidUtils.getUid())
             .userUid(userUid)
             .orgUid(resolvedOrgUid)
@@ -314,8 +328,8 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         }
     }
 
-    private ConnectionEntity fetchConnectionForUpdate(String clientId, Supplier<ConnectionEntity> creator) {
-        return connectionRepository.findByClientIdForUpdate(clientId).orElseGet(creator);
+    private ConnectionEntity fetchConnection(String clientId, Supplier<ConnectionEntity> creator) {
+        return connectionRepository.findByClientId(clientId).orElseGet(creator);
     }
 
     private void applyConnectedState(ConnectionEntity entity, String protocol, Integer ttlSeconds, long now) {
@@ -339,14 +353,14 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
                 return false;
             }
             String resolvedOrgUid = resolveOrgUid(userUid, null);
-            ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
-                    .uid(uidUtils.getUid())
-                    .userUid(userUid)
-                    .orgUid(resolvedOrgUid)
-                    .clientId(clientId)
-                    .deviceUid(deviceUid)
-                    .protocol(ConnectionProtocalEnum.MQTT.name())
-                    .build());
+            ConnectionEntity entity = fetchConnection(clientId, () -> ConnectionEntity.builder()
+                .uid(uidUtils.getUid())
+                .userUid(userUid)
+                .orgUid(resolvedOrgUid)
+                .clientId(clientId)
+                .deviceUid(deviceUid)
+                .protocol(ConnectionProtocalEnum.MQTT.name())
+                .build());
             if (entity.getId() != null) {
                 return false;
             }
@@ -400,25 +414,21 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /** Cleanup expired (stale) connections by TTL */
     @Transactional
     public int expireStaleSessions() {
-        long start = System.currentTimeMillis();
-        long now = start;
-        List<ConnectionEntity> all = connectionRepository.findAll();
-        // int scanned = 0;
+        long now = System.currentTimeMillis();
+        List<ConnectionEntity> activeConnections = connectionRepository.findByStatusAndDeletedFalse(CONNECTED.name());
         int changed = 0;
         Set<String> changedUsers = new HashSet<>();
-        for (ConnectionEntity c : all) {
-            // scanned++;
-            if (c.isDeleted()) continue;
-            if (CONNECTED.name().equals(c.getStatus())) {
-                Long last = c.getLastHeartbeatAt();
-                if (last != null && c.getTtlSeconds() != null && last + c.getTtlSeconds() * 1000L < now) {
-                    c.setStatus(DISCONNECTED.name())
-                     .setDisconnectedAt(now);
-                    save(c);
-                    changed++;
-                    if (StringUtils.hasText(c.getUserUid())) {
-                        changedUsers.add(c.getUserUid());
-                    }
+        for (ConnectionEntity c : activeConnections) {
+            Long last = c.getLastHeartbeatAt();
+            Integer ttlSeconds = c.getTtlSeconds();
+            if (last == null || ttlSeconds == null || last + ttlSeconds * 1000L >= now) {
+                continue;
+            }
+            int updated = connectionRepository.expireIfStale(c.getId(), CONNECTED.name(), DISCONNECTED.name(), now);
+            if (updated > 0) {
+                changed += updated;
+                if (StringUtils.hasText(c.getUserUid())) {
+                    changedUsers.add(c.getUserUid());
                 }
             }
         }
@@ -428,6 +438,12 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         // long cost = System.currentTimeMillis() - start;
         // log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
         return changed;
+    }
+
+    @Transactional
+    public int cleanupInvalidRecordsOlderThan24Hours() {
+        long cutoff = System.currentTimeMillis() - INVALID_RECORD_RETENTION_MS;
+        return connectionRepository.deleteDisconnectedBefore(DISCONNECTED.name(), cutoff);
     }
 
     /** Determine online (has >=1 active non-expired connection) */

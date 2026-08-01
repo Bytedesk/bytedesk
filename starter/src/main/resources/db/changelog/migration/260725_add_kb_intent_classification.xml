@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260725-add-kb-intent-classification" author="bytedesk">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension_settings_knowledge"/>
+            <not>
+                <columnExists tableName="bytedesk_call_extension_settings_knowledge" columnName="enable_kb_intent_classification"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_extension_settings_knowledge">
+            <column name="enable_kb_intent_classification" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_call_extension_settings_knowledge" columnName="enable_kb_intent_classification"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

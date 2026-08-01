@@ -6,10 +6,10 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageTypeConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

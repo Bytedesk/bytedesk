@@ -13,320 +13,934 @@
  */
 package com.bytedesk.core.workflow;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.bytedesk.core.workflow.edge.WorkflowEdge;
-import com.bytedesk.core.workflow.node.WorkflowBaseNode;
-import com.bytedesk.core.workflow.node.WorkflowConditionNode;
-import com.bytedesk.core.workflow.node.WorkflowEndNode;
-import com.bytedesk.core.workflow.node.WorkflowLLMNode;
-import com.bytedesk.core.workflow.node.WorkflowLoopNode;
-import com.bytedesk.core.workflow.node.WorkflowNodeMeta;
-import com.bytedesk.core.workflow.node.WorkflowNodeTypeEnum;
-import com.bytedesk.core.workflow.node.WorkflowStartNode;
-
 /**
  * Workflow initialization data holder.
  * 提供用于后端初始化和示例演示的默认工作流结构。
  */
 public final class WorkflowInitData {
 
-    /** 默认流程 UID 后缀（需要与组织 UID 组合保证唯一性） */
-    public static final String DEFAULT_WORKFLOW_UID_SUFFIX = "df_workflow_builder";
+        /** 默认流程 UID 后缀（需要与组织 UID 组合保证唯一性） */
+        public static final String DEFAULT_WORKFLOW_UID_SUFFIX = "df_workflow_builder";
 
-    /** 默认流程名称 */
-    public static final String DEFAULT_WORKFLOW_NAME = "默认智能流程";
+        /** 默认 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_builder";
 
-    /** 默认流程描述 */
-    public static final String DEFAULT_WORKFLOW_DESCRIPTION = "FlowBuilder 示例流程";
+        /** 默认满意度 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_satisfaction_builder";
 
-    /** 默认开始节点 ID */
-    public static final String DEFAULT_START_NODE_ID = "start_0";
+        /** 默认密码验证 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_password_verification_builder";
 
-    private WorkflowInitData() {
-    }
+        /** 默认机器人对话 IVR 流程 UID 后缀（非默认组织使用） */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_UID_SUFFIX = "df_workflow_ivr_bot_builder";
 
-    /**
-     * 构建默认示例工作流 Schema。
-     */
-    public static WorkflowSchema buildDefaultWorkflow() {
-        List<WorkflowBaseNode> nodes = new ArrayList<>();
-        List<WorkflowEdge> edges = new ArrayList<>();
+        /** 默认流程名称 */
+        public static final String DEFAULT_WORKFLOW_NAME = "默认主动获客流程";
 
-        WorkflowStartNode startNode = WorkflowStartNode.builder()
-                .id(DEFAULT_START_NODE_ID)
-                .type(WorkflowNodeTypeEnum.START.getValue())
-                .name("Start")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(100.0)
-                                .y(200.0)
-                                .build())
-                        .build())
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Start")
-                        .outputs(createOutputs("query", "string", "Hello Flow."))
-                        .build())
-                .build();
-        nodes.add(startNode);
+        /** 默认流程描述 */
+        public static final String DEFAULT_WORKFLOW_DESCRIPTION = "用于教育、医疗等行业的联系方式采集示例流程，支持多轮问答与手机号校验";
 
-        WorkflowConditionNode conditionNode = WorkflowConditionNode.builder()
-                .id("condition_0")
-                .type(WorkflowNodeTypeEnum.CONDITION.getValue())
-                .name("Condition")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(320.0)
-                                .y(200.0)
-                                .build())
-                        .build())
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Condition")
-                        .inputsValues(createConditionInputsValues())
-                        .inputs(createConditionInputs())
-                        .build())
-                .build();
-        nodes.add(conditionNode);
+        /** 默认 IVR 流程名称 */
+        public static final String DEFAULT_IVR_WORKFLOW_NAME = "默认 IVR 自助服务流程";
 
-        WorkflowLLMNode llmNode = WorkflowLLMNode.builder()
-                .id("llm_0")
-                .type(WorkflowNodeTypeEnum.LLM.getValue())
-                .name("LLM_0")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(560.0)
-                                .y(100.0)
-                                .build())
-                        .build())
-                .modelType("gpt-3.5-turbo")
-                .temperature(0.5)
-                .systemPrompt("You are an AI assistant.")
-                .prompt("")
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("LLM_0")
-                        .inputsValues(createLLMInputsValues())
-                        .inputs(createLLMInputs())
-                        .outputs(createOutputs("result", "string", null))
-                        .build())
-                .build();
-        nodes.add(llmNode);
+        /** 默认 IVR 流程描述 */
+        public static final String DEFAULT_IVR_WORKFLOW_DESCRIPTION = "热线 IVR 示例流程，包含自助查询、转人工、排队和留言兜底";
 
-        WorkflowLoopNode loopNode = WorkflowLoopNode.builder()
-                .id("loop_H8M3U")
-                .type(WorkflowNodeTypeEnum.LOOP.getValue())
-                .name("Loop_2")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(560.0)
-                                .y(300.0)
-                                .build())
-                        .build())
-                .loopTimes(2)
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("Loop_2")
-                        .inputsValues(createLoopInputsValues())
-                        .inputs(createLoopInputs())
-                        .outputs(createOutputs("result", "string", null))
-                        .build())
-                .build();
-        nodes.add(loopNode);
+        /** 默认满意度 IVR 流程名称 */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_NAME = "默认满意度回访 IVR 流程";
 
-        WorkflowEndNode endNode = WorkflowEndNode.builder()
-                .id("end_0")
-                .type(WorkflowNodeTypeEnum.END.getValue())
-                .name("End")
-                .meta(WorkflowNodeMeta.builder()
-                        .position(WorkflowNodeMeta.Position.builder()
-                                .x(800.0)
-                                .y(200.0)
-                                .build())
-                        .build())
-                .data(WorkflowBaseNode.NodeData.builder()
-                        .title("End")
-                        .outputs(createOutputs("result", "string", null))
-                        .build())
-                .build();
-        nodes.add(endNode);
+        /** 默认满意度 IVR 流程描述 */
+        public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_DESCRIPTION = "IVRBuilder 满意度回访示例流程，包含评分收集和留言补充";
 
-        WorkflowEdge edge1 = WorkflowEdge.builder()
-                .id("edge_start_condition_0")
-                .sourceNodeID(DEFAULT_START_NODE_ID)
-                .targetNodeID("condition_0")
-                .build();
-        edges.add(edge1);
+        /** 默认密码验证 IVR 流程名称 */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_NAME = "默认密码验证 IVR 流程";
 
-        WorkflowEdge edge2 = WorkflowEdge.builder()
-                .id("edge_condition_llm_0")
-                .sourceNodeID("condition_0")
-                .targetNodeID("llm_0")
-                .sourcePortID("if_0")
-                .build();
-        edges.add(edge2);
+        /** 默认密码验证 IVR 流程描述 */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_DESCRIPTION = "IVRBuilder 验密示例流程，包含身份校验和失败转人工";
 
-        WorkflowEdge edge3 = WorkflowEdge.builder()
-                .id("edge_llm_end_0")
-                .sourceNodeID("llm_0")
-                .targetNodeID("end_0")
-                .build();
-        edges.add(edge3);
+        /** 默认机器人对话 IVR 流程名称 */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_NAME = "默认机器人对话 IVR 流程";
 
-        // condition_0 的 else 分支连接到 loop_H8M3U
-        WorkflowEdge edge4 = WorkflowEdge.builder()
-                .id("edge_condition_loop")
-                .sourceNodeID("condition_0")
-                .targetNodeID("loop_H8M3U")
-                .sourcePortID("if_f0rOAt")
-                .build();
-        edges.add(edge4);
+        /** 默认机器人对话 IVR 流程描述 */
+        public static final String DEFAULT_IVR_BOT_WORKFLOW_DESCRIPTION = "IVRBuilder 机器人对话示例流程，支持转入多轮或不限轮语音机器人";
 
-        // loop_H8M3U 循环完成后连接到 end_0
-        WorkflowEdge edge5 = WorkflowEdge.builder()
-                .id("edge_loop_end_0")
-                .sourceNodeID("loop_H8M3U")
-                .targetNodeID("end_0")
-                .build();
-        edges.add(edge5);
+        /** 默认开始节点 ID */
+        public static final String DEFAULT_START_NODE_ID = "start_0";
 
-        return WorkflowSchema.builder()
-                .nodes(nodes)
-                .edges(edges)
-                .build();
-    }
+        /** 默认 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_START_NODE_ID = "ivr-start-0";
 
-    private static Map<String, Object> createOutputs(String propertyName, String type, String defaultValue) {
-        Map<String, Object> outputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        Map<String, Object> property = new HashMap<>();
+        /** 默认满意度 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_SATISFACTION_START_NODE_ID = "ivr-satisfaction-start-0";
 
-        property.put("type", type);
-        if (defaultValue != null) {
-            property.put("default", defaultValue);
+        /** 默认密码验证 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID = "ivr-password-start-0";
+
+        /** 默认机器人对话 IVR 开始节点 ID */
+        public static final String DEFAULT_IVR_BOT_START_NODE_ID = "ivr-bot-start-0";
+
+        private WorkflowInitData() {
         }
 
-        properties.put(propertyName, property);
-        outputs.put("type", "object");
-        outputs.put("properties", properties);
+        /**
+         * 构建默认获客工作流 Schema。
+         */
+        public static WorkflowSchema buildDefaultWorkflow() {
+                return WorkflowSchema.fromJson(buildDefaultLeadCollectionWorkflowSchemaJson());
+        }
 
-        return outputs;
-    }
+        public static String buildDefaultLeadCollectionWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 100, "y": 240 }
+                                                        },
+                                                        "data": {
+                                                                "title": "主动邀约开始",
+                                                                "description": "教育、医疗等主动获客对话入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-opening",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 360, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "开场提示",
+                                                                "content": "您好，请问您目前的学历是？",
+                                                                "description": "主动获客首轮问答"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-choice-education",
+                                                        "type": "choice",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "学历选择",
+                                                                "content": "您好，请问您目前的学历是？",
+                                                                "variable": "educationLevel",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "lead-education-college",
+                                                                                "label": "1.大专",
+                                                                                "value": "大专",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-1"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-education-undergraduate",
+                                                                                "label": "2.本科",
+                                                                                "value": "本科",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-2"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-education-other",
+                                                                                "label": "3.其他",
+                                                                                "value": "其他",
+                                                                                "outgoingEdgeId": "edge-lead-education-goal-3"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-choice-goal",
+                                                        "type": "choice",
+                                                        "meta": {
+                                                                "position": { "x": 1060, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "诉求判断",
+                                                                "content": "嗯嗯，您主要是想简单拿证还是想系统学习知识呢？",
+                                                                "variable": "learningGoal",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "lead-goal-certificate",
+                                                                                "label": "1. 简单拿证",
+                                                                                "value": "简单拿证",
+                                                                                "outgoingEdgeId": "edge-lead-goal-summary-1"
+                                                                        },
+                                                                        {
+                                                                                "id": "lead-goal-learning",
+                                                                                "label": "2. 系统学习知识",
+                                                                                "value": "系统学习知识",
+                                                                                "outgoingEdgeId": "edge-lead-goal-summary-2"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-summary",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1400, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "资料说明",
+                                                                "content": "收到，您当前是【{{educationLevel}}】学历，倾向于【{{learningGoal}}】。不同地区的报考条件、就诊流程和服务安排会有差异，老师先为您整理适合的院校/科室、费用、流程和注意事项，请留下接收资料的联系方式。",
+                                                                "description": "引导进入联系方式采集"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-form-contact",
+                                                        "type": "form",
+                                                        "meta": {
+                                                                "position": { "x": 1760, "y": 180 }
+                                                        },
+                                                        "data": {
+                                                                "title": "联系方式采集",
+                                                                "content": "请补充所在城市、手机号。手机号用于免费发送资料，如号码格式不正确会提示重新填写。",
+                                                                "description": "采集并校验访客联系方式",
+                                                                "formFields": [
+                                                                        {
+                                                                                "id": "city",
+                                                                                "type": "input",
+                                                                                "label": "所在城市",
+                                                                                "required": true
+                                                                        },
+                                                                        {
+                                                                                "id": "mobile",
+                                                                                "type": "text",
+                                                                                "label": "手机号",
+                                                                                "required": true,
+                                                                                "props": {
+                                                                                        "type": "tel"
+                                                                                },
+                                                                                "rules": [
+                                                                                        {
+                                                                                                "pattern": "^1\\\\d{10}$",
+                                                                                                "message": "请输入正确的11位手机号"
+                                                                                        }
+                                                                                ]
+                                                                        },
+                                                                        {
+                                                                                "id": "remark",
+                                                                                "type": "textarea",
+                                                                                "label": "补充说明",
+                                                                                "required": false
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "lead-text-confirm",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 2140, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "确认与兜底",
+                                                                "content": "好的，请您确认手机号 {{mobile}}{{wechat}}。您已成功预留联系方式，这边会尽快安排顾问添加您并发送资料，请耐心等待，不要频繁重复进线咨询。",
+                                                                "description": "已采集到手机号后的确认与收尾"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "end_0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 2480, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束主动获客流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "id": "edge-lead-start-opening",
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "lead-text-opening",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-opening-education",
+                                                        "sourceNodeId": "lead-text-opening",
+                                                        "targetNodeId": "lead-choice-education",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-1",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-college",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-2",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-undergraduate",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-education-goal-3",
+                                                        "sourceNodeId": "lead-choice-education",
+                                                        "targetNodeId": "lead-choice-goal",
+                                                        "sourcePortId": "choice-option-lead-education-other",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-goal-summary-1",
+                                                        "sourceNodeId": "lead-choice-goal",
+                                                        "targetNodeId": "lead-text-summary",
+                                                        "sourcePortId": "choice-option-lead-goal-certificate",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-goal-summary-2",
+                                                        "sourceNodeId": "lead-choice-goal",
+                                                        "targetNodeId": "lead-text-summary",
+                                                        "sourcePortId": "choice-option-lead-goal-learning",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-summary-form",
+                                                        "sourceNodeId": "lead-text-summary",
+                                                        "targetNodeId": "lead-form-contact",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-form-confirm",
+                                                        "sourceNodeId": "lead-form-contact",
+                                                        "targetNodeId": "lead-text-confirm",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "id": "edge-lead-confirm-end",
+                                                        "sourceNodeId": "lead-text-confirm",
+                                                        "targetNodeId": "end_0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_START_NODE_ID, DEFAULT_START_NODE_ID);
+        }
 
-    private static Map<String, Object> createConditionInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        List<Map<String, Object>> conditions = new ArrayList<>();
+        public static String buildDefaultIvrWorkflowSchemaJson() {
+                return buildDefaultHotlineIvrWorkflowSchemaJson();
+        }
 
-        Map<String, Object> condition1 = new HashMap<>();
-        condition1.put("key", "if_0");
-        Map<String, Object> value1 = new HashMap<>();
-        value1.put("type", "expression");
-        value1.put("content", "");
-        condition1.put("value", value1);
-        conditions.add(condition1);
+        public static String buildDefaultHotlineIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": { "position": { "x": 100, "y": 260 } },
+                                                        "data": {
+                                                                "title": "热线来电进入",
+                                                                "description": "热线 IVR 正式入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-text-welcome",
+                                                        "type": "text",
+                                                        "meta": { "position": { "x": 420, "y": 240 } },
+                                                        "data": {
+                                                                "title": "热线欢迎语",
+                                                                "content": "您好，欢迎致电微语客服热线。按 1 查询订单信息，按 2 收听服务政策，按 0 转人工服务。",
+                                                                "description": "热线主菜单欢迎播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": { "position": { "x": 760, "y": 220 } },
+                                                        "data": {
+                                                                "title": "热线主菜单",
+                                                                "content": "请输入业务按键。",
+                                                                "description": "热线主菜单按键导航",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "hotline-option-order",
+                                                                                "key": "1",
+                                                                                "label": "按 1 查询订单信息",
+                                                                                "outgoingEdgeId": "hotline-business-http-order"
+                                                                        },
+                                                                        {
+                                                                                "id": "hotline-option-policy",
+                                                                                "key": "2",
+                                                                                "label": "按 2 收听服务政策",
+                                                                                "outgoingEdgeId": "hotline-text-policy"
+                                                                        },
+                                                                        {
+                                                                                "id": "hotline-option-human",
+                                                                                "key": "0",
+                                                                                "label": "按 0 转人工服务",
+                                                                                "outgoingEdgeId": "hotline-human-handoff"
+                                                                        }
+                                                                ],
+                                                                "submitKey": ""
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-business-http-order",
+                                                        "type": "business_http",
+                                                        "meta": { "position": { "x": 1120, "y": 80 } },
+                                                        "data": {
+                                                                "title": "订单自助查询",
+                                                                "content": "正在为您查询订单信息，请稍候。",
+                                                                "description": "热线业务自助 HTTP 节点",
+                                                                "apiUrl": "/visitor/api/v1/ivr/demo/order?callerIdNumber=${callerIdNumber}",
+                                                                "httpMethod": "GET",
+                                                                "responseTemplate": "为您查询到演示订单 ${orderNumber}，当前状态：${orderStatus}，收件人：${receiverName}。",
+                                                                "failurePrompt": "订单查询服务暂时不可用，请稍后再试。",
+                                                                "timeoutMs": 3000,
+                                                                "requestBody": ""
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-text-policy",
+                                                        "type": "text",
+                                                        "meta": { "position": { "x": 1120, "y": 260 } },
+                                                        "data": {
+                                                                "title": "服务政策播报",
+                                                                "content": "我们的人工服务时间以后台时间策略为准。非服务时间或坐席忙碌时，您可以留言，我们会尽快回访。",
+                                                                "description": "热线服务政策播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-human-handoff",
+                                                        "type": "human_handoff",
+                                                        "meta": { "position": { "x": 1120, "y": 460 } },
+                                                        "data": {
+                                                                "title": "转人工决策",
+                                                                "content": "正在为您转接人工坐席，请稍候。",
+                                                                "description": "根据服务时间和坐席状态决定进入 ACD 或留言",
+                                                                "queueName": "default",
+                                                                "allowQueue": true,
+                                                                "ringTimeoutSeconds": 20,
+                                                                "strategy": "LONGEST_IDLE",
+                                                                "leaveReason": "USER_REQUESTED"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-leave-message",
+                                                        "type": "leave_message",
+                                                        "meta": { "position": { "x": 1480, "y": 460 } },
+                                                        "data": {
+                                                                "title": "热线留言",
+                                                                "prompt": "请在提示音后留言，留言完成后请挂机。",
+                                                                "leaveReason": "USER_REQUESTED",
+                                                                "queueName": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "hotline-end-0",
+                                                        "type": "end",
+                                                        "meta": { "position": { "x": 1480, "y": 180 } },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "热线自助流程结束"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                { "sourceNodeId": "%s", "targetNodeId": "hotline-text-welcome", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-text-welcome", "targetNodeId": "hotline-keyboard-main", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-business-http-order", "sourcePortId": "keyboard-option-hotline-option-order", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-text-policy", "sourcePortId": "keyboard-option-hotline-option-policy", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-keyboard-main", "targetNodeId": "hotline-human-handoff", "sourcePortId": "keyboard-option-hotline-option-human", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-business-http-order", "targetNodeId": "hotline-end-0", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" },
+                                                { "sourceNodeId": "hotline-text-policy", "targetNodeId": "hotline-end-0", "sourcePortId": "defaultOutput", "targetPortId": "defaultInput" }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_START_NODE_ID, DEFAULT_IVR_START_NODE_ID);
+        }
 
-        Map<String, Object> condition2 = new HashMap<>();
-        condition2.put("key", "if_f0rOAt");
-        Map<String, Object> value2 = new HashMap<>();
-        value2.put("type", "expression");
-        value2.put("content", "");
-        condition2.put("value", value2);
-        conditions.add(condition2);
+        public static String buildDefaultSatisfactionIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度回访开始",
+                                                                "description": "默认满意度回访 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度邀请",
+                                                                "content": "您好，本次通话即将结束。请对本次服务进行评价，按 1 表示非常满意，按 2 表示满意，按 3 表示一般，按 4 表示不满意，按 5 表示非常不满意。",
+                                                                "description": "满意度评分播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "满意度评分",
+                                                                "content": "请输入满意度评分。",
+                                                                "description": "收集 1 到 5 的满意度评分",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-5",
+                                                                                "key": "1",
+                                                                                "label": "按 1 表示非常满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-positive"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-4",
+                                                                                "key": "2",
+                                                                                "label": "按 2 表示满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-positive"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-3",
+                                                                                "key": "3",
+                                                                                "label": "按 3 表示一般",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-neutral"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-2",
+                                                                                "key": "4",
+                                                                                "label": "按 4 表示不满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-negative"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-satisfaction-option-1",
+                                                                                "key": "5",
+                                                                                "label": "按 5 表示非常不满意",
+                                                                                "outgoingEdgeId": "ivr-satisfaction-text-negative"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-positive",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 40 }
+                                                        },
+                                                        "data": {
+                                                                "title": "高分反馈",
+                                                                "content": "感谢您的好评，祝您生活愉快，再见。",
+                                                                "description": "高分评价结束语"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-neutral",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "中立反馈",
+                                                                "content": "感谢您的评价，我们会持续优化服务体验。",
+                                                                "description": "中立评价结束语"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-text-negative",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 400 }
+                                                        },
+                                                        "data": {
+                                                                "title": "低分反馈",
+                                                                "content": "很抱歉本次服务未达预期。请在滴声后留下您的建议，我们将安排专人回访。",
+                                                                "description": "低分评价与留言提示"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-satisfaction-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1430, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认满意度回访流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-satisfaction-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-welcome",
+                                                        "targetNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-positive",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-5",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-positive",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-4",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-neutral",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-3",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-negative",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-2",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-keyboard-main",
+                                                        "targetNodeId": "ivr-satisfaction-text-negative",
+                                                        "sourcePortId": "keyboard-option-ivr-satisfaction-option-1",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-positive",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-neutral",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-satisfaction-text-negative",
+                                                        "targetNodeId": "ivr-satisfaction-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_SATISFACTION_START_NODE_ID,
+                                                DEFAULT_IVR_SATISFACTION_START_NODE_ID);
+        }
 
-        inputsValues.put("conditions", conditions);
-        return inputsValues;
-    }
+        public static String buildDefaultPasswordVerificationIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "密码验证开始",
+                                                                "description": "默认密码验证 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证提示",
+                                                                "content": "您好，为保障账户安全，请输入 6 位服务密码并按井号键结束。",
+                                                                "description": "密码验证前置播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-verify-main",
+                                                        "type": "verify",
+                                                        "meta": {
+                                                                "position": { "x": 700, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "身份验证",
+                                                                "content": "您好，为保障账户安全，请先完成身份验证。",
+                                                                "description": "收集账号和密码，并调用演示验证接口。",
+                                                                "verifyType": "account",
+                                                                "accountPrompt": "请输入账号，按井号键结束。",
+                                                                "passwordPrompt": "请输入 6 位服务密码，按井号键结束。",
+                                                                "verifyApiUrl": "/visitor/api/v1/ivr/demo/verify",
+                                                                "verifyHttpMethod": "POST",
+                                                                "verifyRequestBody": "{\"account\":\"${account}\",\"password\":\"${password}\",\"callerIdNumber\":\"${callerIdNumber}\"}",
+                                                                "verifyTimeoutMs": 3000,
+                                                                "successPrompt": "验证成功。",
+                                                                "customerInfoTemplate": "${customer.name}，您的账户余额为 ${customer.balance} 元，会员等级 ${customer.level}。",
+                                                                "failurePrompt": "验证失败，请重试。",
+                                                                "maxRetries": 3
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-text-success",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 100 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证成功",
+                                                                "content": "验证成功，您的身份已确认，稍后将继续原有服务流程。",
+                                                                "description": "密码验证成功播报"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-transfer-human",
+                                                        "type": "transfer",
+                                                        "meta": {
+                                                                "position": { "x": 1080, "y": 340 }
+                                                        },
+                                                        "data": {
+                                                                "title": "验证失败转人工",
+                                                                "content": "验证未通过，正在为您转接人工坐席，请稍候。",
+                                                                "description": "密码验证失败时转人工",
+                                                                "transferDestination": "5003",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-password-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1430, "y": 180 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认密码验证流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-password-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-text-welcome",
+                                                        "targetNodeId": "ivr-password-verify-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-verify-main",
+                                                        "targetNodeId": "ivr-password-text-success",
+                                                        "sourcePortId": "verifySuccess",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-verify-main",
+                                                        "targetNodeId": "ivr-password-transfer-human",
+                                                        "sourcePortId": "verifyFailure",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-password-text-success",
+                                                        "targetNodeId": "ivr-password-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID,
+                                                DEFAULT_IVR_PASSWORD_VERIFICATION_START_NODE_ID);
+        }
 
-    private static Map<String, Object> createConditionInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        Map<String, Object> conditionsProperty = new HashMap<>();
+        public static String buildDefaultBotIvrWorkflowSchemaJson() {
+                return """
+                                {
+                                        "nodes": [
+                                                {
+                                                        "id": "%s",
+                                                        "type": "start",
+                                                        "meta": {
+                                                                "position": { "x": 120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人对话开始",
+                                                                "description": "默认机器人对话 IVR 入口"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-text-welcome",
+                                                        "type": "text",
+                                                        "meta": {
+                                                                "position": { "x": 440, "y": 210 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人欢迎语",
+                                                                "content": "您好，欢迎进入机器人语音服务演示。按 1 体验多轮语音机器人，按 2 体验不限轮语音机器人，按 0 转人工服务。",
+                                                                "description": "引导用户选择机器人通话模式"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-keyboard-main",
+                                                        "type": "keyboard",
+                                                        "meta": {
+                                                                "position": { "x": 720, "y": 200 }
+                                                        },
+                                                        "data": {
+                                                                "title": "机器人模式选择",
+                                                                "content": "请输入业务按键，选择机器人对话模式。",
+                                                                "description": "按键进入多轮、无限轮或人工服务",
+                                                                "options": [
+                                                                        {
+                                                                                "id": "ivr-bot-option-multi",
+                                                                                "key": "1",
+                                                                                "label": "按 1 体验多轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-multi"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-unlimited",
+                                                                                "key": "2",
+                                                                                "label": "按 2 体验不限轮语音机器人",
+                                                                                "outgoingEdgeId": "ivr-bot-node-unlimited"
+                                                                        },
+                                                                        {
+                                                                                "id": "ivr-bot-option-human",
+                                                                                "key": "0",
+                                                                                "label": "按 0 转人工服务",
+                                                                                "outgoingEdgeId": "ivr-bot-transfer-human"
+                                                                        }
+                                                                ]
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-multi",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 40 }
+                                                        },
+                                                        "data": {
+                                                                "title": "多轮语音机器人",
+                                                                "content": "正在为您接入多轮语音机器人，请稍候。",
+                                                                "description": "接入 9201 多轮语音机器人演示分机",
+                                                                "transferDestination": "9201",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-node-unlimited",
+                                                        "type": "bot",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "不限轮语音机器人",
+                                                                "content": "正在为您接入不限轮语音机器人，请稍候。",
+                                                                "description": "接入 9203 不限轮语音机器人演示分机",
+                                                                "transferDestination": "9203",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-transfer-human",
+                                                        "type": "transfer",
+                                                        "meta": {
+                                                                "position": { "x": 1120, "y": 400 }
+                                                        },
+                                                        "data": {
+                                                                "title": "转人工服务",
+                                                                "content": "正在为您转接人工坐席，请稍候。",
+                                                                "description": "机器人演示流程中的人工兜底节点",
+                                                                "transferDestination": "5003",
+                                                                "transferContext": "default"
+                                                        }
+                                                },
+                                                {
+                                                        "id": "ivr-bot-end-0",
+                                                        "type": "end",
+                                                        "meta": {
+                                                                "position": { "x": 1450, "y": 220 }
+                                                        },
+                                                        "data": {
+                                                                "title": "结束",
+                                                                "description": "结束默认机器人对话流程"
+                                                        }
+                                                }
+                                        ],
+                                        "edges": [
+                                                {
+                                                        "sourceNodeId": "%s",
+                                                        "targetNodeId": "ivr-bot-text-welcome",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-text-welcome",
+                                                        "targetNodeId": "ivr-bot-keyboard-main",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-node-multi",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-multi",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-node-unlimited",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-unlimited",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-keyboard-main",
+                                                        "targetNodeId": "ivr-bot-transfer-human",
+                                                        "sourcePortId": "keyboard-option-ivr-bot-option-human",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-multi",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-node-unlimited",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                },
+                                                {
+                                                        "sourceNodeId": "ivr-bot-transfer-human",
+                                                        "targetNodeId": "ivr-bot-end-0",
+                                                        "sourcePortId": "defaultOutput",
+                                                        "targetPortId": "defaultInput"
+                                                }
+                                        ]
+                                }
+                                """
+                                .formatted(DEFAULT_IVR_BOT_START_NODE_ID, DEFAULT_IVR_BOT_START_NODE_ID);
+        }
 
-        conditionsProperty.put("type", "array");
-        Map<String, Object> items = new HashMap<>();
-        items.put("type", "object");
-        Map<String, Object> itemProperties = new HashMap<>();
-
-        Map<String, Object> keyProperty = new HashMap<>();
-        keyProperty.put("type", "string");
-        itemProperties.put("key", keyProperty);
-
-        Map<String, Object> valueProperty = new HashMap<>();
-        valueProperty.put("type", "string");
-        itemProperties.put("value", valueProperty);
-
-        items.put("properties", itemProperties);
-        conditionsProperty.put("items", items);
-
-        properties.put("conditions", conditionsProperty);
-        inputs.put("type", "object");
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
-
-    private static Map<String, Object> createLLMInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        inputsValues.put("modelType", "gpt-3.5-turbo");
-        inputsValues.put("temperature", 0.5);
-        inputsValues.put("systemPrompt", "You are an AI assistant.");
-        inputsValues.put("prompt", "");
-        return inputsValues;
-    }
-
-    private static Map<String, Object> createLLMInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        List<String> required = new ArrayList<>();
-
-        required.add("modelType");
-        required.add("temperature");
-        required.add("prompt");
-
-        Map<String, Object> modelTypeProperty = new HashMap<>();
-        modelTypeProperty.put("type", "string");
-        properties.put("modelType", modelTypeProperty);
-
-        Map<String, Object> temperatureProperty = new HashMap<>();
-        temperatureProperty.put("type", "number");
-        properties.put("temperature", temperatureProperty);
-
-        Map<String, Object> systemPromptProperty = new HashMap<>();
-        systemPromptProperty.put("type", "string");
-        properties.put("systemPrompt", systemPromptProperty);
-
-        Map<String, Object> promptProperty = new HashMap<>();
-        promptProperty.put("type", "string");
-        properties.put("prompt", promptProperty);
-
-        inputs.put("type", "object");
-        inputs.put("required", required);
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
-
-    private static Map<String, Object> createLoopInputsValues() {
-        Map<String, Object> inputsValues = new HashMap<>();
-        inputsValues.put("loopTimes", 2);
-        return inputsValues;
-    }
-
-    private static Map<String, Object> createLoopInputs() {
-        Map<String, Object> inputs = new HashMap<>();
-        Map<String, Object> properties = new HashMap<>();
-        List<String> required = new ArrayList<>();
-
-        required.add("loopTimes");
-
-        Map<String, Object> loopTimesProperty = new HashMap<>();
-        loopTimesProperty.put("type", "number");
-        properties.put("loopTimes", loopTimesProperty);
-
-        inputs.put("type", "object");
-        inputs.put("required", required);
-        inputs.put("properties", properties);
-
-        return inputs;
-    }
 }

@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
@@ -33,6 +33,11 @@ import com.bytedesk.kbase.llm_chunk.ChunkEntity;
 import com.bytedesk.kbase.llm_chunk.ChunkRequest;
 import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,9 +56,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class ChunkVectorService {
     
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
     
     private final ChunkRestService chunkRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
+
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
     public Map<String, Object> queryVectorByUid(ChunkRequest request) {
         String uid = request.getUid();
@@ -72,7 +81,7 @@ public class ChunkVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -108,6 +117,7 @@ public class ChunkVectorService {
     @Transactional
     public void indexChunkVector(ChunkEntity chunk) {
         log.info("向量索引chunk: {}", chunk.getName());
+        long startMs = System.currentTimeMillis();
         
         try {
             // 1. 为内容创建文档（带有元数据）
@@ -122,6 +132,7 @@ public class ChunkVectorService {
             // 元数据
             Map<String, Object> metadata = new java.util.HashMap<>();
             metadata.put("uid", chunk.getUid());
+            metadata.put("sourceUid", chunk.getUid());
             metadata.put("name", chunk.getName());
             metadata.put(KbaseConst.KBASE_KB_UID, chunk.getKbase() != null ? chunk.getKbase().getUid() : "");
             metadata.put("categoryUid", chunk.getCategoryUid() != null ? chunk.getCategoryUid() : "");
@@ -129,6 +140,9 @@ public class ChunkVectorService {
             metadata.put("enabled", Boolean.toString(chunk.getEnabled()));
             metadata.put("tags", tags);
             metadata.put("type", chunk.getType());
+            metadata.put("language", chunk.getKbase() != null && StringUtils.hasText(chunk.getKbase().getSourceLanguage()) ? chunk.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("sourceLanguage", chunk.getKbase() != null && StringUtils.hasText(chunk.getKbase().getSourceLanguage()) ? chunk.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+            metadata.put("translated", Boolean.FALSE.toString());
             // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
             metadata.put("sourceType", "CHUNK");
             metadata.put("docId", chunk.getDocId() != null ? chunk.getDocId() : "");
@@ -141,22 +155,50 @@ public class ChunkVectorService {
             
             // 2. 添加到向量存储
             // 检查是否已存在该文档ID
-            checkAndDeleteExistingDoc(id);
+            VectorStore vectorStore = vectorStoreResolver.resolveByKbase(chunk.getKbase());
+            checkAndDeleteExistingDoc(vectorStore, id);
             
             // 添加新文档
             vectorStore.add(List.of(document));
+            reindexTranslatedChunkVectors(chunk);
             
             // 3. 仅更新向量状态（避免 detached entity 的版本冲突）
             chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.SUCCESS.name());
             chunkRestService.evictChunkCacheAllEntries();
-            
+
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(chunk.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("CHUNK", chunk.getUid(), chunk.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录CHUNK向量化历史失败: uid={}, error={}", chunk.getUid(), recEx.getMessage());
+            }
+
             log.info("Chunk向量索引成功: {}", chunk.getName());
         } catch (Exception e) {
             log.error("Chunk向量索引失败: {}, 错误: {}", chunk.getName(), e.getMessage());
-            
+
             // 仅更新向量状态（避免 detached entity 的版本冲突）
             chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
             chunkRestService.evictChunkCacheAllEntries();
+
+            // 记录向量化失败
+            try {
+                long failCostMs = System.currentTimeMillis() - startMs;
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(chunk.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("CHUNK", chunk.getUid(), chunk.getOrgUid(),
+                        embProvider, embModel, embDimensions, chunk.getContent(), "ERROR", e.getMessage(), failCostMs);
+            } catch (Exception recEx) {
+                log.warn("记录CHUNK向量化失败历史失败: uid={}, error={}", chunk.getUid(), recEx.getMessage());
+            }
             
             throw e;
         }
@@ -363,7 +405,7 @@ public class ChunkVectorService {
 
         try {
             if (!docIdsToDelete.isEmpty()) {
-                vectorStore.delete(docIdsToDelete);
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
             }
             for (ChunkEntity chunk : chunkList) {
                 chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
@@ -373,7 +415,7 @@ public class ChunkVectorService {
             log.warn("批量删除Chunk向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
             for (ChunkEntity chunk : chunkList) {
                 try {
-                    vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+                    vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of("chunk_" + chunk.getUid()));
                     chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
                     successCount++;
                 } catch (Exception ex) {
@@ -406,7 +448,7 @@ public class ChunkVectorService {
 
         Boolean deleted;
         try {
-            vectorStore.delete(List.of("chunk_" + chunk.getUid()));
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of("chunk_" + chunk.getUid()));
             deleted = true;
         } catch (Exception e) {
             log.warn("删除Chunk向量索引失败: uid={}, error={}", chunk.getUid(), e.getMessage());
@@ -435,7 +477,7 @@ public class ChunkVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
     
@@ -450,7 +492,7 @@ public class ChunkVectorService {
         try {
             // 删除向量文档
             String id = "chunk_" + chunk.getUid();
-            vectorStore.delete(List.of(id));
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of(id));
             
             log.info("Chunk向量索引删除成功: {}", chunk.getName());
         } catch (Exception e) {
@@ -470,7 +512,7 @@ public class ChunkVectorService {
      */
     public List<ChunkVectorSearchResult> searchChunkVector(String query, String kbUid, String categoryUid, String orgUid, int limit) {
         // 默认相似度阈值设为0.0，表示返回所有结果
-        return searchChunkVector(query, kbUid, categoryUid, orgUid, limit, 0.0);
+        return searchChunkVector(query, kbUid, categoryUid, orgUid, limit, 0.0, null);
     }
     
     /**
@@ -484,6 +526,11 @@ public class ChunkVectorService {
      * @return 搜索结果列表
      */
     public List<ChunkVectorSearchResult> searchChunkVector(String query, String kbUid, String categoryUid, String orgUid, int limit, double similarity) {
+        return searchChunkVector(query, kbUid, categoryUid, orgUid, limit, similarity, null);
+        }
+
+        public List<ChunkVectorSearchResult> searchChunkVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, double similarity, String language) {
         log.info("向量搜索chunk: query={}, kbUid={}, categoryUid={}, orgUid={}, limit={}, similarity={}", query, kbUid, categoryUid, orgUid, limit, similarity);
         
         List<ChunkVectorSearchResult> results = new ArrayList<>();
@@ -515,6 +562,11 @@ public class ChunkVectorService {
                 FilterExpressionBuilder.Op orgUidOp = expressionBuilder.eq("orgUid", orgUid);
                 finalOp = expressionBuilder.and(finalOp, orgUidOp);
             }
+
+            if (StringUtils.hasText(language)) {
+                FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+                finalOp = expressionBuilder.and(finalOp, languageOp);
+            }
             
             // 构建最终的过滤表达式
             Expression expression = finalOp.build();
@@ -528,7 +580,7 @@ public class ChunkVectorService {
                     .build();
             
             // 执行相似度搜索
-            List<Document> documents = vectorStore.similaritySearch(searchRequest);
+            List<Document> documents = vectorStoreResolver.resolveByKbUid(kbUid).similaritySearch(searchRequest);
             
             // 处理结果
             for (Document doc : documents) {
@@ -564,6 +616,7 @@ public class ChunkVectorService {
                     .content(content)
                     .type(type)
                     .kbUid(kbaseUid)
+                    .sourceUid((String) metadata.getOrDefault("sourceUid", uid))
                     .categoryUid(catUid)
                     .orgUid(organization)
                     .docId(document)
@@ -571,6 +624,9 @@ public class ChunkVectorService {
                     .fileName(fileName)
                     .fileUrl(fileUrl)
                     .enabled(enabled)
+                    .language((String) metadata.getOrDefault("language", ""))
+                    .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                    .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
                     .tagList(tagsList)
                     .build();
                 
@@ -600,7 +656,7 @@ public class ChunkVectorService {
      * 检查并删除已存在的文档
      * @param id 文档ID
      */
-    private void checkAndDeleteExistingDoc(String id) {
+    private void checkAndDeleteExistingDoc(VectorStore vectorStore, String id) {
         try {
             // 使用过滤表达式查询已存在的文档
             FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
@@ -628,6 +684,108 @@ public class ChunkVectorService {
             } catch (Exception ex) {
                 log.warn("删除可能存在的文档时出错: {}", ex.getMessage());
             }
+        }
+    }
+
+    private VectorStore resolveStoreByUid(String uid) {
+        return chunkRestService.findByUidNoCache(uid)
+                .map(ChunkEntity::getKbase)
+                .map(vectorStoreResolver::resolveByKbase)
+                .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
+    private void reindexTranslatedChunkVectors(ChunkEntity chunk) {
+        deleteTranslatedChunkVectors(chunk);
+
+        String kbUid = chunk.getKbase() != null ? chunk.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        chunk.getUid(),
+                        KbaseTranslationSourceTypeEnum.CHUNK.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            ChunkVector translatedVector = ChunkVector.fromTranslation(chunk, translation);
+            if (!StringUtils.hasText(translatedVector.getName()) && !StringUtils.hasText(translatedVector.getContent())) {
+                continue;
+            }
+
+            String docId = "chunk_translation_" + translation.getUid();
+            String content = (translatedVector.getName() != null ? translatedVector.getName() : "")
+                    + "\n\n"
+                    + (translatedVector.getContent() != null ? translatedVector.getContent() : "");
+
+            Map<String, Object> metadata = new java.util.HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", chunk.getUid());
+            metadata.put("name", translatedVector.getName());
+            metadata.put(KbaseConst.KBASE_KB_UID, kbUid);
+            metadata.put("categoryUid", chunk.getCategoryUid() != null ? chunk.getCategoryUid() : "");
+            metadata.put("orgUid", chunk.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("type", translatedVector.getType());
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "CHUNK");
+            metadata.put("docId", translatedVector.getDocId() != null ? translatedVector.getDocId() : "");
+            metadata.put("fileUid", translatedVector.getFileUid() != null ? translatedVector.getFileUid() : "");
+            metadata.put("fileName", translatedVector.getFileName() != null ? translatedVector.getFileName() : "");
+            metadata.put("fileUrl", translatedVector.getFileUrl() != null ? translatedVector.getFileUrl() : "");
+
+            documents.add(new Document(docId, content, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).add(documents);
+        }
+    }
+
+    private void deleteTranslatedChunkVectors(ChunkEntity chunk) {
+        if (chunk.getKbase() == null || !StringUtils.hasText(chunk.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+                expressionBuilder.eq("sourceType", "CHUNK"),
+                expressionBuilder.eq("sourceUid", chunk.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = vectorStoreResolver.resolveByKbase(chunk.getKbase()).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(docIds);
         }
     }
 }

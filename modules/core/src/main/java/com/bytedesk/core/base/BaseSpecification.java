@@ -16,6 +16,7 @@ package com.bytedesk.core.base;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -25,6 +26,8 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
@@ -68,11 +71,17 @@ public abstract class BaseSpecification<T, TRequest> {
         boolean platformLevelRequest = LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
 
         // 非超级管理员一般必须提供 orgUid；但平台级数据允许任何登录用户在不传 orgUid 的情况下查询
+        // 若请求未携带 orgUid，自动从当前认证用户的组织上下文中补全（queryByOrg 语义）
         if (user != null
                 && !Boolean.TRUE.equals(request.getSuperUser())
                 && !StringUtils.hasText(request.getOrgUid())
                 && !platformLevelRequest) {
-            throw new IllegalArgumentException("orgUid should not be null (org uid must be provided for non-super request)");
+            String userOrgUid = user.getOrgUid();
+            if (StringUtils.hasText(userOrgUid)) {
+                request.setOrgUid(userOrgUid);
+            } else {
+                throw new IllegalArgumentException(I18Consts.I18N_ORG_UID_REQUIRED);
+            }
         }
         
         // 验证请求的 orgUid 是否与当前用户的 orgUid 相同
@@ -83,18 +92,16 @@ public abstract class BaseSpecification<T, TRequest> {
                     && !platformLevelRequest) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
-                    throw new IllegalArgumentException("No permission to access data of other organizations");
+                    throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_ACCESS_DENIED);
                 }
             }
         }
         
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+        predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
         
-        // 只有非超级管理员且有 orgUid 时才加 orgUid 条件
-        if (!Boolean.TRUE.equals(request.getSuperUser())
-                && StringUtils.hasText(request.getOrgUid())
-                && !platformLevelRequest) {
+        // orgUid 过滤条件：只要提供了 orgUid 就按组织过滤（超级管理员可通过传递 orgUid 搜索特定组织数据）
+        if (StringUtils.hasText(request.getOrgUid()) && !platformLevelRequest) {
             // 部分实体（如 BaseEntityNoOrg）没有 orgUid 字段，避免 Criteria 构建时报错
             boolean hasOrgUidAttribute = true;
             try {
@@ -104,7 +111,16 @@ public abstract class BaseSpecification<T, TRequest> {
             }
 
             if (hasOrgUidAttribute) {
-                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                if (Boolean.TRUE.equals(request.getSuperUser())) {
+                    List<String> matchedOrgUids = resolveOrganizationUidsForKeyword(request.getOrgUid());
+                    if (matchedOrgUids.isEmpty()) {
+                        predicates.add(criteriaBuilder.disjunction());
+                    } else {
+                        predicates.add(root.get("orgUid").in(matchedOrgUids));
+                    }
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+                }
             }
         }
         
@@ -124,7 +140,7 @@ public abstract class BaseSpecification<T, TRequest> {
         validateIsSuperUserPermission(request, authService);
 
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+        predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
         return predicates;
     }
 
@@ -239,6 +255,29 @@ public abstract class BaseSpecification<T, TRequest> {
         boolean isDefaultOrg = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(request.getOrgUid());
         boolean isPlatformLevel = LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
         return isDefaultOrg && isPlatformLevel;
+    }
+
+    protected static List<String> resolveOrganizationUidsForKeyword(String keyword) {
+        if (!StringUtils.hasText(keyword)) {
+            return List.of();
+        }
+
+        OrganizationRepository organizationRepository = ApplicationContextHolder.getBean(OrganizationRepository.class);
+        if (organizationRepository == null) {
+            return List.of(keyword);
+        }
+
+        List<String> matchedOrgUids = organizationRepository.searchByKeyword(keyword).stream()
+                .map(OrganizationEntity::getUid)
+                .filter(StringUtils::hasText)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (matchedOrgUids.isEmpty()) {
+            return List.of(keyword);
+        }
+
+        return matchedOrgUids;
     }
 
 }

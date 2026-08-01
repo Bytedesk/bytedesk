@@ -26,12 +26,12 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings_service.ServiceSettingsResponseVisitor;
@@ -66,11 +66,20 @@ public class VisitorThreadTimeoutService {
     private final MessageRestService messageRestService;
 
     /**
-     * 自动提醒客服或关闭会话
+     * 自动提醒客服或关闭会话（异步批量处理）
      */
     @Async
     public void autoRemindAgentOrCloseThread(List<ThreadEntity> threads) {
         threads.forEach(this::processThreadTimeout);
+    }
+
+    /**
+     * 处理单个会话的超时逻辑（同步方法）
+     * 用于 quartz 每分钟定时任务中逐个处理，避免一次性将所有 ThreadEntity 加载到内存导致 OOM。
+     * 处理完返回后，调用方可以立即释放对 ThreadEntity 的引用。
+     */
+    public void processSingleThreadTimeout(ThreadEntity thread) {
+        processThreadTimeout(thread);
     }
 
     /**
@@ -145,7 +154,12 @@ public class VisitorThreadTimeoutService {
             ZonedDateTime agentLastResponseAt = queueMember.getAgentLastResponseAt();
             ZonedDateTime visitorLastMessageAt = queueMember.getVisitorLastMessageAt();
 
-            // 未有客服回复，不开启自动关闭计时
+            // 机器人接待中（ROBOTING）的会话：使用机器人最后回复时间作为自动关闭计时基准
+            if (agentLastResponseAt == null && thread.isRoboting()) {
+                agentLastResponseAt = queueMember.getRobotLastResponseAt();
+            }
+
+            // 未有客服回复（且非机器人接待），不开启自动关闭计时
             if (agentLastResponseAt == null) {
                 return;
             }

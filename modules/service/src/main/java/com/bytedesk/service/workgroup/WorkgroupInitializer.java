@@ -60,15 +60,27 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID)
                 .nickname(I18Consts.I18N_WORKGROUP_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_DESCRIPTION)
+                .type(WorkgroupTypeEnum.GENERAL.name())
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
         workgroupRestService.create(workgroupRequest);
+        // add booking workgroup
+        WorkgroupRequest bookingWorkgroupRequest = WorkgroupRequest.builder()
+            .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_BOOKING)
+            .nickname(I18Consts.I18N_WORKGROUP_BOOKING_NICKNAME)
+            .description(I18Consts.I18N_WORKGROUP_BOOKING_DESCRIPTION)
+            .type(WorkgroupTypeEnum.BOOKING.name())
+            .agentUids(agentUids)
+            .orgUid(orgUid)
+            .build();
+        workgroupRestService.create(bookingWorkgroupRequest);
          // add workgroup before
         WorkgroupRequest workgroupBeforeRequest = WorkgroupRequest.builder()
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_PRESALES)
                 .nickname(I18Consts.I18N_WORKGROUP_BEFORE_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_BEFORE_DESCRIPTION)
+                .type(WorkgroupTypeEnum.PRESALES.name())
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
@@ -78,6 +90,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_AFTERSALES)
                 .nickname(I18Consts.I18N_WORKGROUP_AFTER_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_AFTER_DESCRIPTION)
+                .type(WorkgroupTypeEnum.AFTERSALES.name())
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();
@@ -87,6 +100,7 @@ public class WorkgroupInitializer implements SmartInitializingSingleton {
                 .uid(BytedeskConsts.DEFAULT_WORKGROUP_UID_TICKET)
                 .nickname(I18Consts.I18N_WORKGROUP_TICKET_NICKNAME)
                 .description(I18Consts.I18N_WORKGROUP_TICKET_DESCRIPTION)
+                .type(WorkgroupTypeEnum.TICKET.name())
                 .agentUids(agentUids)
                 .orgUid(orgUid)
                 .build();

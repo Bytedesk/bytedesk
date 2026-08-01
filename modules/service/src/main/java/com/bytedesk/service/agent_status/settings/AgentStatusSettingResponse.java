@@ -14,6 +14,8 @@
 package com.bytedesk.service.agent_status.settings;
 
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseResponse;
 
 import lombok.AllArgsConstructor;
@@ -33,10 +35,18 @@ public class AgentStatusSettingResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
+
+    // 是否支持音频/视频/电话/休息状态
+    private Boolean availableAudioEnabled;
+    private Boolean availableVideoEnabled;
+    private Boolean availablePhoneEnabled;
+    private Boolean restEnabled;
+
+    // 休息状态可选原因列表
+    private List<String> restReasons;
 
     // 是否需要开启客服切换状态审核
     private Boolean needReview;

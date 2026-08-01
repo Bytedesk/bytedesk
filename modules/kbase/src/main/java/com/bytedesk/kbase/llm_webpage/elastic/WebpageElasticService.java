@@ -32,6 +32,10 @@ import com.bytedesk.kbase.llm_webpage.WebpageEntity;
 import com.bytedesk.kbase.llm_webpage.WebpageRequest;
 import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -51,6 +55,8 @@ public class WebpageElasticService {
     private final ElasticsearchOperations elasticsearchOperations;
     
     private final WebpageRestService webpageRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     public Map<String, Object> queryElasticByUid(WebpageRequest request) {
         String uid = request.getUid();
@@ -246,6 +252,7 @@ public class WebpageElasticService {
             
             // 保存到Elasticsearch
             elasticsearchOperations.save(webpageElastic);
+            reindexTranslatedWebpages(webpage);
 
             webpage.setElasticSuccess();
             webpageRestService.save(webpage);
@@ -271,6 +278,45 @@ public class WebpageElasticService {
             log.error("删除网页索引时发生错误: {}, 错误消息: {}", webpageUid, e.getMessage(), e);
         }
     }
+
+        private void reindexTranslatedWebpages(WebpageEntity webpage) {
+        deleteTranslatedWebpageDocuments(webpage.getUid());
+
+        String kbUid = webpage.getKbase() != null ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+            .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                kbUid,
+                webpage.getUid(),
+                KbaseTranslationSourceTypeEnum.WEBPAGE.name());
+
+        translations.stream()
+            .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+            .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+            .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+            .filter(translation -> StringUtils.hasText(translation.getTitle())
+                || StringUtils.hasText(translation.getContent())
+                || StringUtils.hasText(translation.getSummary()))
+            .forEach(translation -> elasticsearchOperations.save(WebpageElastic.fromTranslation(webpage, translation)));
+        }
+
+        private void deleteTranslatedWebpageDocuments(String sourceUid) {
+        if (!StringUtils.hasText(sourceUid)) {
+            return;
+        }
+
+        Query query = NativeQuery.builder()
+            .withQuery(QueryBuilders.bool()
+                .filter(QueryBuilders.term().field("sourceUid").value(sourceUid).build()._toQuery())
+                .filter(QueryBuilders.term().field("translated").value(true).build()._toQuery())
+                .build()._toQuery())
+            .build();
+
+        elasticsearchOperations.delete(DeleteQuery.builder(query).build(), WebpageElastic.class);
+        }
     
     /**
      * 批量删除指定知识库的所有网页索引
@@ -306,7 +352,7 @@ public class WebpageElasticService {
      */
     public List<WebpageElasticSearchResult> searchWebpage(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("网页全文搜索: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, null);
+        return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, null, null);
     }
 
     /**
@@ -316,7 +362,14 @@ public class WebpageElasticService {
      */
     public List<WebpageElasticSearchResult> searchWebpage(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
         log.info("网页全文搜索: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
-        return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+        return searchWebpage(query, kbUid, categoryUid, orgUid, maxResults, null);
+    }
+
+    public List<WebpageElasticSearchResult> searchWebpage(String query, String kbUid, String categoryUid,
+            String orgUid, Integer maxResults, List<String> preferredLanguages) {
+        log.info("网页全文搜索: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}, preferredLanguages={}",
+                query, kbUid, categoryUid, orgUid, maxResults, preferredLanguages);
+        return searchWebpageInternal(query, kbUid, categoryUid, orgUid, false, maxResults, preferredLanguages);
     }
     
     /**
@@ -332,7 +385,7 @@ public class WebpageElasticService {
         String kbUid = request.getKbUid();
         String orgUid = request.getOrgUid();
         
-        List<WebpageElasticSearchResult> results = searchWebpageInternal(query, kbUid, null, orgUid, true, 10);
+        List<WebpageElasticSearchResult> results = searchWebpageInternal(query, kbUid, null, orgUid, true, 10, null);
         log.info("网页输入联想成功，返回结果数: {}", results.size());
         return results;
     }
@@ -354,7 +407,8 @@ public class WebpageElasticService {
             String categoryUid, 
             String orgUid, 
             boolean isSuggest,
-            Integer maxResults) {
+            Integer maxResults,
+            List<String> preferredLanguages) {
         
         if (!StringUtils.hasText(query)) {
             log.info("查询为空，直接返回空结果");
@@ -458,6 +512,18 @@ public class WebpageElasticService {
                 if (StringUtils.hasText(orgUid)) {
                     boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
                     log.debug("添加orgUid过滤条件: {}", orgUid);
+                }
+
+                if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+                    BoolQuery.Builder languageQuery = new BoolQuery.Builder();
+                    preferredLanguages.stream()
+                            .filter(StringUtils::hasText)
+                            .map(String::trim)
+                            .map(String::toUpperCase)
+                            .forEach(language -> languageQuery.should(
+                                    QueryBuilders.term().field("language").value(language).build()._toQuery()));
+                    languageQuery.minimumShouldMatch("1");
+                    boolQueryBuilder.filter(languageQuery.build()._toQuery());
                 }
             } catch (Exception e) {
                 log.warn("添加过滤条件时出错: {}", e.getMessage());

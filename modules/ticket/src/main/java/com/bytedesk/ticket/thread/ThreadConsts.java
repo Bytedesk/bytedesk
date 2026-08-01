@@ -27,6 +27,8 @@ public class ThreadConsts {
 
     public static final String THREAD_PROCESS_PATH = "processes/thread-process.bpmn20.xml";
 
+    public static final String THREAD_PROCESS_FLOWGRAM_PATH = "processes/thread-process.json";
+
     // variables
     public static final String THREAD_VARIABLE_THREAD_UID = "threadUid";
 

@@ -13,5 +13,4 @@
 -->
 # TODO
 
-- [X] finished
-- [ ] todo
+- 将论坛Forum模块统一合并到客户之声VOC模块

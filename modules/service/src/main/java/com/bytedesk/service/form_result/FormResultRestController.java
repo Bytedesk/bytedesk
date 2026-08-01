@@ -15,13 +15,16 @@ package com.bytedesk.service.form_result;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +33,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "表单结果管理", description = "表单结果管理相关接口")
+@Tag(name = "Form Result Management", description = "Form result management APIs")
 @RestController
 @RequestMapping("/api/v1/form/result")
 @AllArgsConstructor
@@ -40,8 +43,10 @@ public class FormResultRestController extends BaseRestController<FormResultReque
     private final FormResultRestService tagRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query form result by org")
     @Operation(summary = "Query Form Results by Organization", description = "Retrieve form results for the current organization")
+    @GetMapping("/query/org")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_READ)
     @Override
     public ResponseEntity<?> queryByOrg(FormResultRequest request) {
         
@@ -50,8 +55,10 @@ public class FormResultRestController extends BaseRestController<FormResultReque
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query form result by user")
     @Operation(summary = "Query Form Results by User", description = "Retrieve form results for the current user")
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_READ)
     @Override
     public ResponseEntity<?> queryByUser(FormResultRequest request) {
         
@@ -60,8 +67,10 @@ public class FormResultRestController extends BaseRestController<FormResultReque
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query form result by uid")
     @Operation(summary = "Query Form Result by UID", description = "Retrieve a specific form result by UID")
+    @GetMapping("/query/uid")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_READ)
     @Override
     public ResponseEntity<?> queryByUid(FormResultRequest request) {
         
@@ -70,52 +79,55 @@ public class FormResultRestController extends BaseRestController<FormResultReque
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_CREATE, description = "create form result")
     @Operation(summary = "Create Form Result", description = "Create a new form result entry")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(FormResultRequest request) {
+    @PostMapping("/create")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_CREATE)
+    public ResponseEntity<?> create(@RequestBody FormResultRequest request) {
         
         FormResultResponse tag = tagRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_UPDATE, description = "update form result")
     @Operation(summary = "Update Form Result", description = "Update an existing form result entry")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(FormResultRequest request) {
+    @PostMapping("/update")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_UPDATE)
+    public ResponseEntity<?> update(@RequestBody FormResultRequest request) {
         
         FormResultResponse tag = tagRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_DELETE, description = "delete form result")
     @Operation(summary = "Delete Form Result", description = "Delete a form result entry")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(FormResultRequest request) {
+    @PostMapping("/delete")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_DELETE)
+    public ResponseEntity<?> delete(@RequestBody FormResultRequest request) {
         
         tagRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @ActionAnnotation(title = I18Consts.I18N_FORM_RESULT, action = I18Consts.I18N_ACTION_EXPORT, description = "export form result")
     @Operation(summary = "Export Form Results", description = "Export form results to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
     @GetMapping("/export")
+    @PreAuthorize(FormResultPermissions.HAS_FORM_RESULT_EXPORT)
     public Object export(FormResultRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,
             response,
             tagRestService,
             FormResultExcel.class,
-            "标签",
-            "tag"
+            "表单结果",
+            "form-result"
         );
     }
 

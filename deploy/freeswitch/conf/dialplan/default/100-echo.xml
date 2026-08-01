@@ -1,0 +1,13 @@
+<include>
+  <!-- Echo test in default context so internal users can dial echo -->
+  <extension name="echo" continue="false">
+    <condition field="destination_number" expression="^echo$">
+      <action application="log" data="INFO [default] echo test call from ${caller_id_number} (${network_addr})"/>
+      <action application="answer"/>
+      <action application="sleep" data="500"/>
+      <action application="playback" data="en/us/callie/ivr/48000/ivr-to_do_a_freeswitch_echo_test.wav"/>
+      <action application="echo"/>
+      <action application="hangup"/>
+    </condition>
+  </extension>
+</include>

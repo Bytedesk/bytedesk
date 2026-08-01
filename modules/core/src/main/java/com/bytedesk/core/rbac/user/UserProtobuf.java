@@ -44,6 +44,8 @@ public class UserProtobuf implements Serializable {
 
     private String avatar;
 
+    private String description;
+
     @Builder.Default
     private String type = UserTypeEnum.USER.name();
 

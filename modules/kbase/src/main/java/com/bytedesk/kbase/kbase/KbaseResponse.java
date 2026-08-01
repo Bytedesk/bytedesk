@@ -95,6 +95,16 @@ public class KbaseResponse extends BaseResponse {
 
     private String language;
 
+    private String sourceLanguage;
+
+    private List<String> targetLanguages;
+
+    private Boolean autoTranslateEnabled;
+
+    private Boolean translateQueryEnabled;
+
+    private Boolean answerWithUserLanguage;
+
     private List<String> tagList;
 
     private Boolean showChat;

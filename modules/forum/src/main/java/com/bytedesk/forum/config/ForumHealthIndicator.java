@@ -13,7 +13,7 @@
  */
 package com.bytedesk.forum.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -33,6 +33,14 @@ import java.sql.Connection;
 @Component
 public class ForumHealthIndicator implements HealthIndicator {
 
+    public ForumHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<RedisTemplate<String, Object>> redisTemplateProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.redisTemplate = redisTemplateProvider.getIfAvailable();
+    }
+
+
     @Value("${bytedesk.forum.post-moderation.enabled:false}")
     private boolean moderationEnabled;
 
@@ -42,11 +50,9 @@ public class ForumHealthIndicator implements HealthIndicator {
     @Value("${bytedesk.forum.search.enabled:true}")
     private boolean searchEnabled;
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired(required = false)
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public Health health() {

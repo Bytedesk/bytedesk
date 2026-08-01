@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260523-add-extension-lease-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_extension" />
+                <not>
+                    <columnExists tableName="bytedesk_call_extension" columnName="assigned_org_uid" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_extension">
+            <column name="assigned_org_uid" type="varchar(64)" />
+            <column name="assigned_user_uid" type="varchar(64)" />
+            <column name="assigned_at" type="datetime" />
+            <column name="lease_expires_at" type="datetime" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

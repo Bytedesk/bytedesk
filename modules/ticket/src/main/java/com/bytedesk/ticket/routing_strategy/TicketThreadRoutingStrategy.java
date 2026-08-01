@@ -25,8 +25,6 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageExtra;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -36,12 +34,15 @@ import com.bytedesk.core.thread.ThreadContent;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.event.ThreadTransferToAgentEvent;
-import com.bytedesk.core.topic.TopicRestService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.routing_strategy.AbstractThreadRoutingStrategy;
 import com.bytedesk.service.utils.ServiceConvertUtils;
@@ -52,9 +53,10 @@ import com.bytedesk.service.workgroup.WorkgroupRestService;
 import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
-import com.bytedesk.ticket.ticket.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
+import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 
 import lombok.AllArgsConstructor;
@@ -81,6 +83,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
+    private static final String DEFAULT_ASSIGNMENT_MODE = TicketAssignmentModeEnum.DEFAULT.name();
+
     private final ThreadRestService threadRestService;
     private final MessageRestService messageRestService;
     private final TicketRepository ticketRepository;
@@ -89,7 +93,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private final TicketSettingsRestService ticketSettingsRestService;
     private final IMessageSendService messageSendService;
     private final BytedeskEventPublisher bytedeskEventPublisher;
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -182,6 +186,19 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     }
 
     /**
+     * 从 TicketBasicSettingsEntity 读取工单分配模式。
+     * 外部工单依赖此配置决定客服分配策略（ROUND_ROBIN / LEAST_ACTIVE / RANDOM / MANUAL 等）。
+     * 内部工单如已直接指定处理人，则不会经过此路径。
+     */
+    private String getTicketAssignmentMode(TicketEntity ticket) {
+        TicketBasicSettingsResponse basicSettings = resolveBasicSettings(ticket);
+        if (basicSettings != null && StringUtils.hasText(basicSettings.getAssignmentMode())) {
+            return TicketAssignmentModeEnum.normalize(basicSettings.getAssignmentMode());
+        }
+        return DEFAULT_ASSIGNMENT_MODE;
+    }
+
+    /**
      * 处理工单会话 NEW 状态：
      * - 发送工单接入提示语
      * - 切换线程状态为 CHATTING
@@ -216,7 +233,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         ThreadEntity savedThread = saveThread(latestAfterAssign);
 
         // 同步订阅 topic（含 internal），放在发消息之前，避免首条消息因订阅延迟而丢失
-        subscribeThreadTopics(savedThread, topicRestService);
+        subscribeThreadTopics(savedThread, topicSubscriptionRestService);
 
         // 通知被分配客服：按 WorkgroupThreadRoutingStrategy 的模式发布事件
         if (hasAssignedAgent(savedThread)) {
@@ -279,9 +296,12 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         WorkgroupEntity workgroup = workgroupRestService.findByUid(workgroupUid)
                 .orElseThrow(() -> new IllegalArgumentException("Workgroup uid " + workgroupUid + " not found"));
 
-        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, thread);
+        // 按 TicketBasicSettingsEntity.assignmentMode 选择客服（MANUAL 时返回 null 即不分配）
+        String assignmentMode = getTicketAssignmentMode(ticket);
+        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, thread, assignmentMode);
         if (selectedAgent == null) {
-            log.info("No available agent for ticket {}, workgroup {}", ticket.getUid(), workgroupUid);
+            log.info("No available agent for ticket {}, workgroup {}, assignmentMode={}",
+                    ticket.getUid(), workgroupUid, assignmentMode);
             return thread;
         }
 
@@ -455,7 +475,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(tip)
+            .content(SystemContent.of(MessageTypeEnum.AGENT_CLOSED, tip).toJson())
                 .type(MessageTypeEnum.AGENT_CLOSED.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())

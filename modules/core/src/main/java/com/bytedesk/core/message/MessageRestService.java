@@ -16,7 +16,6 @@ package com.bytedesk.core.message;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 // import org.springframework.cache.annotation.Cacheable;
@@ -27,11 +26,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import com.bytedesk.core.base.BaseRestServiceWithExport;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.ConvertUtils;
@@ -42,15 +44,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class MessageRestService extends BaseRestServiceWithExport<MessageEntity, MessageRequest, MessageResponse, MessageExcel> {
+public class MessageRestService extends BaseRestService<MessageEntity, MessageRequest, MessageResponse> {
 
     private final MessageRepository messageRepository;
 
-    private final ModelMapper modelMapper;
-
     private final AuthService authService;
 
-    @Override
     public Page<MessageEntity> queryByOrgEntity(MessageRequest request) {
         // 非超级管理员请求如果未传 orgUid，默认使用当前用户的 orgUid，避免抛异常导致 500
         if (!StringUtils.hasText(request.getOrgUid())) {
@@ -73,7 +72,7 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     public Page<MessageResponse> queryByUser(MessageRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         request.setUserUid(user.getUid());
         //
@@ -84,7 +83,7 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     public MessageResponse queryByUid(MessageRequest request) {
         Optional<MessageEntity> optional = findByUid(request.getUid());
         if (!optional.isPresent()) {
-            throw new NotFoundException("Message not found");
+            throw ResourceI18nExceptions.messageNotFound();
         }
         return convertToResponse(optional.get());
     }
@@ -105,6 +104,10 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
         return messageRepository.findFirstByThread_UidOrderByCreatedAtDesc(threadUid);
     }
 
+    public Optional<MessageEntity> findLatestByThreadTopic(String threadTopic) {
+        return messageRepository.findFirstByThread_TopicOrderByCreatedAtDesc(threadTopic);
+    }
+
     // @Cacheable(value = "message", key = "#threadUid", unless = "#result == null")
     public List<MessageEntity> findByThreadUid(String threadUid) {
         return messageRepository.findByThread_UidOrderByCreatedAtAsc(threadUid);
@@ -116,6 +119,11 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     public List<MessageEntity> findByThreadUidBetweenCreatedAt(String threadUid, ZonedDateTime start,
             ZonedDateTime end) {
         return messageRepository.findByThread_UidAndCreatedAtBetweenOrderByCreatedAtAsc(threadUid, start, end);
+    }
+
+    public List<MessageEntity> findByThreadTopicBetweenCreatedAt(String threadTopic, ZonedDateTime start,
+            ZonedDateTime end) {
+        return messageRepository.findByThread_TopicAndCreatedAtBetweenOrderByCreatedAtAsc(threadTopic, start, end);
     }
     
     // @Cacheable(value = "message", key = "#threadUid + #type + #userUid", unless = "#result == null")
@@ -146,14 +154,37 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
 
     @Override
     public MessageResponse update(MessageRequest request) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        UserEntity user = authService.getUser();
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+
+        MessageEntity entity = findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::messageNotFound);
+
+        if (request.getContent() != null) {
+            entity.setContent(request.getContent());
+        }
+        if (StringUtils.hasText(request.getType())) {
+            entity.setType(request.getType());
+        }
+
+        MessageEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
+        }
+        return convertToResponse(savedEntity);
     }
 
     @Override
     // @CachePut(value = "message", key = "#message.uid")
     protected MessageEntity doSave(MessageEntity entity) {
         return messageRepository.save(entity);
+    }
+
+    @Recover
+    public MessageEntity recover(ObjectOptimisticLockingFailureException e, MessageEntity entity) {
+        return handleOptimisticLockingFailureException(e, entity);
     }
 
     @Caching(evict = {
@@ -175,6 +206,13 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
         });
     }
 
+    public MessageResponse restore(@NonNull MessageRequest request) {
+        MessageEntity entity = messageRepository.findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::messageNotFound);
+        entity.setDeleted(false);
+        return convertToResponse(save(entity));
+    }
+
     public Boolean existsByUid(String uid) {
         return messageRepository.existsByUid(uid);
     }
@@ -187,28 +225,86 @@ public class MessageRestService extends BaseRestServiceWithExport<MessageEntity,
     @Override
     public MessageEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             MessageEntity entity) {
-        try {
-            Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                MessageEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // 这里可以根据业务需求合并实体
-                return messageRepository.save(latestEntity);
+        // Retry up to 3 times with fresh data to resolve concurrent updates
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                Optional<MessageEntity> latest = messageRepository.findByUid(entity.getUid());
+                if (latest.isPresent()) {
+                    MessageEntity latestEntity = latest.get();
+                    String mergedStatus = mergeRecoverableStatus(latestEntity.getStatus(), entity.getStatus());
+                    log.warn(
+                            "message optimistic lock recovery (attempt {}): uid {}, requestedStatus {}, latestStatusBeforeMerge {}, mergedStatus {}",
+                            attempt + 1, entity.getUid(), entity.getStatus(), latestEntity.getStatus(), mergedStatus);
+                    latestEntity.setStatus(mergedStatus);
+                    return messageRepository.save(latestEntity);
+                }
+            } catch (ObjectOptimisticLockingFailureException retryEx) {
+                if (attempt < maxRetries - 1) {
+                    log.warn("Optimistic lock recovery retry {} failed for uid {}, retrying...",
+                            attempt + 1, entity.getUid());
+                    // Brief pause to let concurrent transactions complete
+                    try {
+                        Thread.sleep(50L * (attempt + 1));
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    }
+                } else {
+                    log.error("Optimistic lock recovery exhausted after {} attempts for uid {}: {}",
+                            maxRetries, entity.getUid(), retryEx.getMessage());
+                }
+            } catch (Exception ex) {
+                log.error("Unexpected error during optimistic lock recovery for uid {}: {}",
+                        entity.getUid(), ex.getMessage());
+                break;
             }
-        } catch (Exception ex) {
-            log.error("Failed to handle optimistic locking exception: {}", ex.getMessage());
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
         }
+        // After exhausting retries, return null to avoid propagating the error.
+        // The caller (Spring Retry @Recover) will receive null, and the original save
+        // operation will not be retried further — the entity state will be reconciled
+        // on the next write.
+        log.warn("Optimistic lock recovery could not save entity uid {}, returning null", entity.getUid());
         return null;
     }
-    
-    @Override
-    public MessageExcel convertToExcel(MessageEntity entity) {
-        MessageExcel messageExcel = modelMapper.map(entity, MessageExcel.class);
-        messageExcel.setType(MessageTypeConverter.convertToChineseType(entity.getType()));
-        messageExcel.setContent(entity.getContent());
-        messageExcel.setSender(entity.getUserProtobuf().getNickname());
-        return messageExcel;
+
+    private String mergeRecoverableStatus(String latestStatus, String requestedStatus) {
+        if (!StringUtils.hasText(requestedStatus)) {
+            return latestStatus;
+        }
+        if (!StringUtils.hasText(latestStatus)) {
+            return requestedStatus;
+        }
+
+        try {
+            MessageStatusEnum latest = MessageStatusEnum.fromValue(latestStatus);
+            MessageStatusEnum requested = MessageStatusEnum.fromValue(requestedStatus);
+
+            if (isDeliveryStatusRegression(latest, requested)) {
+                return latest.name();
+            }
+            return requested.name();
+        } catch (IllegalArgumentException ex) {
+            return requestedStatus;
+        }
+    }
+
+    private boolean isDeliveryStatusRegression(MessageStatusEnum latest, MessageStatusEnum requested) {
+        if (latest == requested) {
+            return false;
+        }
+        if (latest == MessageStatusEnum.READ) {
+            return requested == MessageStatusEnum.SENDING
+                    || requested == MessageStatusEnum.SUCCESS
+                    || requested == MessageStatusEnum.DELIVERED;
+        }
+        if (latest == MessageStatusEnum.DELIVERED) {
+            return requested == MessageStatusEnum.SENDING
+                    || requested == MessageStatusEnum.SUCCESS;
+        }
+        if (latest == MessageStatusEnum.SUCCESS) {
+            return requested == MessageStatusEnum.SENDING;
+        }
+        return false;
     }
 
     /**

@@ -1,0 +1,16 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql|oracle>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-noai.yaml up -d
+services:
+  bytedesk:
+    environment:
+      SPRING_AI_MODEL_CHAT: none
+      SPRING_AI_MODEL_EMBEDDING: none
+      SPRING_AI_MODEL_VISION: none
+      SPRING_AI_MODEL_IMAGE: none
+      SPRING_AI_MODEL_MODERATION: none
+      SPRING_AI_MODEL_AUDIO: none
+      SPRING_AI_MODEL_RERANK: none
+      SPRING_AI_MODEL_MULTIMODAL: none
+      SPRING_AI_CHAT_CLIENT_ENABLED: "false"
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "false"
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "false"
+

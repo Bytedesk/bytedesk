@@ -126,6 +126,19 @@ public final class RoleAuthorityRules {
     public static final String CATEGORY_UPDATE = "CATEGORY_UPDATE";
     public static final String CATEGORY_DELETE = "CATEGORY_DELETE";
 
+    // room (modules/meet)
+    public static final String ROOM_READ = "ROOM_READ";
+    public static final String ROOM_CREATE = "ROOM_CREATE";
+    public static final String ROOM_UPDATE = "ROOM_UPDATE";
+    public static final String ROOM_DELETE = "ROOM_DELETE";
+
+    // notification (modules/notification)
+    public static final String NOTIFICATION_READ = "NOTIFICATION_READ";
+    public static final String NOTIFICATION_CREATE = "NOTIFICATION_CREATE";
+    public static final String NOTIFICATION_UPDATE = "NOTIFICATION_UPDATE";
+    public static final String NOTIFICATION_DELETE = "NOTIFICATION_DELETE";
+    public static final String NOTIFICATION_EXPORT = "NOTIFICATION_EXPORT";
+
     // message_leave (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String MESSAGE_LEAVE_READ = "MESSAGE_LEAVE_READ";
@@ -140,15 +153,24 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String AGENT_READ = "AGENT_READ";
     public static final String AGENT_UPDATE = "AGENT_UPDATE";
+    public static final String AGENT_SEAT_READ = "AGENT_SEAT_READ";
 
     // agent_status (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String AGENT_STATUS_READ = "AGENT_STATUS_READ";
     public static final String AGENT_STATUS_CREATE = "AGENT_STATUS_CREATE";
+    // 
+    public static final String AGENT_SETTINGS_READ = "AGENT_SETTINGS_READ";
+    public static final String AGENT_SETTINGS_UPDATE = "AGENT_SETTINGS_UPDATE";
+
+    // enterprise/call
+    public static final String CTI_READ = "CTI_READ";
 
     // queue (modules/service)
     // Keep as literals to avoid core -> service module dependency.
     public static final String QUEUE_READ = "QUEUE_READ";
+    // public static final String QUEUE_CREATE = "QUEUE_CREATE";
+    public static final String QUEUE_UPDATE = "QUEUE_UPDATE";
 
     // 
     public static final String ROUTING_POOL_READ = "ROUTING_POOL_READ";
@@ -158,6 +180,9 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> service module dependency.
     public static final String WORKGROUP_READ = "WORKGROUP_READ";
 
+    // topic_subscription (modules/core)
+    public static final String TOPIC_SUBSCRIPTION_READ = "TOPIC_SUBSCRIPTION_READ";
+
     // kbase (modules/kbase)
     // Keep as literals to avoid core -> kbase module dependency.
     public static final String KBASE_READ = "KBASE_READ";
@@ -165,6 +190,62 @@ public final class RoleAuthorityRules {
     public static final String QUICK_REPLY_CREATE = "QUICK_REPLY_CREATE";
     public static final String QUICK_REPLY_UPDATE = "QUICK_REPLY_UPDATE";
     public static final String QUICK_REPLY_DELETE = "QUICK_REPLY_DELETE";
+
+    // tag (modules/core)
+    public static final String TAG_READ = "TAG_READ";
+    public static final String TAG_CREATE = "TAG_CREATE";
+    public static final String TAG_UPDATE = "TAG_UPDATE";
+    public static final String TAG_DELETE = "TAG_DELETE";
+    public static final String TAG_EXPORT = "TAG_EXPORT";
+
+    // visitor (modules/service)
+    public static final String VISITOR_READ = "VISITOR_READ";
+    public static final String VISITOR_CREATE = "VISITOR_CREATE";
+    public static final String VISITOR_UPDATE = "VISITOR_UPDATE";
+    public static final String VISITOR_DELETE = "VISITOR_DELETE";
+    public static final String VISITOR_EXPORT = "VISITOR_EXPORT";
+
+    // browse 
+    public static final String BROWSE_READ = "BROWSE_READ";
+    public static final String BROWSE_CREATE = "BROWSE_CREATE";
+    public static final String BROWSE_UPDATE = "BROWSE_UPDATE";
+    public static final String BROWSE_DELETE = "BROWSE_DELETE"; 
+    public static final String BROWSE_EXPORT = "BROWSE_EXPORT";
+
+    // shop
+    public static final String SHOP_READ = "SHOP_READ";
+    public static final String SHOP_CREATE = "SHOP_CREATE";
+    public static final String SHOP_UPDATE = "SHOP_UPDATE";
+    public static final String SHOP_DELETE = "SHOP_DELETE";
+    public static final String SHOP_EXPORT = "SHOP_EXPORT";
+
+    // order
+    public static final String ORDER_READ = "ORDER_READ";
+    public static final String ORDER_CREATE = "ORDER_CREATE";
+    public static final String ORDER_UPDATE = "ORDER_UPDATE";
+    public static final String ORDER_DELETE = "ORDER_DELETE";
+    public static final String ORDER_EXPORT = "ORDER_EXPORT";
+
+    // goods
+    public static final String GOODS_READ = "GOODS_READ";
+    public static final String GOODS_CREATE = "GOODS_CREATE";
+    public static final String GOODS_UPDATE = "GOODS_UPDATE";
+    public static final String GOODS_DELETE = "GOODS_DELETE";
+    public static final String GOODS_EXPORT = "GOODS_EXPORT";
+
+    // robot
+    public static final String ROBOT_READ = "ROBOT_READ";
+    public static final String ROBOT_CREATE = "ROBOT_CREATE";
+    public static final String ROBOT_UPDATE = "ROBOT_UPDATE";
+    public static final String ROBOT_DELETE = "ROBOT_DELETE";
+    public static final String ROBOT_EXPORT = "ROBOT_EXPORT";
+
+    // ticket comment (modules/ticket)
+    public static final String TICKET_COMMENT_READ = "TICKET_COMMENT_READ";
+    public static final String TICKET_COMMENT_CREATE = "TICKET_COMMENT_CREATE";
+    public static final String TICKET_COMMENT_UPDATE = "TICKET_COMMENT_UPDATE";
+    public static final String TICKET_COMMENT_DELETE = "TICKET_COMMENT_DELETE";
+    // public static final String TICKET_COMMENT_EXPORT = "TICKET_COMMENT_EXPORT";
 
     public static final Set<String> DEFAULT_ROLE_USER_AUTHORITY_VALUES = Set.of(
             USER_READ,
@@ -219,6 +300,7 @@ public final class RoleAuthorityRules {
             ORGANIZATION_CREATE,
             ORGANIZATION_READ,
             ORGANIZATION_UPDATE,
+            TOPIC_SUBSCRIPTION_READ,
             // 
             DEPARTMENT_READ,
             //
@@ -228,7 +310,38 @@ public final class RoleAuthorityRules {
             GROUP_READ,
             GROUP_CREATE,
             GROUP_UPDATE,
-            GROUP_DELETE
+            GROUP_DELETE,
+            //
+            AGENT_SEAT_READ,
+            // 
+            ROOM_READ,
+            ROOM_CREATE,
+            ROOM_UPDATE,
+            ROOM_DELETE,
+            // 
+            NOTIFICATION_READ,
+            NOTIFICATION_CREATE,
+            NOTIFICATION_UPDATE,
+            NOTIFICATION_DELETE,
+            NOTIFICATION_EXPORT,
+
+            // 
+            TAG_CREATE,
+            TAG_READ,
+            TAG_UPDATE,
+            TAG_DELETE,
+
+            // robot
+            ROBOT_READ,
+            ROBOT_CREATE,
+            ROBOT_UPDATE,
+            ROBOT_DELETE,
+
+            // ticket comment
+            TICKET_COMMENT_READ,
+            TICKET_COMMENT_CREATE,
+            TICKET_COMMENT_UPDATE,
+            TICKET_COMMENT_DELETE
     );
 
     /**
@@ -242,8 +355,13 @@ public final class RoleAuthorityRules {
             // 
             AGENT_READ,
             AGENT_UPDATE,
+            AGENT_SEAT_READ,
             AGENT_STATUS_READ,
             AGENT_STATUS_CREATE,
+            AGENT_SETTINGS_READ,
+            AGENT_SETTINGS_UPDATE,
+            // 
+            CTI_READ,
             QUEUE_READ,
             WORKGROUP_READ,
             ROUTING_POOL_READ,
@@ -252,7 +370,45 @@ public final class RoleAuthorityRules {
             // 快捷回复：ROLE_AGENT 默认需要增删改
             QUICK_REPLY_CREATE,
             QUICK_REPLY_UPDATE,
-            QUICK_REPLY_DELETE);
+            QUICK_REPLY_DELETE,
+
+            // 
+            VISITOR_READ,
+            VISITOR_CREATE,
+            VISITOR_UPDATE,
+            VISITOR_DELETE,
+            VISITOR_EXPORT,
+
+            // 
+            BROWSE_READ,
+            BROWSE_CREATE,
+            BROWSE_UPDATE,
+            BROWSE_DELETE,
+            BROWSE_EXPORT,
+
+            // shop
+            SHOP_READ,
+            SHOP_CREATE,
+            SHOP_UPDATE,
+            SHOP_DELETE,
+            SHOP_EXPORT,
+
+            // order
+            ORDER_READ,
+            ORDER_CREATE,
+            ORDER_UPDATE,
+            ORDER_DELETE,   
+            ORDER_EXPORT,
+
+            // goods
+            GOODS_READ,
+            GOODS_CREATE,
+            GOODS_UPDATE,
+            GOODS_DELETE,
+            GOODS_EXPORT,
+
+            QUEUE_UPDATE
+        );
 
     public static boolean isKbaseReadPermission(String permissionValue) {
         if (!StringUtils.hasText(permissionValue)) {

@@ -11,10 +11,10 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
@@ -31,8 +31,12 @@ import com.bytedesk.core.rbac.user.UserEntity;
  */
 public abstract class BaseRestService<T, TRequest extends PageableRequest, TResponse> {
 
-    @Autowired
     protected AuthService authService;
+
+    @Autowired
+    protected void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
 
     // === 原有的抽象方法 ===
     abstract public Optional<T> findByUid(String uid);
@@ -42,6 +46,10 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
     abstract public void delete(TRequest request);
     abstract public T handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, T entity);
     abstract public TResponse convertToResponse(T entity);
+
+    public TResponse restore(TRequest request) {
+        throw new UnsupportedOperationException("Method restore needs to be implemented in child class");
+    }
 
     // === 新增的抽象方法，用于支持通用实现 ===
     
@@ -76,8 +84,12 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
      */
     public Page<TResponse> queryByUser(TRequest request) {
         UserEntity user = authService.getUser();
+        if (user == null) {
+            throw new NotFoundException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
         
         setUserUidToRequest(request, user.getUid());
+        setOrgUidToRequestIfMissing(request, user.getOrgUid());
         return queryByOrg(request);
     }
 
@@ -116,6 +128,18 @@ public abstract class BaseRestService<T, TRequest extends PageableRequest, TResp
             setUserUidMethod.invoke(request, userUid);
         } catch (Exception e) {
             throw new UnsupportedOperationException("Method setUserUid not found in request class: " + request.getClass().getSimpleName(), e);
+        }
+    }
+
+    /**
+     * 在用户维度查询中，自动继承当前登录用户所属组织，避免前端遗漏 orgUid 时触发基础组织校验。
+     */
+    protected void setOrgUidToRequestIfMissing(TRequest request, String orgUid) {
+        if (!(request instanceof BaseRequest baseRequest)) {
+            return;
+        }
+        if (baseRequest.getOrgUid() == null || baseRequest.getOrgUid().isBlank()) {
+            baseRequest.setOrgUid(orgUid);
         }
     }
 

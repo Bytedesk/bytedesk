@@ -48,11 +48,13 @@ import lombok.experimental.SuperBuilder;
  * Manages workgroups that support both robot and human agent services
  * 
  * Database Table: bytedesk_service_workgroup
- * Purpose: Stores workgroup configurations, agent assignments, and service settings
+ * Purpose: Stores workgroup configurations, agent assignments, and service
+ * settings
  * 
  * Key differences:
  * - WorkgroupEntity vs Skills: Organizational structure vs capability labels
- * - WorkgroupEntity vs Agent: Group support (robot + human) vs individual agent only
+ * - WorkgroupEntity vs Agent: Group support (robot + human) vs individual agent
+ * only
  * - WorkgroupEntity vs Robot: Group with routing vs standalone robot
  */
 @Entity
@@ -64,16 +66,13 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EntityListeners(value = { WorkgroupEntityListener.class })
 @JsonIgnoreProperties({
-    "hibernateLazyInitializer", 
-    "handler",
+        "hibernateLazyInitializer",
+        "handler",
 })
 @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY, property = "@class")
-@Table(
-    name = "bytedesk_service_workgroup",
-    indexes = {
+@Table(name = "bytedesk_service_workgroup", indexes = {
         @Index(name = "idx_workgroup_uid", columnList = "uuid")
-    }
-)
+})
 public class WorkgroupEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -95,6 +94,13 @@ public class WorkgroupEntity extends BaseEntity {
      */
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
+
+    /**
+     * Business type of workgroup for different service scenarios.
+     */
+    @Builder.Default
+    @Column(name = "workgroup_type", length = 64)
+    private String type = WorkgroupTypeEnum.GENERAL.name();
 
     // 路由模式迁移至 WorkgroupSettingsEntity
     // 为保持兼容性，保留委托型 getter，从 settings 读取；空值使用默认
@@ -127,11 +133,7 @@ public class WorkgroupEntity extends BaseEntity {
     @Builder.Default
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "bytedesk_service_workgroup_admins",
-        joinColumns = @JoinColumn(name = "workgroup_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "agent_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "bytedesk_service_workgroup_admins", joinColumns = @JoinColumn(name = "workgroup_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "agent_id", referencedColumnName = "id"))
     private List<AgentEntity> admins = new ArrayList<>();
 
     /**
@@ -162,8 +164,8 @@ public class WorkgroupEntity extends BaseEntity {
                 return null;
             }
             return this.agents.stream()
-                .findFirst()
-                .orElse(null);
+                    .findFirst()
+                    .orElse(null);
         }
         return this.messageLeaveAgent;
     }
@@ -171,11 +173,12 @@ public class WorkgroupEntity extends BaseEntity {
     @JsonIgnore
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
-            .uid(this.getUid())
-            .nickname(this.getNickname())
-            .avatar(this.getAvatar())
-            .type(UserTypeEnum.WORKGROUP.name())
-            .build();
+                .uid(this.getUid())
+                .nickname(this.getNickname())
+                .avatar(this.getAvatar())
+                .description(this.getDescription())
+                .type(UserTypeEnum.WORKGROUP.name())
+                .build();
     }
 
     /**
@@ -189,13 +192,20 @@ public class WorkgroupEntity extends BaseEntity {
         return WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
     }
 
+    /**
+     * Backward compatible getter for legacy rows without type value.
+     */
+    public String getType() {
+        return WorkgroupTypeEnum.normalize(this.type);
+    }
+
     // agent connected count
     // @JsonIgnore
     // public long getConnectedAgentCount() {
-    //     if (this.agents == null || this.agents.isEmpty()) {
-    //         return 0;
-    //     }
-    //     return this.agents.stream().filter(agent -> agent.isConnected()).count();
+    // if (this.agents == null || this.agents.isEmpty()) {
+    // return 0;
+    // }
+    // return this.agents.stream().filter(agent -> agent.isConnected()).count();
     // }
 
     // agent available count
@@ -224,14 +234,14 @@ public class WorkgroupEntity extends BaseEntity {
         }
         return this.agents.stream().filter(agent -> agent.isBusy()).count();
     }
-    
-    // agent away count
+
+    // agent rest count
     @JsonIgnore
-    public long getAwayAgentCount() {
+    public long getRestAgentCount() {
         if (this.agents == null || this.agents.isEmpty()) {
             return 0;
         }
-        return this.agents.stream().filter(agent -> agent.isAway()).count();
+        return this.agents.stream().filter(agent -> agent.isRest()).count();
     }
 
 }

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.auto_reply.keyword;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,6 +23,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface AutoReplyKeywordRepository extends JpaRepository<AutoReplyKeywordEntity, Long>, JpaSpecificationExecutor<AutoReplyKeywordEntity> {
     
     Optional<AutoReplyKeywordEntity> findByUid(String uid);
+
+    List<AutoReplyKeywordEntity> findByKbUidAndEnabledTrueAndDeletedFalse(String kbUid);
 
     // List<AutoReplyKeyword> findByAutoReplyKeywordListContaining(String keyword);
 

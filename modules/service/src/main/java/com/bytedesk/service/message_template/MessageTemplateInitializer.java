@@ -16,13 +16,16 @@ package com.bytedesk.service.message_template;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class MessageTemplateInitializer implements SmartInitializingSingleton {
 
-    // private final AuthorityRestService authorityRestService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -30,10 +33,10 @@ public class MessageTemplateInitializer implements SmartInitializingSingleton {
     }
 
     private void initAuthority() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = MessageTemplatePermissions.MESSAGE_TEMPLATE_PREFIX + permission.name();
-        //     authorityRestService.createForPlatform(permissionValue);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = MessageTemplatePermissions.MESSAGE_TEMPLATE_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     

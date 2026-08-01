@@ -22,6 +22,7 @@
  */
 package com.bytedesk.call.mrcp4j.server;
 
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -78,12 +79,9 @@ public class MrcpRequestDecoder implements ProtocolDecoder {
                 throw new ProtocolDecoderException(e.getMessage(), e);
             }
             if (contentLength > 0) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < contentLength; i++) {
-                    byte b = in.get();
-                    sb.append((char) b);
-                } // TODO: handle exceptions
-                request.setContent(sb.toString());
+                byte[] contentBytes = new byte[contentLength];
+                in.get(contentBytes);
+                request.setContent(new String(contentBytes, StandardCharsets.UTF_8));
             }
 
             // write request object to out

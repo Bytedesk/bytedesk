@@ -1,7 +1,6 @@
 package com.bytedesk.ai.service;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -12,19 +11,18 @@ import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class MessagePersistenceHelper {
 
-    @Autowired
-    private MessagePersistCache messagePersistCache;
+    private final MessagePersistCache messagePersistCache;
 
-    @Autowired
-    private RobotMessageCache robotMessageCache;
+    private final RobotMessageCache robotMessageCache;
 
-    @Autowired
-    private PromptHelper promptHelper;
+    private final PromptHelper promptHelper;
 
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.redis.RedisService;
 import lombok.AllArgsConstructor;
@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class MessageUnreadEventListener {
+
+    private static final long READ_UNREAD_DEDUP_TTL_SECONDS = 300L;
 
     private final MessageUnreadRestService messageUnreadRestService;
     
@@ -65,6 +67,11 @@ public class MessageUnreadEventListener {
                 String readMessageUid = messageProtobuf.getContent();
                 if (readMessageUid != null && !readMessageUid.trim().isEmpty()) {
                     try {
+                    if (!redisService.tryMarkMessageReadUnreadProcessed(readMessageUid, READ_UNREAD_DEDUP_TTL_SECONDS)) {
+                        log.debug("skip duplicate READ unread cleanup for messageUid: {}, receiptUid: {}",
+                            readMessageUid, messageProtobuf.getUid());
+                        return;
+                    }
                         // 先清理 Redis 缓存
                         redisService.removeMessageExists(readMessageUid);
                         // 再删除数据库记录

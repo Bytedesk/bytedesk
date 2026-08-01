@@ -14,20 +14,30 @@
 //  */
 package com.bytedesk.core.config;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
+import org.springframework.util.StringUtils;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 // import lombok.extern.slf4j.Slf4j;
 
+import com.bytedesk.core.config.properties.BytedeskProperties;
+
 // @Slf4j
 @Configuration
 @Description("CORS Configuration - Cross-Origin Resource Sharing configuration for handling cross-domain requests")
 public class CorsConfig {
+
+    private final BytedeskProperties bytedeskProperties;
+
+    public CorsConfig(BytedeskProperties bytedeskProperties) {
+        this.bytedeskProperties = bytedeskProperties;
+    }
 
     /**
      * 经测试：仅有此处起作用，corsFilter()和WebMvcConfig.addCorsMappings()不起作用
@@ -38,17 +48,31 @@ public class CorsConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // configuration.setAllowCredentials(true); // 不能启用
-        configuration.setAllowedOrigins(List.of("*")); // 必须启用
-        // configuration.setAllowedOriginPatterns(List.of("*")); // 不能启用
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(resolveAllowedOriginPatterns());
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("X-Request-Id"));
         // configuration.setAllowedMethods(List.of("GET", "POST", "PUT", DELETE, "OPTIONS"));
         // configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         //
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private List<String> resolveAllowedOriginPatterns() {
+        String configuredOrigins = bytedeskProperties.getCorsAllowedOrigins();
+        if (!StringUtils.hasText(configuredOrigins)) {
+            return List.of("*");
+        }
+
+        List<String> originPatterns = Arrays.stream(StringUtils.commaDelimitedListToStringArray(configuredOrigins))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .toList();
+
+        return originPatterns.isEmpty() ? List.of("*") : originPatterns;
     }
 
 }

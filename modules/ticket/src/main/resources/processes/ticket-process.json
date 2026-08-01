@@ -1,0 +1,380 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "meta": {
+        "position": {
+          "x": -332,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "开始",
+        "description": "工单流程开始。"
+      }
+    },
+    {
+      "id": "createTicket",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 4,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "创建工单",
+        "description": "创建新工单并填写详细信息。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${reporterUid}"
+        ],
+        "assigneeNames": [
+          "报告人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false,
+        "ticketStage": "CREATE"
+      }
+    },
+    {
+      "id": "waitClaim",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 322.5,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "工单待认领",
+        "description": "成员认领工单，或由负责人指派处理人。",
+        "assigneeType": "department",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "slaType": "CLAIM",
+        "slaDurationMinutes": 0,
+        "allowDelegate": false,
+        "allowAddSign": false,
+        "commentRequired": true,
+        "ticketStage": "WAIT_CLAIM",
+        "ticketStatusOnEnter": "PENDING",
+        "ticketStatusOnComplete": "PROCESSING",
+        "autoCompleteOnActions": [
+          "CLAIM",
+          "ASSIGN"
+        ],
+        "nextAssigneeVariable": "assigneeUid",
+        "nextTaskStage": "PROCESSING",
+        "availableActions": [
+          {
+            "key": "CLAIM",
+            "label": "认领",
+            "type": "claim"
+          },
+          {
+            "key": "ASSIGN",
+            "label": "指派",
+            "type": "assign",
+            "fields": [
+              {
+                "name": "targetAssigneeUid",
+                "label": "目标处理人",
+                "component": "memberSelect",
+                "required": true,
+                "placeholder": "请选择目标处理人"
+              },
+              {
+                "name": "reason",
+                "label": "说明/原因",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "说明/原因（可选）"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "processTicket",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 668.2864386004012,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "工单处理中",
+        "description": "处理工单并已解决。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${assigneeUid}"
+        ],
+        "assigneeNames": [
+          "处理人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "slaType": "RESOLUTION",
+        "slaDurationMinutes": 0,
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": true,
+        "ticketStage": "PROCESSING",
+        "ticketStatusOnEnter": "PROCESSING",
+        "ticketStatusOnComplete": "RESOLVED",
+        "completeActionLabel": "已解决",
+        "availableActions": [
+          {
+            "key": "COMPLETE",
+            "label": "已解决",
+            "type": "complete",
+            "fields": [
+              {
+                "name": "processComment",
+                "label": "处理意见",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "填写处理意见"
+              }
+            ]
+          },
+          {
+            "key": "HOLD",
+            "label": "挂起",
+            "type": "hold",
+            "fields": [
+              {
+                "name": "processComment",
+                "label": "处理意见",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "填写处理意见"
+              }
+            ]
+          },
+          {
+            "key": "CLOSE",
+            "label": "关单",
+            "type": "close",
+            "danger": true,
+            "fields": [
+              {
+                "name": "processComment",
+                "label": "关单说明",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "填写关单说明"
+              }
+            ]
+          },
+          {
+            "key": "TRANSFER",
+            "label": "转派",
+            "type": "transfer",
+            "fields": [
+              {
+                "name": "targetAssigneeUid",
+                "label": "目标处理人",
+                "component": "memberSelect",
+                "required": true,
+                "placeholder": "请选择目标处理人"
+              },
+              {
+                "name": "reason",
+                "label": "说明/原因",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "说明/原因（可选）"
+              }
+            ]
+          },
+          {
+            "key": "TRANSFER_DEPARTMENT",
+            "label": "转派部门",
+            "type": "transferDepartment",
+            "fields": [
+              {
+                "name": "targetDepartmentUid",
+                "label": "目标部门",
+                "component": "departmentSelect",
+                "required": true,
+                "placeholder": "请选择目标部门"
+              },
+              {
+                "name": "targetAssigneeUid",
+                "label": "目标同事",
+                "component": "memberSelect",
+                "required": false,
+                "placeholder": "请选择目标同事（可选）"
+              },
+              {
+                "name": "reason",
+                "label": "说明/原因",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "说明/原因（可选）"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "customerVerify",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1035.521422999777,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "工单待验证",
+        "description": "验证工单是否已解决。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${reporterUid}"
+        ],
+        "assigneeNames": [
+          "报告人"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "slaType": "CUSTOMER_VERIFY",
+        "slaDurationMinutes": 0,
+        "allowDelegate": false,
+        "allowAddSign": false,
+        "commentRequired": true,
+        "ticketStage": "CUSTOMER_VERIFY",
+        "decisionVariable": "verified",
+        "availableActions": [
+          {
+            "key": "COMPLETE_VERIFIED",
+            "label": "确认解决",
+            "type": "complete",
+            "decisionValue": true,
+            "fields": [
+              {
+                "name": "processComment",
+                "label": "验证意见",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "填写验证意见"
+              }
+            ]
+          },
+          {
+            "key": "COMPLETE_REJECTED",
+            "label": "未解决",
+            "type": "complete",
+            "danger": true,
+            "decisionValue": false,
+            "fields": [
+              {
+                "name": "processComment",
+                "label": "验证意见",
+                "component": "textarea",
+                "required": false,
+                "placeholder": "填写验证意见"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 1402.756407399153,
+          "y": 185
+        }
+      },
+      "data": {
+        "title": "结束",
+        "description": "工单流程结束。"
+      }
+    },
+    {
+      "id": "verifyGateway",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 846.8930242924004,
+          "y": -108.79217740138175
+        }
+      },
+      "data": {
+        "title": "验证结果",
+        "description": "判断工单是否已解决。",
+        "decisionVariable": "verified",
+        "conditions": [
+          {
+            "key": "verified",
+            "label": "已解决",
+            "expression": "${verified == true}",
+            "outgoingEdgeId": "end"
+          },
+          {
+            "key": "notVerified",
+            "label": "未解决",
+            "expression": "${verified == false}",
+            "outgoingEdgeId": "processTicket"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "start",
+      "targetNodeId": "createTicket",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "createTicket",
+      "targetNodeId": "waitClaim",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "waitClaim",
+      "targetNodeId": "processTicket",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "verifyGateway",
+      "targetNodeId": "processTicket",
+      "sourcePortId": "condition-branch-notVerified",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "processTicket",
+      "targetNodeId": "customerVerify",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "customerVerify",
+      "targetNodeId": "verifyGateway",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "verifyGateway",
+      "targetNodeId": "end",
+      "sourcePortId": "condition-branch-verified",
+      "targetPortId": "defaultInput"
+    }
+  ]
+}

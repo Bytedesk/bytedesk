@@ -1,0 +1,9 @@
+# public_account
+
+该包负责公众号记录管理、账号类型元数据与公众号生命周期接口。
+
+## 实现要点
+
+- 核心模型包括 PublicAccountEntity、PublicAccountRequest、PublicAccountResponse、PublicAccountTypeEnum。
+- PublicAccountRepository、PublicAccountSpecification、PublicAccountRestController、PublicAccountRestService 提供持久化、条件过滤和公众号记录管理接口。
+- PublicAccountInitializer、PublicAccountEntityListener、PublicAccountEventListener 提供初始化支持和公众号记录生命周期集成。

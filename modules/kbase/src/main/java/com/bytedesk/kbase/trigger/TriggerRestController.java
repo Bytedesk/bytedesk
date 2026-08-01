@@ -16,12 +16,15 @@ package com.bytedesk.kbase.trigger;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,9 +41,10 @@ public class TriggerRestController extends BaseRestController<TriggerRequest, Tr
 
     private final TriggerRestService triggerRestService;
 
-    @ActionAnnotation(title = "Trigger", action = "组织查询", description = "query trigger by org")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query trigger by org")
     @Operation(summary = "Query Triggers by Organization", description = "Retrieve triggers for the current organization")
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(TriggerRequest request) {
         
@@ -49,9 +53,10 @@ public class TriggerRestController extends BaseRestController<TriggerRequest, Tr
         return ResponseEntity.ok(JsonResult.success(triggers));
     }
 
-    @ActionAnnotation(title = "Trigger", action = "用户查询", description = "query trigger by user")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query trigger by user")
     @Operation(summary = "Query Triggers by User", description = "Retrieve triggers for the current user")
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(TriggerRequest request) {
         
@@ -60,9 +65,10 @@ public class TriggerRestController extends BaseRestController<TriggerRequest, Tr
         return ResponseEntity.ok(JsonResult.success(triggers));
     }
 
-    @ActionAnnotation(title = "Trigger", action = "查询详情", description = "query trigger by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query trigger by uid")
     @Operation(summary = "Query Trigger by UID", description = "Retrieve a specific trigger by its unique identifier")
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(TriggerRequest request) {
         
@@ -71,40 +77,43 @@ public class TriggerRestController extends BaseRestController<TriggerRequest, Tr
         return ResponseEntity.ok(JsonResult.success(trigger));
     }
 
-    @ActionAnnotation(title = "Trigger", action = "新建", description = "create trigger")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_CREATE, description = "create trigger")
     @Operation(summary = "Create Trigger", description = "Create a new trigger")
+    @PostMapping("/create")
     @Override
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_CREATE)
-    public ResponseEntity<?> create(TriggerRequest request) {
+    public ResponseEntity<?> create(@RequestBody TriggerRequest request) {
         
         TriggerResponse trigger = triggerRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(trigger));
     }
 
-    @ActionAnnotation(title = "Trigger", action = "更新", description = "update trigger")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_UPDATE, description = "update trigger")
     @Operation(summary = "Update Trigger", description = "Update an existing trigger")
+    @PostMapping("/update")
     @Override
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_UPDATE)
-    public ResponseEntity<?> update(TriggerRequest request) {
+    public ResponseEntity<?> update(@RequestBody TriggerRequest request) {
         
         TriggerResponse trigger = triggerRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(trigger));
     }
 
-    @ActionAnnotation(title = "Trigger", action = "删除", description = "delete trigger")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_DELETE, description = "delete trigger")
     @Operation(summary = "Delete Trigger", description = "Delete a trigger")
+    @PostMapping("/delete")
     @Override
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_DELETE)
-    public ResponseEntity<?> delete(TriggerRequest request) {
+    public ResponseEntity<?> delete(@RequestBody TriggerRequest request) {
         
         triggerRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Trigger", action = "导出", description = "export trigger")
+    @ActionAnnotation(title = I18Consts.I18N_TRIGGER, action = I18Consts.I18N_ACTION_EXPORT, description = "export trigger")
     @Operation(summary = "Export Triggers", description = "Export triggers to Excel format")
     @Override
     // @PreAuthorize(TriggerPermissions.HAS_TRIGGER_EXPORT)

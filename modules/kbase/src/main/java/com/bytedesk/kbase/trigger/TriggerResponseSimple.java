@@ -30,4 +30,6 @@ public class TriggerResponseSimple implements Serializable {
     private String description;
 
     private String config;
+
+    private Integer maxTriggerCount;
 }

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.thread;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -119,6 +120,9 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "thread_close_type")
     private String closeType = ThreadCloseTypeEnum.NONE.name(); // {@link ThreadCloseTypeEnum}
+
+    @Column(name = "closed_at")
+    private ZonedDateTime closedAt;
 
     // 备注
     @Column(name = "thread_note")

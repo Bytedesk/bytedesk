@@ -36,12 +36,12 @@ import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.kbase.KbaseTypeEnum;
 import com.bytedesk.kbase.quick_reply.QuickReplyRequest;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.service.agent.event.AgentCreateEvent;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ThreadMessageUtil;
+import com.bytedesk.service.utils.WelcomeContentUtils;
 import com.bytedesk.core.message.content.WelcomeContent;
-import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +65,10 @@ public class AgentEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        if (StringUtils.hasText(user.getUid())
+                && agentRestService.findByUserUidAndOrgUid(user.getUid(), orgUid).isPresent()) {
+            return;
+        }
         // log.info("agent - organization created: {}", organization.getName());
         String mobile = user.getMobile();
         if (StringUtils.hasText(mobile)) {
@@ -106,24 +110,8 @@ public class AgentEventListener {
             String tip = agent.getSettings() != null && agent.getSettings().getServiceSettings() != null
                 ? agent.getSettings().getServiceSettings().getWelcomeTip()
                 : null;
-            WelcomeContent.WelcomeContentBuilder<?, ?> builder = WelcomeContent.builder().content(tip);
-            if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
-                var settings = agent.getSettings().getServiceSettings();
-                builder.kbUid(settings.getWelcomeKbUid());
-                if (settings.getWelcomeFaqs() != null && !settings.getWelcomeFaqs().isEmpty()) {
-                    java.util.List<WelcomeContent.QA> qas = new java.util.ArrayList<>();
-                    for (FaqEntity f : settings.getWelcomeFaqs()) {
-                        qas.add(WelcomeContent.QA.builder()
-                                .uid(f.getUid())
-                                .question(f.getQuestion())
-                                .answer(f.getAnswer())
-                                .type(f.getType())
-                                .build());
-                    }
-                    builder.faqs(qas);
-                }
-            }
-            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(builder.build(), thread);
+            WelcomeContent welcomeContent = WelcomeContentUtils.buildAgentWelcomeContent(agent, tip);
+            MessageProtobuf messageProtobuf = ThreadMessageUtil.getThreadWelcomeMessage(welcomeContent, thread);
             messageSendService.sendProtobufMessage(messageProtobuf);
         } else {
             log.error("agent not found {}", agentProtobuf.getUid());

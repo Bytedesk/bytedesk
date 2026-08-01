@@ -13,10 +13,14 @@
  */
 package com.bytedesk.core.socket.stomp;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.lang.NonNull;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.handler.annotation.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -55,12 +59,20 @@ public class StompController {
     public void message(Principal principal,
             @DestinationVariable(value = "sid") String sid,
             @DestinationVariable(value = "uid") String uid,
+            @Header("simpSessionId") String sessionId,
             String message) {
         // principal: null, sid: org.workgroup.df_wg_uid, uid: 1513088171901063, message:
         log.debug("principal: {}, sid: {}, uid: {}, message: {}", principal, sid, uid, message);
-        // TODO: 发送回执
         // 转发给mq
-        messageSendService.sendJsonMessage(message);
+        try {
+            messageSendService.sendJsonMessage(message);
+            // 发送成功回执到用户私有队列，访客端可根据此回执更新消息状态为 SUCCESS
+            sendSuccessToSession(sessionId, buildSuccessPayload(message));
+        } catch (RuntimeException exception) {
+            log.warn("stomp message send failed, sessionId: {}, sid: {}, uid: {}, error: {}",
+                    sessionId, sid, uid, exception.getMessage(), exception);
+            sendErrorToSession(sessionId, buildErrorPayload(message, exception));
+        }
     }
 
     /**
@@ -75,10 +87,59 @@ public class StompController {
     public void receiveTestMessage(Principal principal,
             @DestinationVariable(value = "topic") String topic,
             @NonNull String message) {
-        // TODO: 发送回执
         log.debug("topic: test.{}, message: {}", topic, message);
         // 测试转发，客户端需要首先订阅此主题，如：test.thread.topic
         simpMessagingTemplate.convertAndSend("/topic/test." + topic, message);
+    }
+
+    private void sendErrorToSession(String sessionId, StompErrorPayload payload) {
+        if (sessionId == null || sessionId.isBlank()) {
+            log.warn("skip stomp error push because sessionId is blank, payload: {}", payload);
+            return;
+        }
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        accessor.setSessionId(sessionId);
+        accessor.setLeaveMutable(true);
+        MessageHeaders headers = accessor.getMessageHeaders();
+        simpMessagingTemplate.convertAndSendToUser(sessionId, "/queue/errors", payload, headers);
+    }
+
+    private void sendSuccessToSession(String sessionId, StompSuccessPayload payload) {
+        if (sessionId == null || sessionId.isBlank()) {
+            log.debug("skip stomp success push because sessionId is blank, payload: {}", payload);
+            return;
+        }
+        SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        accessor.setSessionId(sessionId);
+        accessor.setLeaveMutable(true);
+        MessageHeaders headers = accessor.getMessageHeaders();
+        simpMessagingTemplate.convertAndSendToUser(sessionId, "/queue/success", payload, headers);
+    }
+
+    private StompErrorPayload buildErrorPayload(String message, RuntimeException exception) {
+        String messageUid = "";
+        try {
+            messageUid = JSON.parseObject(message).getString("uid");
+        } catch (Exception parseException) {
+            log.debug("failed to parse stomp message uid from payload", parseException);
+        }
+        return new StompErrorPayload(messageUid, exception.getMessage());
+    }
+
+    private StompSuccessPayload buildSuccessPayload(String message) {
+        String messageUid = "";
+        try {
+            messageUid = JSON.parseObject(message).getString("uid");
+        } catch (Exception parseException) {
+            log.debug("failed to parse stomp message uid from payload for success receipt", parseException);
+        }
+        return new StompSuccessPayload(messageUid, "SUCCESS");
+    }
+
+    private record StompErrorPayload(String uid, String message) {
+    }
+
+    private record StompSuccessPayload(String uid, String status) {
     }
 
 }

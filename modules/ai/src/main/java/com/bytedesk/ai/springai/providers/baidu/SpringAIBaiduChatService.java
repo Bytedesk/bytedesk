@@ -20,7 +20,8 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -42,15 +43,18 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.baidu.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIBaiduChatService extends BaseSpringAIService {
 
-    @Autowired(required = false)
-    private OpenAiChatModel baiduChatModel;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    public SpringAIBaiduChatService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAIBaiduChatService(
+            @Qualifier("baiduChatModel") ObjectProvider<OpenAiChatModel> baiduChatModelProvider,
+            TokenUsageHelper tokenUsageHelper) {
+        this.baiduChatModel = baiduChatModelProvider.getIfAvailable();
+        this.tokenUsageHelper = tokenUsageHelper;
     }
+
+
+    private final OpenAiChatModel baiduChatModel;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
@@ -243,6 +247,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("Baidu API response metadata: {}, text {}", response.getMetadata(),
                                         textContent);
 
@@ -252,7 +257,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                                 }
 
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                        textContent, null, sourceReferences);
+                                    textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况 - 使用百度专用的提取方法
                             tokenUsage[0] = extractBaiduTokenUsage(response);

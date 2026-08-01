@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.llm_webpage.vector;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -23,6 +24,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_webpage.WebpageEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -63,12 +65,24 @@ public class WebpageVector {
     
     @Field(type = FieldType.Keyword)
     private String kbUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
     
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
+
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -114,13 +128,50 @@ public class WebpageVector {
             .tagList(webpage.getTagList())
             .orgUid(webpage.getOrgUid())
             .kbUid(kbUid)
+            .sourceUid(webpage.getUid())
             .categoryUid(webpage.getCategoryUid())
             .enabled(webpage.getEnabled())
+            .language(webpage.getKbase() != null ? webpage.getKbase().getSourceLanguage() : null)
+            .sourceLanguage(webpage.getKbase() != null ? webpage.getKbase().getSourceLanguage() : null)
+            .translated(false)
             .startDate(webpage.getStartDate() != null ? webpage.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .endDate(webpage.getEndDate() != null ? webpage.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
             .viewCount(webpage.getViewCount())
             .clickCount(webpage.getClickCount())
             .docIdList(webpage.getDocIdList())
             .build();
+    }
+
+    public static WebpageVector fromTranslation(WebpageEntity webpage, KbaseTranslationEntity translation) {
+        String kbUid = (webpage.getKbase() != null) ? webpage.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing translated webpage uid=" + webpage.getUid());
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+                ? translation.getTargetLanguage().trim().toUpperCase()
+                : (webpage.getKbase() != null ? webpage.getKbase().getSourceLanguage() : null);
+
+        return WebpageVector.builder()
+                .uid(translation.getUid())
+                .title(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : webpage.getTitle())
+                .url(webpage.getUrl())
+                .description(StringUtils.hasText(translation.getSummary()) ? translation.getSummary() : webpage.getDescription())
+                .content(StringUtils.hasText(translation.getContent()) ? translation.getContent() : translation.getSummary())
+                .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? webpage.getTagList() : translation.getTagList())
+                .orgUid(webpage.getOrgUid())
+                .kbUid(kbUid)
+                .sourceUid(webpage.getUid())
+                .categoryUid(webpage.getCategoryUid())
+                .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(webpage.getEnabled()))
+                .language(targetLanguage)
+                .sourceLanguage(webpage.getKbase() != null ? webpage.getKbase().getSourceLanguage() : null)
+                .translated(true)
+                .startDate(webpage.getStartDate() != null ? webpage.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+                .endDate(webpage.getEndDate() != null ? webpage.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+                .viewCount(webpage.getViewCount())
+                .clickCount(webpage.getClickCount())
+                .docIdList(new ArrayList<>())
+                .build();
     }
 }

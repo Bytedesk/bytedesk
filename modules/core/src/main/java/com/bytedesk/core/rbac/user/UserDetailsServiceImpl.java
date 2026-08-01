@@ -16,7 +16,6 @@ package com.bytedesk.core.rbac.user;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,28 +29,33 @@ import com.bytedesk.core.exception.MobileNotFoundException;
 import com.bytedesk.core.exception.UserDisabledException;
 // import com.bytedesk.core.config.properties.BytedeskProperties;
 // import com.bytedesk.core.rbac.user.cache.UserEntityRedisCacheService;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.utils.JwtSubject;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * https://wankhedeshubham.medium.com/spring-boot-security-with-userdetailsservice-and-custom-authentication-provider-3df3a188993f
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
     @Cacheable(value = "user", key = "#email + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
 		return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile + '-' + #platform", unless = "#result == null")
-    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
-		return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
+    @Cacheable(value = "user", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String country, String platform) {
+		return userRepository.findByMobileAndCountryAndPlatformAndDeletedFalse(
+		        mobile,
+		        CountryCodeUtils.normalize(country),
+		        platform);
     }
 
     @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
@@ -113,10 +117,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(userOptional.get());
 	}
 
-	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String platform) {
-		log.debug("loadUserByMobile {}", mobile);
+	public UserDetailsImpl loadUserByMobileAndPlatform(String mobile, String country, String platform) {
+		log.debug("loadUserByMobile {}, country {}", mobile, CountryCodeUtils.normalize(country));
 		//
-		Optional<UserEntity> userOptional = findByMobileAndPlatform(mobile, platform);
+		Optional<UserEntity> userOptional = findByMobileAndPlatform(mobile, country, platform);
 		if (!userOptional.isPresent()) {
 			throw new MobileNotFoundException("mobile " + mobile + " is not found");
 		}

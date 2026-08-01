@@ -13,7 +13,8 @@
  */
 package com.bytedesk.ticket.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class TicketPlugin extends AbstractBytedeskPlugin {
+
+    public TicketPlugin(
+            @Qualifier("ticketHealthIndicator") ObjectProvider<HealthIndicator> ticketHealthIndicatorProvider) {
+        this.ticketHealthIndicator = ticketHealthIndicatorProvider.getIfAvailable();
+    }
+
     
     @Value("${bytedesk.ticket.enabled:true}")
     private boolean enabled;
@@ -36,8 +43,7 @@ public class TicketPlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.ticket.version:1.0.0}")
     private String version;
     
-    @Autowired(required = false)
-    private HealthIndicator ticketHealthIndicator;
+    private final HealthIndicator ticketHealthIndicator;
     
     @Override
     protected HealthIndicator getHealthIndicator() {

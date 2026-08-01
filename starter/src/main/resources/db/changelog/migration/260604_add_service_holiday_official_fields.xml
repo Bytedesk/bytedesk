@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260604-add-service-holiday-official-fields" author="githubcopilot">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <or>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="holiday_date"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="holiday_year"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="country_code"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="is_off_day"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="is_official"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="source_url"/>
+                    <columnExists tableName="bytedesk_service_holiday" columnName="holiday_key"/>
+                </or>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="holiday_date" type="DATE"/>
+            <column name="holiday_year" type="INT" defaultValueNumeric="2026"/>
+            <column name="country_code" type="VARCHAR(16)" defaultValue="CN"/>
+            <column name="is_off_day" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="is_official" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="source_url" type="VARCHAR(512)"/>
+            <column name="holiday_key" type="VARCHAR(128)"/>
+        </addColumn>
+
+        <createIndex tableName="bytedesk_service_holiday" indexName="idx_service_holiday_country_date">
+            <column name="country_code"/>
+            <column name="holiday_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-holiday-date-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="holiday_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="holiday_date" type="DATE"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-holiday-year-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="holiday_year"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="holiday_year" type="INT" defaultValueNumeric="2026"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-country-code-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="country_code"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="country_code" type="VARCHAR(16)" defaultValue="CN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-is-off-day-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="is_off_day"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="is_off_day" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-is-official-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="is_official"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="is_official" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-source-url-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="source_url"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="source_url" type="VARCHAR(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-holiday-key-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <not>
+                <columnExists tableName="bytedesk_service_holiday" columnName="holiday_key"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_holiday">
+            <column name="holiday_key" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260604-add-service-holiday-country-date-index-if-missing" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="country_code"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="holiday_date"/>
+            <not>
+                <indexExists tableName="bytedesk_service_holiday" indexName="idx_service_holiday_country_date"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_service_holiday" indexName="idx_service_holiday_country_date">
+            <column name="country_code"/>
+            <column name="holiday_date"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-start-date" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="start_date"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="start_date"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-end-date" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="end_date"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="end_date"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-all-day" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="all_day"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="all_day"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-start-time" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="start_time"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="start_time"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-end-time" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="end_time"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="end_time"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-repeat-type" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="repeat_type"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="repeat_type"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-repeat-end-date" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="repeat_end_date"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="repeat_end_date"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-weekday" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="weekday"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="weekday"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-day-of-month" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="day_of_month"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="day_of_month"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-is-weekend" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="is_weekend"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="is_weekend"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-customer-notice" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="customer_notice"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="customer_notice"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-service-paused" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="service_paused"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="service_paused"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-alternative-group-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="alternative_group_id"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="alternative_group_id"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-alternative-welcome" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="alternative_welcome"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="alternative_welcome"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-auto-reply-enabled" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="auto_reply_enabled"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="auto_reply_enabled"/>
+    </changeSet>
+
+    <changeSet id="260604-drop-service-holiday-auto-reply-content" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_holiday"/>
+            <columnExists tableName="bytedesk_service_holiday" columnName="auto_reply_content"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_service_holiday" columnName="auto_reply_content"/>
+    </changeSet>
+
+</databaseChangeLog>

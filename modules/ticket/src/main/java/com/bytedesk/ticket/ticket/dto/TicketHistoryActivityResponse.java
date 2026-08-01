@@ -37,6 +37,7 @@ public class TicketHistoryActivityResponse {
     private String taskId;                // 任务ID
     private String calledProcessInstanceId; // 被调用的子流程实例ID
     private String assignee;              // 处理人
+    private String assigneeName;          // 处理人显示名称
     private Date startTime;               // 开始时间
     private Date endTime;                 // 结束时间
     private Long durationInMillis;        // 持续时间

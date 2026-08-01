@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260718-rename-extension-name-to-extension-number" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_extension" />
+                <columnExists tableName="bytedesk_call_extension" columnName="name" />
+                <not>
+                    <columnExists tableName="bytedesk_call_extension" columnName="extension_number" />
+                </not>
+            </and>
+        </preConditions>
+
+        <renameColumn
+            tableName="bytedesk_call_extension"
+            oldColumnName="name"
+            newColumnName="extension_number"
+            columnDataType="varchar(255)" />
+    </changeSet>
+
+</databaseChangeLog>

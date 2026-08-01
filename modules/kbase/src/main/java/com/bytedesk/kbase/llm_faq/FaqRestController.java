@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_faq;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,12 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "常见问题管理", description = "常见问题管理相关接口")
+@Tag(name = "FAQ Management", description = "FAQ management APIs")
 @RestController
 @RequestMapping("/api/v1/faq")
 public class FaqRestController extends BaseRestController<FaqRequest, FaqRestService> {
@@ -46,20 +47,22 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
 
     private final FaqElasticService faqElasticService;
 
-    @Autowired(required = false)
-    private FaqVectorService faqVectorService;
+    private final FaqVectorService faqVectorService;
 
-    public FaqRestController(FaqRestService faqRestService, FaqElasticService faqElasticService) {
+    public FaqRestController(FaqRestService faqRestService, FaqElasticService faqElasticService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider) {
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
         this.faqRestService = faqRestService;
         this.faqElasticService = faqElasticService;
     }
 
-    @Operation(summary = "查询组织下的常见问题", description = "根据组织ID查询常见问题列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query FAQs by Organization", description = "Query the list of FAQs by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
-    @ActionAnnotation(title = "常见问题", action = "组织查询", description = "query faq by org")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query faq by org")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(FaqRequest request) {
 
@@ -68,12 +71,13 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的常见问题", description = "根据用户ID查询常见问题列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query FAQs by User", description = "Query the list of FAQs by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
-    @ActionAnnotation(title = "常见问题", action = "用户查询", description = "query faq by user")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query faq by user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(FaqRequest request) {
         
@@ -82,12 +86,13 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询指定常见问题", description = "根据UID查询常见问题详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query FAQ by UID", description = "Query FAQ details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
-    @ActionAnnotation(title = "常见问题", action = "查询详情", description = "query faq by uid")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query faq by uid")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(FaqRequest request) {
         
@@ -96,12 +101,13 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(faq));
     }
 
-    @Operation(summary = "创建常见问题", description = "创建新的常见问题")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create FAQ", description = "Create a new FAQ")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_CREATE)
-    @ActionAnnotation(title = "常见问题", action = "新建", description = "create faq")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_CREATE, description = "create faq")
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody FaqRequest request) {
 
@@ -110,12 +116,13 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @Operation(summary = "更新常见问题", description = "更新常见问题信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update FAQ", description = "Update FAQ information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "更新", description = "update faq")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_UPDATE, description = "update faq")
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody FaqRequest request) {
 
@@ -124,10 +131,11 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(Faq));
     }
 
-    @Operation(summary = "删除常见问题", description = "删除指定的常见问题")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete FAQ", description = "Delete the specified FAQ")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE)
-    @ActionAnnotation(title = "常见问题", action = "删除", description = "delete faq")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE, description = "delete faq")
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody FaqRequest request) {
 
@@ -142,10 +150,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
-    @Operation(summary = "删除所有常见问题", description = "删除所有常见问题")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete All FAQs", description = "Delete all FAQs")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_DELETE)
-    @ActionAnnotation(title = "常见问题", action = "删除所有", description = "delete faq all")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete faq all")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody FaqRequest request) {
 
@@ -160,10 +168,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "按知识库删除所有FAQ向量索引", description = "按kbUid一键删除当前知识库下FAQ的向量索引，并同步更新FAQ实体vectorStatus")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete All FAQ Vector Indexes by Knowledge Base", description = "Delete all FAQ vector indexes under the current knowledge base by kbUid and sync the FAQ entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "删除向量索引(知识库)", description = "delete faq vector index by kbUid")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete faq vector index by kbUid")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody FaqRequest request) {
         if (faqVectorService == null) {
@@ -173,12 +181,12 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "启用常见问题", description = "启用或禁用常见问题")
-    @ApiResponse(responseCode = "200", description = "操作成功",
+    @Operation(summary = "Enable FAQ", description = "Enable or disable the FAQ")
+    @ApiResponse(responseCode = "200", description = "Operation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FaqResponse.class)))
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "启用", description = "enable faq")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_ENABLE, description = "enable faq")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody FaqRequest request) {
 
@@ -187,10 +195,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success(faqResponse));
     }
 
-    @Operation(summary = "导出常见问题", description = "导出常见问题数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export FAQs", description = "Export FAQ data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_EXPORT)
-    @ActionAnnotation(title = "常见问题", action = "导出", description = "export faq")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_EXPORT, description = "export faq")
     @GetMapping("/export")
     public Object export(FaqRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -198,15 +206,15 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
             response,
             faqRestService,
             FaqExcel.class,
-            "常见问题",
+            "FAQ",
             "faq"
         );
     }
 
-    @Operation(summary = "更新常见问题索引", description = "更新常见问题的Elasticsearch索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
+    @Operation(summary = "Update FAQ Index", description = "Update the Elasticsearch index for the FAQ")
+    @ApiResponse(responseCode = "200", description = "Update successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "更新索引", description = "update faq index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update faq index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody FaqRequest request) {
 
@@ -215,50 +223,50 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success("update index success", request.getUid()));
     }
 
-    @Operation(summary = "删除常见问题索引", description = "删除常见问题在Elasticsearch中的索引，并同步更新FAQ实体索引状态")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete FAQ Index", description = "Delete the FAQ index in Elasticsearch and sync the FAQ entity index status")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "删除索引", description = "delete faq elastic index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete faq elastic index")
     @PostMapping("/deleteIndex")
     public ResponseEntity<?> deleteIndex(@RequestBody FaqRequest request) {
         Boolean deleted = faqElasticService.deleteIndexAndSyncStatus(request);
         return ResponseEntity.ok(JsonResult.success(deleted));
     }
 
-    @Operation(summary = "同步常见问题索引状态", description = "检查Elasticsearch中是否存在FAQ索引并同步更新FAQ实体elasticStatus")
-    @ApiResponse(responseCode = "200", description = "同步成功")
+    @Operation(summary = "Sync FAQ Index Status", description = "Check whether the FAQ index exists in Elasticsearch and sync the FAQ entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "同步索引状态", description = "sync faq elastic status")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync faq elastic status")
     @PostMapping("/syncIndexStatus")
     public ResponseEntity<?> syncIndexStatus(@RequestBody FaqRequest request) {
         var faq = faqElasticService.syncElasticStatus(request);
         return ResponseEntity.ok(JsonResult.success(faq.getElasticStatus()));
     }
 
-    @Operation(summary = "批量同步常见问题索引状态", description = "根据知识库kbUid批量检查Elasticsearch中是否存在FAQ索引并同步更新FAQ实体elasticStatus")
-    @ApiResponse(responseCode = "200", description = "同步成功")
+    @Operation(summary = "Batch Sync FAQ Index Status", description = "Batch check whether FAQ indexes exist in Elasticsearch by knowledge base kbUid and sync the FAQ entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "批量同步索引状态", description = "sync faq elastic status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync faq elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody FaqRequest request) {
         var result = faqElasticService.syncElasticStatusByKbUid(request);
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "知识库一键删除常见问题索引", description = "根据知识库kbUid一键删除Elasticsearch中的FAQ索引，并同步更新FAQ实体elasticStatus")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete All FAQ Indexes by Knowledge Base", description = "Delete FAQ indexes in Elasticsearch by knowledge base kbUid and sync the FAQ entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "知识库删除索引", description = "delete faq elastic index by kb")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete faq elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody FaqRequest request) {
         var result = faqElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "更新常见问题向量索引", description = "更新常见问题的向量索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
+    @Operation(summary = "Update FAQ Vector Index", description = "Update the vector index for the FAQ")
+    @ApiResponse(responseCode = "200", description = "Update successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "更新向量索引", description = "update faq vector index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update faq vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody FaqRequest request) {
 
@@ -271,10 +279,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success("update vector index success", request.getUid()));
     }
 
-    @Operation(summary = "删除常见问题向量索引", description = "删除常见问题在向量存储中的索引，并同步更新FAQ实体向量索引状态")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete FAQ Vector Index", description = "Delete the FAQ index in vector storage and sync the FAQ entity vector index status")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "删除向量索引", description = "delete faq vector index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete faq vector index")
     @PostMapping("/deleteVectorIndex")
     public ResponseEntity<?> deleteVectorIndex(@RequestBody FaqRequest request) {
 
@@ -286,10 +294,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         }
     }
 
-    @Operation(summary = "同步常见问题向量状态", description = "检查向量存储中是否存在FAQ向量索引并同步更新FAQ实体vectorStatus")
-    @ApiResponse(responseCode = "200", description = "同步成功")
+    @Operation(summary = "Sync FAQ Vector Status", description = "Check whether the FAQ vector index exists in vector storage and sync the FAQ entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "同步向量状态", description = "sync faq vector status")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync faq vector status")
     @PostMapping("/syncVectorStatus")
     public ResponseEntity<?> syncVectorStatus(@RequestBody FaqRequest request) {
         
@@ -301,20 +309,20 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         }
     }
 
-    @Operation(summary = "查询常见问题全文索引", description = "根据FAQ UID查询Elasticsearch中的索引文档")
-    @ApiResponse(responseCode = "200", description = "查询成功")
+    @Operation(summary = "Query FAQ Full-Text Index", description = "Query the index document in Elasticsearch by FAQ UID")
+    @ApiResponse(responseCode = "200", description = "Query successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
-    @ActionAnnotation(title = "常见问题", action = "查询全文索引", description = "query faq elastic by uid")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query faq elastic by uid")
     @PostMapping("/queryElasticByUid")
     public ResponseEntity<?> queryElasticByUid(@RequestBody FaqRequest request) {
         var result = faqElasticService.queryElasticByUid(request);
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    @Operation(summary = "查询常见问题向量索引", description = "根据FAQ UID查询向量存储中的索引文档")
-    @ApiResponse(responseCode = "200", description = "查询成功")
+    @Operation(summary = "Query FAQ Vector Index", description = "Query the index document in vector storage by FAQ UID")
+    @ApiResponse(responseCode = "200", description = "Query successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_READ)
-    @ActionAnnotation(title = "常见问题", action = "查询向量索引", description = "query faq vector by uid")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query faq vector by uid")
     @PostMapping("/queryVectorByUid")
     public ResponseEntity<?> queryVectorByUid(@RequestBody FaqRequest request) {
         if (faqVectorService != null) {
@@ -324,10 +332,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
-    @Operation(summary = "批量同步常见问题向量状态", description = "根据知识库kbUid批量检查向量存储中是否存在FAQ向量索引并同步更新FAQ实体vectorStatus")
-    @ApiResponse(responseCode = "200", description = "同步成功")
+    @Operation(summary = "Batch Sync FAQ Vector Status", description = "Batch check whether FAQ vector indexes exist in vector storage by knowledge base kbUid and sync the FAQ entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "批量同步向量状态", description = "sync faq vector status by kb")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync faq vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody FaqRequest request) {
 
@@ -339,10 +347,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         }
     }
 
-    @Operation(summary = "更新所有常见问题索引", description = "更新所有常见问题的Elasticsearch索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
+    @Operation(summary = "Update All FAQ Indexes", description = "Update Elasticsearch indexes for all FAQs")
+    @ApiResponse(responseCode = "200", description = "Update successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "更新所有索引", description = "update all faq index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all faq index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody FaqRequest request) {
 
@@ -351,10 +359,10 @@ public class FaqRestController extends BaseRestController<FaqRequest, FaqRestSer
         return ResponseEntity.ok(JsonResult.success("update all index success", request.getUid()));
     }
 
-    @Operation(summary = "更新所有常见问题向量索引", description = "更新所有常见问题的向量索引")
-    @ApiResponse(responseCode = "200", description = "更新成功")
+    @Operation(summary = "Update All FAQ Vector Indexes", description = "Update vector indexes for all FAQs")
+    @ApiResponse(responseCode = "200", description = "Update successful")
     @PreAuthorize(FaqPermissions.HAS_FAQ_UPDATE)
-    @ActionAnnotation(title = "常见问题", action = "更新所有向量索引", description = "update all faq vector index")
+    @ActionAnnotation(title = I18Consts.I18N_FAQ, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all faq vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody FaqRequest request) {
 

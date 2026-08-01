@@ -14,6 +14,7 @@
 package com.bytedesk.core.server;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,7 +71,7 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
         
         ServerEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create server failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -84,11 +85,11 @@ public class ServerRestService extends BaseRestService<ServerEntity, ServerReque
             
             ServerEntity savedEntity = save(existingEntity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update server failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Server not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

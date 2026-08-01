@@ -47,7 +47,7 @@ public class AIServiceArchitectureTest {
     @Test
     public void testBaseModuleServicesAreRegistered() {
         // 测试基础模块的服务是否被注册
-        String[] baseServices = {"zhipuai", "deepseek", "dashscope", "ollama", "custom"};
+        String[] baseServices = {"zhipuai", "deepseek", "dashscope", "ollama", "moonshot", "custom"};
         
         for (String service : baseServices) {
             try {

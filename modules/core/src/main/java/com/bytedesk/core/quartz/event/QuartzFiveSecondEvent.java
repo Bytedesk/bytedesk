@@ -18,6 +18,10 @@ import org.springframework.context.ApplicationEvent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Event published every 5 seconds.
+ * 每 5 秒发布一次的事件。
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class QuartzFiveSecondEvent extends ApplicationEvent {
@@ -26,7 +30,6 @@ public class QuartzFiveSecondEvent extends ApplicationEvent {
 
     public QuartzFiveSecondEvent(Object source) {
         super(source);
-        //TODO Auto-generated constructor stub
     }
 
 }

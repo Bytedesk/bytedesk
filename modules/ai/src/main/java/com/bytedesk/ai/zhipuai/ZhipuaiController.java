@@ -15,6 +15,7 @@ package com.bytedesk.ai.zhipuai;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.http.MediaType;
@@ -23,12 +24,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import reactor.core.publisher.Flux;
 
-import com.zhipu.oapi.service.v4.model.ChatFunction;
-import com.zhipu.oapi.service.v4.model.ChatFunctionParameters;
-
 import ai.z.openapi.ZhipuAiClient;
 import ai.z.openapi.service.model.ChatCompletionCreateParams;
 import ai.z.openapi.service.model.ChatCompletionResponse;
+import ai.z.openapi.service.model.ChatFunction;
+import ai.z.openapi.service.model.ChatFunctionParameterProperty;
+import ai.z.openapi.service.model.ChatFunctionParameters;
 import ai.z.openapi.service.model.ChatMessage;
 import ai.z.openapi.service.model.ChatMessageRole;
 import ai.z.openapi.service.model.ChatThinking;
@@ -47,15 +48,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
 /**
- * 智谱AI接口 - 使用 oapi-java-sdk
- * https://open.bigmodel.cn/dev/api#sdk_install
- * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * 智谱AI接口 - 使用 zai-sdk
+ * https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java
+ * https://github.com/zai-org/z-ai-sdk-java
  */
 @Slf4j
 @RestController
@@ -69,7 +69,8 @@ public class ZhipuaiController {
     private final BytedeskProperties bytedeskProperties;
     private final ZhipuaiMultiModelService zhipuaiMultiModelService;
     private final ZhipuaiChatService zhipuaiChatService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     /**
      * 同步调用 - 使用新的统一接口
@@ -238,17 +239,31 @@ public class ZhipuaiController {
      * 创建函数参数
      */
     private ChatFunctionParameters createFunctionParameters(Map<String, Object> paramsData) {
+        if (paramsData == null) {
+            return null;
+        }
+
         ChatFunctionParameters parameters = new ChatFunctionParameters();
         parameters.setType((String) paramsData.get("type"));
 
         Map<String, Object> properties = getMapSafely(paramsData, "properties");
         if (properties != null) {
-            parameters.setProperties(properties);
-        }
+            Map<String, ChatFunctionParameterProperty> convertedProperties = new HashMap<>();
+            for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                if (!(entry.getValue() instanceof Map<?, ?> rawProperty)) {
+                    continue;
+                }
 
-        List<String> required = getListSafely(paramsData, "required");
-        if (required != null) {
-            parameters.setRequired(required);
+                @SuppressWarnings("unchecked")
+                Map<String, Object> propertyMap = (Map<String, Object>) rawProperty;
+                ChatFunctionParameterProperty property = ChatFunctionParameterProperty.builder()
+                        .type((String) propertyMap.get("type"))
+                        .description((String) propertyMap.get("description"))
+                        .enums(getListSafely(propertyMap, "enum"))
+                        .build();
+                convertedProperties.put(entry.getKey(), property);
+            }
+            parameters.setProperties(convertedProperties);
         }
 
         return parameters;
@@ -286,18 +301,15 @@ public class ZhipuaiController {
             List<ChatFunction> functions = new ArrayList<>();
 
             // 定义天气查询函数
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("city", new HashMap<String, Object>() {
-                {
-                    put("type", "string");
-                    put("description", "城市名称");
-                }
-            });
+            Map<String, ChatFunctionParameterProperty> properties = new HashMap<>();
+            properties.put("city", ChatFunctionParameterProperty.builder()
+                    .type("string")
+                    .description("城市名称")
+                    .build());
 
             ChatFunctionParameters parameters = new ChatFunctionParameters();
             parameters.setType("object");
             parameters.setProperties(properties);
-            parameters.setRequired(List.of("city"));
 
             ChatFunction weatherFunction = ChatFunction.builder()
                     .name("get_weather")
@@ -332,24 +344,19 @@ public class ZhipuaiController {
             List<ChatFunction> functions = new ArrayList<>();
 
             // 定义航班查询函数
-            Map<String, Object> properties = new HashMap<>();
-            properties.put("departure", new HashMap<String, Object>() {
-                {
-                    put("type", "string");
-                    put("description", "出发城市");
-                }
-            });
-            properties.put("destination", new HashMap<String, Object>() {
-                {
-                    put("type", "string");
-                    put("description", "目的地城市");
-                }
-            });
+            Map<String, ChatFunctionParameterProperty> properties = new HashMap<>();
+            properties.put("departure", ChatFunctionParameterProperty.builder()
+                    .type("string")
+                    .description("出发城市")
+                    .build());
+            properties.put("destination", ChatFunctionParameterProperty.builder()
+                    .type("string")
+                    .description("目的地城市")
+                    .build());
 
             ChatFunctionParameters parameters = new ChatFunctionParameters();
             parameters.setType("object");
             parameters.setProperties(properties);
-            parameters.setRequired(List.of("departure", "destination"));
 
             ChatFunction flightFunction = ChatFunction.builder()
                     .name("query_flight_prices")
@@ -1039,8 +1046,6 @@ public class ZhipuaiController {
      * 在 Bean 销毁时关闭线程池
      */
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

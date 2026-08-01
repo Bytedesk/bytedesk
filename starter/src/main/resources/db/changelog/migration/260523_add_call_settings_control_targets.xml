@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260523-add-call-settings-control-targets" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <not>
+                    <columnExists tableName="bytedesk_call_settings" columnName="consult_extension_numbers" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_settings">
+            <column name="consult_extension_numbers" type="varchar(512)" defaultValue="1006,1007,1008" />
+            <column name="transfer_target_numbers" type="varchar(512)" defaultValue="1006,1007,1008" />
+            <column name="conference_target_numbers" type="varchar(512)" defaultValue="1006,1007,1008" />
+            <column name="ivr_target_numbers" type="varchar(512)" defaultValue="5004,5005" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260523-backfill-call-settings-control-targets" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <columnExists tableName="bytedesk_call_settings" columnName="consult_extension_numbers" />
+            </and>
+        </preConditions>
+
+        <update tableName="bytedesk_call_settings">
+            <column name="consult_extension_numbers" value="1006,1007,1008" />
+            <where>consult_extension_numbers IS NULL OR consult_extension_numbers = ''</where>
+        </update>
+        <update tableName="bytedesk_call_settings">
+            <column name="transfer_target_numbers" value="1006,1007,1008" />
+            <where>transfer_target_numbers IS NULL OR transfer_target_numbers = ''</where>
+        </update>
+        <update tableName="bytedesk_call_settings">
+            <column name="conference_target_numbers" value="1006,1007,1008" />
+            <where>conference_target_numbers IS NULL OR conference_target_numbers = ''</where>
+        </update>
+        <update tableName="bytedesk_call_settings">
+            <column name="ivr_target_numbers" value="5004,5005" />
+            <where>ivr_target_numbers IS NULL OR ivr_target_numbers = ''</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

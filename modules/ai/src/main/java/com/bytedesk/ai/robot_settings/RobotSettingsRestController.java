@@ -17,7 +17,7 @@ import com.bytedesk.core.utils.JsonResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Tag(name = "机器人配置管理", description = "机器人配置相关接口")
+@Tag(name = "Robot Settings Management", description = "Robot settings management APIs")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -26,8 +26,8 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
 
     private final RobotSettingsRestService robotSettingsRestService;
 
-    @Operation(summary = "查询组织下的机器人配置", description = "根据组织ID查询机器人配置列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Robot Settings by Organization", description = "Query the list of robot settings by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
     @Override
     public ResponseEntity<?> queryByOrg(RobotSettingsRequest request) {
@@ -35,8 +35,8 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "根据UID查询机器人配置", description = "根据UID查询机器人配置详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Robot Settings by UID", description = "Query robot settings details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
     @Override
     public ResponseEntity<?> queryByUid(RobotSettingsRequest request) {
@@ -44,8 +44,8 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "创建机器人配置", description = "创建新的机器人配置")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Robot Settings", description = "Create new robot settings")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
     @Override
     public ResponseEntity<?> create(@RequestBody RobotSettingsRequest request) {
@@ -56,8 +56,8 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "更新机器人配置", description = "更新机器人配置信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Robot Settings", description = "Update robot settings information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
     @Override
     public ResponseEntity<?> update(@RequestBody RobotSettingsRequest request) {
@@ -65,16 +65,34 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
-    @Operation(summary = "删除机器人配置", description = "删除指定的机器人配置")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Robot Settings", description = "Delete the specified robot settings")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotSettingsRequest request) {
         robotSettingsRestService.deleteByUid(request.getUid());
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @Operation(summary = "发布机器人配置", description = "将草稿版本发布为线上版本")
-    @ApiResponse(responseCode = "200", description = "发布成功",
+    @Operation(summary = "Enable Robot Settings", description = "Enable the specified robot settings")
+    @ApiResponse(responseCode = "200", description = "Enable successful",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
+    @RequestMapping("/enable")
+    public ResponseEntity<?> enable(@RequestBody RobotSettingsRequest request) {
+        RobotSettingsResponse resp = robotSettingsRestService.enable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @Operation(summary = "Disable Robot Settings", description = "Disable the specified robot settings")
+    @ApiResponse(responseCode = "200", description = "Disable successful",
+        content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
+    @RequestMapping("/disable")
+    public ResponseEntity<?> disable(@RequestBody RobotSettingsRequest request) {
+        RobotSettingsResponse resp = robotSettingsRestService.disable(request.getUid());
+        return ResponseEntity.ok(JsonResult.success(resp));
+    }
+
+    @Operation(summary = "Publish Robot Settings", description = "Publish the draft version to production")
+    @ApiResponse(responseCode = "200", description = "Publish successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
     @RequestMapping("/publish")
     public ResponseEntity<?> publish(@RequestBody RobotSettingsRequest request) {

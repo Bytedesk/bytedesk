@@ -31,10 +31,10 @@ public class LlmProviderConstants {
     public static final String BAIDU = "baidu";
     public static final String VOLCENGINE = "volcengine";
     public static final String MINIMAX = "minimax";
+    public static final String MOONSHOT = "moonshot";
 
     // 开发中
     public static final String XINGHUO = "xinghuo";
-    public static final String MOONSHOT = "moonshot";
     public static final String BAICHUAN = "baichuan";
     public static final String YI = "yi";
     public static final String STEPFUN = "stepfun";

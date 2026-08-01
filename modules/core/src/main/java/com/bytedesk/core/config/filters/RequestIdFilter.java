@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestIdFilter implements Filter {
 
+    // private static final Logger log = LoggerFactory.getLogger(RequestIdFilter.class);
     private static final Pattern SAFE_REQUEST_ID = Pattern.compile("^[a-zA-Z0-9._:-]{1,64}$");
 
     @Override
@@ -50,11 +51,36 @@ public class RequestIdFilter implements Filter {
             requestId = UUID.randomUUID().toString();
         }
 
+        // boolean isCorsPreflight = "OPTIONS".equalsIgnoreCase(httpRequest.getMethod())
+        //         && httpRequest.getHeader("Origin") != null
+        //         && httpRequest.getHeader("Access-Control-Request-Method") != null;
+
         try {
             MDC.put(BytedeskConsts.REQUEST_ID_MDC, requestId);
             httpResponse.setHeader(BytedeskConsts.REQUEST_ID, requestId);
             exposeHeaderIfNeeded(httpResponse, BytedeskConsts.REQUEST_ID);
+
+            // if (isCorsPreflight) {
+            //     log.info(
+            //             "CORS preflight request path={} origin={} referer={} requestedMethod={} requestedHeaders={} userAgent={}",
+            //             httpRequest.getRequestURI(),
+            //             httpRequest.getHeader("Origin"),
+            //             httpRequest.getHeader("Referer"),
+            //             httpRequest.getHeader("Access-Control-Request-Method"),
+            //             httpRequest.getHeader("Access-Control-Request-Headers"),
+            //             httpRequest.getHeader("User-Agent"));
+            // }
+
             chain.doFilter(request, response);
+
+            // if (isCorsPreflight) {
+            //     log.info(
+            //             "CORS preflight response path={} status={} allowOrigin={} vary={}",
+            //             httpRequest.getRequestURI(),
+            //             httpResponse.getStatus(),
+            //             httpResponse.getHeader("Access-Control-Allow-Origin"),
+            //             httpResponse.getHeader("Vary"));
+            // }
         } finally {
             MDC.remove(BytedeskConsts.REQUEST_ID_MDC);
         }

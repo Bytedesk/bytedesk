@@ -2,10 +2,15 @@ package com.bytedesk.ai.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.Assert;
@@ -20,8 +25,8 @@ import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
@@ -39,28 +44,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
 
-    @Autowired
     protected FaqElasticService faqElasticService;
 
-    @Autowired(required = false)
     protected FaqVectorService faqVectorService;
 
-    @Autowired
     protected TextElasticService textElasticService;
 
-    @Autowired(required = false)
     protected TextVectorService textVectorService;
 
-    @Autowired
     protected ChunkElasticService chunkElasticService;
 
-    @Autowired(required = false)
     protected ChunkVectorService chunkVectorService;
 
-    @Autowired
     protected WebpageElasticService webpageElasticService;
 
-    @Autowired(required = false)
     protected WebpageVectorService webpageVectorService;
 
     // @Autowired
@@ -69,48 +66,163 @@ public abstract class BaseSpringAIService implements SpringAIService {
     // @Autowired(required = false)
     // protected ArticleVectorService articleVectorService;
 
-    @Autowired
     protected IMessageSendService messageSendService;
 
-    @Autowired
     protected UidUtils uidUtils;
 
-    @Autowired
     protected RobotRestService robotRestService;
 
-    @Autowired
     protected ThreadRestService threadRestService;
 
-    @Autowired
     protected MessagePersistCache messagePersistCache;
 
-    @Autowired
     protected RobotMessageCache robotMessageCache;
 
-    @Autowired
     protected MessageRestService messageRestService;
 
-    @Autowired
     protected ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
     protected KnowledgeBaseSearchHelper knowledgeBaseSearchHelper;
 
-    @Autowired
     protected PromptHelper promptHelper;
 
-    @Autowired
     protected MessagePersistenceHelper messagePersistenceHelper;
 
-    @Autowired
     protected SseMessageHelper sseMessageHelper;
 
-    @Autowired(required = false)
     protected ChatClientInfoService chatClientInfoService;
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
     protected BaseSpringAIService() {
         // 无参构造函数
+    }
+
+    @Autowired
+    protected void setBaseDependencies(FaqElasticService faqElasticService,
+            ObjectProvider<FaqVectorService> faqVectorServiceProvider,
+            TextElasticService textElasticService,
+            ObjectProvider<TextVectorService> textVectorServiceProvider,
+            ChunkElasticService chunkElasticService,
+            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
+            WebpageElasticService webpageElasticService,
+            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider,
+            IMessageSendService messageSendService,
+            UidUtils uidUtils,
+            RobotRestService robotRestService,
+            ThreadRestService threadRestService,
+            MessagePersistCache messagePersistCache,
+            RobotMessageCache robotMessageCache,
+            MessageRestService messageRestService,
+            ApplicationEventPublisher applicationEventPublisher,
+            KnowledgeBaseSearchHelper knowledgeBaseSearchHelper,
+            PromptHelper promptHelper,
+            MessagePersistenceHelper messagePersistenceHelper,
+            SseMessageHelper sseMessageHelper,
+            ObjectProvider<ChatClientInfoService> chatClientInfoServiceProvider) {
+        this.faqElasticService = faqElasticService;
+        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
+        this.textElasticService = textElasticService;
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
+        this.chunkElasticService = chunkElasticService;
+        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
+        this.webpageElasticService = webpageElasticService;
+        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
+        this.messageSendService = messageSendService;
+        this.uidUtils = uidUtils;
+        this.robotRestService = robotRestService;
+        this.threadRestService = threadRestService;
+        this.messagePersistCache = messagePersistCache;
+        this.robotMessageCache = robotMessageCache;
+        this.messageRestService = messageRestService;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.knowledgeBaseSearchHelper = knowledgeBaseSearchHelper;
+        this.promptHelper = promptHelper;
+        this.messagePersistenceHelper = messagePersistenceHelper;
+        this.sseMessageHelper = sseMessageHelper;
+        this.chatClientInfoService = chatClientInfoServiceProvider.getIfAvailable();
+    }
+
+    protected String extractReasoningContent(Generation generation, AssistantMessage assistantMessage) {
+        String reasoningContent = extractReasoningContentFromObject(assistantMessage);
+        if (StringUtils.hasText(reasoningContent)) {
+            return reasoningContent;
+        }
+
+        reasoningContent = extractReasoningContentFromObject(generation);
+        if (StringUtils.hasText(reasoningContent)) {
+            return reasoningContent;
+        }
+
+        if (generation != null) {
+            reasoningContent = extractReasoningContentFromMetadataObject(generation.getMetadata());
+            if (StringUtils.hasText(reasoningContent)) {
+                return reasoningContent;
+            }
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractReasoningContentFromMetadataObject(Object metadata) {
+        if (metadata instanceof Map<?, ?> map) {
+            return extractReasoningContentFromMetadata((Map<String, Object>) map);
+        }
+        return extractReasoningContentFromObject(metadata);
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractReasoningContentFromObject(Object target) {
+        if (target == null) {
+            return null;
+        }
+
+        for (String methodName : List.of("getReasoningContent", "getReasonContent")) {
+            try {
+                Object value = target.getClass().getMethod(methodName).invoke(target);
+                if (value instanceof String text && StringUtils.hasText(text)) {
+                    return text;
+                }
+            } catch (Exception ignore) {
+                // ignore reflection failures and fall back to metadata inspection
+            }
+        }
+
+        try {
+            Object metadata = target.getClass().getMethod("getMetadata").invoke(target);
+            if (metadata instanceof Map<?, ?> map) {
+                return extractReasoningContentFromMetadata((Map<String, Object>) map);
+            }
+        } catch (Exception ignore) {
+            // ignore reflection failures and fall back to metadata inspection
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractReasoningContentFromMetadata(Map<String, Object> metadata) {
+        if (metadata == null || metadata.isEmpty()) {
+            return null;
+        }
+
+        for (String key : List.of("reasoningContent", "reasoning_content", "reasonContent")) {
+            Object value = metadata.get(key);
+            if (value instanceof String text && StringUtils.hasText(text)) {
+                return text;
+            }
+        }
+
+        for (Object value : metadata.values()) {
+            if (value instanceof Map<?, ?> nestedMap) {
+                String nestedReasoning = extractReasoningContentFromMetadata((Map<String, Object>) nestedMap);
+                if (StringUtils.hasText(nestedReasoning)) {
+                    return nestedReasoning;
+                }
+            }
+        }
+
+        return null;
     }
 
     // 1. 核心消息处理方法

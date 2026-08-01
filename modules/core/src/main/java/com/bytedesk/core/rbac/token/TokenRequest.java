@@ -58,5 +58,4 @@ public class TokenRequest extends BaseRequest {
     // 设备信息，比如安卓手机信息、苹果手机信息等
     private String device;
 
-
 }

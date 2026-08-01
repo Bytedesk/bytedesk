@@ -1,0 +1,35 @@
+<include>
+  <extension name="ivr-workflow-test-5002" continue="false">
+    <condition field="destination_number" expression="^5002$">
+      <action application="set" data="rtp_secure_media=false" />
+      <action application="bind_digit_action" data="ivr_barge_menu,~^[0-9*#]$,exec[P]:transfer,50022 XML default,self,self" />
+      <action application="digit_action_set_realm" data="ivr_barge_menu" />
+      <action application="log" data="INFO [IVR-WORKFLOW] incoming call from ${caller_id_number} (${network_addr}) to ${destination_number}" />
+      <action application="set" data="record_file=$${recordings_dir}/ivr-5002_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="ivr_record_file=${record_file}" />
+      <action application="log" data="INFO [IVR-WORKFLOW] recording start file=${record_file}" />
+      <action application="record_session" data="${record_file}" />
+      <action application="set" data="ivr_collect_digits=0" />
+      <action application="set" data="ivr_next_node_id=" />
+      <action application="httapi" data="{url=$${ai_bot_base_url}/visitor/api/v1/ivr/menu/httapi?extensionNumber=${destination_number}&amp;uuid=${uuid}&amp;callerIdNumber=${caller_id_number},method=GET}" />
+      <action application="transfer" data="50021 XML default" />
+    </condition>
+  </extension>
+
+  <extension name="ivr-workflow-test-5002-read" continue="false">
+    <condition field="destination_number" expression="^50021$">
+      <action application="clear_digit_action" data="ivr_barge_menu" />
+      <action application="log" data="INFO [IVR-WORKFLOW] collect digits nextNode=${ivr_next_node_id} collect=${ivr_collect_digits}" />
+      <action application="read" data="1 1 silence_stream://1000 ivr_digits 5000" />
+      <action application="httapi" data="{url=$${ai_bot_base_url}/visitor/api/v1/ivr/menu/httapi?extensionNumber=5002&amp;uuid=${uuid}&amp;callerIdNumber=${caller_id_number}&amp;nodeId=${ivr_next_node_id}&amp;digits=${ivr_digits},method=GET}" />
+    </condition>
+  </extension>
+
+  <extension name="ivr-workflow-test-5002-barge" continue="false">
+    <condition field="destination_number" expression="^50022$">
+      <action application="clear_digit_action" data="ivr_barge_menu" />
+      <action application="log" data="INFO [IVR-WORKFLOW] barge digits=${last_matching_digits} nextNode=${ivr_next_node_id}" />
+      <action application="httapi" data="{url=$${ai_bot_base_url}/visitor/api/v1/ivr/menu/httapi?extensionNumber=5002&amp;uuid=${uuid}&amp;callerIdNumber=${caller_id_number}&amp;nodeId=${ivr_next_node_id}&amp;digits=${last_matching_digits},method=GET}" />
+    </condition>
+  </extension>
+</include>

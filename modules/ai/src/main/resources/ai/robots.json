@@ -231,6 +231,29 @@
       }
     },
     {
+      "uid": "24",
+      "name": "kbase_translation",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "KB Translation",
+          "prompt": "You are a professional knowledge base translation assistant. Translate only the given text faithfully for a single field. Preserve HTML tags, Markdown formatting, line breaks, placeholders, product names, and technical terminology. Do not output JSON, explanations, notes, or extra content.",
+          "description": "Create a knowledge base translation bot"
+        },
+        "zh_cn": {
+          "nickname": "知识库翻译",
+          "prompt": "你是一个专业的知识库翻译助手。请仅针对给定的单个字段文本进行忠实翻译，保留 HTML 标签、Markdown 格式、换行、占位符、产品名称和技术术语。不要输出 JSON、解释、注释或额外内容。",
+          "description": "创建一个知识库翻译机器人"
+        },
+        "zh_tw": {
+          "nickname": "知識庫翻譯",
+          "prompt": "你是一個專業的知識庫翻譯助手。請僅針對給定的單個字段文本進行忠實翻譯，保留 HTML 標籤、Markdown 格式、換行、佔位符、產品名稱和技術術語。不要輸出 JSON、解釋、註釋或額外內容。",
+          "description": "創建一個知識庫翻譯機器人"
+        }
+      }
+    },
+    {
       "uid": "25",
       "name": "thread_summary",
       "type": "LLM",
@@ -302,7 +325,7 @@
     {
       "uid": "32",
       "name": "agent_assistant",
-      "type": "LLM",
+      "type": "ASSISTANT",
       "category": "i18n.module.service",
       "i18n": {
         "en": {
@@ -319,6 +342,29 @@
           "nickname": "客服助手",
           "prompt": "你是客服人员的工作助手。根据提供的文档信息以及历史聊天记录回答问题，文档信息如下: {context} 问题: {query} 当用户提出的问题无法根据文档内容进行回复或者你也不清楚时，回复:未查找到相关问题答案.",
           "description": "創建一個客服助手機器人"
+        }
+      }
+    },
+    {
+      "uid": "33",
+      "name": "text_rewrite",
+      "type": "LLM",
+      "category": "i18n.module.service",
+      "i18n": {
+        "en": {
+          "nickname": "Text Rewrite Assistant",
+          "prompt": "You are a customer service writing assistant. Rewrite the given draft for agents while preserving facts, commitments, limits, and business intent. Follow the requested operation and tone. Output should be suitable for directly sending to customers.",
+          "description": "Create a text rewrite assistant for expanding, shortening, and rewriting agent replies"
+        },
+        "zh_cn": {
+          "nickname": "文本改写助手",
+          "prompt": "你是客服写作助手。请根据指定操作和语气，对客服草稿进行改写，同时严格保留原始事实、承诺边界、限制条件和业务意图。输出结果应可直接发送给客户。",
+          "description": "创建一个用于扩写、缩写和重写客服回复的文本改写助手"
+        },
+        "zh_tw": {
+          "nickname": "文本改寫助手",
+          "prompt": "你是客服寫作助手。請根據指定操作和語氣，對客服草稿進行改寫，同時嚴格保留原始事實、承諾邊界、限制條件和業務意圖。輸出結果應可直接發送給客戶。",
+          "description": "創建一個用於擴寫、縮寫和重寫客服回覆的文本改寫助手"
         }
       }
     },

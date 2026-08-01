@@ -1,25 +1,31 @@
 package com.bytedesk.service.robot_to_agent_settings;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
+import com.bytedesk.core.message.event.MessageCreateEvent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorRestService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -37,11 +43,23 @@ public class RobotToAgentKeywordListener {
     private static final String EMPTY_JSON = BytedeskConsts.EMPTY_JSON_STRING;
 
     private final ThreadRestService threadRestService;
+    private final MessageRestService messageRestService;
     private final WorkgroupRestService workgroupRestService;
     private final VisitorRestService visitorRestService;
 
+    private final Map<String, PendingKeywordReplyMark> pendingKeywordReplyMarks = new ConcurrentHashMap<>();
+
+    /**
+     * Synchronous listener invoked inline during {@code VisitorRestControllerVisitor.sendSseVisitorMessageInternal()}
+     * BEFORE the async SSE executor starts. This guarantees that when keyword-triggered transfer occurs,
+     * the thread state (ROBOTING→QUEUING) and transferStatus are persisted before
+     * {@code robotService.processSseVisitorMessage()} checks {@code thread.isRoboting()}.
+     * <p>
+        * Do NOT make this method asynchronous — it would break the timing contract with the SSE pipeline.
+        * Also avoid wrapping the whole listener in one transaction; RobotService runs immediately after this method
+        * returns and must observe the saved thread state without waiting for an outer transaction to commit.
+     */
     @EventListener
-    @Transactional
     public void onVisitorRobotMessageEvent(VisitorRobotMessageEvent event) {
         MessageResponse message;
         try {
@@ -109,6 +127,35 @@ public class RobotToAgentKeywordListener {
         triggerForceAgentTransfer(thread, workgroup, message);
     }
 
+    @EventListener
+    public void onMessageCreateEvent(MessageCreateEvent event) {
+        if (event == null || event.getMessage() == null || !StringUtils.hasText(event.getMessage().getUid())) {
+            return;
+        }
+
+        MessageEntity message = event.getMessage();
+        PendingKeywordReplyMark pendingMark = pendingKeywordReplyMarks.remove(message.getUid());
+        if (pendingMark == null) {
+            return;
+        }
+
+        if (!message.isFromVisitor()) {
+            log.debug("Skip pending keyword reply mark for non-visitor message uid={}", message.getUid());
+            return;
+        }
+        if (message.getThread() == null || !StringUtils.hasText(message.getThread().getUid())) {
+            log.debug("Skip pending keyword reply mark due to missing thread uid, messageUid={}", message.getUid());
+            return;
+        }
+        if (!pendingMark.matchesThread(message.getThread().getUid())) {
+            log.debug("Skip pending keyword reply mark due to thread mismatch, messageUid={}, expectedThreadUid={}, actualThreadUid={}",
+                    message.getUid(), pendingMark.threadUid(), message.getThread().getUid());
+            return;
+        }
+
+        markMessageAsReplied(message, pendingMark.repliedAt(), pendingMark.repliedByUid());
+    }
+
     private boolean isVisitorTextMessage(MessageResponse message) {
         if (message == null) {
             return false;
@@ -174,6 +221,7 @@ public class RobotToAgentKeywordListener {
     protected void triggerForceAgentTransfer(ThreadEntity thread, WorkgroupEntity workgroup, MessageResponse message) {
         try {
             markThreadTransferPending(thread);
+            scheduleKeywordTriggerMessageReplyMark(thread, message);
             VisitorRequest visitorRequest = buildVisitorRequest(thread, workgroup, message);
             visitorRequest.setForceAgent(true);
             visitorRestService.requestThread(visitorRequest);
@@ -181,6 +229,61 @@ public class RobotToAgentKeywordListener {
         } catch (Exception ex) {
             log.error("Failed to trigger robot-to-agent transfer for thread {}", thread.getUid(), ex);
         }
+    }
+
+    private void scheduleKeywordTriggerMessageReplyMark(ThreadEntity thread, MessageResponse message) {
+        if (thread == null || message == null || !StringUtils.hasText(message.getUid())) {
+            return;
+        }
+
+        ZonedDateTime repliedAt = BdDateUtils.now();
+        String repliedByUid = resolveKeywordReplyByUid(thread);
+        if (tryMarkMessageAsReplied(message.getUid(), repliedAt, repliedByUid)) {
+            return;
+        }
+
+        pendingKeywordReplyMarks.put(message.getUid(), new PendingKeywordReplyMark(thread.getUid(), repliedAt, repliedByUid));
+        log.debug("Registered pending keyword-trigger reply mark for messageUid={}, threadUid={}", message.getUid(), thread.getUid());
+    }
+
+    private boolean tryMarkMessageAsReplied(String messageUid, ZonedDateTime repliedAt, String repliedByUid) {
+        Optional<MessageEntity> messageOptional = messageRestService.findByUid(messageUid);
+        if (messageOptional.isEmpty()) {
+            return false;
+        }
+        markMessageAsReplied(messageOptional.get(), repliedAt, repliedByUid);
+        return true;
+    }
+
+    private void markMessageAsReplied(MessageEntity message, ZonedDateTime repliedAt, String repliedByUid) {
+        if (message == null || Boolean.TRUE.equals(message.getAgentReplied())) {
+            return;
+        }
+        message.setAgentReplied(true);
+        message.setAgentRepliedAt(repliedAt != null ? repliedAt : BdDateUtils.now());
+        if (StringUtils.hasText(repliedByUid)) {
+            message.setAgentRepliedByUid(repliedByUid);
+        }
+        messageRestService.save(message);
+        log.debug("Marked keyword-trigger transfer message as replied, messageUid={}, threadUid={}, repliedByUid={}",
+                message.getUid(),
+                message.getThread() != null ? message.getThread().getUid() : null,
+                repliedByUid);
+    }
+
+    private String resolveKeywordReplyByUid(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getRobot())) {
+            return null;
+        }
+        try {
+            UserProtobuf robot = JSON.parseObject(thread.getRobot(), UserProtobuf.class);
+            if (robot != null && StringUtils.hasText(robot.getUid())) {
+                return robot.getUid();
+            }
+        } catch (Exception ex) {
+            log.debug("Failed to parse robot uid for keyword-trigger reply mark, threadUid={}", thread.getUid(), ex);
+        }
+        return null;
     }
 
     private void markThreadTransferPending(ThreadEntity thread) {
@@ -243,6 +346,12 @@ public class RobotToAgentKeywordListener {
         } catch (Exception ex) {
             log.warn("Failed to parse visitor info for thread {}", thread.getUid(), ex);
             return null;
+        }
+    }
+
+    private record PendingKeywordReplyMark(String threadUid, ZonedDateTime repliedAt, String repliedByUid) {
+        private boolean matchesThread(String actualThreadUid) {
+            return StringUtils.hasText(threadUid) && threadUid.equals(actualThreadUid);
         }
     }
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
 import com.bytedesk.core.socket.connection.ConnectionEntity;
@@ -165,12 +166,33 @@ public class WorkgroupRoutingEventListener {
             return;
         }
         try {
-            agentRepository.findByUserUid(connection.getUserUid()).ifPresent(agent -> {
-                if (agent == null || agent.getUid() == null) {
-                    return;
-                }
-                refreshWorkgroupsByAgentUid(agent.getUid(), reason);
-            });
+            if (StringUtils.hasText(connection.getOrgUid())) {
+                agentRepository.findByUserUidAndOrgUidAndDeletedFalse(connection.getUserUid(), connection.getOrgUid())
+                        .ifPresent(agent -> {
+                            if (agent == null || agent.getUid() == null) {
+                                return;
+                            }
+                            refreshWorkgroupsByAgentUid(agent.getUid(), reason);
+                        });
+                return;
+            }
+
+            // 无 orgUid 的情况下，userUid 可能对应多个组织坐席，避免触发 NonUniqueResultException。
+            List<com.bytedesk.service.agent.AgentEntity> agents = agentRepository
+                    .findAllByUserUidAndDeletedFalse(connection.getUserUid());
+            if (agents == null || agents.isEmpty()) {
+                return;
+            }
+            if (agents.size() > 1) {
+                log.warn("routing refresh skipped: multiple agents for userUid={}, reason={}",
+                        connection.getUserUid(), reason);
+                return;
+            }
+            com.bytedesk.service.agent.AgentEntity agent = agents.get(0);
+            if (agent == null || agent.getUid() == null) {
+                return;
+            }
+            refreshWorkgroupsByAgentUid(agent.getUid(), reason);
         } catch (Exception e) {
             log.debug("routing refresh on {} failed: userUid={}, err={}", reason, connection.getUserUid(), e.getMessage());
         }

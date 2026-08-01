@@ -49,6 +49,12 @@ public class WorkgroupRequest extends BaseRequest {
     @Builder.Default
     private String description = I18Consts.I18N_WORKGROUP_DESCRIPTION;
 
+    /**
+     * Workgroup business type, e.g. PRESALES/AFTERSALES/TECH_SUPPORT.
+     */
+    @Builder.Default
+    private String type = WorkgroupTypeEnum.GENERAL.name();
+
     // routingMode moved to WorkgroupSettings; use settings APIs instead
 
     @Builder.Default
@@ -59,6 +65,11 @@ public class WorkgroupRequest extends BaseRequest {
      * If not provided, will use the default settings
      */
     private String settingsUid;
+
+    /**
+     * Business shop uid, used by open shop create APIs to resolve organization.
+     */
+    private String shopUid;
 
     private Boolean enabled;
 

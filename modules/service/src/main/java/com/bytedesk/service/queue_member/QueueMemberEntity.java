@@ -97,6 +97,13 @@ public class QueueMemberEntity extends BaseEntity {
     private ZonedDateTime lastNotifiedAt; // 最近一次通知时间
 
     /**
+     * 主动触发已通知次数（用于 maxTriggerCount 限制）。
+     * 每次主动触发器成功发送消息后递增。
+     */
+    @Builder.Default
+    private Integer notifiedCount = 0;
+
+    /**
      * 访客消息统计：
      * 记录第一条访客消息的时间
      * 更新最后一条访客消息的时间

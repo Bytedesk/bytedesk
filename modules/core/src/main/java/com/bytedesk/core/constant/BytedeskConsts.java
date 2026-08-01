@@ -30,21 +30,37 @@ public class BytedeskConsts {
     // HTTP correlation id
     public static final String REQUEST_ID = "X-Request-Id";
     public static final String REQUEST_ID_MDC = "requestId";
+    public static final String LICENSE_VALID_CACHE_PREFIX = "bytedesk:license:valid:";
     // 空字符串
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_JSON_STRING = "{}";
     public static final String EMPTY_ARRAY_STRING = "[]";    
+    public static final String DEFAULT_COLOR = "blue";
     // 默认组织uid
+    public static final String DEFAULT_SUPER_UID = "df_super_uid";
     public static final String DEFAULT_ORGANIZATION_UID = "df_org_uid";
     public static final String DEFAULT_UNIFIED_UID = "df_un_uid";
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid"; // 默认工作组uid
+    public static final String DEFAULT_WORKGROUP_UID_BOOKING = "df_wg_booking"; // booking 场景工作组uid
     public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
     public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
     public static final String DEFAULT_WORKGROUP_UID_TICKET = "df_wg_ticket"; // 工单
     public static final String DEFAULT_DEPARTMENT_UID = "df_dp_uid";
     public static final String DEFAULT_MEMBER_UID = "df_mb_uid"; // 默认团队成员uid
     public static final String DEFAULT_ROBOT_UID = "df_rt_uid"; // 默认机器人uid
+    public static final String DEFAULT_IVR_WORKFLOW_UID = "df_ivr_wf_uid"; // 默认 IVR 工作流 uid
+    public static final String DEFAULT_IVR_SATISFACTION_WORKFLOW_UID = "df_ivr_satisfaction_wf_uid"; // 默认满意度 IVR 工作流 uid
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_WORKFLOW_UID = "df_ivr_password_verification_wf_uid"; // 默认密码验证 IVR 工作流 uid
+    public static final String DEFAULT_IVR_BOT_WORKFLOW_UID = "df_ivr_bot_wf_uid"; // 默认机器人对话 IVR 工作流 uid
+    public static final String DEFAULT_IVR_MENU_UID = "df_ivr_menu_uid"; // 默认 IVR 菜单 uid
+    public static final String DEFAULT_IVR_SATISFACTION_MENU_UID = "df_ivr_satisfaction_menu_uid"; // 默认满意度 IVR 菜单 uid
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_MENU_UID = "df_ivr_password_verification_menu_uid"; // 默认密码验证 IVR 菜单 uid
+    public static final String DEFAULT_IVR_BOT_MENU_UID = "df_ivr_bot_menu_uid"; // 默认机器人对话 IVR 菜单 uid
+    public static final String DEFAULT_IVR_EXTENSION_NUMBER = "5002"; // 默认 IVR 测试号码
+    public static final String DEFAULT_IVR_SATISFACTION_EXTENSION_NUMBER = "5004"; // 默认满意度 IVR 测试号码
+    public static final String DEFAULT_IVR_PASSWORD_VERIFICATION_EXTENSION_NUMBER = "5005"; // 默认密码验证 IVR 测试号码
+    public static final String DEFAULT_IVR_BOT_EXTENSION_NUMBER = "5006"; // 默认机器人对话 IVR 测试号码
     public static final String DEFAULT_FILE_ASSISTANT_UID = "df_fa_uid"; // 默认文件助手uid
     public static final String DEFAULT_QUEUE_ASSISTANT_UID = "df_qa_uid"; // 默认排队助手uid
     public static final String DEFAULT_CLIPBOARD_ASSISTANT_UID = "df_ca_uid"; // 默认剪贴板助手uid
@@ -78,12 +94,6 @@ public class BytedeskConsts {
     // Legacy / deprecated role uid kept for backward compatibility.
     // Older members may still carry this role uid in persisted roleUids.
     public static final String DEPRECATED_ROLE_MEMBER_UID = "df_role_member_uid";
-    // 
-    public static final String ACTION_LOGIN_USERNAME = "密码登录";
-    public static final String ACTION_LOGIN_MOBILE = "手机号登录";
-    public static final String ACTION_LOGIN_EMAIL = "邮箱登录";
-    public static final String ACTION_LOGIN_SCAN = "扫码登录";
-    public static final String ACTION_LOGOUT = "退出登录";
     // 
     public static final int COLUMN_EXTRA_LENGTH = 2048;
     // 

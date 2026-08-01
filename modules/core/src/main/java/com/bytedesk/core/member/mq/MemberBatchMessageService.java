@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
@@ -31,17 +30,18 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberExcelImport;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Member批量导入消息服务
  * 参考FAQ的异步处理模式，用于发送Member批量导入消息到消息队列
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class MemberBatchMessageService {
 
-    @Autowired
-    private MqSender mqSender;
+    private final MqSender mqSender;
 
     /**
      * 发送批量导入消息

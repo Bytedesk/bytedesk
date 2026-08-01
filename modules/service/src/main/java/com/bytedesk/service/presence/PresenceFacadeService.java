@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentStatusEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 
 import lombok.AllArgsConstructor;
@@ -14,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * PresenceFacadeService
- * 统一封装坐席/工作组在线状态判断逻辑，逐步替换旧的 AgentEntity.connected 布尔字段。
- * 逻辑来源：ConnectionEntity 多客户端长连接会话记录 + 接待状态。
+ * 统一封装坐席/工作组可接待状态判断逻辑，逐步替换旧的 AgentEntity.connected 布尔字段。
+ * 规则基于：ConnectionEntity 多客户端长连接会话记录 + 坐席接待状态。
  */
 @Slf4j
 @Service
@@ -38,25 +40,52 @@ public class PresenceFacadeService {
         return online;
     }
 
-    /** 坐席是否在线且当前接待状态可用 */
+    /** 坐席是否满足可接待条件：长连接正常且当前状态可用 */
     public boolean isAgentOnlineAndAvailable(AgentEntity agent) {
         return isAgentOnline(agent) && agent != null && agent.isAvailable();
     }
 
-    /** 计算工作组是否有任意在线坐席 */
-    public boolean isWorkgroupOnline(WorkgroupEntity workgroup) {
+    /** 坐席是否满足指定 callType 的可接待条件 */
+    public boolean isAgentOnlineAndAvailableForCallType(AgentEntity agent, VisitorCallTypeEnum callType) {
+        if (!isAgentOnline(agent) || agent == null) {
+            return false;
+        }
+        AgentStatusEnum status;
+        try {
+            status = AgentStatusEnum.fromValue(agent.getStatus());
+        } catch (Exception e) {
+            return false;
+        }
+
+        // VisitorCallTypeEnum resolvedCallType = callType == null ? VisitorCallTypeEnum.TEXT : callType;
+        if (status == AgentStatusEnum.AVAILABLE) {
+            return true;
+        }
+        return false;
+        // return switch (resolvedCallType) {
+        //     case WEBRTC -> status == AgentStatusEnum.AVAILABLE;
+        //     case PHONE -> status == AgentStatusEnum.AVAILABLE;//AgentStatusEnum.AVAILABLE_PHONE;
+        //     case TEXT -> false;
+        // };
+    }
+
+    /**
+     * 计算工作组是否存在可接待坐席。
+     * 规则：长连接正常，且坐席状态为 AVAILABLE，二者必须同时满足。
+     */
+    public boolean hasAvailableAgents(WorkgroupEntity workgroup) {
         if (workgroup == null || workgroup.getAgents() == null || workgroup.getAgents().isEmpty()) {
             return false;
         }
         for (AgentEntity agent : workgroup.getAgents()) {
-            if (isAgentOnline(agent)) {
+            if (isAgentOnlineAndAvailable(agent)) {
                 return true;
             }
         }
         return false;
     }
 
-    /** 获取在线且可用的坐席列表（替换 WorkgroupEntity#getAvailableAgents 旧实现） */
+    /** 获取满足可接待条件的坐席列表（替换 WorkgroupEntity#getAvailableAgents 旧实现） */
     public List<AgentEntity> getAvailableAgents(WorkgroupEntity workgroup) {
         List<AgentEntity> result = new ArrayList<>();
         if (workgroup == null || workgroup.getAgents() == null) {
@@ -70,11 +99,28 @@ public class PresenceFacadeService {
         return result;
     }
 
-    /** 在线坐席数量（统计用途） */
-    public long countOnlineAgents(WorkgroupEntity workgroup) {
+    /** 获取满足指定 callType 可接待条件的坐席列表 */
+    public List<AgentEntity> getAvailableAgentsForCallType(WorkgroupEntity workgroup, VisitorCallTypeEnum callType) {
+        List<AgentEntity> result = new ArrayList<>();
+        if (workgroup == null || workgroup.getAgents() == null) {
+            return result;
+        }
+        for (AgentEntity agent : workgroup.getAgents()) {
+            if (isAgentOnlineAndAvailableForCallType(agent, callType)) {
+                result.add(agent);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 可接待坐席数量（统计用途）。
+     * 规则：长连接正常，且坐席状态为 AVAILABLE。
+     */
+    public long countAvailableAgents(WorkgroupEntity workgroup) {
         if (workgroup == null || workgroup.getAgents() == null) {
             return 0L;
         }
-        return workgroup.getAgents().stream().filter(this::isAgentOnline).count();
+        return workgroup.getAgents().stream().filter(this::isAgentOnlineAndAvailable).count();
     }
 }

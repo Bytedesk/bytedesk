@@ -13,7 +13,7 @@
  */
 package com.bytedesk.call.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -30,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class CallPlugin extends AbstractBytedeskPlugin {
+
+    public CallPlugin(
+            @Qualifier("callHealthIndicator") ObjectProvider<HealthIndicator> callHealthIndicatorProvider) {
+        this.callHealthIndicator = callHealthIndicatorProvider.getIfAvailable();
+    }
+
     
     @Value("${bytedesk.call.enabled:false}")
     private boolean enabled;
@@ -37,9 +43,7 @@ public class CallPlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.call.version:1.0.0}")
     private String version;
     
-    @Autowired(required = false)
-    @Qualifier("callHealthIndicator")
-    private HealthIndicator callHealthIndicator;
+    private final HealthIndicator callHealthIndicator;
     
     @Override
     protected HealthIndicator getHealthIndicator() {

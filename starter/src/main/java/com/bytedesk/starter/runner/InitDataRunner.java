@@ -13,14 +13,19 @@
  */
 package com.bytedesk.starter.runner;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.context.event.EventListener;
 
-import com.bytedesk.core.utils.NetworkUtils;
+import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.utils.LicenseValidator;
+import com.bytedesk.core.utils.LicenseValidator.LicenseInfo;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -28,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class InitDataRunner implements ApplicationRunner {
+public class InitDataRunner {
 
     @Value("${application.version}")
     private String version;
@@ -36,24 +41,47 @@ public class InitDataRunner implements ApplicationRunner {
     @Value("${server.port}")
     private String port;
 
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // 在应用的主类或配置类中
-        // TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-        // TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
-        String localIP = NetworkUtils.getFirstNonLoopbackIP();
-        List<String> allIPs = NetworkUtils.getLocalIPs();
+    private final BytedeskProperties bytedeskProperties;
+    private final StringRedisTemplate stringRedisTemplate;
 
-        log.info("bytedesk.im v{} started at:", version);
-        log.info("Local Access:  http://127.0.0.1:{}", port);
-        log.info("Network Access: http://{}:{}", localIP, port);
-        
-        if (allIPs.size() > 1) {
-            log.info("Other Network IPs:");
-            allIPs.stream()
-                .filter(ip -> !ip.equals(localIP))
-                .forEach(ip -> log.info("http://{}:{}", ip, port));
+    public InitDataRunner(BytedeskProperties bytedeskProperties,
+                          StringRedisTemplate stringRedisTemplate) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.stringRedisTemplate = stringRedisTemplate;
+    }
+
+    /**
+     * 异步验证许可证有效性（本地 RSA 验签，不依赖远程服务）。
+     * 验证结果写入 Redis 缓存，供 BytedeskPropertiesController 读取。
+     */
+    @Async
+    public void validateLicenseOnStartup() {
+        String licenseKey = bytedeskProperties.getOriginalAppkey();
+        String cacheKey = BytedeskConsts.LICENSE_VALID_CACHE_PREFIX + licenseKey;
+        try {
+            LicenseInfo info = LicenseValidator.validateOnStartup(licenseKey);
+            boolean valid = info != null && info.isValid();
+            stringRedisTemplate.opsForValue().set(cacheKey, String.valueOf(valid));
+            log.info("License startup validation complete: valid={}", valid);
+        } catch (Exception e) {
+            log.error("License startup validation error: {}", e.getMessage(), e);
+            stringRedisTemplate.opsForValue().set(cacheKey, "false");
         }
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady(ApplicationReadyEvent event) {
+        log.info("InitDataRunner executing...");
+        log.info("bytedesk v{} started, http://127.0.0.1:{}", version, port);
+        log.info("ApplicationReadyEvent received. Application is fully started and ready to serve on port {}", port);
+
+        // 异步验证许可证
+        validateLicenseOnStartup();
+    }
+
+    @EventListener(ContextClosedEvent.class)
+    public void onContextClosed(ContextClosedEvent event) {
+        log.warn("ContextClosedEvent received. Application context is shutting down.");
     }
 
 }

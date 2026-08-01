@@ -12,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
@@ -40,6 +43,9 @@ public class QueueService {
     private final WorkgroupRepository workgroupRepository;
 
     private final UidUtils uidUtils;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Transactional
     public QueueMemberEntity enqueueRobot(ThreadEntity threadEntity, UserProtobuf agent,
@@ -103,10 +109,17 @@ public class QueueService {
             QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
             validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
 
+            // 避免在当前事务中直接提交对已有 queue_member 的修改，
+            // 否则与并发统计更新叠加时容易在主流程提交点触发乐观锁异常。
+            entityManager.detach(member);
+
             if (agent.isAgent()) {
                 member.setAgentQueue(agentOrRobotQueue);
             } else {
                 member.setRobotQueue(agentOrRobotQueue);
+                if (member.getRobotAcceptedAt() == null) {
+                    member.robotAutoAcceptThread();
+                }
             }
 
             // 这里的更新不要求强一致：异步 best-effort 保存，避免影响主流程事务
@@ -239,8 +252,30 @@ public class QueueService {
         try {
             return queueRepository.save(queue);
         } catch (DataIntegrityViolationException e) {
+            // 保存失败后，实体可能仍被持久化上下文管理且 ID 为 null。
+            // 必须先 detach，否则后续查询触发 flush 时会抛出 AssertionFailure:
+            // "Entry for instance of QueueEntity has a null identifier"
+            detachEntity(queue);
             return queueRepository.findByTopicAndDayAndDeletedFalse(queueTopic, day)
                     .orElseThrow(() -> new RuntimeException("Queue creation failed for topic " + queueTopic, e));
+        }
+    }
+
+    /**
+     * 安全 detach 实体，避免在 persistence context 异常时二次抛错。
+     */
+    private void detachEntity(Object entity) {
+        try {
+            if (entityManager.contains(entity)) {
+                entityManager.detach(entity);
+            }
+        } catch (Exception ignored) {
+            // 如果 session 已损坏，clear 整个 persistence context
+            try {
+                entityManager.clear();
+            } catch (Exception ignored2) {
+                // 最终兜底
+            }
         }
     }
 
@@ -255,6 +290,8 @@ public class QueueService {
             }
             return updatedMember;
         } catch (DataIntegrityViolationException ex) {
+            // 保存失败后，detach 失败实体避免后续 flush 时 AssertionFailure
+            detachEntity(member);
             String threadUid = member.getThread() != null ? member.getThread().getUid() : null;
             if (threadUid != null) {
                 Optional<QueueMemberEntity> existingMember = queueMemberRestService.findByThreadUid(threadUid);
@@ -276,21 +313,48 @@ public class QueueService {
         }
     }
 
+    private static final int MAX_RETRY_COUNT = 3;
+
     /**
-     * 重试操作的通用方法
+     * 重试操作的通用方法（最多重试 3 次，不重试致命错误）
      */
     private <T> T retryOperation(java.util.function.Supplier<T> operation) {
-        while (true) {
+        int attempt = 0;
+        while (attempt < MAX_RETRY_COUNT) {
             try {
                 return operation.get();
-            } catch (Exception e) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ie) {
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("Queue operation interrupted", ie);
+            } catch (DataIntegrityViolationException e) {
+                // 唯一约束冲突：重试以获取并发创建的记录
+                attempt++;
+                if (attempt >= MAX_RETRY_COUNT) {
+                    throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts", e);
                 }
+                log.debug("Queue create conflict, retry attempt {}/{}", attempt, MAX_RETRY_COUNT);
+                sleepBeforeRetry();
+            } catch (QueueFullException e) {
+                // 队列满不应重试，直接抛出
+                throw e;
+            } catch (RuntimeException e) {
+                // 其他运行时异常不应无限重试
+                throw e;
+            } catch (Exception e) {
+                attempt++;
+                if (attempt >= MAX_RETRY_COUNT) {
+                    throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts", e);
+                }
+                log.warn("Queue operation error, retry attempt {}/{}", attempt, MAX_RETRY_COUNT, e);
+                sleepBeforeRetry();
             }
+        }
+        throw new RuntimeException("Queue operation failed after " + MAX_RETRY_COUNT + " attempts");
+    }
+
+    private void sleepBeforeRetry() {
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Queue operation interrupted", ie);
         }
     }
 
@@ -362,9 +426,9 @@ public class QueueService {
      * @param agentUid 客服UID
      * @return 完整队列统计响应
      */
-    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+    public QueueAgentStatsResponse getAgentQueueStats(String agentUid) {
         if (!StringUtils.hasText(agentUid)) {
-            return AgentQueueStatsResponse.builder()
+            return QueueAgentStatsResponse.builder()
                     .agentUid(agentUid)
                     .build();
         }
@@ -378,7 +442,7 @@ public class QueueService {
 
         // 如果客服队列不存在，返回基础统计
         if (agentQueueOpt.isEmpty()) {
-            return AgentQueueStatsResponse.builder()
+            return QueueAgentStatsResponse.builder()
                     .agentUid(agentUid)
                     .queuingCount(queuingCount.totalQueuingCount())
                     .directQueuingCount(queuingCount.directQueuingCount())
@@ -388,8 +452,8 @@ public class QueueService {
 
         QueueEntity agentQueue = agentQueueOpt.get();
 
-        // 响应时长统计（基于 QueueMemberEntity 聚合）
-        var responseStats = queueMemberRestService.computeAgentResponseLengthStats(agentQueue.getUid());
+        // KPI 统计（基于 QueueMemberEntity 聚合）
+        var kpiStats = queueMemberRestService.computeAgentKpiStats(agentQueue.getUid());
 
         int totalCount = agentQueue.getTotalCount();
         int chattingCount = agentQueue.getChattingCount();
@@ -404,7 +468,7 @@ public class QueueService {
         // log.debug("客服队列统计 - agentUid: {}, 总人数: {}, 排队: {}, 接待: {}, 留言: {}, 转人工: {}",
         //         agentUid, totalCount, queuingCount.totalQueuingCount(), chattingCount, leaveMsgCount, robotToAgentCount);
 
-        return AgentQueueStatsResponse.builder()
+        return QueueAgentStatsResponse.builder()
                 .agentUid(agentUid)
                 .totalCount(totalCount)
                 .queuingCount(queuingCount.totalQueuingCount())
@@ -417,8 +481,13 @@ public class QueueService {
                 .robotToAgentCount(robotToAgentCount)
                 .robotingCount(robotingCount)
                 .agentServedCount(agentServedCount)
-            .agentFirstResponseLength(responseStats.agentFirstResponseLength())
-            .agentAvgResponseLength(responseStats.agentAvgResponseLength())
+                .agentFirstResponseLength(kpiStats.agentFirstResponseLength())
+                .agentAvgResponseLength(kpiStats.agentAvgResponseLength())
+                .answerRate30s(kpiStats.answerRate30s())
+                .agentReplyRate3m(kpiStats.agentReplyRate3m())
+                .inquiryConversionRate(kpiStats.inquiryConversionRate())
+                .dissatisfiedCount(kpiStats.dissatisfiedCount())
+                .dissatisfiedRate(kpiStats.dissatisfiedRate())
                 .threadsCountByHour(threadsCountByHour)
                 .build();
     }

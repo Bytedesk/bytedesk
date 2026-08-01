@@ -16,18 +16,18 @@ package com.bytedesk.core.upload;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.upload.storage.UploadStorageException;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Configuration
 public class UploadConfig {
 
-    @Autowired
-    private BytedeskProperties properties;
+    private final BytedeskProperties properties;
     
     @Bean
     public Path uploadDir() {

@@ -122,6 +122,11 @@ public class ActiveThreadCacheService {
             for (Map.Entry<Object, Object> entry : entries.entrySet()) {
                 try {
                     ActiveThreadCache cache = ActiveThreadCache.fromJson(entry.getValue().toString());
+                    if (!StringUtils.hasText(cache.getUid())) {
+                        log.warn("Removing malformed active thread cache entry without uid: {}", entry.getKey());
+                        stringRedisTemplate.opsForHash().delete(RedisConsts.ACTIVE_SERVICE_THREADS_KEY, entry.getKey());
+                        continue;
+                    }
                     // 过滤掉已关闭的会话（理论上不应该存在，但做防御性检查）
                     if (!ThreadProcessStatusEnum.CLOSED.name().equals(cache.getStatus())) {
                         result.add(cache);

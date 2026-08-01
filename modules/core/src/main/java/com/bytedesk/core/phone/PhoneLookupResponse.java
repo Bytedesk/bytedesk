@@ -26,4 +26,15 @@ public record PhoneLookupResponse(
                 info.getIsp() != null ? info.getIsp().getCnName() : null
         );
     }
+
+    /**
+     * 号码未在数据库中查到时的默认响应（如固话/座机号段）
+     */
+    public static PhoneLookupResponse notFound(String number) {
+        return new PhoneLookupResponse(
+                number, null, null, null, null,
+                PhoneISPEnum.UNKNOWN.name(),
+                PhoneISPEnum.UNKNOWN.getCnName()
+        );
+    }
 }

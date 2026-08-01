@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -60,9 +59,11 @@ public class RedisCacheConfig implements CachingConfigurer {
     @Value("${spring.cache.redis.key-prefix:bytedeskim:cache:}")
     private String keyPrefix;
     
-    @Autowired
-    @Qualifier("redisObjectMapper")
-    private ObjectMapper objectMapperBean;
+    private final ObjectMapper objectMapperBean;
+
+    public RedisCacheConfig(@Qualifier("redisObjectMapper") ObjectMapper objectMapperBean) {
+        this.objectMapperBean = objectMapperBean;
+    }
     
     /**
      * Redis缓存管理器配置

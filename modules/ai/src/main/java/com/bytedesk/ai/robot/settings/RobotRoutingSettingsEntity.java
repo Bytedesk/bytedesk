@@ -66,7 +66,7 @@ public class RobotRoutingSettingsEntity extends BaseEntity {
 
     @lombok.Builder.Default
     private Boolean nonWorktimeRobot = false;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private RobotEntity robot;

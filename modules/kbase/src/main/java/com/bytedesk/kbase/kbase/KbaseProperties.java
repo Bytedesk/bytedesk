@@ -122,5 +122,37 @@ public class KbaseProperties {
     public String resolveBlogApiUrl() {
         return StringUtils.hasText(blog.getApiUrl()) ? blog.getApiUrl() : resolveHelpcenterApiUrl();
     }
+
+    // -------------------- portal resolve (compatible default) --------------------
+    
+    public String resolvePortalTheme() {
+        if (StringUtils.hasText(blog.getTheme())) {
+            return blog.getTheme();
+        }
+        // blog 未配置时，复用旧 theme（或 helpcenter 主题）
+        return resolveHelpcenterTheme();
+    }
+
+    public String resolvePortalHtmlRootDir() {
+        String root;
+        if (StringUtils.hasText(blog.getHtmlPath())) {
+            root = blog.getHtmlPath();
+        } else {
+            String hcRoot = resolveHelpcenterHtmlPath();
+            root = (hcRoot == null ? null : hcRoot + "/blog");
+        }
+        // explicit null-check so static analysis recognizes root may be null
+        if (root == null) {
+            return null;
+        }
+        if (!StringUtils.hasText(root)) {
+            return root;
+        }
+        return root.endsWith("/") ? root : root + "/";
+    }
+
+    public String resolvePortalApiUrl() {
+        return StringUtils.hasText(blog.getApiUrl()) ? blog.getApiUrl() : resolveHelpcenterApiUrl();
+    }
     
 }

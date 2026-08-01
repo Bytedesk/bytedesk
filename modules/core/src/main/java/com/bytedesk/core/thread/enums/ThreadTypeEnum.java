@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.thread.enums;
 
+import com.bytedesk.core.constant.I18Consts;
+
 /**
  * 会话类型
  */
@@ -66,45 +68,51 @@ public enum ThreadTypeEnum {
     }
     
     /**
-     * 获取枚举类型对应的中文名称
-     * @return 对应的中文名称
+     * 获取枚举类型对应的国际化 key
+     * @return 对应的国际化 key
      */
     public String getChineseName() {
         switch (this) {
             case AGENT:
-                return "一对一客服";
+                return I18Consts.I18N_THREAD_TYPE_AGENT;
             case WORKGROUP:
-                return "工作组客服";
+                return I18Consts.I18N_THREAD_TYPE_WORKGROUP;
             case ROBOT:
-                return "机器人客服";
+                return I18Consts.I18N_THREAD_TYPE_ROBOT;
             case MEMBER:
-                return "组织成员对话";
+                return I18Consts.I18N_THREAD_TYPE_MEMBER;
             case GROUP:
-                return "群组对话";
+                return I18Consts.I18N_THREAD_TYPE_GROUP;
             case FEEDBACK:
-                return "意见反馈";
+                return I18Consts.I18N_THREAD_TYPE_FEEDBACK;
             case ASSISTANT:
-                return "助理";
+                return I18Consts.I18N_THREAD_TYPE_ASSISTANT;
             case CHANNEL:
-                return "渠道对话";
+                return I18Consts.I18N_THREAD_TYPE_CHANNEL;
             case LOCAL:
-                return "本地对话";
+                return I18Consts.I18N_THREAD_TYPE_LOCAL;
             case FRIEND:
-                return "好友对话";
+                return I18Consts.I18N_THREAD_TYPE_FRIEND;
             case TICKET_INTERNAL:
-                return "内部工单会话";
+                return I18Consts.I18N_THREAD_TYPE_TICKET_INTERNAL;
             case KBASE:
-                return "知识库对话";
+                return I18Consts.I18N_THREAD_TYPE_KBASE;
             case KBDOC:
-                return "知识库文档对话";
+                return I18Consts.I18N_THREAD_TYPE_KBDOC;
             case LLM:
-                return "大模型对话";
+                return I18Consts.I18N_THREAD_TYPE_LLM;
             case UNIFIED:
-                return "统一客服入口";
+                return I18Consts.I18N_THREAD_TYPE_UNIFIED;
             case HISTORY:
-                return "历史对话";
+                return I18Consts.I18N_THREAD_TYPE_HISTORY;
+            case WORKFLOW:
+                return I18Consts.I18N_THREAD_TYPE_WORKFLOW;
+            case QUEUE:
+                return I18Consts.I18N_THREAD_TYPE_QUEUE;
+            case CALLCENTER:
+                return I18Consts.I18N_THREAD_TYPE_CALLCENTER;
             case TICKET_EXTERNAL:
-                return "外部工单会话";
+                return I18Consts.I18N_THREAD_TYPE_TICKET_EXTERNAL;
             default:
                 return this.name();
         }

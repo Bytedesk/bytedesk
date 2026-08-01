@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.quick_reply.mq;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,23 +26,22 @@ import com.bytedesk.kbase.quick_reply.vector.QuickReplyVectorService;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 快捷回复索引消费者
  */
+@RequiredArgsConstructor
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class QuickReplyIndexConsumer {
 
-    @Autowired
-    private QuickReplyRepository quickReplyRepository;
+    private final QuickReplyRepository quickReplyRepository;
 
-    @Autowired
-    private QuickReplyElasticService quickReplyElasticService;
+    private final QuickReplyElasticService quickReplyElasticService;
 
-    @Autowired
-    private QuickReplyVectorService quickReplyVectorService;
+    private final QuickReplyVectorService quickReplyVectorService;
 
     /**
      * 处理快捷回复索引消息

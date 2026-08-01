@@ -13,6 +13,9 @@
  */
 package com.bytedesk.service.queue;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +37,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.QueueMeta;
+import com.bytedesk.core.thread.ThreadQueueMeta;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRepository;
@@ -42,6 +45,9 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.message.MessageRepository;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_member.QueueMemberEntity;
@@ -51,6 +57,9 @@ import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
 import org.springframework.util.StringUtils;
 import org.springframework.data.domain.PageImpl;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -82,9 +91,14 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
     private final MessageRepository messageRepository;
 
+    private final MessageRestService messageRestService;
+
     private final ThreadRepository threadRepository;
 
     private final QueueService queueService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     protected Specification<QueueEntity> createSpecification(QueueRequest request) {
@@ -121,9 +135,24 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         UserEntity user = authService.getUser();
         // 设置查询条件：状态为排队中
         request.setStatus(ThreadProcessStatusEnum.QUEUING.name());
+
+        // topicList 在反序列化/手动构造时可能被置空，做一次兜底
+        if (request.getTopicList() == null) {
+            request.setTopicList(new ArrayList<>());
+        }
         
         // 通过user.uid查询相应的agent
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        String orgUid = user != null ? user.getOrgUid() : null;
+        if (!StringUtils.hasText(orgUid)) {
+            orgUid = request.getOrgUid();
+        }
+        // 确保 orgUid 已写回 request，避免下游 BaseSpecification 验证失败
+        request.setOrgUid(orgUid);
+
+        String userUid = user != null ? user.getUid() : request.getUserUid();
+        Optional<AgentEntity> agentOptional = (StringUtils.hasText(orgUid) && StringUtils.hasText(userUid))
+                ? agentRestService.findByUserUidAndOrgUid(userUid, orgUid)
+                : Optional.empty();
         if (agentOptional.isPresent()) {
             AgentEntity agent = agentOptional.get();
             // 将agent.uid添加到topicList中
@@ -173,7 +202,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
                 waitingMs = Math.max(0, now - enqueuedAt);
             }
 
-            QueueMeta meta = QueueMeta.builder()
+            ThreadQueueMeta meta = ThreadQueueMeta.builder()
                     .queueMemberUid(qm.getUid())
                     .position(qm.getQueueNumber())
                     .serverTimestamp(now)
@@ -195,26 +224,99 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
      * - 将 waitingMs 写入 ThreadResponse.queueMeta（与排队中 query/queuing 一致的承载方式）。
      */
     public Page<ThreadResponse> queryUnreplied(ThreadRequest request) {
-        UserEntity user = authService.getUser();
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(user.getUid());
+        return queryUnreplied(request, true);
+    }
+
+    public int markUnrepliedThreadAsReplied(ThreadRequest request) {
+        Optional<AgentEntity> agentOptional = resolveCurrentAgent(request);
+        if (agentOptional.isEmpty()) {
+            return 0;
+        }
+
+        Optional<ThreadEntity> threadOptional = resolveRequestedThread(request);
+        if (threadOptional.isEmpty()) {
+            return 0;
+        }
+
+        ThreadEntity thread = threadOptional.get();
+        if (Boolean.TRUE.equals(thread.isDeleted()) || !isThreadAssignedToAgent(thread, agentOptional.get().getUid())) {
+            return 0;
+        }
+
+        return markThreadUnrepliedMessagesAsReplied(thread, ZonedDateTime.now(), agentOptional.get().getUid());
+    }
+
+    public int markAllUnrepliedThreadsAsReplied(ThreadRequest request) {
+        Optional<AgentEntity> agentOptional = resolveCurrentAgent(request);
+        if (agentOptional.isEmpty()) {
+            return 0;
+        }
+
+        String agentUid = agentOptional.get().getUid();
+        String agentUidPattern = "%\"uid\":\"" + agentUid + "\"%";
+        int totalUpdated = 0;
+
+        while (true) {
+            List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUidPattern, 100, 0);
+            if (rows == null || rows.isEmpty()) {
+                break;
+            }
+
+            List<String> threadUids = rows.stream()
+                    .filter(row -> row != null && row.length > 0 && row[0] != null)
+                    .map(row -> String.valueOf(row[0]))
+                    .filter(StringUtils::hasText)
+                    .distinct()
+                    .toList();
+            if (threadUids.isEmpty()) {
+                break;
+            }
+
+            Map<String, ThreadEntity> threadByUid = threadRepository.findByUidInAndDeletedFalse(threadUids)
+                    .stream()
+                    .filter(thread -> thread != null && StringUtils.hasText(thread.getUid()))
+                    .collect(Collectors.toMap(ThreadEntity::getUid, thread -> thread, (a, b) -> a));
+
+            int batchUpdated = 0;
+            ZonedDateTime repliedAt = ZonedDateTime.now();
+            for (String threadUid : threadUids) {
+                ThreadEntity thread = threadByUid.get(threadUid);
+                if (thread == null) {
+                    continue;
+                }
+                batchUpdated += markThreadUnrepliedMessagesAsReplied(thread, repliedAt, agentUid);
+            }
+
+            totalUpdated += batchUpdated;
+            if (batchUpdated <= 0) {
+                break;
+            }
+        }
+
+        return totalUpdated;
+    }
+
+    private Page<ThreadResponse> queryUnreplied(ThreadRequest request, boolean allowSelfHeal) {
+        Optional<AgentEntity> agentOptional = resolveCurrentAgent(request);
         if (agentOptional.isEmpty()) {
             return Page.empty();
         }
 
         AgentEntity agent = agentOptional.get();
         String agentUid = agent.getUid();
+        String agentUidPattern = "%\"uid\":\"" + agentUid + "\"%";
 
         Pageable pageable = request.getPageable();
         int pageNumber = (pageable == null) ? 0 : pageable.getPageNumber();
         int pageSize = (pageable == null) ? 20 : pageable.getPageSize();
         int offset = Math.max(0, pageNumber) * Math.max(1, pageSize);
 
-        long total = messageRepository.countUnrepliedVisitorThreadsByAgentUid(agentUid);
+        long total = messageRepository.countUnrepliedVisitorThreadsByAgentUid(agentUidPattern);
         if (total <= 0) {
             return Page.empty(pageable);
         }
 
-        List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUid, pageSize, offset);
+        List<Object[]> rows = messageRepository.pageUnrepliedVisitorThreadUidsByAgentUid(agentUidPattern, pageSize, offset);
         if (rows == null || rows.isEmpty()) {
             return new PageImpl<>(List.of(), pageable, total);
         }
@@ -248,13 +350,19 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             return new PageImpl<>(List.of(), pageable, total);
         }
 
-        // 批量加载线程并保持与 rows 相同的顺序
         List<ThreadEntity> threadEntities = threadRepository.findByUidInAndDeletedFalse(threadUids);
         Map<String, ThreadEntity> threadByUid = new HashMap<>();
         for (ThreadEntity t : threadEntities) {
             if (t != null && StringUtils.hasText(t.getUid())) {
                 threadByUid.put(t.getUid(), t);
             }
+        }
+
+        int healedCount = allowSelfHeal ? healStaleUnrepliedThreads(firstUnrepliedAtByThreadUid, threadByUid) : 0;
+        if (healedCount > 0) {
+            log.info("queryUnreplied rerun after self-heal: agentUid={}, pageNumber={}, pageSize={}, healedCount={}",
+                    agentUid, pageNumber, pageSize, healedCount);
+            return queryUnreplied(request, false);
         }
 
         Map<String, QueueMemberEntity> queueMemberByThreadUid = queueMemberRestService.findByThreadUids(threadUids)
@@ -272,13 +380,13 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
 
             ThreadResponse resp = threadRestService.convertToResponse(entity);
 
-            Long firstUnrepliedAt = firstUnrepliedAtByThreadUid.get(threadUid);
+            Long firstUnrepliedAt = resolveFirstUnrepliedAt(threadUid, firstUnrepliedAtByThreadUid.get(threadUid));
             Long waitingMs = (firstUnrepliedAt == null) ? null : Math.max(0, now - firstUnrepliedAt);
 
             QueueMemberEntity qm = queueMemberByThreadUid.get(threadUid);
             String queueMemberUid = (qm == null) ? null : qm.getUid();
 
-            QueueMeta meta = QueueMeta.builder()
+            ThreadQueueMeta meta = ThreadQueueMeta.builder()
                     .queueMemberUid(queueMemberUid)
                     .serverTimestamp(now)
                     // 复用字段：这里 enqueuedAt 表示“最早未回复访客消息时间”
@@ -293,13 +401,229 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         return new PageImpl<>(responses, pageable, total);
     }
 
+    private Optional<AgentEntity> resolveCurrentAgent(ThreadRequest request) {
+        UserEntity user = authService.getUser();
+        String orgUid = user != null ? user.getOrgUid() : null;
+        if (!StringUtils.hasText(orgUid)) {
+            orgUid = request.getOrgUid();
+        }
+        String userUid = user != null ? user.getUid() : request.getUserUid();
+        return (StringUtils.hasText(orgUid) && StringUtils.hasText(userUid))
+                ? agentRestService.findByUserUidAndOrgUid(userUid, orgUid)
+                : Optional.empty();
+    }
+
+    private Optional<ThreadEntity> resolveRequestedThread(ThreadRequest request) {
+        if (request == null) {
+            return Optional.empty();
+        }
+        if (StringUtils.hasText(request.getUid())) {
+            return threadRepository.findByUid(request.getUid());
+        }
+        if (StringUtils.hasText(request.getTopic())) {
+            return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(request.getTopic(), false);
+        }
+        return Optional.empty();
+    }
+
+    private boolean isThreadAssignedToAgent(ThreadEntity thread, String agentUid) {
+        if (thread == null || !StringUtils.hasText(agentUid) || !StringUtils.hasText(thread.getAgent())) {
+            return false;
+        }
+        try {
+            return agentUid.equals(thread.getAgentProtobuf().getUid());
+        } catch (Exception exception) {
+            log.warn("failed to parse thread agent protobuf when marking unreplied: threadUid={}", thread.getUid(), exception);
+            return false;
+        }
+    }
+
+    private int markThreadUnrepliedMessagesAsReplied(ThreadEntity thread, ZonedDateTime repliedAt, String repliedByUid) {
+        if (thread == null || repliedAt == null || !StringUtils.hasText(repliedByUid)) {
+            return 0;
+        }
+
+        ZoneId zoneId = repliedAt.getZone() != null ? repliedAt.getZone() : ZoneId.systemDefault();
+        ZonedDateTime windowStart = ZonedDateTime.ofInstant(Instant.EPOCH, zoneId);
+        List<MessageEntity> messages = StringUtils.hasText(thread.getTopic())
+                ? messageRestService.findByThreadTopicBetweenCreatedAt(thread.getTopic(), windowStart, repliedAt)
+                : messageRestService.findByThreadUid(thread.getUid());
+        if (messages == null || messages.isEmpty()) {
+            return 0;
+        }
+
+        int updated = 0;
+        for (MessageEntity message : messages) {
+            if (!isVisitorMessageForUnreplied(message)) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(message.getAgentReplied())) {
+                continue;
+            }
+            if (message.getCreatedAt() == null || message.getCreatedAt().isAfter(repliedAt)) {
+                continue;
+            }
+
+            message.setAgentReplied(true);
+            message.setAgentRepliedAt(repliedAt);
+            message.setAgentRepliedByUid(repliedByUid);
+            messageRestService.save(message);
+            updated++;
+        }
+
+        if (updated > 0) {
+            log.info("marked unreplied thread as replied: threadUid={}, topic={}, count={}, repliedByUid={}",
+                    thread.getUid(), thread.getTopic(), updated, repliedByUid);
+        }
+        return updated;
+    }
+
+    private Long resolveFirstUnrepliedAt(String threadUid, Long fallbackFirstUnrepliedAt) {
+        if (!StringUtils.hasText(threadUid)) {
+            return fallbackFirstUnrepliedAt;
+        }
+
+        List<MessageEntity> messages = messageRestService.findByThreadUid(threadUid);
+        if (messages == null || messages.isEmpty()) {
+            return fallbackFirstUnrepliedAt;
+        }
+
+        for (MessageEntity message : messages) {
+            if (!isVisitorMessageForUnreplied(message)) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(message.getAgentReplied())) {
+                continue;
+            }
+            if (message.getCreatedAt() == null) {
+                continue;
+            }
+            return message.getCreatedAt().toInstant().toEpochMilli();
+        }
+
+        return fallbackFirstUnrepliedAt;
+    }
+
+    private int healStaleUnrepliedThreads(Map<String, Long> firstUnrepliedAtByThreadUid,
+            Map<String, ThreadEntity> threadByUid) {
+        if (firstUnrepliedAtByThreadUid == null || firstUnrepliedAtByThreadUid.isEmpty() || threadByUid == null) {
+            return 0;
+        }
+
+        int healedCount = 0;
+        for (Map.Entry<String, Long> entry : firstUnrepliedAtByThreadUid.entrySet()) {
+            String threadUid = entry.getKey();
+            Long firstUnrepliedAt = entry.getValue();
+            if (!StringUtils.hasText(threadUid) || firstUnrepliedAt == null) {
+                continue;
+            }
+
+            ThreadEntity thread = threadByUid.get(threadUid);
+            if (thread == null) {
+                continue;
+            }
+
+            String threadTopic = thread.getTopic();
+
+            Optional<MessageEntity> latestOptional = StringUtils.hasText(threadTopic)
+                    ? messageRestService.findLatestByThreadTopic(threadTopic)
+                    : messageRestService.findLatestByThreadUid(threadUid);
+            if (latestOptional.isEmpty()) {
+                continue;
+            }
+
+            MessageEntity latestMessage = latestOptional.get();
+            if (!isAgentOrRobotReplyMessage(thread, latestMessage) || latestMessage.getCreatedAt() == null) {
+                continue;
+            }
+
+            ZonedDateTime repliedAt = latestMessage.getCreatedAt();
+            long repliedAtMillis = repliedAt.toInstant().toEpochMilli();
+            if (repliedAtMillis < firstUnrepliedAt) {
+                continue;
+            }
+
+            ZoneId zoneId = repliedAt.getZone() != null ? repliedAt.getZone() : ZoneId.systemDefault();
+            ZonedDateTime windowStart = ZonedDateTime.ofInstant(Instant.ofEpochMilli(firstUnrepliedAt), zoneId);
+            String agentUid = latestMessage.getUserProtobuf() != null ? latestMessage.getUserProtobuf().getUid() : null;
+
+            List<MessageEntity> messages = StringUtils.hasText(threadTopic)
+                    ? messageRestService.findByThreadTopicBetweenCreatedAt(threadTopic, windowStart, repliedAt)
+                    : messageRestService.findByThreadUidBetweenCreatedAt(threadUid, windowStart, repliedAt);
+            if (messages == null || messages.isEmpty()) {
+                continue;
+            }
+
+            int updated = 0;
+            for (MessageEntity message : messages) {
+                if (message == null || !message.isFromVisitor() || message.getCreatedAt() == null) {
+                    continue;
+                }
+                if (message.getCreatedAt().isBefore(windowStart) || message.getCreatedAt().isAfter(repliedAt)) {
+                    continue;
+                }
+                if (Boolean.TRUE.equals(message.getAgentReplied())) {
+                    continue;
+                }
+
+                message.setAgentReplied(true);
+                message.setAgentRepliedAt(repliedAt);
+                message.setAgentRepliedByUid(agentUid);
+                messageRestService.save(message);
+                updated++;
+            }
+
+            if (updated > 0) {
+                healedCount += updated;
+                log.info("queryUnreplied self-healed stale unreplied thread: threadUid={}, topic={}, count={}, agentUid={}",
+                        threadUid, threadTopic, updated, agentUid);
+            }
+        }
+
+        return healedCount;
+    }
+
+    private boolean isHumanReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromRobot() || message.isFromSystem()) {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isAgentOrRobotReplyMessage(ThreadEntity thread, MessageEntity message) {
+        if (thread == null || message == null) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(thread.isCustomerService())) {
+            return false;
+        }
+        if (message.isFromVisitor() || message.isFromSystem()) {
+            return false;
+        }
+        return message.isFromRobot() || isHumanReplyMessage(thread, message);
+    }
+
+    private boolean isVisitorMessageForUnreplied(MessageEntity message) {
+        if (message == null || !message.isFromVisitor()) {
+            return false;
+        }
+
+        MessageTypeEnum messageType = MessageTypeEnum.fromValue(message.getType());
+        return messageType != MessageTypeEnum.SYSTEM && messageType != MessageTypeEnum.NOTICE;
+    }
+
     @Cacheable(value = "queue", key = "#uid", unless = "#result==null")
     @Override
     public Optional<QueueEntity> findByUid(String uid) {
         return queueRepository.findByUid(uid);
     }
 
-    @Cacheable(value = "queue", key = "#topic+#day", unless = "#result==null")
     public Optional<QueueEntity> findByTopicAndDay(String topic, String day) {
         return queueRepository.findFirstByTopicAndDayAndDeletedFalseOrderByCreatedAtDesc(topic, day);
     }
@@ -310,10 +634,27 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         try {
             return queueRepository.save(queue);
         } catch (DataIntegrityViolationException e) {
+            // 保存失败后，实体可能仍被持久化上下文管理且 ID 为 null。
+            // 必须先 detach，否则后续查询触发 flush 时会抛出 AssertionFailure
+            detachSafely(queue);
             // 如果在保存时发生唯一约束冲突，说明其他线程已创建
             // 重新查询获取已存在的记录
             return queueRepository.findByTopicAndDayAndDeletedFalse(request.getTopic(), request.getDay())
                     .orElseThrow(() -> new RuntimeException("Queue creation failed"));
+        }
+    }
+
+    private void detachSafely(Object entity) {
+        try {
+            if (entityManager.contains(entity)) {
+                entityManager.detach(entity);
+            }
+        } catch (Exception ignored) {
+            try {
+                entityManager.clear();
+            } catch (Exception ignored2) {
+                // 最终兜底
+            }
         }
     }
 
@@ -426,7 +767,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
      * @param agentUid 客服UID
      * @return 完整队列统计响应
      */
-    public AgentQueueStatsResponse getAgentQueueStats(String agentUid) {
+    public QueueAgentStatsResponse getAgentQueueStats(String agentUid) {
         return queueService.getAgentQueueStats(agentUid);
     }
 }

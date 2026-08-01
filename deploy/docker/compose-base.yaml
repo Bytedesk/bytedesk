@@ -1,0 +1,220 @@
+services:
+  bytedesk-redis:
+    image: redis:latest
+    container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
+    command: sh -c "chown -R redis:redis /data && exec redis-server --requirepass ${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+  # bytedesk-ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama-bytedesk
+  #   ports:
+  #     - "21434:11434"
+  #   volumes:
+  #     - ollama_models:/root/.ollama
+  #   environment:
+  #     - OLLAMA_MODELS=qwen3:0.6b
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:11434/api/version"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
+  # docker compose -f compose-base.yaml up -d bytedesk-ttsasr
+  # docker compose -f compose-base.yaml logs -f bytedesk-ttsasr
+  # bytedesk-ttsasr:
+  #   image: registry.cn-hangzhou.aliyuncs.com/bytedesk/ttsasr:latest
+  #   container_name: ttsasr-bytedesk
+  #   ports:
+  #     - "18000:8000"
+  #   environment:
+  #     - FUNASR_DEVICE=${FUNASR_DEVICE:-cpu}
+  #     - FUNASR_MODEL=${FUNASR_MODEL:-iic/SenseVoiceSmall}
+  #     - FUNASR_VAD_MODEL=${FUNASR_VAD_MODEL:-fsmn-vad}
+  #     - FUNASR_MAX_URL_FILE_SIZE=${FUNASR_MAX_URL_FILE_SIZE:-52428800}
+  #     - FUNASR_PRELOAD=${FUNASR_PRELOAD:-false}
+  #     - FUNASR_DISABLE_UPDATE=${FUNASR_DISABLE_UPDATE:-true}
+  #     - FUNASR_TRUST_REMOTE_CODE=${FUNASR_TRUST_REMOTE_CODE:-false}
+  #     - TTS_PROVIDER=${TTS_PROVIDER:-voxcpm}
+  #     - VOXCPM_MODEL=${VOXCPM_MODEL:-openbmb/VoxCPM2}
+  #     - VOXCPM_SOURCE=${VOXCPM_SOURCE:-modelscope}
+  #     - VOXCPM_MODELSCOPE_MODEL=${VOXCPM_MODELSCOPE_MODEL:-OpenBMB/VoxCPM2}
+  #     - VOXCPM_DEVICE=${VOXCPM_DEVICE:-cpu}
+  #     - VOXCPM_LOAD_DENOISER=${VOXCPM_LOAD_DENOISER:-false}
+  #     - VOXCPM_PRELOAD=${VOXCPM_PRELOAD:-false}
+  #     - QWEN_TTS_MODEL=${QWEN_TTS_MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice}
+  #     - QWEN_TTS_SOURCE=${QWEN_TTS_SOURCE:-modelscope}
+  #     - QWEN_TTS_MODELSCOPE_MODEL=${QWEN_TTS_MODELSCOPE_MODEL:-Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice}
+  #     - QWEN_TTS_DEVICE_MAP=${QWEN_TTS_DEVICE_MAP:-cpu}
+  #     - QWEN_TTS_LANGUAGE=${QWEN_TTS_LANGUAGE:-Auto}
+  #     - QWEN_TTS_SPEAKER=${QWEN_TTS_SPEAKER:-Vivian}
+  #     - QWEN_TTS_PRELOAD=${QWEN_TTS_PRELOAD:-false}
+  #   # 复用模型缓存，避免每次重启重复下载大模型
+  #   volumes:
+  #     - ttsasr_modelscope:/root/.cache/modelscope
+  #   # 避免 VoxCPM 首次加载时 OOM（可按宿主机情况调整）
+  #   mem_limit: 16g
+  #   memswap_limit: 24g
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     # 首次冷启动（下载/加载模型）可能很久，避免过早判定不健康
+  #     start_period: 600s
+  #   restart: unless-stopped
+      
+  # ElasticSearch 向量数据库
+  bytedesk-elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    container_name: elasticsearch-bytedesk
+    environment:
+      - node.name=bytedesk-es01
+      - cluster.name=bytedesk-es-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    entrypoint: ["bash", "-c", "IK_PLUGIN_DIR=/tmp/ik-plugin-cache; IK_PLUGIN_FILE=$$IK_PLUGIN_DIR/elasticsearch-analysis-ik-8.18.0.zip; IK_PLUGIN_TMP=$$IK_PLUGIN_FILE.tmp; mkdir -p $$IK_PLUGIN_DIR; if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; curl -fsSL -o $$IK_PLUGIN_TMP https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && mv $$IK_PLUGIN_TMP $$IK_PLUGIN_FILE; /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file://$$IK_PLUGIN_FILE; fi; exec /usr/local/bin/docker-entrypoint.sh"]
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+      # 默认安装 IK 分词插件（缓存目录中的 zip 文件）
+      # 如缓存目录中无 zip 文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
+      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/ik-plugin-cache
+    ports:
+      - "19200:9200"
+      - "19300:9300"
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+
+  # https://www.elastic.co/guide/en/logstash/8.18/docker.html
+  # Logstash 日志采集中转
+  bytedesk-logstash:
+    image: docker.elastic.co/logstash/logstash:8.18.0
+    container_name: logstash-bytedesk
+    depends_on:
+      - bytedesk-elasticsearch
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-bytedesk:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - XPACK_MONITORING_ENABLED=false
+    volumes:
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - log_data:/var/log/bytedesk:ro
+      - ../../starter/logs:/var/log/bytedesk-source:ro
+      - logstash_data:/usr/share/logstash/data
+    ports:
+      - "19600:9600"
+    networks:
+      - bytedesk-network
+
+  # Kibana 日志查询界面
+  bytedesk-kibana:
+    image: docker.elastic.co/kibana/kibana:8.18.0
+    container_name: kibana-bytedesk
+    depends_on:
+      - bytedesk-elasticsearch
+    environment:
+      - SERVER_NAME=bytedesk-kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-bytedesk:9200
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN=${KIBANA_SERVICE_ACCOUNT_TOKEN}
+      - I18N_LOCALE=zh-CN
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=bytedesk-kibana-encrypted-saved-objects-key-2026
+      - XPACK_REPORTING_ENCRYPTIONKEY=bytedesk-kibana-reporting-encryption-key-2026
+      - XPACK_SECURITY_ENCRYPTIONKEY=bytedesk-kibana-security-encryption-key-2026
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "15601:5601"
+    networks:
+      - bytedesk-network
+
+  # Zipkin 分布式追踪系统- Spring Ai Observability
+  # bytedesk-zipkin:
+  #   image: 'openzipkin/zipkin:latest'
+  #   container_name: zipkin-bytedesk
+  #   ports:
+  #     - '19411:9411'
+  #   volumes:
+  #     - zipkin_data:/data
+  #   networks:
+  #     - bytedesk-network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO Console
+  # http://localhost:19001 - MinIO API
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  redis_data:
+    name: bytedesk_redis_data
+  # ollama_models:
+  #   name: bytedesk_ollama_models
+  # ttsasr_modelscope:
+  #   name: bytedesk_ttsasr_modelscope
+  elasticsearch_data:
+    name: bytedesk_elasticsearch_data
+  log_data:
+    name: bytedesk_log_data
+  logstash_data:
+    name: bytedesk_logstash_data
+  kibana_data:
+    name: bytedesk_kibana_data
+  # zipkin_data:
+  #   name: bytedesk_zipkin_data
+  minio_data:
+    name: bytedesk_minio_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -143,7 +144,7 @@ public abstract class MrcpMessage {
         }
 
         content = content.concat(CRLF);
-        int contentLength = content.length();
+    int contentLength = content.getBytes(StandardCharsets.UTF_8).length;
 
         // construct applicable headers
         MrcpHeader contentTypeHeader = MrcpHeaderName.CONTENT_TYPE.constructHeader(contentType);

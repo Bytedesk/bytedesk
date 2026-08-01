@@ -20,7 +20,7 @@ import lombok.Data;
 
 @Data
 @Component
-@ConfigurationProperties(JedisProperties.CONFIG_PREFIX)
+@ConfigurationProperties(JedisPoolProperties.CONFIG_PREFIX)
 public class JedisPoolProperties {
     
     public static final String CONFIG_PREFIX = "bytedesk.redis.pool-config";
@@ -30,5 +30,8 @@ public class JedisPoolProperties {
     private int maxTotal;
 
     private int minIdle;
-    // private long maxWaitMillis;
+
+    private long maxWaitMillis = 5000;
+
+    private boolean blockWhenExhausted = true;
 }

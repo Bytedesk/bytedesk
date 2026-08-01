@@ -154,6 +154,9 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setNickname(request.getNickname());
         robot.setType(request.getType());
         robot.setOrgUid(request.getOrgUid());
+        if (StringUtils.hasText(request.getLevel())) {
+            robot.setLevel(request.getLevel());
+        }
         // robot.setKbEnabled(request.getKbEnabled()); // 后台在faq对话测试时，创建机器人时会用到
         // robot.setKbUid(request.getKbUid()); // 后台在faq对话测试时，创建机器人时会用到
 
@@ -177,7 +180,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     request.getOrgUid(), ex.getMessage());
             robot.setSettings(robotSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
-
         // LLM 配置
         // 设置llm相关属性
         if (request.getLlm() != null) {
@@ -279,7 +281,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         if (request.getLlm() != null) {
             robot.setLlm(request.getLlm());
         }
-
         //
         RobotEntity updateRobot = save(robot);
         if (updateRobot == null) {
@@ -646,12 +647,21 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
         Optional<RobotEntity> robotOptional = findByNameAndOrgUidAndDeletedFalse(robotName, orgUid);
         if (robotOptional.isPresent()) {
+            syncRobotTypeFromJson(robotOptional.get(), robotJson);
+            syncSystemRobotDefaults(robotOptional.get(), robotName, localeData);
             return;
         }
 
         RobotLlm robotLlm = RobotLlm.builder()
                 .prompt(localeData != null ? localeData.getPrompt() : null)
                 .build();
+
+        if (RobotConsts.ROBOT_NAME_KB_TRANSLATION.equals(robotName)) {
+            robotLlm.setTextProvider(com.bytedesk.core.llm.LlmDefaults.DEFAULT_CHAT_PROVIDER);
+            robotLlm.setTextModel(RobotConsts.ROBOT_MODEL_KB_TRANSLATION);
+            robotLlm.setTemperature(0.0);
+            robotLlm.setTopP(0.8);
+        }
 
         String robotUid = uidUtils.getUid();
         if ("airline_booking_assistant".equals(robotJson.getName())) {
@@ -695,6 +705,73 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     dive.getMessage());
         } catch (Exception ex) {
             log.error("failed to save robot {}: {}", robotUid, ex.getMessage(), ex);
+        }
+    }
+
+    private void syncRobotTypeFromJson(RobotEntity robotEntity, Robot robotJson) {
+        if (robotEntity == null || robotJson == null || !StringUtils.hasText(robotJson.getType())) {
+            return;
+        }
+        if (robotJson.getType().equals(robotEntity.getType())) {
+            return;
+        }
+
+        String oldType = robotEntity.getType();
+        robotEntity.setType(robotJson.getType());
+        try {
+            save(robotEntity);
+            log.info("synced robot type from robots.json, name={}, orgUid={}, oldType={}, newType={}",
+                    robotEntity.getName(), robotEntity.getOrgUid(), oldType, robotJson.getType());
+        } catch (Exception ex) {
+            log.error("failed to sync robot type from robots.json, name={}, orgUid={}, targetType={}, err={}",
+                    robotEntity.getName(), robotEntity.getOrgUid(), robotJson.getType(), ex.getMessage(), ex);
+        }
+
+    }
+
+    private void syncSystemRobotDefaults(RobotEntity robotEntity, String robotName,
+            RobotJsonLoader.LocaleData localeData) {
+        if (robotEntity == null || !RobotConsts.ROBOT_NAME_KB_TRANSLATION.equals(robotName)) {
+            return;
+        }
+        if (robotEntity.getLlm() == null) {
+            robotEntity.setLlm(RobotLlm.builder().build());
+        }
+
+        boolean changed = false;
+        String prompt = localeData != null ? localeData.getPrompt() : null;
+        if (StringUtils.hasText(prompt) && !prompt.equals(robotEntity.getLlm().getPrompt())) {
+            robotEntity.getLlm().setPrompt(prompt);
+            changed = true;
+        }
+        if (!StringUtils.hasText(robotEntity.getLlm().getTextProvider())) {
+            robotEntity.getLlm().setTextProvider(com.bytedesk.core.llm.LlmDefaults.DEFAULT_CHAT_PROVIDER);
+            changed = true;
+        }
+        if (!RobotConsts.ROBOT_MODEL_KB_TRANSLATION.equals(robotEntity.getLlm().getTextModel())) {
+            robotEntity.getLlm().setTextModel(RobotConsts.ROBOT_MODEL_KB_TRANSLATION);
+            changed = true;
+        }
+        if (robotEntity.getLlm().getTemperature() == null || robotEntity.getLlm().getTemperature() != 0.0d) {
+            robotEntity.getLlm().setTemperature(0.0d);
+            changed = true;
+        }
+        if (robotEntity.getLlm().getTopP() == null || robotEntity.getLlm().getTopP() != 0.8d) {
+            robotEntity.getLlm().setTopP(0.8d);
+            changed = true;
+        }
+
+        if (!changed) {
+            return;
+        }
+
+        try {
+            save(robotEntity);
+            log.info("synced kb translation robot defaults to model={} for orgUid={}",
+                    RobotConsts.ROBOT_MODEL_KB_TRANSLATION, robotEntity.getOrgUid());
+        } catch (Exception ex) {
+            log.error("failed to sync kb translation robot defaults for orgUid={}, err={}",
+                    robotEntity.getOrgUid(), ex.getMessage(), ex);
         }
     }
 

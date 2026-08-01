@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260423-add-ai-skill-source" author="github-copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_skill" />
+            <not>
+                <columnExists tableName="bytedesk_ai_skill" columnName="skill_source" />
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_skill">
+            <column name="skill_source" type="varchar(32)" remarks="Skill source: INTERNAL or EXTERNAL" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

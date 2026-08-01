@@ -19,16 +19,19 @@ public class ProcessDemoConsts {
     public static final String LEAVE_APPROVAL_PROCESS_NAME = "请假审批流程";
     public static final String LEAVE_APPROVAL_PROCESS_KEY = "leaveApprovalProcess";
     public static final String LEAVE_APPROVAL_PROCESS_PATH = "processes/leave-approval-process.bpmn20.xml";
+    public static final String LEAVE_APPROVAL_PROCESS_FLOWGRAM_PATH = "processes/leave-approval-process.json";
 
     // 报销审批流程
     public static final String REIMBURSEMENT_APPROVAL_PROCESS_NAME = "报销审批流程";
     public static final String REIMBURSEMENT_APPROVAL_PROCESS_KEY = "reimbursementApprovalProcess";
     public static final String REIMBURSEMENT_APPROVAL_PROCESS_PATH = "processes/reimbursement-approval-process.bpmn20.xml";
+    public static final String REIMBURSEMENT_APPROVAL_PROCESS_FLOWGRAM_PATH = "processes/reimbursement-approval-process.json";
 
     // IT支持流程
     public static final String IT_SUPPORT_PROCESS_NAME = "IT支持流程";
     public static final String IT_SUPPORT_PROCESS_KEY = "itSupportProcess";
     public static final String IT_SUPPORT_PROCESS_PATH = "processes/it-support-process.bpmn20.xml";
+    public static final String IT_SUPPORT_PROCESS_FLOWGRAM_PATH = "processes/it-support-process.json";
 
     // 流程变量名常量 - 请假审批流程
     public static final String LEAVE_VARIABLE_APPLICANT_UID = "applicantUid";

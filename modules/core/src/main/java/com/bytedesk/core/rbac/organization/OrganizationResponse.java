@@ -70,6 +70,9 @@ public class OrganizationResponse extends BaseResponseNoOrg {
     // 是否会员
     private Boolean vip;
 
+    // 会员等级：0=非会员，1及以上为会员等级
+    private Integer vipLevel;
+
     // 会员截止日期
     private ZonedDateTime vipExpireDate;
 
@@ -78,6 +81,9 @@ public class OrganizationResponse extends BaseResponseNoOrg {
 
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
+
+    // 是否已删除（逻辑删除）
+    private Boolean deleted;
 
     // 是否启用自定义服务器（域名/IP）
     private Boolean customServerEnabled;

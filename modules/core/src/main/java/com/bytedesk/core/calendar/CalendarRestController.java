@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,10 +42,11 @@ public class CalendarRestController extends BaseRestController<CalendarRequest, 
 
     private final CalendarRestService calendarRestService;
 
-    @ActionAnnotation(title = "Calendar", action = "组织查询", description = "query calendar by org")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query calendar by org")
     @Operation(summary = "Query Calendars by Organization", description = "Retrieve calendars for the current organization")
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(CalendarRequest request) {
         
         Page<CalendarResponse> calendars = calendarRestService.queryByOrg(request);
@@ -50,10 +54,11 @@ public class CalendarRestController extends BaseRestController<CalendarRequest, 
         return ResponseEntity.ok(JsonResult.success(calendars));
     }
 
-    @ActionAnnotation(title = "Calendar", action = "用户查询", description = "query calendar by user")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query calendar by user")
     @Operation(summary = "Query Calendars by User", description = "Retrieve calendars for the current user")
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(CalendarRequest request) {
         
         Page<CalendarResponse> calendars = calendarRestService.queryByUser(request);
@@ -61,10 +66,11 @@ public class CalendarRestController extends BaseRestController<CalendarRequest, 
         return ResponseEntity.ok(JsonResult.success(calendars));
     }
 
-    @ActionAnnotation(title = "Calendar", action = "查询详情", description = "query calendar by uid")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query calendar by uid")
     @Operation(summary = "Query Calendar by UID", description = "Retrieve a specific calendar by its unique identifier")
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(CalendarRequest request) {
         
         CalendarResponse calendar = calendarRestService.queryByUid(request);
@@ -72,40 +78,43 @@ public class CalendarRestController extends BaseRestController<CalendarRequest, 
         return ResponseEntity.ok(JsonResult.success(calendar));
     }
 
-    @ActionAnnotation(title = "Calendar", action = "新建", description = "create calendar")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_CREATE, description = "create calendar")
     @Operation(summary = "Create Calendar", description = "Create a new calendar")
     @Override
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_CREATE)
-    public ResponseEntity<?> create(CalendarRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody CalendarRequest request) {
         
         CalendarResponse calendar = calendarRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(calendar));
     }
 
-    @ActionAnnotation(title = "Calendar", action = "更新", description = "update calendar")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_UPDATE, description = "update calendar")
     @Operation(summary = "Update Calendar", description = "Update an existing calendar")
     @Override
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_UPDATE)
-    public ResponseEntity<?> update(CalendarRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody CalendarRequest request) {
         
         CalendarResponse calendar = calendarRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(calendar));
     }
 
-    @ActionAnnotation(title = "Calendar", action = "删除", description = "delete calendar")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_DELETE, description = "delete calendar")
     @Operation(summary = "Delete Calendar", description = "Delete a calendar")
     @Override
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_DELETE)
-    public ResponseEntity<?> delete(CalendarRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody CalendarRequest request) {
         
         calendarRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Calendar", action = "导出", description = "export calendar")
+    @ActionAnnotation(title = I18Consts.I18N_CALENDAR, action = I18Consts.I18N_ACTION_EXPORT, description = "export calendar")
     @Operation(summary = "Export Calendars", description = "Export calendars to Excel format")
     @Override
     @PreAuthorize(CalendarPermissions.HAS_CALENDAR_EXPORT)

@@ -13,13 +13,11 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import jakarta.persistence.LockModeType;
 
 /**
  * Repository for AgentSettingsEntity
  */
-@Repository
 public interface AgentSettingsRepository extends JpaRepository<AgentSettingsEntity, Long>, JpaSpecificationExecutor<AgentSettingsEntity> {
 
     Optional<AgentSettingsEntity> findByUid(String uid);

@@ -14,7 +14,7 @@
 package com.bytedesk.service.agent;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -34,6 +34,7 @@ import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.utils.JsonResult;
@@ -48,7 +49,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "客服管理", description = "客服管理相关接口")
+@Tag(name = "Agent Management", description = "Agent management APIs")
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -60,15 +61,17 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
 
     private final RobotService robotService;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // @PreAuthorize(AgentPermissions.HAS_AGENT_READ) 前端很多地方需要查询，所以不需要权限
-    @ActionAnnotation(title = "客服", action = "组织查询", description = "query agent by org")
-    @Operation(summary = "查询组织下的客服", description = "根据组织ID查询客服列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent by org")
+    @Operation(summary = "Query Agents by Organization", description = "Retrieve agent list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(AgentRequest request) {
 
@@ -77,12 +80,13 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @ActionAnnotation(title = "客服", action = "用户查询", description = "query agent by user")
-    @Operation(summary = "查询用户下的客服", description = "根据用户ID查询客服信息")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent by user")
+    @Operation(summary = "Query Agents by User", description = "Retrieve agent information by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(AgentRequest request) {
 
@@ -91,9 +95,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agentResponse));
     }
 
-    @ActionAnnotation(title = "客服", action = "用户UID查询", description = "query agent by user uid")
-    @Operation(summary = "根据用户UID查询客服", description = "根据 userUid 查询单个客服信息（可选传 orgUid 进行精确匹配）")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_QUERY_USER_UID, description = "query agent by user uid")
+    @Operation(summary = "Query Agent by User UID", description = "Retrieve a single agent by userUid, with optional orgUid for precise matching")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
@@ -105,12 +109,13 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @ActionAnnotation(title = "客服", action = "查询详情", description = "query agent by uid")
-    @Operation(summary = "根据UID查询客服", description = "根据UID查询客服详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent by uid")
+    @Operation(summary = "Query Agent by UID", description = "Retrieve agent details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(AgentRequest request) {
         
@@ -119,11 +124,11 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @Operation(summary = "客服接受会话", description = "客服接受会话请求")
-    @ApiResponse(responseCode = "200", description = "接受成功",
+    @Operation(summary = "Agent Accepts Thread", description = "Allow the agent to accept a thread request")
+    @ApiResponse(responseCode = "200", description = "Accepted successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponseSimple.class)))
-    @ActionAnnotation(title = "会话", action = "accept", description = "accept thread")
+    @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_ACCEPT, description = "accept thread")
     @PostMapping("/accept")
     public ResponseEntity<?> acceptByAgent(@RequestBody ThreadRequest request) {
         
@@ -132,12 +137,13 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(threadResponse));   
     }
 
-    @ActionAnnotation(title = "客服", action = "新建", description = "create agent")
-    @Operation(summary = "创建客服", description = "创建新的客服")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_CREATE, description = "create agent")
+    @Operation(summary = "Create Agent", description = "Create a new agent")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_CREATE)
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody AgentRequest request) {
 
@@ -146,12 +152,13 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         return ResponseEntity.ok(JsonResult.success(agent));
     }
 
-    @ActionAnnotation(title = "客服", action = "更新", description = "update agent")
-    @Operation(summary = "更新客服", description = "更新客服信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent")
+    @Operation(summary = "Update Agent", description = "Update agent information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody AgentRequest request) {
 
@@ -161,9 +168,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
-    @ActionAnnotation(title = "客服", action = "更新头像", description = "update agent avatar")
-    @Operation(summary = "更新客服头像", description = "更新客服的头像")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE_AVATAR, description = "update agent avatar")
+    @Operation(summary = "Update Agent Avatar", description = "Update the agent avatar")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PostMapping("/update/avatar")
@@ -175,9 +182,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
-    @ActionAnnotation(title = "客服", action = "更新状态", description = "update agent status")
-    @Operation(summary = "更新客服状态", description = "更新客服的在线状态")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE_AGENT_STATUS, description = "update agent status")
+    @Operation(summary = "Update Agent Status", description = "Update the agent online status")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PostMapping("/update/status")
@@ -189,9 +196,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
-    @ActionAnnotation(title = "客服", action = "更新自动回复", description = "update agent autoreply")
-    @Operation(summary = "更新客服自动回复", description = "更新客服的自动回复设置")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE_AUTO_REPLY, description = "update agent autoreply")
+    @Operation(summary = "Update Agent Auto Reply", description = "Update the agent auto-reply settings")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = AgentResponse.class)))
     @PostMapping("/update/autoreply")
@@ -201,11 +208,38 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         //
         return ResponseEntity.ok(JsonResult.success(agent));
     }
+
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE, description = "force logout agent")
+    @Operation(summary = "Force Logout Agent", description = "Force the specified agent to logout from desktop and block re-login")
+    @ApiResponse(responseCode = "200", description = "Force logout applied successfully",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = AgentResponse.class)))
+    @PostMapping("/force/logout")
+    public ResponseEntity<?> forceLogout(@RequestBody AgentRequest request) {
+
+        AgentResponse agent = agentRestService.forceLogout(request);
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
+
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_UPDATE, description = "restore agent login")
+    @Operation(summary = "Restore Agent Login", description = "Restore the specified agent login after a forced logout")
+    @ApiResponse(responseCode = "200", description = "Agent login restored successfully",
+        content = @Content(mediaType = "application/json",
+        schema = @Schema(implementation = AgentResponse.class)))
+    @PostMapping("/restore/login")
+    public ResponseEntity<?> restoreLogin(@RequestBody AgentRequest request) {
+
+        AgentResponse agent = agentRestService.restoreLogin(request);
+        return ResponseEntity.ok(JsonResult.success(agent));
+    }
     
     @PreAuthorize(AgentPermissions.HAS_AGENT_DELETE)
-    @ActionAnnotation(title = "客服", action = "删除", description = "delete agent")
-    @Operation(summary = "删除客服", description = "删除指定的客服")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent")
+    @Operation(summary = "Delete Agent", description = "Delete the specified agent")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody AgentRequest request) {
 
@@ -215,9 +249,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     }
 
     @PreAuthorize(AgentPermissions.HAS_AGENT_EXPORT)
-    @ActionAnnotation(title = "客服", action = "导出", description = "export agent")
-    @Operation(summary = "导出客服", description = "导出客服数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent")
+    @Operation(summary = "Export Agents", description = "Export agent data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @GetMapping("/export")
     @Override
     public Object export(AgentRequest request, HttpServletResponse response) {
@@ -234,9 +268,9 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     @BlackIpFilter(title = "black", action = "sendAgentSseMessage")
     @BlackUserFilter(title = "black", action = "sendAgentSseMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendAgentSseMessage")
-    @Operation(summary = "客服消息SSE推送", description = "客服消息SSE实时推送接口")
-    @ApiResponse(responseCode = "200", description = "推送成功")
-    @ActionAnnotation(title = "客服", action = "sendAgentSseMessage", description = "sendAgentSseMessage")
+    @Operation(summary = "Agent Message SSE Push", description = "Real-time SSE push endpoint for agent messages")
+    @ApiResponse(responseCode = "200", description = "Pushed successfully")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT, action = I18Consts.I18N_ACTION_SEND_AGENT_SSE_MESSAGE, description = "sendAgentSseMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendAgentSseMessage(@RequestParam(value = "message") String message) {
 
@@ -278,9 +312,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 
 }

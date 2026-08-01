@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.user;
 import java.util.Optional;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -38,6 +39,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -51,6 +53,7 @@ import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +64,13 @@ import org.modelmapper.ModelMapper;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    // ROLE_USER is enforced automatically for every user and should not participate
+    // in restricted-role diff checks, otherwise fresh members can fail creation
+    // when the request is normalized to include it.
+    private static final Set<String> RESTRICTED_ROLE_UIDS = Set.of(
+            BytedeskConsts.DEFAULT_ROLE_ADMIN_UID,
+            BytedeskConsts.DEFAULT_ROLE_SUPER_UID);
 
     private final UserRepository userRepository;
 
@@ -88,7 +98,7 @@ public class UserService {
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "user:exists", key = "#request.username + '-' + #request.platform", condition = "#request.username != null"),
-            @CacheEvict(value = "user:exists", key = "#request.mobile + '-' + #request.platform", condition = "#request.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#request.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#request.country)) + '-' + #request.platform", condition = "#request.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#request.email + '-' + #request.platform", condition = "#request.email != null"),
     })
     public UserResponse register(UserRequest request) {
@@ -102,8 +112,11 @@ public class UserService {
 
         if (!StringUtils.hasText(request.getEmail())
                 && !StringUtils.hasText(request.getMobile())) {
-            throw new RuntimeException("email or mobile is required..!!");
+            throw new RuntimeException(I18Consts.I18N_EMAIL_OR_MOBILE_REQUIRED);
         }
+
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
 
         // 保护超级管理员账号：仅在超级管理员已存在时进行验证
         // 首次安装时，超级管理员尚未创建，应跳过此验证
@@ -117,7 +130,7 @@ public class UserService {
         }
 
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndPlatform(request.getMobile(), platform)) {
+                && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, platform)) {
             throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
         }
         //
@@ -179,7 +192,7 @@ public class UserService {
         if (StringUtils.hasText(request.getMobile())) {
             if (!StringUtils.hasText(request.getUsername())
                     && !StringUtils.hasText(request.getEmail())) {
-                user.setUsername(request.getMobile());
+                user.setUsername(CountryCodeUtils.buildMobileUsername(normalizedCountry, request.getMobile()));
             } else {
                 user.setUsername(request.getUsername());
             }
@@ -240,13 +253,26 @@ public class UserService {
 
             if (StringUtils.hasText(request.getMobile())) {
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
-                if (!request.getMobile().equals(user.getMobile())) {
+                String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+                boolean mobileChanged = !request.getMobile().equals(user.getMobile());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (mobileChanged || countryChanged) {
                     if (existsByMobileAndPlatform(request.getMobile(),
+                            normalizedCountry,
                             request.getPlatform())) {
                         throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
                     }
                 }
                 user.setMobile(request.getMobile());
+                user.setCountry(normalizedCountry);
+            } else if (StringUtils.hasText(request.getCountry()) && StringUtils.hasText(user.getMobile())) {
+                String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (countryChanged
+                        && existsByMobileAndPlatform(user.getMobile(), normalizedCountry, request.getPlatform())) {
+                    throw new MobileExistsException("Mobile " + user.getMobile() + " already exists..!!");
+                }
+                user.setCountry(normalizedCountry);
             }
 
             if (StringUtils.hasText(request.getDescription())) {
@@ -261,7 +287,7 @@ public class UserService {
             return UserConvertUtils.convertToUserResponse(user);
 
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -290,7 +316,7 @@ public class UserService {
                 throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
             }
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -310,7 +336,7 @@ public class UserService {
             //
             return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -332,14 +358,14 @@ public class UserService {
                 }
                 user.setEmail(request.getEmail());
             } else {
-                throw new RuntimeException("Email is required..!!");
+                throw new RuntimeException(I18Consts.I18N_EMAIL_REQUIRED);
             }
             user.setEmailVerified(true);
             user = save(user);
             //
             return UserConvertUtils.convertToUserResponse(user);
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -349,31 +375,38 @@ public class UserService {
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
+            String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
             if (StringUtils.hasText(request.getMobile())) {
                 // 保护超级管理员账号：禁止将手机号改为与超管相同（除非本人就是超管）
                 validateNotUsingSuperCredentials(null, request.getMobile(), user.getUid());
                 // 如果新手机号跟旧手机号不同，需要首先判断新手机号是否已经存在，如果存在则抛出异常
-                if (!request.getMobile().equals(user.getMobile())) {
+                boolean mobileChanged = !request.getMobile().equals(user.getMobile());
+                boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
+                if (mobileChanged || countryChanged) {
                     if (existsByMobileAndPlatform(request.getMobile(),
+                            normalizedCountry,
                             request.getPlatform())) {
                         throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
                     }
                 }
                 user.setMobile(request.getMobile());
             } else {
-                throw new RuntimeException("Mobile is required..!!");
+                throw new RuntimeException(I18Consts.I18N_MOBILE_REQUIRED);
             }
+            user.setCountry(normalizedCountry);
             user.setMobileVerified(true);
             user = save(user);
 
             return UserConvertUtils.convertToUserResponse(user);
         } else {
-            throw new RuntimeException("User not found..!!");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
     @Transactional
     public UserEntity createUserFromMember(UserRequest request) {
+        String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
+        request.setCountry(normalizedCountry);
         //
         // 保护超级管理员账号：仅在超级管理员已存在时进行验证
         // 首次安装时，超级管理员尚未创建，应跳过此验证
@@ -382,8 +415,9 @@ public class UserService {
         }
 
         if (StringUtils.hasText(request.getMobile())
-                && existsByMobileAndPlatform(request.getMobile(), request.getPlatform())) {
-            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), request.getPlatform());
+                && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, request.getPlatform())) {
+            Optional<UserEntity> userOptional = findByMobileAndPlatform(request.getMobile(), normalizedCountry,
+                    request.getPlatform());
             return userOptional.get();
         }
 
@@ -398,6 +432,7 @@ public class UserService {
                 .avatar(request.getAvatar())
                 .nickname(request.getNickname())
                 .mobile(request.getMobile())
+                .country(normalizedCountry)
                 .num(request.getMobile())
                 .email(request.getEmail())
                 .superUser(false)
@@ -414,7 +449,7 @@ public class UserService {
         if (StringUtils.hasText(request.getEmail())) {
             user.setUsername(request.getEmail());
         } else if (StringUtils.hasText(request.getMobile())) {
-            user.setUsername(request.getMobile());
+            user.setUsername(CountryCodeUtils.buildMobileUsername(normalizedCountry, request.getMobile()));
         }
         //
         if (StringUtils.hasText(request.getPassword())) {
@@ -427,7 +462,7 @@ public class UserService {
         //
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(request.getOrgUid());
         if (!orgOptional.isPresent()) {
-            throw new RuntimeException("Organization not found..!!");
+            throw new RuntimeException(I18Consts.I18N_ORGANIZATION_NOT_FOUND);
         } else {
             user.setCurrentOrganization(orgOptional.get());
         }
@@ -454,12 +489,12 @@ public class UserService {
 
         if (StringUtils.hasText(email) && StringUtils.hasText(superUser.getEmail())
                 && email.trim().equalsIgnoreCase(superUser.getEmail().trim())) {
-            throw new EmailExistsException("邮箱为系统超级管理员保留，禁止使用");
+            throw new EmailExistsException(I18Consts.I18N_EMAIL_RESERVED_BY_SUPER_ADMIN);
         }
 
         if (StringUtils.hasText(mobile) && StringUtils.hasText(superUser.getMobile())
                 && mobile.trim().equals(superUser.getMobile().trim())) {
-            throw new MobileExistsException("手机号为系统超级管理员保留，禁止使用");
+            throw new MobileExistsException(I18Consts.I18N_MOBILE_RESERVED_BY_SUPER_ADMIN);
         }
     }
 
@@ -474,16 +509,48 @@ public class UserService {
         if (!StringUtils.hasText(orgUid)) {
             return user;
         }
-        if (user.getCurrentOrganization() != null && orgUid.equals(user.getCurrentOrganization().getUid())) {
-            return user;
-        }
 
         Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
         if (!orgOptional.isPresent()) {
-            throw new RuntimeException("Organization not found..!!");
+            throw OrganizationI18nExceptions.organizationNotFound(orgUid);
         }
-        user.setCurrentOrganization(orgOptional.get());
+
+        OrganizationEntity organization = orgOptional.get();
+        if (organization.isDeleted()) {
+            throw OrganizationI18nExceptions.organizationNotFound(orgUid);
+        }
+        if (Boolean.FALSE.equals(organization.getEnabled())) {
+            throw OrganizationI18nExceptions.organizationAccessDenied();
+        }
+
+        if (user.getCurrentOrganization() != null && orgUid.equals(user.getCurrentOrganization().getUid())) {
+            user.setCurrentOrganization(organization);
+            return user;
+        }
+        user.setCurrentOrganization(organization);
         return user;
+    }
+
+    private boolean isOrganizationAvailable(OrganizationEntity organization) {
+        return organization != null
+                && StringUtils.hasText(organization.getUid())
+                && !organization.isDeleted()
+                && !Boolean.FALSE.equals(organization.getEnabled());
+    }
+
+    @Transactional
+    public void removeAllUsersFromOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        List<UserEntity> users = userRepository.findAllByOrganizationUidWithOrganizations(orgUid);
+        for (UserEntity user : users) {
+            if (user == null || !StringUtils.hasText(user.getUid())) {
+                continue;
+            }
+            removeUserFromOrganization(user.getUid(), orgUid);
+        }
     }
 
     /**
@@ -508,7 +575,8 @@ public class UserService {
         // 兼容历史/脏数据
         if (managedUser.getUserOrganizationRoles() != null) {
             managedUser.getUserOrganizationRoles().removeIf(
-                    u -> u == null || u.getOrganization() == null || !StringUtils.hasText(u.getOrganization().getUid()));
+                    u -> u == null || u.getOrganization() == null
+                            || !StringUtils.hasText(u.getOrganization().getUid()));
         }
 
         boolean removedCurrentOrg = managedUser.getCurrentOrganization() != null
@@ -529,7 +597,11 @@ public class UserService {
             String nextOrgUid = null;
             if (managedUser.getUserOrganizationRoles() != null) {
                 for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
-                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                    if (uor == null || uor.getOrganization() == null
+                            || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                        continue;
+                    }
+                    if (!isOrganizationAvailable(uor.getOrganization())) {
                         continue;
                     }
                     nextOrgUid = uor.getOrganization().getUid();
@@ -545,21 +617,7 @@ public class UserService {
         }
 
         // 3) 同步 currentRoles
-        managedUser.getCurrentRoles().clear();
-        if (managedUser.getCurrentOrganization() != null && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
-            String currentOrgUid = managedUser.getCurrentOrganization().getUid();
-            if (managedUser.getUserOrganizationRoles() != null) {
-                for (UserOrganizationRoleEntity uor : managedUser.getUserOrganizationRoles()) {
-                    if (uor == null || uor.getOrganization() == null || !StringUtils.hasText(uor.getOrganization().getUid())) {
-                        continue;
-                    }
-                    if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
-                        managedUser.getCurrentRoles().addAll(uor.getRoles());
-                        break;
-                    }
-                }
-            }
-        }
+        syncCurrentRolesForCurrentOrganization(managedUser);
 
         // 4) 强制确保 ROLE_USER（避免调用 addRoleUser 触发额外 save）
         Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
@@ -571,7 +629,7 @@ public class UserService {
             }
             RoleEntity managedRoleUser = entityManager.find(RoleEntity.class, roleId);
             if (managedRoleUser == null) {
-                throw new RuntimeException("Role not found by id: " + roleId);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID, roleId));
             }
 
             if (managedUser.getCurrentOrganization() == null) {
@@ -590,7 +648,38 @@ public class UserService {
     }
 
     public UserEntity updateUserFromMember(UserEntity user, MemberRequest request) {
-        return updateUserRoles(user, request.getRoleUids());
+        if (user == null) {
+            return null;
+        }
+        if (StringUtils.hasText(request.getCountry())) {
+            user.setCountry(CountryCodeUtils.normalize(request.getCountry()));
+        }
+        // Profile updates may omit roleUids; in that case keep existing roles unchanged.
+        if (request.getRoleUids() == null) {
+            return user;
+        }
+        return updateUserRoles(user, request.getRoleUids(), request.getOrgUid(), true);
+    }
+
+    private void syncCurrentRolesForCurrentOrganization(UserEntity user) {
+        user.getCurrentRoles().clear();
+        if (user.getCurrentOrganization() == null
+                || !StringUtils.hasText(user.getCurrentOrganization().getUid())
+                || user.getUserOrganizationRoles() == null) {
+            return;
+        }
+
+        String currentOrgUid = user.getCurrentOrganization().getUid();
+        for (UserOrganizationRoleEntity uor : user.getUserOrganizationRoles()) {
+            if (uor == null || uor.getOrganization() == null
+                    || !StringUtils.hasText(uor.getOrganization().getUid())) {
+                continue;
+            }
+            if (currentOrgUid.equals(uor.getOrganization().getUid()) && uor.getRoles() != null) {
+                user.getCurrentRoles().addAll(uor.getRoles());
+                break;
+            }
+        }
     }
 
     /**
@@ -601,6 +690,12 @@ public class UserService {
      */
     @Transactional
     public UserEntity updateUserRoles(UserEntity user, Set<String> roleUids) {
+        return updateUserRoles(user, roleUids, null, false);
+    }
+
+    @Transactional
+    public UserEntity updateUserRoles(UserEntity user, Set<String> roleUids, String targetOrgUid,
+            boolean preserveCurrentOrganization) {
         if (user == null) {
             return null;
         }
@@ -612,9 +707,17 @@ public class UserService {
         UserEntity managedUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("User not found: " + user.getUid()));
 
+        String originalCurrentOrgUid = null;
+        if (managedUser.getCurrentOrganization() != null
+                && StringUtils.hasText(managedUser.getCurrentOrganization().getUid())) {
+            originalCurrentOrgUid = managedUser.getCurrentOrganization().getUid();
+        }
+
         // Ensure currentOrganization is set on the managed instance
-        String orgUid = null;
-        if (user.getCurrentOrganization() != null && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
+        String orgUid = targetOrgUid;
+        if (!StringUtils.hasText(orgUid)
+                && user.getCurrentOrganization() != null
+                && StringUtils.hasText(user.getCurrentOrganization().getUid())) {
             orgUid = user.getCurrentOrganization().getUid();
         }
         ensureCurrentOrganization(managedUser, orgUid);
@@ -642,6 +745,12 @@ public class UserService {
         // All users must have ROLE_USER (df_role_user_uid)
         normalizedRoleUids.add(BytedeskConsts.DEFAULT_ROLE_USER_UID);
 
+        Set<String> existingRestrictedRoleUids = extractRestrictedRoleUids(managedUser.getRoleUids());
+        Set<String> requestedRestrictedRoleUids = extractRestrictedRoleUids(normalizedRoleUids);
+        if (!existingRestrictedRoleUids.equals(requestedRestrictedRoleUids)) {
+            throw new RuntimeException(I18Consts.I18N_MEMBER_RESTRICTED_ROLE_UPDATE_NOT_SUPPORTED);
+        }
+
         // 首先判断是否有变化，如果无变化则不更新
         if (managedUser.getRoleUids() != null && managedUser.getRoleUids().equals(normalizedRoleUids)) {
             return managedUser;
@@ -664,16 +773,37 @@ public class UserService {
                 }
                 RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
                 if (managedRole == null) {
-                    throw new RuntimeException("Role not found by id: " + roleId + ", uid: " + roleUid);
+                    throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_UID, roleId, roleUid));
                 }
                 managedUser.addOrganizationRole(managedRole);
             } else {
-                throw new RuntimeException("Role not found: " + roleUid);
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, roleUid));
             }
+        }
+
+        if (preserveCurrentOrganization
+                && StringUtils.hasText(originalCurrentOrgUid)
+                && StringUtils.hasText(orgUid)
+                && !originalCurrentOrgUid.equals(orgUid)) {
+            ensureCurrentOrganization(managedUser, originalCurrentOrgUid);
+            syncCurrentRolesForCurrentOrganization(managedUser);
         }
 
         // managedUser is tracked by JPA; changes will flush on transaction commit
         return managedUser;
+    }
+
+    private Set<String> extractRestrictedRoleUids(Set<String> roleUids) {
+        Set<String> restrictedRoleUids = new LinkedHashSet<>();
+        if (roleUids == null) {
+            return restrictedRoleUids;
+        }
+        for (String roleUid : roleUids) {
+            if (RESTRICTED_ROLE_UIDS.contains(roleUid)) {
+                restrictedRoleUids.add(roleUid);
+            }
+        }
+        return restrictedRoleUids;
     }
 
     public UserEntity addRoleAgent(UserEntity user) {
@@ -753,7 +883,7 @@ public class UserService {
 
         Optional<RoleEntity> roleOptional = roleRestService.findByNamePlatform(roleName);
         if (!roleOptional.isPresent()) {
-            throw new RuntimeException("Role not found: " + roleName);
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, roleName));
         }
 
         RoleEntity role = roleOptional.get();
@@ -766,7 +896,23 @@ public class UserService {
         // and mark the surrounding transaction rollback-only under concurrent access.
         RoleEntity managedRole = entityManager.find(RoleEntity.class, roleId);
         if (managedRole == null) {
-            throw new RuntimeException("Role not found by id: " + roleId + ", name: " + roleName);
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME, roleId, roleName));
+        }
+
+        RoleEntity managedRoleUser = null;
+        if (managedUser.getCurrentOrganization() != null) {
+            Optional<RoleEntity> roleUserOptional = roleRestService.findByNamePlatform(RoleConsts.ROLE_USER);
+            if (!roleUserOptional.isPresent()) {
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND, RoleConsts.ROLE_USER));
+            }
+            Long roleUserId = roleUserOptional.get().getId();
+            if (roleUserId == null) {
+                throw new RuntimeException("Role id is null for name: " + RoleConsts.ROLE_USER);
+            }
+            managedRoleUser = entityManager.find(RoleEntity.class, roleUserId);
+            if (managedRoleUser == null) {
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME, roleUserId, RoleConsts.ROLE_USER));
+            }
         }
 
         // Allow ROLE_USER without organization context so auto-registered users have a
@@ -782,6 +928,7 @@ public class UserService {
                 managedUser.getCurrentRoles().add(managedRole);
             }
         } else {
+            managedUser.addOrganizationRole(managedRoleUser);
             managedUser.addOrganizationRole(managedRole);
         }
 
@@ -807,7 +954,7 @@ public class UserService {
                 throw new RuntimeException("User remove role failed..!!", e);
             }
         } else {
-            throw new RuntimeException("Role not found..!!");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -816,9 +963,16 @@ public class UserService {
         return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
-    @Cacheable(value = "user", key = "#mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Optional<UserEntity> findByMobileAndPlatform(String mobile, String country, String platform) {
+        return userRepository.findByMobileAndCountryAndPlatformAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String platform) {
-        return userRepository.findByMobileAndPlatformAndDeletedFalse(mobile, platform);
+        return findByMobileAndPlatform(mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
@@ -841,9 +995,16 @@ public class UserService {
         return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
-    @Cacheable(value = "user:exists", key = "#mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Boolean existsByMobileAndPlatform(@NonNull String mobile, String country, @NonNull String platform) {
+        return userRepository.existsByMobileAndCountryAndPlatformAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
-        return userRepository.existsByMobileAndPlatformAndDeletedFalse(mobile, platform);
+        return existsByMobileAndPlatform(mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#email + '-' + #platform", unless = "#result == null")
@@ -852,10 +1013,20 @@ public class UserService {
     }
 
     // exists by username and mobile
-    @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + #platform", unless = "#result == null")
+    @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
+    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
+            String country,
+            @NonNull String platform) {
+        return userRepository.existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
+                username,
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
+    }
+
     public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
             @NonNull String platform) {
-        return userRepository.existsByUsernameAndMobileAndPlatformAndDeletedFalse(username, mobile, platform);
+        return existsByUsernameAndMobileAndPlatform(username, mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     public Boolean existsBySuperUser() {
@@ -865,15 +1036,18 @@ public class UserService {
     @Transactional
     @Caching(put = {
             @CachePut(value = "user", key = "#user.username + '-' + #user.platform", unless = "#user.username == null"),
-            @CachePut(value = "user", key = "#user.mobile + '-' + #user.platform", unless = "#user.mobile == null"),
+            @CachePut(value = "user", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform", unless = "#user.mobile == null"),
             @CachePut(value = "user", key = "#user.email + '-' + #user.platform", unless = "#user.email == null"),
             @CachePut(value = "user", key = "#user.uid", unless = "#user.uid == null"),
     }, evict = {
             @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform", condition = "#user.username != null"),
-            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform", condition = "#user.mobile != null"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform", condition = "#user.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform", condition = "#user.email != null"),
     })
     public UserEntity save(@NonNull UserEntity user) {
+        if (StringUtils.hasText(user.getMobile())) {
+            user.setCountry(CountryCodeUtils.normalize(user.getCountry()));
+        }
         try {
             return userRepository.save(user);
         } catch (ObjectOptimisticLockingFailureException optimisticLockingFailureException) {
@@ -887,11 +1061,11 @@ public class UserService {
 
     @Caching(evict = {
             @CacheEvict(value = "user", key = "#user.username + '-' + #user.platform"),
-            @CacheEvict(value = "user", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform"),
             @CacheEvict(value = "user", key = "#user.email + '-' + #user.platform"),
             @CacheEvict(value = "user", key = "#user.uid"),
             @CacheEvict(value = "user:exists", key = "#user.username + '-' + #user.platform"),
-            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + #user.platform"),
+            @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform"),
     })
     public void delete(@NonNull UserEntity user) {

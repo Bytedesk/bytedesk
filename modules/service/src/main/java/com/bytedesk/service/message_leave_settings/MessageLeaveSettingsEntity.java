@@ -44,10 +44,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MessageLeaveSettingsEntity extends BaseEntity {
 
-    @Builder.Default
-    @Column(name = "is_leave_msg_enabled")
-    private Boolean messageLeaveEnabled = true;
-
     @NotBlank
     @Builder.Default
     private String messageLeaveTip = I18Consts.I18N_MESSAGE_LEAVE_TIP;
@@ -84,6 +80,13 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
      */
     @Builder.Default
     private Boolean messageLeaveFormEnabled = false;
+
+    /**
+     * 客服离线时是否允许访客继续在会话中发送消息。
+     * 默认允许，只有显式配置为 false 时才阻断。
+     */
+    @Builder.Default
+    private Boolean messageLeaveAllowVisitorSendWhenOffline = false;
 
     /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：
@@ -142,8 +145,12 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
         if (request == null || modelMapper == null) {
             return MessageLeaveSettingsEntity.builder().build();
         }
-        
-        return modelMapper.map(request, MessageLeaveSettingsEntity.class);
+
+        MessageLeaveSettingsEntity entity = modelMapper.map(request, MessageLeaveSettingsEntity.class);
+        if (entity.getMessageLeaveAllowVisitorSendWhenOffline() == null) {
+            entity.setMessageLeaveAllowVisitorSendWhenOffline(true);
+        }
+        return entity;
     }
 
 }

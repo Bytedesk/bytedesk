@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.upload.tencent;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +26,11 @@ import com.qcloud.cos.region.Region;
 @Configuration
 public class TencentConfig {
 
-    @Autowired
-    TencentProperties tencentProperties;
+    private final TencentProperties tencentProperties;
+
+    public TencentConfig(TencentProperties tencentProperties) {
+        this.tencentProperties = tencentProperties;
+    }
 
     @Bean
     @ConditionalOnProperty(name = "bytedesk.tencent.enabled", havingValue = "true", matchIfMissing = false)

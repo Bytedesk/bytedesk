@@ -19,7 +19,6 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.support.DatabaseType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,24 +27,23 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Spring Batch配置类
  * 用于配置Spring Batch所需的基本组件
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableBatchProcessing
 @Description("Batch Processing Configuration - Spring Batch configuration for knowledge base data processing")
 public class BatchConfig {
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    @Autowired
-    private PlatformTransactionManager transactionManager;
+    private final PlatformTransactionManager transactionManager;
 
-    @Autowired
-    private Environment environment;
+    private final Environment environment;
 
     @Value("${spring.batch.database-type:}")
     private String configuredDatabaseType;

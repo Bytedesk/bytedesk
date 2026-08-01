@@ -1,0 +1,76 @@
+<configuration name="acl.conf" description="Network Lists">
+  <network-lists>
+    <!--
+	 These ACL's are automatically created on startup.
+
+	 rfc1918.auto  - RFC1918 Space
+	 nat.auto      - RFC1918 Excluding your local lan.
+	 localnet.auto - ACL for your local lan.
+	 loopback.auto - ACL for your local lan.
+    -->
+
+    <list name="lan" default="allow">
+      <node type="deny" cidr="192.168.42.0/24" />
+      <node type="allow" cidr="192.168.42.42/32" />
+    </list>
+
+    <!--
+	This will traverse the directory adding all users
+	with the cidr= tag to this ACL, when this ACL matches
+	the users variables and params apply as if they
+	digest authenticated.
+    -->
+    <list name="domains" default="deny">
+      <!-- domain= is special it scans the domain from the directory to build the ACL -->
+      <node type="allow" domain="$${domain}" />
+      <!-- use cidr= if you wish to allow ip ranges to this domains acl. -->
+      <!-- <node type="allow" cidr="192.168.0.0/24"/> -->
+    </list>
+
+    <list name="bytedesk_allowed" default="deny">
+      <node type="allow" cidr="127.0.0.0/8" />
+      <node type="allow" cidr="10.0.0.0/8" />
+      <node type="allow" cidr="172.16.0.0/12" />
+      <node type="allow" cidr="192.168.0.0/16" />
+      <node type="allow" cidr="::1/128" />
+      <!-- <node type="allow" cidr="YOUR_PUBLIC_IP/32"/> -->
+      <node type="allow" cidr="27.23.0.0/16" />
+      <node type="allow" cidr="111.181.0.0/16" />
+      <node type="allow" cidr="111.183.0.0/16" />
+      <node type="allow" cidr="183.92.15.0/24" />
+      <node type="allow" cidr="122.191.157.0/24" />
+      <node type="allow" cidr="185.199.109.133/32" />
+      <node type="allow" cidr="178.128.69.202/32" />
+      <node type="allow" cidr="138.68.11.125/32" />
+    </list>
+
+    <list name="kamailio_only" default="deny">
+      <node type="allow" cidr="127.0.0.0/8" />
+      <node type="allow" cidr="::1/128" />
+      <node type="allow" cidr="192.168.0.102/32" />
+      <!-- If Kamailio forwards over a private network, add its private IP as /32 here. -->
+    </list>
+
+    <!--
+      WebRTC 本地网段判定：只把真实宿主机 LAN 视为 local network，
+      避免 Docker bridge 172.16.0.0/12 被 localnet.auto 误判为本地，
+      进而让 internal profile 在答 SDP 时回落到容器 IP。
+    -->
+    <list name="bytedesk_webrtc_local" default="deny">
+      <node type="allow" cidr="127.0.0.0/8" />
+      <node type="allow" cidr="::1/128" />
+      <node type="allow" cidr="192.168.0.0/16" />
+    </list>
+
+    <!--
+      Docker NAT 场景：internal profile 的 WebSocket/WSS 连接经 Docker 网关转发，
+      nat.auto（RFC1918 排除本地 LAN）会把 Docker 桥接网段排除，导致 ext-rtp-ip 不生效。
+      此 ACL 匹配所有地址，确保 internal profile 始终使用 ext-rtp-ip 宣告 SDP。
+    -->
+    <list name="docker_nat" default="allow">
+      <node type="allow" cidr="0.0.0.0/0" />
+      <node type="allow" cidr="::/0" />
+    </list>
+
+  </network-lists>
+</configuration>

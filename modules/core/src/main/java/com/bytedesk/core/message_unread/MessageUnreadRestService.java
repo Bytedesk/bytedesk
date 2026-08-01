@@ -22,14 +22,17 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.redis.RedisService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -56,11 +59,26 @@ public class MessageUnreadRestService
 
     private final RedisService redisService;
 
+    private final PlatformTransactionManager transactionManager;
+
     // Redis 缓存过期时间：24小时
     private static final long MESSAGE_CACHE_TTL = 24 * 60 * 60;
 
     @Override
     public Page<MessageUnreadResponse> queryByOrg(MessageUnreadRequest request) {
+        if (StringUtils.hasText(request.getThreadTopic())
+                && StringUtils.hasText(request.getUid())
+                && StringUtils.hasText(request.getOrgUid())) {
+            Pageable pageable = request.getPageable();
+            Page<MessageUnreadEntity> page = messageUnreadRepository
+                    .findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                            request.getThreadTopic(),
+                            request.getOrgUid(),
+                            request.getUid(),
+                            pageable);
+            return page.map(this::convertToResponse);
+        }
+
         Pageable pageable = request.getPageable();
         Specification<MessageUnreadEntity> specs = MessageUnreadSpecification.search(request, authService);
         Page<MessageUnreadEntity> page = messageUnreadRepository.findAll(specs, pageable);
@@ -186,7 +204,7 @@ public class MessageUnreadRestService
             messageUnread.setOrgUid(orgUid);
         }
         try {
-            MessageUnreadEntity savedMessageUnread = save(messageUnread);
+            MessageUnreadEntity savedMessageUnread = saveInNewTransaction(messageUnread);
             if (savedMessageUnread == null) {
                 // 如果保存失败，删除 Redis 标记
                 redisService.removeMessageExists(uid);
@@ -226,12 +244,25 @@ public class MessageUnreadRestService
         }
     }
 
+    private MessageUnreadEntity saveInNewTransaction(MessageUnreadEntity messageUnread) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        return transactionTemplate.execute(status -> messageUnreadRepository.saveAndFlush(messageUnread));
+    }
+
     public long getUnreadCount(MessageUnreadRequest request) {
         if (!StringUtils.hasText(request.getUid()) 
             || !StringUtils.hasText(request.getOrgUid())) {
             return 0;
         }
-        // 
+
+        if (StringUtils.hasText(request.getThreadTopic())) {
+            return messageUnreadRepository.countByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                    request.getThreadTopic(),
+                    request.getOrgUid(),
+                    request.getUid());
+        }
+
         Page<MessageUnreadResponse> page = queryByOrg(request);
         return page.getTotalElements();
     }
@@ -244,9 +275,16 @@ public class MessageUnreadRestService
             log.info("Clearing unread messages for uid: {}", uid);
             
             redisService.removeMessageExists(uid);
-            
-            // 删除符合条件的未读消息
-            messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+
+            if (StringUtils.hasText(request.getThreadTopic()) && StringUtils.hasText(request.getOrgUid())) {
+                messageUnreadRepository.softDeleteByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
+                        request.getThreadTopic(),
+                        request.getOrgUid(),
+                        uid);
+            } else {
+                // 删除符合条件的未读消息
+                messageUnreadRepository.deleteByThreadTopicContainsAndUserNotContains(uid, uid);
+            }
             
             // 同步更新相关会话的未读消息数为0
             // 对于访客uid，通常会话的topic会包含这个uid，我们需要找到所有相关的会话并清零未读数

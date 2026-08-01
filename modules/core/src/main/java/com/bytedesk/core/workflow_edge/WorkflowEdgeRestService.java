@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -98,7 +99,7 @@ public class WorkflowEdgeRestService extends BaseRestServiceWithExport<WorkflowE
         // 
         WorkflowEdgeEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create workflow_edge failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -113,12 +114,12 @@ public class WorkflowEdgeRestService extends BaseRestServiceWithExport<WorkflowE
             //
             WorkflowEdgeEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update workflow_edge failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("WorkflowEdge not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -156,7 +157,7 @@ public class WorkflowEdgeRestService extends BaseRestServiceWithExport<WorkflowE
             // workflow_edgeRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("WorkflowEdge not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

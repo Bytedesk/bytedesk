@@ -13,25 +13,24 @@
  */
 package com.bytedesk.core.feature;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class FeatureService {
 
-    @Autowired
-    private FeatureRepository featureRepository;
+    private final FeatureRepository featureRepository;
     
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     
     @Transactional
     public FeatureEntity registerFeature(String code, String name, String moduleName) {

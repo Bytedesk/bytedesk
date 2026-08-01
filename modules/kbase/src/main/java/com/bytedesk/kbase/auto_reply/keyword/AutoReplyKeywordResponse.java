@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;

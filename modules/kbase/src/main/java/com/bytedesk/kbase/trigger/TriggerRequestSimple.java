@@ -39,4 +39,7 @@ public class TriggerRequestSimple implements Serializable {
     /** JSON config string */
     @Builder.Default
     private String config = "{}";
+
+    /** 最大触发次数（null = 不限制） */
+    private Integer maxTriggerCount;
 }

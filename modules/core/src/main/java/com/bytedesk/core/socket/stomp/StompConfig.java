@@ -13,6 +13,8 @@
  */
 package com.bytedesk.core.socket.stomp;
 
+import java.time.Duration;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
@@ -86,7 +88,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         JettyRequestUpgradeStrategy strategy = new JettyRequestUpgradeStrategy();
         strategy.addWebSocketConfigurer(configurable -> {
             configurable.setInputBufferSize(4 * 8192);
-            // configurable.setIdleTimeout(600000);
+            configurable.setIdleTimeout(Duration.ofSeconds(120));
         });
         return new DefaultHandshakeHandler(strategy);
     }
@@ -101,7 +103,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry messageBrokerRegistry) {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(1);
+        taskScheduler.setPoolSize(4);
         taskScheduler.setThreadNamePrefix("wss-heartbeat-thread-");
         taskScheduler.initialize();
         // https://docs.spring.io/spring-framework/reference/web/websocket/stomp/message-flow.html

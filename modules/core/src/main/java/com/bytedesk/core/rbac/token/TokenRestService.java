@@ -14,6 +14,7 @@
 package com.bytedesk.core.rbac.token;
 
 import java.util.Optional;
+import java.util.UUID;
 // import java.time.ZonedDateTime;
 // import java.time.Duration;
 
@@ -32,8 +33,10 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
@@ -45,9 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest, TokenResponse> {
 
-    // 触发 lastActiveAt 写库的最小间隔（避免每次请求都更新）
-    // private static final Duration LAST_ACTIVE_UPDATE_MIN_INTERVAL = Duration.ofMinutes(5);
-
     private final TokenRepository tokenRepository;
 
     private final ModelMapper modelMapper;
@@ -55,6 +55,8 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final UserRepository userRepository;
 
     private final BytedeskProperties bytedeskProperties;
 
@@ -129,10 +131,15 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         if (!Boolean.TRUE.equals(entity.getPermanent()) && entity.getExpiresAt() == null) {
             entity.setExpiresAt(JwtUtils.calculateExpirationTime(request.getChannel()));
         }
+
+        // 若未提供 refreshToken，则自动生成，便于后续使用 refresh 接口。
+        if (!StringUtils.hasText(entity.getRefreshToken())) {
+            entity.setRefreshToken(UUID.randomUUID().toString().replace("-", ""));
+        }
         
         TokenEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create token failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
 
         return convertToResponse(savedEntity);
@@ -149,13 +156,13 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             // 保存更新后的实体
             TokenEntity updatedEntity = save(entity);
             if (updatedEntity == null) {
-                throw new RuntimeException("Update token failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             // 手动将更新后的实体放入缓存
             // cacheToken(updatedEntity);
             return convertToResponse(updatedEntity);
         } else {
-            throw new RuntimeException("Token not found for uid: " + request.getUid());
+            throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID, request.getUid()));
         }
     }
 
@@ -192,7 +199,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
                 modelMapper.map(entity, existingEntity);
                 return doSave(existingEntity);
             } else {
-                throw new RuntimeException("Token not found for uid: " + entity.getUid());
+                throw new RuntimeException(I18Consts.withArgs(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID, entity.getUid()));
             }
         } catch (Exception ex) {
             log.error("Error handling optimistic locking failure: {}", ex.getMessage());
@@ -221,8 +228,48 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         }
         String channel = request.getChannel();
         
-        // 生成访问令牌，传递渠道信息以设置合适的过期时间
-        return JwtUtils.generateJwtToken(username, platform, channel);
+        // 永久有效 token 仍然写入 JWT exp，但使用足够长的 100 年有效期避免数据库永久、JWT先过期。
+        return JwtUtils.generateJwtToken(username, platform, channel, request.getPermanent());
+    }
+
+    /**
+     * 使用 refreshToken 刷新 accessToken。
+     */
+    @Transactional
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    public TokenResponse refreshAccessToken(TokenRequest request) {
+        if (!StringUtils.hasText(request.getRefreshToken())) {
+            throw new RuntimeException("refreshToken is required");
+        }
+
+        TokenEntity tokenEntity = tokenRepository.findFirstByRefreshTokenAndDeletedFalse(request.getRefreshToken())
+                .orElseThrow(() -> new RuntimeException("token not found by refreshToken"));
+
+        if (Boolean.TRUE.equals(tokenEntity.getRevoked())) {
+            throw new RuntimeException("token already revoked");
+        }
+
+        if (!StringUtils.hasText(tokenEntity.getUserUid())) {
+            throw new RuntimeException("token userUid is required");
+        }
+
+        UserEntity userEntity = userRepository.findByUid(tokenEntity.getUserUid())
+                .orElseThrow(() -> new RuntimeException("user not found by token userUid"));
+
+        String channel = StringUtils.hasText(request.getChannel()) ? request.getChannel() : tokenEntity.getChannel();
+        String platform = userEntity.getPlatform();
+        if (!StringUtils.hasText(platform)) {
+            platform = PlatformEnum.BYTEDESK.name();
+        }
+
+        boolean permanent = Boolean.TRUE.equals(tokenEntity.getPermanent());
+        String newAccessToken = JwtUtils.generateJwtToken(userEntity.getUsername(), platform, channel, permanent);
+        tokenEntity.setAccessToken(newAccessToken);
+        tokenEntity.setChannel(channel);
+        tokenEntity.setExpiresAt(permanent ? null : JwtUtils.calculateExpirationTime(channel));
+
+        TokenEntity savedEntity = save(tokenEntity);
+        return convertToResponse(savedEntity);
     }
 
     /**

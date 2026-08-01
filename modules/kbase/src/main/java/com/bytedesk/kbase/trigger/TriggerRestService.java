@@ -256,6 +256,7 @@ public class TriggerRestService extends BaseRestServiceWithExport<TriggerEntity,
                             .type(TriggerTypeEnum.THREAD.name())
                             .triggerKey(TriggerKeyConsts.VISITOR_NO_RESPONSE_PROACTIVE_MESSAGE)
                             .enabled(true)
+                            .maxTriggerCount(3)
                             .name("访客长时间未回复提醒")
                             .description("访客长时间未发送消息时，主动发送提醒消息")
                             .config(JSON.toJSONString(config))

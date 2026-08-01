@@ -41,11 +41,12 @@ public class ConvertUtils {
         // return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
         BytedeskPropertiesResponse response = getModelMapper().map(bytedeskProperties, BytedeskPropertiesResponse.class);
         
-        // 确保使用加密后的licenseKey
+        // 先带出配置中的许可证值，控制器会在返回前替换为前端专用加密摘要。
         response.setLicenseKey(bytedeskProperties.getLicenseKey());
         
         // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {
+            response.getCustom().setUploadApiUrl(bytedeskProperties.getCustom().getUploadApiUrl());
             response.getCustom().setMqttWebsocketUrl(bytedeskProperties.getCustom().getMqttWebsocketUrl());
             response.getCustom().setShowRightCornerChat(bytedeskProperties.getCustom().getShowRightCornerChat());
             response.getCustom().setLoginUsernameEnable(bytedeskProperties.getCustom().getLoginUsernameEnable());
@@ -59,13 +60,49 @@ public class ConvertUtils {
             response.getCustom().setEnabled(bytedeskProperties.getCustom().getEnabled());
             response.getCustom().setName(bytedeskProperties.getCustom().getName());
             response.getCustom().setLogo(bytedeskProperties.getCustom().getLogo());
+            response.getCustom().setFavicon(bytedeskProperties.getCustom().getFavicon());
             response.getCustom().setDescription(bytedeskProperties.getCustom().getDescription());
             response.getCustom().setPrivacyPolicyUrl(bytedeskProperties.getCustom().getPrivacyPolicyUrl());
             response.getCustom().setTermsOfServiceUrl(bytedeskProperties.getCustom().getTermsOfServiceUrl());
             // 
             response.getCustom().setAllowRegister(bytedeskProperties.getCustom().getAllowRegister());
+            response.getCustom().setAutoRegisterOnLogin(bytedeskProperties.getCustom().getAutoRegisterOnLogin());
             response.getCustom().setForceValidateMobile(bytedeskProperties.getCustom().getForceValidateMobile());
             response.getCustom().setForceValidateEmail(bytedeskProperties.getCustom().getForceValidateEmail());
+                response.getCustom().setForceVisitorAuth(bytedeskProperties.getCustom().getForceVisitorAuth());
+                response.getCustom().setWechatMpSubscribePromptEnabled(
+                    bytedeskProperties.getCustom().getWechatMpSubscribePromptEnabled());
+                response.getCustom().setWechatMpSubscribePromptAppId(
+                    bytedeskProperties.getCustom().getWechatMpSubscribePromptAppId());
+                response.getCustom().setDefaultLlmPrompt(
+                    bytedeskProperties.getCustom().getDefaultLlmPrompt());
+        }
+
+        // 明确设置Organization部分字段，确保从配置中获取
+        if (bytedeskProperties.getOrganization() != null) {
+            if (response.getOrganization() == null) {
+                response.setOrganization(new BytedeskPropertiesResponse.Organization());
+            }
+            response.getOrganization().setName(bytedeskProperties.getOrganization().getName());
+            response.getOrganization().setCode(bytedeskProperties.getOrganization().getCode());
+            response.getOrganization().setAllowCreateOrg(bytedeskProperties.getOrganization().getAllowCreateOrg());
+            response.getOrganization().setAllowJoinOrg(bytedeskProperties.getOrganization().getAllowJoinOrg());
+            response.getOrganization().setDefaultVipLevel(bytedeskProperties.getOrganization().getDefaultVipLevel());
+            response.getOrganization().setDefaultVipDays(bytedeskProperties.getOrganization().getDefaultVipDays());
+            response.getOrganization().setDefaultMaxMembers(bytedeskProperties.getOrganization().getDefaultMaxMembers());
+            response.getOrganization().setDefaultMaxAgents(bytedeskProperties.getOrganization().getDefaultMaxAgents());
+            response.getOrganization().setDefaultMaxWorkgroups(bytedeskProperties.getOrganization().getDefaultMaxWorkgroups());
+        }
+
+        if (bytedeskProperties.getCall() != null && bytedeskProperties.getCall().getFreeswitch() != null) {
+            if (response.getCall() == null) {
+                response.setCall(new BytedeskPropertiesResponse.Call());
+            }
+            if (response.getCall().getFreeswitch() == null) {
+                response.getCall().setFreeswitch(new BytedeskPropertiesResponse.Freeswitch());
+            }
+            response.getCall().getFreeswitch()
+                    .setRecordingsBaseUrl(bytedeskProperties.getCall().getFreeswitch().getRecordingsBaseUrl());
         }
 
         return response;

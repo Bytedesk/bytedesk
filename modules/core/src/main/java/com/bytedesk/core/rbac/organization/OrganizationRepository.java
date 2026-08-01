@@ -22,9 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.lang.NonNull;
+import org.springframework.data.repository.query.Param;
 // import org.springframework.security.access.prepost.PreAuthorize;
 // import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -42,7 +44,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")
 // https://docs.spring.io/spring-data/rest/reference/customizing/configuring-the-rest-url-path.html
 // use excerptProjection to self define response format:
-// @RepositoryRestResource(path = "org", excerptProjection = OrganizationResponse.class)
+// @RepositoryRestResource(path = "org", excerptProjection =
+// OrganizationResponse.class)
 public interface OrganizationRepository
                 extends JpaRepository<OrganizationEntity, Long>, JpaSpecificationExecutor<OrganizationEntity> {
 
@@ -53,12 +56,19 @@ public interface OrganizationRepository
 
         Optional<OrganizationEntity> findByCodeAndDeleted(String code, Boolean deleted);
 
-        List<OrganizationEntity> findByDeletedFalse();
+        @Query("""
+                select o from OrganizationEntity o
+                where o.deleted = false
+                        and (
+                                o.uid = :keyword
+                                or lower(o.name) like lower(concat('%', :keyword, '%'))
+                                or lower(o.code) like lower(concat('%', :keyword, '%'))
+                                or lower(o.description) like lower(concat('%', :keyword, '%'))
+                        )
+        """)
+        List<OrganizationEntity> searchByKeyword(@Param("keyword") String keyword);
 
-        //
-        // @NonNull
-        // @PreAuthorize("hasRole('ROLE_SUPER')")
-        // List<Organization> findAll();
+        List<OrganizationEntity> findByDeletedFalse();
 
         //
         Page<OrganizationEntity> findByUser(UserEntity user, Pageable pageable);

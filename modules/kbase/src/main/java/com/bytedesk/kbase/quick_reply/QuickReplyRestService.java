@@ -36,8 +36,8 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.FormContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
 import lombok.AllArgsConstructor;
@@ -198,6 +198,10 @@ public class QuickReplyRestService extends BaseRestServiceWithExport<QuickReplyE
 
     public void save(List<QuickReplyEntity> entities) {
         quickReplyRepository.saveAll(entities);
+    }
+
+    public List<QuickReplyEntity> findAllNotDeleted() {
+        return quickReplyRepository.findByDeleted(false);
     }
 
     private String normalizeType(String rawType) {

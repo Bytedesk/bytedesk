@@ -53,24 +53,61 @@ public class WorkgroupRoutingService {
     private final PresenceFacadeService presenceFacadeService;
 
     /**
-     * 根据工作组路由模式选择客服
+     * 根据工作组路由模式选择客服（兼容原有调用方，如 WorkgroupThreadRoutingStrategy）。
+     * <p>
+     * 行为与修改前完全一致：按 workgroup.getRoutingMode() 选择，不做 MANUAL 拦截。
      */
     @Transactional
     public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread) {
+        return selectAgentInternal(workgroup, thread, workgroup.getRoutingMode());
+    }
+
+    /**
+     * 根据指定的分配模式选择客服。
+     * <p>
+     * 用于支持 TicketBasicSettingsEntity.assignmentMode 覆盖工作组默认 routingMode 的场景：
+     * <ul>
+     *   <li>MANUAL — 不自动分配，返回 null</li>
+     *   <li>其他模式 — 按指定模式从工作组可用客服中选择</li>
+     * </ul>
+     * <p>
+     * 注意：此方法仅用于工单路由等需要按 TicketBasicSettings 分配模式的场景。
+     * 原有的 WorkgroupThreadRoutingStrategy 应继续使用两参数版本 {@link #selectAgent(WorkgroupEntity, ThreadEntity)}。
+     *
+     * @param workgroup      工作组
+     * @param thread         当前会话
+     * @param assignmentMode 分配模式（TicketAssignmentModeEnum 值）
+     * @return 选中的客服，MANUAL 模式或无可用客服时返回 null
+     */
+    @Transactional
+    public AgentEntity selectAgent(WorkgroupEntity workgroup, ThreadEntity thread, String assignmentMode) {
+        // MANUAL 模式：不自动分配（此拦截仅对 TicketThreadRoutingStrategy 等工单调用方生效）
+        if ("MANUAL".equalsIgnoreCase(assignmentMode)) {
+            log.debug("selectAgent: MANUAL mode, skip auto-assignment for workgroup={}", workgroup.getUid());
+            return null;
+        }
+        return selectAgentInternal(workgroup, thread, normalizeRoutingMode(assignmentMode));
+    }
+
+    /**
+     * 核心路由逻辑：根据指定 routingMode 从工作组可用客服中选择。
+     * 不做 MANUAL 拦截 —— MANUAL 由上层（三参数重载 / WorkgroupThreadRoutingStrategy）各自处理。
+     */
+    private AgentEntity selectAgentInternal(WorkgroupEntity workgroup, ThreadEntity thread, String routingMode) {
         List<AgentEntity> availableAgents = sortAgentsByUid(presenceFacadeService.getAvailableAgents(workgroup));
         if (availableAgents == null || availableAgents.isEmpty()) {
             return null;
         }
 
-        String routingMode = workgroup.getRoutingMode();
-        if (!isEntityBackedMode(routingMode)) {
+        String mode = normalizeRoutingMode(routingMode);
+        if (!isEntityBackedMode(mode)) {
             // 对于依赖访客上下文的模式（如 CONSISTENT_HASH/RECENT），仍沿用原实时计算逻辑
-            return selectAgentRealtimeFallback(workgroup, thread, availableAgents, routingMode);
+            return selectAgentRealtimeFallback(workgroup, thread, availableAgents, mode);
         }
 
         // 读 WorkgroupRoutingEntity 中预计算好的 nextAgent；推进/刷新由异步任务处理
         WorkgroupRoutingEntity state = getOrCreateRoutingState(workgroup);
-        if (state.getRoutingMode() == null || !Objects.equals(state.getRoutingMode(), routingMode)) {
+        if (state.getRoutingMode() == null || !Objects.equals(state.getRoutingMode(), mode)) {
             // routingMode 变化：不在这里写库，交给异步 refresh 统一重算
             bytedeskEventPublisher.publishEvent(new WorkgroupRoutingRefreshEvent(this, workgroup.getUid(), "mode_changed"));
         }
@@ -79,7 +116,7 @@ public class WorkgroupRoutingService {
         if (selected == null) {
             // nextAgent 不存在/不在线：触发异步 refresh，同时本次走一个轻量 fallback，避免阻塞访客路径
             bytedeskEventPublisher.publishEvent(new WorkgroupRoutingRefreshEvent(this, workgroup.getUid(), "next_missing"));
-            selected = computeNextAgentForDisplay(routingMode, workgroup, thread, availableAgents, state);
+            selected = computeNextAgentForDisplay(mode, workgroup, thread, availableAgents, state);
         }
 
         if (selected != null) {
@@ -88,6 +125,17 @@ public class WorkgroupRoutingService {
         }
 
         return selected;
+    }
+
+    /**
+     * 将 TicketAssignmentModeEnum / WorkgroupRoutingModeEnum 值统一规范化为大写形式。
+     * null / blank 回退到 ROUND_ROBIN。
+     */
+    private String normalizeRoutingMode(String mode) {
+        if (mode == null || mode.isBlank()) {
+            return "ROUND_ROBIN";
+        }
+        return mode.trim().toUpperCase();
     }
 
     /**

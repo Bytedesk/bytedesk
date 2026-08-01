@@ -32,7 +32,7 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -48,19 +48,22 @@ import java.util.Optional;
 @Service
 public class SpringAISiliconFlowService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
-
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
-
-    @Autowired(required = false)
-    @Qualifier("siliconFlowChatModel")
-    private OpenAiChatModel defaultChatModel;
-
-    public SpringAISiliconFlowService() {
-        super(); // 调用基类的无参构造函数
+    public SpringAISiliconFlowService(
+            LlmProviderRestService llmProviderRestService,
+            TokenUsageHelper tokenUsageHelper,
+            @Qualifier("siliconFlowChatModel") ObjectProvider<OpenAiChatModel> defaultChatModelProvider) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
     }
+
+
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final TokenUsageHelper tokenUsageHelper;
+
+    private final OpenAiChatModel defaultChatModel;
+
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions
@@ -270,10 +273,11 @@ public class SpringAISiliconFlowService extends BaseSpringAIService {
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
+                                String reasonContent = extractReasoningContent(generation, assistantMessage);
                                 log.info("siliconFlow API response metadata: {}, text {}",
                                         response.getMetadata(), textContent);
                                 
-                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, null, sourceReferences);
+                                sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况
                             tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);

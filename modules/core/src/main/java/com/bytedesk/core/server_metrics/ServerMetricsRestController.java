@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import com.bytedesk.core.server.ServerEntity;
@@ -55,9 +56,10 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
     private final ServerRestService serverRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "服务器指标", action = "组织查询", description = "query server metrics by org")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query server metrics by org")
     @Operation(summary = "Query Server Metrics by Organization", description = "Retrieve server metrics for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(ServerMetricsRequest request) {
         
         Page<ServerMetricsResponse> metrics = serverMetricsRestService.queryByOrg(request);
@@ -65,9 +67,10 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "用户查询", description = "query server metrics by user")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query server metrics by user")
     @Operation(summary = "Query Server Metrics by User", description = "Retrieve server metrics for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(ServerMetricsRequest request) {
         
         Page<ServerMetricsResponse> metrics = serverMetricsRestService.queryByUser(request);
@@ -75,9 +78,10 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "查询详情", description = "query server metrics by uid")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics by uid")
     @Operation(summary = "Query Server Metrics by UID", description = "Retrieve a specific server metrics by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(ServerMetricsRequest request) {
         
         ServerMetricsResponse metrics = serverMetricsRestService.queryByUid(request);
@@ -85,37 +89,40 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "新建", description = "create server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_CREATE, description = "create server metrics")
     @Operation(summary = "Create Server Metrics", description = "Create a new server metrics record")
     @Override
-    public ResponseEntity<?> create(ServerMetricsRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ServerMetricsRequest request) {
         
         ServerMetricsResponse metrics = serverMetricsRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "更新", description = "update server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_UPDATE, description = "update server metrics")
     @Operation(summary = "Update Server Metrics", description = "Update an existing server metrics record")
     @Override
-    public ResponseEntity<?> update(ServerMetricsRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody ServerMetricsRequest request) {
         
         ServerMetricsResponse metrics = serverMetricsRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "删除", description = "delete server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_DELETE, description = "delete server metrics")
     @Operation(summary = "Delete Server Metrics", description = "Delete a server metrics record")
     @Override
-    public ResponseEntity<?> delete(ServerMetricsRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody ServerMetricsRequest request) {
         
         serverMetricsRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "服务器指标", action = "导出", description = "export server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_EXPORT, description = "export server metrics")
     @Operation(summary = "Export Server Metrics", description = "Export server metrics to Excel format")
     @Override
     @GetMapping("/export")

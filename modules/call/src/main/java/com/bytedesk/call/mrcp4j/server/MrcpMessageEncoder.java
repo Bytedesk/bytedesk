@@ -29,6 +29,7 @@ import com.bytedesk.call.mrcp4j.message.MrcpResponse;
 import com.bytedesk.call.mrcp4j.message.MrcpServerMessage;
 import com.bytedesk.call.mrcp4j.message.header.MrcpHeader;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolEncoder;
@@ -76,7 +77,7 @@ public class MrcpMessageEncoder implements ProtocolEncoder {
         }
 
         // determine and set message length
-        int bufferLength = _encodeBuf.length();
+        int bufferLength = _encodeBuf.toString().getBytes(StandardCharsets.UTF_8).length;
         int bufferLengthLength = Integer.toString(bufferLength).length();
         int messageLength = bufferLength + bufferLengthLength;
         String messageLengthString = Integer.toString(messageLength);
@@ -85,13 +86,11 @@ public class MrcpMessageEncoder implements ProtocolEncoder {
         }
         _encodeBuf.insert(offset, messageLengthString);
         serverMessage.setMessageLength(messageLength);
-        bufferLength = _encodeBuf.length();
+        byte[] encodedBytes = _encodeBuf.toString().getBytes(StandardCharsets.UTF_8);
 
         // write _encodeBuf to out
-        IoBuffer bytes = IoBuffer.allocate(bufferLength);
-        for (int i = 0; i < bufferLength; i++) {
-            bytes.put((byte) _encodeBuf.charAt(i));
-        }
+        IoBuffer bytes = IoBuffer.allocate(encodedBytes.length);
+        bytes.put(encodedBytes);
         bytes.flip();
         out.write(bytes);
     }

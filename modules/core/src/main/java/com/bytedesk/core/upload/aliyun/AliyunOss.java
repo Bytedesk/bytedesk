@@ -3,17 +3,17 @@ package com.bytedesk.core.upload.aliyun;
 import com.aliyun.oss.OSS;
 // import com.aliyun.oss.model.PutObjectResult;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 /**
  * 阿里云OSS对象存储服务工具类
@@ -32,20 +32,15 @@ import java.net.URL;
  */
 @Component
 @ConditionalOnProperty(name = "bytedesk.aliyun.enabled", havingValue = "true", matchIfMissing = false)
+@RequiredArgsConstructor
 @Slf4j
 public class AliyunOss {
 
     private String uploadDirPrefix = "";
 
-    public AliyunOss() {
-        // 构造函数
-    }
+    private final AliyunProperties aliyunProperties;
 
-    @Autowired
-    private AliyunProperties aliyunProperties;
-
-    @Autowired
-    private OSS ossClient;
+    private final OSS ossClient;
 
     public String uploadAttachment(MediaType mediaType, String fileName, int width, int height, String username,
             File file) {
@@ -160,7 +155,7 @@ public class AliyunOss {
         String folder = "wechat/images/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -181,7 +176,7 @@ public class AliyunOss {
         String folder = "wechat/avatars/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -201,7 +196,7 @@ public class AliyunOss {
         String folder = "wechat/voices/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -221,7 +216,7 @@ public class AliyunOss {
         String folder = "wechat/videos/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -241,7 +236,7 @@ public class AliyunOss {
         String folder = "wechat/thumbs/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -254,7 +249,7 @@ public class AliyunOss {
         String folder = "wechat/files/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -290,7 +285,7 @@ public class AliyunOss {
         String folder = "school/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -303,7 +298,7 @@ public class AliyunOss {
         String folder = "course/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }

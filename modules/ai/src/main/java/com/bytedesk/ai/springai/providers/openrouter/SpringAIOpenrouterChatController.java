@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.openrouter;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
@@ -53,7 +53,8 @@ import reactor.core.publisher.Flux;
 public class SpringAIOpenrouterChatController {
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIOpenrouterChatService springAIOpenrouterService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/openrouter/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -237,8 +238,6 @@ public class SpringAIOpenrouterChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

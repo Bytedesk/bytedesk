@@ -36,7 +36,7 @@ public class ProcessEventListener {
         String orgUid = organization.getUid();
         log.info("ticket process - organization created: {}", orgUid);
         processRestService.initProcess(orgUid);
-        processRestService.initThreadProcess(orgUid);
+        // processRestService.initThreadProcess(orgUid);
     }
 
 }

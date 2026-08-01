@@ -125,10 +125,9 @@ public class ThreadRequest extends BaseRequest {
     private Boolean forceNew = false;
 
     // 在客服端需要将同一个访客所有的会话合并为一条会话显示，但在管理后台需要显示所有会话，所以需要区分
-    // 在客服端需要设置 mergeByTopic = true，在管理后台需要设置 mergeByTopic = false
-    // 是否合并相同topic的记录
-    @Builder.Default
-    private Boolean mergeByTopic = false;
+    // null 表示调用方未显式传参，由具体接口自行决定默认行为
+    // true/false 表示调用方显式指定是否按 topic 合并
+    private Boolean mergeByTopic;
 
     private UserProtobuf user;
 
@@ -143,6 +142,9 @@ public class ThreadRequest extends BaseRequest {
     private String ownerNickname;
 
     private String ownerUid;
+
+    // 访客唯一标识（与 uid 区分：uid 常用于实体主键；visitorUid 用于跨会话稳定识别）
+    private String visitorUid;
 
     // 用于更新robot-agent-llm配置，不能修改为UserProtobuf,否则会序列化出错
     private String agent;

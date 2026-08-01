@@ -16,3 +16,25 @@
 - open - 开源
 - local - 本地
 - prod - 生产
+
+## 模块拆分约定
+
+- 目录：`properties/local/`
+- 命名：`NN-module-name.properties`（`NN` 为两位数字，控制加载顺序）
+- 入口：`application-local.properties` 通过 `spring.config.import` 统一引用
+- `spring.config.import` 支持换行（每行一个文件），使用 `\` 续行
+
+当前已拆分示例：
+
+- `30-core-business.properties`
+- `31-call-freeswitch.properties`
+- `32-webrtc.properties`
+- `40-oauth-ldap-logging.properties`
+- `50-datasource.properties`
+- `51-jpa-web-actuator.properties`
+- `60-mq-mail-quartz.properties`
+- `70-ai-batch-liquibase.properties`
+- `75-mcp.properties`
+- `80-flowable.properties`
+- `90-thirdparty-cloud.properties`
+- `99-docker-compose.properties`

@@ -21,6 +21,7 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -48,28 +49,28 @@ public class CallHealthIndicator implements HealthIndicator {
                 return Health.up()
                         .withDetail("server", freeSwitchProperties.getServer())
                         .withDetail("port", freeSwitchProperties.getEslPort())
-                        .withDetail("status", "可连接")
+                        .withDetail("status", CallI18nConsts.HEALTH_STATUS_CONNECTABLE)
                         .withDetail("lastCheck", getCurrentTime())
-                        .withDetail("message", "Call ESL端口可访问")
+                        .withDetail("message", CallI18nConsts.HEALTH_MESSAGE_ESL_PORT_REACHABLE)
                         .build();
             } else {
                 return Health.down()
                         .withDetail("server", freeSwitchProperties.getServer())
                         .withDetail("port", freeSwitchProperties.getEslPort())
-                        .withDetail("status", "连接失败")
+                        .withDetail("status", CallI18nConsts.HEALTH_STATUS_CONNECTION_FAILED)
                         .withDetail("lastCheck", getCurrentTime())
-                        .withDetail("message", "无法连接到Call ESL端口")
-                        .withDetail("troubleshooting", "检查Call服务状态和网络连接")
+                        .withDetail("message", CallI18nConsts.HEALTH_MESSAGE_ESL_PORT_UNREACHABLE)
+                        .withDetail("troubleshooting", CallI18nConsts.HEALTH_TROUBLESHOOT_NETWORK)
                         .build();
             }
         } catch (Exception e) {
             return Health.down()
                     .withDetail("server", freeSwitchProperties.getServer())
                     .withDetail("port", freeSwitchProperties.getEslPort())
-                    .withDetail("status", "检查异常")
+                    .withDetail("status", CallI18nConsts.HEALTH_STATUS_CHECK_EXCEPTION)
                     .withDetail("lastCheck", getCurrentTime())
                     .withDetail("error", e.getMessage())
-                    .withDetail("message", "健康检查过程中发生异常")
+                    .withDetail("message", CallI18nConsts.HEALTH_MESSAGE_EXCEPTION_DURING_CHECK)
                     .build();
         }
     }
@@ -86,7 +87,7 @@ public class CallHealthIndicator implements HealthIndicator {
             socket.connect(new java.net.InetSocketAddress(server, port), 3000);
             return socket.isConnected();
         } catch (IOException e) {
-            log.debug("Call健康检查连接失败: {}", e.getMessage());
+            log.debug(CallI18nConsts.HEALTH_LOG_CONNECTION_FAILED, e.getMessage());
             return false;
         }
     }
@@ -119,7 +120,7 @@ public class CallHealthIndicator implements HealthIndicator {
             
             status.setConnectable(true);
             status.setResponseTime(endTime - startTime);
-            status.setMessage("连接成功");
+            status.setMessage(CallI18nConsts.HEALTH_MESSAGE_CONNECT_SUCCESS);
             
             // 尝试读取Call响应
             try {
@@ -132,24 +133,24 @@ public class CallHealthIndicator implements HealthIndicator {
                     status.setServerResponse(response);
                     
                     if (response.contains("rude-rejection")) {
-                        status.setMessage("连接被拒绝 - ACL限制");
-                        status.setTroubleshooting("检查Call的ACL配置");
+                        status.setMessage(CallI18nConsts.HEALTH_MESSAGE_ACL_REJECTED);
+                        status.setTroubleshooting(CallI18nConsts.HEALTH_TROUBLESHOOT_ACL);
                     } else if (response.contains("auth/request")) {
-                        status.setMessage("服务正常 - 等待认证");
+                        status.setMessage(CallI18nConsts.HEALTH_MESSAGE_WAIT_AUTH);
                     }
                 }
             } catch (IOException e) {
-                status.setMessage("连接成功但读取响应失败: " + e.getMessage());
+                status.setMessage(CallI18nConsts.HEALTH_MESSAGE_READ_RESPONSE_FAILED_PREFIX + e.getMessage());
             }
             
         } catch (IOException e) {
             status.setConnectable(false);
-            status.setMessage("连接失败: " + e.getMessage());
+            status.setMessage(CallI18nConsts.HEALTH_MESSAGE_CONNECT_FAILED_PREFIX + e.getMessage());
             
             if (e.getMessage().contains("Connection refused")) {
-                status.setTroubleshooting("检查Call服务状态和端口配置");
+                status.setTroubleshooting(CallI18nConsts.HEALTH_TROUBLESHOOT_SERVICE_AND_PORT);
             } else if (e.getMessage().contains("timeout")) {
-                status.setTroubleshooting("检查网络连接和防火墙设置");
+                status.setTroubleshooting(CallI18nConsts.HEALTH_TROUBLESHOOT_FIREWALL);
             }
         }
         

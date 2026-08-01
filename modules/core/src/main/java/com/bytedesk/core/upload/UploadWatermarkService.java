@@ -85,47 +85,37 @@ public class UploadWatermarkService {
      * 为文件添加水印（支持自定义参数）
      */
     public void addWatermarkToFile(MultipartFile file, Path destinationPath, UploadRequest request) throws IOException {
-        try {
-            // 读取原始图片
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-            if (originalImage == null) {
-                log.error("无法读取图片文件: {}", file.getOriginalFilename());
-                // 如果无法读取图片，直接保存原文件
-                try (InputStream inputStream = file.getInputStream()) {
-                    Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-                }
-                return;
-            }
-
-            // 获取水印参数
-            String watermarkText = getWatermarkText(request);
-            WatermarkService.WatermarkPosition position = getWatermarkPosition(request);
-            int fontSize = getWatermarkFontSize(request);
-            Color watermarkColor = getWatermarkColor(request);
-
-            // 添加水印
-            byte[] watermarkedImageBytes = watermarkService.addTextWatermark(
-                originalImage, 
-                watermarkText, 
-                position,
-                fontSize,
-                watermarkColor
-            );
-
-            // 保存到文件
-            try (InputStream inputStream = new ByteArrayInputStream(watermarkedImageBytes)) {
-                Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            log.info("成功为图片添加水印: {}", file.getOriginalFilename());
-
-        } catch (Exception e) {
-            log.error("添加水印失败，保存原文件: {}", file.getOriginalFilename(), e);
-            // 如果添加水印失败，保存原文件
-            try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-            }
+        // 读取原始图片
+        BufferedImage originalImage;
+        try (InputStream inputStream = file.getInputStream()) {
+            originalImage = ImageIO.read(inputStream);
         }
+        if (originalImage == null) {
+            log.warn("图片解码失败，拒绝保存原文件: {}", file.getOriginalFilename());
+            throw new IOException("图片解码失败，拒绝保存原文件");
+        }
+
+        // 获取水印参数
+        String watermarkText = getWatermarkText(request);
+        WatermarkService.WatermarkPosition position = getWatermarkPosition(request);
+        int fontSize = getWatermarkFontSize(request);
+        Color watermarkColor = getWatermarkColor(request);
+
+        // 添加水印
+        byte[] watermarkedImageBytes = watermarkService.addTextWatermark(
+            originalImage,
+            watermarkText,
+            position,
+            fontSize,
+            watermarkColor
+        );
+
+        // 保存到文件
+        try (InputStream inputStream = new ByteArrayInputStream(watermarkedImageBytes)) {
+            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        log.info("成功为图片添加水印: {}", file.getOriginalFilename());
     }
 
     /**

@@ -16,7 +16,6 @@ package com.bytedesk.core.workflow_edge;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,17 +24,18 @@ import com.bytedesk.core.workflow.edge.WorkflowEdge;
 import com.bytedesk.core.exception.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 工作流边服务类
  * 提供边的CRUD操作和格式转换功能
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class WorkflowEdgeService {
 
-    @Autowired
-    private WorkflowEdgeRestService workflowEdgeRestService;
+    private final WorkflowEdgeRestService workflowEdgeRestService;
 
     /**
      * 创建工作流边
@@ -48,7 +48,7 @@ public class WorkflowEdgeService {
         }
 
         // 验证连接的节点是否存在
-        validateEdgeConnection(workflow, edge.getSourceNodeID(), edge.getTargetNodeID());
+        validateEdgeConnection(workflow, edge.getSourceNodeId(), edge.getTargetNodeId());
 
         WorkflowEdgeEntity entity = WorkflowEdgeEntity.of(workflow, edge);
         
@@ -208,8 +208,8 @@ public class WorkflowEdgeService {
         // 转换为WorkflowEdge后修改ID和连接
         WorkflowEdge workflowEdge = sourceEdge.toWorkflowEdge();
         workflowEdge.setId(newEdgeUid);
-        workflowEdge.setSourceNodeID(newSourceNodeId);
-        workflowEdge.setTargetNodeID(newTargetNodeId);
+        workflowEdge.setSourceNodeId(newSourceNodeId);
+        workflowEdge.setTargetNodeId(newTargetNodeId);
 
         // 创建新的边实体
         return createEdge(targetWorkflow, workflowEdge);

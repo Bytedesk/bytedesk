@@ -184,10 +184,10 @@ public class WorkflowEdgeEntity extends BaseEntity {
             return WorkflowEdge.builder()
                     .id(this.getUid())
                     .name(this.name)
-                    .sourceNodeID(this.sourceNodeId)
-                    .targetNodeID(this.targetNodeId)
-                    .sourcePortID(this.sourcePortId)
-                    .targetPortID(this.targetPortId)
+                    .sourceNodeId(this.sourceNodeId)
+                    .targetNodeId(this.targetNodeId)
+                    .sourcePortId(this.sourcePortId)
+                    .targetPortId(this.targetPortId)
                     .build();
         }
         
@@ -197,20 +197,20 @@ public class WorkflowEdgeEntity extends BaseEntity {
             // 确保基本字段正确
             edge.setId(this.getUid());
             edge.setName(this.name);
-            edge.setSourceNodeID(this.sourceNodeId);
-            edge.setTargetNodeID(this.targetNodeId);
-            edge.setSourcePortID(this.sourcePortId);
-            edge.setTargetPortID(this.targetPortId);
+            edge.setSourceNodeId(this.sourceNodeId);
+            edge.setTargetNodeId(this.targetNodeId);
+            edge.setSourcePortId(this.sourcePortId);
+            edge.setTargetPortId(this.targetPortId);
             return edge;
         } catch (Exception e) {
             // 解析失败时返回基础边
             return WorkflowEdge.builder()
                     .id(this.getUid())
                     .name(this.name)
-                    .sourceNodeID(this.sourceNodeId)
-                    .targetNodeID(this.targetNodeId)
-                    .sourcePortID(this.sourcePortId)
-                    .targetPortID(this.targetPortId)
+                    .sourceNodeId(this.sourceNodeId)
+                    .targetNodeId(this.targetNodeId)
+                    .sourcePortId(this.sourcePortId)
+                    .targetPortId(this.targetPortId)
                     .build();
         }
     }
@@ -221,10 +221,10 @@ public class WorkflowEdgeEntity extends BaseEntity {
     public void fromWorkflowEdge(WorkflowEdge edge) {
         this.setUid(edge.getId());
         this.name = edge.getName();
-        this.sourceNodeId = edge.getSourceNodeID();
-        this.targetNodeId = edge.getTargetNodeID();
-        this.sourcePortId = edge.getSourcePortID();
-        this.targetPortId = edge.getTargetPortID();
+        this.sourceNodeId = edge.getSourceNodeId();
+        this.targetNodeId = edge.getTargetNodeId();
+        this.sourcePortId = edge.getSourcePortId();
+        this.targetPortId = edge.getTargetPortId();
         this.edgeData = edge.toJson();
     }
 
@@ -306,10 +306,10 @@ public class WorkflowEdgeEntity extends BaseEntity {
                 .workflow(workflow)
                 .uid(edge.getId())
                 .name(edge.getName())
-                .sourceNodeId(edge.getSourceNodeID())
-                .targetNodeId(edge.getTargetNodeID())
-                .sourcePortId(edge.getSourcePortID())
-                .targetPortId(edge.getTargetPortID())
+                .sourceNodeId(edge.getSourceNodeId())
+                .targetNodeId(edge.getTargetNodeId())
+                .sourcePortId(edge.getSourcePortId())
+                .targetPortId(edge.getTargetPortId())
                 .edgeData(edge.toJson())
                 .build();
         return entity;

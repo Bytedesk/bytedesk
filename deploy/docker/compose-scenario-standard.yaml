@@ -1,0 +1,3 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql|oracle>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-standard.yaml up -d
+# 标准场景不额外覆盖服务，仅作为组合入口层
+services: {}

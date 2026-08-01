@@ -35,7 +35,7 @@ public class MessageUnreadRequest extends BaseRequest {
 
     // private String threadUid;
 
-    // private String threadTopic;
+    private String threadTopic;
 
     private Boolean clearUnread;
 }

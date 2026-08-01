@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,32 +35,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.exception.NotFoundException;
-import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCloseEvent;
 import com.bytedesk.core.thread.event.ThreadRemoveTopicEvent;
-import com.bytedesk.core.topic.TopicEntity;
-import com.bytedesk.core.topic.TopicRequest;
-import com.bytedesk.core.topic.TopicRestService;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRestService;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +73,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @AllArgsConstructor
 public class ThreadRestService
-        extends BaseRestServiceWithExport<ThreadEntity, ThreadRequest, ThreadResponse, ThreadExcel> {
+        extends BaseRestService<ThreadEntity, ThreadRequest, ThreadResponse> {
 
     private final AuthService authService;
 
@@ -80,9 +85,11 @@ public class ThreadRestService
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
-    private final TopicRestService topicRestService;
+    private final TopicSubscriptionRestService topicSubscriptionRestService;
 
     private final ActiveThreadCacheService activeThreadCacheService;
+
+    private final MessageRestService messageRestService;
 
     // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
     public Optional<ThreadEntity> findByUid(@NonNull String uid) {
@@ -149,7 +156,6 @@ public class ThreadRestService
         return result;
     }
 
-    @Override
     public Page<ThreadEntity> queryByOrgEntity(ThreadRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.search(request, authService);
@@ -168,7 +174,7 @@ public class ThreadRestService
         UserEntity user = authService.getUser();
 
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
 
         request.setUserUid(user.getUid());
@@ -176,6 +182,12 @@ public class ThreadRestService
 
         Pageable pageable = request.getPageable();
         Specification<ThreadEntity> specs = ThreadSpecification.searchForUser(request, user.getUid(), user.getOrgUid());
+
+        if (!Boolean.FALSE.equals(request.getMergeByTopic())) {
+            List<ThreadEntity> mergedThreads = mergeThreadsByTopic(threadRepository.findAll(specs));
+            return pageMergedThreads(mergedThreads, pageable);
+        }
+
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, pageable);
         return threadPage.map(this::convertToResponse);
     }
@@ -184,11 +196,16 @@ public class ThreadRestService
      * 访客端-根据访客UID分页查询其相关的会话列表（支持基础筛选）
      */
     public Page<ThreadResponse> queryByVisitor(ThreadRequest request) {
-        if (request == null || !StringUtils.hasText(request.getUid())) {
+        if (request == null) {
             return Page.empty();
         }
 
-        String visitorUid = request.getUid();
+        String uid = request.getUid();
+        String visitorUid = request.getVisitorUid();
+        if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+            return Page.empty();
+        }
+
         Pageable pageable = request.getPageable();
 
         // visitor(匿名)侧：统一走 Specification 查询，避免 repository native query 的列名/排序兼容问题
@@ -196,23 +213,95 @@ public class ThreadRestService
                 ? Pageable.unpaged()
                 : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
-        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, visitorUid);
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
+
+        if (Boolean.TRUE.equals(request.getMergeByTopic())) {
+            List<ThreadEntity> mergedThreads = mergeThreadsByTopic(threadRepository.findAll(specs));
+
+            if (pageable == null || pageable.isUnpaged()) {
+                return new PageImpl<>(
+                        mergedThreads.stream().map(this::convertToResponse).toList(),
+                        Pageable.unpaged(),
+                        mergedThreads.size());
+            }
+
+            int start = Math.toIntExact(pageable.getOffset());
+            if (start >= mergedThreads.size()) {
+                return new PageImpl<>(List.of(), pageable, mergedThreads.size());
+            }
+
+            int end = Math.min(start + pageable.getPageSize(), mergedThreads.size());
+            List<ThreadResponse> content = mergedThreads.subList(start, end).stream()
+                    .map(this::convertToResponse)
+                    .toList();
+            return new PageImpl<>(content, pageable, mergedThreads.size());
+        }
+
         Page<ThreadEntity> threadPage = threadRepository.findAll(specs, effectivePageable);
         return threadPage.map(this::convertToResponse);
+    }
+
+    /**
+     * 访客端-查询全部匹配会话，用于上层做跨实体过滤后再分页。
+     */
+    public List<ThreadResponse> queryAllByVisitor(ThreadRequest request) {
+        if (request == null) {
+            return List.of();
+        }
+
+        String uid = request.getUid();
+        String visitorUid = request.getVisitorUid();
+        if (!StringUtils.hasText(uid) && !StringUtils.hasText(visitorUid)) {
+            return List.of();
+        }
+
+        Specification<ThreadEntity> specs = ThreadSpecification.searchForVisitor(request, uid, visitorUid);
+        List<ThreadEntity> threads = threadRepository.findAll(specs);
+        List<ThreadEntity> effectiveThreads = Boolean.TRUE.equals(request.getMergeByTopic())
+                ? mergeThreadsByTopic(threads)
+                : threads;
+        return effectiveThreads.stream().map(this::convertToResponse).toList();
+    }
+
+    private List<ThreadEntity> mergeThreadsByTopic(List<ThreadEntity> threads) {
+        return threads.stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toMap(
+                                thread -> StringUtils.hasText(thread.getTopic()) ? thread.getTopic() : thread.getUid(),
+                                thread -> thread,
+                                (existing, ignored) -> existing,
+                                LinkedHashMap::new),
+                        map -> new ArrayList<>(map.values())));
+    }
+
+    private Page<ThreadResponse> pageMergedThreads(List<ThreadEntity> mergedThreads, Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return new PageImpl<>(
+                    mergedThreads.stream().map(this::convertToResponse).toList(),
+                    Pageable.unpaged(),
+                    mergedThreads.size());
+        }
+
+        int start = Math.toIntExact(pageable.getOffset());
+        if (start >= mergedThreads.size()) {
+            return new PageImpl<>(List.of(), pageable, mergedThreads.size());
+        }
+
+        int end = Math.min(start + pageable.getPageSize(), mergedThreads.size());
+        List<ThreadResponse> content = mergedThreads.subList(start, end).stream()
+                .map(this::convertToResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, mergedThreads.size());
     }
 
     public Page<ThreadResponse> queryThreadsByUserTopics(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
 
-        Optional<TopicEntity> topicOptional = topicRestService.findByUserUid(user.getUid());
-        if (!topicOptional.isPresent()) {
-            return Page.empty();
-        }
-
-        Set<String> customerServiceTopics = topicOptional.get().getTopics().stream()
+        Set<String> customerServiceTopics = topicSubscriptionRestService.findSubscribedTopicsByUserUid(user.getUid())
+                .stream()
                 .filter(TopicUtils::isCustomerServiceTopic)
                 .collect(Collectors.toSet());
 
@@ -245,13 +334,13 @@ public class ThreadRestService
     public ThreadResponse queryByTopicAndOwner(ThreadRequest request) {
         UserEntity owner = authService.getUser();
         if (owner == null) {
-            throw new NotLoginException("owner not found");
+            throw CommonI18nExceptions.loginRequired();
         }
         Optional<ThreadEntity> threadOptional = findFirstByTopicAndOwner(request.getTopic(), owner);
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         } else {
-            throw new NotFoundException("thread not found");
+            throw ResourceI18nExceptions.threadNotFound();
         }
     }
 
@@ -261,7 +350,7 @@ public class ThreadRestService
         if (threadOptional.isPresent()) {
             return convertToResponse(threadOptional.get());
         } else {
-            throw new NotFoundException("thread " + request.getUid() + " not found");
+            throw ResourceI18nExceptions.threadNotFound(request.getUid());
         }
     }
 
@@ -376,7 +465,7 @@ public class ThreadRestService
     }
 
     // 系统通知会话：system/{user_uid}
-    public ThreadResponse createSystemNoticeAccountThread(UserEntity user) {
+    public ThreadResponse createSystemPublicAccountThread(UserEntity user) {
         //
         String topic = TopicUtils.getSystemTopic(user.getUid());
         //
@@ -700,14 +789,21 @@ public class ThreadRestService
         }
         //
         ThreadEntity thread = threadOptional.get();
-        if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())) {
-            throw new RuntimeException("thread " + thread.getUid() + " is already closed");
+        if (thread.isClosed()) {
+            if (!StringUtils.hasText(thread.getCloseType()) && StringUtils.hasText(request.getCloseType())) {
+                thread.setCloseType(request.getCloseType());
+                ThreadEntity updatedThread = save(thread);
+                return convertToResponse(updatedThread != null ? updatedThread : thread);
+            }
+            log.info("thread {} is already closed, returning current state", thread.getUid());
+            return convertToResponse(thread);
         }
         // 设置关闭来源
         if (StringUtils.hasText(request.getCloseType())) {
             thread.setCloseType(request.getCloseType());
         }
         thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+        markClosedAtIfAbsent(thread);
         // 发布关闭消息, 通知用户
         String content;
         String closeType = thread.getCloseType();
@@ -731,11 +827,11 @@ public class ThreadRestService
         }
         if (Boolean.TRUE.equals(request.getUnsubscribe())
                 || com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
-            TopicRequest topicRequest = TopicRequest.builder()
+            TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
-            topicRestService.remove(topicRequest);
+            topicSubscriptionRestService.remove(topicRequest);
         }
         // 发布关闭事件
         bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
@@ -747,7 +843,7 @@ public class ThreadRestService
     public ThreadResponse closeByTopic(ThreadRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new NotLoginException("login required");
+            throw CommonI18nExceptions.loginRequired();
         }
         request.setUserUid(user.getUid());
 
@@ -771,6 +867,7 @@ public class ThreadRestService
                 thread.setCloseType(request.getCloseType());
             }
             thread.setStatus(ThreadProcessStatusEnum.CLOSED.name());
+            markClosedAtIfAbsent(thread);
 
             // 发布关闭消息, 通知用户
             String closeType = thread.getCloseType();
@@ -806,11 +903,11 @@ public class ThreadRestService
         }
 
         if (Boolean.TRUE.equals(request.getUnsubscribe())) {
-            TopicRequest topicRequest = TopicRequest.builder()
+            TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                     .topic(request.getTopic())
                     .userUid(request.getUserUid())
                     .build();
-            topicRestService.remove(topicRequest);
+            topicSubscriptionRestService.remove(topicRequest);
         }
 
         // 返回值：优先返回 thread.uid == request.uid
@@ -874,6 +971,11 @@ public class ThreadRestService
         return savedEntity;
     }
 
+    @Recover
+    public ThreadEntity recover(ObjectOptimisticLockingFailureException e, ThreadEntity entity) {
+        return handleOptimisticLockingFailureException(e, entity);
+    }
+
     @Override
     @Caching(put = {
             @CachePut(value = "thread", key = "#entity.uid", unless = "#result == null"),
@@ -914,6 +1016,9 @@ public class ThreadRestService
                 latestEntity.setFold(entity.getFold() != null ? entity.getFold() : latestEntity.getFold());
                 if (entity.getCloseType() != null) {
                     latestEntity.setCloseType(entity.getCloseType());
+                }
+                if (entity.getClosedAt() != null && latestEntity.getClosedAt() == null) {
+                    latestEntity.setClosedAt(entity.getClosedAt());
                 }
 
                 // Preserve metadata
@@ -982,6 +1087,16 @@ public class ThreadRestService
         return null;
     }
 
+    private void markClosedAtIfAbsent(ThreadEntity thread) {
+        if (thread == null || thread.getClosedAt() != null) {
+            return;
+        }
+        if (ThreadProcessStatusEnum.CLOSED.name().equals(thread.getStatus())
+                || ThreadProcessStatusEnum.TIMEOUT.name().equals(thread.getStatus())) {
+            thread.setClosedAt(BdDateUtils.now());
+        }
+    }
+
     @CacheEvict(value = "thread", key = "#topic")
     public void deleteByTopic(String topic) {
         List<ThreadEntity> threads = findListByTopic(topic);
@@ -1009,45 +1124,15 @@ public class ThreadRestService
         deleteByUid(entity.getUid());
     }
 
-    public ThreadResponse convertToResponse(ThreadEntity thread) {
-        return ThreadConvertUtils.convertToThreadResponse(thread);
+    public ThreadResponse restore(@NonNull ThreadRequest request) {
+        ThreadEntity thread = threadRepository.findByUid(request.getUid())
+                .orElseThrow(ResourceI18nExceptions::threadNotFound);
+        thread.setDeleted(false);
+        return convertToResponse(save(thread));
     }
 
-    @Override
-    public ThreadExcel convertToExcel(ThreadEntity entity) {
-        ThreadExcel excel = modelMapper.map(entity, ThreadExcel.class);
-        excel.setUid(entity.getUid());
-        //
-        if (entity.getUser() != null) {
-            UserProtobuf user = UserProtobuf.fromJson(entity.getUser());
-            excel.setVisitorNickname(user.getNickname());
-        }
-        // agent
-        if (entity.getAgent() != null) {
-            UserProtobuf agent = UserProtobuf.fromJson(entity.getAgent());
-            excel.setAgentNickname(agent.getNickname());
-        }
-        // robot
-        if (entity.getRobot() != null) {
-            UserProtobuf robot = UserProtobuf.fromJson(entity.getRobot());
-            excel.setRobotNickname(robot.getNickname());
-        }
-        if (entity.getWorkgroup() != null) {
-            UserProtobuf workgroup = UserProtobuf.fromJson(entity.getWorkgroup());
-            excel.setWorkgroupNickname(workgroup.getNickname());
-        }
-
-        // 将client转换为中文
-        if (StringUtils.hasText(entity.getChannel())) {
-            excel.setChannel(ChannelEnum.toChineseDisplay(entity.getChannel()));
-        }
-
-        // 将status转换为中文
-        if (StringUtils.hasText(entity.getStatus())) {
-            excel.setStatus(ThreadProcessStatusEnum.toChineseDisplay(entity.getStatus()));
-        }
-
-        return excel;
+    public ThreadResponse convertToResponse(ThreadEntity thread) {
+        return ThreadConvertUtils.convertToThreadResponse(thread);
     }
 
     @Override
@@ -1058,6 +1143,33 @@ public class ThreadRestService
     @Override
     protected Page<ThreadEntity> executePageQuery(Specification<ThreadEntity> spec, Pageable pageable) {
         return threadRepository.findAll(spec, pageable);
+    }
+
+    /**
+     * 标记访客在当前会话中的未读客服消息为已读
+     * 将 thread 中所有 agent 发送的未读消息状态更新为 READ，
+     * 这样 getVisitorUnreadCount() 会返回 0。
+     */
+    @Transactional
+    public void markVisitorMessagesRead(String threadUid) {
+        if (!StringUtils.hasText(threadUid)) {
+            return;
+        }
+
+        List<MessageEntity> messages = messageRestService.findByThreadUid(threadUid);
+        int updated = 0;
+        for (MessageEntity message : messages) {
+            if (message == null || message.isDeleted()) {
+                continue;
+            }
+            // 只处理 agent 发送的未读消息
+            if (message.isFromAgent() && message.isUnread()) {
+                message.setStatus(MessageStatusEnum.READ.name());
+                messageRestService.save(message);
+                updated++;
+            }
+        }
+        log.info("markVisitorMessagesRead: threadUid={}, updated={}", threadUid, updated);
     }
 
 }

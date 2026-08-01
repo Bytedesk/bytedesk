@@ -7,6 +7,11 @@
 	<#include "../common/header_css.ftl" />
 	<#-- i18n macro -->
 	<#include "../common/macro/i18n.ftl" />
+	<#-- Language prefix for links -->
+	<#assign langPrefix = "">
+	<#if lang?? && lang != "zh-CN">
+		<#assign langPrefix = "/" + lang>
+	</#if>
 	
 </head>
 
@@ -127,8 +132,175 @@ Features START -->
 Features END -->
 
 <!-- =======================
-Models START -->
+AI Agents START -->
 <section class="bg-light">
+	<div class="container">
+		<div class="row mb-4">
+			<div class="col-12 text-center">
+				<h2><@t key="page.ai.agents.title">微语 AI Agent 矩阵</@t></h2>
+				<p class="mb-0"><@t key="page.ai.agents.desc">围绕客服、售前、售中、售后和运营构建企业数字员工，让服务成为增长引擎</@t></p>
+			</div>
+		</div>
+
+		<div class="row g-4">
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
+						<i class="bi bi-headset fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.service.title">客服助手 Agent</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.service.desc">辅助人工客服检索知识、生成回复建议、总结会话、识别情绪与SLA风险，并推荐下一步服务动作。</@t></p>
+				</div>
+			</div>
+
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-success bg-opacity-10 text-success rounded-circle mb-3">
+						<i class="bi bi-person-plus fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.presales.title">售前 Agent</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.presales.desc">识别访客需求、推荐商品或方案、收集线索、判断购买意向，并将高价值客户平滑转交人工跟进。</@t></p>
+				</div>
+			</div>
+
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-warning bg-opacity-10 text-warning rounded-circle mb-3">
+						<i class="bi bi-cart-check fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.sales.title">售中 Agent</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.sales.desc">围绕报价说明、下单引导、支付提醒、订单查询和履约协同，减少从咨询到成交之间的流失。</@t></p>
+				</div>
+			</div>
+
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-3">
+						<i class="bi bi-tools fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.aftersales.title">售后 Agent</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.aftersales.desc">处理订单、物流、退款、退换货、质保、投诉和工单跟进，提高售后响应效率与客户满意度。</@t></p>
+				</div>
+			</div>
+
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-danger bg-opacity-10 text-danger rounded-circle mb-3">
+						<i class="bi bi-graph-up-arrow fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.operations.title">运营 Agent</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.operations.desc">汇聚会话、标签、订单和工单数据，自动生成客户分群、触达策略和复购运营建议。</@t></p>
+				</div>
+			</div>
+
+			<!-- Agent item -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-purple bg-opacity-10 text-purple rounded-circle mb-3">
+						<i class="bi bi-arrow-repeat fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.agent.loop.title">服务增长闭环</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.loop.desc">会话沉淀客户资产，客户资产驱动个性化服务，服务结果反哺知识、流程和运营策略。</@t></p>
+				</div>
+			</div>
+		</div>
+
+		<div class="row g-4 mt-4 align-items-center">
+			<div class="col-lg-6">
+				<h4><@t key="page.ai.agent.plan.title">分阶段建设规划</@t></h4>
+				<p><@t key="page.ai.agent.plan.desc">微语将以可配置提示词、知识库检索、工具调用、工作流编排和数据分析为基础，逐步开放可落地的企业智能体能力。</@t></p>
+				<ul class="list-group list-group-borderless">
+					<li class="list-group-item d-flex px-0">
+						<i class="bi bi-check-circle-fill text-success me-2"></i>
+						<@t key="page.ai.agent.plan.context">统一会话、访客、会员、订单、工单和知识库上下文</@t>
+					</li>
+					<li class="list-group-item d-flex px-0">
+						<i class="bi bi-check-circle-fill text-success me-2"></i>
+						<@t key="page.ai.agent.plan.tools">通过权限可控的工具调用连接真实业务系统</@t>
+					</li>
+					<li class="list-group-item d-flex px-0">
+						<i class="bi bi-check-circle-fill text-success me-2"></i>
+						<@t key="page.ai.agent.plan.workflow">用工作流承接转人工、建工单、回访、触达和复盘动作</@t>
+					</li>
+					<li class="list-group-item d-flex px-0">
+						<i class="bi bi-check-circle-fill text-success me-2"></i>
+						<@t key="page.ai.agent.plan.analytics">持续统计响应效率、转化率、满意度、复购率和服务质量</@t>
+					</li>
+				</ul>
+			</div>
+			<div class="col-lg-6">
+				<div class="p-4 bg-white rounded-3 shadow-sm">
+					<h5><@t key="page.ai.agent.value.title">从客服工具到数字员工</@t></h5>
+					<p class="mb-0"><@t key="page.ai.agent.value.desc">AI Agent 不只是自动回复机器人，而是能够理解客户、调用知识、执行流程、沉淀经验并辅助增长的业务执行者。企业可以先从客服助手和知识库问答开始，再逐步扩展到售前转化、售中协同、售后工单和全域运营。</@t></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+AI Agents END -->
+
+<!-- =======================
+MCP / CLI / Skills START -->
+<section class="bg-light">
+	<div class="container">
+		<div class="row mb-4">
+			<div class="col-12 text-center">
+				<h2><@t key="page.ai.integration.title">AI 开放能力</@t></h2>
+				<p class="mb-0"><@t key="page.ai.integration.desc">通过 MCP、CLI、Skills 三种方式将微语 AI 能力对接到您的工具链中</@t></p>
+			</div>
+		</div>
+
+		<div class="row g-4">
+			<!-- MCP -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-primary bg-opacity-10 text-primary rounded-circle mb-3">
+						<i class="bi bi-plug fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.mcp.title">MCP 服务</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.mcp.desc">基于 Model Context Protocol，让 Claude、Codex 等 AI Agent 直接调用微语的知识库、工单、客服等核心 API。</@t></p>
+					<a href="${langPrefix}/features/mcp.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.mcp.link">了解 MCP →</@t></a>
+				</div>
+			</div>
+
+			<!-- CLI -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-success bg-opacity-10 text-success rounded-circle mb-3">
+						<i class="bi bi-terminal fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.cli.title">CLI 命令行</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.cli.desc">在终端中通过命令行直接操作微语系统，支持管道、脚本和 CI/CD 集成。</@t></p>
+					<a href="${langPrefix}/features/cli.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.cli.link">了解 CLI →</@t></a>
+				</div>
+			</div>
+
+			<!-- Skills -->
+			<div class="col-md-6 col-lg-4">
+				<div class="card card-body h-100 border-0 shadow-sm">
+					<div class="icon-lg bg-info bg-opacity-10 text-info rounded-circle mb-3">
+						<i class="bi bi-puzzle fs-5"></i>
+					</div>
+					<h5><@t key="page.ai.integration.skill.title">Skills 技能</@t></h5>
+					<p class="mb-3"><@t key="page.ai.integration.skill.desc">将客服经验沉淀为标准化技能包，让 AI Agent 像专家一样处理客户问题，支持自进化。</@t></p>
+					<a href="${langPrefix}/features/skill.html" class="btn btn-sm btn-outline-primary"><@t key="page.ai.integration.skill.link">了解 Skills →</@t></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- =======================
+MCP / CLI / Skills END -->
+
+<!-- =======================
+Models START -->
+<section>
 	<div class="container">
 		<div class="row mb-4">
 			<div class="col-12 text-center">

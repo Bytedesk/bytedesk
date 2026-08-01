@@ -16,6 +16,8 @@ import com.bytedesk.core.socket.mqtt.protocol.ProtocolProcess;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.util.Locale;
 
 
 @Slf4j
@@ -170,6 +172,12 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
 
     @Override
     public void exceptionCaught(ChannelHandlerContext channelHandlerContext, Throwable cause) throws Exception {
+        if (cause == null) {
+            log.warn("MqttTransportHandler received null cause in exceptionCaught, closing channel");
+            channelHandlerContext.close();
+            return;
+        }
+
         // FIXME: 异常断开，发送will topic消息 java.io.IOException: Connection reset by peer
         // FIXME: 异常断开，发送will topic消息 java.lang.ArrayIndexOutOfBoundsException
         
@@ -186,20 +194,47 @@ public class MqttTransportHandler extends SimpleChannelInboundHandler<MqttMessag
             log.debug("Protobuf parsing error: {}", cause.getMessage());
             return;
         }
-        
-        log.error("TODO: 异常断开，发送will topic消息 {}", cause.toString());
+
+        if (isExpectedDisconnect(cause)) {
+            log.debug("MqttTransportHandler remote peer disconnected: {}", cause.toString());
+            channelHandlerContext.close();
+            return;
+        }
+
         if (cause instanceof IOException) {
-            // 远程主机强迫关闭了一个现有的连接的异常
-            log.error("cause instanceof IOException");
+            log.warn("MqttTransportHandler IOException, closing channel: {}", cause.toString());
             channelHandlerContext.close();
         } else {
             // FIXME: DefaultChannelPipeline : An exceptionCaught() event was fired, and it
             // reached
             // at the tail of the pipeline. It usually means the last handler in the
             // pipeline did not handle the exception.
-            log.error("cause other");
+            log.error("MqttTransportHandler unexpected exception", cause);
             super.exceptionCaught(channelHandlerContext, cause);
         }
+    }
+
+    private boolean isExpectedDisconnect(Throwable cause) {
+        Throwable current = cause;
+        while (current != null) {
+            if (current instanceof SocketException || current instanceof IOException) {
+                String message = current.getMessage();
+                if (message == null) {
+                    return true;
+                }
+                String normalized = message.toLowerCase(Locale.ROOT);
+                if (normalized.contains("connection reset")
+                        || normalized.contains("broken pipe")
+                        || normalized.contains("forcibly closed")
+                        || normalized.contains("timed out")
+                        || normalized.contains("can't assign requested address")
+                        || normalized.contains("cannot assign requested address")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     /**

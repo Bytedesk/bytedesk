@@ -13,13 +13,19 @@
  */
 package com.bytedesk.service.agent;
 
+/**
+ * 客服状态枚举类
+ */
 public enum AgentStatusEnum {
-    AVAILABLE, // 接待状态
-    AWAY, // 离开状态
-    REST, // 休息状态
-    BUSY, // 挂起/忙碌状态
-    OFFLINE, // 离线状态
-    DISABLED; // 禁用状态
+    AVAILABLE, // 在线/接待状态
+    // AVAILABLE_AUDIO, // 支持音频会话，修改为可勾选
+    // AVAILABLE_VIDEO, // 支持视频会话，修改为可勾选
+    // AVAILABLE_PHONE, // 支持电话会话，修改为可勾选
+    // AWAY, // 离开状态，合并到REST状态中，支持设置离开原因
+    AFTER_CALL, // 话后整理：在接听电话结束时，状态将由忙碌变为话后整理并进入话后整理倒计时，倒计时结束员工自动进入空闲状态。倒计时结束前员工可单击返回接待进入空闲状态，或单击继续话后整理保持该状态。
+    REST, // 小休/休息状态： 支持设置小休原因，后台可配置，可设置多个，支持前端用户选择
+    BUSY, // 忙碌/挂起状态
+    OFFLINE; // 下线/离线状态
 
     // 根据字符串查找对应的枚举常量
     public static AgentStatusEnum fromValue(String value) {

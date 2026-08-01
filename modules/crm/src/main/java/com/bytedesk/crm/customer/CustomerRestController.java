@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "客户管理", description = "客户管理相关接口")
+@Tag(name = "Customer Management", description = "Customer management APIs")
 @RestController
 @RequestMapping("/api/v1/customer")
 @AllArgsConstructor
@@ -41,8 +41,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
 
     private final CustomerRestService customerRestService;
 
-    @Operation(summary = "查询组织下的客户", description = "根据组织ID查询客户列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Customers by Organization", description = "Retrieve customer list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
@@ -54,8 +54,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "查询用户下的客户", description = "根据用户ID查询客户列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Customers by User", description = "Retrieve customer list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     @Override
@@ -66,8 +66,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "查询指定客户", description = "根据UID查询客户详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Customer by UID", description = "Retrieve customer details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     @Override
@@ -79,8 +79,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
     }
 
     // query/visitorUid
-    @Operation(summary = "查询访客下的客户", description = "根据访客UID查询客户列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Customers by Visitor UID", description = "Retrieve customer list by visitor UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     @GetMapping("/query/visitorUid")
@@ -91,8 +91,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "创建客户", description = "创建新的客户")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Customer", description = "Create a new customer")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     @Override
@@ -103,8 +103,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "更新客户", description = "更新客户信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Customer", description = "Update customer information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
     @Override
@@ -115,8 +115,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    @Operation(summary = "删除客户", description = "删除指定的客户")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Customer", description = "Delete the specified customer")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
     public ResponseEntity<?> delete(CustomerRequest request) {
         
@@ -125,8 +125,8 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
-    @Operation(summary = "导出客户", description = "导出客户数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Customers", description = "Export customer data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     public Object export(CustomerRequest request, HttpServletResponse response) {
         return exportTemplate(

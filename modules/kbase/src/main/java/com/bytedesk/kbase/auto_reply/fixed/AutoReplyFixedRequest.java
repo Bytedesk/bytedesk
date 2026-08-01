@@ -54,7 +54,4 @@ public class AutoReplyFixedRequest extends BaseRequest {
     private String categoryUid;
 
     private String kbUid; // 对应知识库
-
-    // user uid
-    // private String userUid;
 }

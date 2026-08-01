@@ -13,10 +13,13 @@
  */
 package com.bytedesk.service.agent;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.member.MemberProtobuf;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.service.agent_settings.AgentSettingsResponse;
-import com.bytedesk.service.queue.AgentQueueStatsResponse;
+import com.bytedesk.service.queue.QueueAgentStatsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,6 +47,8 @@ public class AgentResponse extends BaseResponse {
 
     private String avatar;
 
+    private String country;
+
     private String mobile;
 
     private String email;
@@ -52,9 +57,17 @@ public class AgentResponse extends BaseResponse {
 
     private String status;
 
+    private String restReason;
+
     private Boolean connected;
 
     private Boolean enabled;
+
+    private Boolean forceLogout;
+
+    private String forceLogoutReason;
+
+    private ZonedDateTime forceLogoutAt;
 
     /**
      * Agent settings (loaded from settings entity)
@@ -62,9 +75,14 @@ public class AgentResponse extends BaseResponse {
     private AgentSettingsResponse settings;
 
     /**
+     * Per-agent auto-reply settings.
+     */
+    private AutoReplySettingsResponse autoReplySettings;
+
+    /**
      * Agent queue statistics (loaded from queue service)
      */
-    private AgentQueueStatsResponse queueStats;
+    private QueueAgentStatsResponse queueStats;
 
     private MemberProtobuf member;
 

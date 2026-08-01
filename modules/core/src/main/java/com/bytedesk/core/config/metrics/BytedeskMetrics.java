@@ -1,6 +1,5 @@
 package com.bytedesk.core.config.metrics;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.micrometer.core.instrument.Counter;
@@ -43,7 +42,6 @@ public class BytedeskMetrics {
     private final Counter wsMessageCounter;
     private final Gauge wsActiveConnectionGauge;
 
-    @Autowired
     public BytedeskMetrics(MeterRegistry registry) {
         this.registry = registry;
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.visitor.VisitorPermissions;
 
@@ -17,7 +18,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 
-@Tag(name = "访客扩展字段配置", description = "按组织配置访客扩展字段定义")
+@Tag(name = "Visitor Custom Field Settings", description = "Configure visitor custom field definitions by organization")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/visitor/customFieldSettings")
@@ -25,16 +26,16 @@ public class VisitorCustomFieldSettingsRestController {
 
     private final VisitorCustomFieldSettingsRestService visitorCustomFieldSettingsRestService;
 
-    @ActionAnnotation(title = "访客扩展字段", action = "查询", description = "query visitor custom field settings by org")
-    @Operation(summary = "查询组织下的访客扩展字段定义", description = "根据 orgUid 查询扩展字段定义列表")
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR_CUSTOM_FIELD_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query visitor custom field settings by org")
+    @Operation(summary = "Query Visitor Custom Field Definitions by Organization", description = "Retrieve custom field definitions by orgUid")
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_READ)
     @GetMapping("/query")
     public ResponseEntity<?> queryByOrg(@RequestParam("orgUid") String orgUid) {
         return ResponseEntity.ok(JsonResult.success(visitorCustomFieldSettingsRestService.queryByOrg(orgUid)));
     }
 
-    @ActionAnnotation(title = "访客扩展字段", action = "更新", description = "update visitor custom field settings by org")
-    @Operation(summary = "更新组织下的访客扩展字段定义", description = "根据 orgUid 更新扩展字段定义列表")
+    @ActionAnnotation(title = I18Consts.I18N_VISITOR_CUSTOM_FIELD_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update visitor custom field settings by org")
+    @Operation(summary = "Update Visitor Custom Field Definitions by Organization", description = "Update custom field definitions by orgUid")
     @PreAuthorize(VisitorPermissions.HAS_VISITOR_UPDATE)
     @PostMapping("/update")
     public ResponseEntity<?> updateByOrg(@RequestBody VisitorCustomFieldSettingsRequest request) {

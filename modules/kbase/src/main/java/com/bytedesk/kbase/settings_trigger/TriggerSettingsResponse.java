@@ -41,6 +41,7 @@ public class TriggerSettingsResponse implements Serializable {
                                 .name(t.getName())
                                 .description(t.getDescription())
                                 .config(t.getConfig())
+                                .maxTriggerCount(t.getMaxTriggerCount())
                                 .build()).toList())
                 .build();
     }

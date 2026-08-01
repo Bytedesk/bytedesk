@@ -14,22 +14,21 @@
 package com.bytedesk.kbase.llm_faq;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.utils.Utils;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Component
 public class FaqInitializer implements SmartInitializingSingleton {
 
-    @Autowired
-    private FaqRestService faqRestService;
+    private final FaqRestService faqRestService;
 
-    @Autowired
-    private AuthorityRestService authorityRestService;
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260609-create-wechat-mp-qrcode-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_wechat_mp_qrcode" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_wechat_mp_qrcode_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="app_id" type="VARCHAR(128)"/>
+            <column name="scene_str" type="VARCHAR(128)"/>
+            <column name="scene_id" type="INT"/>
+            <column name="custom_param" type="VARCHAR(255)"/>
+            <column name="is_permanent" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="expire_seconds" type="INT"/>
+            <column name="action_name" type="VARCHAR(64)"/>
+            <column name="ticket" type="VARCHAR(255)"/>
+            <column name="qrcode_url" type="VARCHAR(512)"/>
+        </createTable>
+
+        <createIndex tableName="bytedesk_channel_wechat_mp_qrcode" indexName="idx_wechat_mp_qrcode_app_uid">
+            <column name="app_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_channel_wechat_mp_qrcode" indexName="idx_wechat_mp_qrcode_ticket">
+            <column name="ticket"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-app-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="app_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="app_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-app-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="app_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="app_id" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-scene-str" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="scene_str"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="scene_str" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-scene-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="scene_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="scene_id" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-custom-param" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="custom_param"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="custom_param" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-is-permanent" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="is_permanent"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="is_permanent" type="BOOLEAN" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-expire-seconds" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="expire_seconds"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="expire_seconds" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-action-name" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="action_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="action_name" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-ticket" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="ticket"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="ticket" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-url" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_qrcode" columnName="qrcode_url"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_qrcode">
+            <column name="qrcode_url" type="VARCHAR(512)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-qrcode-ticket-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_qrcode"/>
+            <not>
+                <indexExists tableName="bytedesk_channel_wechat_mp_qrcode" indexName="idx_wechat_mp_qrcode_ticket"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_channel_wechat_mp_qrcode" indexName="idx_wechat_mp_qrcode_ticket">
+            <column name="ticket"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

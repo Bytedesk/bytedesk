@@ -20,6 +20,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.uid.UidUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkflowVariableService {
 
     private final WorkflowVariableRepository variableRepository;
+    private final UidUtils uidUtils;
     
     /**
      * 创建或更新工作流变量
@@ -57,6 +59,7 @@ public class WorkflowVariableService {
         } else {
             // 创建新变量
             variable = new WorkflowVariableEntity();
+            variable.setUid(uidUtils.getUid());
             variable.setName(name);
             variable.setWorkflowUid(workflowUid);
             variable.setScope(scope.name());
@@ -65,7 +68,7 @@ public class WorkflowVariableService {
         // 根据类型设置值
         String valueStr = convertValueToString(value);
         variable.setValue(valueStr);
-        // variable.setType(type.name());
+        variable.setType(type != null ? type.name() : WorkflowVariableTypeEnum.STRING.name());
         
         // 保存变量
         return variableRepository.save(variable);
@@ -95,6 +98,7 @@ public class WorkflowVariableService {
         } else {
             // 创建新变量
             variable = new WorkflowVariableEntity();
+            variable.setUid(uidUtils.getUid());
             variable.setName(name);
             variable.setWorkflowUid(workflowUid);
             variable.setNodeUid(nodeUid);
@@ -104,7 +108,7 @@ public class WorkflowVariableService {
         // 根据类型设置值
         String valueStr = convertValueToString(value);
         variable.setValue(valueStr);
-        // variable.setType(type.name());
+        variable.setType(type != null ? type.name() : WorkflowVariableTypeEnum.STRING.name());
         
         // 保存变量
         return variableRepository.save(variable);

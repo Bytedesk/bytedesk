@@ -16,6 +16,8 @@ package com.bytedesk.service.agent;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -32,6 +34,11 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Optional<AgentEntity> findByUserUid(String userUid);
 
+    /**
+     * 用于在 userUid 可能对应多个组织坐席时，避免 Optional 查询触发 NonUniqueResultException。
+     */
+    List<AgentEntity> findAllByUserUidAndDeletedFalse(String userUid);
+
     List<AgentEntity> findByOrgUid(String orgUid);
 
     Optional<AgentEntity> findByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);
@@ -45,9 +52,13 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     List<AgentEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
+    Page<AgentEntity> findByOrgUidAndDeletedFalse(String orgUid, Pageable pageable);
+
     long countByOrgUidAndDeletedFalse(String orgUid);
 
     Boolean existsByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
+
+    Boolean existsByUserUidAndOrgUidAndUidNotAndDeletedFalse(String userUid, String orgUid, String uid);
 
     
     @Transactional
@@ -115,4 +126,7 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
      * Check if any non-deleted agent references the given AgentSettings uid
      */
     Boolean existsBySettings_UidAndDeletedFalse(String settingsUid);
+
+    Boolean existsByAutoReplySettings_IdAndUidNotAndDeletedFalse(Long autoReplySettingsId, String uid);
+
 }

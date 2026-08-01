@@ -85,6 +85,25 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         }
         return queueMemberRepository.findByThreadUids(threadUids);
     }
+
+    public List<QueueMemberEntity> findClosedQueueMembersForQualityRerun(
+            String orgUid,
+            List<String> threadTypes,
+            ZonedDateTime startTime,
+            ZonedDateTime endTime,
+            int limit) {
+        if (!StringUtils.hasText(orgUid) || threadTypes == null || threadTypes.isEmpty() || startTime == null || endTime == null) {
+            return Collections.emptyList();
+        }
+        int pageSize = Math.max(1, limit);
+        return queueMemberRepository.findClosedQueueMembersForQualityRerun(
+                orgUid,
+                threadTypes,
+                ThreadProcessStatusEnum.CLOSED.name(),
+                startTime,
+                endTime,
+                PageRequest.of(0, pageSize));
+    }
     
     @Override
     public QueueMemberResponse create(QueueMemberRequest request) {
@@ -138,7 +157,16 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         try {
             transactionTemplate.executeWithoutResult(status -> queueMemberRepository.saveAndFlush(entity));
         } catch (ObjectOptimisticLockingFailureException e) {
-            log.warn("QueueMember async update optimistic lock ignored: uid={}, msg={}", entity.getUid(), e.getMessage());
+            log.warn("QueueMember async update optimistic lock detected, retry merge: uid={}, msg={}", entity.getUid(), e.getMessage());
+            try {
+                transactionTemplate.executeWithoutResult(status -> queueMemberRepository.findByUid(entity.getUid())
+                        .ifPresent(latest -> {
+                            mergeBestEffortFields(latest, entity);
+                            queueMemberRepository.saveAndFlush(latest);
+                        }));
+            } catch (Exception ex) {
+                log.error("QueueMember async merge retry failed: uid={}, msg={}", entity.getUid(), ex.getMessage(), ex);
+            }
         } catch (Exception e) {
             log.error("QueueMember async update failed: uid={}, msg={}", entity.getUid(), e.getMessage(), e);
         }
@@ -174,37 +202,7 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             Optional<QueueMemberEntity> latestEntityOpt = queueMemberRepository.findByUid(entity.getUid());
             if (latestEntityOpt.isPresent()) {
                 QueueMemberEntity latestEntity = latestEntityOpt.get();
-                
-                // 根据业务需求合并变更
-                // 保留当前实体中的重要计数值
-                if (entity.getVisitorMessageCount() > latestEntity.getVisitorMessageCount()) {
-                    latestEntity.setVisitorMessageCount(entity.getVisitorMessageCount());
-                }
-                
-                if (entity.getAgentMessageCount() > latestEntity.getAgentMessageCount()) {
-                    latestEntity.setAgentMessageCount(entity.getAgentMessageCount());
-                }
-                
-                if (entity.getRobotMessageCount() > latestEntity.getRobotMessageCount()) {
-                    latestEntity.setRobotMessageCount(entity.getRobotMessageCount());
-                }
-                
-                if (entity.getSystemMessageCount() > latestEntity.getSystemMessageCount()) {
-                    latestEntity.setSystemMessageCount(entity.getSystemMessageCount());
-                }
-                
-                // 保持最新的时间戳
-                if (entity.getVisitorLastMessageAt() != null && 
-                    (latestEntity.getVisitorLastMessageAt() == null || 
-                     entity.getVisitorLastMessageAt().isAfter(latestEntity.getVisitorLastMessageAt()))) {
-                    latestEntity.setVisitorLastMessageAt(entity.getVisitorLastMessageAt());
-                }
-                
-                if (entity.getAgentLastResponseAt() != null && 
-                    (latestEntity.getAgentLastResponseAt() == null || 
-                     entity.getAgentLastResponseAt().isAfter(latestEntity.getAgentLastResponseAt()))) {
-                    latestEntity.setAgentLastResponseAt(entity.getAgentLastResponseAt());
-                }
+                mergeBestEffortFields(latestEntity, entity);
                 
                 // 保存合并后的实体
                 return queueMemberRepository.save(latestEntity);
@@ -216,6 +214,102 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
             log.error("在处理乐观锁异常时发生错误: {}", ex.getMessage(), ex);
             // 抛出运行时异常以确保事务一致性，避免静默回滚
             throw new RuntimeException("处理乐观锁异常失败: " + ex.getMessage(), ex);
+        }
+    }
+
+    private void mergeBestEffortFields(QueueMemberEntity target, QueueMemberEntity source) {
+        if (source.getAgentQueue() != null && target.getAgentQueue() == null) {
+            target.setAgentQueue(source.getAgentQueue());
+        }
+
+        if (source.getRobotQueue() != null && target.getRobotQueue() == null) {
+            target.setRobotQueue(source.getRobotQueue());
+        }
+
+        if (source.getVisitorMessageCount() > target.getVisitorMessageCount()) {
+            target.setVisitorMessageCount(source.getVisitorMessageCount());
+        }
+
+        if (source.getAgentMessageCount() > target.getAgentMessageCount()) {
+            target.setAgentMessageCount(source.getAgentMessageCount());
+        }
+
+        if (source.getRobotMessageCount() > target.getRobotMessageCount()) {
+            target.setRobotMessageCount(source.getRobotMessageCount());
+        }
+
+        if (source.getSystemMessageCount() > target.getSystemMessageCount()) {
+            target.setSystemMessageCount(source.getSystemMessageCount());
+        }
+
+        if (source.getAgentAvgResponseLength() != null && source.getAgentAvgResponseLength() > 0
+                && (target.getAgentAvgResponseLength() == null || target.getAgentAvgResponseLength() <= 0)) {
+            target.setAgentAvgResponseLength(source.getAgentAvgResponseLength());
+        }
+
+        if (source.getAgentMaxResponseLength() != null && source.getAgentMaxResponseLength() > 0
+                && (target.getAgentMaxResponseLength() == null || source.getAgentMaxResponseLength() > target.getAgentMaxResponseLength())) {
+            target.setAgentMaxResponseLength(source.getAgentMaxResponseLength());
+        }
+
+        if (source.getVisitorFirstMessageAt() != null
+                && (target.getVisitorFirstMessageAt() == null || source.getVisitorFirstMessageAt().isBefore(target.getVisitorFirstMessageAt()))) {
+            target.setVisitorFirstMessageAt(source.getVisitorFirstMessageAt());
+        }
+
+        if (source.getVisitorLastMessageAt() != null
+                && (target.getVisitorLastMessageAt() == null || source.getVisitorLastMessageAt().isAfter(target.getVisitorLastMessageAt()))) {
+            target.setVisitorLastMessageAt(source.getVisitorLastMessageAt());
+        }
+
+        if (source.getAgentAcceptedAt() != null
+                && (target.getAgentAcceptedAt() == null || source.getAgentAcceptedAt().isBefore(target.getAgentAcceptedAt()))) {
+            target.setAgentAcceptedAt(source.getAgentAcceptedAt());
+        }
+
+        if (source.getAgentFirstResponseAt() != null
+                && (target.getAgentFirstResponseAt() == null || source.getAgentFirstResponseAt().isBefore(target.getAgentFirstResponseAt()))) {
+            target.setAgentFirstResponseAt(source.getAgentFirstResponseAt());
+        }
+
+        if (Boolean.TRUE.equals(source.getAgentFirstResponse())) {
+            target.setAgentFirstResponse(true);
+        }
+
+        if (source.getAgentLastResponseAt() != null
+                && (target.getAgentLastResponseAt() == null || source.getAgentLastResponseAt().isAfter(target.getAgentLastResponseAt()))) {
+            target.setAgentLastResponseAt(source.getAgentLastResponseAt());
+        }
+
+        if (source.getAgentClosedAt() != null
+                && (target.getAgentClosedAt() == null || source.getAgentClosedAt().isAfter(target.getAgentClosedAt()))) {
+            target.setAgentClosedAt(source.getAgentClosedAt());
+        }
+
+        if (source.getSystemClosedAt() != null
+                && (target.getSystemClosedAt() == null || source.getSystemClosedAt().isAfter(target.getSystemClosedAt()))) {
+            target.setSystemClosedAt(source.getSystemClosedAt());
+        }
+
+        if (Boolean.TRUE.equals(source.getAgentClose())) {
+            target.setAgentClose(true);
+        }
+
+        if (Boolean.TRUE.equals(source.getSystemClose())) {
+            target.setSystemClose(true);
+        }
+
+        if (StringUtils.hasText(source.getAgentAcceptType()) && !StringUtils.hasText(target.getAgentAcceptType())) {
+            target.setAgentAcceptType(source.getAgentAcceptType());
+        }
+
+        if (source.getRobotAcceptedAt() != null
+                && (target.getRobotAcceptedAt() == null || source.getRobotAcceptedAt().isBefore(target.getRobotAcceptedAt()))) {
+            target.setRobotAcceptedAt(source.getRobotAcceptedAt());
+        }
+
+        if (StringUtils.hasText(source.getRobotAcceptType()) && !StringUtils.hasText(target.getRobotAcceptType())) {
+            target.setRobotAcceptType(source.getRobotAcceptType());
         }
     }
 
@@ -395,36 +489,62 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
     }
 
     /**
-     * 聚合统计某个客服队列(按天)的首次/平均响应时长（秒）。
-     * - 首次响应：对 visitorFirstMessageAt 与 agentFirstResponseAt 均非空的会话计算 Duration
-     * - 平均响应：使用会话内已维护的 agentAvgResponseLength（>0 才计入）
+     * 聚合统计某个客服队列(按天) KPI：
+     * - 首次/平均响应时长
+     * - 30秒应答率
+     * - 3分钟人工回复率
+     * - 询单转化率（当前口径：有访客消息会话中已解决占比）
+     * - 不满意会话数（满意度评分≤3）
+     * - 不满意会话率（不满意会话数 / 已评分会话数）
      */
-    public AgentResponseLengthStats computeAgentResponseLengthStats(String agentQueueUid) {
+    public AgentKpiStats computeAgentKpiStats(String agentQueueUid) {
         if (!StringUtils.hasText(agentQueueUid)) {
-            return new AgentResponseLengthStats(0, 0);
+            return new AgentKpiStats(0, 0, 0D, 0D, 0D, 0, 0D);
         }
 
-        List<Object[]> rows = queueMemberRepository.findAgentResponseStatsRows(agentQueueUid);
+        List<Object[]> rows = queueMemberRepository.findAgentKpiStatsRows(agentQueueUid);
         if (rows == null || rows.isEmpty()) {
-            return new AgentResponseLengthStats(0, 0);
+            return new AgentKpiStats(0, 0, 0D, 0D, 0D, 0, 0D);
         }
 
         long firstSum = 0;
         int firstCount = 0;
         long avgSum = 0;
         int avgCount = 0;
+        int responseEligibleCount = 0;
+        int answerIn30sCount = 0;
+        int answerIn3mCount = 0;
+        int inquiryCount = 0;
+        int convertedCount = 0;
+        int dissatisfiedCount = 0;
+        int ratedCount = 0;
 
         for (Object[] row : rows) {
-            // row[0]=visitorFirstMessageAt, row[1]=agentFirstResponseAt, row[2]=agentAvgResponseLength
+            // row[0]=visitorFirstMessageAt, row[1]=agentFirstResponseAt, row[2]=agentAvgResponseLength,
+            // row[3]=rated, row[4]=rateScore, row[5]=resolved, row[6]=visitorMessageCount
             ZonedDateTime visitorFirstMessageAt = (ZonedDateTime) row[0];
             ZonedDateTime agentFirstResponseAt = (ZonedDateTime) row[1];
             Integer agentAvgResponseLength = (Integer) row[2];
+            Boolean rated = (Boolean) row[3];
+            Integer rateScore = (Integer) row[4];
+            Boolean resolved = (Boolean) row[5];
+            Integer visitorMessageCount = (Integer) row[6];
+
+            if (visitorFirstMessageAt != null) {
+                responseEligibleCount += 1;
+            }
 
             if (visitorFirstMessageAt != null && agentFirstResponseAt != null) {
                 long seconds = Duration.between(visitorFirstMessageAt, agentFirstResponseAt).getSeconds();
                 if (seconds >= 0) {
                     firstSum += seconds;
                     firstCount += 1;
+                    if (seconds <= 30) {
+                        answerIn30sCount += 1;
+                    }
+                    if (seconds <= 180) {
+                        answerIn3mCount += 1;
+                    }
                 }
             }
 
@@ -432,12 +552,62 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
                 avgSum += agentAvgResponseLength;
                 avgCount += 1;
             }
+
+            if (visitorMessageCount != null && visitorMessageCount > 0) {
+                inquiryCount += 1;
+                if (Boolean.TRUE.equals(resolved)) {
+                    convertedCount += 1;
+                }
+            }
+
+            if (rateScore != null && (rated == null || rated)) {
+                ratedCount += 1;
+                if (rateScore <= 3) {
+                    dissatisfiedCount += 1;
+                }
+            }
         }
 
         int firstAvg = firstCount == 0 ? 0 : (int) Math.round((double) firstSum / firstCount);
         int avgAvg = avgCount == 0 ? 0 : (int) Math.round((double) avgSum / avgCount);
+        double answerRate30s = calculatePercentage(answerIn30sCount, responseEligibleCount);
+        double replyRate3m = calculatePercentage(answerIn3mCount, responseEligibleCount);
+        double inquiryConversionRate = calculatePercentage(convertedCount, inquiryCount);
+        double dissatisfiedRate = calculatePercentage(dissatisfiedCount, ratedCount);
 
-        return new AgentResponseLengthStats(firstAvg, avgAvg);
+        return new AgentKpiStats(
+                firstAvg,
+                avgAvg,
+                answerRate30s,
+                replyRate3m,
+                inquiryConversionRate,
+            dissatisfiedCount,
+            dissatisfiedRate);
+    }
+
+    private double calculatePercentage(int numerator, int denominator) {
+        if (denominator <= 0) {
+            return 0D;
+        }
+        return Math.round((numerator * 10000D) / denominator) / 100D;
+    }
+
+    /**
+     * 兼容旧调用：仅返回首次/平均响应时长。
+     */
+    public AgentResponseLengthStats computeAgentResponseLengthStats(String agentQueueUid) {
+        AgentKpiStats stats = computeAgentKpiStats(agentQueueUid);
+        return new AgentResponseLengthStats(stats.agentFirstResponseLength(), stats.agentAvgResponseLength());
+    }
+
+    public record AgentKpiStats(
+            int agentFirstResponseLength,
+            int agentAvgResponseLength,
+            double answerRate30s,
+            double agentReplyRate3m,
+            double inquiryConversionRate,
+                int dissatisfiedCount,
+            double dissatisfiedRate) {
     }
 
     public record AgentResponseLengthStats(int agentFirstResponseLength, int agentAvgResponseLength) {

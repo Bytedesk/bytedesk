@@ -14,6 +14,8 @@
  */
 package com.bytedesk.service.agent;
 
+import java.time.ZonedDateTime;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -21,6 +23,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +34,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -76,6 +81,8 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     private String description = I18Consts.I18N_USER_DESCRIPTION;
 
+    private String country;
+
     private String mobile;
 
     @Email(message = I18Consts.I18N_EMAIL_FORMAT_ERROR)
@@ -85,12 +92,26 @@ public class AgentEntity extends BaseEntity {
     @Column(name = "agent_status")
     private String status = AgentStatusEnum.OFFLINE.name();
 
+    @Column(name = "rest_reason", length = 255)
+    private String restReason;
+
     /**
      * Configuration settings reference
      * All settings are managed through the settings entity
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private AgentSettingsEntity settings;
+
+    /**
+     * Per-agent auto-reply settings.
+     * This is intentionally kept on AgentEntity instead of shared settings
+     * template.
+     */
+    @OneToOne(fetch = FetchType.LAZY, optional = true, cascade = {
+            jakarta.persistence.CascadeType.PERSIST,
+            jakarta.persistence.CascadeType.MERGE })
+    @JoinColumn(name = "auto_reply_settings_id", unique = true)
+    private AutoReplySettingsEntity autoReplySettings;
 
     // 以下设置项已迁移至 AgentSettingsEntity
     // 为保持兼容性，保留委托型 getter，以 settings 中的值为准
@@ -104,6 +125,26 @@ public class AgentEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    /**
+     * Whether this agent account should be forced out of desktop and blocked from re-login
+     * until manually restored by an admin.
+     */
+    @Builder.Default
+    @Column(name = "force_logout")
+    private Boolean forceLogout = false;
+
+    /**
+     * Optional admin-facing reason for the forced logout.
+     */
+    @Column(name = "force_logout_reason", length = 512)
+    private String forceLogoutReason;
+
+    /**
+     * Timestamp of the last forced logout action.
+     */
+    @Column(name = "force_logout_at")
+    private ZonedDateTime forceLogoutAt;
 
     // org member
     @ManyToOne(fetch = FetchType.LAZY)
@@ -129,17 +170,18 @@ public class AgentEntity extends BaseEntity {
         return this.status.equals(AgentStatusEnum.BUSY.name());
     }
 
-    public Boolean isAway() {
-        return this.status.equals(AgentStatusEnum.AWAY.name());
+    public Boolean isRest() {
+        return this.status.equals(AgentStatusEnum.REST.name());
     }
 
     public UserProtobuf toUserProtobuf() {
         return UserProtobuf.builder()
-            .uid(this.getUid())
-            .nickname(this.getNickname())
-            .avatar(this.getAvatar())
-            .type(UserTypeEnum.AGENT.name())
-            .build();
+                .uid(this.getUid())
+                .nickname(this.getNickname())
+                .avatar(this.getAvatar())
+                .description(this.getDescription())
+                .type(UserTypeEnum.AGENT.name())
+                .build();
     }
 
     /**
@@ -178,4 +220,3 @@ public class AgentEntity extends BaseEntity {
     }
 
 }
-

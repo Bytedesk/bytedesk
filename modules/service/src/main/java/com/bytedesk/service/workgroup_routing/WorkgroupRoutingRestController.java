@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRestService;
@@ -47,9 +49,10 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
 
     private final WorkgroupRoutingService workgroupRoutingService;
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "组织查询", description = "query workgroup_routing by org")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workgroup_routing by org")
     @Operation(summary = "Query WorkgroupRoutings by Organization", description = "Retrieve workgroup_routings for the current organization")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WorkgroupRoutingRequest request) {
         
@@ -58,9 +61,10 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
         return ResponseEntity.ok(JsonResult.success(workgroup_routings));
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "用户查询", description = "query workgroup_routing by user")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workgroup_routing by user")
     @Operation(summary = "Query WorkgroupRoutings by User", description = "Retrieve workgroup_routings for the current user")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRoutingRequest request) {
         
@@ -69,9 +73,10 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
         return ResponseEntity.ok(JsonResult.success(workgroup_routings));
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "查询详情", description = "query workgroup_routing by uid")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workgroup_routing by uid")
     @Operation(summary = "Query WorkgroupRouting by UID", description = "Retrieve a specific workgroup_routing by its unique identifier")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRoutingRequest request) {
         
@@ -80,40 +85,43 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
         return ResponseEntity.ok(JsonResult.success(workgroup_routing));
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "新建", description = "create workgroup_routing")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_CREATE, description = "create workgroup_routing")
     @Operation(summary = "Create WorkgroupRouting", description = "Create a new workgroup_routing")
     @Override
+    @PostMapping("/create")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_CREATE)
-    public ResponseEntity<?> create(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> create(@RequestBody WorkgroupRoutingRequest request) {
         
         WorkgroupRoutingResponse workgroup_routing = agentNextRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(workgroup_routing));
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "更新", description = "update workgroup_routing")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_UPDATE, description = "update workgroup_routing")
     @Operation(summary = "Update WorkgroupRouting", description = "Update an existing workgroup_routing")
     @Override
+    @PostMapping("/update")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_UPDATE)
-    public ResponseEntity<?> update(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> update(@RequestBody WorkgroupRoutingRequest request) {
         
         WorkgroupRoutingResponse workgroup_routing = agentNextRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(workgroup_routing));
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "删除", description = "delete workgroup_routing")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_DELETE, description = "delete workgroup_routing")
     @Operation(summary = "Delete WorkgroupRouting", description = "Delete a workgroup_routing")
     @Override
+    @PostMapping("/delete")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_DELETE)
-    public ResponseEntity<?> delete(WorkgroupRoutingRequest request) {
+    public ResponseEntity<?> delete(@RequestBody WorkgroupRoutingRequest request) {
         
         agentNextRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "WorkgroupRouting", action = "导出", description = "export workgroup_routing")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_EXPORT, description = "export workgroup_routing")
     @Operation(summary = "Export WorkgroupRoutings", description = "Export workgroup_routings to Excel format")
     @Override
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_EXPORT)
@@ -130,6 +138,7 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     }
 
     @GetMapping("/state")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_QUERY_STATE, description = "query workgroup routing state")
     @Operation(summary = "Get Workgroup Routing State", description = "Get current routing mode, available agents and precomputed next agent for a workgroup")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
     public ResponseEntity<?> state(@RequestParam("workgroupUid") String workgroupUid) {
@@ -140,6 +149,7 @@ public class WorkgroupRoutingRestController extends BaseRestController<Workgroup
     }
 
     @PostMapping("/state/refresh")
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_ROUTING, action = I18Consts.I18N_ACTION_REFRESH_STATE, description = "refresh workgroup routing state")
     @Operation(summary = "Refresh Workgroup Routing State", description = "Manually recompute and persist routing state (nextAgent) for a workgroup, then return the latest state")
     @PreAuthorize(WorkgroupRoutingPermissions.HAS_WORKGROUP_ROUTING_READ)
     public ResponseEntity<?> refreshState(@RequestParam("workgroupUid") String workgroupUid) {

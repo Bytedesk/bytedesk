@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
 
     private final WorkflowNodeRestService workflow_nodeRestService;
 
-    @ActionAnnotation(title = "Workflow Node", action = "组织查询", description = "query workflow_node by org")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workflow_node by org")
     @Operation(summary = "Query WorkflowNodes by Organization", description = "Retrieve workflow_nodes for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(WorkflowNodeRequest request) {
         
         Page<WorkflowNodeResponse> workflow_nodes = workflow_nodeRestService.queryByOrg(request);
@@ -49,9 +53,10 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "用户查询", description = "query workflow_node by user")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workflow_node by user")
     @Operation(summary = "Query WorkflowNodes by User", description = "Retrieve workflow_nodes for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(WorkflowNodeRequest request) {
         
         Page<WorkflowNodeResponse> workflow_nodes = workflow_nodeRestService.queryByUser(request);
@@ -59,9 +64,10 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "查询详情", description = "query workflow_node by uid")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow_node by uid")
     @Operation(summary = "Query WorkflowNode by UID", description = "Retrieve a specific workflow_node by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(WorkflowNodeRequest request) {
         
         WorkflowNodeResponse workflow_node = workflow_nodeRestService.queryByUid(request);
@@ -69,40 +75,43 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "新建", description = "create workflow_node")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow_node")
     @Operation(summary = "Create WorkflowNode", description = "Create a new workflow_node")
     @Override
     // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_CREATE)
-    public ResponseEntity<?> create(WorkflowNodeRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody WorkflowNodeRequest request) {
         
         WorkflowNodeResponse workflow_node = workflow_nodeRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "更新", description = "update workflow_node")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_UPDATE, description = "update workflow_node")
     @Operation(summary = "Update WorkflowNode", description = "Update an existing workflow_node")
     @Override
     // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_UPDATE)
-    public ResponseEntity<?> update(WorkflowNodeRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody WorkflowNodeRequest request) {
         
         WorkflowNodeResponse workflow_node = workflow_nodeRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(workflow_node));
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "删除", description = "delete workflow_node")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow_node")
     @Operation(summary = "Delete WorkflowNode", description = "Delete a workflow_node")
     @Override
     // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_DELETE)
-    public ResponseEntity<?> delete(WorkflowNodeRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody WorkflowNodeRequest request) {
         
         workflow_nodeRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Workflow Node", action = "导出", description = "export workflow_node")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_EXPORT, description = "export workflow_node")
     @Operation(summary = "Export WorkflowNodes", description = "Export workflow_nodes to Excel format")
     @Override
     // @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_EXPORT)

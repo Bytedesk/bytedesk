@@ -64,7 +64,7 @@ public class UserOrganizationRoleEntity implements Serializable  {
 
     // 可以设置多个角色
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(
         name = "bytedesk_core_user_org_role_roles",
         joinColumns = @JoinColumn(name = "user_org_role_id"),
@@ -76,8 +76,5 @@ public class UserOrganizationRoleEntity implements Serializable  {
     // 用户角色有效期
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
-
-    // 可能还有其他字段，如权限等
-
     
 }

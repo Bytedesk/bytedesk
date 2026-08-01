@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,13 +34,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/agent/status/setting")
 @AllArgsConstructor
-@Tag(name = "客服状态设置管理", description = "客服状态设置管理相关接口")
+@Tag(name = "Agent Status Setting Management", description = "Agent status setting management APIs")
 public class AgentStatusSettingRestController extends BaseRestController<AgentStatusSettingRequest, AgentStatusSettingRestService> {
 
     private final AgentStatusSettingRestService tagService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "查询组织", description = "query tag by org")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent status setting by org")
+    @GetMapping("/query/org")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByOrg(AgentStatusSettingRequest request) {
         
@@ -46,7 +51,9 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询用户", description = "query tag by user")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent status setting by user")
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByUser(AgentStatusSettingRequest request) {
         
@@ -55,7 +62,9 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent status setting by uid")
+    @GetMapping("/query/uid")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
     @Override
     public ResponseEntity<?> queryByUid(AgentStatusSettingRequest request) {
         
@@ -64,39 +73,42 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_CREATE, description = "create agent status setting")
     @Override
-    @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(AgentStatusSettingRequest request) {
+    @PostMapping("/create")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_CREATE)
+    public ResponseEntity<?> create(@RequestBody AgentStatusSettingRequest request) {
         
         AgentStatusSettingResponse tag = tagService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent status setting")
     @Override
-    @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(AgentStatusSettingRequest request) {
+    @PostMapping("/update")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_UPDATE)
+    public ResponseEntity<?> update(@RequestBody AgentStatusSettingRequest request) {
         
         AgentStatusSettingResponse tag = tagService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent status setting")
     @Override
-    @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(AgentStatusSettingRequest request) {
+    @PostMapping("/delete")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_DELETE)
+    public ResponseEntity<?> delete(@RequestBody AgentStatusSettingRequest request) {
         
         tagService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status setting")
     @Override
-    @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_EXPORT)
     @GetMapping("/export")
     public Object export(AgentStatusSettingRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -104,8 +116,8 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
             response,
             tagService,
             AgentStatusSettingExcel.class,
-            "标签",
-            "tag"
+            "客服状态设置",
+            "agent-status-setting"
         );
     }
 

@@ -16,7 +16,7 @@ package com.bytedesk.core.message.content;
 import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseContent;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

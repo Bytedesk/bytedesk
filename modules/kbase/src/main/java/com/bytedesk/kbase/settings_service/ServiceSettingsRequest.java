@@ -54,10 +54,7 @@ public class ServiceSettingsRequest  implements Serializable {
 
     private ZonedDateTime topTipEnd;
 
-    // show rate btn on chat toolbar
-    @Builder.Default
-    private Boolean showRateBtn = false;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     @Builder.Default
     private Boolean autoInviteRate = false;
 

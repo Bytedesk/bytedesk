@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,8 +39,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
 
     // 管理后台加载
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
-    @ActionAnnotation(title = "快捷回复", action = "组织查询", description = "query quickReply by org")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query quickReply by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(QuickReplyRequest request) {
         
         Page<QuickReplyResponse> page = quickReplyRestService.queryByOrg(request);
@@ -49,8 +51,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
 
     // 客服端加载
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
-    @ActionAnnotation(title = "快捷回复", action = "用户查询", description = "query quickReply by user")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query quickReply by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(QuickReplyRequest request) {
 
         Page<QuickReplyResponse> page = quickReplyRestService.queryByUser(request);
@@ -60,6 +63,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
 
     // @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
         
         QuickReplyResponse quickReply = quickReplyRestService.queryByUid(request);
@@ -68,8 +72,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
     
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_CREATE)
-    @ActionAnnotation(title = "快捷回复", action = "新建", description = "create quickReply")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_CREATE, description = "create quickReply")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody QuickReplyRequest request) {
         
         QuickReplyResponse quickReply = quickReplyRestService.create(request);
@@ -78,8 +83,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_UPDATE)
-    @ActionAnnotation(title = "快捷回复", action = "更新", description = "update quickReply")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_UPDATE, description = "update quickReply")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody QuickReplyRequest request) {
         
         QuickReplyResponse quickReply = quickReplyRestService.update(request);
@@ -88,8 +94,9 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_DELETE)
-    @ActionAnnotation(title = "快捷回复", action = "删除", description = "delete quickReply")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_DELETE, description = "delete quickReply")
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody QuickReplyRequest request) {
 
         quickReplyRestService.delete(request);
@@ -98,7 +105,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
     
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_UPDATE)
-    @ActionAnnotation(title = "快捷回复", action = "启用", description = "enable quickReply")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_ENABLE, description = "enable quickReply")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody QuickReplyRequest request) {
         
@@ -108,7 +115,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
     
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_EXPORT)
-    @ActionAnnotation(title = "快捷回复", action = "导出", description = "export quickReply")
+    @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_EXPORT, description = "export quickReply")
     @GetMapping("/export")
     @Override
     public Object export(QuickReplyRequest request, HttpServletResponse response) {

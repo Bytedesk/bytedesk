@@ -24,9 +24,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -64,42 +66,70 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
     public List<BlackEntity> findByEndTimeBefore(ZonedDateTime endTime) {
         return repository.findByEndTimeBeforeAndDeletedFalse(endTime);
     }
-    // 根据黑名单用户uid查询
-    @Cacheable(value = "black", key = "#blackUid", unless = "#result == null")
-    public Optional<BlackEntity> findByBlackUid(String blackUid) {
-        return repository.findFirstByBlackUidAndDeletedFalse(blackUid);
+
+    @Cacheable(value = "black", key = "'platform_' + #blackUid", unless = "#result == null")
+    public Optional<BlackEntity> findPlatformBlackByUid(String blackUid) {
+        return repository.findFirstByBlackUidAndLevelAndDeletedFalse(blackUid, LevelEnum.PLATFORM.name());
     }
 
     @Cacheable(value = "blacks", key = "#visitorUid + '_' + #orgUid", unless = "#result == null")
     public Optional<BlackEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
-        return repository.findByBlackUidAndOrgUidAndDeletedFalse(visitorUid, orgUid);
+        return repository.findFirstByBlackUidAndOrgUidAndLevelAndDeletedFalse(
+                visitorUid,
+                orgUid,
+                LevelEnum.ORGANIZATION.name());
+    }
+
+    @Cacheable(value = "blacks", key = "#blackUid + '_' + #orgUid + '_' + #level", unless = "#result == null")
+    public Optional<BlackEntity> findByBlackUidAndScope(String blackUid, String orgUid, String level) {
+        String normalizedLevel = normalizeLevel(level);
+        if (LevelEnum.PLATFORM.name().equals(normalizedLevel)) {
+            return findPlatformBlackByUid(blackUid);
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            return Optional.empty();
+        }
+        return repository.findFirstByBlackUidAndOrgUidAndLevelAndDeletedFalse(blackUid, orgUid, normalizedLevel);
+    }
+
+    public Optional<BlackEntity> findActiveByBlackUidAndOrgUid(String blackUid, String orgUid) {
+        Optional<BlackEntity> platformBlack = findPlatformBlackByUid(blackUid);
+        if (platformBlack.isPresent()) {
+            return platformBlack;
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            return Optional.empty();
+        }
+        return findByVisitorUidAndOrgUid(blackUid, orgUid);
     }
     
     public Boolean existsByBlackUid(BlackRequest request) {
-        // 根据黑名单用户uid查询
-        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
-        if (black.isPresent()) {
-            return true;
-        } else {
-            return false;
+        String level = normalizeLevel(request.getLevel());
+        if (LevelEnum.PLATFORM.name().equals(level)) {
+            return findByBlackUidAndScope(request.getBlackUid(), request.getOrgUid(), level).isPresent();
         }
+        return findActiveByBlackUidAndOrgUid(request.getBlackUid(), request.getOrgUid()).isPresent();
     }
 
     public void unblockByBlackUid(BlackRequest request) {
-        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
+        Optional<BlackEntity> black = findByBlackUidAndScope(request.getBlackUid(), request.getOrgUid(), request.getLevel());
         if (black.isPresent()) {
             BlackEntity entity = black.get();
             entity.setDeleted(true);
             save(entity);
         } else {
-            throw new RuntimeException("unblockByBlackUid Black not found" + request.getBlackUid());
+            throw new RuntimeException("unblockByBlackUid Black not found " + request.getBlackUid());
         }
     }
 
     @Override
     public BlackResponse create(BlackRequest request) {
-        // 判断是否已经存在黑名单用户uid
-        Optional<BlackEntity> black = findByBlackUid(request.getBlackUid());
+        String level = normalizeLevel(request.getLevel());
+        request.setLevel(level);
+
+        Optional<BlackEntity> black = LevelEnum.PLATFORM.name().equals(level)
+                ? findByBlackUidAndScope(request.getBlackUid(), request.getOrgUid(), level)
+                : findActiveByBlackUidAndOrgUid(request.getBlackUid(), request.getOrgUid());
         if (black.isPresent()) {
             return convertToResponse(black.get());
         }
@@ -111,6 +141,7 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
         //
         BlackEntity entity = modelMapper.map(request, BlackEntity.class);
         entity.setUid(uidUtils.getUid());
+        entity.setLevel(level);
         entity.setUserUid(user.getUid());
         entity.setUserNickname(user.getNickname());
         entity.setUserAvatar(user.getAvatar());
@@ -135,7 +166,7 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
             }
             return convertToResponse(savedBlack);
         } else {
-            throw new RuntimeException("Black not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -175,6 +206,46 @@ public class BlackRestService extends BaseRestServiceWithExport<BlackEntity, Bla
     @Override
     public BlackExcel convertToExcel(BlackEntity entity) {
         return modelMapper.map(entity, BlackExcel.class);
+    }
+
+    public BlackResponse createFromExcelRow(BlackExcel row, String orgUid) {
+        if (row == null) {
+            throw new RuntimeException("Black import row is null");
+        }
+        String blackUid = row.getBlackUid();
+        if (!StringUtils.hasText(blackUid)) {
+            throw new RuntimeException("Black import blackUid is required");
+        }
+        BlackRequest request = BlackRequest.builder()
+            .blackUid(blackUid)
+                .blackNickname(row.getBlackNickname())
+                .reason(row.getReason())
+                .blockIp(parseBlockIp(row.getBlockIp()))
+                .userNickname(row.getUserNickname())
+                .startTime(row.getStartTime())
+                .endTime(row.getEndTime())
+                .build();
+        request.setOrgUid(orgUid);
+        return create(request);
+    }
+
+    private Boolean parseBlockIp(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        String normalized = value.trim().toLowerCase();
+        return "true".equals(normalized)
+                || "1".equals(normalized)
+                || "yes".equals(normalized)
+                || "y".equals(normalized)
+                || "是".equals(value.trim());
+    }
+
+    private String normalizeLevel(String level) {
+        if (!StringUtils.hasText(level)) {
+            return LevelEnum.ORGANIZATION.name();
+        }
+        return LevelEnum.fromValue(level).name();
     }
 
     

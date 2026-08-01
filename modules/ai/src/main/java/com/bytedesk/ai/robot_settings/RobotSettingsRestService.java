@@ -24,6 +24,7 @@ import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
 import com.bytedesk.kbase.settings_invite.InviteSettingsEntity;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsEntity;
+import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsEntity;
 import com.bytedesk.kbase.settings_service.ServiceSettingsHelper;
@@ -157,6 +158,18 @@ public class RobotSettingsRestService
         syncOrgUser(sumDraft, orgUid, userUid);
         entity.setDraftSummarySettings(sumDraft);
 
+        // 发布与草稿：自动解决配置（统一使用 fromRequest，内部已处理 null）
+        AutoResolvedSettingsEntity autoResolved = AutoResolvedSettingsEntity.fromRequest(request.getAutoResolvedSettings(),
+            modelMapper);
+        autoResolved.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolved, orgUid, userUid);
+        entity.setAutoResolvedSettings(autoResolved);
+        AutoResolvedSettingsEntity autoResolvedDraft = AutoResolvedSettingsEntity
+            .fromRequest(request.getAutoResolvedSettings(), modelMapper);
+        autoResolvedDraft.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolvedDraft, orgUid, userUid);
+        entity.setDraftAutoResolvedSettings(autoResolvedDraft);
+
         // 发布与草稿：差评配置（统一使用 fromRequest，内部已处理 null）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(request.getRateDownSettings(), modelMapper);
         r.setUid(uidUtils.getUid());
@@ -204,11 +217,21 @@ public class RobotSettingsRestService
         RobotSettingsEntity entity = optional.get();
         // 使用 ModelMapper 批量更新基础字段
         // modelMapper.map(request, entity);
-        entity.setName(request.getName());
-        entity.setDescription(request.getDescription());
-        entity.setIsDefault(request.getIsDefault());
-        entity.setEnabled(request.getEnabled());
-
+        if (StringUtils.hasText(request.getName())) {
+            entity.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            entity.setDescription(request.getDescription());
+        }
+        if (request.getIsDefault() != null) {
+            entity.setIsDefault(request.getIsDefault());
+        }
+        if (request.getEnabled() != null) {
+            entity.setEnabled(request.getEnabled());
+        }
+        if (request.getHideThinkingProcess() != null) {
+            entity.setHideThinkingProcess(request.getHideThinkingProcess());
+        }
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();
@@ -220,6 +243,7 @@ public class RobotSettingsRestService
             String originalUid = draft.getUid();
             Long originalId = draft.getId();
             modelMapper.map(request.getServiceSettings(), draft);
+            ServiceSettingsEntity.applyRequestAliases(request.getServiceSettings(), draft);
             // 恢复或设置 uid
             if (originalUid != null) {
                 draft.setUid(originalUid);
@@ -342,6 +366,26 @@ public class RobotSettingsRestService
             entity.setHasUnpublishedChanges(true);
         }
 
+        if (request.getAutoResolvedSettings() != null) {
+            AutoResolvedSettingsEntity draft = entity.getDraftAutoResolvedSettings();
+            if (draft == null) {
+                draft = new AutoResolvedSettingsEntity();
+                entity.setDraftAutoResolvedSettings(draft);
+            }
+            String originalUid = draft.getUid();
+            Long originalId = draft.getId();
+            modelMapper.map(request.getAutoResolvedSettings(), draft);
+            if (originalUid != null) {
+                draft.setUid(originalUid);
+            } else {
+                draft.setUid(uidUtils.getUid());
+            }
+            if (originalId != null) {
+                draft.setId(originalId);
+            }
+            entity.setHasUnpublishedChanges(true);
+        }
+
         if (request.getRateDownSettings() != null) {
             RatedownSettingsEntity draft = entity.getDraftRateDownSettings();
             if (draft == null) {
@@ -427,6 +471,42 @@ public class RobotSettingsRestService
     @Override
     public void delete(RobotSettingsRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
+    public RobotSettingsResponse enable(String uid) {
+        Optional<RobotSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + uid);
+        }
+        RobotSettingsEntity entity = optional.get();
+        entity.setEnabled(true);
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
+    }
+
+    @Transactional
+    @Caching(put = @CachePut(value = CACHE_ROBOT_SETTINGS, key = "#uid", unless = "#result == null"), evict = {
+            @CacheEvict(value = CACHE_ROBOT_ENTITY, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_RESP, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_NAME_ORG, allEntries = true),
+            @CacheEvict(value = CACHE_ROBOT_EXISTS, allEntries = true)
+    })
+    public RobotSettingsResponse disable(String uid) {
+        Optional<RobotSettingsEntity> optional = findByUid(uid);
+        if (!optional.isPresent()) {
+            throw new RuntimeException("RobotSettings not found: " + uid);
+        }
+        RobotSettingsEntity entity = optional.get();
+        entity.setEnabled(false);
+        RobotSettingsEntity updated = save(entity);
+        return convertToResponse(updated);
     }
 
     @Override
@@ -529,6 +609,16 @@ public class RobotSettingsRestService
         syncOrgUser(sumDraft, orgUid, userUid);
         settings.setDraftSummarySettings(sumDraft);
 
+        // 自动解决配置（发布 + 草稿）
+        AutoResolvedSettingsEntity autoResolved = AutoResolvedSettingsEntity.fromRequest(null, modelMapper);
+        autoResolved.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolved, orgUid, userUid);
+        settings.setAutoResolvedSettings(autoResolved);
+        AutoResolvedSettingsEntity autoResolvedDraft = AutoResolvedSettingsEntity.fromRequest(null, modelMapper);
+        autoResolvedDraft.setUid(uidUtils.getUid());
+        syncOrgUser(autoResolvedDraft, orgUid, userUid);
+        settings.setDraftAutoResolvedSettings(autoResolvedDraft);
+
         // Ratedown settings（发布 + 草稿）
         RatedownSettingsEntity r = RatedownSettingsEntity.fromRequest(null, modelMapper);
         r.setUid(uidUtils.getUid());
@@ -587,8 +677,8 @@ public class RobotSettingsRestService
         if (entity.getDraftServiceSettings() != null) {
             ServiceSettingsEntity published = entity.getServiceSettings();
             if (published != null) {
-                log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(),
-                        entity.getDraftServiceSettings().getWelcomeTip());
+                // log.info("welcomeTip {}, draftWelcomeTip {}", entity.getServiceSettings().getWelcomeTip(),
+                        // entity.getDraftServiceSettings().getWelcomeTip());
                 //
                 copyPropertiesExcludingIds(entity.getDraftServiceSettings(), published);
             } else {
@@ -672,6 +762,18 @@ public class RobotSettingsRestService
             }
         }
 
+        if (entity.getDraftAutoResolvedSettings() != null) {
+            AutoResolvedSettingsEntity published = entity.getAutoResolvedSettings();
+            if (published != null) {
+                copyPropertiesExcludingIds(entity.getDraftAutoResolvedSettings(), published);
+            } else {
+                AutoResolvedSettingsEntity newPublished = new AutoResolvedSettingsEntity();
+                copyPropertiesExcludingIds(entity.getDraftAutoResolvedSettings(), newPublished);
+                newPublished.setUid(uidUtils.getUid());
+                entity.setAutoResolvedSettings(newPublished);
+            }
+        }
+
         if (entity.getDraftToolsSettings() != null) {
             RobotToolsSettingsEntity published = entity.getToolsSettings();
             if (published != null) {
@@ -716,7 +818,16 @@ public class RobotSettingsRestService
 
     @Override
     public RobotSettingsResponse convertToResponse(RobotSettingsEntity entity) {
-        return modelMapper.map(entity, RobotSettingsResponse.class);
+        RobotSettingsResponse resp = modelMapper.map(entity, RobotSettingsResponse.class);
+        resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
+        resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
+        resp.setAutoResolvedSettings(
+            com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsResponse.fromEntity(
+                entity.getAutoResolvedSettings()));
+        resp.setDraftAutoResolvedSettings(
+            com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsResponse.fromEntity(
+                entity.getDraftAutoResolvedSettings()));
+        return resp;
     }
 
     /**

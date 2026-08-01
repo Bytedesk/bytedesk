@@ -27,17 +27,17 @@ import lombok.Data;
 @Data
 public class TopicSubscriptionExcel {
 
-    @ExcelProperty(index = 0, value = "标签名称")
-    @ColumnWidth(20)
-    private String name;
+    @ExcelProperty(index = 0, value = "订阅用户")
+    @ColumnWidth(24)
+    private String userUid;
 
-    @ExcelProperty(index = 1, value = "类型")
+    @ExcelProperty(index = 1, value = "订阅主题")
+    @ColumnWidth(48)
+    private String topic;
+
+    @ExcelProperty(index = 2, value = "订阅类型")
     @ColumnWidth(20)
     private String type;
-
-    @ExcelProperty(index = 2, value = "颜色")
-    @ColumnWidth(20)
-    private String color;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)

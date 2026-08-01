@@ -13,17 +13,12 @@
  */
 package com.bytedesk.ai.springai.providers.dashscope;
 
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.Data;
@@ -54,33 +49,20 @@ public class SpringAIDashscopeEmbeddingConfig {
     @Value("${spring.ai.dashscope.embedding.options.model:text-embedding-v1}")
     private String dashscopeEmbeddingModel;
 
-    @Bean("bytedeskDashscopeEmbeddingApi")
-    @Primary
-    DashScopeApi bytedeskDashscopeEmbeddingApi() {
-        if (dashscopeEmbeddingApiKey != null && !dashscopeEmbeddingApiKey.isEmpty()) {
-            return DashScopeApi.builder()
-                    .baseUrl(dashscopeBaseUrl)
-                    .apiKey(dashscopeEmbeddingApiKey)
-                    .build();
-        } else {
-            return DashScopeApi.builder()
-                    .baseUrl(dashscopeBaseUrl)
-                    .apiKey(dashscopeApiKey)
-                    .build();
-        }
-    }
-
     @Bean("bytedeskDashscopeEmbeddingOptions")
-    DashScopeEmbeddingOptions bytedeskDashscopeEmbeddingOptions() {
-        return DashScopeEmbeddingOptions.builder()
+    BytedeskDashScopeEmbeddingOptions bytedeskDashscopeEmbeddingOptions() {
+        return BytedeskDashScopeEmbeddingOptions.builder()
                 .model(dashscopeEmbeddingModel)
                 .build(); 
     }
 
     @Bean("dashscopeEmbeddingModel")
     @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.DASHSCOPE, matchIfMissing = false)
-    DashScopeEmbeddingModel dashscopeEmbeddingModel() {
-        return new DashScopeEmbeddingModel(bytedeskDashscopeEmbeddingApi(), MetadataMode.EMBED, bytedeskDashscopeEmbeddingOptions());
+    BytedeskDashScopeEmbeddingModel dashscopeEmbeddingModel() {
+        String apiKey = dashscopeEmbeddingApiKey != null && !dashscopeEmbeddingApiKey.isEmpty()
+                ? dashscopeEmbeddingApiKey
+                : dashscopeApiKey;
+        return new BytedeskDashScopeEmbeddingModel(dashscopeBaseUrl, apiKey, bytedeskDashscopeEmbeddingOptions());
     }
 
 }

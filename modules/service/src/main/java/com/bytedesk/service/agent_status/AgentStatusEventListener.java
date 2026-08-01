@@ -45,6 +45,7 @@ public class AgentStatusEventListener {
         // 客服切换接待状态
         AgentStatusRequest agentStatusRequest = AgentStatusRequest.builder()
                 .status(agent.getStatus())
+            .restReason(agent.getRestReason())
                 .agent(userProtobuf.toJson())
                 // .userUid(agent.getMember().getUser().getUid()) // 懒加载可能导致报错
                 .orgUid(agent.getOrgUid())

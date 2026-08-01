@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260620-add-ticket-statistics-ticket-type-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="ticket_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="ticket_type" type="varchar(32)" defaultValue="EXTERNAL"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-category-uid-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="category_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="category_uid" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-category-name-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="category_name"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="category_name" type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-category-tickets-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="category_tickets"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="category_tickets" type="bigint" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-category-ratio-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="category_ratio"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="category_ratio" type="double" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-average-rating-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="average_rating"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="average_rating" type="double" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-rated-tickets-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_statistics" columnName="rated_tickets"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_statistics">
+            <column name="rated_tickets" type="bigint" defaultValueNumeric="0"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-ticket-type-index-mysql" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="ticket_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_ticket_type_date"/>
+            </not>
+        </preConditions>
+
+        <sql><![CDATA[
+            ALTER TABLE `bytedesk_ticket_statistics`
+            ADD INDEX `idx_ticket_stats_org_ticket_type_date` (
+                `org_uid`(64),
+                `ticket_type`(32),
+                `statistic_type`(32),
+                `date`(16),
+                `is_deleted`
+            )
+        ]]></sql>
+    </changeSet>
+
+    <changeSet id="260620-add-ticket-statistics-ticket-type-index-postgresql" author="githubcopilot" dbms="postgresql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_statistics"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="org_uid"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="ticket_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="statistic_type"/>
+            <columnExists tableName="bytedesk_ticket_statistics" columnName="date"/>
+            <not>
+                <indexExists tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_ticket_type_date"/>
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_ticket_statistics" indexName="idx_ticket_stats_org_ticket_type_date">
+            <column name="org_uid"/>
+            <column name="ticket_type"/>
+            <column name="statistic_type"/>
+            <column name="date"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

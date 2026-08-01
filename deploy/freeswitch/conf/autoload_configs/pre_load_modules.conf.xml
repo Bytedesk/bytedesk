@@ -1,0 +1,8 @@
+<configuration name="pre_load_modules.conf" description="Modules">
+  <modules>
+    <load module="mod_mariadb" />
+<!-- <load module="mod_mariadb" /> -->
+    <!-- <load module="mod_pgsql" /> -->
+    <!-- Databases -->
+  </modules>
+</configuration>

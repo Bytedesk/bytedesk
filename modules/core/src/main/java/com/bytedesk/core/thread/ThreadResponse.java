@@ -170,5 +170,5 @@ public class ThreadResponse extends BaseResponse {
     private Integer robotMessageCount;
 
     // queue meta (filled by service module when needed)
-    private QueueMeta queueMeta;
+    private ThreadQueueMeta queueMeta;
 }

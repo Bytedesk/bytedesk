@@ -66,13 +66,13 @@ public class IpUtils {
      * 
      * @return ip
      */
-    @SuppressWarnings("null")
     public static String getClientIp(HttpServletRequest request) {
 
         String unknown = "unknown";
         String localhost = "127.0.0.1";
         String ipAddress = null;
         String ipv6 = "0:0:0:0:0:0:0:1";
+        String ipv6Compressed = "::1";
 
         try {
             ipAddress = request.getHeader("X-Forwarded-For");
@@ -93,29 +93,23 @@ public class IpUtils {
             }
             if (ipAddress == null || ipAddress.length() == 0 || unknown.equalsIgnoreCase(ipAddress)) {
                 ipAddress = request.getRemoteAddr();
-                if (ipAddress.equals(localhost)) {
-                    // 根据网卡取本机配置的IP
-                    InetAddress inet = null;
-                    try {
-                        inet = InetAddress.getLocalHost();
-                    } catch (UnknownHostException e) {
-                        log.error("获取本机 IP 失败", e);
-                    }
-                    ipAddress = inet.getHostAddress();
-                }
             }
             // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
-            if (ipAddress != null && ipAddress.length() > 15) {
+            if (ipAddress != null) {
+                ipAddress = ipAddress.trim();
+            }
+            if (ipAddress != null && ipAddress.indexOf(",") > 0) {
                 // "***.***.***.***".length() = 15
-                if (ipAddress.indexOf(",") > 0) {
-                    ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
-                }
+                ipAddress = ipAddress.substring(0, ipAddress.indexOf(",")).trim();
             }
         } catch (Exception e) {
             ipAddress = "";
         }
 
-        return ipAddress.equals(ipv6) ? localhost : ipAddress;
+        if (ipv6.equals(ipAddress) || ipv6Compressed.equals(ipAddress)) {
+            return localhost;
+        }
+        return ipAddress;
     }
 
     // private String getClientIp(HttpServletRequest request) {

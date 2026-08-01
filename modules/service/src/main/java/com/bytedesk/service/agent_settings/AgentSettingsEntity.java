@@ -5,13 +5,17 @@
  */
 package com.bytedesk.service.agent_settings;
 
-import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButton;
+import com.bytedesk.service.agent_quickreply.AgentQuickReplyButtonListConverter;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTab;
+import com.bytedesk.service.agent_rightpanel.AgentRightPanelTabListConverter;
 import com.bytedesk.service.agent_status.settings.AgentStatusSettingEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +55,7 @@ import lombok.experimental.SuperBuilder;
  * - serviceSettings, inviteSettings, intentionSettings
  * 
  * Agent-specific fields:
- * - messageLeaveSettings, autoReplySettings, queueSettings, rateDownSettings
+ * - messageLeaveSettings, queueSettings, rateDownSettings
  * 
  * Database Table: bytedesk_service_agent_settings
  */
@@ -162,18 +166,6 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     private WorktimeSettingEntity draftWorktimeSettings;
 
     /**
-     * Auto-reply settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private AutoReplySettingsEntity autoReplySettings;
-
-    /**
-     * Draft Auto-reply settings
-     */
-    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
-    private AutoReplySettingsEntity draftAutoReplySettings;
-
-    /**
      * Queue settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { jakarta.persistence.CascadeType.PERSIST, jakarta.persistence.CascadeType.MERGE, jakarta.persistence.CascadeType.REMOVE })
@@ -210,15 +202,15 @@ public class AgentSettingsEntity extends BaseSettingsEntity {
     private AgentStatusSettingEntity draftAgentStatusSettings;
 
     /**
-     * Convenience accessor so queue notice batching is surfaced even when agent settings are shared.
+     * WebRTC settings
      */
-    // public int resolveQueueNoticeBatchWindowMs() {
-    //     if (queueSettings != null && queueSettings.getQueueNoticeBatchWindowMs() != null) {
-    //         return queueSettings.getQueueNoticeBatchWindowMs();
-    //     }
-    //     if (draftQueueSettings != null && draftQueueSettings.getQueueNoticeBatchWindowMs() != null) {
-    //         return draftQueueSettings.getQueueNoticeBatchWindowMs();
-    //     }
-    //     return QueueSettingsEntity.DEFAULT_QUEUE_NOTICE_BATCH_WINDOW_MS;
-    // }
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity webrtcSettings;
+
+    /**
+     * Draft WebRTC settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity draftWebrtcSettings;
+
 }

@@ -21,7 +21,7 @@ import com.bytedesk.core.base.BaseRestController;
 import lombok.AllArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/email-template")
+@RequestMapping("/api/v1/email/template")
 @AllArgsConstructor
 public class EmailTemplateRestController extends BaseRestController<EmailTemplateRequest, EmailTemplateRestService> {
 

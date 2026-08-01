@@ -49,10 +49,27 @@ public class PluginRegistry {
         List<BytedeskPlugin> sortedPlugins = pluginList.stream()
             .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
             .collect(Collectors.toList());
-        
-        // 注册所有插件
-        for (BytedeskPlugin plugin : sortedPlugins) {
-            registerPlugin(plugin);
+
+        // 依赖感知注册：优先级仅作为同层排序依据，依赖未满足的插件会在后续轮次重试
+        List<BytedeskPlugin> pendingPlugins = new ArrayList<>(sortedPlugins);
+        boolean progress;
+        do {
+            progress = false;
+            Iterator<BytedeskPlugin> iterator = pendingPlugins.iterator();
+            while (iterator.hasNext()) {
+                BytedeskPlugin plugin = iterator.next();
+                if (checkDependencies(plugin, false)) {
+                    registerPlugin(plugin);
+                    iterator.remove();
+                    progress = true;
+                }
+            }
+        } while (progress && !pendingPlugins.isEmpty());
+
+        // 仍未注册成功的插件（可能是循环依赖或缺失依赖）
+        for (BytedeskPlugin plugin : pendingPlugins) {
+            List<String> missingDependencies = getMissingDependencies(plugin);
+            log.error("Plugin {} has unmet dependencies: {}", plugin.getPluginId(), String.join(", ", missingDependencies));
         }
         
         log.info("Plugin Registry initialized with {} plugins", plugins.size());
@@ -210,6 +227,10 @@ public class PluginRegistry {
      * 检查插件依赖是否满足
      */
     private boolean checkDependencies(BytedeskPlugin plugin) {
+        return checkDependencies(plugin, true);
+    }
+
+    private boolean checkDependencies(BytedeskPlugin plugin, boolean logMissing) {
         String[] dependencies = plugin.getDependencies();
         if (dependencies == null || dependencies.length == 0) {
             return true;
@@ -217,13 +238,26 @@ public class PluginRegistry {
         
         for (String dependency : dependencies) {
             if (!plugins.containsKey(dependency)) {
-                log.warn("Plugin {} depends on {}, but it's not registered yet", 
-                    plugin.getPluginId(), dependency);
+                if (logMissing) {
+                    log.warn("Plugin {} depends on {}, but it's not registered yet", 
+                        plugin.getPluginId(), dependency);
+                }
                 return false;
             }
         }
         
         return true;
+    }
+
+    private List<String> getMissingDependencies(BytedeskPlugin plugin) {
+        String[] dependencies = plugin.getDependencies();
+        if (dependencies == null || dependencies.length == 0) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(dependencies)
+            .filter(dependency -> !plugins.containsKey(dependency))
+            .collect(Collectors.toList());
     }
     
     /**

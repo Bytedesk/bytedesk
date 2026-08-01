@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -49,7 +50,7 @@ public class WorkflowVariableController {
      */
     @Operation(summary = "创建工作流变量", description = "创建新的工作流变量")
     @ApiResponse(responseCode = "200", description = "创建成功")
-    @ActionAnnotation(title = "工作流变量", action = "新建", description = "create workflow variable")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow variable")
     @PostMapping("/create")
     public ResponseEntity<?> createVariable(@RequestBody WorkflowVariableRequest request) {
         // 解析变量类型和作用域
@@ -153,7 +154,7 @@ public class WorkflowVariableController {
      */
     @Operation(summary = "删除工作流变量", description = "删除指定工作流变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "工作流变量", action = "删除", description = "delete workflow variable")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow variable")
     @DeleteMapping("/{workflowUid}/{name}")
     public ResponseEntity<?> removeVariable(
             @PathVariable String workflowUid,
@@ -168,7 +169,7 @@ public class WorkflowVariableController {
      */
     @Operation(summary = "删除工作流局部变量", description = "删除指定节点的局部变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "工作流局部变量", action = "删除", description = "delete workflow local variable")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOCAL_VARIABLE, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow local variable")
     @DeleteMapping("/{workflowUid}/{nodeUid}/{name}")
     public ResponseEntity<?> removeLocalVariable(
             @PathVariable String workflowUid,
@@ -184,7 +185,7 @@ public class WorkflowVariableController {
      */
     @Operation(summary = "删除工作流所有变量", description = "删除指定工作流的所有变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "工作流变量", action = "批量删除", description = "delete all workflow variables")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all workflow variables")
     @DeleteMapping("/{workflowUid}")
     public ResponseEntity<?> removeAllVariables(@PathVariable String workflowUid) {
         variableService.removeAllVariables(workflowUid);
@@ -196,7 +197,7 @@ public class WorkflowVariableController {
      */
     @Operation(summary = "删除节点所有局部变量", description = "删除指定节点的所有局部变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "工作流局部变量", action = "批量删除", description = "delete all workflow local variables")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOCAL_VARIABLE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all workflow local variables")
     @DeleteMapping("/{workflowUid}/{nodeUid}")
     public ResponseEntity<?> removeAllLocalVariables(
             @PathVariable String workflowUid,

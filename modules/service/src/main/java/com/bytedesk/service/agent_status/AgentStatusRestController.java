@@ -15,10 +15,16 @@ package com.bytedesk.service.agent_status;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,13 +35,16 @@ import lombok.AllArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/agent/status")
 @AllArgsConstructor
-@Tag(name = "客服状态管理", description = "客服状态管理相关接口")
+@Tag(name = "Agent Status Management", description = "Agent status management APIs")
 public class AgentStatusRestController extends BaseRestController<AgentStatusRequest, AgentStatusRestService> {
 
     private final AgentStatusRestService agentStatusService;
 
     @Override
-    @Operation(summary = "根据组织查询客服状态")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent status by org")
+    @Operation(summary = "Query Agent Status by Organization")
+    @GetMapping("/query/org")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByOrg(AgentStatusRequest request) {
         
         Page<AgentStatusResponse> page = agentStatusService.queryByOrg(request);
@@ -44,7 +53,10 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "根据用户查询客服状态")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent status by user")
+    @Operation(summary = "Query Agent Status by User")
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUser(AgentStatusRequest request) {
         
         Page<AgentStatusResponse> page = agentStatusService.queryByUser(request);
@@ -53,7 +65,10 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "根据UID查询客服状态")
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent status by uid")
+    @Operation(summary = "Query Agent Status by UID")
+    @GetMapping("/query/uid")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_READ)
     public ResponseEntity<?> queryByUid(AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.queryByUid(request);
@@ -62,8 +77,11 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "创建客服状态")
-    public ResponseEntity<?> create(AgentStatusRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_CREATE, description = "create agent status")
+    @Operation(summary = "Create Agent Status")
+    @PostMapping("/create")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_CREATE)
+    public ResponseEntity<?> create(@RequestBody AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.create(request);
 
@@ -71,8 +89,11 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "更新客服状态")
-    public ResponseEntity<?> update(AgentStatusRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent status")
+    @Operation(summary = "Update Agent Status")
+    @PostMapping("/update")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_UPDATE)
+    public ResponseEntity<?> update(@RequestBody AgentStatusRequest request) {
         
         AgentStatusResponse response = agentStatusService.update(request);
 
@@ -80,8 +101,11 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
-    @Operation(summary = "删除客服状态")
-    public ResponseEntity<?> delete(AgentStatusRequest request) {
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent status")
+    @Operation(summary = "Delete Agent Status")
+    @PostMapping("/delete")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_DELETE)
+    public ResponseEntity<?> delete(@RequestBody AgentStatusRequest request) {
         
         agentStatusService.delete(request);
 
@@ -89,9 +113,18 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
     }
 
     @Override
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status")
+    @GetMapping("/export")
+    @PreAuthorize(AgentStatusPermissions.HAS_AGENT_STATUS_EXPORT)
     public Object export(AgentStatusRequest request, HttpServletResponse response) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'export'");
+        return exportTemplate(
+            request,
+            response,
+            agentStatusService,
+            AgentStatusExcel.class,
+            "客服状态",
+            "agent_status"
+        );
     }
 
     

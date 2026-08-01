@@ -21,9 +21,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
-import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,17 +43,9 @@ public class SpringAIDashscopeChatConfig {
     @Value("${spring.ai.dashscope.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("bytedeskDashscopeApi")
-    DashScopeApi bytedeskDashscopeApi() {
-        return DashScopeApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("bytedeskDashscopeChatOptions")
-    DashScopeChatOptions bytedeskDashscopeChatOptions() {
-        return DashScopeChatOptions.builder()
+    BytedeskDashScopeChatOptions bytedeskDashscopeChatOptions() {
+        return BytedeskDashScopeChatOptions.builder()
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -64,10 +53,7 @@ public class SpringAIDashscopeChatConfig {
 
     @Bean("bytedeskDashscopeChatModel")
     ChatModel bytedeskDashscopeChatModel() {
-        return DashScopeChatModel.builder()
-                .dashScopeApi(bytedeskDashscopeApi())
-                .defaultOptions(bytedeskDashscopeChatOptions())
-                .build();
+        return new BytedeskDashScopeChatModel(baseUrl, apiKey, bytedeskDashscopeChatOptions());
     }
 
     @Bean("bytedeskDashscopeChatClient")

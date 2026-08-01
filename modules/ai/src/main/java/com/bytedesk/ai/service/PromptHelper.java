@@ -9,7 +9,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -18,18 +17,19 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Slf4j
 @Component
 public class PromptHelper {
 
-    @Autowired
-    private MessageRestService messageRestService;
+    private final MessageRestService messageRestService;
 
     public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {
@@ -161,15 +161,7 @@ public class PromptHelper {
         for (Message message : messages) {
             String content = message.getText();
             if (content != null && !content.trim().isEmpty()) {
-                if (message instanceof SystemMessage) {
-                    fullPrompt.append(I18Consts.I18N_SYSTEM_PREFIX).append(content).append("\n");
-                } else if (message instanceof UserMessage) {
-                    fullPrompt.append(I18Consts.I18N_USER_PREFIX).append(content).append("\n");
-                } else if (message instanceof AssistantMessage) {
-                    fullPrompt.append(I18Consts.I18N_ASSISTANT_PREFIX).append(content).append("\n");
-                } else {
-                    fullPrompt.append(content).append("\n");
-                }
+                fullPrompt.append(content).append("\n");
             }
         }
         return fullPrompt.toString().trim();

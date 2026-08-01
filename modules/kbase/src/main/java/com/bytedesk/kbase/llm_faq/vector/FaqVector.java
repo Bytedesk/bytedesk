@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_faq.vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -23,6 +24,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,12 +62,24 @@ public class FaqVector {
     
     @Field(type = FieldType.Keyword)
     private String kbUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
     
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
+
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
 
     // 向量嵌入存储
     @Field(type = FieldType.Dense_Vector, dims = 1536)
@@ -116,8 +130,12 @@ public class FaqVector {
             .tagList(faq.getTagList())
             .orgUid(faq.getOrgUid())
             .kbUid(kbUid)
+            .sourceUid(faq.getUid())
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
+            .language(faq.getKbase() != null ? faq.getKbase().getSourceLanguage() : null)
+            .sourceLanguage(faq.getKbase() != null ? faq.getKbase().getSourceLanguage() : null)
+            .translated(false)
             // .startDate(faq.getStartDate())
             // .endDate(faq.getEndDate())
             .viewCount(faq.getViewCount())
@@ -126,5 +144,32 @@ public class FaqVector {
             .downCount(faq.getDownCount())
             .docIdList(faq.getDocIdList())
             .build();
+    }
+
+    public static FaqVector fromTranslation(FaqEntity faq, KbaseTranslationEntity translation) {
+        String kbUid = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for vectorizing translated faq uid=" + faq.getUid());
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+                ? translation.getTargetLanguage().trim().toUpperCase()
+                : (faq.getKbase() != null ? faq.getKbase().getSourceLanguage() : null);
+
+        return FaqVector.builder()
+                .uid(translation.getUid())
+                .question(StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : faq.getQuestion())
+                .answer(StringUtils.hasText(translation.getContent()) ? translation.getContent() : translation.getSummary())
+                .similarQuestions(new ArrayList<>())
+                .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? faq.getTagList() : translation.getTagList())
+                .orgUid(faq.getOrgUid())
+                .kbUid(kbUid)
+                .sourceUid(faq.getUid())
+                .categoryUid(faq.getCategoryUid())
+                .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(faq.getEnabled()))
+                .language(targetLanguage)
+                .sourceLanguage(faq.getKbase() != null ? faq.getKbase().getSourceLanguage() : null)
+                .translated(true)
+                .build();
     }
 }

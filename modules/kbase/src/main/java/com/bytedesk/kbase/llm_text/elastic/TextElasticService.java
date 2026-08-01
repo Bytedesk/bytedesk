@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -33,24 +32,30 @@ import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.llm_text.TextRequest;
 import com.bytedesk.kbase.llm_text.TextRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * elasticsearch 全文检索服务
  * @author jackning
  */
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class TextElasticService {
     
-    @Autowired
-    private ElasticsearchOperations elasticsearchOperations;
+    private final ElasticsearchOperations elasticsearchOperations;
 
-    @Autowired
-    private TextRestService textRestService;
+    private final TextRestService textRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
 
     public Map<String, Object> queryElasticByUid(TextRequest request) {
         String uid = request.getUid();
@@ -278,6 +283,7 @@ public class TextElasticService {
             
             // 将文档索引到Elasticsearch
             elasticsearchOperations.save(textElastic);
+            reindexTranslatedTexts(text);
             
             if (exists) {
                 log.info("Text索引更新成功: {}", textUid);
@@ -320,6 +326,45 @@ public class TextElasticService {
             return false;
         }
     }
+
+        private void reindexTranslatedTexts(TextEntity text) {
+        deleteTranslatedTextDocuments(text.getUid());
+
+        String kbUid = text.getKbase() != null ? text.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+            .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                kbUid,
+                text.getUid(),
+                KbaseTranslationSourceTypeEnum.TEXT.name());
+
+        translations.stream()
+            .filter(translation -> Boolean.TRUE.equals(translation.getEnabled()))
+            .filter(translation -> KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus()))
+            .filter(translation -> StringUtils.hasText(translation.getTargetLanguage()))
+            .filter(translation -> StringUtils.hasText(translation.getTitle())
+                || StringUtils.hasText(translation.getContent())
+                || StringUtils.hasText(translation.getSummary()))
+            .forEach(translation -> elasticsearchOperations.save(TextElastic.fromTranslation(text, translation)));
+        }
+
+        private void deleteTranslatedTextDocuments(String sourceUid) {
+        if (!StringUtils.hasText(sourceUid)) {
+            return;
+        }
+
+        Query query = NativeQuery.builder()
+            .withQuery(QueryBuilders.bool()
+                .filter(QueryBuilders.term().field("sourceUid").value(sourceUid).build()._toQuery())
+                .filter(QueryBuilders.term().field("translated").value(true).build()._toQuery())
+                .build()._toQuery())
+            .build();
+
+        elasticsearchOperations.delete(DeleteQuery.builder(query).build(), TextElastic.class);
+        }
     
     /**
      * 根据知识库UID删除所有相关Text索引
@@ -363,7 +408,7 @@ public class TextElasticService {
      */
     public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid) {
         log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
-        return searchTexts(query, kbUid, categoryUid, orgUid, 10);
+        return searchTexts(query, kbUid, categoryUid, orgUid, 10, null);
     }
 
     /**
@@ -373,7 +418,14 @@ public class TextElasticService {
      */
     public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid, Integer maxResults) {
         log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}", query, kbUid, categoryUid, orgUid, maxResults);
-        return searchTextsInternal(query, kbUid, categoryUid, orgUid, false, maxResults);
+        return searchTexts(query, kbUid, categoryUid, orgUid, maxResults, null);
+    }
+
+    public List<TextElasticSearchResult> searchTexts(String query, String kbUid, String categoryUid, String orgUid,
+            Integer maxResults, List<String> preferredLanguages) {
+        log.info("搜索Texts: query={}, kbUid={}, categoryUid={}, orgUid={}, maxResults={}, preferredLanguages={}",
+                query, kbUid, categoryUid, orgUid, maxResults, preferredLanguages);
+        return searchTextsInternal(query, kbUid, categoryUid, orgUid, false, maxResults, preferredLanguages);
     }
 
     /**
@@ -388,7 +440,7 @@ public class TextElasticService {
         
         log.info("联想Texts: query={}, kbUid={}, orgUid={}", query, kbUid, orgUid);
         
-        List<TextElasticSearchResult> results = searchTextsInternal(query, kbUid, null, orgUid, true, 10);
+        List<TextElasticSearchResult> results = searchTextsInternal(query, kbUid, null, orgUid, true, 10, null);
         log.info("Text联想完成，找到{}条结果", results.size());
         return results;
     }
@@ -410,7 +462,8 @@ public class TextElasticService {
             String categoryUid, 
             String orgUid, 
             boolean isSuggest,
-            Integer maxResults) {
+            Integer maxResults,
+            List<String> preferredLanguages) {
         
         if (query == null || query.trim().isEmpty()) {
             return new ArrayList<>();
@@ -495,6 +548,18 @@ public class TextElasticService {
             
             if (orgUid != null && !orgUid.trim().isEmpty()) {
                 boolQueryBuilder.filter(QueryBuilders.term().field("orgUid").value(orgUid).build()._toQuery());
+            }
+
+            if (preferredLanguages != null && !preferredLanguages.isEmpty()) {
+                BoolQuery.Builder languageQuery = new BoolQuery.Builder();
+                preferredLanguages.stream()
+                        .filter(StringUtils::hasText)
+                        .map(String::trim)
+                        .map(String::toUpperCase)
+                        .forEach(language -> languageQuery.should(
+                                QueryBuilders.term().field("language").value(language).build()._toQuery()));
+                languageQuery.minimumShouldMatch("1");
+                boolQueryBuilder.filter(languageQuery.build()._toQuery());
             }
             
             // 构建最终查询

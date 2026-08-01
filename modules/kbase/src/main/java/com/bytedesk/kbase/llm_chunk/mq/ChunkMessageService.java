@@ -16,25 +16,33 @@ package com.bytedesk.kbase.llm_chunk.mq;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.mq.jms.JmsArtemisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Chunk消息服务
  * 使用核心模块中的JmsTemplate发送Chunk索引请求
  * 优化了批处理逻辑，避免大文件处理时的并发问题
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class ChunkMessageService {
 
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
+
+    @Value("${bytedesk.mq.type:artemis}")
+    private String mqType;
+
+    private boolean isArtemisEnabled() {
+        return "artemis".equalsIgnoreCase(mqType);
+    }
     
     private final Random random = new Random();
     
@@ -54,6 +62,10 @@ public class ChunkMessageService {
      * @param fileUid 文件UID
      */
     public void sendToIndexQueue(String chunkUid, String fileUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS Chunk索引发送: {}", mqType, chunkUid);
+            return;
+        }
         try {
             log.debug("发送Chunk到索引队列: {}", chunkUid);
             
@@ -108,6 +120,10 @@ public class ChunkMessageService {
      * @param fileUid 文件UID
      */
     public void sendToDeleteQueue(String chunkUid, String fileUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS Chunk删除发送: {}", mqType, chunkUid);
+            return;
+        }
         try {
             log.debug("发送Chunk删除请求到索引队列: {}", chunkUid);
             
@@ -157,6 +173,10 @@ public class ChunkMessageService {
      * @param fileUid 文件UID（用于分组）
      */
     public void batchSendToIndexQueue(List<String> chunkUids, String fileUid) {
+        if (!isArtemisEnabled()) {
+            log.debug("当前MQ类型为{}，跳过JMS Chunk批量索引发送", mqType);
+            return;
+        }
         if (chunkUids == null || chunkUids.isEmpty()) {
             log.warn("批量发送的Chunk列表为空");
             return;

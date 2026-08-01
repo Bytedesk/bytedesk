@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260609-create-wechat-mp-shorten-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_wechat_mp_shorten" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_wechat_mp_shorten_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(64)"/>
+            <column name="platform_type" type="VARCHAR(64)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="app_id" type="VARCHAR(128)"/>
+            <column name="long_data" type="VARCHAR(4096)"/>
+            <column name="short_key" type="VARCHAR(64)"/>
+            <column name="expire_seconds" type="INT"/>
+            <column name="wechat_create_time" type="BIGINT"/>
+        </createTable>
+
+        <createIndex tableName="bytedesk_channel_wechat_mp_shorten" indexName="idx_wechat_mp_shorten_app_uid">
+            <column name="app_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_channel_wechat_mp_shorten" indexName="idx_wechat_mp_shorten_short_key">
+            <column name="short_key"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-app-uid" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="app_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="app_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-app-id" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="app_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="app_id" type="VARCHAR(128)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-long-data" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="long_data"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="long_data" type="VARCHAR(4096)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-short-key" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="short_key"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="short_key" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-expire-seconds" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="expire_seconds"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="expire_seconds" type="INT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-wechat-create-time" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <columnExists tableName="bytedesk_channel_wechat_mp_shorten" columnName="wechat_create_time"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_wechat_mp_shorten">
+            <column name="wechat_create_time" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260609-add-wechat-mp-shorten-short-key-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_channel_wechat_mp_shorten"/>
+            <not>
+                <indexExists tableName="bytedesk_channel_wechat_mp_shorten" indexName="idx_wechat_mp_shorten_short_key"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_channel_wechat_mp_shorten" indexName="idx_wechat_mp_shorten_short_key">
+            <column name="short_key"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

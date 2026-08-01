@@ -38,7 +38,7 @@ public class CallConnectionTester implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        log.info("开始Call连接测试...");
+        log.info(CallI18nConsts.CONNECTION_TEST_START);
         testConnection();
     }
 
@@ -49,14 +49,14 @@ public class CallConnectionTester implements CommandLineRunner {
         String server = callProperties.getServer();
         int port = callProperties.getEslPort();
         
-        log.info("测试连接到Call ESL: {}:{}", server, port);
+        log.info(CallI18nConsts.CONNECTION_TEST_TARGET, server, port);
         
         try (Socket socket = new Socket()) {
             // 设置5秒连接超时
             socket.connect(new java.net.InetSocketAddress(server, port), 5000);
             
             if (socket.isConnected()) {
-                log.info("✅ 网络连接成功: {}:{}", server, port);
+                log.info(CallI18nConsts.CONNECTION_TEST_NETWORK_SUCCESS, server, port);
                 
                 // 尝试读取Call的欢迎消息
                 try {
@@ -66,76 +66,76 @@ public class CallConnectionTester implements CommandLineRunner {
                     
                     if (bytesRead > 0) {
                         String response = new String(buffer, 0, bytesRead);
-                        log.info("收到Call响应: {}", response.trim());
+                        log.info(CallI18nConsts.CONNECTION_TEST_RESPONSE_RECEIVED, response.trim());
                         
                         if (response.contains("rude-rejection")) {
-                            log.error("❌ Call ESL拒绝连接 - Access Control List (ACL) 限制");
-                            log.error("解决方案:");
-                            log.error("1. 修改Call的 event_socket.conf.xml 文件");
-                            log.error("2. 在ACL配置中添加允许当前IP地址的规则");
-                            log.error("3. 或者移除 apply-inbound-acl 参数以允许所有连接");
+                            log.error(CallI18nConsts.CONNECTION_TEST_ACL_REJECTED);
+                            log.error(CallI18nConsts.CONNECTION_TEST_SOLUTION);
+                            log.error(CallI18nConsts.CONNECTION_TEST_SOLUTION_STEP_1);
+                            log.error(CallI18nConsts.CONNECTION_TEST_SOLUTION_STEP_2);
+                            log.error(CallI18nConsts.CONNECTION_TEST_SOLUTION_STEP_3);
                         } else if (response.contains("auth/request")) {
-                            log.info("✅ Call ESL服务正常，等待认证");
+                            log.info(CallI18nConsts.CONNECTION_TEST_WAIT_AUTH);
                         }
                     }
                 } catch (SocketTimeoutException e) {
-                    log.warn("⚠️ 读取Call响应超时，但连接已建立");
+                    log.warn(CallI18nConsts.CONNECTION_TEST_READ_TIMEOUT);
                 } catch (IOException e) {
-                    log.error("❌ 读取Call响应失败: {}", e.getMessage());
+                    log.error(CallI18nConsts.CONNECTION_TEST_READ_FAILED, e.getMessage());
                 }
             }
             
         } catch (IOException e) {
-            log.error("❌ 连接失败: {}", e.getMessage());
+            log.error(CallI18nConsts.CONNECTION_TEST_CONNECT_FAILED, e.getMessage());
             
             if (e.getMessage().contains("Connection refused")) {
-                log.error("可能的原因:");
-                log.error("1. Call服务未运行");
-                log.error("2. 端口{}未开放", port);
-                log.error("3. 防火墙阻止了连接");
+                log.error(CallI18nConsts.CONNECTION_TEST_POSSIBLE_REASON);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_SERVICE_NOT_RUNNING);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_PORT_NOT_OPEN, port);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_FIREWALL);
             } else if (e.getMessage().contains("timeout")) {
-                log.error("可能的原因:");
-                log.error("1. 网络连接超时");
-                log.error("2. 服务器地址不正确: {}", server);
-                log.error("3. 路由或网络配置问题");
+                log.error(CallI18nConsts.CONNECTION_TEST_POSSIBLE_REASON);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_NETWORK_TIMEOUT);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_SERVER_INVALID, server);
+                log.error(CallI18nConsts.CONNECTION_TEST_REASON_ROUTE);
             }
             
-            log.error("当前配置: 服务器={}, 端口={}, 密码={}", 
+            log.error(CallI18nConsts.CONNECTION_TEST_CURRENT_CONFIG, 
                     server, port, callProperties.getEslPassword());
         }
         
-        log.info("Call连接测试完成");
+        log.info(CallI18nConsts.CONNECTION_TEST_FINISH);
     }
 
     /**
      * 提供连接诊断信息
      */
     public void printDiagnosticInfo() {
-        log.info("=== Call ESL 连接诊断信息 ===");
-        log.info("服务器地址: {}", callProperties.getServer());
-        log.info("ESL端口: {}", callProperties.getEslPort());
-        log.info("ESL密码: {}", callProperties.getEslPassword());
-        log.info("启用状态: {}", callProperties.isEnabled());
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_HEADER);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_SERVER, callProperties.getServer());
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_PORT, callProperties.getEslPort());
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_PASSWORD, callProperties.getEslPassword());
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_ENABLED, callProperties.isEnabled());
         
-        log.info("\n=== 故障排除指南 ===");
-        log.info("1. 检查Call服务状态:");
-        log.info("   sudo systemctl status freeswitch");
-        log.info("   或 ps aux | grep freeswitch");
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_GUIDE);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_SERVICE);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_SERVICE_CMD_1);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_SERVICE_CMD_2);
         
-        log.info("\n2. 检查端口监听:");
-        log.info("   netstat -tlnp | grep 8021");
-        log.info("   或 ss -tlnp | grep 8021");
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_PORT);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_PORT_CMD_1);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_PORT_CMD_2);
         
-        log.info("\n3. 测试端口连通性:");
-        log.info("   telnet {} {}", callProperties.getServer(), callProperties.getEslPort());
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_TELNET);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_TELNET_CMD, callProperties.getServer(), callProperties.getEslPort());
         
-        log.info("\n4. 检查Call配置:");
-        log.info("   配置文件: conf/autoload_configs/event_socket.conf.xml");
-        log.info("   ACL配置: conf/autoload_configs/acl.conf.xml");
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_CONFIG);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_CONFIG_FILE);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_ACL_FILE);
         
-        log.info("\n5. 查看Call日志:");
-        log.info("   tail -f /usr/local/freeswitch/log/freeswitch.log");
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_LOG);
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_CHECK_LOG_CMD);
         
-        log.info("=====================================");
+        log.info(CallI18nConsts.CONNECTION_DIAGNOSTIC_FOOTER);
     }
 }

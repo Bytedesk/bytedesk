@@ -15,24 +15,24 @@ package com.bytedesk.core.redis;
 
 import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.RedisConsts;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 登录重试次数限制和账户锁定的Redis服务
  * 专门处理用户登录失败重试、账户锁定等安全相关功能
  */
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class RedisLoginRetryService {
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     
     /**
      * 获取用户登录失败次数

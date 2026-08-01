@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_text;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -30,7 +31,6 @@ import com.bytedesk.kbase.llm_text.event.TextDeleteEvent;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -39,11 +39,12 @@ public class TextEventListener {
 
     private final TextRestService textRestService;
     private final TextElasticService textElasticService;
-    @Autowired(required = false)
-    private TextVectorService textVectorService;
+    private final TextVectorService textVectorService;
     private final UploadRestService uploadRestService;
 
-    public TextEventListener(TextRestService textRestService, TextElasticService textElasticService, UploadRestService uploadRestService) {
+    public TextEventListener(TextRestService textRestService, TextElasticService textElasticService, UploadRestService uploadRestService,
+            ObjectProvider<TextVectorService> textVectorServiceProvider) {
+        this.textVectorService = textVectorServiceProvider.getIfAvailable();
         this.textRestService = textRestService;
         this.textElasticService = textElasticService;
         this.uploadRestService = uploadRestService;

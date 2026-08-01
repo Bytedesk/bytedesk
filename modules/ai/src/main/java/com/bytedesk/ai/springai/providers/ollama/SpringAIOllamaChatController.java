@@ -16,7 +16,7 @@ package com.bytedesk.ai.springai.providers.ollama;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
@@ -57,7 +57,8 @@ public class SpringAIOllamaChatController {
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIOllamaChatService springAIOllamaService;
 
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/ollama/format?actor=&baseUrl=http://127.0.0.1:11434&model=llama3
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -272,8 +273,6 @@ public class SpringAIOllamaChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

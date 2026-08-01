@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.task.TaskEntity;
 import com.bytedesk.core.task.TaskRepository;
@@ -173,7 +174,7 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
         
         // 检查用户是否有权限创建该层级的数据
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TaskCommentPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
+            throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
         
         // 
@@ -184,7 +185,7 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
         // 
         TaskCommentEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create task_comment failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -200,12 +201,12 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
             if (StringUtils.hasText(entity.getTaskUid())) {
                 UserEntity user = authService.getUser();
                 if (user == null || !StringUtils.hasText(user.getUid()) || !user.getUid().equals(entity.getUserUid())) {
-                    throw new RuntimeException("无权限更新该评论");
+                    throw new RuntimeException(I18Consts.I18N_COMMENT_UPDATE_DENIED);
                 }
             } else {
                 // 标签/配置类：沿用原权限
                 if (!permissionService.hasEntityPermission(TaskCommentPermissions.MODULE_NAME, "UPDATE", entity)) {
-                    throw new RuntimeException("无权限更新该标签数据");
+                    throw new RuntimeException(I18Consts.I18N_PERMISSION_UPDATE_DENIED);
                 }
             }
             
@@ -213,12 +214,12 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
             //
             TaskCommentEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update task_comment failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("TaskComment not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -257,12 +258,12 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
             if (StringUtils.hasText(entity.getTaskUid())) {
                 UserEntity user = authService.getUser();
                 if (user == null || !StringUtils.hasText(user.getUid()) || !user.getUid().equals(entity.getUserUid())) {
-                    throw new RuntimeException("无权限删除该评论");
+                    throw new RuntimeException(I18Consts.I18N_COMMENT_DELETE_DENIED);
                 }
             } else {
                 // 标签/配置类：沿用原权限
                 if (!permissionService.hasEntityPermission(TaskCommentPermissions.MODULE_NAME, "DELETE", entity)) {
-                    throw new RuntimeException("无权限删除该标签数据");
+                    throw new RuntimeException(I18Consts.I18N_PERMISSION_DELETE_DENIED);
                 }
             }
             
@@ -282,7 +283,7 @@ public class TaskCommentRestService extends BaseRestServiceWithExport<TaskCommen
             // task_commentRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("TaskComment not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

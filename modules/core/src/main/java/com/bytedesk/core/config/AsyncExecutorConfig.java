@@ -13,14 +13,16 @@
  */
 package com.bytedesk.core.config;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * async executor config
@@ -30,6 +32,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 @Configuration
 public class AsyncExecutorConfig implements AsyncConfigurer {
+
+    @Bean(name = "virtualAsyncExecutor", destroyMethod = "close")
+    public ExecutorService virtualAsyncExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
     
     /**
      * 定义 applicationTaskExecutor bean
@@ -39,15 +46,7 @@ public class AsyncExecutorConfig implements AsyncConfigurer {
      */
     @Bean(name = "applicationTaskExecutor")
     public AsyncTaskExecutor applicationTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(8);
-        executor.setMaxPoolSize(32);
-        executor.setQueueCapacity(1000);
-        executor.setThreadNamePrefix("async-executor-");
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
-        return executor;
+        return new TaskExecutorAdapter(virtualAsyncExecutor());
     }
 
     @Override

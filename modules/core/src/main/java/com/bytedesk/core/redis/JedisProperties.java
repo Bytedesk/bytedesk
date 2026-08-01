@@ -13,6 +13,9 @@
  */
 package com.bytedesk.core.redis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLParameters;
 
@@ -45,4 +48,12 @@ public class JedisProperties {
     // private SSLSocketFactory sslSocketFactory;
     private SSLParameters sslParameters;
     private HostnameVerifier hostnameVerifier;
+
+    private Cluster cluster = new Cluster();
+
+    @Data
+    public static class Cluster {
+        private List<String> nodes = new ArrayList<>();
+        private Integer maxRedirects;
+    }
 }

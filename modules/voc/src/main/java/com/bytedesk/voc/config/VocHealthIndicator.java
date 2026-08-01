@@ -13,7 +13,7 @@
  */
 package com.bytedesk.voc.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -32,11 +32,17 @@ import java.sql.Connection;
 @Component
 public class VocHealthIndicator implements HealthIndicator {
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    public VocHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<ElasticsearchOperations> elasticsearchOperationsProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.elasticsearchOperations = elasticsearchOperationsProvider.getIfAvailable();
+    }
 
-    @Autowired(required = false)
-    private ElasticsearchOperations elasticsearchOperations;
+
+    private final DataSource dataSource;
+
+    private final ElasticsearchOperations elasticsearchOperations;
 
     @Override
     public Health health() {

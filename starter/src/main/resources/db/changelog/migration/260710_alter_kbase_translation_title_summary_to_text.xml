@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260710-alter-kbase-translation-title-summary-to-text" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_kbase_translation" />
+                <columnExists tableName="bytedesk_kbase_translation" columnName="title" />
+                <columnExists tableName="bytedesk_kbase_translation" columnName="summary" />
+            </and>
+        </preConditions>
+
+        <modifyDataType tableName="bytedesk_kbase_translation" columnName="title" newDataType="TEXT" />
+        <modifyDataType tableName="bytedesk_kbase_translation" columnName="summary" newDataType="TEXT" />
+
+        <rollback>
+            <modifyDataType tableName="bytedesk_kbase_translation" columnName="title" newDataType="VARCHAR(255)" />
+            <modifyDataType tableName="bytedesk_kbase_translation" columnName="summary" newDataType="VARCHAR(255)" />
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

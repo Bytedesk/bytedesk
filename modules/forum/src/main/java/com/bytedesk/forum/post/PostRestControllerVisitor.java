@@ -1,21 +1,21 @@
 package com.bytedesk.forum.post;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 论坛匿名访问接口
  * 无需登录即可访问的公开接口
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/visitor/api/v1/posts")
 public class PostRestControllerVisitor {
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
     /**
      * 获取话题列表（匿名访问）

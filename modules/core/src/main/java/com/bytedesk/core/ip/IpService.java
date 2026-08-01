@@ -13,13 +13,19 @@
  */
 package com.bytedesk.core.ip;
 
-import org.lionsoul.ip2region.xdb.Searcher;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.core.ip.ip2region.Ip2RegionLocationProvider;
 import com.bytedesk.core.uid.UidUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,12 +33,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-@AllArgsConstructor
 public class IpService {
 
-    private final Searcher searcher;
+    private final Map<String, IpLocationProvider> providers;
+
+    private final IpProperties ipProperties;
 
     private final UidUtils uidUtils;
+
+    public IpService(List<IpLocationProvider> providers, IpProperties ipProperties, UidUtils uidUtils) {
+        this.ipProperties = ipProperties;
+        this.uidUtils = uidUtils;
+        this.providers = new LinkedHashMap<>();
+        for (IpLocationProvider provider : providers) {
+            this.providers.put(provider.getName().toLowerCase(Locale.ROOT), provider);
+        }
+    }
 
     /**
      * location: "国家|区域|省份|城市|ISP"
@@ -42,24 +58,69 @@ public class IpService {
      * @return
      */
     public String getIpLocation(String ip) {
-        // java.lang.Exception: invalid ip address `[0:0:0:0:0:0:0:1]` // replace
-        // localhost with 127.0.0.1
-        // 首先验证IP格式是否正确
-        if (!IpUtils.isValidIp(ip)) {
-            log.error("Invalid IP address format: " + ip);
-            return "0|0|0|内网IP|内网IP";
-        }
-        try {
-            return searcher.search(ip);
-        } catch (Exception e) {
-            log.error("failed to search(%s): %s\n", ip, e);
-        }
-        return null;
+        return getIpLocationDetail(ip).getLocation();
     }
 
     public String getIpLocation(HttpServletRequest request) {
         String ip = IpUtils.getIp(request);
         return getIpLocation(ip);
+    }
+
+    public IpLocationResult getIpLocationDetail(String ip) {
+        return getIpLocationDetail(ip, null);
+    }
+
+    public IpLocationResult getIpLocationDetail(String ip, String providerName) {
+        String resolvedProviderName = resolveProviderName(providerName);
+        if (!IpUtils.isValidIp(ip)) {
+            log.error("Invalid IP address format: {}", ip);
+            return IpLocationResult.local(resolvedProviderName, ip);
+        }
+
+        IpLocationResult result = locateByProvider(ip, resolvedProviderName);
+        if (result != null) {
+            return result;
+        }
+
+        if (ipProperties.isFallbackEnabled()) {
+            for (IpLocationProvider provider : providers.values()) {
+                if (provider.getName().equalsIgnoreCase(resolvedProviderName)) {
+                    continue;
+                }
+                result = safeLocate(provider, ip);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+
+        return IpLocationResult.local(resolvedProviderName, ip);
+    }
+
+    public String getConfiguredProvider() {
+        return resolveProviderName(null);
+    }
+
+    private IpLocationResult locateByProvider(String ip, String providerName) {
+        IpLocationProvider provider = providers.get(providerName.toLowerCase(Locale.ROOT));
+        if (provider == null) {
+            log.warn("Unknown ip provider: {}", providerName);
+            return null;
+        }
+        return safeLocate(provider, ip);
+    }
+
+    private IpLocationResult safeLocate(IpLocationProvider provider, String ip) {
+        if (provider == null || !provider.isAvailable()) {
+            return null;
+        }
+        return provider.locate(ip);
+    }
+
+    private String resolveProviderName(String providerName) {
+        String configuredProvider = StringUtils.hasText(providerName) ? providerName : ipProperties.getProvider();
+        return StringUtils.hasText(configuredProvider) ? configuredProvider.trim().toLowerCase(Locale.ROOT)
+                : Ip2RegionLocationProvider.PROVIDER_NAME;
     }
 
     // TODO: cache区分org
@@ -73,7 +134,7 @@ public class IpService {
     public String createVisitorNickname(HttpServletRequest request) {
         String ip = IpUtils.getIp(request);
         String location = getIpLocation(ip);
-        // uidUtils.getCacheSerialUid(); // TODO: 修改昵称后缀数字为从1~递增
+        // uidUtils.getUid(); // TODO: 修改昵称后缀数字为从1~递增
         String randomId = uidUtils.getUid(); //"[" + ip + "]"; 
 
         // location: "国家|区域|省份|城市|ISP"

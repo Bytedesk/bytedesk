@@ -14,16 +14,9 @@
 package com.bytedesk.service.workgroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashSet;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -36,20 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsService;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
-import com.bytedesk.core.rbac.user.UserProtobuf;
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadRepository;
-import com.bytedesk.core.thread.ThreadResponse;
-import com.bytedesk.core.thread.ThreadRestService;
-import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
-import com.bytedesk.core.thread.enums.ThreadTypeEnum;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRestService;
+import com.bytedesk.service.constant.I18ServiceConsts;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 
@@ -65,10 +55,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
 
     private final WorkgroupRepository workgroupRepository;
 
-    private final ThreadRepository threadRepository;
-
-    private final ThreadRestService threadRestService;
-
     private final AgentRestService agentRestService;
 
     private final ModelMapper modelMapper;
@@ -80,6 +66,8 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
     private final OrganizationRestService organizationRestService;
+
+    private final RobotRoutingSettingsService workgroupAutoReplyConfigService;
 
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
@@ -94,6 +82,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     }
 
     private void assertWorkgroupCapacityAvailable(String orgUid) {
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(orgUid)) {
+            return;
+        }
         if (authService.getUser() != null && authService.getUser().isSuperUser()) {
             return;
         }
@@ -101,7 +92,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         int maxWorkgroups = resolveMaxWorkgroups(organization);
         long current = workgroupRepository.countByOrgUidAndDeletedFalse(orgUid);
         if (current >= maxWorkgroups) {
-            throw new RuntimeException("Organization workgroup limit exceeded");
+            throw new RuntimeException(I18ServiceConsts.I18N_ORGANIZATION_WORKGROUP_LIMIT_EXCEEDED);
         }
     }
 
@@ -110,9 +101,18 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         WorkgroupEntity workgroup = findByUid(request.getUid())
                 .orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + request.getUid()));
 
-        // 安全兜底：若请求携带 orgUid，则强制校验资源归属组织，避免凭 UID 跨组织探测
-        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(workgroup.getOrgUid())) {
-            throw new RuntimeException("workgroup org mismatch");
+        // 安全兜底：优先使用请求 orgUid，未携带时回退登录态 orgUid；跨组织时按“未找到”处理，避免 500 噪音
+        String expectedOrgUid = request.getOrgUid();
+        if (!StringUtils.hasText(expectedOrgUid)) {
+            UserEntity authUser = authService.getUser();
+            if (authUser != null) {
+                expectedOrgUid = authUser.getOrgUid();
+            }
+        }
+        if (StringUtils.hasText(expectedOrgUid) && !expectedOrgUid.equals(workgroup.getOrgUid())) {
+            log.warn("workgroup org mismatch: workgroupUid={}, requestOrgUid={}, resourceOrgUid={}",
+                    request.getUid(), expectedOrgUid, workgroup.getOrgUid());
+            return null;
         }
 
         return convertToResponse(workgroup);
@@ -134,6 +134,7 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         } else {
             workgroup.setUid(request.getUid());
         }
+        workgroup.setType(WorkgroupTypeEnum.normalize(request.getType()));
         workgroup.setOrgUid(request.getOrgUid());
         //
         // 绑定工作组配置：优先使用请求中的 settingsUid，否则使用组织默认配置
@@ -145,7 +146,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         } else {
             workgroup.setSettings(workgroupSettingsRestService.getOrCreateDefault(request.getOrgUid()));
         }
-        //
         if (request.getAgentUids() != null) {
             Iterator<String> agentIterator = request.getAgentUids().iterator();
             while (agentIterator.hasNext()) {
@@ -202,6 +202,9 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         workgroup.setNickname(request.getNickname());
         workgroup.setAvatar(request.getAvatar());
         workgroup.setDescription(request.getDescription());
+        if (request.getType() != null) {
+            workgroup.setType(WorkgroupTypeEnum.normalize(request.getType()));
+        }
         // workgroup.setRoutingMode(request.getRoutingMode());
         workgroup.setStatus(request.getStatus());
         //
@@ -242,7 +245,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         if (StringUtils.hasText(request.getSettingsUid())) {
             workgroupSettingsRestService.findByUid(request.getSettingsUid()).ifPresent(workgroup::setSettings);
         }
-
         // robust 设置留言处理坐席：
         if (StringUtils.hasText(request.getMessageLeaveAgentUid())) {
             agentRestService.findByUid(request.getMessageLeaveAgentUid()).ifPresent(workgroup::setMessageLeaveAgent);
@@ -380,12 +382,19 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         if (savedEntity.getAdmins() != null) {
             savedEntity.getAdmins().size();
         }
+
+        if (StringUtils.hasText(savedEntity.getUid())) {
+            workgroupAutoReplyConfigService.evictByWorkgroupUid(savedEntity.getUid());
+        }
         
         return savedEntity;
     }
 
     @CacheEvict(value = "workgroup", key = "#uid")
     public void deleteByUid(String uid) {
+        if (StringUtils.hasText(uid)) {
+            workgroupAutoReplyConfigService.evictByWorkgroupUid(uid);
+        }
         Optional<WorkgroupEntity> workgroupOptional = findByUid(uid);
         workgroupOptional.ifPresent(workgroup -> {
             workgroup.setDeleted(true);
@@ -396,97 +405,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
     @Override
     public void delete(WorkgroupRequest request) {
         deleteByUid(request.getUid());
-    }
-
-    /**
-     * 批量设置某个 agent 作为管理员(监控/接管权限)的工作组列表。
-     *
-     * 规则：只对每个 workgroup 增删该 agent 一条关系，不影响其它管理员。
-     */
-    @Transactional
-    public Map<String, Object> updateAdminWorkgroupsForAgent(WorkgroupAdminRequest request) {
-        if (request == null) {
-            throw new IllegalArgumentException("request is required");
-        }
-        if (!StringUtils.hasText(request.getOrgUid())) {
-            throw new IllegalArgumentException("orgUid is required");
-        }
-        if (!StringUtils.hasText(request.getAgentUid())) {
-            throw new IllegalArgumentException("agentUid is required");
-        }
-
-        AgentEntity agent = agentRestService.findByUid(request.getAgentUid())
-                .orElseThrow(() -> new RuntimeException(request.getAgentUid() + " is not found."));
-
-        Set<String> targetUids = new HashSet<>(
-                Optional.ofNullable(request.getWorkgroupUids()).orElse(Collections.emptyList())
-                        .stream().filter(StringUtils::hasText).collect(Collectors.toSet()));
-
-        List<WorkgroupEntity> existingAdminWorkgroups = workgroupRepository.findByAdminAgentUid(request.getAgentUid());
-        if (existingAdminWorkgroups == null) {
-            existingAdminWorkgroups = new ArrayList<>();
-        }
-
-        // 仅处理当前 org 的 workgroup，避免跨组织误操作
-        List<WorkgroupEntity> existingInOrg = existingAdminWorkgroups.stream()
-                .filter(Objects::nonNull)
-                .filter(w -> request.getOrgUid().equals(w.getOrgUid()))
-            .filter(w -> !w.isDeleted())
-                .collect(Collectors.toList());
-
-        Set<String> existingUids = existingInOrg.stream().map(WorkgroupEntity::getUid).collect(Collectors.toSet());
-
-        Set<String> toAdd = new HashSet<>(targetUids);
-        toAdd.removeAll(existingUids);
-
-        Set<String> toRemove = new HashSet<>(existingUids);
-        toRemove.removeAll(targetUids);
-
-        int added = 0;
-        int removed = 0;
-
-        // remove
-        for (WorkgroupEntity workgroup : existingInOrg) {
-            if (!toRemove.contains(workgroup.getUid())) {
-                continue;
-            }
-            if (workgroup.getAdmins() == null) {
-                workgroup.setAdmins(new ArrayList<>());
-            }
-            boolean changed = workgroup.getAdmins().removeIf(a -> a != null && request.getAgentUid().equals(a.getUid()));
-            if (changed) {
-                save(workgroup);
-                removed++;
-            }
-        }
-
-        // add
-        for (String workgroupUid : toAdd) {
-            WorkgroupEntity workgroup = findByUid(workgroupUid)
-                    .orElseThrow(() -> new RuntimeException("workgroup not found with uid: " + workgroupUid));
-            if (!request.getOrgUid().equals(workgroup.getOrgUid())) {
-                throw new RuntimeException("workgroup org mismatch: " + workgroupUid);
-            }
-            if (workgroup.isDeleted()) {
-                continue;
-            }
-            if (workgroup.getAdmins() == null) {
-                workgroup.setAdmins(new ArrayList<>());
-            }
-            boolean exists = workgroup.getAdmins().stream().anyMatch(a -> a != null && request.getAgentUid().equals(a.getUid()));
-            if (!exists) {
-                workgroup.getAdmins().add(agent);
-                save(workgroup);
-                added++;
-            }
-        }
-
-        return Map.of(
-                "agentUid", request.getAgentUid(),
-                "orgUid", request.getOrgUid(),
-                "assignedWorkgroupUids", targetUids,
-                "added", added,
-                "removed", removed);
     }
 
     @Override
@@ -501,7 +419,6 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
                 latestEntity.setAvatar(entity.getAvatar());
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setStatus(entity.getStatus());
-                // TODO: Settings should be managed through WorkgroupSettingsEntity
                 // latestEntity.setMessageLeaveSettings(entity.getMessageLeaveSettings());
                 // latestEntity.setRobotSettings(entity.getRobotSettings());
                 // latestEntity.setServiceSettings(entity.getServiceSettings());
@@ -545,7 +462,13 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
             return new ArrayList<>();
         }
 
-        Optional<AgentEntity> agentOptional = agentRestService.findByUserUid(userUid);
+        Optional<AgentEntity> agentOptional;
+        try {
+            agentOptional = agentRestService.findByUserUid(userUid);
+        } catch (IllegalStateException e) {
+            log.warn("findWorkgroupUidsByUserUid skipped: {}, userUid={}", e.getMessage(), userUid);
+            return new ArrayList<>();
+        }
         if (!agentOptional.isPresent()) {
             return new ArrayList<>();
         }
@@ -559,80 +482,5 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         }
         return workgroupUids;
     }
-
-    @Transactional(readOnly = true)
-    public List<WorkgroupResponse> queryAdminWorkgroups(String agentUid, String orgUid) {
-        if (!StringUtils.hasText(agentUid)) {
-            return new ArrayList<>();
-        }
-
-        List<WorkgroupEntity> workgroups = workgroupRepository.findByAdminAgentUid(agentUid);
-        return workgroups.stream()
-                .filter(w -> w != null && !w.isDeleted())
-                .filter(w -> !StringUtils.hasText(orgUid) || orgUid.equals(w.getOrgUid()))
-                .map(this::convertToResponse)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<ThreadResponse> queryAdminOngoingThreads(
-            String agentUid,
-            String orgUid,
-            int pageNumber,
-            int pageSize) {
-
-        int safePageNumber = Math.max(0, pageNumber);
-        int safePageSize = pageSize <= 0 ? 100 : pageSize;
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(safePageNumber, safePageSize);
-
-        if (!StringUtils.hasText(agentUid) || !StringUtils.hasText(orgUid)) {
-            return new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        Set<String> adminWorkgroupUids = workgroupRepository.findByAdminAgentUid(agentUid).stream()
-                .filter(w -> w != null && !w.isDeleted())
-                .filter(w -> orgUid.equals(w.getOrgUid()))
-                .map(WorkgroupEntity::getUid)
-                .filter(StringUtils::hasText)
-                .collect(Collectors.toSet());
-
-        if (adminWorkgroupUids.isEmpty()) {
-            return new org.springframework.data.domain.PageImpl<>(Collections.emptyList(), pageable, 0);
-        }
-
-        List<String> ongoingStatuses = Arrays.asList(
-                ThreadProcessStatusEnum.CHATTING.name(),
-                ThreadProcessStatusEnum.NEW.name());
-
-        List<ThreadEntity> candidates = threadRepository
-                .findByOrgUidAndTypeAndStatusInAndDeletedFalseOrderByUpdatedAtDescCreatedAtDesc(
-                        orgUid,
-                        ThreadTypeEnum.WORKGROUP.name(),
-                        ongoingStatuses);
-
-        List<ThreadResponse> matched = candidates.stream()
-                .filter(t -> {
-                    try {
-                        if (t == null || t.getWorkgroup() == null) {
-                            return false;
-                        }
-                        UserProtobuf workgroup = UserProtobuf.fromJson(t.getWorkgroup());
-                        return workgroup != null
-                                && StringUtils.hasText(workgroup.getUid())
-                                && adminWorkgroupUids.contains(workgroup.getUid());
-                    } catch (Exception e) {
-                        return false;
-                    }
-                })
-                .map(threadRestService::convertToResponse)
-                .collect(Collectors.toList());
-
-        int start = Math.min(safePageNumber * safePageSize, matched.size());
-        int end = Math.min(start + safePageSize, matched.size());
-        List<ThreadResponse> pageContent = matched.subList(start, end);
-
-        return new org.springframework.data.domain.PageImpl<>(pageContent, pageable, matched.size());
-    }
-
 
 }

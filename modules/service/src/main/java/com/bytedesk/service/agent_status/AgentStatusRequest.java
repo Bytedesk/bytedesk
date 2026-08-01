@@ -32,6 +32,8 @@ public class AgentStatusRequest extends BaseRequest {
 
     private String status;
 
+    private String restReason;
+
     private String agent;
 
     private Long durationSeconds;

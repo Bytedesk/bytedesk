@@ -55,6 +55,9 @@ public class WelcomeContent extends BaseContent {
         private String answer;
 
         private String type;
+
+        @Builder.Default
+        private Boolean routeToRobot = false;
     }
     
 }

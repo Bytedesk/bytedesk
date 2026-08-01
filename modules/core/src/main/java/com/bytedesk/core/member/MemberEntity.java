@@ -13,7 +13,13 @@
  */
 package com.bytedesk.core.member;
 
+import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.converter.StringSetConverter;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -25,8 +31,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-
-import java.util.Objects;
 
 /**
  * Team member entity for organizational structure management
@@ -55,6 +59,12 @@ public class MemberEntity extends BaseEntity {
     private String nickname;
 
     /**
+     * Pinyin of the nickname for pinyin-based search (auto-populated by MemberEntityListener)
+     */
+    @Column(name = "nickname_pinyin", length = 512)
+    private String nicknamePinyin;
+
+    /**
      * Profile picture URL for the member
      */
     @Builder.Default
@@ -71,6 +81,11 @@ public class MemberEntity extends BaseEntity {
      */
     @Email(message = "email format error")
     private String email;
+
+    /**
+     * Country or region dialing code for the mobile number
+     */
+    private String country;
 
     /**
      * Mobile phone number (Chinese format supported)
@@ -104,9 +119,43 @@ public class MemberEntity extends BaseEntity {
     private String status = MemberStatusEnum.INVITING.name();
 
     /**
+     * Whether this member account should be forced out of desktop and blocked from re-login
+     * until manually restored by an admin.
+     */
+    @Builder.Default
+    @Column(name = "force_logout")
+    private Boolean forceLogout = false;
+
+    /**
+     * Optional admin-facing reason for the forced logout.
+     */
+    @Column(name = "force_logout_reason", length = 512)
+    private String forceLogoutReason;
+
+    /**
+     * Timestamp of the last forced logout action.
+     */
+    @Column(name = "force_logout_at")
+    private ZonedDateTime forceLogoutAt;
+
+    /**
+     * Frontend platforms that this member is allowed to sign in to.
+     */
+    @Builder.Default
+    @Convert(converter = StringSetConverter.class)
+    @Column(name = "allowed_login_platforms", length = 512)
+    private Set<String> allowedLoginPlatforms = new HashSet<>();
+
+    /**
      * Department UID that this member belongs to
      */
     private String deptUid;
+
+    /**
+     * Manager/direct leader member UID for ticket auto-assignment (assigneeType=leader).
+     * Points to another MemberEntity in the same organization.
+     */
+    private String managerMemberUid;
 
     /**
      * Associated user account for this member

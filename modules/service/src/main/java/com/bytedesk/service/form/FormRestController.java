@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,7 +37,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "表单管理", description = "表单管理相关接口")
+@Tag(name = "Form Management", description = "Form management APIs")
 @RestController
 @RequestMapping("/api/v1/form")
 @AllArgsConstructor
@@ -44,11 +47,12 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     private final FormRestService formRestService;
 
     @PreAuthorize(FormPermissions.HAS_FORM_READ)
-    @ActionAnnotation(title = "表单管理", action = "查询组织表单", description = "queryByOrg form")
-    @Operation(summary = "查询组织下的表单", description = "根据组织ID查询表单列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "queryByOrg form")
+    @Operation(summary = "Query Forms by Organization", description = "Retrieve form list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(FormRequest request) {
         
@@ -58,11 +62,12 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @PreAuthorize(FormPermissions.HAS_FORM_READ)
-    @ActionAnnotation(title = "表单管理", action = "查询用户表单", description = "queryByUser form")
-    @Operation(summary = "查询用户下的表单", description = "根据用户ID查询表单列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_QUERY_USER, description = "queryByUser form")
+    @Operation(summary = "Query Forms by User", description = "Retrieve form list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(FormRequest request) {
         
@@ -72,11 +77,12 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @PreAuthorize(FormPermissions.HAS_FORM_READ)
-    @ActionAnnotation(title = "表单管理", action = "查询表单详情", description = "queryByUid form")
-    @Operation(summary = "查询指定表单", description = "根据UID查询表单详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "queryByUid form")
+    @Operation(summary = "Query Form by UID", description = "Retrieve form details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(FormRequest request) {
         
@@ -86,13 +92,14 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @PreAuthorize(FormPermissions.HAS_FORM_CREATE)
-    @ActionAnnotation(title = "表单管理", action = "创建表单", description = "create form")
-    @Operation(summary = "创建表单", description = "创建新的表单")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_CREATE, description = "create form")
+    @Operation(summary = "Create Form", description = "Create a new form")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @PostMapping("/create")
     @Override
-    public ResponseEntity<?> create(FormRequest request) {
+    public ResponseEntity<?> create(@RequestBody FormRequest request) {
         
         FormResponse form = formRestService.create(request);
 
@@ -100,13 +107,14 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @PreAuthorize(FormPermissions.HAS_FORM_UPDATE)
-    @ActionAnnotation(title = "表单管理", action = "更新表单", description = "update form")
-    @Operation(summary = "更新表单", description = "更新表单信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_UPDATE, description = "update form")
+    @Operation(summary = "Update Form", description = "Update form information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = FormResponse.class)))
+    @PostMapping("/update")
     @Override
-    public ResponseEntity<?> update(FormRequest request) {
+    public ResponseEntity<?> update(@RequestBody FormRequest request) {
         
         FormResponse form = formRestService.update(request);
 
@@ -114,11 +122,12 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
     }
 
     @PreAuthorize(FormPermissions.HAS_FORM_DELETE)
-    @ActionAnnotation(title = "表单管理", action = "删除表单", description = "delete form")
-    @Operation(summary = "删除表单", description = "删除指定的表单")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_DELETE, description = "delete form")
+    @Operation(summary = "Delete Form", description = "Delete the specified form")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
+    @PostMapping("/delete")
     @Override
-    public ResponseEntity<?> delete(FormRequest request) {
+    public ResponseEntity<?> delete(@RequestBody FormRequest request) {
         
         formRestService.delete(request);
 
@@ -127,9 +136,9 @@ public class FormRestController extends BaseRestController<FormRequest, FormRest
 
     @GetMapping("/export")
     @PreAuthorize(FormPermissions.HAS_FORM_EXPORT)
-    @ActionAnnotation(title = "表单管理", action = "导出表单", description = "export form")
-    @Operation(summary = "导出表单", description = "导出表单数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_EXPORT, description = "export form")
+    @Operation(summary = "Export Forms", description = "Export form data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     public Object export(FormRequest request, HttpServletResponse response) {
         return exportTemplate(

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.springai.providers.gitee;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SpringAIGiteeRestService {
 
     private static final String DEFAULT_GITEE_API_URL = "https://ai.gitee.com/v1";
+    private static final String ALLOWED_GITEE_HOST = "ai.gitee.com";
 
     /**
      * 获取可用模型列表
@@ -49,9 +51,7 @@ public class SpringAIGiteeRestService {
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getModels(GiteeRequest request) {
         try {
-            String apiUrl = StringUtils.hasText(request.getApiUrl())
-                    ? request.getApiUrl()
-                    : DEFAULT_GITEE_API_URL;
+            String apiUrl = resolveSafeApiUrl(request);
 
             String modelsUrl = apiUrl + "/models";
 
@@ -94,6 +94,33 @@ public class SpringAIGiteeRestService {
             log.error("Failed to get Gitee AI models: {}", e.getMessage(), e);
             // 作为备用方案，返回空列表
             return List.of();
+        }
+    }
+
+    private String resolveSafeApiUrl(GiteeRequest request) {
+        if (!StringUtils.hasText(request.getApiUrl())) {
+            return DEFAULT_GITEE_API_URL;
+        }
+
+        try {
+            URI uri = URI.create(request.getApiUrl().trim());
+            String scheme = uri.getScheme();
+            String host = uri.getHost();
+
+            if (!"https".equalsIgnoreCase(scheme)) {
+                log.warn("Rejected Gitee apiUrl due to non-https scheme: {}", request.getApiUrl());
+                return DEFAULT_GITEE_API_URL;
+            }
+
+            if (host == null || !ALLOWED_GITEE_HOST.equalsIgnoreCase(host)) {
+                log.warn("Rejected Gitee apiUrl due to disallowed host: {}", request.getApiUrl());
+                return DEFAULT_GITEE_API_URL;
+            }
+
+            return request.getApiUrl().trim().replaceAll("/+$", "");
+        } catch (Exception ex) {
+            log.warn("Rejected Gitee apiUrl due to parse error: {}", request.getApiUrl());
+            return DEFAULT_GITEE_API_URL;
         }
     }
 

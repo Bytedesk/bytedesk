@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class ProductRestController extends BaseRestController<ProductRequest, Pr
 
     private final ProductRestService productRestService;
 
-    @ActionAnnotation(title = "Product", action = "组织查询", description = "query product by org")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query product by org")
     @Operation(summary = "Query Products by Organization", description = "Retrieve products for the current organization")
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(ProductRequest request) {
         
@@ -50,9 +54,10 @@ public class ProductRestController extends BaseRestController<ProductRequest, Pr
         return ResponseEntity.ok(JsonResult.success(products));
     }
 
-    @ActionAnnotation(title = "Product", action = "用户查询", description = "query product by user")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query product by user")
     @Operation(summary = "Query Products by User", description = "Retrieve products for the current user")
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(ProductRequest request) {
         
@@ -61,9 +66,10 @@ public class ProductRestController extends BaseRestController<ProductRequest, Pr
         return ResponseEntity.ok(JsonResult.success(products));
     }
 
-    @ActionAnnotation(title = "Product", action = "查询详情", description = "query product by uid")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query product by uid")
     @Operation(summary = "Query Product by UID", description = "Retrieve a specific product by its unique identifier")
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(ProductRequest request) {
         
@@ -72,40 +78,43 @@ public class ProductRestController extends BaseRestController<ProductRequest, Pr
         return ResponseEntity.ok(JsonResult.success(product));
     }
 
-    @ActionAnnotation(title = "Product", action = "新建", description = "create product")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_CREATE, description = "create product")
     @Operation(summary = "Create Product", description = "Create a new product")
     @Override
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_CREATE)
-    public ResponseEntity<?> create(ProductRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody ProductRequest request) {
         
         ProductResponse product = productRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(product));
     }
 
-    @ActionAnnotation(title = "Product", action = "更新", description = "update product")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_UPDATE, description = "update product")
     @Operation(summary = "Update Product", description = "Update an existing product")
     @Override
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_UPDATE)
-    public ResponseEntity<?> update(ProductRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody ProductRequest request) {
         
         ProductResponse product = productRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(product));
     }
 
-    @ActionAnnotation(title = "Product", action = "删除", description = "delete product")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_DELETE, description = "delete product")
     @Operation(summary = "Delete Product", description = "Delete a product")
     @Override
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_DELETE)
-    public ResponseEntity<?> delete(ProductRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody ProductRequest request) {
         
         productRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Product", action = "导出", description = "export product")
+    @ActionAnnotation(title = I18Consts.I18N_PRODUCT, action = I18Consts.I18N_ACTION_EXPORT, description = "export product")
     @Operation(summary = "Export Products", description = "Export products to Excel format")
     @Override
     @PreAuthorize(ProductPermissions.HAS_PRODUCT_EXPORT)

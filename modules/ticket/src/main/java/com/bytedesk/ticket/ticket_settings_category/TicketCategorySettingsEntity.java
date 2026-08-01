@@ -34,9 +34,9 @@ public class TicketCategorySettingsEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
-    @Convert(converter = CategorySettingsConverter.class)
+    @Convert(converter = TicketCategorySettingsConverter.class)
     @Column(length = 4096)
-    private CategorySettingsData content = CategorySettingsData.builder().build();
+    private TicketCategorySettingsData content = TicketCategorySettingsData.builder().build();
 
     public static TicketCategorySettingsEntity fromRequest(TicketCategorySettingsRequest request, Supplier<String> uidSupplier) {
         TicketCategorySettingsEntity entity = new TicketCategorySettingsEntity();
@@ -48,21 +48,21 @@ public class TicketCategorySettingsEntity extends BaseEntity {
         this.content = buildContent(request, uidSupplier);
     }
 
-    private static CategorySettingsData buildContent(
+    private static TicketCategorySettingsData buildContent(
             TicketCategorySettingsRequest request,
             Supplier<String> uidSupplier) {
-        CategorySettingsData data = CategorySettingsData.builder().build();
+        TicketCategorySettingsData data = TicketCategorySettingsData.builder().build();
         if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
             data.normalize();
             return data;
         }
-        List<CategoryItemData> items = new ArrayList<>();
+        List<TicketCategoryItemData> items = new ArrayList<>();
         int order = 0;
         for (TicketCategoryItemRequest itemReq : request.getItems()) {
             if (itemReq == null) {
                 continue;
             }
-            CategoryItemData item = CategoryItemData.builder()
+            TicketCategoryItemData item = TicketCategoryItemData.builder()
                     .uid(itemReq.getUid() != null ? itemReq.getUid() : uidSupplier.get())
                     .name(itemReq.getName())
                     .description(itemReq.getDescription())

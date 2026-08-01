@@ -14,8 +14,8 @@
 package com.bytedesk.core.topic_subscription;
 
 public enum TopicSubscriptionTypeEnum {
-    THREAD,
-    VISITOR,
-    CUSTOMER,
-    TICKET
+    CHAT, // 订阅聊天消息
+    MONITOR, // 订阅监控消息
+    TAKEOVER, // 订阅接管消息
+    INSERT // 订阅强插消息
 }

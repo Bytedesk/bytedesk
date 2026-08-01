@@ -15,6 +15,7 @@
 package com.bytedesk.core.message;
 
 import com.bytedesk.core.base.BaseExtra;
+import com.bytedesk.core.message.enums.MessageVisibilityEnum;
 
 import lombok.Builder;
 import lombok.Getter;

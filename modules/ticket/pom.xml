@@ -67,6 +67,7 @@
 
 		<!-- //////////////////////////////////第三方依赖/////////////////////////////////////////// -->
 
+		<!-- https://www.flowable.com/open-source/docs/bpmn/ch05a-Spring-Boot -->
 		<!-- https://mvnrepository.com/artifact/org.flowable/flowable-spring-boot-starter -->
 		<dependency>
 			<groupId>org.flowable</groupId>

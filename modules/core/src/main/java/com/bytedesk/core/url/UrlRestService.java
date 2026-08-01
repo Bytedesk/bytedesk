@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -64,7 +65,7 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
 
         UrlEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create tag failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -82,12 +83,12 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
             // 
             UrlEntity savedEntity = save(entity);
             if (savedEntity == null) {  
-                throw new RuntimeException("Update tag failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
 
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("Url not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -121,7 +122,7 @@ public class UrlRestService extends BaseRestService<UrlEntity, UrlRequest, UrlRe
             save(optional.get());
         }
         else {
-            throw new RuntimeException("Url not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

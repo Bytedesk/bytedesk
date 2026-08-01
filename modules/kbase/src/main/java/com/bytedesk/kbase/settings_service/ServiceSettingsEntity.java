@@ -87,11 +87,7 @@ public class ServiceSettingsEntity extends BaseEntity {
     private ZonedDateTime topTipEnd;
 
     // 满意度评价设置--------------------------------------------------
-    // show rate btn on chat toolbar
-    @NotNull
-    @Builder.Default
-    private Boolean showRateBtn = false;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     // 关闭会话时自动发送满意度评价
     @NotNull
     @Builder.Default
@@ -226,7 +222,7 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private Integer inputPreviewShowSeconds = 5;
     
-    // 常见问题
+    // 右侧栏常见问题
     @Builder.Default
     private Boolean showFaqs = false;
     @Builder.Default
@@ -287,8 +283,20 @@ public class ServiceSettingsEntity extends BaseEntity {
         if (request.getLanguage() != null) {
             settings.setLanguage(request.getLanguage().name());
         }
+
+        applyRequestAliases(request, settings);
         
         return settings;
+    }
+
+    public static void applyRequestAliases(ServiceSettingsRequest request, ServiceSettingsEntity settings) {
+        if (request == null || settings == null) {
+            return;
+        }
+
+        if (request.getPreForm() != null) {
+            settings.setPreFormSchema(request.getPreForm());
+        }
     }
     
 }

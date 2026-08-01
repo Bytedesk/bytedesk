@@ -13,19 +13,19 @@
  */
 package com.bytedesk.core.mq.jms;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import com.bytedesk.core.message.MessageProtobuf;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 @ConditionalOnProperty(name = "bytedesk.mq.type", havingValue = "artemis", matchIfMissing = true)
 public class JmsArtemisService {
     
-    @Autowired
-    private JmsTemplate jmsTemplate;
+    private final JmsTemplate jmsTemplate;
 
     public void send(String destination, String message) {
         jmsTemplate.convertAndSend(destination, message);

@@ -20,8 +20,6 @@ import java.util.HashSet;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
@@ -72,12 +71,10 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
 
     // 注意：不要缓存“查不到”的结果，否则会出现“部门刚创建但仍查不到”的负缓存问题
     // Spring Cache 对 Optional 返回值可能会做解包（empty -> null / present -> entity），因此这里只做 null 判断，避免对实体误调用 isEmpty()
-    @Cacheable(value = "department", key = "#name + '-' + #orgUid", unless = "#result == null")
     public Optional<DepartmentEntity> findByNameAndOrgUid(String name, String orgUid) {
         return departmentRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
     }
 
-    @Cacheable(value = "department", key = "#uid", unless = "#result == null")
     public Optional<DepartmentEntity> findByUid(String uid) {
         return departmentRepository.findByUid(uid);
     }
@@ -136,7 +133,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             DepartmentEntity department = optional.get();
             // modelMapper.map(departmentRequest, DepartmentEntity.class);
             if (request.getUid().equals(request.getParentUid())) {
-                throw new RuntimeException("不能将当前部门设置为父部门");
+                throw new RuntimeException(I18Consts.I18N_DEPARTMENT_PARENT_SELF_NOT_ALLOWED);
             }
             department.setName(request.getName());
             department.setDescription(request.getDescription());
@@ -150,15 +147,14 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             // 
             DepartmentEntity savedEntity = save(department);
             if (savedEntity == null) {
-                throw new RuntimeException("department update failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         } else {
-            throw new RuntimeException("department not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
-    @CachePut(value = "department", key = "#entity.uid")
     @Override
     protected DepartmentEntity doSave(DepartmentEntity entity) {
         return departmentRepository.save(entity);
@@ -187,7 +183,7 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
             }
         } else {
             log.error("department not found");
-            throw new RuntimeException("department not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

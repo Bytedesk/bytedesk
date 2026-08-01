@@ -43,8 +43,7 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private String topTip;
 
-    private Boolean showRateBtn;
-
+    // 评价按钮显示控制已迁移至 ToolbarSettings.rate
     private Boolean autoInviteRate;
 
     private String inviteRateTip;
@@ -56,6 +55,8 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private Boolean preFormRequired;
 
     private String preForm;
+
+    private String preFormUid;
 
     private Boolean showHistory;
 
@@ -140,6 +141,9 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 访客端转人工按钮文案
     private String manualTransferLabel;
 
+    // 访客端是否隐藏机器人思考过程
+    private Boolean hideThinkingProcess;
+
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
 
@@ -156,6 +160,11 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     private String messageLeaveForm;
 
     /**
+     * 客服离线时是否允许访客继续发送消息。
+     */
+    private Boolean messageLeaveAllowVisitorSendWhenOffline;
+
+    /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）
      */
     private Boolean messageLeaveCustomFormEnabled;
@@ -164,4 +173,14 @@ public class ServiceSettingsResponseVisitor implements Serializable {
      * 自定义留言表单 uid（FormEntity.uid）
      */
     private String messageLeaveFormUid;
+
+    /**
+     * 访客发消息前自动回复开关（工作组）
+     */
+    private Boolean autoReplyEnabled;
+
+    /**
+     * 自动回复设置 UID（AutoReplySettingsEntity.uid）
+     */
+    private String autoReplySettingsUid;
 }

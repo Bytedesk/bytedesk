@@ -41,7 +41,16 @@ public class WorktimeSettingResponse extends BaseResponse {
 
     private List<WorktimeSlotValue> specialWorktimes;
 
-    private String holidays;
+    private Boolean holidaySettingsEnabled;
+
+    // 暂时不启用，统一使用 CN（默认）
+    // private String holidayCountryCode;
+
+    // 暂时不启用，统一使用 ORG_ONLY（默认）
+    // private String holidayScopeType;
+
+    // 暂时不启用，统一使用 Asia/Shanghai（默认）
+    // private String timezone;
 
     /**
      * 非工作时间提示

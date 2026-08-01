@@ -18,9 +18,6 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface VisitorRepository extends JpaRepository<VisitorEntity, Long>, JpaSpecificationExecutor<VisitorEntity> {
 
@@ -29,9 +26,4 @@ public interface VisitorRepository extends JpaRepository<VisitorEntity, Long>, J
     Optional<VisitorEntity> findByVisitorUidAndOrgUidAndDeleted(String visitorUid, String orgUid, Boolean deleted);
 
     List<VisitorEntity> findByStatusAndDeleted(String status, Boolean deleted);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE VisitorEntity v SET v.status = :status WHERE v.uid = :uid")
-    int updateStatusByUid(String uid, String status);
 }

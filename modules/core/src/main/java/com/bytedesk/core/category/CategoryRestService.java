@@ -15,6 +15,7 @@ package com.bytedesk.core.category;
 
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Objects;
@@ -22,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
@@ -133,7 +133,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return new PageImpl<>(content, pageable, uniqueUids.size());
     }
 
-    @Cacheable(value = "category", key = "#uid", unless = "#result == null")
+    // @Cacheable(value = "category", key = "#uid", unless = "#result == null")
     @Override
     public Optional<CategoryEntity> findByUid(String uid) {
         return categoryRepository.findByUid(uid);
@@ -151,6 +151,41 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     public List<CategoryEntity> findByKbUid(String kbUid) {
         return categoryRepository.findByKbUidAndDeletedFalse(kbUid);
+    }
+
+    public List<String> collectSelfAndDescendantUids(String categoryUid) {
+        if (!StringUtils.hasText(categoryUid)) {
+            return List.of();
+        }
+
+        return findByUid(categoryUid)
+                .map(this::collectSelfAndDescendantUids)
+                .orElse(List.of());
+    }
+
+    public List<String> collectSelfAndDescendantUids(CategoryEntity category) {
+        if (category == null || !StringUtils.hasText(category.getUid()) || category.isDeleted()) {
+            return List.of();
+        }
+
+        Set<String> categoryUids = new LinkedHashSet<>();
+        collectSelfAndDescendantUids(category, categoryUids);
+        return List.copyOf(categoryUids);
+    }
+
+    private void collectSelfAndDescendantUids(CategoryEntity category, Set<String> categoryUids) {
+        if (category == null || !StringUtils.hasText(category.getUid()) || category.isDeleted()) {
+            return;
+        }
+
+        categoryUids.add(category.getUid());
+        if (category.getChildren() == null || category.getChildren().isEmpty()) {
+            return;
+        }
+
+        category.getChildren().stream()
+                .filter(Objects::nonNull)
+                .forEach(child -> collectSelfAndDescendantUids(child, categoryUids));
     }
 
     public Boolean existsByUid(String uid) {
@@ -199,7 +234,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         //
         CategoryEntity newCategory = save(category);
         if (newCategory == null) {
-            throw new RuntimeException("category save error");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         //
         return convertToResponse(newCategory);
@@ -209,7 +244,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
     public CategoryResponse update(CategoryRequest request) {
         Optional<CategoryEntity> category = findByUid(request.getUid());
         if (!category.isPresent()) {
-            throw new RuntimeException("category not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
         CategoryEntity entity = category.get();
         // modelMapper.map(request, entity);
@@ -250,7 +285,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         //
         CategoryEntity newCategory = save(entity);
         if (newCategory == null) {
-            throw new RuntimeException("category save error");
+            throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
         }
 
         return convertToResponse(newCategory);
@@ -271,11 +306,31 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
 
     @Override
     public void deleteByUid(String uid) {
-        Optional<CategoryEntity> category = findByUid(uid);
-        if (category.isPresent()) {
-            category.get().setDeleted(true);
-            save(category.get());
+        if (!StringUtils.hasText(uid)) {
+            throw new IllegalArgumentException("category uid is required");
         }
+
+        Optional<CategoryEntity> category = findByUid(uid);
+        if (!category.isPresent() || category.get().isDeleted()) {
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+
+        CategoryEntity entity = category.get();
+        markDeletedRecursively(entity);
+        save(entity);
+    }
+
+    private void markDeletedRecursively(CategoryEntity entity) {
+        entity.setDeleted(true);
+
+        if (entity.getChildren() == null || entity.getChildren().isEmpty()) {
+            return;
+        }
+
+        entity.getChildren().stream()
+                .filter(Objects::nonNull)
+                .filter(child -> !child.isDeleted())
+                .forEach(this::markDeletedRecursively);
     }
 
     @Override
@@ -296,6 +351,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                 freshEntity.setType(entity.getType());
                 // freshEntity.setOrder(entity.getOrder());
                 freshEntity.setKbUid(entity.getKbUid());
+                freshEntity.setDeleted(entity.isDeleted());
                 // 其他字段...
                 return save(freshEntity);
             } else {
@@ -342,9 +398,9 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
                     .sorted(byOrder.thenComparing(c -> StringUtils.hasText(c.getName()) ? c.getName() : ""))
                     .map(c -> convertToResponseRecursive(c, visited))
                     .collect(Collectors.toList());
-            if (!childResponses.isEmpty()) {
-                response.setChildren(childResponses);
-            }
+            response.setChildren(childResponses);
+        } else {
+            response.setChildren(List.of());
         }
         return response;
     }

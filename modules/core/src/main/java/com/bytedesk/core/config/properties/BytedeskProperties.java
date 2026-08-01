@@ -16,9 +16,9 @@ package com.bytedesk.core.config.properties;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Base64;
-import java.nio.charset.StandardCharsets;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.core.env.Environment;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -28,20 +28,26 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import com.bytedesk.core.utils.LicenseValidator;
 
 @Slf4j
 @Getter
 @Setter
 @Component
 @ConfigurationProperties(BytedeskProperties.CONFIG_PREFIX)
-public class BytedeskProperties {
+public class BytedeskProperties implements EnvironmentAware {
 
     public static final String CONFIG_PREFIX = "bytedesk";
-    private static final String ENCRYPTION_KEY = "bytedesk_license"; // 16字节密钥
+    private static final String APPLICATION_VERSION_KEY = "application.version";
 
     private static volatile BytedeskProperties instance; // 使用volatile关键字确保可见性
+
+    private Environment environment;
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 
     @PostConstruct
     public void init() {
@@ -55,6 +61,7 @@ public class BytedeskProperties {
                             this.custom.setName(handleChineseText(this.custom.getName(), "BYTEDESK_CUSTOM_NAME"));
                             this.custom.setDescription(handleChineseText(this.custom.getDescription(), "BYTEDESK_CUSTOM_DESCRIPTION"));
                             this.custom.setLogo(handleChineseText(this.custom.getLogo(), "BYTEDESK_CUSTOM_LOGO"));
+                            this.custom.setDefaultLlmPrompt(handleChineseText(this.custom.getDefaultLlmPrompt(), "BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT"));
                         }
 
                         // 处理 Admin 相关字段
@@ -67,26 +74,6 @@ public class BytedeskProperties {
                             this.organization.setName(handleChineseText(this.organization.getName(), "BYTEDESK_ORGANIZATION_NAME"));
                         }
 
-                        // 验证 licenseKey 解密状态
-                        // if (StringUtils.hasText(this.licenseKey)) {
-                        //     if (this.licenseKey.startsWith("ENC(")) {
-                        //         log.warn("⚠️  licenseKey 未被正确解密，仍为加密格式！");
-                        //         log.warn("   请确保已设置环境变量: export JASYPT_ENCRYPTOR_PASSWORD=xxx");
-                        //         log.warn("   或在启动命令中添加: -Djasypt.encryptor.password=xxx");
-                        //     } else {
-                        //         String maskedKey = maskSensitiveValue(this.licenseKey);
-                        //         String firstPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(0, 8) : this.licenseKey;
-                        //         String lastPart = this.licenseKey.length() > 8 ? this.licenseKey.substring(this.licenseKey.length() - 8) : this.licenseKey;
-                        //         log.info("✓ licenseKey 已被成功解密 (长度: {})", this.licenseKey.length());
-                        //         log.debug("  脱敏显示: {}", maskedKey);
-                        //         log.debug("  首部: {}, 末尾: {}", firstPart, lastPart);
-                        //         // Debug 模式下打印完整值用于验证
-                        //         if (this.debug != null && this.debug) {
-                        //             log.debug("  [DEBUG] 完整解密值: {}", this.licenseKey);
-                        //         }
-                        //     }
-                        // }
-
                     } catch (Exception e) {
                         log.error("初始化 BytedeskProperties 时出错", e);
                     }
@@ -97,24 +84,29 @@ public class BytedeskProperties {
     }
 
     /**
-     * AES加密字符串
-     * @param plainText 明文
-     * @return 加密后的Base64字符串
+     * 许可证载荷缓存 (避免重复验签)
      */
-    public static String encryptString(String plainText) {
-        try {
-            if (!StringUtils.hasText(plainText)) {
-                return plainText;
+    private transient volatile LicenseValidator.LicenseInfo cachedLicenseInfo;
+    private transient volatile String cachedLicenseInfoFor;
+
+    /**
+     * 验证许可证并返回解析后的信息
+     * 结果会被缓存，仅在 licenseKey 变化时重新验证
+     *
+     * @return LicenseInfo 验证成功返回许可证信息，失败返回 null
+     */
+    public LicenseValidator.LicenseInfo validateLicense() {
+        String currentKey = this.licenseKey;
+        if (cachedLicenseInfo != null && currentKey != null && currentKey.equals(cachedLicenseInfoFor)) {
+            return cachedLicenseInfo;
+        }
+        synchronized (this) {
+            if (cachedLicenseInfo != null && currentKey != null && currentKey.equals(cachedLicenseInfoFor)) {
+                return cachedLicenseInfo;
             }
-            
-            SecretKeySpec secretKey = new SecretKeySpec(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
-            return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (Exception e) {
-            log.error("encryptString failed", e);
-            return plainText; // 加密失败时返回原值
+            cachedLicenseInfo = LicenseValidator.validate(currentKey);
+            cachedLicenseInfoFor = currentKey;
+            return cachedLicenseInfo;
         }
     }
 
@@ -164,22 +156,6 @@ public class BytedeskProperties {
         }
     }
 
-    /**
-     * 脱敏敏感信息用于日志输出
-     * @param value 敏感信息
-     * @return 脱敏后的字符串
-     */
-    // private static String maskSensitiveValue(String value) {
-    //     if (!StringUtils.hasText(value)) {
-    //         return value;
-    //     }
-    //     if (value.length() <= 16) {
-    //         return "*".repeat(value.length());
-    //     }
-    //     // 显示前8个和后8个字符，便于对比验证
-    //     return value.substring(0, 8) + "***[" + (value.length() - 16) + " chars]***" + value.substring(value.length() - 8);
-    // }
-
     public static BytedeskProperties getInstance() {
         return instance;
     }
@@ -189,6 +165,9 @@ public class BytedeskProperties {
     private String version;
 
     private String licenseKey;
+
+    // 许可证配置
+    private License license = new License();
 
     // 自定义配置
     private Custom custom = new Custom();
@@ -235,6 +214,9 @@ public class BytedeskProperties {
     // MinIO 配置
     private Minio minio = new Minio();
 
+    // 呼叫中心配置
+    private Call call = new Call();
+
     // 微信支付配置
     private WechatPay wechatPay = new WechatPay();
 
@@ -246,16 +228,34 @@ public class BytedeskProperties {
 
     @Getter
     @Setter
+    public static class License {
+        /** RSA 私钥文件路径，用于签发许可证签名 */
+        private String privateKeyPath;
+    }
+
+    @Getter
+    @Setter
     public static class Custom {
         private Boolean enabled = false;
         private String name;
         private String logo;
+        private String favicon;
         private String description;
+        /**
+         * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
+         * 例如：https://upload.example.com
+         */
+        private String uploadApiUrl;
         /**
          * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
          * 例如：wss://api.example.com/websocket
          */
         private String mqttWebsocketUrl;
+        /**
+         * 外网可访问的访客工单页面地址（完整URL，不带末尾斜杠），用于邮件中的工单会话直达链接。
+         * 例如：https://support.example.com/ticket
+         */
+        private String ticketHtmlUrl;
         private Boolean showRightCornerChat = true;
         private String rightCornerChatPlacement = "bottom-right"; // 位置：bottom-right / bottom-left
         private Boolean showDemo = true; // 是否显示演示
@@ -279,9 +279,18 @@ public class BytedeskProperties {
         private String lang = "zh-CN";
         // 
         private Boolean allowRegister = false;
+        // 手机/邮箱验证码登录时，未注册用户是否允许自动创建账号
+        private Boolean autoRegisterOnLogin = true;
         private Boolean forceValidateMobile = false;
         private Boolean forceValidateEmail = false;
         private Boolean forceVisitorAuth = false; // 是否强制访客认证，默认false
+        private Boolean wechatMpSubscribePromptEnabled = false;
+        private String wechatMpSubscribePromptAppId;
+        private String wechatMpLoginNoticeTemplateId;
+        /**
+         * 自定义默认 LLM Prompt；为空时回退到代码内置默认值。
+         */
+        private String defaultLlmPrompt;
     }
 
     @Getter
@@ -315,11 +324,18 @@ public class BytedeskProperties {
         // whitelist ip for performance testing
         private List<String> ipWhitelist = new ArrayList<>();
     }
+    
     @Getter
     @Setter 
     public static class Organization {
         private String name;
         private String code;
+        // when user has no organization after login, allow creating a new organization
+        private Boolean allowCreateOrg = true;
+        // when user has no organization after login, allow applying to join an existing organization
+        private Boolean allowJoinOrg = true;
+        // default vip level for new organizations
+        private Integer defaultVipLevel = 0;
         // default validity period (days) for new organizations
         private Integer defaultVipDays = 365;
         // default limits for new organizations
@@ -448,6 +464,18 @@ public class BytedeskProperties {
         private String bucketName = "bytedesk";
         private String region = "us-east-1";
         private Boolean secure = false;
+    }
+
+    @Getter
+    @Setter
+    public static class Call {
+        private Freeswitch freeswitch = new Freeswitch();
+
+        @Getter
+        @Setter
+        public static class Freeswitch {
+            private String recordingsBaseUrl;
+        }
     }
 
     // 为了保持向后兼容,添加getter方法
@@ -624,11 +652,11 @@ public class BytedeskProperties {
                Boolean.TRUE.equals(testing.getDisableCaptcha());
     }
 
-    public Boolean isSuperUser(@NonNull String user) {
-        if (user == null || user.isEmpty()) {
+    public Boolean isAdminIdentifier(@NonNull String identifier) {
+        if (identifier == null || identifier.isEmpty()) {
             return false;
         }
-        return user.equals(admin.getMobile()) || user.equals(admin.getEmail());
+        return identifier.equals(admin.getMobile()) || identifier.equals(admin.getEmail());
     }
 
     public Boolean isInWhitelist(@NonNull String user) {
@@ -643,12 +671,13 @@ public class BytedeskProperties {
     }
 
     /**
-     * 获取加密后的licenseKey
-     * @return 加密后的licenseKey字符串
+     * 获取 licenseKey（新格式为 RSA 签名，旧格式为 Base64 编码）
+     * 不再进行 AES 加密，前端通过 RSA 验签或 Base64 解码获取信息。
+     *
+     * @return licenseKey 字符串
      */
     public String getLicenseKey() {
-        // 原始licenseKey已经是Base64编码的许可证信息，直接AES加密
-        return encryptString(this.licenseKey);
+        return this.licenseKey;
     }
 
     /**
@@ -657,6 +686,13 @@ public class BytedeskProperties {
      */
     public String getOriginalAppkey() {
         return this.licenseKey;
+    }
+
+    public String getVersion() {
+        if (StringUtils.hasText(this.version)) {
+            return this.version;
+        }
+        return environment != null ? environment.getProperty(APPLICATION_VERSION_KEY) : null;
     }
 
 }

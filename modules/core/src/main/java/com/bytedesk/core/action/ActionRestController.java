@@ -99,7 +99,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
-    // @ActionAnnotation(title = "action", action = "导出", description = "export
+    // @ActionAnnotation(title = "action", action = "Export", description = "export
     // action")
     @Operation(summary = "Export Action Logs", description = "Export action logs to Excel format")
     @PreAuthorize(ActionPermissions.HAS_ACTION_EXPORT)

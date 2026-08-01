@@ -16,10 +16,12 @@ package com.bytedesk.core.push;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import com.bytedesk.core.push.service.PushSendService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.service.PushSendResult;
 import com.bytedesk.core.rbac.auth.AuthRequest;
+import com.bytedesk.core.utils.CountryCodeUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +81,39 @@ public class PushService {
         return false;
     }
 
+    public Boolean validateCode(String receiver, String country, String code, HttpServletRequest request) {
+        Assert.hasText(receiver, "Receiver cannot be null or empty");
+        Assert.hasText(code, "Code cannot be null or empty");
+        Assert.notNull(request, "HttpServletRequest cannot be null");
+        String normalizedCountry = CountryCodeUtils.normalize(country);
+        log.info("validate code for receiver: {}, country: {}, code: {}", receiver, normalizedCountry, code);
+
+        Optional<PushEntity> pushOptional = findByStatusAndReceiverAndCountryAndContent(
+                PushStatusEnum.PENDING.name(),
+                receiver,
+                normalizedCountry,
+                code);
+        if (pushOptional.isPresent()) {
+            PushEntity push = pushOptional.get();
+            push.setStatus(PushStatusEnum.CONFIRMED.name());
+            pushRepository.save(push);
+
+            try {
+                pushExpireCacheService.remove(push.getUid());
+            } catch (Exception e) {
+                log.warn("push expire cache remove failed, uid={}", push.getUid(), e);
+            }
+
+            String ip = IpUtils.getClientIp(request);
+            pushFilterService.removeIpLastSentTime(ip);
+
+            return true;
+        }
+
+        log.info("No matching push record found for receiver: {}, country: {}, code: {}", receiver, normalizedCountry, code);
+        return false;
+    }
+
     /**
      * 检查是否存在指定状态、类型和接收者的记录
      */
@@ -90,5 +125,21 @@ public class PushService {
 
     private Optional<PushEntity> findByStatusAndReceiverAndContent(String status, String receiver, String content) {
         return pushRepository.findByStatusAndReceiverAndContent(status, receiver, content);
+    }
+
+    private Optional<PushEntity> findByStatusAndReceiverAndCountryAndContent(String status, String receiver, String country, String content) {
+        Optional<PushEntity> pushOptional = pushRepository.findTopByStatusAndReceiverAndCountryAndContentOrderByUpdatedAtDesc(
+                status,
+                receiver,
+                country,
+                content);
+        if (pushOptional.isPresent()) {
+            return pushOptional;
+        }
+        if (CountryCodeUtils.DEFAULT_COUNTRY.equals(country)) {
+            return pushRepository.findTopByStatusAndReceiverAndContentOrderByUpdatedAtDesc(status, receiver, content)
+                    .filter(push -> !StringUtils.hasText(push.getCountry()));
+        }
+        return Optional.empty();
     }
 }

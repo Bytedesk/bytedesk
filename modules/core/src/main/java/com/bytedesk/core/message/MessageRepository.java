@@ -48,6 +48,23 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             ZonedDateTime start,
             ZonedDateTime end);
 
+    @Query("SELECT m.thread.uid AS threadUid, m.createdAt AS createdAt, m.agentRepliedAt AS agentRepliedAt, "
+            + "m.type AS type, m.user AS user "
+            + "FROM MessageEntity m "
+            + "WHERE m.thread.uid IN :threadUids AND m.createdAt BETWEEN :start AND :end "
+            + "ORDER BY m.thread.uid ASC, m.createdAt ASC")
+    List<MessageStatisticRow> findStatisticRowsByThreadUidInAndCreatedAtBetween(
+            @Param("threadUids") List<String> threadUids,
+            @Param("start") ZonedDateTime start,
+            @Param("end") ZonedDateTime end);
+
+    Optional<MessageEntity> findFirstByThread_TopicOrderByCreatedAtDesc(String threadTopic);
+
+    List<MessageEntity> findByThread_TopicAndCreatedAtBetweenOrderByCreatedAtAsc(
+            String threadTopic,
+            ZonedDateTime start,
+            ZonedDateTime end);
+
     // 根据threadTopic查询最新n条消息
     @Query("SELECT m FROM MessageEntity m WHERE m.thread.topic = :threadTopic ORDER BY m.createdAt DESC")
     List<MessageEntity> findLatestByThreadTopicOrderByCreatedAtDesc(@Param("threadTopic") String threadTopic, org.springframework.data.domain.Pageable pageable);
@@ -72,23 +89,26 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
      *
      * 说明：
      * - 以 message.agent_replied = 0 标识“未回复访客消息”。
-     * - 通过 message_user JSON 中 visitor type 判定访客消息（沿用 migration 回填的判断方式）。
-     * - 通过 thread.agent JSON 中 uid 过滤到当前客服。
+     * - 通过 JSON 序列化后的精确片段匹配访客消息，避免误匹配 visitor:false，并保持多数据库兼容。
+     * - 通过 thread.agent 中的 uid 片段过滤到当前客服，避免依赖各数据库 JSON 函数方言。
      */
     @Query(value = "SELECT t.uuid AS thread_uid, MIN(m.created_at) AS first_unreplied_at "
             + "FROM bytedesk_core_message m "
             + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
             + "WHERE m.agent_replied = 0 "
-            + "  AND m.message_user LIKE '%\"type\"%\"visitor\"%' "
+            + "  AND m.message_type NOT IN ('SYSTEM', 'NOTICE') "
+            + "  AND (m.message_user LIKE '%\"visitor\":true%' "
+            + "       OR m.message_user LIKE '%\"type\":\"VISITOR\"%' "
+            + "       OR m.message_user LIKE '%\"type\":\"visitor\"%') "
             + "  AND t.is_deleted = false "
             + "  AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
             + "  AND t.agent IS NOT NULL AND t.agent != '' "
-            + "  AND JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) = :agentUid "
+            + "  AND t.agent LIKE :agentUidPattern "
             + "GROUP BY t.uuid "
             + "ORDER BY first_unreplied_at ASC "
             + "LIMIT :limit OFFSET :offset", nativeQuery = true)
     List<Object[]> pageUnrepliedVisitorThreadUidsByAgentUid(
-            @Param("agentUid") String agentUid,
+            @Param("agentUidPattern") String agentUidPattern,
             @Param("limit") int limit,
             @Param("offset") int offset);
 
@@ -97,14 +117,17 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + "  FROM bytedesk_core_message m "
             + "  INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
             + "  WHERE m.agent_replied = 0 "
-            + "    AND m.message_user LIKE '%\"type\"%\"visitor\"%' "
+            + "    AND m.message_type NOT IN ('SYSTEM', 'NOTICE') "
+            + "    AND (m.message_user LIKE '%\"visitor\":true%' "
+            + "         OR m.message_user LIKE '%\"type\":\"VISITOR\"%' "
+            + "         OR m.message_user LIKE '%\"type\":\"visitor\"%') "
             + "    AND t.is_deleted = false "
             + "    AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
             + "    AND t.agent IS NOT NULL AND t.agent != '' "
-            + "    AND JSON_UNQUOTE(JSON_EXTRACT(t.agent, '$.uid')) = :agentUid "
+            + "    AND t.agent LIKE :agentUidPattern "
             + "  GROUP BY t.uuid "
             + ") x", nativeQuery = true)
-    long countUnrepliedVisitorThreadsByAgentUid(@Param("agentUid") String agentUid);
+    long countUnrepliedVisitorThreadsByAgentUid(@Param("agentUidPattern") String agentUidPattern);
 
     /**
      * 统计“访客端未读消息数”：当前会话中由客服发送且状态仍为未读（未到 READ）的消息数量。
@@ -118,8 +141,16 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + "  AND t.is_deleted = false "
             + "  AND m.is_deleted = false "
             + "  AND m.status IN ('SENDING','SUCCESS','DELIVERED') "
-            + "  AND m.message_user LIKE '%\"type\"%\"agent\"%'", nativeQuery = true)
+            + "  AND (m.message_user LIKE '%\"agent\":true%' "
+            + "       OR m.message_user LIKE '%\"type\":\"AGENT\"%' "
+            + "       OR m.message_user LIKE '%\"type\":\"agent\"%')", nativeQuery = true)
     long countVisitorUnreadByThreadUid(@Param("threadUid") String threadUid);
+
+        /**
+         * 查找会话中全部 ROBOT_STREAM 消息（按创建时间升序）。
+         * 用于热门问题统计：从 RobotContent.question 提取访客原始提问。
+         */
+        List<MessageEntity> findByThread_UidAndTypeOrderByCreatedAtAsc(String threadUid, String type);
 
     boolean existsByUid(String uid);
 }

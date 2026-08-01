@@ -22,4 +22,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface QuickReplyRepository extends JpaRepository<QuickReplyEntity, Long>, JpaSpecificationExecutor<QuickReplyEntity> {
     Optional<QuickReplyEntity> findByUid(String uid);
     List<QuickReplyEntity> findByCategoryUid(String categoryUid);
+    List<QuickReplyEntity> findByDeleted(Boolean deleted);
 }

@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.alibaba.excel.EasyExcel;
-import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -74,8 +72,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> queryByOrg(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByOrg", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByOrg", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -87,12 +84,11 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
      * 减少子类重复代码
      * 注意：由于泛型擦除，需要使用PageableRequest.class来查找方法
      */
-    @GetMapping("/query")
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUser", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByUser", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -108,8 +104,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> queryByUid(T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("queryByUid", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "queryByUid", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -125,8 +120,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> create(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("create", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "create", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -142,8 +136,7 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> update(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("update", PageableRequest.class);
-            Object result = method.invoke(service, request);
+            Object result = invokeRequestMethod(service, "update", request);
             return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
@@ -159,9 +152,23 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
     public ResponseEntity<?> delete(@RequestBody T request) {
         try {
             S service = getService();
-            Method method = service.getClass().getMethod("delete", PageableRequest.class);
-            method.invoke(service, request);
+            invokeRequestMethod(service, "delete", request);
             return ResponseEntity.ok(JsonResult.success());
+        } catch (Exception e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 通用的restore实现
+     * 减少子类重复代码
+     */
+    @PostMapping("/restore")
+    public ResponseEntity<?> restore(@RequestBody T request) {
+        try {
+            S service = getService();
+            Object result = invokeRequestMethod(service, "restore", request);
+            return ResponseEntity.ok(JsonResult.success(result));
         } catch (Exception e) {
             return ResponseEntity.ok(JsonResult.error(e.getMessage()));
         }
@@ -200,23 +207,9 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
             String sheetName, 
             String filePrefix) {
         try {
-            // 设置响应类型
-            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setCharacterEncoding("utf-8");
-            
-            // 生成文件名
-            String fileName = filePrefix + "-" + BdDateUtils.formatDatetimeUid() + ".xlsx";
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName);
-
-            // 获取数据并转换为Excel格式
             Object data = invokeMethod(service, "queryByOrgEntity", request);
             List<E> excelList = convertToExcelList(service, data);
-
-            // 写入Excel
-            EasyExcel.write(response.getOutputStream(), excelClass)
-                    .autoCloseStream(Boolean.FALSE)
-                    .sheet(sheetName)
-                    .doWrite(excelList);
+            ExcelExportUtils.writeExcel(response, request, excelList, excelClass, sheetName, filePrefix);
 
         } catch (Exception e) {
             log.error("exportTemplate failed: filePrefix={}, sheetName={}, excelClass={}, request={}",
@@ -250,6 +243,27 @@ public abstract class BaseRestController<T extends PageableRequest, S> {
             return method.invoke(service, args);
         }
         throw new NoSuchMethodException("Method " + methodName + " not found");
+    }
+
+    /**
+     * 调用接收具体请求对象的服务方法
+     */
+    private <SVC> Object invokeRequestMethod(SVC service, String methodName, T request) throws Exception {
+        Method method = null;
+        for (Method candidate : service.getClass().getMethods()) {
+            if (!candidate.getName().equals(methodName) || candidate.getParameterCount() != 1) {
+                continue;
+            }
+            Class<?> parameterType = candidate.getParameterTypes()[0];
+            if (parameterType.isAssignableFrom(request.getClass())) {
+                method = candidate;
+                break;
+            }
+        }
+        if (method == null) {
+            throw new NoSuchMethodException("Method " + methodName + " not found for request type " + request.getClass().getSimpleName());
+        }
+        return method.invoke(service, request);
     }
 
     /**

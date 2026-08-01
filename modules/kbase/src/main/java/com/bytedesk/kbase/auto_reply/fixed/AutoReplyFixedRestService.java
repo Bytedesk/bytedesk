@@ -30,10 +30,10 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.NotLoginException;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -56,6 +56,8 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
     private final CategoryRestService categoryRestService;
 
     private final AuthService authService;
+
+    private final AutoReplyFixedService autoReplyFixedService;
 
     @Override
     protected Specification<AutoReplyFixedEntity> createSpecification(AutoReplyFixedRequest request) {
@@ -200,7 +202,7 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
     public AutoReplyFixedEntity convertExcelToAutoReplyFixed(AutoReplyFixedExcel excel, String kbUid, String orgUid) {
         // return modelMapper.map(excel, AutoReplyFixed.class);
         AutoReplyFixedEntity autoReply = AutoReplyFixedEntity.builder().build();
-        autoReply.setUid(uidUtils.getCacheSerialUid());
+        autoReply.setUid(uidUtils.getUid());
         autoReply.setContent(excel.getContent());
         // 
         // autoReply.setType(MessageTypeEnum.TEXT); // TODO: 根据实际类型设置
@@ -269,6 +271,13 @@ public class AutoReplyFixedRestService extends BaseRestServiceWithExport<AutoRep
 
         // 保存所有数据
         save(autoReplyList);
+    }
+
+    /**
+     * 根据知识库 UID 获取一条可用固定回复内容。
+     */
+    public String getFixedReply(String kbUid) {
+        return autoReplyFixedService.getFixedReply(kbUid);
     }
 
     

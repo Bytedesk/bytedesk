@@ -20,7 +20,6 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.AvatarConsts;
-import com.bytedesk.core.uid.UidUtils;
 
 // import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
@@ -38,8 +37,6 @@ public class UserInitializer {
 
     private final BytedeskProperties bytedeskProperties;
 
-    private final UidUtils uidUtils;
-
     // 初始化超级管理员账号, 在 organizationInitializer 中初始化后执行
     public void init() {
         // 系统只能存在一个超级管理员账号
@@ -51,7 +48,7 @@ public class UserInitializer {
         log.info("init super administrator account...");
         // 创建超级管理员账号
         UserEntity superAdmin = UserEntity.builder()
-                .uid(uidUtils.getUid())
+                .uid(BytedeskConsts.DEFAULT_SUPER_UID) // 固定uid，便于后续权限分配等操作
                 .email(bytedeskProperties.getEmail())
                 .username(bytedeskProperties.getEmail())
                 .password(new BCryptPasswordEncoder().encode(bytedeskProperties.getPassword()))

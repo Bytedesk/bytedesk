@@ -692,7 +692,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("notice-apis")
                 .displayName("Notice Management APIs")
-                .pathsToMatch("/api/v1/notice/**")
+                .pathsToMatch("/api/v1/notification/**")
                 .build();
     }
 
@@ -1304,7 +1304,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("topic-apis")
                 .displayName("Topic Management APIs")
-                .pathsToMatch("/api/v1/topic/**")
+                .pathsToMatch("/api/v1/topic/subscription/**")
                 .build();
     }
 
@@ -1393,6 +1393,18 @@ public class SwaggerApiConfig {
     }
 
     /**
+     * 质量规则管理接口
+     */
+    @Bean
+    public GroupedOpenApi qualityRuleApis() {
+        return GroupedOpenApi.builder()
+                .group("quality-rule-apis")
+                .displayName("QualityRule Management APIs")
+                .pathsToMatch("/api/v1/quality/rule/**")
+                .build();
+    }
+
+    /**
      * Token统计管理接口
      */
     @Bean
@@ -1448,7 +1460,7 @@ public class SwaggerApiConfig {
         return GroupedOpenApi.builder()
                 .group("call-ivr-apis")
                 .displayName("CallIvr Management APIs")
-                .pathsToMatch("/api/v1/call/ivr/**")
+                .pathsToMatch("/api/v1/call/ivr/menu/**")
                 .build();
     }
 

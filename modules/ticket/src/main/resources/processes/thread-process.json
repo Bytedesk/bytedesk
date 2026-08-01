@@ -1,0 +1,477 @@
+{
+  "nodes": [
+    {
+      "id": "start",
+      "type": "start",
+      "meta": {
+        "position": {
+          "x": -1193.3724144631492,
+          "y": 260
+        }
+      },
+      "data": {
+        "title": "访客发起会话",
+        "description": "访客发起新的客服会话。"
+      }
+    },
+    {
+      "id": "isRobotEnabled",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": -767.7233314500122,
+          "y": 260
+        }
+      },
+      "data": {
+        "title": "机器人接待?",
+        "description": "判断是否启用机器人接待。",
+        "conditions": [
+          {
+            "key": "robotEnabled",
+            "label": "启用机器人",
+            "expression": "${robotEnabled == true}",
+            "outgoingEdgeId": "robotService"
+          },
+          {
+            "key": "robotDisabled",
+            "label": "直接转人工",
+            "expression": "${robotEnabled == false}",
+            "outgoingEdgeId": "isAgentsOffline"
+          }
+        ]
+      }
+    },
+    {
+      "id": "robotService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": -329.48989173003446,
+          "y": -94.6476783660014
+        }
+      },
+      "data": {
+        "title": "机器人接待",
+        "description": "机器人自动回复访客消息。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "robotIdleTimeoutService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 932.4828553813978,
+          "y": -112.6053042121685
+        }
+      },
+      "data": {
+        "title": "访客超时未发消息",
+        "description": "机器人接待中访客超时未发消息，自动结束会话。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "transferToHumanTask",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 179.43837753510138,
+          "y": 25.216330838639273
+        }
+      },
+      "data": {
+        "title": "转人工客服",
+        "description": "通过UI按钮或关键词触发转人工服务。",
+        "assigneeType": "user",
+        "assigneeUids": [
+          "${agentUid}"
+        ],
+        "assigneeNames": [
+          "客服"
+        ],
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "isAgentsOffline",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 525.2830056377142,
+          "y": 260
+        }
+      },
+      "data": {
+        "title": "客服离线?",
+        "description": "判断是否有客服在线。",
+        "conditions": [
+          {
+            "key": "agentsOnline",
+            "label": "客服在线",
+            "expression": "${agentsOffline == false}",
+            "outgoingEdgeId": "isAgentsBusy"
+          },
+          {
+            "key": "agentsOffline",
+            "label": "客服离线",
+            "expression": "${agentsOffline == true}",
+            "outgoingEdgeId": "agentsOfflineService"
+          }
+        ]
+      }
+    },
+    {
+      "id": "agentsOfflineService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 1997.3624969145499,
+          "y": 538.7914889272294
+        }
+      },
+      "data": {
+        "title": "坐席离线处理",
+        "description": "所有客服离线时进行离线留言处理。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "queueService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 932.4828553813978,
+          "y": 105.9858752820557
+        }
+      },
+      "data": {
+        "title": "排队等待",
+        "description": "所有坐席繁忙时进入排队队列等待。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "humanService",
+      "type": "approval",
+      "meta": {
+        "position": {
+          "x": 1341.9325352272137,
+          "y": 246.50353117948606
+        }
+      },
+      "data": {
+        "title": "人工接待",
+        "description": "客服人员接待访客，支持流转和协助。",
+        "assigneeType": "role",
+        "roleUid": "${workgroupUid}",
+        "timeoutMinutes": 0,
+        "timeoutAction": "remind",
+        "allowDelegate": true,
+        "allowAddSign": true,
+        "commentRequired": false
+      }
+    },
+    {
+      "id": "slaNotification",
+      "type": "notification",
+      "meta": {
+        "position": {
+          "x": 1997.3624969145499,
+          "y": 716.3892258424947
+        }
+      },
+      "data": {
+        "title": "SLA超时通知",
+        "description": "人工接待超过SLA时间后发送提醒。",
+        "channels": [
+          "message"
+        ],
+        "template": "会话接待已超过SLA时间，请及时处理。",
+        "recipientType": "role",
+        "recipientUids": [
+          "${workgroupUid}"
+        ]
+      }
+    },
+    {
+      "id": "humanIdleTimeoutService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 2090.2486903901745,
+          "y": -105.64861698291823
+        }
+      },
+      "data": {
+        "title": "访客超时未发消息",
+        "description": "人工接待中访客超时未发消息，自动结束会话。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "transferService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 1328.4643158425886,
+          "y": -200.6053042121685
+        }
+      },
+      "data": {
+        "title": "转接服务",
+        "description": "将会话转接给其他客服或技能组。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "inviteService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 1364.8404397403774,
+          "y": 716.3892258424947
+        }
+      },
+      "data": {
+        "title": "邀请协助",
+        "description": "邀请其他客服加入会话协助处理。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "satisfactionService",
+      "type": "http",
+      "meta": {
+        "position": {
+          "x": 1997.3624969145499,
+          "y": 390.19278738471155
+        }
+      },
+      "data": {
+        "title": "满意度评价",
+        "description": "触发满意度评价事件，邀请访客评价。",
+        "method": "POST",
+        "url": "",
+        "headers": [],
+        "queryParams": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "end",
+      "type": "end",
+      "meta": {
+        "position": {
+          "x": 2670.604281007765,
+          "y": 260
+        }
+      },
+      "data": {
+        "title": "会话结束",
+        "description": "会话流程结束。"
+      }
+    },
+    {
+      "id": "isAgentsBusy",
+      "type": "condition",
+      "meta": {
+        "position": {
+          "x": 963.1655930732946,
+          "y": 559.3800143268672
+        }
+      },
+      "data": {
+        "title": "坐席繁忙?",
+        "description": "判断是否有空闲坐席。",
+        "conditions": [
+          {
+            "key": "agentsBusy",
+            "label": "坐席繁忙",
+            "expression": "${agentsBusy == true}",
+            "outgoingEdgeId": "queueService"
+          },
+          {
+            "key": "agentsAvailable",
+            "label": "坐席空闲",
+            "expression": "${agentsBusy == false}",
+            "outgoingEdgeId": "humanService"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNodeId": "start",
+      "targetNodeId": "isRobotEnabled",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isRobotEnabled",
+      "targetNodeId": "robotService",
+      "sourcePortId": "condition-branch-robotEnabled",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isRobotEnabled",
+      "targetNodeId": "isAgentsOffline",
+      "sourcePortId": "condition-branch-robotDisabled",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "robotService",
+      "targetNodeId": "transferToHumanTask",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "robotService",
+      "targetNodeId": "robotIdleTimeoutService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "robotIdleTimeoutService",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "transferToHumanTask",
+      "targetNodeId": "isAgentsOffline",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isAgentsOffline",
+      "targetNodeId": "isAgentsBusy",
+      "sourcePortId": "condition-branch-agentsOnline",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isAgentsOffline",
+      "targetNodeId": "agentsOfflineService",
+      "sourcePortId": "condition-branch-agentsOffline",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "agentsOfflineService",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isAgentsBusy",
+      "targetNodeId": "queueService",
+      "sourcePortId": "condition-branch-agentsBusy",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "queueService",
+      "targetNodeId": "humanService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "isAgentsBusy",
+      "targetNodeId": "humanService",
+      "sourcePortId": "condition-branch-agentsAvailable",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "transferService",
+      "targetNodeId": "humanService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "inviteService",
+      "targetNodeId": "humanService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "slaNotification",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "humanIdleTimeoutService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "transferService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "inviteService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "satisfactionService",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanService",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "humanIdleTimeoutService",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    },
+    {
+      "sourceNodeId": "satisfactionService",
+      "targetNodeId": "end",
+      "sourcePortId": "defaultOutput",
+      "targetPortId": "defaultInput"
+    }
+  ]
+}

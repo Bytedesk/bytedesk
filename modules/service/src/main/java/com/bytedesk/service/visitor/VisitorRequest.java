@@ -21,6 +21,7 @@ import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 import lombok.Builder;
@@ -32,6 +33,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.SuperBuilder;
 import lombok.experimental.Accessors;
+import org.springframework.data.domain.Pageable;
+import org.springframework.util.StringUtils;
 
 
 @Slf4j
@@ -58,9 +61,6 @@ public class VisitorRequest extends BaseRequest {
 
 	@Builder.Default
 	private String lang = LanguageEnum.ZH_CN.name();
-
-	// @Builder.Default
-	// private String type = VisitorTypeEnum.ANONYMOUS.name();
 	
 	// device info
 	private String browser;
@@ -81,6 +81,20 @@ public class VisitorRequest extends BaseRequest {
 
 	// for visitor thread list filter
 	private String topic;
+
+	// 会话接入意图（TEXT/WEBRTC/PHONE），不替代 BaseRequest.type 的路由语义
+	@Builder.Default
+	private String callType = VisitorCallTypeEnum.TEXT.name();
+
+	// WEBRTC 默认是否启用麦克风/摄像头
+	@Builder.Default
+	private Boolean audio = true;
+
+	@Builder.Default
+	private Boolean video = true;
+
+	// 访客呼叫目标分机/AOR，由呼叫页面显式传入
+	private String target;
 
 	// 强制转人工服务，默认false
 	@Builder.Default
@@ -123,6 +137,10 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Integer vipLevel = 0;
 
+	// 本地/测试环境可直接绑定已有 FreeSWITCH 静态分机账号
+	private String sipExtension;
+	private String sipPassword;
+
 	// 用于区分本地测试还是线上环境
 	@Builder.Default
 	private Boolean debug = false;
@@ -146,7 +164,8 @@ public class VisitorRequest extends BaseRequest {
 	
 	public Boolean isWeChat() {
 		// 忽略大小写，常量放在前面避免空指针异常
-		return this.channel != null && ChannelEnum.WECHAT.name().toLowerCase().contains(this.channel.toLowerCase());
+		return this.channel != null
+				&& this.channel.toLowerCase().contains(ChannelEnum.WECHAT.name().toLowerCase());
 	}
 
 	public Boolean isMeta() {
@@ -194,14 +213,65 @@ public class VisitorRequest extends BaseRequest {
 	}
 
 	public ThreadTypeEnum formatType() {
-		int typeInt;
-		try {
-			typeInt = Integer.parseInt(super.type);
-		} catch (NumberFormatException e) {
-			log.error("VisitorRequest formatType parse failed: {}", super.type, e);
-			typeInt = 0;
+		if (!StringUtils.hasText(super.type)) {
+			return ThreadTypeEnum.AGENT;
 		}
-		return ThreadTypeEnum.fromValue(typeInt);
+
+		String normalized = super.type.trim();
+		try {
+			return ThreadTypeEnum.fromValue(Integer.parseInt(normalized));
+		} catch (NumberFormatException ignored) {
+			// Fallback to enum literal names, e.g. WORKGROUP/AGENT/ROBOT from frontend.
+		}
+
+		try {
+			return ThreadTypeEnum.valueOf(normalized.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			log.error("VisitorRequest formatType parse failed: {}", super.type, e);
+			return ThreadTypeEnum.AGENT;
+		}
+	}
+
+	public VisitorCallTypeEnum formatCallType() {
+		return VisitorCallTypeEnum.fromValue(this.callType);
+	}
+
+	public boolean isRealtimeCallType() {
+		VisitorCallTypeEnum callType = formatCallType();
+		return VisitorCallTypeEnum.WEBRTC == callType
+				|| VisitorCallTypeEnum.PHONE == callType;
+	}
+
+	public boolean isWebrtcType() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType();
+	}
+
+	public boolean isWebrtcAudioType() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType() && !Boolean.FALSE.equals(audio);
+	}
+
+	public boolean isWebrtcVideoType() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType() && !Boolean.FALSE.equals(video);
+	}
+
+	public boolean isWebrtcPhoneType() {
+		return VisitorCallTypeEnum.PHONE == formatCallType();
+	}
+
+	public boolean shouldTriggerWebrtcInvite() {
+		return VisitorCallTypeEnum.WEBRTC == formatCallType();
+	}
+
+	public String resolveWebrtcInviteVideoMode() {
+		if (!shouldTriggerWebrtcInvite() || !isWebrtcVideoType()) {
+			return null;
+		}
+		return "TWO_WAY";
+	}
+
+	@Override
+	public Pageable getPageable() {
+		return super.getPageable();
 	}
 
 	

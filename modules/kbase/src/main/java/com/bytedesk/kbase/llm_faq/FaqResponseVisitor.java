@@ -42,5 +42,7 @@ public class FaqResponseVisitor implements Serializable {
 
     private String type;
 
+    private Boolean routeToRobot;
+
     private String categoryUid; // 分类
 }

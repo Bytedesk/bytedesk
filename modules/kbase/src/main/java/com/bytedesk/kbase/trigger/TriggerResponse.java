@@ -45,4 +45,6 @@ public class TriggerResponse extends BaseResponse {
 
     private String config;
 
+    private Integer maxTriggerCount;
+
 }

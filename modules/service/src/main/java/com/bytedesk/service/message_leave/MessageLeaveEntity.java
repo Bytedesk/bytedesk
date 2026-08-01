@@ -72,6 +72,12 @@ public class MessageLeaveEntity extends BaseEntity {
     private String content;
 
     /**
+     * Generic form data snapshot stored as JSON string
+     */
+    @Column(name = "form_data", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String formData;
+
+    /**
      * Type of the leave message
      */
     @Builder.Default

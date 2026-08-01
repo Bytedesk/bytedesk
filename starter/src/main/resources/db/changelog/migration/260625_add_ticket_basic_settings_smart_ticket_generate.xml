@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="jackning" id="260625_add_ticket_basic_settings_smart_ticket_generate">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ticket_basic_settings"/>
+                <not>
+                    <columnExists tableName="bytedesk_ticket_basic_settings" columnName="enable_smart_ticket_generate"/>
+                    <columnExists tableName="bytedesk_ticket_basic_settings" columnName="smart_ticket_robot_uid"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_basic_settings">
+            <column name="enable_smart_ticket_generate" type="BOOLEAN" defaultValueBoolean="false" remarks="是否启用智能工单生成">
+                <constraints nullable="true" />
+            </column>
+            <column name="smart_ticket_robot_uid" type="VARCHAR(64)" remarks="智能工单生成使用的 RobotEntity.uid">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

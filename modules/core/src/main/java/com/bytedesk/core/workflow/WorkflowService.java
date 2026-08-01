@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.workflow.node.WorkflowBaseNode;
 import com.bytedesk.core.workflow.node.WorkflowNodeFactory;
@@ -67,7 +68,7 @@ public class WorkflowService {
         // 2. 解析工作流内容
         String content = workflow.getSchema();
         if (content == null || content.isEmpty()) {
-            throw new RuntimeException("工作流内容为空");
+            throw new RuntimeException(I18Consts.I18N_WORKFLOW_CONTENT_EMPTY);
         }
         JSONObject workflowJson = JSON.parseObject(content);
         
@@ -115,7 +116,7 @@ public class WorkflowService {
                     }
                 }
             }
-            throw new RuntimeException("工作流中未找到开始节点");
+            throw new RuntimeException(I18Consts.I18N_WORKFLOW_START_NODE_NOT_FOUND);
         } catch (Exception e) {
             log.error("查找开始节点失败: {}", e.getMessage(), e);
             throw new RuntimeException("查找开始节点失败: " + e.getMessage(), e);

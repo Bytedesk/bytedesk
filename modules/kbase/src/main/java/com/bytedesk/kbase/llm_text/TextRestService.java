@@ -26,6 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.category.CategoryEntity;
@@ -40,6 +41,7 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_text.event.TextUpdateDocEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
@@ -60,8 +62,13 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
     
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
+
     @Override
     protected Specification<TextEntity> createSpecification(TextRequest request) {
+        if (StringUtils.hasText(request.getCategoryUid())) {
+            request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
+        }
         return TextSpecification.search(request, authService);
     }
 
@@ -131,6 +138,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         if (savedEntity == null) {
             throw new RuntimeException("Create text failed");
         }
+        kbaseTranslationSyncService.syncText(savedEntity);
         return convertToResponse(savedEntity);
     }
 
@@ -172,6 +180,7 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
             if (savedEntity == null) {
                 throw new RuntimeException("Update text failed");
             }
+            kbaseTranslationSyncService.syncText(savedEntity);
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Text not found");

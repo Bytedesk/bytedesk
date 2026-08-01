@@ -69,5 +69,4 @@ public class AutoReplyKeywordRequest extends BaseRequest {
     
     private String kbUid; // 对应知识库
 
-    // private String userUid;
 }

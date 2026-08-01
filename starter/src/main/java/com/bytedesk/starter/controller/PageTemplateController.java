@@ -67,6 +67,9 @@ public class PageTemplateController {
         pageTemplateService.toHtml("features/video");
         pageTemplateService.toHtml("features/service");
         pageTemplateService.toHtml("features/open");
+        pageTemplateService.toHtml("features/mcp");
+        pageTemplateService.toHtml("features/cli");
+        pageTemplateService.toHtml("features/skill");
         
         // multilingual generation
         pageTemplateService.toHtmlMulti("index");
@@ -90,6 +93,9 @@ public class PageTemplateController {
         pageTemplateService.toHtmlMulti("features/video");
         pageTemplateService.toHtmlMulti("features/service");
         pageTemplateService.toHtmlMulti("features/open");
+        pageTemplateService.toHtmlMulti("features/mcp");
+        pageTemplateService.toHtmlMulti("features/cli");
+        pageTemplateService.toHtmlMulti("features/skill");
         
         return JsonResult.success("generate html success (multi-language)", 200, true);
     }

@@ -13,6 +13,9 @@
  */
 package com.bytedesk.ai.robot;
 
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.RedisConsts;
 
@@ -59,6 +62,8 @@ public class RobotConsts {
 //     public static final String ROBOT_NAME_AFTER_SALE_CUSTOMER_ASSISTANT = "after_sale_customer_assistant"; // 售后客服
 //     public static final String ROBOT_NAME_LOGISTICS_CUSTOMER_ASSISTANT = "logistics_customer_assistant"; // 物流客服
     public static final String ROBOT_NAME_LANGUAGE_TRANSLATION = "language_translation"; // 语言翻译
+    public static final String ROBOT_NAME_KB_TRANSLATION = "kbase_translation"; // 知识库内容翻译
+    public static final String ROBOT_MODEL_KB_TRANSLATION = "qwen-mt-flash";
 //     public static final String ROBOT_NAME_LANGUAGE_RECOGNITION = "language_recognition"; // 语言识别
 //     public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis"; // 语义分析
 //     public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别
@@ -70,6 +75,7 @@ public class RobotConsts {
 //     public static final String ROBOT_NAME_GENERATE_XIAOHONGSHU_ARTICLE = "generate_xiaohongshu_article"; // 生成小红书文章
     public static final String ROBOT_NAME_AGENT_ASSISTANT = "agent_assistant"; // 客服助手
     public static final String ROBOT_NAME_THREAD_SUMMARY = "thread_summary"; // 会话小结
+    public static final String ROBOT_NAME_TEXT_REWRITE = "text_rewrite"; // 文本改写
 
     // prompt tools
     public static final String ROBOT_NAME_PROMPT_SCORE = "prompt_score"; // 提示词评分
@@ -114,31 +120,14 @@ public class RobotConsts {
             """;
         //     6. 如果上下文内容不完整，无法回答问题，直接回答“未查找到相关问题答案”，不要猜测;
 
-    // 默认知识库对话提示词
-    // public static final String ROBOT_LLM_CHAT_PROMPT = """
-    //         你是一个专业、友好的AI助手。现在用户提出的问题超出了你的知识库范围，你需要生成一个礼貌且有帮助的回复。
-
-    //         ## 回复要求
-    //         - 诚实承认你无法提供准确答案
-    //         - 简洁友好，不要过度道歉
-    //         - 可以提供相关的建议或替代方案
-    //         - 回复控制在50字以内
-    //         - 使用礼貌、专业的语气
-
-    //         ## Few-shot示例
-
-    //         用户问题: 今天杭州西湖的游客数量是多少？
-    //         回复: 抱歉，我无法获取实时的杭州西湖游客数据。您可以通过杭州旅游官网或相关APP查询这一信息。
-
-    //         用户问题: 张教授的新论文发表了吗？
-    //         回复: 我没有张教授的最新论文信息。建议您查询学术数据库或直接联系张教授获取最新动态。
-
-    //         用户问题: 我的银行卡号是多少？
-    //         回复: 作为AI助手，我无法获取您的个人银行信息。请登录您的银行APP或联系银行客服获取相关信息。
-
-    //         ## 用户当前的问题是:
-    //         {{.Query}}
-    //         """;
+    public static String resolveDefaultLlmPrompt() {
+        BytedeskProperties bytedeskProperties = BytedeskProperties.getInstance();
+        if (bytedeskProperties != null && bytedeskProperties.getCustom() != null
+                && StringUtils.hasText(bytedeskProperties.getCustom().getDefaultLlmPrompt())) {
+            return bytedeskProperties.getCustom().getDefaultLlmPrompt();
+        }
+        return ROBOT_LLM_DEFAULT_PROMPT;
+    }
 
     // 默认重写提示词
     public static final String ROBOT_LLM_DEFAULT_REWRITE_PROMPT = """

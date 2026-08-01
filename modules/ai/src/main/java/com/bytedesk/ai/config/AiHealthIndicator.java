@@ -13,8 +13,8 @@
  */
 package com.bytedesk.ai.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -30,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class AiHealthIndicator implements HealthIndicator {
 
+    public AiHealthIndicator(
+            ObjectProvider<ChatModel> primaryChatModelProvider) {
+        this.primaryChatModel = primaryChatModelProvider.getIfAvailable();
+    }
+
+
     @Value("${spring.ai.model.chat:none}")
     private String chatModel;
 
@@ -39,8 +45,7 @@ public class AiHealthIndicator implements HealthIndicator {
     @Value("${spring.ai.model.image:none}")
     private String imageModel;
 
-    @Autowired(required = false)
-    private ChatModel primaryChatModel;
+    private final ChatModel primaryChatModel;
 
     @Override
     public Health health() {

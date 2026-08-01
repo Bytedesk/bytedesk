@@ -33,6 +33,7 @@ public enum UploadTypeEnum {
     TICKET, // 工单
     BPMN, // 流程图
     CUSTOMER, // 客户
+    BLACK, // 黑名单
     WORKFLOW, // 工作流
     ATTACHMENT; // 附件
 

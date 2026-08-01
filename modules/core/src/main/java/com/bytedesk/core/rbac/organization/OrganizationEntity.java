@@ -31,6 +31,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationIdentityTypeEnum;
+import com.bytedesk.core.rbac.organization.enums.OrganizationVerifyStatusEnum;
 
 @Entity
 @Data
@@ -96,10 +99,36 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     // 认证失败原因
     private String rejectReason;
 
-    // 是否付费会员
+    // 会员等级：0=非会员，1及以上为会员等级
     @Builder.Default
-    @Column(name = "is_vip")
-    private Boolean vip = false;
+    @Column(name = "vip_level")
+    private Integer vipLevel = 0;
+
+    public Boolean getVip() {
+        return vipLevel != null && vipLevel > 0;
+    }
+
+    public void setVip(Boolean vip) {
+        if (vip == null) {
+            return;
+        }
+        if (Boolean.TRUE.equals(vip)) {
+            if (vipLevel == null || vipLevel < 1) {
+                vipLevel = 1;
+            }
+            return;
+        }
+        vipLevel = 0;
+    }
+
+    @PostLoad
+    @PrePersist
+    @PreUpdate
+    private void normalizeVipLevel() {
+        if (vipLevel == null || vipLevel < 0) {
+            vipLevel = 0;
+        }
+    }
 
     // 会员截止日期、组织有效期
     private ZonedDateTime vipExpireDate;
@@ -124,17 +153,17 @@ public class OrganizationEntity extends BaseEntityNoOrg {
     @Column(name = "custom_server_host")
     private String customServerHost = BytedeskConsts.EMPTY_STRING;
 
-    // 组织成员最大数
+    // 组织成员最大数：控制组织内创建成员的数量，和同时登录的成员数量
     @Builder.Default
     @Column(name = "max_members")
     private Integer maxMembers = 20;
 
-    // 客服坐席最大数
+    // 客服账号最大数：控制组织内创建客服账号的数量，和同时在线的客服账号数量
     @Builder.Default
     @Column(name = "max_agents")
     private Integer maxAgents = 20;
 
-    // 工作组最大数
+    // 工作组最大数：控制组织内创建工作组的数量
     @Builder.Default
     @Column(name = "max_workgroups")
     private Integer maxWorkgroups = 20;

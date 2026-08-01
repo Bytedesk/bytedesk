@@ -26,20 +26,30 @@ public class BytedeskPropertiesResponse implements Serializable {
 
     private Boolean debug;
     private String version; 
-    private String licenseKey; // 注意：这是加密后的licenseKey，前端需要先解密再解码
+    private String licenseKey; // 注意：这是前端专用的加密许可证摘要，不再暴露原始 licenseKey
 
     // 
     private Custom custom;
     private Features features;
     private Testing testing;
+    private Organization organization;
+    private Service service;
+    private Ai ai;
+    private Call call;
 
     @Getter
     @Setter
     public static class Custom {
         private Boolean enabled;
+        private Boolean bndEnabled = false;
         private String name;
         private String logo;
+        private String favicon;
         private String description;
+        /**
+         * 外网可访问的上传 API 地址（完整URL，不带上传路径），用于反向代理/多节点场景。
+         */
+        private String uploadApiUrl;
         /**
          * 外网可访问的 MQTT WebSocket 地址（完整URL），用于反向代理场景。
          */
@@ -66,9 +76,13 @@ public class BytedeskPropertiesResponse implements Serializable {
         private String lang = "zh-CN";
         // 
         private Boolean allowRegister;
+        private Boolean autoRegisterOnLogin;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
         private Boolean forceVisitorAuth; // 是否强制访客认证，默认false
+        private Boolean wechatMpSubscribePromptEnabled = false;
+        private String wechatMpSubscribePromptAppId;
+        private String defaultLlmPrompt;
     }
 
     @Getter
@@ -87,6 +101,67 @@ public class BytedeskPropertiesResponse implements Serializable {
     public static class Features {
         // private Integer freeDays = 30;
         private String avatarBaseUrl;
+    }
+
+    @Getter
+    @Setter
+    public static class Organization {
+        private String name;
+        private String code;
+        private Boolean allowCreateOrg = true;
+        private Boolean allowJoinOrg = true;
+        private Integer defaultVipLevel = 0;
+        private Integer defaultVipDays = 365;
+        private Integer defaultMaxMembers = 20;
+        private Integer defaultMaxAgents = 20;
+        private Integer defaultMaxWorkgroups = 20;
+    }
+
+    @Getter
+    @Setter
+    public static class Service {
+        private Boolean agentSeatEnabled = false;
+    }
+
+    @Getter
+    @Setter
+    public static class Ai {
+        // bytedesk.ai.* 聚合后的应用默认值，供前端表单和执行接口共享。
+        private Tts tts;
+        private Asr asr;
+    }
+
+    @Getter
+    @Setter
+    public static class Call {
+        private Freeswitch freeswitch;
+    }
+
+    @Getter
+    @Setter
+    public static class Freeswitch {
+        private String recordingsBaseUrl;
+    }
+
+    @Getter
+    @Setter
+    public static class Tts {
+        private String provider;
+        private String model;
+        private String voice;
+        private String language;
+        private String audioFormat;
+    }
+
+    @Getter
+    @Setter
+    public static class Asr {
+        private String provider;
+        private String model;
+        private String realtimeModel;
+        private String sourceFormat;
+        private Long timeoutMs;
+        private Long pollIntervalMs;
     }
     
 }

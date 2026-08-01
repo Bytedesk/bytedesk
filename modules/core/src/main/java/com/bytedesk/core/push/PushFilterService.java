@@ -14,7 +14,6 @@
 package com.bytedesk.core.push;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,25 +22,35 @@ import com.bytedesk.core.constant.RedisConsts;
 
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Slf4j
 @Service
 public class PushFilterService {
     
     // 验证码发送间隔阈值（单位：秒）
     private static final long VALIDATE_CODE_SEND_INTERVAL_SECONDS = 10 * 60; // 10分钟
 
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    @Autowired
-    private BytedeskProperties bytedeskProperties;
+    private final BytedeskProperties bytedeskProperties;
 
     // 检查是否可以发送验证码
     public Boolean canSendCode(String ip) {
-        if (Boolean.TRUE.equals(bytedeskProperties.getDebug())) {
+        Boolean debugEnabled = bytedeskProperties.getDebug();
+        if (Boolean.TRUE.equals(debugEnabled)) {
+            log.info("PushFilterService bypass rate limit because bytedesk.debug=true, ip={}", ip);
             return true;
         }
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
         Boolean exists = stringRedisTemplate.hasKey(key);
+        log.info("PushFilterService rate limit check, debug={}, ip={}, redisKey={}, exists={}",
+                debugEnabled,
+                ip,
+                key,
+                exists);
         return exists == null || !exists;
     }
 

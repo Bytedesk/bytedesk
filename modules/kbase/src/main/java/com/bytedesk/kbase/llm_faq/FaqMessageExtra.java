@@ -13,38 +13,29 @@
  */
 package com.bytedesk.kbase.llm_faq;
 
-import java.util.List;
+// import com.alibaba.fastjson2.JSON;
+// import com.bytedesk.core.message.MessageExtra;
 
-import com.alibaba.fastjson2.JSON;
-import com.bytedesk.core.message.MessageExtra;
+// import lombok.AllArgsConstructor;
+// import lombok.Data;
+// import lombok.EqualsAndHashCode;
+// import lombok.NoArgsConstructor;
+// import lombok.experimental.SuperBuilder;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+// @Data
+// @EqualsAndHashCode(callSuper = true)
+// @SuperBuilder
+// @AllArgsConstructor
+// @NoArgsConstructor
+// public class FaqMessageExtra extends MessageExtra {
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
-public class FaqMessageExtra extends MessageExtra {
+//     private static final long serialVersionUID = 1L;
 
-    private static final long serialVersionUID = 1L;
-    // 
-    private String faqUid;
-    // 
-    private List<String> images;
-    // 
-    private List<String> attachments;
-    // 
-    private List<FaqAnswer> answerList;
-    // 
-    private List<FaqResponseSimple> relatedFaqs;
-    // 
+//     // Keep only faqUid for rating/statistics tracing.
+//     // FAQ display payload has been migrated to Message.content (FaqContent).
+//     private String faqUid;
 
-    public static FaqMessageExtra fromJson(String json) {
-        return JSON.parseObject(json, FaqMessageExtra.class);
-    }
-}
+//     public static FaqMessageExtra fromJson(String json) {
+//         return JSON.parseObject(json, FaqMessageExtra.class);
+//     }
+// }

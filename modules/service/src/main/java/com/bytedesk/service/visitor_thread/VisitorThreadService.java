@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadExtra;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -50,6 +51,7 @@ import com.bytedesk.service.agent_settings.AgentSettingsRestService;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsEntity;
 import com.bytedesk.service.workgroup_settings.WorkgroupSettingsRestService;
+import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -99,14 +101,17 @@ public class VisitorThreadService
 
     /**
      * 主动触发：判断“访客长时间未发送消息”是否达到阈值，并用 QueueMember.lastNotifiedAt 做节流。
+     * 同时检查 maxTriggerCount 防止无限触发。
      *
      * 规则：
      * - 优先使用 QueueMember.visitorLastMessageAt 作为基准时间
      * - 若为空，则使用 visitorEnqueueAt 作为兜底
      * - 达到 noResponseTimeoutSeconds 才允许触发
      * - 触发后写入 lastNotifiedAt，避免每分钟重复触发
+     * - maxTriggerCount 不为 null 时，notifiedCount >= maxTriggerCount 则拒绝触发
      */
-    public boolean consumeVisitorNoResponseTriggerPermit(String threadUid, int noResponseTimeoutSeconds) {
+    public boolean consumeVisitorNoResponseTriggerPermit(String threadUid, int noResponseTimeoutSeconds,
+            Integer maxTriggerCount) {
         if (!StringUtils.hasText(threadUid) || noResponseTimeoutSeconds <= 0) {
             return false;
         }
@@ -142,6 +147,15 @@ public class VisitorThreadService
             }
         }
 
+        // maxTriggerCount 不为 null 时，检查已触发次数是否达到上限
+        if (maxTriggerCount != null && maxTriggerCount > 0) {
+            int currentCount = queueMember.getNotifiedCount() != null ? queueMember.getNotifiedCount() : 0;
+            if (currentCount >= maxTriggerCount) {
+                return false;
+            }
+            queueMember.setNotifiedCount(currentCount + 1);
+        }
+
         queueMember.setLastNotifiedAt(now);
         queueMemberRestService.saveAsyncBestEffort(queueMember);
         return true;
@@ -172,10 +186,13 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkgroupEntity workgroup) {
+    public ThreadEntity reInitWorkgroupThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkgroupEntity workgroup) {
         //
         String extra = buildWorkgroupExtra(visitorRequest, workgroup);
+        String workgroupString = ServiceConvertUtils.convertToUserProtobufJSONString(workgroup);
         thread.setExtra(extra);
+        thread.setWorkgroup(workgroupString);
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {
@@ -183,7 +200,7 @@ public class VisitorThreadService
         }
         return savedEntity;
     }
-    
+
     public ThreadEntity createAgentThread(VisitorRequest visitorRequest, AgentEntity agent, String topic) {
         //
         // 为避免从缓存加载导致 member/user 为空，这里需要保证 owner 永不为 null
@@ -209,7 +226,7 @@ public class VisitorThreadService
         // 考虑到客服信息发生变化，更新客服信息
         UserProtobuf agentProtobuf = effectiveAgent.toUserProtobuf();
         // 访客信息
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
         String extra = buildAgentExtra(visitorRequest, effectiveAgent);
         //
@@ -222,7 +239,7 @@ public class VisitorThreadService
                 .agent(agentProtobuf.toJson())
                 .userUid(effectiveAgent.getUid()) // 客服uid
                 .owner(owner)
-                .user(visitor)
+                .user(user)
                 .extra(extra)
                 .channel(visitorRequest.getChannel())
                 .orgUid(orgUid)
@@ -260,7 +277,7 @@ public class VisitorThreadService
     public ThreadEntity createRobotThread(VisitorRequest visitorRequest, RobotEntity robot, String topic) {
         // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
         String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robot);
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（支持 debug 下 settingsUid 覆盖）
         String extra = buildRobotExtra(visitorRequest, robot);
         //
@@ -271,7 +288,7 @@ public class VisitorThreadService
                 // .agent(robotString) // 人工客服
                 .robot(robotString) // 机器人
                 .userUid(robot.getUid()) // 机器人uid
-                .user(visitor)
+                .user(user)
                 .channel(visitorRequest.getChannel())
                 .orgUid(robot.getOrgUid())
                 .extra(extra)
@@ -303,7 +320,7 @@ public class VisitorThreadService
     public ThreadEntity createWorkflowThread(VisitorRequest visitorRequest, WorkflowEntity workflow, String topic) {
         //
         String workflowString = ServiceConvertUtils.convertToWorkflowProtobufString(workflow);
-        String visitor = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
+        String user = ServiceConvertUtils.convertToVisitorProtobufJSONString(visitorRequest);
         // 生成 thread.extra（工作流暂时不支持 debug 预览）
         String extra = buildWorkflowExtra(visitorRequest, workflow);
         //
@@ -313,7 +330,7 @@ public class VisitorThreadService
                 .type(ThreadTypeEnum.WORKFLOW.name())
                 .workflow(workflowString) // 工作流
                 .userUid(workflow.getUid()) // 工作流uid
-                .user(visitor)
+                .user(user)
                 .channel(visitorRequest.getChannel())
                 .orgUid(workflow.getOrgUid())
                 .extra(extra)
@@ -325,7 +342,8 @@ public class VisitorThreadService
         return savedEntity;
     }
 
-    public ThreadEntity reInitWorkflowThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread, WorkflowEntity workflow) {
+    public ThreadEntity reInitWorkflowThreadExtra(VisitorRequest visitorRequest, ThreadEntity thread,
+            WorkflowEntity workflow) {
         //
         String extra = buildWorkflowExtra(visitorRequest, workflow);
         thread.setExtra(extra);
@@ -346,15 +364,26 @@ public class VisitorThreadService
      * - 工作流暂时不支持 debug 预览
      */
     private String buildWorkflowExtra(VisitorRequest visitorRequest, WorkflowEntity workflow) {
-        // 工作流暂时没有设置实体，返回空的 JSON 对象
-        return BytedeskConsts.EMPTY_JSON_STRING;
+        return ThreadExtra.builder()
+                .showQuickButtons(false)
+                .workflowCurrentNodeId(null)
+                .workflowWaitingChoiceNodeId(null)
+                .workflowWaitingQuestionNodeId(null)
+            .workflowWaitingFormNodeId(null)
+                .workflowQuestionVariable(null)
+                .workflowQuestionAnswer(null)
+            .workflowFormResponseData(null)
+                .workflowSelectedOptionValue(null)
+                .workflowCompleted(false)
+                .build()
+                .toJson();
     }
 
     /**
      * 根据请求与工作组实体构建 thread.extra
      * - 社交渠道：直接使用请求中的 extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildWorkgroupExtra(VisitorRequest visitorRequest, WorkgroupEntity workgroup) {
         // 社交渠道直接透传
@@ -379,7 +408,8 @@ public class VisitorThreadService
             }
         }
 
-        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings, preview);
+        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings,
+                preview);
 
         RobotToAgentSettingsEntity robotToAgentSettings = null;
         if (settings != null) {
@@ -401,13 +431,29 @@ public class VisitorThreadService
             extra.setManualTransferLabel(null);
         }
 
+        // 读取工作组关联机器人的 hideThinkingProcess 设置，使工作组会话中的 RobotBubble 也能响应
+        RobotRoutingSettingsEntity robotRoutingSettings = null;
+        if (settings != null) {
+            if (preview && settings.getDraftRobotSettings() != null) {
+                robotRoutingSettings = settings.getDraftRobotSettings();
+            } else {
+                robotRoutingSettings = settings.getRobotSettings();
+            }
+        }
+        if (robotRoutingSettings != null && robotRoutingSettings.getRobot() != null) {
+            RobotSettingsEntity robotSettings = robotRoutingSettings.getRobot().getSettings();
+            if (robotSettings != null) {
+                extra.setHideThinkingProcess(Boolean.TRUE.equals(robotSettings.getHideThinkingProcess()));
+            }
+        }
+
         return JSON.toJSONString(extra);
     }
 
     /**
      * 根据请求与客服实体构建 thread.extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildAgentExtra(VisitorRequest visitorRequest, AgentEntity agent) {
         AgentSettingsEntity settings = agent.getSettings();
@@ -420,15 +466,16 @@ public class VisitorThreadService
                 log.warn("Debug preview: agent settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
-        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug())
+                || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-            settings, preview);
+                settings, preview);
     }
 
     /**
      * 根据请求与机器人实体构建 thread.extra
      * - 普通渠道：构建 ServiceSettingsResponseVisitor JSON
-     *   若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
+     * 若 debug=true 且 settingsUid 非空，则优先使用指定 settings 进行预览
      */
     private String buildRobotExtra(VisitorRequest visitorRequest, RobotEntity robot) {
         RobotSettingsEntity settings = robot.getSettings();
@@ -441,9 +488,10 @@ public class VisitorThreadService
                 log.warn("Debug preview: robot settingsUid not found: {}", visitorRequest.getSettingsUid());
             }
         }
-        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug()) || Boolean.TRUE.equals(visitorRequest.getDraft());
+        boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug())
+                || Boolean.TRUE.equals(visitorRequest.getDraft());
         return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-            settings, preview);
+                settings, preview);
     }
 
     public VisitorThreadEntity update(ThreadEntity thread) {

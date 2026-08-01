@@ -13,7 +13,19 @@
  */
 package com.bytedesk.service.message_leave;
 
+import java.util.List;
+
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRepository;
+import com.bytedesk.service.message_leave.event.MessageLeaveCreateEvent;
+import com.bytedesk.service.queue_member.QueueMemberRestService;
+import com.bytedesk.service.utils.ThreadMessageUtil;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,5 +35,43 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class MessageLeaveEventListener {
 
+	private final AgentRepository agentRepository;
+	private final QueueMemberRestService queueMemberRestService;
+	private final IMessageSendService messageSendService;
+
+	@EventListener
+	public void onMessageLeaveCreate(MessageLeaveCreateEvent event) {
+		MessageLeaveEntity messageLeave = event.getMessageLeave();
+		if (messageLeave == null || !StringUtils.hasText(messageLeave.getOrgUid())) {
+			return;
+		}
+
+		List<AgentEntity> agents = agentRepository.findByOrgUidAndDeletedFalse(messageLeave.getOrgUid());
+		if (agents == null || agents.isEmpty()) {
+			log.debug("message leave notify skipped, no agents found: orgUid={}", messageLeave.getOrgUid());
+			return;
+		}
+
+		MessageLeaveExtra payload = MessageLeaveExtra.builder()
+				.uid(messageLeave.getUid())
+				.nickname(messageLeave.getNickname())
+				.contact(messageLeave.getContact())
+				.content(messageLeave.getContent())
+				.type(messageLeave.getType())
+				.images(messageLeave.getImages())
+				.status(messageLeave.getStatus())
+				.build();
+
+		for (AgentEntity agent : agents) {
+			try {
+				var agentQueueThread = queueMemberRestService.createAgentQueueThread(agent);
+				MessageProtobuf message = ThreadMessageUtil.getAgentLeaveMsgSubmitMessage(payload, agentQueueThread);
+				messageSendService.sendProtobufMessage(message);
+			} catch (Exception e) {
+				log.error("Failed to send LEAVE_MSG_SUBMIT notice: orgUid={}, agentUid={}, leaveUid={}, error={}",
+						messageLeave.getOrgUid(), agent.getUid(), messageLeave.getUid(), e.getMessage(), e);
+			}
+		}
+	}
 
 }

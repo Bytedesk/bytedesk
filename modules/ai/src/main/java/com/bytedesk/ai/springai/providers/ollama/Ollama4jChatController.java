@@ -15,7 +15,6 @@ package com.bytedesk.ai.springai.providers.ollama;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,20 +37,22 @@ import io.github.ollama4j.models.generate.OllamaStreamHandler;
 import io.github.ollama4j.models.response.OllamaAsyncResultStreamer;
 import io.github.ollama4j.models.response.OllamaResult;
 import io.github.ollama4j.utils.OptionsBuilder;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 // https://ollama4j.github.io/ollama4j/apis-generate/generate/
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/ollama4j/chat")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.ollama.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class Ollama4jChatController {
 
-    @Autowired
-    @Qualifier("ollama4jApi")
-    private OllamaAPI ollama4jApi;
+    public Ollama4jChatController(
+            @Qualifier("ollama4jApi") OllamaAPI ollama4jApi) {
+        this.ollama4jApi = ollama4jApi;
+    }
+
+
+    private final OllamaAPI ollama4jApi;
 
     @Value("${spring.ai.ollama.chat.options.model}")
     private String ollamaDefaultModel;
@@ -126,7 +127,7 @@ public class Ollama4jChatController {
         };
 
         // 在新线程中调用generate方法以避免阻塞
-        new Thread(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 // 发送开始事件
                 emitter.send(SseEmitter.event().data(JsonResult.success(
@@ -153,7 +154,7 @@ public class Ollama4jChatController {
                     log.debug("Failed to complete emitter with error: {}", completeException.getMessage());
                 }
             }
-        }).start();
+        });
 
         // 返回SseEmitter以开始发送事件
         return emitter;

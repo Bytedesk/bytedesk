@@ -1,5 +1,7 @@
 package com.bytedesk.core.message.content;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseContent;
 
 import lombok.AllArgsConstructor;
@@ -19,9 +21,21 @@ public class FaqContent extends BaseContent {
 
     private String faqUid;
 
-    private String faqQuestion;
+    // Canonical FAQ fields.
+    private String question;
 
-    private String faqAnswer;
+    private String answer;
+
+    // Optional generic display text, usually aligned with answer.
+    private String content;
+
+    private List<String> images;
+
+    private List<String> attachments;
+
+    private List<Object> answerList;
+
+    private List<Object> relatedFaqs;
 
     public static FaqContent fromJson(String json) {
         return BaseContent.fromJson(json, FaqContent.class);

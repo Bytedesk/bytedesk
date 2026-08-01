@@ -84,6 +84,12 @@ public class UserEntity extends BaseEntityNoOrg {
 	private String nickname;
 
 	/**
+	 * Pinyin of the nickname for pinyin-based search (auto-populated by UserEntityListener)
+	 */
+	@Column(name = "nickname_pinyin", length = 512)
+	private String nicknamePinyin;
+
+	/**
 	 * Encrypted password for user authentication
 	 */
 	private String password;
@@ -174,8 +180,6 @@ public class UserEntity extends BaseEntityNoOrg {
 	@Column(name = "password_modified_at")
 	private ZonedDateTime passwordModifiedAt;
 
-	// TODO: 一个用户可以属于多个组织
-
 	/**
 	 * User's current active organization
 	 * Users can belong to multiple organizations but can only be active in one at a time
@@ -197,6 +201,7 @@ public class UserEntity extends BaseEntityNoOrg {
     private Set<RoleEntity> currentRoles = new HashSet<>();
 
 	/**
+	 * 一个用户可以属于多个组织
 	 * User's roles across all organizations
 	 * One user can belong to multiple organizations with different roles in each
 	 */

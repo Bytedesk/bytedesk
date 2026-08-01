@@ -1,75 +1,67 @@
-import { LOG_ENABLE as f } from "../constants/index.js";
-let s = null;
-const L = (t) => {
-  s = t;
-}, n = () => {
-  const t = localStorage.getItem(f);
-  return t === null ? (s == null ? void 0 : s.isDebug) ?? !1 : t === "true";
-}, a = () => {
-  const t = (s == null ? void 0 : s.isDebug) ?? !1;
-  return t && process.env.NODE_ENV === "production" ? 1 : t ? 0 : 1;
-}, c = a(), l = /* @__PURE__ */ new Map(), d = 1e3, p = (t) => {
-  const e = Date.now(), o = l.get(t);
-  return !o || e - o > d ? (l.set(t, e), !0) : !1;
+import { LOG_ENABLE as e } from "../constants/index.js";
+//#region src/utils/logger.ts
+var t = null, n = (e) => {
+	t = e;
 }, r = () => {
-  const t = /* @__PURE__ */ new Date(), e = t.getFullYear(), o = String(t.getMonth() + 1).padStart(2, "0"), i = String(t.getDate()).padStart(2, "0"), u = String(t.getHours()).padStart(2, "0"), g = String(t.getMinutes()).padStart(2, "0"), $ = String(t.getSeconds()).padStart(2, "0");
-  return `${e}-${o}-${i} ${u}:${g}:${$}`;
-}, E = {
-  debug: (t, ...e) => {
-    if (n() && c <= 0) {
-      if (!p(t))
-        return;
-      const o = r();
-      e.length ? console.debug(`${o} [DEBUG]: ${t}`, ...e) : console.debug(`${o} [DEBUG]: ${t}`);
-    }
-  },
-  info: (t, ...e) => {
-    if (n() && c <= 1) {
-      const o = r();
-      e.length ? console.info(`${o} [INFO]: ${t}`, ...e) : console.info(`${o} [INFO]: ${t}`);
-    }
-  },
-  warn: (t, ...e) => {
-    if (n() && c <= 2) {
-      const o = r();
-      e.length ? console.warn(`${o} [WARN]: ${t}`, ...e) : console.warn(`${o} [WARN]: ${t}`);
-    }
-  },
-  error: (t, ...e) => {
-    const o = r();
-    e.length ? console.error(`${o} [ERROR]: ${t}`, ...e) : console.error(`${o} [ERROR]: ${t}`);
-  },
-  // 输出日志的快捷方法
-  debugIf: (t, ...e) => {
-    n() && E.debug(t, ...e);
-  },
-  // 新增的日志方法
-  log: (t, ...e) => {
-    if (n()) {
-      const o = r();
-      e.length ? console.log(`${o} [LOG]: ${t}`, ...e) : console.log(`${o} [LOG]: ${t}`);
-    }
-  },
-  // 分组日志
-  group: (t) => {
-    n() && console.group(`[ByteDesk] ${t}`);
-  },
-  groupEnd: () => {
-    n() && console.groupEnd();
-  },
-  // 表格日志
-  table: (t) => {
-    n() && console.table(t);
-  },
-  // 时间日志
-  time: (t) => {
-    n() && console.time(`[ByteDesk] ${t}`);
-  },
-  timeEnd: (t) => {
-    n() && console.timeEnd(`[ByteDesk] ${t}`);
-  }
+	let n = localStorage.getItem(e);
+	return n === null ? t?.isDebug ?? !1 : n === "true";
+}, i = (() => {
+	let e = t?.isDebug ?? !1;
+	return e && process.env.NODE_ENV === "production" ? 1 : +!e;
+})(), a = /* @__PURE__ */ new Map(), o = 1e3, s = (e) => {
+	let t = Date.now(), n = a.get(e);
+	return !n || t - n > o ? (a.set(e, t), !0) : !1;
+}, c = () => {
+	let e = /* @__PURE__ */ new Date();
+	return `${e.getFullYear()}-${String(e.getMonth() + 1).padStart(2, "0")}-${String(e.getDate()).padStart(2, "0")} ${String(e.getHours()).padStart(2, "0")}:${String(e.getMinutes()).padStart(2, "0")}:${String(e.getSeconds()).padStart(2, "0")}`;
+}, l = {
+	debug: (e, ...t) => {
+		if (r() && i <= 0) {
+			if (!s(e)) return;
+			let n = c();
+			t.length ? console.debug(`${n} [DEBUG]: ${e}`, ...t) : console.debug(`${n} [DEBUG]: ${e}`);
+		}
+	},
+	info: (e, ...t) => {
+		if (r() && i <= 1) {
+			let n = c();
+			t.length ? console.info(`${n} [INFO]: ${e}`, ...t) : console.info(`${n} [INFO]: ${e}`);
+		}
+	},
+	warn: (e, ...t) => {
+		if (r() && i <= 2) {
+			let n = c();
+			t.length ? console.warn(`${n} [WARN]: ${e}`, ...t) : console.warn(`${n} [WARN]: ${e}`);
+		}
+	},
+	error: (e, ...t) => {
+		let n = c();
+		t.length ? console.error(`${n} [ERROR]: ${e}`, ...t) : console.error(`${n} [ERROR]: ${e}`);
+	},
+	debugIf: (e, ...t) => {
+		r() && l.debug(e, ...t);
+	},
+	log: (e, ...t) => {
+		if (r()) {
+			let n = c();
+			t.length ? console.log(`${n} [LOG]: ${e}`, ...t) : console.log(`${n} [LOG]: ${e}`);
+		}
+	},
+	group: (e) => {
+		r() && console.group(`[ByteDesk] ${e}`);
+	},
+	groupEnd: () => {
+		r() && console.groupEnd();
+	},
+	table: (e) => {
+		r() && console.table(e);
+	},
+	time: (e) => {
+		r() && console.time(`[ByteDesk] ${e}`);
+	},
+	timeEnd: (e) => {
+		r() && console.timeEnd(`[ByteDesk] ${e}`);
+	}
 };
-export {
-  E as default,
-  L as setGlobalConfig
-};
+//#endregion
+export { l as default, n as setGlobalConfig };

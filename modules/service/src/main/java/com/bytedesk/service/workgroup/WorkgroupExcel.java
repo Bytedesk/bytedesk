@@ -40,7 +40,11 @@ public class WorkgroupExcel {
     @ColumnWidth(15)
     private String status;
 
-    @ExcelProperty(index = 3, value = "是否启用")
+    @ExcelProperty(index = 3, value = "类型")
+    @ColumnWidth(20)
+    private String type;
+
+    @ExcelProperty(index = 4, value = "是否启用")
     @ColumnWidth(15)
     private Boolean enabled;
 

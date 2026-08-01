@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,9 +42,10 @@ public class LeadRestController extends BaseRestController<LeadRequest, LeadRest
 
     private final LeadRestService leadRestService;
 
-    @ActionAnnotation(title = "Lead", action = "组织查询", description = "query lead by org")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query lead by org")
     @Operation(summary = "Query Leads by Organization", description = "Retrieve leads for the current organization")
     @PreAuthorize(LeadPermissions.HAS_LEAD_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(LeadRequest request) {
         
@@ -50,9 +54,10 @@ public class LeadRestController extends BaseRestController<LeadRequest, LeadRest
         return ResponseEntity.ok(JsonResult.success(leads));
     }
 
-    @ActionAnnotation(title = "Lead", action = "用户查询", description = "query lead by user")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query lead by user")
     @Operation(summary = "Query Leads by User", description = "Retrieve leads for the current user")
     @PreAuthorize(LeadPermissions.HAS_LEAD_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(LeadRequest request) {
         
@@ -61,9 +66,10 @@ public class LeadRestController extends BaseRestController<LeadRequest, LeadRest
         return ResponseEntity.ok(JsonResult.success(leads));
     }
 
-    @ActionAnnotation(title = "Lead", action = "查询详情", description = "query lead by uid")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query lead by uid")
     @Operation(summary = "Query Lead by UID", description = "Retrieve a specific lead by its unique identifier")
     @PreAuthorize(LeadPermissions.HAS_LEAD_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(LeadRequest request) {
         
@@ -72,40 +78,43 @@ public class LeadRestController extends BaseRestController<LeadRequest, LeadRest
         return ResponseEntity.ok(JsonResult.success(lead));
     }
 
-    @ActionAnnotation(title = "Lead", action = "新建", description = "create lead")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_CREATE, description = "create lead")
     @Operation(summary = "Create Lead", description = "Create a new lead")
     @Override
     @PreAuthorize(LeadPermissions.HAS_LEAD_CREATE)
-    public ResponseEntity<?> create(LeadRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody LeadRequest request) {
         
         LeadResponse lead = leadRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(lead));
     }
 
-    @ActionAnnotation(title = "Lead", action = "更新", description = "update lead")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_UPDATE, description = "update lead")
     @Operation(summary = "Update Lead", description = "Update an existing lead")
     @Override
     @PreAuthorize(LeadPermissions.HAS_LEAD_UPDATE)
-    public ResponseEntity<?> update(LeadRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody LeadRequest request) {
         
         LeadResponse lead = leadRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(lead));
     }
 
-    @ActionAnnotation(title = "Lead", action = "删除", description = "delete lead")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_DELETE, description = "delete lead")
     @Operation(summary = "Delete Lead", description = "Delete a lead")
     @Override
     @PreAuthorize(LeadPermissions.HAS_LEAD_DELETE)
-    public ResponseEntity<?> delete(LeadRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody LeadRequest request) {
         
         leadRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Lead", action = "导出", description = "export lead")
+    @ActionAnnotation(title = I18Consts.I18N_LEAD, action = I18Consts.I18N_ACTION_EXPORT, description = "export lead")
     @Operation(summary = "Export Leads", description = "Export leads to Excel format")
     @Override
     @PreAuthorize(LeadPermissions.HAS_LEAD_EXPORT)

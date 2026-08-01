@@ -21,7 +21,7 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 
 import jakarta.persistence.Column;
@@ -148,6 +148,11 @@ public class FaqEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "is_enabled")
     private Boolean enabled = true;
+
+    // 点击 FAQ 时是否改走机器人消息链路，避免进入默认 FAQ 点击流
+    @Builder.Default
+    @Column(name = "route_to_robot")
+    private Boolean routeToRobot = false;
 
     // 有效开始日期
     @Builder.Default

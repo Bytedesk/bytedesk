@@ -1,0 +1,83 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql|oracle|kingbase9>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-webrtc.yaml up -d
+# 说明：WebRTC 音视频客服组件，包含 coturn 与 janus，可独立启动，也可与 compose-scenario-call.yaml 组合使用
+services:
+  # Coturn TURN server
+  # https://hub.docker.com/r/coturn/coturn
+  # 参考：https://github.com/coturn/coturn/blob/master/docker/coturn/README.md
+  # 说明：TURN 需要开放一段 UDP 中继端口范围（RFC 5766）。Docker 对超大端口段映射性能较差，
+  # 这里按官方示例收敛到 49160-49200（可按需调整）。
+  bytedesk-coturn:
+    image: coturn/coturn:latest
+    container_name: coturn-bytedesk
+    restart: always
+    ports:
+      - "13478:3478"
+      - "13478:3478/udp"
+      - "15349:5349"
+      - "15349:5349/udp"
+      - "49160-49200:49160-49200/udp"
+    command:
+      - -n
+      - --log-file=stdout
+      - --min-port=49160
+      - --max-port=49200
+      - --lt-cred-mech
+      - --fingerprint
+      - --no-multicast-peers
+      - --no-cli
+      - --no-tlsv1
+      - --realm=${COTURN_REALM:-bytedesk.local}
+      - --user=${COTURN_USER}:${COTURN_PASS}
+    volumes:
+      - coturn_data:/var/lib/coturn
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "turnutils_stunclient -p 3478 127.0.0.1 >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 15s
+
+  # Janus WebRTC Gateway
+  # https://github.com/meetecho/janus-gateway
+  # [github](https://github.com/Bytedesk/bytedesk-janus)
+  # [janus docker镜像](https://hub.docker.com/r/bytedesk/janus)
+  # Janus WebRTC Gateway（仅启动 Janus，不启用 nginx）
+  # 启动后可在浏览器访问端口（用于连通性），但直接 GET 通常会返回 404（正常）：
+  # - http://localhost:18089
+  # - ws://localhost:18188/janus （WebSocket API，需通过客户端连接，非普通网页）
+  # 正确检查方式（HTTP API 需 POST 到 /janus）：
+  # curl -sS -X POST -H 'Content-Type: application/json' --data '{"janus":"ping","transaction":"check"}' http://localhost:18089/janus
+  bytedesk-janus:
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/janus:latest
+    container_name: janus-bytedesk
+    restart: always
+    ports:
+      - "18089:8088/tcp"
+      - "18090:8089/tcp"
+      - "18188:8188/tcp"
+      - "17188:7188/tcp"
+      - "18178:3478/udp"
+      - "18179:3478/tcp"
+      - "11000-11200:10000-10200/udp"
+    command: ["/usr/local/bin/janus", "-F", "/usr/local/etc/janus"]
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ../janus/etc/janus:/usr/local/etc/janus:ro
+    depends_on:
+      bytedesk-coturn:
+        condition: service_healthy
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sS -X POST -H 'Content-Type: application/json' --data '{\"janus\":\"ping\",\"transaction\":\"healthcheck\"}' http://127.0.0.1:8088/janus | grep -qi pong"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  coturn_data:
+    name: bytedesk_coturn_data

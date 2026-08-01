@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import com.bytedesk.ai.utils.AIFileUtils;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -36,7 +36,6 @@ import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageTypeEnum;
 
 import ai.z.openapi.ZhipuAiClient;
 import ai.z.openapi.service.model.ChatCompletionCreateParams;
@@ -55,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.message.content.ImageContent;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.content.VideoContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.content.FileContent;
 import com.bytedesk.core.message.content.AudioContent;
 
@@ -62,15 +62,21 @@ import com.bytedesk.core.message.content.AudioContent;
 @Service
 public class ZhipuaiMultiModelService extends BaseSpringAIService {
 
-    @Autowired
-    private LlmProviderRestService llmProviderRestService;
+    public ZhipuaiMultiModelService(
+            @Qualifier("zhipuAiClient") ObjectProvider<ZhipuAiClient> defaultClientProvider,
+            LlmProviderRestService llmProviderRestService,
+            TokenUsageHelper tokenUsageHelper) {
+        this.llmProviderRestService = llmProviderRestService;
+        this.tokenUsageHelper = tokenUsageHelper;
+        this.defaultClient = defaultClientProvider.getIfAvailable();
+    }
 
-    @Autowired(required = false)
-    @Qualifier("zhipuAiClient")
-    private ZhipuAiClient defaultClient;
 
-    @Autowired
-    private TokenUsageHelper tokenUsageHelper;
+    private final LlmProviderRestService llmProviderRestService;
+
+    private final ZhipuAiClient defaultClient;
+
+    private final TokenUsageHelper tokenUsageHelper;
 
     private static final String DEFAULT_MULTI_MODEL = "glm-4.1v-thinking-flash";
     // zai-sdk 角色/思维模式常量
@@ -113,6 +119,9 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
             return ZhipuAiClient.builder().apiKey(apiKey).build();
         } catch (Exception e) {
             log.error("Failed to create dynamic ZhipuAiClient, using default", e);
+            return defaultClient;
+        } catch (LinkageError e) {
+            log.error("Failed to create dynamic ZhipuAiClient due to SDK/runtime incompatibility, using default", e);
             return defaultClient;
         }
     }
@@ -657,9 +666,26 @@ public class ZhipuaiMultiModelService extends BaseSpringAIService {
                                                     pieceTrim,
                                                     reasoning,
                                                     sourceReferences);
+                                        } else if (reasoning != null && !reasoning.isEmpty()) {
+                                            // 某些 thinking 模型会先只返回推理内容，此时也要把 reasonContent 推到前端。
+                                            sseMessageHelper.sendStreamMessage(
+                                                    messageProtobufQuery,
+                                                    messageProtobufReply,
+                                                    emitter,
+                                                    "",
+                                                    reasoning,
+                                                    sourceReferences);
                                         } else {
                                             log.debug("SSE piece is empty after trim, delta={}", delta);
                                         }
+                                    } else if (reasoning != null && !reasoning.isEmpty()) {
+                                        sseMessageHelper.sendStreamMessage(
+                                                messageProtobufQuery,
+                                                messageProtobufReply,
+                                                emitter,
+                                                "",
+                                                reasoning,
+                                                sourceReferences);
                                     } else {
                                         log.debug("SSE piece is null, delta={}", delta);
                                     }

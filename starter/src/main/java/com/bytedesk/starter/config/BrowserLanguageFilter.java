@@ -83,28 +83,30 @@ public class BrowserLanguageFilter extends OncePerRequestFilter {
         if (localeStr == null || localeStr.isEmpty()) {
             return Locale.getDefault();
         }
+
+        String normalized = localeStr.trim().replace('_', '-');
         
         // 支持的语言：en、zh_CN、zh_TW
-        if ("en".equalsIgnoreCase(localeStr)) {
+        if ("en".equalsIgnoreCase(normalized)) {
             return Locale.ENGLISH;
-        } else if ("zh_CN".equalsIgnoreCase(localeStr) || "zh-CN".equalsIgnoreCase(localeStr)) {
+        } else if ("zh-CN".equalsIgnoreCase(normalized)) {
             return Locale.SIMPLIFIED_CHINESE;
-        } else if ("zh_TW".equalsIgnoreCase(localeStr) || "zh-TW".equalsIgnoreCase(localeStr)) {
+        } else if ("zh-TW".equalsIgnoreCase(normalized)) {
             return Locale.TRADITIONAL_CHINESE;
-        } else if (localeStr.startsWith("zh")) {
+        } else if (normalized.toLowerCase(Locale.ROOT).startsWith("zh")) {
             return Locale.SIMPLIFIED_CHINESE; // 默认中文使用简体中文
         }
         
         // 尝试标准解析
         try {
-            String[] parts = localeStr.split("[_-]");
-            if (parts.length > 1) {
-                return new Locale(parts[0], parts[1]);
-            } else {
-                return new Locale(parts[0]);
+            Locale parsed = Locale.forLanguageTag(normalized);
+            if (parsed != null && parsed.getLanguage() != null && !parsed.getLanguage().isEmpty()) {
+                return parsed;
             }
         } catch (Exception e) {
-            return Locale.getDefault();
+            // ignore and fallback
         }
+
+        return Locale.getDefault();
     }
 }

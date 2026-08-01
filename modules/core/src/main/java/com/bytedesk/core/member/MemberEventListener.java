@@ -36,9 +36,9 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.event.ThreadCreateEvent;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionCacheService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
@@ -67,7 +67,7 @@ public class MemberEventListener {
 
     private final UidUtils uidUtils;
 
-    private final TopicCacheService topicCacheService;
+    private final TopicSubscriptionCacheService topicSubscriptionCacheService;
 
     private final UploadRestService uploadRestService;
     
@@ -80,19 +80,31 @@ public class MemberEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
         log.info("organization created: {}", organization.getName());
+        var existingMemberOptional = memberRestService.findByUserAndOrgUid(user, orgUid);
+        if (existingMemberOptional.isPresent()) {
+            MemberEntity existingMember = existingMemberOptional.get();
+            existingMember.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
+            memberRestService.save(existingMember);
+            return;
+        }
         //
-        DepartmentRequest departmentRequest = DepartmentRequest.builder()
-                .uid(uidUtils.getUid())
-                .name(DepartmentConsts.DEPT_ADMIN)
-                .description("Description for" + DepartmentConsts.DEPT_ADMIN)
-                .orgUid(orgUid)
-                .build();
-        DepartmentResponse departmentResponse = departmentRestService.create(departmentRequest);
+        DepartmentResponse departmentResponse = departmentRestService
+                .findByNameAndOrgUid(DepartmentConsts.DEPT_ADMIN, orgUid)
+                .map(departmentRestService::convertToResponse)
+                .orElseGet(() -> {
+                    DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                            .uid(uidUtils.getUid())
+                            .name(DepartmentConsts.DEPT_ADMIN)
+                            .description("Description for" + DepartmentConsts.DEPT_ADMIN)
+                            .orgUid(orgUid)
+                            .build();
+                    return departmentRestService.create(departmentRequest);
+                });
         //
         if (departmentResponse != null) {
-            // DEFAULT_MEMBER_UID 是 member uid，不是 role uid；这里需要授予默认管理员角色
-            Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
+            // DEFAULT_ROLE_ADMIN_UID 是组织管理员角色 uid；组织 owner 默认拥有全平台登录权限
             // 创建团队成员
             MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
             memberRequest.setJobNo("001");
@@ -100,6 +112,7 @@ public class MemberEventListener {
             memberRequest.setSeatNo("001");
             memberRequest.setTelephone("001");
             memberRequest.setMobile(user.getMobile());
+            memberRequest.setCountry(user.getCountry());
             memberRequest.setStatus(MemberStatusEnum.ACTIVE.name());
             memberRequest.setRoleUids(roleUids);
             memberRequest.setDeptUid(departmentResponse.getUid());
@@ -125,11 +138,11 @@ public class MemberEventListener {
         log.info("member created: {}", member.getUid());
         // 默认订阅成员主题
         String topic = TopicUtils.formatOrgMemberTopic(member.getUid());
-        TopicRequest request = TopicRequest.builder()
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
                 .topic(topic)
                 .userUid(user.getUid())
                 .build();
-        topicCacheService.pushRequest(request);
+        topicSubscriptionCacheService.pushRequest(request);
     }
 
     @EventListener

@@ -13,8 +13,32 @@
  */
 package com.bytedesk.core.message;
 
-import org.springframework.stereotype.Service;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRepository;
+import com.bytedesk.core.message.content.NoticeContent;
+import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.utils.MessageUtils;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
+import com.bytedesk.core.thread.ThreadEntity;
+import com.bytedesk.core.thread.ThreadResponse;
+import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -25,9 +49,20 @@ public class MessageService {
 
     private final MessagePersistCache messagePersistCache;
 
+    private final ThreadRestService threadRestService;
+
+    private final IMessageSendService messageSendService;
+
+    private final UidUtils uidUtils;
+
+    private final UserRepository userRepository;
+
+    private final MemberRepository memberRepository;
+
     public String processMessageJson(String messageJson, Boolean isRobot) {
 
         MessageProtobuf messageProtobuf = MessageProtobuf.fromJson(messageJson); 
+        // validateThreadReplyPermission(messageProtobuf);
 
         // 收到消息，更新消息状态为发送成功
         if (messageProtobuf.getStatus().equals(MessageStatusEnum.SENDING)) {
@@ -48,6 +83,221 @@ public class MessageService {
         messagePersistCache.pushForPersist(messageJsonResult);
 
         return messageJsonResult;
+    }
+
+    // private void validateThreadReplyPermission(MessageProtobuf messageProtobuf) {
+    //     if (messageProtobuf == null || messageProtobuf.getThread() == null || !StringUtils.hasText(messageProtobuf.getThread().getUid())) {
+    //         return;
+    //     }
+    //     UserProtobuf sender = messageProtobuf.getUser();
+    //     if (sender == null || !Boolean.TRUE.equals(sender.isAgent())) {
+    //         return;
+    //     }
+
+    //     ThreadEntity thread = threadRestService.findByUid(messageProtobuf.getThread().getUid()).orElse(null);
+    //     if (thread == null || !ThreadTypeEnum.WORKGROUP.name().equals(thread.getType())) {
+    //         return;
+    //     }
+    //     if (canAgentReplyInThread(thread, sender.getUid())) {
+    //         return;
+    //     }
+    //     throw new RuntimeException("agent has no reply permission in current thread");
+    // }
+
+    // private boolean canAgentReplyInThread(ThreadEntity thread, String senderUid) {
+    //     if (!StringUtils.hasText(senderUid)) {
+    //         return false;
+    //     }
+    //     UserEntity owner = thread.getOwner();
+    //     if (owner != null && senderUid.equals(owner.getUid())) {
+    //         return true;
+    //     }
+    //     return containsParticipantUid(thread.getAssistants(), senderUid)
+    //             || containsParticipantUid(thread.getInvites(), senderUid);
+    // }
+
+    // private boolean containsParticipantUid(List<String> participants, String senderUid) {
+    //     if (participants == null || participants.isEmpty() || !StringUtils.hasText(senderUid)) {
+    //         return false;
+    //     }
+    //     return participants.stream()
+    //             .map(UserProtobuf::fromJson)
+    //             .filter(java.util.Objects::nonNull)
+    //             .anyMatch(item -> senderUid.equals(item.getUid()));
+    // }
+
+    public void sendForceLogoutMessage(UserEntity user, String orgUid, String sourceType, String sourceUid, String reason) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return;
+        }
+
+        ThreadEntity thread = getOrCreateSystemThread(user);
+        String content = JSON.toJSONString(Map.of(
+            "reason", StringUtils.hasText(reason) ? reason : I18Consts.I18N_FORCE_LOGOUT_REASON,
+                "sourceType", StringUtils.hasText(sourceType) ? sourceType : "UNKNOWN",
+                "sourceUid", StringUtils.hasText(sourceUid) ? sourceUid : "",
+                "action", "FORCE_LOGOUT"));
+
+        MessageProtobuf message = MessageUtils.createKickoffMessage(
+                uidUtils.getUid(),
+                thread.toProtobuf(),
+                orgUid,
+                content);
+        messageSendService.sendProtobufMessage(message);
+    }
+
+    public void sendSystemNotice(NoticeContent noticeContent) {
+        validateNoticeContent(noticeContent);
+        Set<UserEntity> recipients = resolveRecipients(noticeContent);
+        for (UserEntity recipient : recipients) {
+            sendSystemNoticeToRecipient(noticeContent, recipient, false);
+        }
+    }
+
+    public void sendSystemLoginNotice(NoticeContent noticeContent) {
+        validateNoticeContent(noticeContent);
+        Set<UserEntity> recipients = resolveRecipients(noticeContent);
+        for (UserEntity recipient : recipients) {
+            sendSystemNoticeToRecipient(noticeContent, recipient, true);
+        }
+    }
+
+    public String sendNoticeMessage(UserEntity user, String orgUid, String content) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return null;
+        }
+
+        ThreadEntity thread = getOrCreateSystemThread(user);
+        String messageUid = uidUtils.getUid();
+        MessageProtobuf message = MessageUtils.createNoticeMessage(
+                messageUid,
+                thread.toProtobuf(),
+                orgUid,
+                content);
+        messageSendService.sendProtobufMessage(message);
+        return messageUid;
+    }
+
+    public String sendLoginNoticeMessage(UserEntity user, String orgUid, String content) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return null;
+        }
+
+        ThreadEntity thread = getOrCreateSystemThread(user);
+        String messageUid = uidUtils.getUid();
+        MessageProtobuf message = MessageUtils.createLoginNoticeMessage(messageUid, thread.toProtobuf(), orgUid, content);
+        messageSendService.sendProtobufMessage(message);
+        return messageUid;
+    }
+
+    private void sendSystemNoticeToRecipient(NoticeContent sourceNoticeContent, UserEntity recipient, boolean loginNotice) {
+        String orgUid = resolveRecipientOrgUid(sourceNoticeContent, recipient);
+        NoticeContent noticeContent = NoticeContent.builder()
+                .noticeUid(sourceNoticeContent.getNoticeUid())
+                .title(sourceNoticeContent.getTitle())
+                .content(sourceNoticeContent.getContent())
+                .type(resolveType(sourceNoticeContent, loginNotice))
+                .status(resolveStatus(sourceNoticeContent, loginNotice))
+                .level(normalizeLevel(sourceNoticeContent.getLevel()).name())
+                .orgUid(orgUid)
+                .userUid(recipient.getUid())
+                .deptUid(sourceNoticeContent.getDeptUid())
+                .senderUid(sourceNoticeContent.getSenderUid())
+                .senderNickname(sourceNoticeContent.getSenderNickname())
+                .extra(resolveExtra(sourceNoticeContent))
+                .build();
+
+        if (loginNotice) {
+            sendLoginNoticeMessage(recipient, orgUid, noticeContent.toJson());
+            return;
+        }
+        sendNoticeMessage(recipient, orgUid, noticeContent.toJson());
+    }
+
+    private void validateNoticeContent(NoticeContent noticeContent) {
+        Assert.notNull(noticeContent, "Notice content cannot be null");
+        Assert.hasText(noticeContent.getTitle(), "Notice title cannot be null or empty");
+        Assert.hasText(noticeContent.getContent(), "Notice content cannot be null or empty");
+    }
+
+    private Set<UserEntity> resolveRecipients(NoticeContent noticeContent) {
+        LevelEnum level = normalizeLevel(noticeContent.getLevel());
+        return switch (level) {
+            case PLATFORM -> resolvePlatformRecipients();
+            case ORGANIZATION -> resolveOrganizationRecipients(noticeContent.getOrgUid());
+            case DEPARTMENT -> resolveDepartmentRecipients(noticeContent.getDeptUid());
+            case USER -> new LinkedHashSet<>(List.of(userRepository.findByUid(noticeContent.getUserUid())
+                    .orElseThrow(() -> new RuntimeException("Notice recipient not found: " + noticeContent.getUserUid()))));
+            default -> throw new RuntimeException("Unsupported notice level: " + level.name());
+        };
+    }
+
+    private Set<UserEntity> resolvePlatformRecipients() {
+        return new LinkedHashSet<>(userRepository.findAll().stream()
+                .filter(user -> !user.isDeleted())
+                .toList());
+    }
+
+    private Set<UserEntity> resolveOrganizationRecipients(String orgUid) {
+        Assert.hasText(orgUid, "Organization UID cannot be empty when sending organization notice");
+        return new LinkedHashSet<>(memberRepository.findAll().stream()
+                .filter(member -> !member.isDeleted())
+                .filter(member -> orgUid.equals(member.getOrgUid()))
+                .map(MemberEntity::getUser)
+                .filter(java.util.Objects::nonNull)
+                .toList());
+    }
+
+    private Set<UserEntity> resolveDepartmentRecipients(String deptUid) {
+        Assert.hasText(deptUid, "Department UID cannot be empty when sending department notice");
+        return new LinkedHashSet<>(memberRepository.findByDeptUidAndDeletedFalse(deptUid).stream()
+                .map(MemberEntity::getUser)
+                .filter(java.util.Objects::nonNull)
+                .toList());
+    }
+
+    private LevelEnum normalizeLevel(String level) {
+        if (!StringUtils.hasText(level)) {
+            return LevelEnum.USER;
+        }
+        return LevelEnum.fromValue(level);
+    }
+
+    private String resolveType(NoticeContent noticeContent, boolean loginNotice) {
+        if (loginNotice) {
+            return MessageNoticeTypeEnum.LOGIN.name();
+        }
+        return StringUtils.hasText(noticeContent.getType()) ? noticeContent.getType() : MessageNoticeTypeEnum.GENERAL.name();
+    }
+
+    private String resolveStatus(NoticeContent noticeContent, boolean loginNotice) {
+        if (StringUtils.hasText(noticeContent.getStatus())) {
+            return noticeContent.getStatus();
+        }
+        return loginNotice ? MessageStatusEnum.READ.name() : MessageStatusEnum.SUCCESS.name();
+    }
+
+    private String resolveRecipientOrgUid(NoticeContent noticeContent, UserEntity recipient) {
+        if (StringUtils.hasText(noticeContent.getOrgUid())) {
+            return noticeContent.getOrgUid();
+        }
+        return recipient.getOrgUid();
+    }
+
+    private String resolveExtra(NoticeContent noticeContent) {
+        return StringUtils.hasText(noticeContent.getExtra()) ? noticeContent.getExtra() : "{}";
+    }
+
+    private ThreadEntity getOrCreateSystemThread(UserEntity user) {
+        String topic = TopicUtils.getSystemTopic(user.getUid());
+        Optional<ThreadEntity> existing = threadRestService.findFirstByTopicAndOwner(topic, user);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        ThreadResponse created = threadRestService.createSystemPublicAccountThread(user);
+        return threadRestService.findByUid(created.getUid())
+                .orElseThrow(() -> new RuntimeException("Failed to create system notice thread for user: " + user.getUid()));
     }
 
 

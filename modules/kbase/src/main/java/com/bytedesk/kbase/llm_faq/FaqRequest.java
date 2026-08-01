@@ -103,6 +103,9 @@ public class FaqRequest extends BaseRequest {
     private Boolean enabled = true;
 
     @Builder.Default
+    private Boolean routeToRobot = false;
+
+    @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
     @Builder.Default

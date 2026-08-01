@@ -37,11 +37,15 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.exception.UsernameExistsException;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.exception.OrganizationI18nExceptions;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +58,8 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     private final UserService userService;
 
     private final UserDetailsServiceImpl userDetailsService;
+
+    private final MemberRepository memberRepository;
 
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -69,7 +75,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public Page<UserResponse> queryByUser(UserRequest request) {
         UserEntity user = authService.getUser();
         if (user == null) {
-            throw new RuntimeException("Login required");
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
         }
         request.setUserUid(user.getUid());
         // 
@@ -95,13 +101,13 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public UserResponse getProfile() {
         UserEntity user = authService.getUser(); // 返回的是缓存，导致修改后的数据无法获取
         if (user == null) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
         Optional<UserEntity> userOptional = userRepository.findByUidWithOrganizations(user.getUid());
         if (userOptional.isPresent()) {
             return convertToResponse(userOptional.get());
         } else {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -112,12 +118,12 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public List<OrganizationResponseSimple> getOrganizations() {
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new RuntimeException("Login required");
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
         }
 
         // 直接查库拿 managed entity，避免从缓存拿到 detached entity 导致懒加载失败
         UserEntity managedUser = userRepository.findByUid(authUser.getUid())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException(I18Consts.I18N_USER_NOT_FOUND));
 
         // 保持插入顺序，优先把 currentOrganization 放在第一位
         LinkedHashMap<String, OrganizationResponseSimple> result = new LinkedHashMap<>();
@@ -156,11 +162,34 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new RuntimeException("Login required");
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
         }
 
         UserEntity managedUser = userRepository.findByUid(authUser.getUid())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return switchUserOrganizationInternal(managedUser, orgUid, true);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public UserResponse switchUserOrganization(String userUid, String orgUid) {
+        if (!StringUtils.hasText(userUid)) {
+            throw new RuntimeException("uid is required");
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        UserEntity managedUser = userRepository.findByUidWithOrganizations(userUid)
+            .orElseThrow(() -> new RuntimeException(I18Consts.I18N_USER_NOT_FOUND));
+
+        return switchUserOrganizationInternal(managedUser, orgUid, false);
+    }
+
+    private UserResponse switchUserOrganizationInternal(UserEntity managedUser, String orgUid, boolean refreshSecurityContext) {
+        if (managedUser == null) {
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
+        }
 
         // membership check
         if (!managedUser.isSuperUser()) {
@@ -185,7 +214,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
             }
 
             if (!isMember) {
-                throw new RuntimeException("Access denied");
+                throw new RuntimeException(I18Consts.I18N_ACCESS_DENIED);
             }
         }
 
@@ -213,25 +242,61 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         UserEntity saved = userService.save(ensured);
 
         // 5) refresh security context so AuthService.getUser() sees latest org/roles immediately
-        try {
-            Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
-            String platform = StringUtils.hasText(saved.getPlatform()) ? saved.getPlatform() : PlatformEnum.BYTEDESK.name();
-            UserDetailsImpl refreshedDetails = userDetailsService.loadUserByUsernameAndPlatform(saved.getUsername(), platform);
+        if (refreshSecurityContext) {
+            try {
+                Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+                String platform = StringUtils.hasText(saved.getPlatform()) ? saved.getPlatform() : PlatformEnum.BYTEDESK.name();
+                UserDetailsImpl refreshedDetails = userDetailsService.loadUserByUsernameAndPlatform(saved.getUsername(), platform);
 
-            UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
-                    refreshedDetails,
-                    currentAuth != null ? currentAuth.getCredentials() : null,
-                    refreshedDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken newAuth = new UsernamePasswordAuthenticationToken(
+                        refreshedDetails,
+                        currentAuth != null ? currentAuth.getCredentials() : null,
+                        refreshedDetails.getAuthorities());
 
-            if (currentAuth != null) {
-                newAuth.setDetails(currentAuth.getDetails());
+                if (currentAuth != null) {
+                    newAuth.setDetails(currentAuth.getDetails());
+                }
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            } catch (Exception ignored) {
+                // If refresh fails, switching is still persisted; client can re-fetch profile.
             }
-            SecurityContextHolder.getContext().setAuthentication(newAuth);
-        } catch (Exception ignored) {
-            // If refresh fails, switching is still persisted; client can re-fetch profile.
         }
 
         return convertToResponse(saved);
+    }
+
+    /**
+     * 用户主动退出组织（只能退出非当前组织）
+     * - 软删除该用户在该组织下的 MemberEntity
+     * - 移除 UserEntity.userOrganizationRoles 中该组织的关联
+     */
+    @Transactional
+    public void leaveOrganization(String orgUid) {
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+
+        // 不允许退出当前组织，需先切换到其他组织
+        if (authUser.getCurrentOrganization() != null
+                && StringUtils.hasText(authUser.getCurrentOrganization().getUid())
+                && orgUid.equals(authUser.getCurrentOrganization().getUid())) {
+            throw new RuntimeException("Cannot leave current organization, please switch to another organization first");
+        }
+
+        // 软删除该用户在该组织下的 MemberEntity
+        memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(authUser.getUid(), orgUid)
+                .ifPresent(member -> {
+                    member.setDeleted(true);
+                    memberRepository.save(member);
+                });
+
+        // 移除 user-organization 角色关联
+        userService.removeUserFromOrganization(authUser.getUid(), orgUid);
     }
 
     @Override
@@ -243,19 +308,19 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public UserResponse update(UserRequest request) {
         UserEntity authUser = authService.getUser();
         if (authUser == null) {
-            throw new RuntimeException("Login required");
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
         }
 
         final String targetUid = StringUtils.hasText(request.getUid()) ? request.getUid() : authUser.getUid();
 
         if (!authUser.isSuperUser() && !authUser.getUid().equals(targetUid)) {
-            throw new RuntimeException("Access denied");
+            throw new RuntimeException(I18Consts.I18N_ACCESS_DENIED);
         }
 
         // 更新时候不使用缓存，直接查询
         Optional<UserEntity> userOptional = userRepository.findByUid(targetUid);
         if (userOptional.isEmpty()) {
-            throw new RuntimeException("User not found");
+            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
         }
 
         UserEntity userEntity = userOptional.get();
@@ -386,6 +451,38 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     @Override
     public void delete(UserRequest request) {
         deleteByUid(request.getUid());
+    }
+
+    @Transactional
+    public UserResponse updateEnabledBySuper(UserRequest request) {
+        Optional<UserEntity> userOptional = userRepository.findByUid(request.getUid());
+        if (userOptional.isEmpty()) {
+            throw new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+
+        UserEntity userEntity = userOptional.get();
+        Boolean enabled = request.getEnabled();
+        if (enabled == null) {
+            return convertToResponse(userEntity);
+        }
+
+        if (BytedeskConsts.DEFAULT_SUPER_UID.equals(userEntity.getUid()) && Boolean.FALSE.equals(enabled)) {
+            throw OrganizationI18nExceptions.superUserDisableDenied();
+        }
+
+        userEntity.setEnabled(enabled);
+        UserEntity saved = save(userEntity);
+        if (saved == null) {
+            throw new RuntimeException("Failed to save user");
+        }
+        return convertToResponse(saved);
+    }
+
+    public UserResponse restore(UserRequest request) {
+        UserEntity userEntity = userRepository.findByUid(request.getUid())
+                .orElseThrow(() -> new NotFoundException(I18Consts.I18N_RESOURCE_NOT_FOUND));
+        userEntity.setDeleted(false);
+        return convertToResponse(save(userEntity));
     }
 
     @Override

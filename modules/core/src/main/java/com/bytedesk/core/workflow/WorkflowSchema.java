@@ -14,11 +14,15 @@
 package com.bytedesk.core.workflow;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.workflow.edge.WorkflowEdge;
 import com.bytedesk.core.workflow.node.WorkflowBaseNode;
+import com.bytedesk.core.workflow.node.WorkflowNodeFactory;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,7 +54,37 @@ public class WorkflowSchema implements Serializable {
      * 从JSON字符串创建WorkflowDocument
      */
     public static WorkflowSchema fromJson(String json) {
-        return JSON.parseObject(json, WorkflowSchema.class);
+        JSONObject root = JSON.parseObject(json);
+        WorkflowSchema schema = new WorkflowSchema();
+        schema.setNodes(parseNodes(root.getJSONArray("nodes")));
+        schema.setEdges(parseEdges(root.getJSONArray("edges")));
+        return schema;
+    }
+
+    private static List<WorkflowBaseNode> parseNodes(JSONArray nodeArray) {
+        if (nodeArray == null) {
+            return new ArrayList<>();
+        }
+
+        List<WorkflowBaseNode> nodes = new ArrayList<>(nodeArray.size());
+        for (int i = 0; i < nodeArray.size(); i++) {
+            JSONObject nodeObject = nodeArray.getJSONObject(i);
+            WorkflowBaseNode node = WorkflowNodeFactory.parseNode(nodeObject);
+            if (node != null && nodeObject != null) {
+                node.setBlocks(parseNodes(nodeObject.getJSONArray("blocks")));
+                node.setEdges(parseEdges(nodeObject.getJSONArray("edges")));
+            }
+            nodes.add(node);
+        }
+        return nodes;
+    }
+
+    private static List<WorkflowEdge> parseEdges(JSONArray edgeArray) {
+        if (edgeArray == null) {
+            return new ArrayList<>();
+        }
+
+        return edgeArray.toJavaList(WorkflowEdge.class);
     }
     
     /**

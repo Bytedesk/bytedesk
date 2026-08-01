@@ -69,6 +69,7 @@ public class MemberInitializer implements SmartInitializingSingleton {
                 .nickname(nickname)
                 .seatNo("001")
                 .telephone("001")
+                .country(superUser.getCountry())
                 .mobile(mobile)
                 .email(email)
                 .roleUids(roleUids)

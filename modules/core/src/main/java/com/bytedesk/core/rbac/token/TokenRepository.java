@@ -17,6 +17,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -27,6 +29,10 @@ import org.springframework.transaction.annotation.Transactional;
 public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSpecificationExecutor<TokenEntity> {
 
     Optional<TokenEntity> findByUid(String uid);
+
+        Page<TokenEntity> findByOrgUidAndDeletedFalse(String orgUid, Pageable pageable);
+
+        Page<TokenEntity> findByOrgUidAndUserUidAndDeletedFalse(String orgUid, String userUid, Pageable pageable);
 
     /**
      * 通过访问令牌查找Token实体
@@ -40,6 +46,11 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
      * 通过访问令牌查找Token实体（包含 revoked=true 的记录，用于判定“是否已撤销”）。
      */
     Optional<TokenEntity> findFirstByAccessTokenAndDeletedFalse(String accessToken);
+
+        /**
+         * 通过刷新令牌查找Token实体（包含 revoked=true 的记录，由上层决定是否允许刷新）。
+         */
+        Optional<TokenEntity> findFirstByRefreshTokenAndDeletedFalse(String refreshToken);
 
     /**
      * 通过用户UID、类型、未撤销、未删除和过期时间查询有效令牌

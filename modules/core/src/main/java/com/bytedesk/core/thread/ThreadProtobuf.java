@@ -16,6 +16,7 @@ package com.bytedesk.core.thread;
 import java.io.Serializable;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -45,6 +46,48 @@ public class ThreadProtobuf implements Serializable {
     private ThreadProcessStatusEnum status;
 
     private UserProtobuf user;
+
+    private String agent;
+
+    public UserProtobuf getAgentProtobuf() {
+        if (agent == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(agent);
+    }
+
+    @JSONField(name = "agentProtobuf")
+    public void setAgentProtobuf(UserProtobuf agentProtobuf) {
+        this.agent = agentProtobuf != null ? agentProtobuf.toJson() : null;
+    }
+
+    private String robot;
+
+    public UserProtobuf getRobotProtobuf() {
+        if (robot == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(robot);
+    }
+
+    @JSONField(name = "robotProtobuf")
+    public void setRobotProtobuf(UserProtobuf robotProtobuf) {
+        this.robot = robotProtobuf != null ? robotProtobuf.toJson() : null;
+    }
+
+    private String workgroup;
+
+    public UserProtobuf getWorkgroupProtobuf() {
+        if (workgroup == null) {
+            return null;
+        }
+        return UserProtobuf.fromJson(workgroup);
+    }
+
+    @JSONField(name = "workgroupProtobuf")
+    public void setWorkgroupProtobuf(UserProtobuf workgroupProtobuf) {
+        this.workgroup = workgroupProtobuf != null ? workgroupProtobuf.toJson() : null;
+    }
 
     private ChannelEnum channel;
 

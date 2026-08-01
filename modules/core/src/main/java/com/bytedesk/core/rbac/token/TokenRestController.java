@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.token;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -39,6 +41,7 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     private final TokenRestService tokenRestService;
 
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TokenRequest request) {
         
         Page<TokenResponse> page = tokenRestService.queryByOrg(request);
@@ -47,6 +50,7 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TokenRequest request) {
         
         Page<TokenResponse> page = tokenRestService.queryByUser(request);
@@ -55,6 +59,7 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TokenRequest request) {
 
         TokenResponse response = tokenRestService.queryByUid(request);
@@ -63,7 +68,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @Override
-    public ResponseEntity<?> create(TokenRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody TokenRequest request) {
         
         TokenResponse response = tokenRestService.create(request);
 
@@ -71,7 +77,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @Override
-    public ResponseEntity<?> update(TokenRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody TokenRequest request) {
         
         TokenResponse response = tokenRestService.update(request);
 
@@ -79,7 +86,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @Override
-    public ResponseEntity<?> delete(TokenRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody TokenRequest request) {
         
         tokenRestService.delete(request);
 
@@ -87,7 +95,7 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @PostMapping("/generate")
-    @ActionAnnotation(title = "用户", action = "generate_token", description = "Generate Access Token")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Generate Access Token")
     public ResponseEntity<?> generateAccessToken(@RequestBody TokenRequest request) {
 
         String accessToken = tokenRestService.generateAccessToken(request);
@@ -96,7 +104,7 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     }
 
     @PostMapping("/revoke")
-    @ActionAnnotation(title = "用户", action = "revoke_token", description = "Revoke Access Token")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Revoke Access Token")
     public ResponseEntity<?> revoke(@RequestBody TokenRequest request) {
 
         String reason = request.getRevokeReason();
@@ -110,6 +118,15 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         }
 
         return ResponseEntity.badRequest().body(JsonResult.error("uid or accessToken is required", 400));
+    }
+
+    @PostMapping("/refresh")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Refresh Access Token")
+    public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
+
+        TokenResponse response = tokenRestService.refreshAccessToken(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
     }
 
     

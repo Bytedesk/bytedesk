@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -84,7 +85,7 @@ public class EmailTemplateRestService extends BaseRestService<EmailTemplateEntit
             EmailTemplateEntity saved = save(entity);
             return convertToResponse(saved);
         }
-        throw new RuntimeException("EmailTemplate not found");
+        throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
     }
 
     @Override
@@ -118,7 +119,7 @@ public class EmailTemplateRestService extends BaseRestService<EmailTemplateEntit
             entity.setDeleted(true);
             save(entity);
         } else {
-            throw new RuntimeException("EmailTemplate not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -130,5 +131,36 @@ public class EmailTemplateRestService extends BaseRestService<EmailTemplateEntit
     @Override
     public EmailTemplateResponse convertToResponse(EmailTemplateEntity entity) {
         return modelMapper.map(entity, EmailTemplateResponse.class);
+    }
+
+    /**
+     * 初始化默认邮件模板
+     * 仅在模板不存在时创建，不会覆盖已有模板
+     */
+    public void initEmailTemplates(String orgUid) {
+        for (EmailTemplateInitData.EmailTemplateDef def : EmailTemplateInitData.DEFAULT_TICKET_TEMPLATES) {
+            String uid = def.uid();
+            if (!existsByUid(uid)) {
+                try {
+                    EmailTemplateEntity entity = EmailTemplateEntity.builder()
+                            .uid(uid)
+                            .name(def.name())
+                            .subject(def.subject())
+                            .content(def.content())
+                            .templateType(def.templateType())
+                            .description(def.description())
+                            .contentType(EmailTemplateContentTypeEnum.HTML.name())
+                            .status(EmailTemplateStatusEnum.PUBLISHED.name())
+                            .enabled(true)
+                            .defaultTemplate(true)
+                            .orgUid(orgUid)
+                            .build();
+                    emailTemplateRepository.save(entity);
+                    log.info("initEmailTemplates created: uid={}, name={}", uid, def.name());
+                } catch (Exception e) {
+                    log.warn("initEmailTemplates failed for uid={}: {}", uid, e.getMessage());
+                }
+            }
+        }
     }
 }

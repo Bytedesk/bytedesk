@@ -23,8 +23,10 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordEntity;
 
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Subquery;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -38,14 +40,48 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService)); // 基础查询条件
-            
+            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request,
+            // authService)); // 基础查询条件
+
+            // 组织隔离：按 orgUid 限定查询范围，避免跨组织数据泄露
+            if (StringUtils.hasText(request.getOrgUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("orgUid"), request.getOrgUid()));
+            }
+
             if (StringUtils.hasText(request.getTitle())) {
                 predicates.add(criteriaBuilder.like(root.get("title"), "%" + request.getTitle() + "%"));
             }
             // description
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
+            }
+
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText().trim().toLowerCase();
+                String searchPattern = "%" + escapeLike(searchText) + "%";
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("ticketNumber")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("contactName")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("wechat")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("threadTopic")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("visitorThreadTopic")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("reporter")), searchPattern,
+                                LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("assignee")), searchPattern,
+                                LIKE_ESCAPE_CHAR)));
             }
 
             // ticket number
@@ -98,9 +134,12 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     // 未分配：assignee 为空/null/{} 或不包含 uid 字段
                     Predicate assigneeIsNull = criteriaBuilder.isNull(root.get("assignee"));
                     Predicate assigneeIsEmptyString = criteriaBuilder.equal(root.get("assignee"), "");
-                    Predicate assigneeIsEmptyJson = criteriaBuilder.equal(root.get("assignee"), BytedeskConsts.EMPTY_JSON_STRING);
-                    Predicate assigneeUidEmpty = criteriaBuilder.like(root.get("assignee"), "%\"uid\":\"\"%", LIKE_ESCAPE_CHAR);
-                    Predicate assigneeHasNoUidField = criteriaBuilder.notLike(root.get("assignee"), "%\"uid\":\"%", LIKE_ESCAPE_CHAR);
+                    Predicate assigneeIsEmptyJson = criteriaBuilder.equal(root.get("assignee"),
+                            BytedeskConsts.EMPTY_JSON_STRING);
+                    Predicate assigneeUidEmpty = criteriaBuilder.like(root.get("assignee"), "%\"uid\":\"\"%",
+                            LIKE_ESCAPE_CHAR);
+                    Predicate assigneeHasNoUidField = criteriaBuilder.notLike(root.get("assignee"), "%\"uid\":\"%",
+                            LIKE_ESCAPE_CHAR);
                     predicates.add(criteriaBuilder.or(
                             assigneeIsNull,
                             assigneeIsEmptyString,
@@ -123,6 +162,20 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
+
+            appendVisibilityPredicates(request, root, criteriaBuilder, predicates);
+
+            if (StringUtils.hasText(request.getSlaStatus())) {
+                Subquery<String> slaSubquery = query.subquery(String.class);
+                var slaRoot = slaSubquery.from(TicketSlaRecordEntity.class);
+                slaSubquery.select(slaRoot.get("ticketUid"));
+                slaSubquery.where(
+                        criteriaBuilder.equal(slaRoot.get("deleted"), false),
+                        criteriaBuilder.equal(slaRoot.get("status"), request.getSlaStatus()),
+                        criteriaBuilder.equal(slaRoot.get("ticketUid"), root.get("uid")));
+                predicates.add(criteriaBuilder.exists(slaSubquery));
+            }
+
             // 时间范围过滤 - 使用BdDateUtils进行时间解析和转换
             if (StringUtils.hasText(request.getCreatedAtStart())) {
                 try {
@@ -144,7 +197,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                     log.warn("Invalid createdAtEnd format: {}", request.getCreatedAtEnd());
                 }
             }
-            // 
+            //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }
@@ -157,5 +210,51 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 .replace("\\\\", "\\\\\\\\")
                 .replace("%", "\\\\%")
                 .replace("_", "\\\\_");
+    }
+
+    private static void appendVisibilityPredicates(TicketRequest request,
+            jakarta.persistence.criteria.Root<TicketEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            List<Predicate> predicates) {
+        if (!Boolean.TRUE.equals(request.getVisibilityRestricted())) {
+            return;
+        }
+        if (!StringUtils.hasText(request.getVisibilityCurrentUserUid())) {
+            return;
+        }
+
+        String assigneePattern = "%\"uid\":\""
+                + escapeLike(request.getVisibilityCurrentUserUid())
+                + "\"%";
+        Predicate reporterSelf = criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserUid());
+        Predicate assigneeSelf = criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR);
+        Predicate noDepartmentAssigned = criteriaBuilder.or(
+                criteriaBuilder.isNull(root.get("departmentUid")),
+                criteriaBuilder.equal(root.get("departmentUid"), ""));
+        Predicate sameDepartment = StringUtils.hasText(request.getVisibilityCurrentUserDepartmentUid())
+                ? criteriaBuilder.equal(root.get("departmentUid"), request.getVisibilityCurrentUserDepartmentUid())
+                : criteriaBuilder.disjunction();
+
+        if ("DEPARTMENT_ONLY".equalsIgnoreCase(request.getVisibilityMode())) {
+            predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned, sameDepartment));
+            return;
+        }
+
+        if ("CATEGORY_BASED".equalsIgnoreCase(request.getVisibilityMode())
+                && request.getVisibilityRestrictedCategoryUids() != null
+                && !request.getVisibilityRestrictedCategoryUids().isEmpty()) {
+            List<Predicate> restrictedCategories = new ArrayList<>();
+            for (String categoryUid : request.getVisibilityRestrictedCategoryUids()) {
+                if (StringUtils.hasText(categoryUid)) {
+                    restrictedCategories.add(criteriaBuilder.equal(root.get("categoryUid"), categoryUid));
+                }
+            }
+            if (!restrictedCategories.isEmpty()) {
+                Predicate restrictedCategory = criteriaBuilder.or(restrictedCategories.toArray(new Predicate[0]));
+                Predicate departmentVisible = criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned,
+                        sameDepartment);
+                predicates.add(criteriaBuilder.or(criteriaBuilder.not(restrictedCategory), departmentVisible));
+            }
+        }
     }
 }

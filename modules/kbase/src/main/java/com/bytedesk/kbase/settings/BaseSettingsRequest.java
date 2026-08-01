@@ -6,6 +6,7 @@
 package com.bytedesk.kbase.settings;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsRequest;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingRequest;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsRequest;
 import com.bytedesk.kbase.settings_invite.InviteSettingsRequest;
@@ -101,4 +102,9 @@ public abstract class BaseSettingsRequest extends BaseRequest {
      * Conversation summary settings (common to all settings)
      */
     private SummarySettingsRequest summarySettings;
+
+    /**
+     * Auto resolved timeout settings (common to all settings)
+     */
+    private AutoResolvedSettingsRequest autoResolvedSettings;
 }

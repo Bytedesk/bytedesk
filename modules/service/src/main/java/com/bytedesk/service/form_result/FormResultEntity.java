@@ -77,6 +77,12 @@ public class FormResultEntity extends BaseEntity {
     private String formData;
 
     /**
+     * 提交时表单 schema 快照，JSON 格式
+     */
+    @Column(name = "form_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String formSchema;
+
+    /**
      * 表单版本号 - 记录提交时表单的版本
      */
     @Column(name = "form_version")

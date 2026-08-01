@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,8 +42,9 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
 
     private final VocCommentRestService commentRestService;
 
-    @ActionAnnotation(title = "comment", action = "组织查询", description = "query comment by org")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query comment by org")
     @Operation(summary = "Query VocComments by Organization", description = "Retrieve comments for the current organization")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(VocCommentRequest request) {
         
@@ -49,8 +53,9 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @ActionAnnotation(title = "comment", action = "用户查询", description = "query comment by user")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query comment by user")
     @Operation(summary = "Query VocComments by User", description = "Retrieve comments for the current user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(VocCommentRequest request) {
         
@@ -59,8 +64,9 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @ActionAnnotation(title = "comment", action = "查询详情", description = "query comment by uid")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query comment by uid")
     @Operation(summary = "Query VocComment by UID", description = "Retrieve a specific comment by its unique identifier")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(VocCommentRequest request) {
         
@@ -69,40 +75,43 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "comment", action = "新建", description = "create comment")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create comment")
     @Operation(summary = "Create VocComment", description = "Create a new comment")
+    @PostMapping("/create")
     @Override
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(VocCommentRequest request) {
+    public ResponseEntity<?> create(@RequestBody VocCommentRequest request) {
         
         VocCommentResponse comment = commentRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "comment", action = "更新", description = "update comment")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update comment")
     @Operation(summary = "Update VocComment", description = "Update an existing comment")
+    @PostMapping("/update")
     @Override
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(VocCommentRequest request) {
+    public ResponseEntity<?> update(@RequestBody VocCommentRequest request) {
         
         VocCommentResponse comment = commentRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @ActionAnnotation(title = "comment", action = "删除", description = "delete comment")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete comment")
     @Operation(summary = "Delete VocComment", description = "Delete a comment")
+    @PostMapping("/delete")
     @Override
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(VocCommentRequest request) {
+    public ResponseEntity<?> delete(@RequestBody VocCommentRequest request) {
         
         commentRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "comment", action = "导出", description = "export comment")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export comment")
     @Operation(summary = "Export VocComments", description = "Export comments to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")

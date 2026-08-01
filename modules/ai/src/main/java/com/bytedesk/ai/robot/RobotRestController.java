@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
@@ -38,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.context.annotation.Description;
 
-@Tag(name = "机器人管理", description = "机器人管理相关接口")
+@Tag(name = "Robot Management", description = "Robot management APIs")
 @RestController
 @RequestMapping("/api/v1/robot")
 @RequiredArgsConstructor
@@ -47,12 +48,13 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
 
     private final RobotRestService robotRestService;
 
-    @Operation(summary = "查询组织下的机器人", description = "根据组织ID查询机器人列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Robots by Organization", description = "Query the list of robots by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
-    @ActionAnnotation(title = "机器人", action = "组织查询", description = "query robot by org")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query robot by org")
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(RobotRequest request) {
         
@@ -61,12 +63,13 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的机器人", description = "根据用户ID查询机器人列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Robots by User", description = "Query the list of robots by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
-    @ActionAnnotation(title = "机器人", action = "用户查询", description = "query robot by user")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query robot by user")
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(RobotRequest request) {
         
@@ -75,12 +78,13 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询指定机器人", description = "根据UID查询机器人详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Robot by UID", description = "Query robot details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_READ)
-    @ActionAnnotation(title = "机器人", action = "查询详情", description = "query robot by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query robot by uid")
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(RobotRequest request) {
 
@@ -89,12 +93,13 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robot));
     }
     
-    @Operation(summary = "创建机器人", description = "创建新的机器人")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Robot", description = "Create a new robot")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
-    @ActionAnnotation(title = "机器人", action = "新建", description = "create robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_CREATE, description = "create robot")
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody RobotRequest request) {
 
@@ -103,12 +108,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robot));
     }
     
-    @Operation(summary = "创建智能体会话", description = "员工/客服创建智能体会话")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create LLM Thread", description = "Allow staff or agents to create an LLM thread")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
-    @ActionAnnotation(title = "机器人", action = "新建", description = "create robot thread")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_CREATE_THREAD, description = "create robot thread")
     @PostMapping("/create/llm/thread")
     public ResponseEntity<?> createLlmThread(@RequestBody ThreadRequest request) {
         //
@@ -117,12 +122,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
-    @Operation(summary = "更新智能体会话", description = "更新智能体会话信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update LLM Thread", description = "Update LLM thread information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot thread")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_THREAD, description = "update robot thread")
     @PostMapping("/update/llm/thread")
     public ResponseEntity<?> updateLlmThread(@RequestBody ThreadRequest request) {
         //
@@ -131,12 +136,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(thread));
     }
 
-    @Operation(summary = "创建智能体模板", description = "创建提示词机器人模板")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Prompt Robot Template", description = "Create a prompt-based robot template")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_CREATE)
-    @ActionAnnotation(title = "机器人", action = "新建", description = "create prompt robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_CREATE_PROMPT, description = "create prompt robot")
     @PostMapping("/create/prompt")
     public ResponseEntity<?> createPromptRobot(@RequestBody RobotRequest request) {
         //
@@ -145,12 +150,13 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robot));
     }
 
-    @Operation(summary = "更新机器人", description = "更新机器人信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Robot", description = "Update robot information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE, description = "update robot")
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody RobotRequest request) {
 
@@ -159,12 +165,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @Operation(summary = "更新机器人头像", description = "更新机器人的头像")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Robot Avatar", description = "Update the robot avatar")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot avatar")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_AVATAR, description = "update robot avatar")
     @PostMapping("/update/avatar")
     public ResponseEntity<?> updateAvatar(@RequestBody RobotRequest request) {
 
@@ -173,12 +179,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @Operation(summary = "更新提示词机器人", description = "更新提示词机器人信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Prompt Robot", description = "Update prompt robot information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update prompt robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_PROMPT, description = "update prompt robot")
     @PostMapping("/update/prompt")
     public ResponseEntity<?> updatePromptRobot(@RequestBody RobotRequest request) {
 
@@ -187,12 +193,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @Operation(summary = "更新机器人提示词", description = "仅根据UID更新机器人提示词内容")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Robot Prompt Text", description = "Update robot prompt text by UID only")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot prompt text")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_PROMPT_TEXT, description = "update robot prompt text")
     @PostMapping("/update/prompt/text")
     public ResponseEntity<?> updatePromptText(@RequestBody RobotRequest request) {
 
@@ -201,12 +207,12 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @Operation(summary = "更新机器人知识库", description = "更新机器人的知识库UID")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Robot Knowledge Base", description = "Update the robot knowledge base UID")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = RobotResponse.class)))
     @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
-    @ActionAnnotation(title = "机器人", action = "更新", description = "update robot kbUid")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_KB_UID, description = "update robot kbUid")
     @PostMapping("/update/kbUid")
     public ResponseEntity<?> updateKbUid(@RequestBody RobotRequest request) {
         
@@ -215,10 +221,11 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
-    @Operation(summary = "删除机器人", description = "删除指定的机器人")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Robot", description = "Delete the specified robot")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(RobotPermissions.HAS_ROBOT_DELETE)
-    @ActionAnnotation(title = "机器人", action = "删除", description = "delete robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_DELETE, description = "delete robot")
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody RobotRequest request) {
         
@@ -227,10 +234,10 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @Operation(summary = "导出机器人", description = "导出机器人数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Robots", description = "Export robot data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(RobotPermissions.HAS_ROBOT_EXPORT)
-    @ActionAnnotation(title = "机器人", action = "导出", description = "export robot")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_EXPORT, description = "export robot")
     @GetMapping("/export")
     @Override
     public Object export(RobotRequest request, HttpServletResponse response) {
@@ -239,7 +246,7 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
             response,
             robotRestService,
             RobotExcel.class,
-            "提示词",
+            "Prompt",
             "prompt"
         );
     }

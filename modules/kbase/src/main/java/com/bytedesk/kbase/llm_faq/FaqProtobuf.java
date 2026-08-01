@@ -52,6 +52,14 @@ public class FaqProtobuf implements Serializable {
 
     private String type;
 
+    private String sourceUid;
+
+    private String language;
+
+    private String sourceLanguage;
+
+    private Boolean translated;
+
     @Builder.Default
     private List<FaqProtobuf> relatedFaqs = new ArrayList<>();
 
@@ -65,6 +73,10 @@ public class FaqProtobuf implements Serializable {
                 .question(faq.getQuestion())
                 .answer(faq.getAnswer())
                 .type(FaqProtobufTypeEnum.FAQ.name())
+                .sourceUid(faq.getSourceUid())
+                .language(faq.getLanguage())
+                .sourceLanguage(faq.getSourceLanguage())
+                .translated(faq.getTranslated())
                 .build();
     }
 
@@ -74,6 +86,10 @@ public class FaqProtobuf implements Serializable {
                 .question(faq.getQuestion())
                 .answer(faq.getAnswer())
                 .type(FaqProtobufTypeEnum.FAQ.name())
+                .sourceUid(faq.getSourceUid())
+                .language(faq.getLanguage())
+                .sourceLanguage(faq.getSourceLanguage())
+                .translated(faq.getTranslated())
                 .build();
     }
 
@@ -83,6 +99,10 @@ public class FaqProtobuf implements Serializable {
                 .question(text.getTitle())
                 .answer(text.getContent())
                 .type(FaqProtobufTypeEnum.TEXT.name())
+                .sourceUid(text.getSourceUid())
+                .language(text.getLanguage())
+                .sourceLanguage(text.getSourceLanguage())
+                .translated(text.getTranslated())
                 .build();
     }
 
@@ -93,6 +113,10 @@ public class FaqProtobuf implements Serializable {
                 .question(text.getTitle())
                 .answer(text.getContent())
                 .type(FaqProtobufTypeEnum.TEXT.name())
+                .sourceUid(text.getSourceUid())
+                .language(text.getLanguage())
+                .sourceLanguage(text.getSourceLanguage())
+                .translated(text.getTranslated())
                 .build();
     }
 
@@ -102,6 +126,10 @@ public class FaqProtobuf implements Serializable {
                .question(chunk.getName())
                .answer(chunk.getContent())
                .type(FaqProtobufTypeEnum.CHUNK.name())
+               .sourceUid(chunk.getSourceUid())
+               .language(chunk.getLanguage())
+               .sourceLanguage(chunk.getSourceLanguage())
+               .translated(chunk.getTranslated())
                .build();
     }
 
@@ -112,6 +140,10 @@ public class FaqProtobuf implements Serializable {
                 .question(chunk.getName())
                 .answer(chunk.getContent())
                 .type(FaqProtobufTypeEnum.CHUNK.name())
+                .sourceUid(chunk.getSourceUid())
+                .language(chunk.getLanguage())
+                .sourceLanguage(chunk.getSourceLanguage())
+                .translated(chunk.getTranslated())
                 .build();
     }
 
@@ -121,6 +153,7 @@ public class FaqProtobuf implements Serializable {
                 .question(article.getTitle())
                 .answer(article.getContentMarkdown() != null ? article.getContentMarkdown() : article.getSummary())
                 .type(FaqProtobufTypeEnum.ARTICLE.name())
+                .sourceUid(article.getUid())
                 .build();
     }
 
@@ -131,6 +164,7 @@ public class FaqProtobuf implements Serializable {
                 .question(article.getTitle())
                 .answer(article.getContentMarkdown() != null ? article.getContentMarkdown() : article.getSummary())
                 .type(FaqProtobufTypeEnum.ARTICLE.name())
+                .sourceUid(article.getUid())
                 .build();
     }
 
@@ -140,6 +174,10 @@ public class FaqProtobuf implements Serializable {
                 .question(webpage.getTitle())
                 .answer(webpage.getContent())
                 .type(FaqProtobufTypeEnum.WEBPAGE.name())
+                .sourceUid(webpage.getSourceUid())
+                .language(webpage.getLanguage())
+                .sourceLanguage(webpage.getSourceLanguage())
+                .translated(webpage.getTranslated())
                 .build();
     }
 
@@ -150,6 +188,10 @@ public class FaqProtobuf implements Serializable {
                 .question(webpage.getTitle())
                 .answer(webpage.getContent())
                 .type(FaqProtobufTypeEnum.WEBPAGE.name())
+                .sourceUid(webpage.getSourceUid())
+                .language(webpage.getLanguage())
+                .sourceLanguage(webpage.getSourceLanguage())
+                .translated(webpage.getTranslated())
                 .build();
     }
     

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkmeetAdmin=self.webpackChunkmeetAdmin||[]).push([[423],{76423:function(e,t,n){n.d(t,{submitFeedback:function(){return i}});var u=n(27969);function i(e){return(0,u.Z)({url:"/visitor/api/feedback/submit",method:"post",data:e})}}}]);

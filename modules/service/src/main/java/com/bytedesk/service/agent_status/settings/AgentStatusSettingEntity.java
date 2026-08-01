@@ -13,11 +13,18 @@
  */
 package com.bytedesk.service.agent_status.settings;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.service.constant.I18ServiceConsts;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
@@ -50,6 +57,32 @@ public class AgentStatusSettingEntity extends BaseEntity {
     // @Builder.Default
     // @Column(name = "tag_type")
     // private String type = AgentStatusSettingTypeEnum.CUSTOMER.name();
+
+    // 是否支持音频会话状态
+    @Builder.Default
+    @Column(name = "available_audio_enabled")
+    private Boolean availableAudioEnabled = false;
+
+    // 是否支持视频会话状态
+    @Builder.Default
+    @Column(name = "available_video_enabled")
+    private Boolean availableVideoEnabled = false;
+
+    // 是否支持电话会话状态
+    @Builder.Default
+    @Column(name = "available_phone_enabled")
+    private Boolean availablePhoneEnabled = false;
+
+    // 是否支持休息状态
+    @Builder.Default
+    @Column(name = "rest_enabled")
+    private Boolean restEnabled = true;
+
+    // 休息状态可选原因，供前端坐席切换状态时选择
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "rest_reasons", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private List<String> restReasons = new ArrayList<>(I18ServiceConsts.getDefaultAgentStatusRestReasons());
 
     // 是否需要开启客服切换状态审核
     @Builder.Default
@@ -88,9 +121,46 @@ public class AgentStatusSettingEntity extends BaseEntity {
      * @return AgentStatusSettingEntity 实体，永远不为 null
      */
     public static AgentStatusSettingEntity fromRequest(AgentStatusSettingRequest request, ModelMapper modelMapper) {
+        AgentStatusSettingEntity entity;
         if (request == null) {
-            return AgentStatusSettingEntity.builder().build();
+            entity = AgentStatusSettingEntity.builder().build();
+        } else {
+            entity = modelMapper.map(request, AgentStatusSettingEntity.class);
         }
-        return modelMapper.map(request, AgentStatusSettingEntity.class);
+        ensureDefaults(entity);
+        return entity;
+    }
+
+    public static void ensureDefaults(AgentStatusSettingEntity entity) {
+        if (entity == null) {
+            return;
+        }
+        if (entity.getNeedReview() == null) {
+            entity.setNeedReview(false);
+        }
+        if (entity.getAvailableAudioEnabled() == null) {
+            entity.setAvailableAudioEnabled(false);
+        }
+        if (entity.getAvailableVideoEnabled() == null) {
+            entity.setAvailableVideoEnabled(false);
+        }
+        if (entity.getAvailablePhoneEnabled() == null) {
+            entity.setAvailablePhoneEnabled(false);
+        }
+        if (entity.getRestEnabled() == null) {
+            entity.setRestEnabled(true);
+        }
+        if (entity.getRestReasons() == null) {
+            entity.setRestReasons(new ArrayList<>(I18ServiceConsts.getDefaultAgentStatusRestReasons()));
+        }
+        if (entity.getReviewTimeType() == null) {
+            entity.setReviewTimeType("ANY_TIME");
+        }
+        if (entity.getReviewMethod() == null) {
+            entity.setReviewMethod("ALWAYS_MANUAL");
+        }
+        if (entity.getReviewTimeoutMinutes() == null) {
+            entity.setReviewTimeoutMinutes(10);
+        }
     }
 }

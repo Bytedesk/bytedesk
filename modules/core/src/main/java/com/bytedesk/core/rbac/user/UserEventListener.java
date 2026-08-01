@@ -19,9 +19,9 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.rbac.user.event.UserCreateEvent;
 import com.bytedesk.core.rbac.user.event.UserUpdateEvent;
-import com.bytedesk.core.topic.TopicCacheService;
-import com.bytedesk.core.topic.TopicRequest;
 import com.bytedesk.core.topic.TopicUtils;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionCacheService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,21 +31,21 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class UserEventListener {
 
-    private final TopicCacheService topicCacheService;
+    private final TopicSubscriptionCacheService topicCacheService;
 
     @EventListener
     public void onUserCreateEvent(UserCreateEvent event) {
         UserEntity user = event.getUser();
         log.info("topic onUserCreateEvent: {}", user.getUid());
         // 默认订阅用户主题
-        TopicRequest topicRequest = TopicRequest.builder()
+        TopicSubscriptionRequest topicRequest = TopicSubscriptionRequest.builder()
                 .topic(TopicUtils.getUserTopic(user.getUid()))
                 .userUid(user.getUid())
                 .build();
         topicCacheService.pushRequest(topicRequest);
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
-            TopicRequest topicRequestOrg = TopicRequest.builder()
+                TopicSubscriptionRequest topicRequestOrg = TopicSubscriptionRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
                     .userUid(user.getUid())
                     .build();
@@ -59,7 +59,7 @@ public class UserEventListener {
         log.info("topic onUserUpdateEvent: {}", user.getUid());
         // 默认订阅组织主题
         if (StringUtils.hasText(user.getOrgUid())) {
-            TopicRequest topicRequestOrg = TopicRequest.builder()
+                TopicSubscriptionRequest topicRequestOrg = TopicSubscriptionRequest.builder()
                     .topic(TopicUtils.getOrgTopic(user.getOrgUid()))
                     .userUid(user.getUid())
                     .build();

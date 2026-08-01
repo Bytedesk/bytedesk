@@ -108,6 +108,9 @@ public class TriggerSettingsHelper {
             if (ref.getConfig() != null) {
                 triggerEntity.setConfig(ref.getConfig());
             }
+            if (ref.getMaxTriggerCount() != null) {
+                triggerEntity.setMaxTriggerCount(ref.getMaxTriggerCount());
+            }
 
             target.getTriggers().add(triggerEntity);
         }

@@ -16,20 +16,35 @@ package com.bytedesk.core.socket.connection;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.config.DatabaseIndexBootstrapService;
+
 import lombok.AllArgsConstructor;
 
 @Component
 @AllArgsConstructor
 public class ConnectionInitializer implements SmartInitializingSingleton {
 
+    private final DatabaseIndexBootstrapService databaseIndexBootstrapService;
+
     // private final ConnectionRestService connectionRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
+        initIndexes();
         initAuthority();
         // create default
         // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
         // connectionRestService.initConnections(orgUid);
+    }
+
+    private void initIndexes() {
+        databaseIndexBootstrapService.ensureIndex(
+            "bytedesk_core_connection",
+            "idx_core_conn_user_status_deleted",
+            java.util.List.of("user_uid", "status", "is_deleted"),
+            "CREATE INDEX idx_core_conn_user_status_deleted ON bytedesk_core_connection (user_uid, status, is_deleted)",
+            "CREATE INDEX idx_core_conn_user_status_deleted ON bytedesk_core_connection (user_uid, status, is_deleted)"
+        );
     }
 
     private void initAuthority() {

@@ -15,8 +15,7 @@ package com.bytedesk.service.visitor;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,17 +40,19 @@ import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.kbase.taboo.TabooService;
+import com.bytedesk.kbase.auto_reply.AutoReplyService;
 import com.bytedesk.core.message_unread.MessageUnreadRequest;
 import com.bytedesk.core.message_unread.MessageUnreadResponse;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadRequest;
-import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.ThreadSequenceResponse;
 import java.time.ZonedDateTime;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentPublicResponse;
 import com.bytedesk.service.agent.AgentRestService;
 
 import java.util.Optional;
@@ -86,10 +87,16 @@ public class VisitorRestControllerVisitor {
     private final RobotService robotService;
 
     private final AgentRestService agentRestService;
-    
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    private final TabooService tabooService;
+
+    private final AutoReplyService autoReplyService;
+
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     @ApiRateLimiter(value = 1, timeout = 1)
+    @BlackIpFilter(title = "black", action = "init")
     @PostMapping("/init")
     public ResponseEntity<?> init(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
@@ -108,6 +115,7 @@ public class VisitorRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(visitor));
     }
 
+    @BlackIpFilter(title = "black", action = "thread")
     @PostMapping("/thread")
     public ResponseEntity<?> requestThread(@RequestBody VisitorRequest request, HttpServletRequest httpRequest) {
         //
@@ -153,6 +161,12 @@ public class VisitorRestControllerVisitor {
     // @Operation(summary = "根据主题查询消息", description = "根据主题查询相关消息")
     @GetMapping("/message/thread/topic")
     public ResponseEntity<?> queryByThreadTopic(MessageRequest request) {
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("orgUid required"));
+        }
+        if (!StringUtils.hasText(request.getVisitorUid()) && !StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.ok(JsonResult.error("visitorUid or uid required"));
+        }
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
@@ -167,6 +181,9 @@ public class VisitorRestControllerVisitor {
      */
     @GetMapping("/message/thread/uid")
     public ResponseEntity<?> queryByThreadUid(MessageRequest request) {
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("orgUid required"));
+        }
 
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
@@ -193,37 +210,42 @@ public class VisitorRestControllerVisitor {
 
     /**
      * 访客主动关闭当前会话(按topic或uid)，支持传closeType=VISITOR
+     * 迁移到 ThreadRestControllerVisitor.closeThread()，保留此接口仅用于兼容旧版本
      */
-    @PostMapping("/thread/close")
-    public ResponseEntity<?> closeThread(@RequestBody ThreadRequest request) {
-        // 强制标记来源为VISITOR，除非显式传其他类型(允许未来扩展)
-        if (!StringUtils.hasText(request.getCloseType())) {
-            request.setCloseType(ThreadCloseTypeEnum.VISITOR.name());
-        }
-        // ThreadResponse response;
-        // if (StringUtils.hasText(request.getUid())) {
-        //     response = threadRestService.closeByUid(request);
-        //     // 从排队中退出（若存在）
-        //     queueMemberRestService.visitorExitQueue(request.getUid());
-        // } else if (StringUtils.hasText(request.getTopic())) {
-        //     response = threadRestService.closeByTopic(request);
-        //     if (response != null && StringUtils.hasText(response.getUid())) {
-        //         queueMemberRestService.visitorExitQueue(response.getUid());
-        //     }
-        // } else {
-        //     return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
-        // }
-        return ResponseEntity.ok(JsonResult.success("close success"));
-    }
+    // @PostMapping("/thread/close")
+    // public ResponseEntity<?> closeThread(@RequestBody ThreadRequest request) {
+    //     // 强制标记来源为VISITOR，除非显式传其他类型(允许未来扩展)
+    //     if (!StringUtils.hasText(request.getCloseType())) {
+    //         request.setCloseType(ThreadCloseTypeEnum.VISITOR.name());
+    //     }
+    //     // ThreadResponse response;
+    //     // if (StringUtils.hasText(request.getUid())) {
+    //     // response = threadRestService.closeByUid(request);
+    //     // // 从排队中退出（若存在）
+    //     // queueMemberRestService.visitorExitQueue(request.getUid());
+    //     // } else if (StringUtils.hasText(request.getTopic())) {
+    //     // response = threadRestService.closeByTopic(request);
+    //     // if (response != null && StringUtils.hasText(response.getUid())) {
+    //     // queueMemberRestService.visitorExitQueue(response.getUid());
+    //     // }
+    //     // } else {
+    //     // return ResponseEntity.ok(JsonResult.error("thread uid/topic required"));
+    //     // }
+    //     return ResponseEntity.ok(JsonResult.success("close success"));
+    // }
 
     /**
      * 关闭来源分布报表(按 updatedAt 时间范围统计)
      */
     @GetMapping("/thread/report/close-type")
     public ResponseEntity<?> queryCloseType(@RequestParam(value = "start", required = false) Long startEpoch,
-                                             @RequestParam(value = "end", required = false) Long endEpoch) {
-        ZonedDateTime end = endEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault()) : ZonedDateTime.now();
-        ZonedDateTime start = startEpoch != null ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault()) : end.minusDays(1);
+            @RequestParam(value = "end", required = false) Long endEpoch) {
+        ZonedDateTime end = endEpoch != null
+                ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(endEpoch), java.time.ZoneId.systemDefault())
+                : ZonedDateTime.now();
+        ZonedDateTime start = startEpoch != null
+                ? ZonedDateTime.ofInstant(java.time.Instant.ofEpochMilli(startEpoch), java.time.ZoneId.systemDefault())
+                : end.minusDays(1);
         Map<String, Long> data = threadRestService.queryClosedByCloseType(start, end);
         return ResponseEntity.ok(JsonResult.success("report success", data));
     }
@@ -249,10 +271,43 @@ public class VisitorRestControllerVisitor {
      */
     @GetMapping("/threads")
     public ResponseEntity<?> queryVisitorThreads(ThreadRequest request) {
+        if (request.getMergeByTopic() == null) {
+            request.setMergeByTopic(true);
+        }
 
         Page<ThreadResponse> threads = threadRestService.queryByVisitor(request);
-        
+
         return ResponseEntity.ok(JsonResult.success("查询成功", threads));
+    }
+
+    /**
+     * 匿名查询访客详情（用于访客端资料面板展示服务端真实数据）
+     */
+    @GetMapping("/visitor/query/uid")
+    public ResponseEntity<?> queryVisitorByUid(
+            @RequestParam(value = "uid") String uid,
+            @RequestParam(value = "orgUid", required = false) String orgUid) {
+        if (!StringUtils.hasText(uid)) {
+            return ResponseEntity.ok(JsonResult.error("uid required"));
+        }
+
+        Optional<VisitorEntity> visitorOptional = Optional.empty();
+        if (StringUtils.hasText(orgUid)) {
+            visitorOptional = visitorRestService.findByVisitorUidAndOrgUid(uid, orgUid);
+        }
+        if (!visitorOptional.isPresent()) {
+            visitorOptional = visitorRestService.findByUid(uid);
+        }
+        if (!visitorOptional.isPresent()) {
+            return ResponseEntity.ok(JsonResult.error("visitor not found"));
+        }
+
+        VisitorEntity visitor = visitorOptional.get();
+        if (StringUtils.hasText(orgUid) && !orgUid.equals(visitor.getOrgUid())) {
+            return ResponseEntity.ok(JsonResult.error("visitor not found"));
+        }
+
+        return ResponseEntity.ok(JsonResult.success(visitorRestService.convertToResponse(visitor)));
     }
 
     /**
@@ -263,55 +318,127 @@ public class VisitorRestControllerVisitor {
      * - uid 既支持传 agent.uid（客服实体 uid），也支持传 userUid（消息中 user.uid）
      */
     @GetMapping("/agent/query/uid")
-    public ResponseEntity<?> queryAgentByUid(@RequestParam(value = "uid") String uid) {
+    public ResponseEntity<?> queryAgentByUid(
+            @RequestParam(value = "uid") String uid,
+            @RequestParam(value = "orgUid", required = false) String orgUid) {
         if (!StringUtils.hasText(uid)) {
             return ResponseEntity.ok(JsonResult.error("uid required"));
         }
 
         Optional<AgentEntity> agentOptional = agentRestService.findByUid(uid);
         if (!agentOptional.isPresent()) {
-            agentOptional = agentRestService.findByUserUid(uid);
+            if (StringUtils.hasText(orgUid)) {
+                agentOptional = agentRestService.findByUserUidAndOrgUid(uid, orgUid);
+            } else {
+                try {
+                    agentOptional = agentRestService.findByUserUid(uid);
+                } catch (IllegalStateException e) {
+                    return ResponseEntity.ok(JsonResult.error("multiple agents found, please provide orgUid"));
+                }
+            }
         }
         if (!agentOptional.isPresent()) {
             return ResponseEntity.ok(JsonResult.error("agent not found"));
         }
 
         AgentEntity agent = agentOptional.get();
-        AgentPublicResponse response = new AgentPublicResponse(
-                agent.getUid(),
-                agent.getUserUid(),
-                agent.getNickname(),
-                agent.getAgentNo(),
-                agent.getAvatar(),
-                agent.getStatus());
+        AgentPublicResponse response = AgentPublicResponse.from(agent);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    /**
-     * 访客端公开的客服信息（最小字段集）
-     */
-    public record AgentPublicResponse(
-            String uid,
-            String userUid,
-            String nickname,
-            String agentNo,
-            String avatar,
-            String status) {
-    }
-
     // 访客发送http消息
+    @BlackIpFilter(title = "black", action = "sendRestMessage")
+    @BlackUserFilter(title = "black", action = "sendRestMessage")
     @VisitorAnnotation(title = "visitor", action = "sendRestMessage", description = "sendRestMessage")
     @PostMapping("/message/send")
     public ResponseEntity<?> sendRestMessage(@RequestBody Map<String, String> map) {
-        //
         String json = (String) map.get("json");
+        if (!StringUtils.hasText(json)) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        MessageProtobuf messageProtobuf;
+        try {
+            messageProtobuf = MessageProtobuf.fromJson(json);
+        } catch (Exception e) {
+            log.warn("invalid visitor message payload: {}", e.getMessage());
+            return ResponseEntity.ok(JsonResult.error("invalid messageJson"));
+        }
+
+        if (messageProtobuf == null || messageProtobuf.getThread() == null) {
+            return ResponseEntity.ok(JsonResult.error("thread required"));
+        }
+
+        String threadUid = messageProtobuf.getThread().getUid();
+        String threadTopic = messageProtobuf.getThread().getTopic();
+        if (!StringUtils.hasText(threadTopic) && StringUtils.hasText(threadUid)) {
+            Optional<com.bytedesk.core.thread.ThreadEntity> threadOptional = threadRestService.findByUid(threadUid);
+            if (threadOptional.isPresent()) {
+                messageProtobuf.getThread().setTopic(threadOptional.get().getTopic());
+                if (!StringUtils.hasText(messageProtobuf.getThread().getUid())) {
+                    messageProtobuf.getThread().setUid(threadOptional.get().getUid());
+                }
+                json = messageProtobuf.toJson();
+            }
+        }
+
+        if (!StringUtils.hasText(messageProtobuf.getThread().getUid())
+                || !StringUtils.hasText(messageProtobuf.getThread().getTopic())) {
+            return ResponseEntity.ok(JsonResult.error("thread uid and topic required"));
+        }
+
         log.debug("json {}", json);
         messageSendService.sendJsonMessage(json);
 
         return ResponseEntity.ok(JsonResult.success(json));
     }
 
+    /**
+     * 访客发送机器人 SSE 消息前先做敏感词预检：
+     * - hit=true: 直接落库访客问题(敏感词替换后)和机器人回复，并返回消息实体给前端直接展示
+     * - hit=false: 前端继续走 sendSseMessage
+     */
+    @PostMapping("/message/taboo/check")
+    public ResponseEntity<?> checkTabooBeforeSse(@RequestBody VisitorTabooCheckRequest request) {
+        if (request == null || !StringUtils.hasText(request.messageJson())) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        try {
+            TabooService.VisitorTabooCheckResult result = tabooService.checkVisitorTabooBeforeSse(
+                    request.messageJson(),
+                    request.orgUid());
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 访客发送机器人 SSE 消息前自动回复预检：
+     * - hit=true: 前端直接展示自动回复并跳过 SSE
+     * - hit=false: 前端继续走 sendSseMessage
+     */
+    @PostMapping("/message/autoreply/check")
+    public ResponseEntity<?> checkAutoReplyBeforeSse(@RequestBody VisitorAutoReplyCheckRequest request) {
+        if (request == null || !StringUtils.hasText(request.messageJson())) {
+            return ResponseEntity.ok(JsonResult.error("messageJson required"));
+        }
+
+        try {
+            AutoReplyService.VisitorAutoReplyCheckResult result = autoReplyService.checkVisitorAutoReplyBeforeSse(
+                    request.messageJson(),
+                    request.orgUid(),
+                    request.autoReplySettingsUid());
+            return ResponseEntity.ok(JsonResult.success(result));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(JsonResult.error(e.getMessage()));
+        }
+    }
+
+    // @BlackIpFilter(title = "black", action = "sendSseMemberMessage")
+    // @BlackUserFilter(title = "black", action = "sendSseMemberMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -370,8 +497,30 @@ public class VisitorRestControllerVisitor {
     @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
     @GetMapping(value = "/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendSseVisitorMessage(@RequestParam(value = "message") String message) {
+    public SseEmitter sendSseVisitorMessageGet(@RequestParam(value = "message") String message) {
 
+        return sendSseVisitorMessageInternal(message);
+    }
+
+    @BlackIpFilter(title = "black", action = "sendSseVisitorMessage")
+    @BlackUserFilter(title = "black", action = "sendSseVisitorMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSseVisitorMessage")
+    @VisitorAnnotation(title = "visitor", action = "sendSseVisitorMessage", description = "sendSseVisitorMessage")
+    @PostMapping(value = "/message/sse", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseVisitorMessagePost(@RequestBody String message) {
+
+        return sendSseVisitorMessageInternal(message);
+    }
+
+    private SseEmitter sendSseVisitorMessageInternal(String message) {
+        if (!StringUtils.hasText(message)) {
+            return createInvalidSseEmitter("message required");
+        }
+
+        // IMPORTANT: publishVisitorMessageEvent must complete BEFORE the async SSE processing below.
+        // @EventListener is synchronous by default, so RobotToAgentKeywordListener runs inline here
+        // and may mutate thread state (e.g. ROBOTING→QUEUING). The async executor then sees the
+        // updated state when it calls robotService.processSseVisitorMessage().
         visitorRestService.publishVisitorMessageEvent(message);
 
         // 延长超时时间至10分钟
@@ -422,6 +571,16 @@ public class VisitorRestControllerVisitor {
         return emitter;
     }
 
+    private SseEmitter createInvalidSseEmitter(String message) {
+        SseEmitter emitter = new SseEmitter(1L);
+        try {
+            emitter.completeWithError(new IllegalArgumentException(message));
+        } catch (Exception exception) {
+            log.debug("Failed to complete invalid SSE emitter: {}", exception.getMessage());
+        }
+        return emitter;
+    }
+
     // message/sync
     @BlackIpFilter(title = "black", action = "sync")
     @BlackUserFilter(title = "black", action = "sync")
@@ -450,6 +609,10 @@ public class VisitorRestControllerVisitor {
         }
     }
 
-    
+    public record VisitorTabooCheckRequest(String messageJson, String orgUid) {
+    }
+
+    public record VisitorAutoReplyCheckRequest(String messageJson, String orgUid, String autoReplySettingsUid) {
+    }
 
 }

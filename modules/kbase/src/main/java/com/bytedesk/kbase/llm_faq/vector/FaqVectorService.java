@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
-import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,6 +36,11 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqRequest;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.FaqStatusEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationRepository;
+import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
+import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,11 +57,15 @@ import lombok.extern.slf4j.Slf4j;
 @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class FaqVectorService {
 
-    private final ElasticsearchVectorStore vectorStore;
+    private final KbaseVectorStoreResolver vectorStoreResolver;
 
     private final FaqRestService faqRestService;
 
     private final KbaseRestService kbaseRestService;
+
+    private final KbaseTranslationRepository kbaseTranslationRepository;
+
+    private final com.bytedesk.kbase.llm_embedding.LlmEmbeddingRestService llmEmbeddingRestService;
 
     public Map<String, Object> queryVectorByUid(FaqRequest request) {
         String uid = request.getUid();
@@ -75,7 +84,7 @@ public class FaqVectorService {
                 .topK(10)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         List<Map<String, Object>> docMaps = new ArrayList<>();
         if (docs != null) {
             for (Document doc : docs) {
@@ -231,7 +240,7 @@ public class FaqVectorService {
 
         try {
             if (!docIdsToDelete.isEmpty()) {
-                vectorStore.delete(docIdsToDelete);
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
             }
             for (FaqEntity faq : faqList) {
                 faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
@@ -244,7 +253,7 @@ public class FaqVectorService {
                 try {
                     // 兼容：docIdList 为空时也尝试默认 docId
                     if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
-                        vectorStore.delete(List.of("faq_" + faq.getUid()));
+                        vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(List.of("faq_" + faq.getUid()));
                         faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
                         faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
                         successCount++;
@@ -295,7 +304,7 @@ public class FaqVectorService {
         if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
             try {
                 String defaultDocId = "faq_" + faq.getUid();
-                vectorStore.delete(List.of(defaultDocId));
+                vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(List.of(defaultDocId));
             } catch (Exception e) {
                 log.warn("按默认docId删除向量索引失败（将继续走常规删除逻辑）: uid={}, error={}", faq.getUid(), e.getMessage());
             }
@@ -326,7 +335,7 @@ public class FaqVectorService {
                 .topK(1)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = resolveStoreByUid(uid).similaritySearch(searchRequest);
         return docs != null && !docs.isEmpty();
     }
     
@@ -344,6 +353,7 @@ public class FaqVectorService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void indexFaqVector(FaqEntity faq) {
         log.info("开始向量索引FAQ: {}, ID: {}", faq.getQuestion(), faq.getUid());
+        long startMs = System.currentTimeMillis();
 
         // 尝试从入参携带的 kbase 取 kbUid 作为兜底（防止 DB 中关联缺失或保存时出现乐观锁冲突）
         final String kbUidHint = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
@@ -398,24 +408,27 @@ public class FaqVectorService {
             String tags = String.join(",", currentFaq.getTagList());
 
             // 元数据
-            Map<String, Object> metadata = Map.of(
-                    "uid", currentFaq.getUid(),
-                    "question", currentFaq.getQuestion(),
-                    "kbUid", kbUid,
-                    "categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "",
-                    "orgUid", currentFaq.getOrgUid(),
-                    "enabled", Boolean.toString(currentFaq.getEnabled()),
-                    "tags", tags,
-                    // 用于向量检索侧按数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
-                    "sourceType", "FAQ");
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("uid", currentFaq.getUid());
+                metadata.put("question", currentFaq.getQuestion());
+                metadata.put("kbUid", kbUid);
+                metadata.put("categoryUid", currentFaq.getCategoryUid() != null ? currentFaq.getCategoryUid() : "");
+                metadata.put("orgUid", currentFaq.getOrgUid());
+                metadata.put("enabled", Boolean.toString(currentFaq.getEnabled()));
+                metadata.put("tags", tags);
+                metadata.put("language", currentFaq.getKbase() != null && StringUtils.hasText(currentFaq.getKbase().getSourceLanguage()) ? currentFaq.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("sourceLanguage", currentFaq.getKbase() != null && StringUtils.hasText(currentFaq.getKbase().getSourceLanguage()) ? currentFaq.getKbase().getSourceLanguage().trim().toUpperCase() : "");
+                metadata.put("translated", Boolean.FALSE.toString());
+                metadata.put("sourceType", "FAQ");
 
             // 创建文档
             Document document = new Document(id, content, metadata);
 
             // 添加新文档到向量存储
             log.info("向向量存储添加文档: {}", id);
-            vectorStore.add(List.of(document));
+            vectorStoreResolver.resolveByKbase(currentFaq.getKbase()).add(List.of(document));
             log.info("已成功添加文档到向量存储: {}", id);
+            reindexTranslatedFaqVectors(currentFaq);
 
             // 3. 更新FAQ实体中的文档ID列表
             List<String> docIdList = currentFaq.getDocIdList();
@@ -434,8 +447,21 @@ public class FaqVectorService {
             faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.SUCCESS.name());
             faqRestService.evictFaqCacheAllEntries();
 
+            // 记录向量化成功
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentFaq.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("FAQ", currentFaq.getUid(), currentFaq.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "SUCCESS", null, costMs);
+            } catch (Exception recEx) {
+                log.warn("记录向量化历史失败: uid={}, error={}", currentFaq.getUid(), recEx.getMessage());
+            }
+
         } catch (Exception e) {
-            log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage(), e);
+            log.error("FAQ向量索引失败: {}, 错误: {}", currentFaq.getQuestion(), e.getMessage());
 
             // 设置向量索引状态为失败
             try {
@@ -444,6 +470,20 @@ public class FaqVectorService {
                 faqRestService.evictFaqCacheAllEntries();
             } catch (Exception saveEx) {
                 log.error("更新FAQ向量索引状态失败: {}, 错误: {}", currentFaq.getUid(), saveEx.getMessage());
+            }
+
+            // 记录向量化失败
+            long costMs = System.currentTimeMillis() - startMs;
+            try {
+                String content = currentFaq.getQuestion() + "\n" + currentFaq.getAnswer();
+                KbaseVectorStoreResolver.EmbeddingInfo embeddingInfo = vectorStoreResolver.getEmbeddingInfo(currentFaq.getKbase());
+                String embProvider = embeddingInfo != null ? embeddingInfo.provider() : null;
+                String embModel = embeddingInfo != null ? embeddingInfo.model() : null;
+                Integer embDimensions = embeddingInfo != null ? embeddingInfo.dimensions() : null;
+                llmEmbeddingRestService.recordEmbedding("FAQ", currentFaq.getUid(), currentFaq.getOrgUid(),
+                        embProvider, embModel, embDimensions, content, "ERROR", e.getMessage(), costMs);
+            } catch (Exception recEx) {
+                log.warn("记录向量化失败历史失败: uid={}, error={}", currentFaq.getUid(), recEx.getMessage());
             }
 
             throw new RuntimeException("创建向量索引失败: " + e.getMessage(), e);
@@ -518,7 +558,7 @@ public class FaqVectorService {
 
             // 从向量存储中删除所有相关文档
             log.info("删除FAQ向量文档, 数量: {}, IDs: {}", docIdList.size(), docIdList);
-            vectorStore.delete(docIdList);
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(docIdList);
 
             // 不再在此方法中更新实体状态，避免乐观锁冲突
             // 状态更新将在indexFaqVector方法中完成
@@ -543,6 +583,11 @@ public class FaqVectorService {
      */
     public List<FaqVectorSearchResult> searchFaqVector(String query, String kbUid, String categoryUid, String orgUid,
             int limit) {
+        return searchFaqVector(query, kbUid, categoryUid, orgUid, limit, null);
+        }
+
+        public List<FaqVectorSearchResult> searchFaqVector(String query, String kbUid, String categoryUid, String orgUid,
+            int limit, String language) {
         log.info("向量搜索FAQ: query={}, kbUid={}, categoryUid={}, orgUid={}", query, kbUid, categoryUid, orgUid);
 
         // 创建过滤表达式构建器
@@ -572,6 +617,11 @@ public class FaqVectorService {
             finalOp = expressionBuilder.and(finalOp, orgUidOp);
         }
 
+        if (StringUtils.hasText(language)) {
+            FilterExpressionBuilder.Op languageOp = expressionBuilder.eq("language", language.trim().toUpperCase());
+            finalOp = expressionBuilder.and(finalOp, languageOp);
+        }
+
         // 构建最终的过滤表达式
         Expression expression = finalOp.build();
 
@@ -583,7 +633,7 @@ public class FaqVectorService {
                 .build();
 
         // 执行相似度搜索
-        List<Document> similarDocuments = vectorStore.similaritySearch(searchRequest);
+        List<Document> similarDocuments = vectorStoreResolver.resolveByKbUid(kbUid).similaritySearch(searchRequest);
 
         // 解析结果
         List<FaqVectorSearchResult> resultList = new ArrayList<>();
@@ -636,6 +686,13 @@ public class FaqVectorService {
         return resultList;
     }
 
+    private VectorStore resolveStoreByUid(String uid) {
+        return faqRestService.findByUidNoCache(uid)
+                .map(FaqEntity::getKbase)
+                .map(vectorStoreResolver::resolveByKbase)
+                .orElseGet(vectorStoreResolver::resolveDefault);
+    }
+
     /**
      * 从文档创建简化版的FaqVector对象
      * 用于在找不到对应的FAQ实体时提供基础信息
@@ -676,9 +733,104 @@ public class FaqVectorService {
                 .kbUid((String) metadata.getOrDefault(
                     KbaseConst.KBASE_KB_UID,
                     metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, "")))
+                .sourceUid((String) metadata.getOrDefault("sourceUid", uid))
                 .categoryUid((String) metadata.getOrDefault("categoryUid", ""))
                 .enabled(Boolean.parseBoolean((String) metadata.getOrDefault("enabled", "true")))
+                .language((String) metadata.getOrDefault("language", ""))
+                .sourceLanguage((String) metadata.getOrDefault("sourceLanguage", ""))
+                .translated(Boolean.parseBoolean((String) metadata.getOrDefault("translated", "false")))
                 .build();
+    }
+
+    private void reindexTranslatedFaqVectors(FaqEntity faq) {
+        deleteTranslatedFaqVectors(faq);
+
+        String kbUid = faq.getKbase() != null ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            return;
+        }
+
+        List<KbaseTranslationEntity> translations = kbaseTranslationRepository
+                .findByKbase_UidAndSourceUidAndSourceTypeAndDeletedFalse(
+                        kbUid,
+                        faq.getUid(),
+                        KbaseTranslationSourceTypeEnum.FAQ.name());
+
+        List<Document> documents = new ArrayList<>();
+        for (KbaseTranslationEntity translation : translations) {
+            if (!Boolean.TRUE.equals(translation.getEnabled())) {
+                continue;
+            }
+            if (!KbaseTranslationStatusEnum.SUCCESS.name().equals(translation.getTranslateStatus())) {
+                continue;
+            }
+            if (!StringUtils.hasText(translation.getTargetLanguage())) {
+                continue;
+            }
+
+            FaqVector translatedVector = FaqVector.fromTranslation(faq, translation);
+            String translatedQuestion = translatedVector.getQuestion();
+            String translatedAnswer = translatedVector.getAnswer();
+            if (!StringUtils.hasText(translatedQuestion) && !StringUtils.hasText(translatedAnswer)) {
+                continue;
+            }
+
+            String docId = "faq_translation_" + translation.getUid();
+            String content = (translatedQuestion != null ? translatedQuestion : "") + "\n"
+                    + (translatedAnswer != null ? translatedAnswer : "");
+
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("uid", translation.getUid());
+            metadata.put("sourceUid", faq.getUid());
+            metadata.put("question", translatedQuestion);
+            metadata.put("kbUid", kbUid);
+            metadata.put("categoryUid", faq.getCategoryUid() != null ? faq.getCategoryUid() : "");
+            metadata.put("orgUid", faq.getOrgUid());
+            metadata.put("enabled", Boolean.toString(translatedVector.getEnabled()));
+            metadata.put("tags", translatedVector.getTagList() == null ? "" : String.join(",", translatedVector.getTagList()));
+            metadata.put("language", translatedVector.getLanguage() != null ? translatedVector.getLanguage() : "");
+            metadata.put("sourceLanguage", translatedVector.getSourceLanguage() != null ? translatedVector.getSourceLanguage() : "");
+            metadata.put("translated", Boolean.TRUE.toString());
+            metadata.put("sourceType", "FAQ");
+
+            documents.add(new Document(docId, content, metadata));
+        }
+
+        if (!documents.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).add(documents);
+        }
+    }
+
+    private void deleteTranslatedFaqVectors(FaqEntity faq) {
+        if (faq.getKbase() == null || !StringUtils.hasText(faq.getUid())) {
+            return;
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op finalOp = expressionBuilder.and(
+            expressionBuilder.eq("sourceType", "FAQ"),
+            expressionBuilder.eq("sourceUid", faq.getUid()));
+        finalOp = expressionBuilder.and(finalOp, expressionBuilder.eq("translated", "true"));
+        Expression expression = finalOp.build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(200)
+                .build();
+
+        List<Document> existingDocs = vectorStoreResolver.resolveByKbase(faq.getKbase()).similaritySearch(searchRequest);
+        if (existingDocs == null || existingDocs.isEmpty()) {
+            return;
+        }
+
+        List<String> docIds = existingDocs.stream()
+                .map(Document::getId)
+                .filter(StringUtils::hasText)
+                .toList();
+        if (!docIds.isEmpty()) {
+            vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(docIds);
+        }
     }
 
 

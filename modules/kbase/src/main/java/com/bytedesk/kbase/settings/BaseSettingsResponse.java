@@ -6,6 +6,7 @@
 package com.bytedesk.kbase.settings;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsResponse;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingResponse;
 import com.bytedesk.kbase.settings_intention.IntentionSettingsResponse;
 import com.bytedesk.kbase.settings_invite.InviteSettingsResponse;
@@ -134,6 +135,16 @@ public abstract class BaseSettingsResponse extends BaseResponse {
      * Draft conversation summary settings (admin editing/testing only)
      */
     private SummarySettingsResponse draftSummarySettings;
+
+    /**
+     * Auto resolved timeout settings (published)
+     */
+    private AutoResolvedSettingsResponse autoResolvedSettings;
+
+    /**
+     * Auto resolved timeout settings (draft)
+     */
+    private AutoResolvedSettingsResponse draftAutoResolvedSettings;
 
     /**
      * Whether there are unpublished changes in draft

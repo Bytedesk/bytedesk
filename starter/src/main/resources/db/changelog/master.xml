@@ -4,80 +4,114 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/changelog/migration/250821_rename_kb_type_to_kbase_type.xml" />
-    <include file="db/changelog/migration/250910_rename_api_url_to_base_url.xml" />
-    <include file="db/changelog/migration/250916_rename_name_to_provider_type.xml" />
-    <include file="db/changelog/migration/250922_rename_content_to_process_schema.xml" />
-    <include file="db/changelog/migration/250923_rename_provider_name_to_provider_type.xml" />
-    <include file="db/changelog/migration/250928_add_register_source_to_user.xml" />
-    <!-- <include file="db/changelog/migration/251010_create_service_statistic_views.xml" /> -->
-    <!-- <include file="db/changelog/migration/251010_create_quality_statistic_views.xml" /> -->
-
-    <include file="db/changelog/migration/251111_alter_thread_content_to_text.xml" />
-    <include file="db/changelog/migration/251117_rename_ticket_title_to_summary.xml" />
-    <!-- <include file="db/changelog/migration/251120_queue_member_core_fields.xml" /> -->
-    <include file="db/changelog/migration/251120_queue_settings_notice_batch_window.xml" />
-    <include file="db/changelog/migration/251125_queue_settings_add_fields.xml" />
-    <include file="db/changelog/migration/251126_queue_topic_day_unique_constraint.xml" />
-    <include file="db/changelog/migration/251127_visitor_uid_org_uid_unique_constraint.xml" />
-    <include file="db/changelog/migration/251129_cleanup_legacy_authorities.xml" />
-    <include file="db/changelog/migration/251201_remove_default_member_role.xml" />
-    <include file="db/changelog/migration/251202_grant_role_level_permissions.xml" />
-    <include file="db/changelog/migration/251205_rename_ticket_summary_to_title.xml" />
-    <include file="db/changelog/migration/251206_update_default_role_levels.xml" />
-    <!-- <include file="db/changelog/migration/251208_agent_status_duration_seconds.xml" /> -->
-    <include file="db/changelog/migration/251211_update_ticket_process_type.xml" />
-    <include file="db/changelog/migration/251212_ticket_settings_custom_form_enabled_reset.xml" />
-    <include file="db/changelog/migration/251213_assign_quickbutton_role_permissions.xml" />
-    <include file="db/changelog/migration/251214_remove_menu_color_column.xml" />
-    <include file="db/changelog/migration/251216_drop_is_markdown_from_articles.xml" />
-    <include file="db/changelog/migration/251217_drop_kbase_settings_flags.xml" />
-    <include file="db/changelog/migration/251218_drop_process_key_and_ticket_process_definition_key.xml" />
-    <include file="db/changelog/migration/251218_drop_ticket_rated_and_rating.xml" />
-    <include file="db/changelog/migration/251222_migrate_authorities_to_module_action.xml" />
-    <include file="db/changelog/migration/251225_sync_authority_fields_after_module_action.xml" />
-    <include file="db/changelog/migration/251223_sync_default_role_authorities.xml" />
-    <include file="db/changelog/migration/251224_add_role_user_organization_authorities.xml" />
-    <include file="db/changelog/migration/251224_set_default_system_roles_level_platform.xml" />
-    <include file="db/changelog/migration/251224_add_role_value_to_core_role.xml" />
-    <include file="db/changelog/migration/251226_drop_service_settings_proactive_trigger.xml" />
-    <include file="db/changelog/migration/251226_update_authority_level_settings_platform_others_organization.xml" />
-    <include file="db/changelog/migration/251223_drop_bytedesk_core_quartz.xml" />
-
-    <include file="db/changelog/migration/251231_add_form_version_and_form_user.xml" />
-    <include file="db/changelog/migration/251231_drop_form_result_legacy_columns.xml" />
-
-    <include file="db/changelog/migration/260112_alter_browse_user_agent_length.xml" />
-    <include file="db/changelog/migration/260112_alter_browse_event_data_to_text.xml" />
-    <include file="db/changelog/migration/260114_alter_browse_referrer_url_title_length.xml" />
-    <include file="db/changelog/migration/260113_add_input_preview_display_settings.xml" />
-    <include file="db/changelog/migration/260114_add_toolbar_upload_robot.xml" />
-    <!-- <include file="db/changelog/migration/260114_drop_org_name_code_unique_constraints.xml" /> -->
-
-    <include file="db/changelog/migration/260117_add_message_agent_reply_fields.xml" />
-
-    <include file="db/changelog/migration/260120_drop_ticket_visitor_thread_columns.xml" />
-
-    <include file="db/changelog/migration/260121_add_ticket_visitor_thread_uid.xml" />
-
-    <include file="db/changelog/migration/260122_add_org_custom_server_fields.xml" />
-
-    <include file="db/changelog/migration/260126_drop_service_unified_legacy_columns.xml" />
-
-    <include file="db/changelog/migration/260204_add_show_message_status.xml" />
-
-    <include file="db/changelog/migration/260212_add_visitor_recall_settings.xml" />
-
-    <include file="db/changelog/migration/260207_add_organization_limits.xml" />
-
-    <include file="db/changelog/migration/260923_add_org_vip_expire_login_check.xml" />
-
-    <include file="db/changelog/migration/260204_add_service_statistic_robot_message_count.xml" />
-
-    <include file="db/changelog/migration/260208_add_role_expires_at.xml" />
-
-    <include file="db/changelog/migration/260208_add_workgroup_admins.xml" />
-
-    <include file="db/changelog/migration/260210_add_crm_customer_shop_consult_followup.xml" />
-
+    <include file="db/changelog/migration/260421_add_topic_subscription_type.xml" />
+    <include file="db/changelog/migration/260421_add_notice_dept_uid.xml" />
+    <include file="db/changelog/migration/260423_alter_ai_skill_description_type.xml" />
+    <include file="db/changelog/migration/260423_add_ai_skill_source.xml" />
+    <include file="db/changelog/migration/260424_add_ai_ocr_task_fields.xml" />
+    <include file="db/changelog/migration/260425_add_message_leave_allow_visitor_send_when_offline.xml" />
+    <include file="db/changelog/migration/260428_drop_order_price_column.xml" />
+    <include file="db/changelog/migration/260509_add_goods_order_type.xml" />
+    <include file="db/changelog/migration/260509_add_goods_order_navigate_to_path.xml" />
+    <include file="db/changelog/migration/260510_drop_agent_seat_assigned_member_uid.xml" />
+    <include file="db/changelog/migration/260510_add_goods_status.xml" />
+    <include file="db/changelog/migration/260512_add_ivr_menu_extension_number.xml" />
+    <include file="db/changelog/migration/260514_add_ivr_record_runtime_fields.xml" />
+    <include file="db/changelog/migration/260516_refactor_apns_p12_fields.xml" />
+    <include file="db/changelog/migration/260516_refactor_apns_token_schema.xml" />
+    <include file="db/changelog/migration/260518_refactor_agent_call_settings.xml" />
+    <include file="db/changelog/migration/260518_rename_call_settings_enabled_column.xml" />
+    <include file="db/changelog/migration/260519_rename_call_settings_number_column.xml" />
+    <include file="db/changelog/migration/260520_add_esl_event_source_ip.xml" />
+    <include file="db/changelog/migration/260522_add_call_settings_hold_media_url.xml" />
+    <include file="db/changelog/migration/260522_add_acd_runtime_tables.xml" />
+    <include file="db/changelog/migration/260523_add_call_settings_control_targets.xml" />
+    <include file="db/changelog/migration/260523_add_call_settings_registration_status.xml" />
+    <include file="db/changelog/migration/260523_add_extension_registration_status.xml" />
+    <include file="db/changelog/migration/260523_add_extension_lease_fields.xml" />
+    <include file="db/changelog/migration/260523_rename_goods_order_keyword_columns.xml" />
+    <include file="db/changelog/migration/260526_add_call_cdr_call_type.xml" />
+    <include file="db/changelog/migration/260529_add_outbound_call_task_fields.xml" />
+    <include file="db/changelog/migration/260530_add_robot_workspace_agent_fields.xml" />
+    <include file="db/changelog/migration/260601_add_call_cdr_transcript_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_cdr_thread_uid.xml" />
+    <include file="db/changelog/migration/260602_add_call_recordings_audio_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_popup_iframe_fields.xml" />
+    <include file="db/changelog/migration/260602_add_call_settings_mobile_outbound_fields.xml" />
+    <include file="db/changelog/migration/260602_cleanup_extension_blank_name.xml" />
+    <include file="db/changelog/migration/260603_add_call_settings_signed_in.xml" />
+    <include file="db/changelog/migration/260603_add_call_task_transfer_and_ivr_fields.xml" />
+    <include file="db/changelog/migration/260604_add_time_condition_detail_table.xml" />
+    <include file="db/changelog/migration/260604_add_service_holiday_official_fields.xml" />
+    <include file="db/changelog/migration/260604_add_call_route_time_condition_uid.xml" />
+    <include file="db/changelog/migration/260604_add_ring_group_fields.xml" />
+    <include file="db/changelog/migration/260605_add_dialplan_generated_xml_cache_fields.xml" />
+    <include file="db/changelog/migration/260605_add_bridge_runtime_fields.xml" />
+    <include file="db/changelog/migration/260606_add_apns_push_record_fields.xml" />
+    <include file="db/changelog/migration/260606_add_apns_token_environment.xml" />
+    <include file="db/changelog/migration/260606_rename_apns_builder_id_to_p12_uid.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_template_message_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_subscribe_scan_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_qrcode_table.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_qrcode_scan_link_fields.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_shorten_table.xml" />
+    <include file="db/changelog/migration/260609_add_wechat_mp_push_record_fields.xml" />
+    <include file="db/changelog/migration/260610_add_connection_presence_index.xml" />
+    <include file="db/changelog/migration/260611_add_ticket_statistics_indexes.xml" />
+    <include file="db/changelog/migration/260611_add_service_statistic_scope_indexes.xml" />
+    <include file="db/changelog/migration/260611_refactor_xml_curl_trace_table.xml" />
+    <include file="db/changelog/migration/260612_alter_esl_event_api_argument_to_text.xml" />
+    <include file="db/changelog/migration/260617_drop_time_condition_json_column.xml" />
+    <include file="db/changelog/migration/260616_add_quality_rule_engine_tables.xml" />
+    <include file="db/changelog/migration/260617_add_quality_inspection_task_table.xml" />
+    <include file="db/changelog/migration/260620_add_ticket_statistics_customer_metrics.xml" />
+    <include file="db/changelog/migration/260623_add_thread_query_indexes.xml" />
+    <include file="db/changelog/migration/260624_add_ticket_sla_tables.xml" />
+    <include file="db/changelog/migration/260624_rename_robot_to_agent_settings_enabled_column.xml" />
+    <include file="db/changelog/migration/260625_add_robot_settings_hide_thinking_process.xml" />
+    <include file="db/changelog/migration/260625_add_ticket_basic_settings_smart_ticket_generate.xml" />
+    <include file="db/changelog/migration/260704_add_nickname_pinyin.xml" />
+    <include file="db/changelog/migration/260704_drop_service_settings_show_rate_btn.xml" />
+    <include file="db/changelog/migration/260704_alter_email_template_content_to_text.xml" />
+    <include file="db/changelog/migration/260706_rename_wechat_mp_tables.xml" />
+    <include file="db/changelog/migration/260707_alter_license_key_to_text.xml" />
+    <include file="db/changelog/migration/260709_add_kbase_i18n_config_fields.xml" />
+    <include file="db/changelog/migration/260709_create_kbase_translation_table.xml" />
+    <include file="db/changelog/migration/260710_alter_kbase_translation_title_summary_to_text.xml" />
+    <include file="db/changelog/migration/260711_add_article_source_fields.xml" />
+    <include file="db/changelog/migration/260713_add_voicemail_hotline_fields.xml" />
+    <include file="db/changelog/migration/260713_add_ivr_record_hotline_trace_fields.xml" />
+    <include file="db/changelog/migration/260715_add_visitor_sip_profile_fields.xml" />
+    <include file="db/changelog/migration/260718_rename_extension_name_to_extension_number.xml" />
+    <include file="db/changelog/migration/260720_drop_extension_legacy_columns.xml" />
+    <include file="db/changelog/migration/260720_add_extension_number_unique_index.xml" />
+    <include file="db/changelog/migration/260721_add_call_route_source_fields.xml" />
+    <include file="db/changelog/migration/260722_add_call_queue_agent_member_fields.xml" />
+    <include file="db/changelog/migration/260722_add_acd_agent_wrap_up_until.xml" />
+    <include file="db/changelog/migration/260722_add_cdr_queue_agent_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_knowledge_welcome_type.xml" />
+    <include file="db/changelog/migration/260722_refactor_voice_voicemail_knowledge_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_ivr_fields.xml" />
+    <include file="db/changelog/migration/260722_add_extension_settings_routing_time_condition_switch.xml" />
+    <include file="db/changelog/migration/260722_fix_extension_settings_uuid_unique.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_tables.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_relation_fields.xml" />
+    <include file="db/changelog/migration/260724_add_call_session_indexes.xml" />
+    <include file="db/changelog/migration/260724_add_acd_queue_entry_destination_number.xml" />
+    <include file="db/changelog/migration/260725_add_kb_interim_prompt.xml" />
+    <include file="db/changelog/migration/260725_add_kb_intent_classification.xml" />
+    <include file="db/changelog/migration/260727_add_ticket_auto_create_settings.xml" />
+    <include file="db/changelog/migration/260728_fix_ticket_auto_create_settings_columns.xml" />
+    <include file="db/changelog/migration/260727_add_ticket_visibility_settings.xml" />
+    <include file="db/changelog/migration/260727_refactor_unified_worktime_schema.xml" />
+    <include file="db/changelog/migration/260728_add_thread_resolved_tracking_fields.xml" />
+    <include file="db/changelog/migration/260728_add_auto_resolved_settings.xml" />
+    <include file="db/changelog/migration/260728_add_ticket_assignment_log.xml" />
+    <include file="db/changelog/migration/260728_add_member_manager_uid.xml" />
+    <include file="db/changelog/migration/260728_add_ivr_record_context_json.xml" />
+    <include file="db/changelog/migration/260729_add_voice_clone_fields.xml" />
+    <include file="db/changelog/migration/260729_add_asr_hotword_vocabulary_fields.xml" />
+    <include file="db/changelog/migration/260729_add_ticket_sla_record_node_fields.xml" />
+    <include file="db/changelog/migration/260730_drop_ticket_basic_settings_unused_timeout_tips.xml" />
+    
 </databaseChangeLog>

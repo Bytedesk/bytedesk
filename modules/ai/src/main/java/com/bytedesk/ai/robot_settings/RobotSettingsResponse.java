@@ -33,7 +33,12 @@ import lombok.experimental.SuperBuilder;
 public class RobotSettingsResponse extends BaseSettingsResponse {
 
     private static final long serialVersionUID = 1L;
-    
+
+    /**
+     * Hide thinking process from visitor UI.
+     */
+    private Boolean hideThinkingProcess;
+
     /**
      * Rating down settings (Robot-specific)
      */

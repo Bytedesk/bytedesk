@@ -29,7 +29,7 @@
     },
     "siliconflow": {
         "nickname": "硅基流动",
-        "logo": "silicon.png",
+        "logo": "siliconflow.png",
         "baseUrl": "https://api.siliconflow.cn",
         "webUrl": "https://www.siliconflow.cn/",
         "status": "PRODUCTION"
@@ -65,7 +65,7 @@
     "minimax": {
         "nickname": "Minimax",
         "logo": "minimax.png",
-        "baseUrl": "https://api.minimax.chat/v1/",
+        "baseUrl": "https://api.minimax.chat",
         "webUrl": "https://platform.minimaxi.com/",
         "status": "PRODUCTION"
     },
@@ -118,18 +118,18 @@
         "webUrl": "https://openrouter.ai/",
         "status": "PRODUCTION"
     },
+    "moonshot": {
+        "nickname": "Moonshot",
+        "logo": "moonshot.png",
+        "baseUrl": "https://api.moonshot.cn",
+        "webUrl": "https://moonshot.ai/",
+        "status": "PRODUCTION"
+    },
     "xinghuo": {
         "nickname": "讯飞星火",
         "logo": "xinghuo.png",
         "baseUrl": "https://xinghuo.xfyun.cn/sparkapi",
         "webUrl": "https://xinghuo.xfyun.cn/sparkapi",
-        "status": "DEVELOPMENT"
-    },
-    "moonshot": {
-        "nickname": "Kimi",
-        "logo": "moonshot.png",
-        "baseUrl": "https://api.moonshot.cn",
-        "webUrl": "https://moonshot.ai/",
         "status": "DEVELOPMENT"
     },
     "baichuan": {

@@ -17,8 +17,8 @@
 					<#--  <img class="dark-mode-item h-40px" src="/assets/images/logo-light.svg" alt="logo">  -->
 				</a>
 
-				<p class="my-4"><h3 class="text-white">${(i18n['brand.title'])! '微语 - 重复工作自动化'}</h3></p>
-				<p><h5 class="text-white-50">${(i18n['brand.subtitle'])! '开源办公软件'}</h5></p>
+				<p class="my-4"><h3 class="text-white">${(i18n['brand.title'])! '微语 - 解决客户问题'}</h3></p>
+				<p><h5 class="text-white-50">${(i18n['brand.subtitle'])! '开源创造价值'}</h5></p>
 				<#--  开源即时通讯平台、开源智能客服系统、开源AI应用创新平台  -->
 				<!-- Newsletter -->
 				<#--  <form class="row row-cols-lg-auto g-2">
@@ -125,6 +125,17 @@
 					<div class="col-6 col-lg-3">
 						<a href="${langPrefix}/features/office.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.office">AI文档</@t></a>
 					</div>
+
+					<#--  第五行: MCP/CLI/Skills  -->
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/mcp.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.mcp">MCP 服务</@t></a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/cli.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.cli">CLI 命令行</@t></a>
+					</div>
+					<div class="col-6 col-lg-3">
+						<a href="${langPrefix}/features/skill.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.skill">Skills 技能</@t></a>
+					</div>
 				</div>
 			</div>
 		</div><!-- Row END -->
@@ -136,7 +147,7 @@
 			<div class="col-12">
 				<div class="d-md-flex justify-content-between align-items-center pt-2 pb-4 text-center">
 					<!-- copyright text -->
-					<div class="text-white-50"> ${(i18n['footercopyright'])! 'Copyrights ©2013~2025 北京微语天下科技有限公司'}</div>
+					<div class="text-white-50"> ${(i18n['footercopyright'])! 'Copyrights ©2013~2026 北京微语天下科技有限公司'}</div>
 					<!-- copyright links-->
 					<div class="nav justify-content-center mt-3 mt-md-0">
 						<ul class="list-inline mb-0">

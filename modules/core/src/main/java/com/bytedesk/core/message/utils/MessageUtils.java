@@ -13,13 +13,16 @@
  */
 package com.bytedesk.core.message.utils;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.SystemContent;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserUtils;
 import com.bytedesk.core.thread.ThreadEntity;
@@ -34,6 +37,16 @@ import lombok.extern.slf4j.Slf4j;
 @UtilityClass
 @Slf4j
 public class MessageUtils {
+
+    private static String buildSystemContent(MessageTypeEnum type, String content) {
+        return SystemContent.of(type, content).toJson();
+    }
+
+    private static String buildSystemContent(MessageTypeEnum type, String content, String extra) {
+        SystemContent systemContent = SystemContent.of(type, content);
+        systemContent.setExtra(extra);
+        return systemContent.toJson();
+    }
 
     public static MessageProtobuf createLoginNoticeMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid, String content) {
         // 
@@ -72,6 +85,23 @@ public class MessageUtils {
                 .build();
         return message;
     }
+
+    public static MessageProtobuf createKickoffMessage(String messageUid, ThreadProtobuf threadProtobuf, String orgUid,
+            String content) {
+        UserProtobuf system = UserUtils.getSystemUser();
+        MessageExtra messageExtra = MessageExtra.fromOrgUid(orgUid);
+        return MessageProtobuf.builder()
+                .uid(messageUid)
+                .type(MessageTypeEnum.KICKOFF)
+                .content(content)
+                .status(MessageStatusEnum.SUCCESS)
+                .createdAt(BdDateUtils.now())
+                .channel(ChannelEnum.SYSTEM)
+                .thread(threadProtobuf)
+                .user(system)
+                .extra(messageExtra.toJson())
+                .build();
+    }
     
     public static MessageProtobuf createThreadMessage(String messageUid, ThreadEntity thread, MessageTypeEnum type, String content) {
         //
@@ -97,14 +127,44 @@ public class MessageUtils {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AUTO_CLOSED,
-                content);
+                buildSystemContent(MessageTypeEnum.AUTO_CLOSED, content));
+    }
+
+    public static MessageProtobuf createAutoCloseMessage(ThreadEntity thread, String content, String extra) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.AUTO_CLOSED,
+                buildSystemContent(MessageTypeEnum.AUTO_CLOSED, content, extra));
     }
 
     public static MessageProtobuf createAgentCloseMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.AGENT_CLOSED,
-                content);
+                buildSystemContent(MessageTypeEnum.AGENT_CLOSED, content));
+    }
+
+    public static MessageProtobuf createAgentCloseMessage(ThreadEntity thread, String content, String extra) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.AGENT_CLOSED,
+                buildSystemContent(MessageTypeEnum.AGENT_CLOSED, content, extra));
+    }
+
+    public static String buildResolvedPromptExtra(String threadUid, String orgUid, boolean submitted, Boolean resolved) {
+        JSONObject resolvedPrompt = new JSONObject();
+        resolvedPrompt.put("show", true);
+        resolvedPrompt.put("threadUid", threadUid);
+        resolvedPrompt.put("orgUid", orgUid);
+        resolvedPrompt.put("allowResolvedFeedback", true);
+        resolvedPrompt.put("submitted", submitted);
+        if (resolved != null) {
+            resolvedPrompt.put("resolved", resolved);
+        }
+
+        JSONObject extra = new JSONObject();
+        extra.put("resolvedPrompt", resolvedPrompt);
+        return JSON.toJSONString(extra);
     }
 
     public static MessageProtobuf createAgentReplyTimeoutMessage(ThreadEntity thread, String content) {

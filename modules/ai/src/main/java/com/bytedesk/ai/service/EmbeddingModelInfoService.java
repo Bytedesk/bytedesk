@@ -1,16 +1,14 @@
 package com.bytedesk.ai.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
-import com.alibaba.cloud.ai.dashscope.embedding.DashScopeEmbeddingModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,22 +21,31 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmbeddingModelInfoService {
+
+    public EmbeddingModelInfoService(
+            ObjectProvider<ZhiPuAiEmbeddingModel> zhipuaiEmbeddingModelProvider,
+            ObjectProvider<OllamaEmbeddingModel> ollamaEmbeddingModelProvider,
+            @Qualifier("dashscopeEmbeddingModel")
+            ObjectProvider<EmbeddingModel> dashscopeEmbeddingModelProvider,
+            ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.zhipuaiEmbeddingModel = zhipuaiEmbeddingModelProvider.getIfAvailable();
+        this.ollamaEmbeddingModel = ollamaEmbeddingModelProvider.getIfAvailable();
+        this.dashscopeEmbeddingModel = dashscopeEmbeddingModelProvider.getIfAvailable();
+    }
+
 
     private final ApplicationContext applicationContext;
     
     @Value("${spring.ai.model.embedding:none}")
     private String primaryEmbeddingProvider;
 
-    @Autowired(required = false)
-    private ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel;
+    private final ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel;
 
-    @Autowired(required = false)
-    private OllamaEmbeddingModel ollamaEmbeddingModel;
+    private final OllamaEmbeddingModel ollamaEmbeddingModel;
 
-    @Autowired(required = false)
-    private DashScopeEmbeddingModel dashscopeEmbeddingModel;
+    private final EmbeddingModel dashscopeEmbeddingModel;
 
     /**
      * 测试不同的 embedding 模型
@@ -47,7 +54,7 @@ public class EmbeddingModelInfoService {
         Map<String, Object> result = new HashMap<>();
         
         if (dashscopeEmbeddingModel == null) {
-            result.put("error", "DashScopeEmbeddingModel is not available");
+            result.put("error", "BytedeskDashScopeEmbeddingModel is not available");
             return result;
         }
         
@@ -57,7 +64,7 @@ public class EmbeddingModelInfoService {
         for (String model : testModels) {
             try {
                 log.info("Testing DashScope embedding model: {}", model);
-                // 这里需要动态设置模型，但 DashScopeEmbeddingModel 可能不支持动态切换
+                // 这里需要动态设置模型，但 BytedeskDashScopeEmbeddingModel 可能不支持动态切换
          
                     Map<String, Object> modelResult = new HashMap<>();
                     modelResult.put("status", "Not Configured");

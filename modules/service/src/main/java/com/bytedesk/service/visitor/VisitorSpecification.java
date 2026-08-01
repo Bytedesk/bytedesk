@@ -31,8 +31,7 @@ public class VisitorSpecification extends BaseSpecification<VisitorEntity, Visit
         // log.info("request: {}", request);
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
-            predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
+            predicates.add(criteriaBuilder.equal(root.get("deleted"), Boolean.TRUE.equals(request.getDeleted())));
             // ip
             if (StringUtils.hasText(request.getIp())) {
                 predicates.add(criteriaBuilder.like(root.get("ip"), "%" + request.getIp() + "%"));

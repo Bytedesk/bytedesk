@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260711-add-article-source-fields" author="bytedesk">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_article" />
+            <not>
+                <columnExists tableName="bytedesk_kbase_article" columnName="source_url" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_kbase_article">
+            <column name="source_url" type="varchar(1024)" />
+            <column name="source_name" type="varchar(255)" />
+            <column name="is_show_source" type="boolean" defaultValueBoolean="false" />
+        </addColumn>
+
+        <rollback>
+            <dropColumn tableName="bytedesk_kbase_article" columnName="is_show_source" />
+            <dropColumn tableName="bytedesk_kbase_article" columnName="source_name" />
+            <dropColumn tableName="bytedesk_kbase_article" columnName="source_url" />
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,1 +1,10 @@
-# 
+# organization
+
+该包负责组织记录管理、认证与身份元数据，以及组织生命周期接口。
+
+## 实现要点
+
+- 核心模型包括 OrganizationEntity、OrganizationRequest、OrganizationResponse、OrganizationResponseSimple、OrganizationIdentityTypeEnum、OrganizationVerifyStatusEnum、OrganizationVerifyTypeEnum。
+- OrganizationRepository、OrganizationSpecification、OrganizationRestController、OrganizationRestService 提供持久化、条件过滤和组织管理接口。
+- OrganizationDefaults、OrganizationInitializer、OrganizationPermissions 提供组织默认值、初始化逻辑和权限元数据。
+- OrganizationEntityListener、OrganizationEventListener 与 event 子包负责组织生命周期回调和创建事件。

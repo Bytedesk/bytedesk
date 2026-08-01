@@ -17,7 +17,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;

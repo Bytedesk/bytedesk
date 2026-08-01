@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,8 +38,9 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
     private final WorkflowLogRestService workflowResultRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "标签", action = "组织查询", description = "query tag by org")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workflow log by org")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(WorkflowLogRequest request) {
         
         Page<WorkflowLogResponse> tags = workflowResultRestService.queryByOrg(request);
@@ -44,8 +48,9 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "用户查询", description = "query tag by user")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workflow log by user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(WorkflowLogRequest request) {
         
         Page<WorkflowLogResponse> tags = workflowResultRestService.queryByUser(request);
@@ -53,8 +58,9 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
-    @ActionAnnotation(title = "标签", action = "查询详情", description = "query tag by uid")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow log by uid")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(WorkflowLogRequest request) {
         
         WorkflowLogResponse tag = workflowResultRestService.queryByUid(request);
@@ -62,37 +68,40 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "新建", description = "create tag")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_CREATE)
-    public ResponseEntity<?> create(WorkflowLogRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody WorkflowLogRequest request) {
         
         WorkflowLogResponse tag = workflowResultRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "更新", description = "update tag")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_UPDATE, description = "update workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_UPDATE)
-    public ResponseEntity<?> update(WorkflowLogRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody WorkflowLogRequest request) {
         
         WorkflowLogResponse tag = workflowResultRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
-    @ActionAnnotation(title = "标签", action = "删除", description = "delete tag")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_DELETE)
-    public ResponseEntity<?> delete(WorkflowLogRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody WorkflowLogRequest request) {
         
         workflowResultRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "标签", action = "导出", description = "export tag")
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_EXPORT, description = "export workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_EXPORT)
     @GetMapping("/export")
@@ -102,8 +111,8 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
             response,
             workflowResultRestService,
             WorkflowLogExcel.class,
-            "标签",
-            "tag"
+            "Workflow Log",
+            "workflow_log"
         );
     }
 

@@ -116,5 +116,54 @@ public class BdPinyinUtils {
         return PinyinBs.newInstance().style(PinyinToneStyles.firstLetter()).toPinyin(text);
         // Assert.assertEquals("w a z w", pinyin);
     }
-    
+
+    /**
+     * 数字声调格式（声调用数字表示，放在拼音末尾）
+     * 如: "wo3 ai4 zhong1 wen2"
+     * 
+     * @since 0.0.4
+     */
+    public static String toPinyinNumLast(String text) {
+        if (!StringUtils.hasText(text)) {
+            return "";
+        }
+        return PinyinBs.newInstance().style(PinyinToneStyles.numLast()).toPinyin(text);
+    }
+
+    /**
+     * 判断字符串是否包含中文字符
+     * 
+     * @since 0.0.4
+     */
+    public static boolean containsChinese(String text) {
+        if (!StringUtils.hasText(text)) {
+            return false;
+        }
+        for (char c : text.toCharArray()) {
+            if (isChinese(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 同时返回多种拼音格式
+     *
+     * @since 0.0.4
+     */
+    public static PinyinResult toPinyinAll(String text) {
+        if (!StringUtils.hasText(text)) {
+            return PinyinResult.empty();
+        }
+        PinyinBs bs = PinyinBs.newInstance();
+        return PinyinResult.builder()
+                .normal(bs.style(PinyinToneStyles.normal()).toPinyin(text))
+                .tone(bs.toPinyin(text))
+                .firstLetter(bs.style(PinyinToneStyles.firstLetter()).toPinyin(text))
+                .numLast(bs.style(PinyinToneStyles.numLast()).toPinyin(text))
+                .build();
+    }
+
 }
+

@@ -35,7 +35,9 @@ public class WebsiteSpecification extends BaseSpecification<WebsiteEntity, Websi
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
 
             // categoryUid
-            if (StringUtils.hasText(request.getCategoryUid())) {
+            if (request.getCategoryUids() != null && !request.getCategoryUids().isEmpty()) {
+                predicates.add(root.get("categoryUid").in(request.getCategoryUids()));
+            } else if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));
             }
             // kbUid

@@ -36,7 +36,6 @@ import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleResponse;
 import com.bytedesk.kbase.article.event.ArticleCreateEvent;
 import com.bytedesk.kbase.article.event.ArticleUpdateEvent;
-import com.bytedesk.kbase.blog.BlogStaticService;
 import com.bytedesk.kbase.kbase.event.KbaseCreateEvent;
 import com.bytedesk.kbase.kbase.event.KbaseUpdateEvent;
 import com.bytedesk.kbase.quick_reply.QuickReplyRestService;
@@ -60,8 +59,6 @@ public class KbaseEventListener {
         private final QuickReplyRestService quickReplyRestService;
 
         private final ArticleRestService articleRestService;
-
-        private final BlogStaticService blogStaticService;
 
         @EventListener
         public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -102,10 +99,6 @@ public class KbaseEventListener {
                         return;
                 }
 
-                if (kbase.getType().equals(KbaseTypeEnum.BLOG.name())) {
-                        blogStaticService.updateBlogKbase(kbase.getUid());
-                        return;
-                }
         }
 
         @EventListener
@@ -115,10 +108,6 @@ public class KbaseEventListener {
                 // log.info("onKbaseUpdateEvent {}", kbase.getUid());
                 if (kbase.getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                         kbaseStaticService.updateKbase(kbase);
-                        return;
-                }
-                if (kbase.getType().equals(KbaseTypeEnum.BLOG.name())) {
-                        blogStaticService.updateBlogKbase(kbase.getUid());
                         return;
                 }
         }
@@ -139,10 +128,6 @@ public class KbaseEventListener {
                                 kbaseStaticService.updateKbase(kbaseOptional.get());
                                 return;
                         }
-                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.BLOG.name())) {
-                                blogStaticService.updateBlogKbase(kbUid);
-                                return;
-                        }
                 } else {
                         log.error("onCategoryCreateEvent kb not found {}", kbUid);
                 }
@@ -161,10 +146,6 @@ public class KbaseEventListener {
                 if (kbaseOptional.isPresent()) {
                         if (kbaseOptional.get().getType().equals(KbaseTypeEnum.HELPCENTER.name())) {
                                 kbaseStaticService.updateKbase(kbaseOptional.get());
-                                return;
-                        }
-                        if (kbaseOptional.get().getType().equals(KbaseTypeEnum.BLOG.name())) {
-                                blogStaticService.updateBlogKbase(category.getKbUid());
                                 return;
                         }
                 } else {

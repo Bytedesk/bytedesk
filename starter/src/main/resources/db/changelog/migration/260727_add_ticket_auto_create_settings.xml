@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet author="jackning" id="260727_add_ticket_auto_create_settings_table">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_ticket_auto_create_settings">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_bytedesk_ticket_auto_create_settings" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(64)"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="nickname" type="VARCHAR(255)"/>
+            <column name="avatar" type="VARCHAR(255)"/>
+            <column name="real_name" type="VARCHAR(255)"/>
+            <column name="mobile" type="VARCHAR(64)"/>
+            <column name="email" type="VARCHAR(128)"/>
+            <column name="description" type="VARCHAR(512)"/>
+            <column name="deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="updated_by" type="VARCHAR(255)"/>
+            <column name="version" type="BIGINT"/>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="min_visitor_message_count" type="INT" defaultValueNumeric="2"/>
+            <column name="min_robot_message_count" type="INT" defaultValueNumeric="1"/>
+            <column name="require_ai_unresolved" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="require_agent_offline" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="skip_if_ticket_exists" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="worktime_settings_id" type="BIGINT"/>
+            <column name="summary_prompt" type="VARCHAR(2048)"/>
+        </createTable>
+        <addUniqueConstraint tableName="bytedesk_ticket_auto_create_settings" columnNames="uuid" constraintName="uk_ticket_auto_create_settings_uuid"/>
+    </changeSet>
+
+    <changeSet author="jackning" id="260727_add_ticket_auto_create_settings_fk_columns">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_settings"/>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_settings">
+            <column name="auto_create_settings_id" type="BIGINT"/>
+            <column name="draft_auto_create_settings_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet author="jackning" id="260727_add_ticket_auto_create_settings_foreign_keys">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+                <tableExists tableName="bytedesk_ticket_settings"/>
+            </and>
+        </preConditions>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_ticket_auto_create_settings"
+            baseColumnNames="worktime_settings_id"
+            constraintName="fk_ticket_auto_create_worktime_settings"
+            referencedTableName="bytedesk_service_worktime_setting"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_ticket_settings"
+            baseColumnNames="auto_create_settings_id"
+            constraintName="fk_ticket_settings_auto_create_settings"
+            referencedTableName="bytedesk_ticket_auto_create_settings"
+            referencedColumnNames="id"/>
+        <addForeignKeyConstraint
+            baseTableName="bytedesk_ticket_settings"
+            baseColumnNames="draft_auto_create_settings_id"
+            constraintName="fk_ticket_settings_draft_auto_create_settings"
+            referencedTableName="bytedesk_ticket_auto_create_settings"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

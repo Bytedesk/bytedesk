@@ -18,8 +18,8 @@ import java.util.List;
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageExtra;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.AllArgsConstructor;

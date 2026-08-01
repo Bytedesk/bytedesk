@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260510-add-goods-status-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_goods"/>
+            <not>
+                <columnExists tableName="bytedesk_core_goods" columnName="status"/>
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_goods">
+            <column name="status" type="VARCHAR(64)" defaultValue="ON_SHELF">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260510-backfill-goods-status" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_goods"/>
+            <columnExists tableName="bytedesk_core_goods" columnName="status"/>
+        </preConditions>
+
+        <sql>
+            UPDATE bytedesk_core_goods
+            SET status = 'ON_SHELF'
+            WHERE status IS NULL OR TRIM(status) = '';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

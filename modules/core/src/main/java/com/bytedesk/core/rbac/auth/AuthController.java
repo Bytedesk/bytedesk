@@ -22,7 +22,6 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.annotation.ActionAnnotation;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
@@ -41,6 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
+import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import org.springframework.util.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -76,7 +76,7 @@ public class AuthController {
         }
 
         // validate sms code
-        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCode(), request)) {
+        if (!pushService.validateCode(userRequest.getMobile(), userRequest.getCountry(), userRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -1, false));
         }
 
@@ -86,7 +86,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         // Avoid logging sensitive fields (password/passwordHash/passwordSalt)
         log.debug("login request: username={}, platform={}, channel={}, deviceUid={}",
@@ -109,7 +109,7 @@ public class AuthController {
         // validate two-factor code if enabled 双重验证
         if (!performanceTestingEnabled && authRequest.getTwoFactorEnabled() != null && authRequest.getTwoFactorEnabled()) {
             log.debug("Two-factor authentication is enabled for user: {}", authRequest.getUsername());
-            if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+            if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCountry(), authRequest.getCode(), request)) {
                 return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
             }
             // 验证用户名和手机号是否为同一个用户
@@ -117,6 +117,7 @@ public class AuthController {
                 Boolean userMatch = userService.existsByUsernameAndMobileAndPlatform(
                         authRequest.getUsername(),
                         authRequest.getMobile(),
+                    authRequest.getCountry(),
                         authRequest.getPlatform());
                 if (!userMatch) {
                     return ResponseEntity.ok().body(JsonResult.error("用户名和手机号不匹配，请检查后重新输入", -3, false));
@@ -214,7 +215,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login mobile {}", authRequest.toString());
@@ -225,15 +226,18 @@ public class AuthController {
         }
 
         // validate mobile & code
-        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCode(), request)) {
+        if (!pushService.validateCode(authRequest.getMobile(), authRequest.getCountry(), authRequest.getCode(), request)) {
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
         }
 
         // if mobile already exists, if none, then register
         // 手机号是否已经注册，如果没有，则自动注册
-        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())) {
+        if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getCountry(), authRequest.getPlatform())) {
+            if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
+                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -3, false));
+            }
             UserRequest userRequest = new UserRequest();
-            userRequest.setUsername(authRequest.getMobile());
+            userRequest.setUsername(CountryCodeUtils.buildMobileUsername(authRequest.getCountry(), authRequest.getMobile()));
             userRequest.setCountry(authRequest.getCountry());
             userRequest.setNum(authRequest.getMobile());
             userRequest.setMobile(authRequest.getMobile());
@@ -246,7 +250,7 @@ public class AuthController {
             userService.register(userRequest);
         } else {
             // 如果用户已存在，检查并更新手机验证状态
-            userService.findByMobileAndPlatform(authRequest.getMobile(), authRequest.getPlatform())
+            userService.findByMobileAndPlatform(authRequest.getMobile(), authRequest.getCountry(), authRequest.getPlatform())
                 .ifPresent(user -> {
                     if (!user.isMobileVerified()) {
                         user.setMobileVerified(true);
@@ -258,6 +262,7 @@ public class AuthController {
 
         Authentication authentication = authService.authenticationWithMobileAndPlatform(
                 authRequest.getMobile(),
+            authRequest.getCountry(),
                 authRequest.getPlatform(),
                 authRequest.getChannel(),
                 authRequest.getDevice());
@@ -290,7 +295,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
-    @ActionAnnotation(title = "auth", action = BytedeskConsts.ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("login email {}", authRequest.toString());
@@ -303,6 +308,9 @@ public class AuthController {
         // 邮箱是否已经注册，如果没有，则自动注册
         if (!userService.existsByEmailAndPlatform(authRequest.getEmail(),
                 authRequest.getPlatform())) {
+            if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
+                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -2, false));
+            }
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getEmail());
             userRequest.setNum(authRequest.getEmail());
@@ -342,7 +350,7 @@ public class AuthController {
     }
 
     @PostMapping("/login/accessToken")
-    @ActionAnnotation(title = "auth", action = "login_accessToken", description = "Login With Access Token", type = ActionTypeEnum.LOGIN)
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_ACCESS_TOKEN, description = "Login With Access Token", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithAccessToken(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("validate accessToken {}", authRequest.getAccessToken());
 

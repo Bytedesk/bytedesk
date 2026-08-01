@@ -15,7 +15,7 @@
 
 ## 目录结构
 
-```
+```bash
 db/
 ├── readme.md                                    # 本文档
 └── changelog/
@@ -125,9 +125,11 @@ mvn liquibase:rollback -Dliquibase.rollbackDate=2025-10-09
 
 1. 检查 preConditions 是否正确
 2. 手动删除视图后重新执行：
+
    ```sql
    DROP VIEW IF EXISTS view_agent_thread_stats;
    ```
+
 3. 使用 Liquibase 回滚后重新执行
 
 ### Liquibase 锁定

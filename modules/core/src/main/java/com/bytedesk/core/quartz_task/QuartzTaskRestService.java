@@ -41,6 +41,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.quartz.QuartzConsts;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
@@ -102,12 +103,12 @@ public class QuartzTaskRestService extends BaseRestServiceWithExport<QuartzTaskE
         // 
         QuartzTaskEntity entity = modelMapper.map(request, QuartzTaskEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
-            entity.setUid(uidUtils.getCacheSerialUid());
+            entity.setUid(uidUtils.getUid());
         }
         // 
         QuartzTaskEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create quartz_task failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -122,12 +123,12 @@ public class QuartzTaskRestService extends BaseRestServiceWithExport<QuartzTaskE
             //
             QuartzTaskEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update quartz_task failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("QuartzTask not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -163,7 +164,7 @@ public class QuartzTaskRestService extends BaseRestServiceWithExport<QuartzTaskE
             // quartz_taskRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("QuartzTask not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 

@@ -16,7 +16,23 @@ package com.bytedesk.core.constant;
 // 国际化常量
 public class I18Consts {
 
+    public static final String I18N_ARG_SEPARATOR = "|";
+
     private I18Consts() {
+    }
+
+    public static String withArgs(String key, Object... args) {
+        if (args == null || args.length == 0) {
+            return key;
+        }
+        StringBuilder builder = new StringBuilder(key);
+        for (Object arg : args) {
+            builder.append(I18N_ARG_SEPARATOR);
+            if (arg != null) {
+                builder.append(String.valueOf(arg).replace(I18N_ARG_SEPARATOR, "/"));
+            }
+        }
+        return builder.toString();
     }
 
     // 国际化常量定义
@@ -28,6 +44,360 @@ public class I18Consts {
     public static final String I18N_CITY_INIT_SCHEDULED = I18N_PREFIX + "city.init.scheduled";
     public static final String I18N_CITY_INIT_SKIPPED = I18N_PREFIX + "city.init.skipped";
 
+    // 通用操作动作与模块标题
+    public static final String I18N_TAG = I18N_PREFIX + "tag";
+    public static final String I18N_APNS_P12 = I18N_PREFIX + "apns.p12";
+    public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";
+    public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
+    public static final String I18N_EMAIL_PUSH = I18N_PREFIX + "email.push";
+    public static final String I18N_PUSH_SETTINGS = I18N_PREFIX + "push.settings";
+    public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
+    public static final String I18N_TOOL = I18N_PREFIX + "tool";
+    public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
+    public static final String I18N_TOOL_AUDIT = I18N_PREFIX + "tool.audit";
+    public static final String I18N_TOOL_GUARD = I18N_PREFIX + "tool.guard";
+    public static final String I18N_TOOL_RULE = I18N_PREFIX + "tool.rule";
+    public static final String I18N_PLAN = I18N_PREFIX + "plan";
+    public static final String I18N_PLAN_SUB = I18N_PREFIX + "plan.sub";
+    public static final String I18N_SKILL = I18N_PREFIX + "skill";
+    public static final String I18N_MEMORY = I18N_PREFIX + "memory";
+    public static final String I18N_MULTI_MODAL = I18N_PREFIX + "multi.modal";
+    public static final String I18N_MCP_SERVER = I18N_PREFIX + "mcp.server";
+    public static final String I18N_MEMBER = I18N_PREFIX + "member";
+    public static final String I18N_MEMBER_NOT_FOUND = I18N_PREFIX + "member.not.found"; // 成员未找到
+    public static final String I18N_DEPARTMENT = I18N_PREFIX + "department";
+    public static final String I18N_RELATION = I18N_PREFIX + "relation";
+    public static final String I18N_CATEGORY = I18N_PREFIX + "category";
+    public static final String I18N_ASSET = I18N_PREFIX + "asset";
+    public static final String I18N_CALENDAR = I18N_PREFIX + "calendar";
+    public static final String I18N_EMAIL = I18N_PREFIX + "email";
+    public static final String I18N_SMS_PUSH = I18N_PREFIX + "sms.push";
+    public static final String I18N_SCHEDULE = I18N_PREFIX + "schedule";
+    public static final String I18N_ROLE = I18N_PREFIX + "role";
+    public static final String I18N_TASK_LIST = I18N_PREFIX + "task.list";
+    public static final String I18N_WORKFLOW_NODE = I18N_PREFIX + "workflow.node";
+    public static final String I18N_ORGANIZATION = I18N_PREFIX + "organization";
+    public static final String I18N_ORGANIZATION_APPLY = I18N_PREFIX + "organization.apply";
+    public static final String I18N_ORGANIZATION_APPLY_ALREADY_MEMBER = I18N_PREFIX
+            + "organization.apply.already.member";
+    public static final String I18N_ORGANIZATION_APPLY_ALREADY_PENDING = I18N_PREFIX
+            + "organization.apply.already.pending";
+    public static final String I18N_ORGANIZATION_SETTINGS = I18N_PREFIX + "organization.settings";
+    public static final String I18N_CITY = I18N_PREFIX + "city";
+    public static final String I18N_WORKFLOW = I18N_PREFIX + "workflow";
+    public static final String I18N_WORKFLOW_SETTINGS = I18N_PREFIX + "workflow.settings";
+    public static final String I18N_WEBRTC_SETTINGS = I18N_PREFIX + "webrtc.settings";
+    public static final String I18N_AUDIO_RECORDINGS = I18N_PREFIX + "audio.recordings";
+    public static final String I18N_VIDEO_RECORDINGS = I18N_PREFIX + "video.recordings";
+    public static final String I18N_DEVICE = I18N_PREFIX + "device";
+    public static final String I18N_EQUIPMENT = I18N_PREFIX + "equipment";
+    public static final String I18N_LOGISTICS = I18N_PREFIX + "logistics";
+    public static final String I18N_DOCUMENT = I18N_PREFIX + "document";
+    public static final String I18N_WORKFLOW_EDGE = I18N_PREFIX + "workflow.edge";
+    public static final String I18N_TOPIC_SUBSCRIPTION = I18N_PREFIX + "topic.subscription";
+    public static final String I18N_MENU = I18N_PREFIX + "menu";
+    public static final String I18N_QUARTZ_TASK = I18N_PREFIX + "quartz.task";
+    public static final String I18N_OPEN_PLATFORM = I18N_PREFIX + "open.platform";
+    public static final String I18N_APP = I18N_PREFIX + "app";
+    public static final String I18N_ASR = I18N_PREFIX + "asr";
+    public static final String I18N_TTS = I18N_PREFIX + "tts";
+    public static final String I18N_OCR = I18N_PREFIX + "ocr";
+    public static final String I18N_AI_TOKEN_STATISTIC = I18N_PREFIX + "ai.token.statistic";
+    public static final String I18N_META_APP = I18N_PREFIX + "meta.app";
+    public static final String I18N_SHOP_APP = I18N_PREFIX + "shop.app";
+    public static final String I18N_SERVER_METRICS = I18N_PREFIX + "server.metrics";
+    public static final String I18N_ANNOUNCEMENT = I18N_PREFIX + "announcement";
+    public static final String I18N_SERVER = I18N_PREFIX + "server";
+    public static final String I18N_REPORT = I18N_PREFIX + "report";
+    public static final String I18N_WORKFLOW_LOG = I18N_PREFIX + "workflow.log";
+    public static final String I18N_MOMENT = I18N_PREFIX + "moment";
+    public static final String I18N_CONNECTION = I18N_PREFIX + "connection";
+    public static final String I18N_TOPIC = I18N_PREFIX + "topic";
+    public static final String I18N_USER = I18N_PREFIX + "user";
+    public static final String I18N_TOKEN = I18N_PREFIX + "token";
+    public static final String I18N_EMAIL_MESSAGE = I18N_PREFIX + "email.message";
+    public static final String I18N_TASK = I18N_PREFIX + "task";
+    public static final String I18N_TASK_COMMENT = I18N_PREFIX + "task.comment";
+    public static final String I18N_GROUP = I18N_PREFIX + "group";
+    public static final String I18N_MESSAGE = I18N_PREFIX + "message";
+    public static final String I18N_MESSAGE_NOT_FOUND = I18N_PREFIX + "message.not.found"; // 消息未找到
+    public static final String I18N_TRANSLATE_BAIDU_CONFIGURED = I18N_PREFIX + "translate.baidu.configured";
+    public static final String I18N_TRANSLATE_BAIDU_NOT_CONFIGURED = I18N_PREFIX + "translate.baidu.not.configured";
+    public static final String I18N_TRANSLATE_CONTENT_REQUIRED = I18N_PREFIX + "translate.content.required";
+    public static final String I18N_UPLOAD = I18N_PREFIX + "upload";
+    public static final String I18N_WORKFLOW_VARIABLE = I18N_PREFIX + "workflow.variable";
+    public static final String I18N_WORKFLOW_LOCAL_VARIABLE = I18N_PREFIX + "workflow.local.variable";
+    public static final String I18N_THREAD = I18N_PREFIX + "thread";
+    public static final String I18N_THREAD_NOT_FOUND = I18N_PREFIX + "thread.not.found"; // 会话未找到
+    public static final String I18N_THREAD_NOT_FOUND_WITH_UID = I18N_PREFIX + "thread.not.found.with.uid"; // 指定 uid
+                                                                                                           // 的会话未找到
+    public static final String I18N_THREAD_TYPE_AGENT = I18N_PREFIX + "thread.type.agent";
+    public static final String I18N_THREAD_TYPE_WORKGROUP = I18N_PREFIX + "thread.type.workgroup";
+    public static final String I18N_THREAD_TYPE_ROBOT = I18N_PREFIX + "thread.type.robot";
+    public static final String I18N_THREAD_TYPE_MEMBER = I18N_PREFIX + "thread.type.member";
+    public static final String I18N_THREAD_TYPE_GROUP = I18N_PREFIX + "thread.type.group";
+    public static final String I18N_THREAD_TYPE_FEEDBACK = I18N_PREFIX + "thread.type.feedback";
+    public static final String I18N_THREAD_TYPE_ASSISTANT = I18N_PREFIX + "thread.type.assistant";
+    public static final String I18N_THREAD_TYPE_CHANNEL = I18N_PREFIX + "thread.type.channel";
+    public static final String I18N_THREAD_TYPE_LOCAL = I18N_PREFIX + "thread.type.local";
+    public static final String I18N_THREAD_TYPE_FRIEND = I18N_PREFIX + "thread.type.friend";
+    public static final String I18N_THREAD_TYPE_TICKET_INTERNAL = I18N_PREFIX + "thread.type.ticket.internal";
+    public static final String I18N_THREAD_TYPE_TICKET_EXTERNAL = I18N_PREFIX + "thread.type.ticket.external";
+    public static final String I18N_THREAD_TYPE_KBASE = I18N_PREFIX + "thread.type.kbase";
+    public static final String I18N_THREAD_TYPE_KBDOC = I18N_PREFIX + "thread.type.kbdoc";
+    public static final String I18N_THREAD_TYPE_LLM = I18N_PREFIX + "thread.type.llm";
+    public static final String I18N_THREAD_TYPE_UNIFIED = I18N_PREFIX + "thread.type.unified";
+    public static final String I18N_THREAD_TYPE_HISTORY = I18N_PREFIX + "thread.type.history";
+    public static final String I18N_THREAD_TYPE_WORKFLOW = I18N_PREFIX + "thread.type.workflow";
+    public static final String I18N_THREAD_TYPE_QUEUE = I18N_PREFIX + "thread.type.queue";
+    public static final String I18N_THREAD_TYPE_CALLCENTER = I18N_PREFIX + "thread.type.callcenter";
+    public static final String I18N_MATERIAL = I18N_PREFIX + "material";
+    public static final String I18N_QUICK_BUTTON = I18N_PREFIX + "quick.button";
+    public static final String I18N_WORKGROUP = I18N_PREFIX + "workgroup";
+    public static final String I18N_ARTICLE = I18N_PREFIX + "article";
+    public static final String I18N_MESSAGE_TEMPLATE = I18N_PREFIX + "message.template";
+    public static final String I18N_QUEUE = I18N_PREFIX + "queue";
+    public static final String I18N_ROOM = I18N_PREFIX + "room";
+    public static final String I18N_FEEDBACK = I18N_PREFIX + "feedback";
+    public static final String I18N_FEEDBACK_SETTINGS = I18N_PREFIX + "feedback.settings";
+    public static final String I18N_QUICK_REPLY = I18N_PREFIX + "quick.reply";
+    public static final String I18N_AUTO_REPLY_FIXED = I18N_PREFIX + "auto.reply.fixed";
+    public static final String I18N_AUTO_REPLY_KEYWORD = I18N_PREFIX + "auto.reply.keyword";
+    public static final String I18N_ROUTING_POOL = I18N_PREFIX + "routing.pool";
+    public static final String I18N_WORKGROUP_ROUTING = I18N_PREFIX + "workgroup.routing";
+    public static final String I18N_QUEUE_MEMBER = I18N_PREFIX + "queue.member";
+    public static final String I18N_CALL_STATISTIC = I18N_PREFIX + "call.statistic";
+    public static final String I18N_CALL_STATISTIC_AGENT = I18N_PREFIX + "call.statistic.agent";
+    public static final String I18N_CALL_SETTINGS = I18N_PREFIX + "call.settings";
+    public static final String I18N_CALL_IP_BLACKLIST = I18N_PREFIX + "call.ip.blacklist";
+    public static final String I18N_FORM = I18N_PREFIX + "form";
+    public static final String I18N_HOLIDAY = I18N_PREFIX + "holiday";
+    public static final String I18N_BLOG = I18N_PREFIX + "blog";
+    public static final String I18N_PORTAL = I18N_PREFIX + "portal";
+    public static final String I18N_COURSE = I18N_PREFIX + "course";
+    public static final String I18N_NOTE = I18N_PREFIX + "note";
+    public static final String I18N_CHANNEL = I18N_PREFIX + "channel";
+    public static final String I18N_KBASE = I18N_PREFIX + "kbase";
+    public static final String I18N_KBASE_STATISTIC = I18N_PREFIX + "kbase.statistic";
+    public static final String I18N_AGENT = I18N_PREFIX + "agent";
+    public static final String I18N_AGENT_SEAT = I18N_PREFIX + "agent.seat";
+    public static final String I18N_VISITOR = I18N_PREFIX + "visitor";
+    public static final String I18N_TICKET = I18N_PREFIX + "ticket";
+    public static final String I18N_TICKET_RATING = I18N_PREFIX + "ticket.rating";
+    public static final String I18N_TICKET_COMMENT = I18N_PREFIX + "ticket.comment";
+    public static final String I18N_BUG = I18N_PREFIX + "bug";
+    public static final String I18N_MESSAGE_LEAVE = I18N_PREFIX + "message.leave";
+    public static final String I18N_TICKET_SETTINGS = I18N_PREFIX + "ticket.settings";
+    public static final String I18N_FORM_RESULT = I18N_PREFIX + "form.result";
+    public static final String I18N_AGENT_STATUS = I18N_PREFIX + "agent.status";
+    public static final String I18N_AGENT_STATUS_SETTING = I18N_PREFIX + "agent.status.setting";
+    public static final String I18N_VISITOR_CUSTOM_FIELD_SETTINGS = I18N_PREFIX
+            + "visitor.custom.field.settings";
+    public static final String I18N_CUSTOMER_CUSTOM_FIELD_SETTINGS = I18N_PREFIX
+            + "customer.custom.field.settings";
+    public static final String I18N_TABOO = I18N_PREFIX + "taboo";
+    public static final String I18N_WEBSITE = I18N_PREFIX + "website";
+    public static final String I18N_FILE = I18N_PREFIX + "file";
+    public static final String I18N_TEXT = I18N_PREFIX + "text";
+    public static final String I18N_FAQ = I18N_PREFIX + "faq";
+    public static final String I18N_WEBPAGE = I18N_PREFIX + "webpage";
+    public static final String I18N_CHUNK = I18N_PREFIX + "chunk";
+    public static final String I18N_LLM_EMBEDDING = I18N_PREFIX + "llm.embedding";
+    public static final String I18N_ROBOT = I18N_PREFIX + "robot";
+    public static final String I18N_ROBOT_WORKSPACE = I18N_PREFIX + "robot.workspace";
+    public static final String I18N_SIGN = I18N_PREFIX + "sign";
+    public static final String I18N_COMMENT = I18N_PREFIX + "comment";
+    public static final String I18N_TRIGGER = I18N_PREFIX + "trigger";
+    public static final String I18N_LEAD = I18N_PREFIX + "lead";
+    public static final String I18N_PRODUCT = I18N_PREFIX + "product";
+    public static final String I18N_LEAD_FOLLOW = I18N_PREFIX + "lead.follow";
+    public static final String I18N_TENDER = I18N_PREFIX + "tender";
+    public static final String I18N_CUSTOMER_GROUP = I18N_PREFIX + "customer.group";
+    public static final String I18N_CONTRACT = I18N_PREFIX + "contract";
+    public static final String I18N_OPPORTUNITY = I18N_PREFIX + "opportunity";
+    public static final String I18N_ESL_EVENT = I18N_PREFIX + "esl.event";
+    public static final String I18N_CUSTOMER_COMPANY = I18N_PREFIX + "customer.company";
+    public static final String I18N_VISITOR_TOKEN = I18N_PREFIX + "visitor.token";
+    public static final String I18N_VOICE_CLONE = I18N_PREFIX + "voice.clone";
+    public static final String I18N_ASR_HOTWORD = I18N_PREFIX + "asr.hotword";
+    public static final String I18N_AUTH = I18N_PREFIX + "auth";
+    public static final String I18N_ACTION_QUERY_ORG = I18N_PREFIX + "action.query.org";
+    public static final String I18N_ACTION_QUERY_USER = I18N_PREFIX + "action.query.user";
+    public static final String I18N_ACTION_QUERY_DETAIL = I18N_PREFIX + "action.query.detail";
+    public static final String I18N_ACTION_QUERY_USER_UID = I18N_PREFIX + "action.query.user.uid";
+    public static final String I18N_ACTION_CREATE = I18N_PREFIX + "action.create";
+    public static final String I18N_ACTION_UPDATE = I18N_PREFIX + "action.update";
+    public static final String I18N_ACTION_DELETE = I18N_PREFIX + "action.delete";
+    public static final String I18N_ACTION_EXPORT = I18N_PREFIX + "action.export";
+    public static final String I18N_ACTION_REFRESH_TOKEN = I18N_PREFIX + "action.refresh.token";
+    public static final String I18N_ACTION_CHECK_SERVICE_REACHABLE = I18N_PREFIX + "action.check.service.reachable";
+    public static final String I18N_ACTION_START_BOT = I18N_PREFIX + "action.start.bot";
+    public static final String I18N_ACTION_STOP_BOT = I18N_PREFIX + "action.stop.bot";
+    public static final String I18N_ACTION_ACTIVATE = I18N_PREFIX + "action.activate";
+    public static final String I18N_ACTION_AUTHORITIES_RESET_LEVEL = I18N_PREFIX + "action.authorities.reset.level";
+    public static final String I18N_ACTION_AUTHORITIES_ADD = I18N_PREFIX + "action.authorities.add";
+    public static final String I18N_ACTION_AUTHORITIES_REMOVE = I18N_PREFIX + "action.authorities.remove";
+    public static final String I18N_ACTION_RESET = I18N_PREFIX + "action.reset";
+    public static final String I18N_ACTION_INIT = I18N_PREFIX + "action.init";
+    public static final String I18N_ACTION_EXECUTE = I18N_PREFIX + "action.execute";
+    public static final String I18N_ACTION_LOGIN_USERNAME = I18N_PREFIX + "action.login.username";
+    public static final String I18N_ACTION_LOGIN_MOBILE = I18N_PREFIX + "action.login.mobile";
+    public static final String I18N_ACTION_LOGIN_EMAIL = I18N_PREFIX + "action.login.email";
+    public static final String I18N_ACTION_LOGIN_SCAN = I18N_PREFIX + "action.login.scan";
+    public static final String I18N_ACTION_LOGOUT = I18N_PREFIX + "action.logout";
+    public static final String I18N_ACTION_SWITCH_ORGANIZATION = I18N_PREFIX + "action.switch.organization";
+    public static final String I18N_ACTION_LEAVE_ORGANIZATION = I18N_PREFIX + "action.leave.organization";
+    public static final String I18N_ACTION_CHANGE_PASSWORD = I18N_PREFIX + "action.change.password";
+    public static final String I18N_ACTION_CHANGE_EMAIL = I18N_PREFIX + "action.change.email";
+    public static final String I18N_ACTION_CHANGE_MOBILE = I18N_PREFIX + "action.change.mobile";
+    public static final String I18N_ACTION_GENERATE_TOKEN = I18N_PREFIX + "action.generate.token";
+    public static final String I18N_ACTION_LOGIN_ACCESS_TOKEN = I18N_PREFIX + "action.login.access.token";
+    public static final String I18N_ACTION_KB_INDEX = I18N_PREFIX + "action.kb.index";
+    public static final String I18N_ACTION_REVOKE_TOKEN = I18N_PREFIX + "action.revoke.token";
+    public static final String I18N_ACTION_SUBMIT_APPLY = I18N_PREFIX + "action.submit.apply";
+    public static final String I18N_ACTION_APPROVE = I18N_PREFIX + "action.approve";
+    public static final String I18N_ACTION_REJECT = I18N_PREFIX + "action.reject";
+    public static final String I18N_ACTION_CANCEL = I18N_PREFIX + "action.cancel";
+    public static final String I18N_ACTION_APPROVE_APPEAL = I18N_PREFIX + "action.approve.appeal";
+    public static final String I18N_ACTION_REJECT_APPEAL = I18N_PREFIX + "action.reject.appeal";
+    public static final String I18N_ACTION_QUERY_DATE_RANGE_STATISTIC = I18N_PREFIX
+            + "action.query.date.range.statistic";
+    public static final String I18N_ACTION_CALCULATE_TODAY_STATISTIC = I18N_PREFIX + "action.calculate.today.statistic";
+    public static final String I18N_ACTION_QUERY_BY_HOUR = I18N_PREFIX + "action.query.by.hour";
+    public static final String I18N_ACTION_QUERY_BY_HOUR_AND_PROVIDER = I18N_PREFIX
+            + "action.query.by.hour.and.provider";
+    public static final String I18N_ACTION_QUERY_BY_HOUR_AND_MODEL = I18N_PREFIX + "action.query.by.hour.and.model";
+    public static final String I18N_ACTION_INTENTION_RECOGNITION = I18N_PREFIX + "action.intention.recognition";
+    public static final String I18N_ACTION_EMOTION_ANALYSIS = I18N_PREFIX + "action.emotion.analysis";
+    public static final String I18N_ACTION_THREAD_SUMMARY = I18N_PREFIX + "action.thread.summary";
+    public static final String I18N_ACTION_INTELLIGENT_QUALITY_INSPECTION = I18N_PREFIX
+            + "action.intelligent.quality.inspection";
+    public static final String I18N_ACTION_UPDATE_KID = I18N_PREFIX + "action.update.kid";
+    public static final String I18N_ACTION_UPDATE_ACCESS_TOKEN = I18N_PREFIX + "action.update.access.token";
+    public static final String I18N_ACTION_QUERY_PLATFORM_EMAIL_SETTINGS = I18N_PREFIX
+            + "action.query.platform.email.settings";
+    public static final String I18N_ACTION_SAVE_PLATFORM_EMAIL_SETTINGS = I18N_PREFIX
+            + "action.save.platform.email.settings";
+    public static final String I18N_ACTION_QUERY_PLATFORM_SMS_SETTINGS = I18N_PREFIX
+            + "action.query.platform.sms.settings";
+    public static final String I18N_ACTION_SAVE_PLATFORM_SMS_SETTINGS = I18N_PREFIX
+            + "action.save.platform.sms.settings";
+    public static final String I18N_ACTION_QUERY_PLATFORM_TICKET_CENTER_SETTINGS = I18N_PREFIX
+            + "action.query.platform.ticket.center.settings";
+    public static final String I18N_ACTION_SAVE_PLATFORM_TICKET_CENTER_SETTINGS = I18N_PREFIX
+            + "action.save.platform.ticket.center.settings";
+    public static final String I18N_ACTION_TEST_PLATFORM_EMAIL_SETTINGS = I18N_PREFIX
+            + "action.test.platform.email.settings";
+    public static final String I18N_ACTION_TEST_PLATFORM_SMS_SETTINGS = I18N_PREFIX
+            + "action.test.platform.sms.settings";
+    public static final String I18N_ACTION_SEND_EMAIL = I18N_PREFIX + "action.send.email";
+    public static final String I18N_ACTION_SEND_TEST_EMAIL = I18N_PREFIX + "action.send.test.email";
+    public static final String I18N_ACTION_TEST_SMTP_CONNECTION = I18N_PREFIX + "action.test.smtp.connection";
+    public static final String I18N_ACTION_IMPORT = I18N_PREFIX + "action.import";
+    public static final String I18N_ACTION_SYNC = I18N_PREFIX + "action.sync";
+    public static final String I18N_ACTION_SCORE = I18N_PREFIX + "action.score";
+    public static final String I18N_ACTION_OPTIMIZE = I18N_PREFIX + "action.optimize";
+    public static final String I18N_ACTION_RESET_ALL = I18N_PREFIX + "action.reset.all";
+    public static final String I18N_ACTION_RESET_ONE = I18N_PREFIX + "action.reset.one";
+    public static final String I18N_ACTION_TOGGLE = I18N_PREFIX + "action.toggle";
+    public static final String I18N_ACTION_SWITCH_CURRENT_MANAGED_DOMAIN = I18N_PREFIX
+            + "action.switch.current.managed.domain";
+    public static final String I18N_ACTION_QUERY_CURRENT_MANAGED_DOMAIN = I18N_PREFIX
+            + "action.query.current.managed.domain";
+    public static final String I18N_ACTION_LIKE = I18N_PREFIX + "action.like";
+    public static final String I18N_ACTION_UNLIKE = I18N_PREFIX + "action.unlike";
+    public static final String I18N_ACTION_FAVORITE = I18N_PREFIX + "action.favorite";
+    public static final String I18N_ACTION_UNFAVORITE = I18N_PREFIX + "action.unfavorite";
+    public static final String I18N_ACTION_INVITE = I18N_PREFIX + "action.invite";
+    public static final String I18N_ACTION_JOIN = I18N_PREFIX + "action.join";
+    public static final String I18N_ACTION_REMOVE = I18N_PREFIX + "action.remove";
+    public static final String I18N_ACTION_LEAVE = I18N_PREFIX + "action.leave";
+    public static final String I18N_ACTION_DISMISS = I18N_PREFIX + "action.dismiss";
+    public static final String I18N_ACTION_QUERY_TASK = I18N_PREFIX + "action.query.task";
+    public static final String I18N_ACTION_DELETE_ALL = I18N_PREFIX + "action.delete.all";
+    public static final String I18N_ACTION_QUERY_INVITE_THREAD = I18N_PREFIX + "action.query.invite.thread";
+    public static final String I18N_ACTION_QUERY_BY_TOPIC = I18N_PREFIX + "action.query.by.topic";
+    public static final String I18N_ACTION_QUERY_BY_TOPIC_USER = I18N_PREFIX + "action.query.by.topic.user";
+    public static final String I18N_ACTION_UPDATE_TOP = I18N_PREFIX + "action.update.top";
+    public static final String I18N_ACTION_UPDATE_STAR = I18N_PREFIX + "action.update.star";
+    public static final String I18N_ACTION_UPDATE_MUTE = I18N_PREFIX + "action.update.mute";
+    public static final String I18N_ACTION_UPDATE_HIDE = I18N_PREFIX + "action.update.hide";
+    public static final String I18N_ACTION_UPDATE_FOLD = I18N_PREFIX + "action.update.fold";
+    public static final String I18N_ACTION_UPDATE_USER = I18N_PREFIX + "action.update.user";
+    public static final String I18N_ACTION_UPDATE_TAG_LIST = I18N_PREFIX + "action.update.tag.list";
+    public static final String I18N_ACTION_UPDATE_UNREAD = I18N_PREFIX + "action.update.unread";
+    public static final String I18N_ACTION_UPDATE_STATUS = I18N_PREFIX + "action.update.status";
+    public static final String I18N_ACTION_QUERY_USER_SERVICE_THREAD = I18N_PREFIX + "action.query.user.service.thread";
+    public static final String I18N_ACTION_UPDATE_NOTE = I18N_PREFIX + "action.update.note";
+    public static final String I18N_ACTION_ADMIN_UPDATE = I18N_PREFIX + "action.admin.update";
+    public static final String I18N_ACTION_CLOSE = I18N_PREFIX + "action.close";
+    public static final String I18N_ACTION_CLOSE_BY_TOPIC = I18N_PREFIX + "action.close.by.topic";
+    public static final String I18N_ACTION_REQUEST_MESSAGE_METADATA = I18N_PREFIX + "action.request.message.metadata";
+    public static final String I18N_ACTION_ENABLE = I18N_PREFIX + "action.enable";
+    public static final String I18N_ACTION_UPDATE_AVATAR = I18N_PREFIX + "action.update.avatar";
+    public static final String I18N_ACTION_QUERY_ADMIN_WORKGROUP = I18N_PREFIX + "action.query.admin.workgroup";
+    public static final String I18N_ACTION_QUERY_ADMIN_ONGOING_THREAD = I18N_PREFIX
+            + "action.query.admin.ongoing.thread";
+    public static final String I18N_ACTION_BATCH_UPDATE_ADMIN_WORKGROUP = I18N_PREFIX
+            + "action.batch.update.admin.workgroup";
+    public static final String I18N_ACTION_UPDATE_INDEX = I18N_PREFIX + "action.update.index";
+    public static final String I18N_ACTION_UPDATE_VECTOR_INDEX = I18N_PREFIX + "action.update.vector.index";
+    public static final String I18N_ACTION_UPDATE_ALL_INDEX = I18N_PREFIX + "action.update.all.index";
+    public static final String I18N_ACTION_UPDATE_ALL_VECTOR_INDEX = I18N_PREFIX + "action.update.all.vector.index";
+    public static final String I18N_ACTION_SEARCH = I18N_PREFIX + "action.search";
+    public static final String I18N_ACTION_QUERY_QUEUING_THREAD = I18N_PREFIX + "action.query.queuing.thread";
+    public static final String I18N_ACTION_QUERY_UNREPLIED_THREAD = I18N_PREFIX + "action.query.unreplied.thread";
+    public static final String I18N_ACTION_GET_AGENT_QUEUING_COUNT = I18N_PREFIX + "action.get.agent.queuing.count";
+    public static final String I18N_ACTION_GET_AGENT_QUEUE_STATS = I18N_PREFIX + "action.get.agent.queue.stats";
+    public static final String I18N_ACTION_PUBLISH = I18N_PREFIX + "action.publish";
+    public static final String I18N_ACTION_ACCEPT = I18N_PREFIX + "action.accept";
+    public static final String I18N_ACTION_QUERY_STATE = I18N_PREFIX + "action.query.state";
+    public static final String I18N_ACTION_REFRESH_STATE = I18N_PREFIX + "action.refresh.state";
+    public static final String I18N_ACTION_QUERY_VISITOR_UID = I18N_PREFIX + "action.query.visitor.uid";
+    public static final String I18N_ACTION_UPDATE_AGENT_STATUS = I18N_PREFIX + "action.update.agent.status";
+    public static final String I18N_ACTION_UPDATE_AUTO_REPLY = I18N_PREFIX + "action.update.auto.reply";
+    public static final String I18N_ACTION_SEND_AGENT_SSE_MESSAGE = I18N_PREFIX + "action.send.agent.sse.message";
+    public static final String I18N_ACTION_QUERY_BY_THREAD_UID = I18N_PREFIX + "action.query.by.thread.uid";
+    public static final String I18N_ACTION_QUERY_BY_VISITOR_THREAD_UID = I18N_PREFIX
+            + "action.query.by.visitor.thread.uid";
+    public static final String I18N_ACTION_QUERY_BY_VISITOR_THREAD_TOPIC = I18N_PREFIX
+            + "action.query.by.visitor.thread.topic";
+    public static final String I18N_ACTION_COUNT_STATUS = I18N_PREFIX + "action.count.status";
+    public static final String I18N_ACTION_QUERY_RELATED_THREAD = I18N_PREFIX + "action.query.related.thread";
+    public static final String I18N_ACTION_COUNT_PENDING = I18N_PREFIX + "action.count.pending";
+    public static final String I18N_ACTION_REPLY = I18N_PREFIX + "action.reply";
+    public static final String I18N_ACTION_UPDATE_MESSAGE_LEAVE_STATUS = I18N_PREFIX
+            + "action.update.message.leave.status";
+    public static final String I18N_ACTION_MARK_AS_READ = I18N_PREFIX + "action.mark.as.read";
+    public static final String I18N_ACTION_TRANSFER = I18N_PREFIX + "action.transfer";
+    public static final String I18N_ACTION_MARK_AS_SPAM = I18N_PREFIX + "action.mark.as.spam";
+    public static final String I18N_ACTION_QUERY_BY_WORKGROUP = I18N_PREFIX + "action.query.by.workgroup";
+    public static final String I18N_ACTION_SAVE_BY_WORKGROUP = I18N_PREFIX + "action.save.by.workgroup";
+    public static final String I18N_ACTION_PUBLISH_BY_WORKGROUP = I18N_PREFIX + "action.publish.by.workgroup";
+    public static final String I18N_ACTION_BATCH_BIND_WORKGROUP = I18N_PREFIX + "action.batch.bind.workgroup";
+    public static final String I18N_ACTION_QUERY_BIND_WORKGROUP = I18N_PREFIX + "action.query.bind.workgroup";
+    public static final String I18N_ACTION_QUERY_CATEGORIES_BY_WORKGROUP = I18N_PREFIX
+            + "action.query.categories.by.workgroup";
+    public static final String I18N_ACTION_DELETE_INDEX = I18N_PREFIX + "action.delete.index";
+    public static final String I18N_ACTION_SYNC_INDEX_STATUS = I18N_PREFIX + "action.sync.index.status";
+    public static final String I18N_ACTION_BATCH_SYNC_INDEX_STATUS = I18N_PREFIX + "action.batch.sync.index.status";
+    public static final String I18N_ACTION_DELETE_INDEX_BY_KB = I18N_PREFIX + "action.delete.index.by.kb";
+    public static final String I18N_ACTION_DELETE_VECTOR_INDEX = I18N_PREFIX + "action.delete.vector.index";
+    public static final String I18N_ACTION_SYNC_VECTOR_STATUS = I18N_PREFIX + "action.sync.vector.status";
+    public static final String I18N_ACTION_QUERY_ELASTIC_INDEX = I18N_PREFIX + "action.query.elastic.index";
+    public static final String I18N_ACTION_QUERY_VECTOR_INDEX = I18N_PREFIX + "action.query.vector.index";
+    public static final String I18N_ACTION_BATCH_SYNC_VECTOR_STATUS = I18N_PREFIX + "action.batch.sync.vector.status";
+    public static final String I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB = I18N_PREFIX + "action.delete.vector.index.by.kb";
+    public static final String I18N_ACTION_CREATE_THREAD = I18N_PREFIX + "action.create.thread";
+    public static final String I18N_ACTION_UPDATE_THREAD = I18N_PREFIX + "action.update.thread";
+    public static final String I18N_THREAD_CLOSE_SUCCESS = I18N_PREFIX + "thread.close.success";
+    public static final String I18N_THREAD_CLOSE_ALREADY_CLOSED = I18N_PREFIX + "thread.close.already.closed";
+    public static final String I18N_ACTION_CREATE_PROMPT = I18N_PREFIX + "action.create.prompt";
+    public static final String I18N_ACTION_UPDATE_PROMPT = I18N_PREFIX + "action.update.prompt";
+    public static final String I18N_ACTION_UPDATE_PROMPT_TEXT = I18N_PREFIX + "action.update.prompt.text";
+    public static final String I18N_ACTION_UPDATE_KB_UID = I18N_PREFIX + "action.update.kb.uid";
+    public static final String I18N_EMBEDDING_SETTINGS = I18N_PREFIX + "embedding.settings";
+
     // 角色描述（用于 RoleInitializer 默认角色 description，前端通过 translateString 翻译）
     public static final String I18N_ROLE_SUPER_DESCRIPTION = I18N_DESCRIPTION_PREFIX + "role.super";
     public static final String I18N_ROLE_ADMIN_DESCRIPTION = I18N_DESCRIPTION_PREFIX + "role.admin";
@@ -37,198 +407,259 @@ public class I18Consts {
     public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification"; // 系统通知
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
     public static final String I18N_LOGIN_REQUIRED = I18N_PREFIX + "login.required"; // 请先登录
+    public static final String I18N_FORCE_LOGOUT_REASON = I18N_PREFIX + "force.logout.reason"; // 账号已被管理员强制下线，请联系管理员恢复后再登录。
+    public static final String I18N_SUPER_ADMIN_REQUIRED = I18N_PREFIX + "super.admin.required"; // 仅超级管理员可操作
 
     // 账号相关
-    public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = "用户名或密码不正确"; // 用户名或密码不正确
-    public static final String I18N_MOBILE_ALREADY_EXISTS = "手机号已存在"; // 手机号已存在
-    public static final String I18N_EMAIL_ALREADY_EXISTS = "邮箱已存在"; // 邮箱已存在
-    public static final String I18N_MOBILE_NOT_EXISTS = "手机号不存在"; // 手机号不存在
-    public static final String I18N_EMAIL_NOT_EXISTS = "邮箱不存在"; // 邮箱不存在
-    public static final String I18N_MOBILE_FORMAT_ERROR = "手机号格式错误"; // 手机号格式错误
-    public static final String I18N_EMAIL_FORMAT_ERROR = "邮箱格式错误"; // 邮箱格式错误
+    public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect"; // 用户名或密码不正确
+    public static final String I18N_MOBILE_ALREADY_EXISTS = I18N_PREFIX + "mobile.already.exists"; // 手机号已存在
+    public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists"; // 邮箱已存在
+    public static final String I18N_MEMBER_RESTRICTED_ROLE_UPDATE_NOT_SUPPORTED = I18N_PREFIX
+            + "member.restricted.role.update.not.supported"; // 不支持在成员入口修改管理员/超管角色
+    public static final String I18N_PERMISSION_CREATE_DENIED = I18N_PREFIX + "permission.create.denied"; // 无权限创建当前层级数据
+    public static final String I18N_PERMISSION_UPDATE_DENIED = I18N_PREFIX + "permission.update.denied"; // 无权限更新当前数据
+    public static final String I18N_PERMISSION_DELETE_DENIED = I18N_PREFIX + "permission.delete.denied"; // 无权限删除当前数据
+    public static final String I18N_COMMENT_UPDATE_DENIED = I18N_PREFIX + "comment.update.denied"; // 无权限更新该评论
+    public static final String I18N_COMMENT_DELETE_DENIED = I18N_PREFIX + "comment.delete.denied"; // 无权限删除该评论
+    public static final String I18N_DEPARTMENT_PARENT_SELF_NOT_ALLOWED = I18N_PREFIX
+            + "department.parent.self.not.allowed"; // 不能将当前部门设置为父部门
+    public static final String I18N_WORKFLOW_CONTENT_EMPTY = I18N_PREFIX + "workflow.content.empty"; // 工作流内容为空
+    public static final String I18N_WORKFLOW_START_NODE_NOT_FOUND = I18N_PREFIX + "workflow.start.node.not.found"; // 工作流中未找到开始节点
+    public static final String I18N_ACCESS_DENIED = I18N_PREFIX + "access.denied"; // 无权限访问
+    public static final String I18N_VISITOR_MESSAGE_RECEIVE_DENIED = I18N_PREFIX + "visitor.message.receive.denied"; // 当前对方无法接收您的消息！
+    public static final String I18N_ORG_UID_REQUIRED = I18N_PREFIX + "org.uid.required"; // 非超级管理员必须指定组织
+    public static final String I18N_ORGANIZATION_ACCESS_DENIED = I18N_PREFIX + "organization.access.denied"; // 无权访问其他组织数据
+    public static final String I18N_ORGANIZATION_NOT_FOUND = I18N_PREFIX + "organization.not.found"; // 组织未找到
+    public static final String I18N_ORGANIZATION_NOT_FOUND_WITH_UID = I18N_PREFIX + "organization.not.found.with.uid"; // 指定
+                                                                                                                       // uid
+                                                                                                                       // 的组织未找到
+    public static final String I18N_ORGANIZATION_NAME_EXISTS = I18N_PREFIX + "organization.name.exists"; // 组织名称已存在
+    public static final String I18N_ORGANIZATION_CODE_EXISTS = I18N_PREFIX + "organization.code.exists"; // 组织代码已存在
+    public static final String I18N_ORGANIZATION_CREATE_CONSTRAINT_FAILED = I18N_PREFIX
+            + "organization.create.constraint.failed"; // 创建组织失败，名称或代码冲突
+    public static final String I18N_ORGANIZATION_SUPER_USER_DISABLE_DENIED = I18N_PREFIX
+            + "organization.super.user.disable.denied"; // 超级用户组织不允许禁用
+    public static final String I18N_ORGANIZATION_DEFAULT_DISABLE_DENIED = I18N_PREFIX
+            + "organization.default.disable.denied"; // 默认组织不允许禁用
+    public static final String I18N_ORGANIZATION_DEFAULT_DELETE_DENIED = I18N_PREFIX
+            + "organization.default.delete.denied"; // 默认组织不允许删除
+    public static final String I18N_USER_SUPER_DISABLE_DENIED = I18N_PREFIX
+            + "user.super.disable.denied"; // 超级管理员用户不允许禁用
+    public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空
+    public static final String I18N_MOBILE_REQUIRED = I18N_PREFIX + "mobile.required"; // 手机号不能为空
+    public static final String I18N_EMAIL_OR_MOBILE_REQUIRED = I18N_PREFIX + "email.or.mobile.required"; // 邮箱或手机号不能为空
+    public static final String I18N_EMAIL_RESERVED_BY_SUPER_ADMIN = I18N_PREFIX + "email.reserved.by.super.admin"; // 邮箱为系统超级管理员保留，禁止使用
+    public static final String I18N_MOBILE_RESERVED_BY_SUPER_ADMIN = I18N_PREFIX + "mobile.reserved.by.super.admin"; // 手机号为系统超级管理员保留，禁止使用
+    public static final String I18N_PASSWORD_DECRYPT_FAILED = I18N_PREFIX + "password.decrypt.failed"; // 密码解密失败
+    public static final String I18N_PASSWORD_DECRYPT_KEY_INVALID = I18N_PREFIX + "password.decrypt.key.invalid"; // 密钥错误导致密码解密失败
+    public static final String I18N_MOBILE_NOT_EXISTS = I18N_PREFIX + "mobile.not.exists"; // 手机号不存在
+    public static final String I18N_EMAIL_NOT_EXISTS = I18N_PREFIX + "email.not.exists"; // 邮箱不存在
+    public static final String I18N_MOBILE_FORMAT_ERROR = I18N_PREFIX + "mobile.format.error"; // 手机号格式错误
+    public static final String I18N_EMAIL_FORMAT_ERROR = I18N_PREFIX + "email.format.error"; // 邮箱格式错误
     // 验证码相关
-    public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS = "验证码发送成功"; // 验证码发送成功
-    public static final String I18N_AUTH_CAPTCHA_ERROR = "验证码错误"; // 验证码错误
-    public static final String I18N_AUTH_CAPTCHA_EXPIRED = "验证码已过期"; // 验证码已过期
-    public static final String I18N_AUTH_CAPTCHA_ALREADY_SEND = "验证码已发送"; // 验证码已发送
-    public static final String I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT = "验证码发送过于频繁"; // 验证码发送过于频繁
-    public static final String I18N_AUTH_CAPTCHA_VALIDATE_FAILED = "验证码验证失败"; // 验证码验证失败
+    public static final String I18N_AUTH_CAPTCHA_SEND_SUCCESS = I18N_PREFIX + "auth.captcha.send.success"; // 验证码发送成功
+    public static final String I18N_AUTH_CAPTCHA_ERROR = I18N_PREFIX + "auth.captcha.error"; // 验证码错误
+    public static final String I18N_AUTH_CAPTCHA_EXPIRED = I18N_PREFIX + "auth.captcha.expired"; // 验证码已过期
+    public static final String I18N_AUTH_CAPTCHA_ALREADY_SEND = I18N_PREFIX + "auth.captcha.already.send"; // 验证码已发送
+    public static final String I18N_AUTH_CAPTCHA_SEND_TOO_FREQUENT = I18N_PREFIX + "auth.captcha.send.too.frequent"; // 验证码发送过于频繁
+    public static final String I18N_AUTH_CAPTCHA_VALIDATE_FAILED = I18N_PREFIX + "auth.captcha.validate.failed"; // 验证码验证失败
     // 助手相关
-    public static final String I18N_FILE_ASSISTANT_NAME = "文件助手"; // 文件助手
-    public static final String I18N_QUEUE_ASSISTANT_NAME = "排队助手"; // 排队助手
-    public static final String I18N_CLIPBOARD_ASSISTANT_NAME = "剪贴板助手"; // 剪贴板助手
-    public static final String I18N_INTENT_REWRITE_ASSISTANT_NAME = "意图改写"; // 意图改写
-    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME = "意图识别"; // 意图识别
-    public static final String I18N_EMOTION_ASSISTANT_NAME = "情绪分析"; // 情绪分析
-    public static final String I18N_FILE_ASSISTANT_DESCRIPTION = "手机、电脑文件互传"; // 手机、电脑文件互传
-    public static final String I18N_QUEUE_ASSISTANT_DESCRIPTION = "排队助手描述"; // 排队助手描述
-    public static final String I18N_CLIPBOARD_ASSISTANT_DESCRIPTION = "手机、电脑剪贴板内容互传"; // 手机、电脑剪贴板内容互传
-    public static final String I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION = "用于改写客户意图"; // 用于改写客户意图
-    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = "用于识别客户意图"; // 用于识别客户意图
-    public static final String I18N_EMOTION_ASSISTANT_DESCRIPTION = "用于分析客户情绪"; // 用于分析客户情绪
+    public static final String I18N_FILE_ASSISTANT_NAME = I18N_PREFIX + "file.assistant.name"; // 文件助手
+    public static final String I18N_QUEUE_ASSISTANT_NAME = I18N_PREFIX + "queue.assistant.name"; // 排队助手
+    public static final String I18N_CLIPBOARD_ASSISTANT_NAME = I18N_PREFIX + "clipboard.assistant.name"; // 剪贴板助手
+    public static final String I18N_INTENT_REWRITE_ASSISTANT_NAME = I18N_PREFIX + "intent.rewrite.assistant.name"; // 意图改写
+    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_NAME = I18N_PREFIX
+            + "intent.classification.assistant.name"; // 意图识别
+    public static final String I18N_EMOTION_ASSISTANT_NAME = I18N_PREFIX + "emotion.assistant.name"; // 情绪分析
+    public static final String I18N_FILE_ASSISTANT_DESCRIPTION = I18N_PREFIX + "file.assistant.description"; // 手机、电脑文件互传
+    public static final String I18N_QUEUE_ASSISTANT_DESCRIPTION = I18N_PREFIX + "queue.assistant.description"; // 排队助手描述
+    public static final String I18N_CLIPBOARD_ASSISTANT_DESCRIPTION = I18N_PREFIX + "clipboard.assistant.description"; // 手机、电脑剪贴板内容互传
+    public static final String I18N_INTENT_REWRITE_ASSISTANT_DESCRIPTION = I18N_PREFIX
+            + "intent.rewrite.assistant.description"; // 用于改写客户意图
+    public static final String I18N_INTENT_CLASSIFICATION_ASSISTANT_DESCRIPTION = I18N_PREFIX
+            + "intent.classification.assistant.description"; // 用于识别客户意图
+    public static final String I18N_EMOTION_ASSISTANT_DESCRIPTION = I18N_PREFIX + "emotion.assistant.description"; // 用于分析客户情绪
     // 系统通知
     // public static final String I18N_SYSTEM_NOTIFICATION_NAME = "系统通知"; // 系统通知
-    public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = "系统通知消息"; // 系统通知消息
+    public static final String I18N_SYSTEM_NOTIFICATION_DESCRIPTION = I18N_PREFIX + "system.notification.description"; // 系统通知消息
     // 用户相关
-    public static final String I18N_USER_OLD_PASSWORD_WRONG = "旧密码错误"; // 旧密码错误
+    public static final String I18N_USER_OLD_PASSWORD_WRONG = I18N_PREFIX + "old.password.wrong"; // 旧密码错误
     // 内容类型
-    public static final String I18N_THREAD_CONTENT_IMAGE = "图片"; // 图片
-    public static final String I18N_THREAD_CONTENT_FILE = "文件"; // 文件
-    public static final String I18N_THREAD_CONTENT_AUDIO = "语音"; // 语音
-    public static final String I18N_THREAD_CONTENT_VIDEO = "视频"; // 视频
+    public static final String I18N_THREAD_CONTENT_IMAGE = I18N_PREFIX + "thread.content.image"; // 图片
+    public static final String I18N_THREAD_CONTENT_FILE = I18N_PREFIX + "thread.content.file"; // 文件
+    public static final String I18N_THREAD_CONTENT_AUDIO = I18N_PREFIX + "thread.content.audio"; // 语音
+    public static final String I18N_THREAD_CONTENT_VIDEO = I18N_PREFIX + "thread.content.video"; // 视频
     // 提示信息
-    public static final String I18N_WELCOME_TIP = "您好，请问有什么可以帮助您？"; // 欢迎提示
-    public static final String I18N_TOP_TIP = "置顶提示"; // 置顶提示
-    public static final String I18N_MESSAGE_LEAVE_TIP = "您好，请留言，我们会尽快回复您"; // 留言提示
+    public static final String I18N_WELCOME_TIP = I18N_PREFIX + "welcome.tip"; // 欢迎提示
+    public static final String I18N_TOP_TIP = I18N_PREFIX + "top.tip"; // 置顶提示
+    public static final String I18N_MESSAGE_LEAVE_TIP = I18N_PREFIX + "message.leave.tip"; // 留言提示
     // public static final String I18N_REENTER_TIP = "继续会话"; // 重新进入提示
-    public static final String I18N_QUEUE_TIP = "您好，客服繁忙，请稍后"; // 排队提示（旧版，保持兼容）
-    public static final String I18N_QUEUE_MESSAGE_TEMPLATE = "您前面还有{0}人排队"; // 您前面还有{0}人排队（旧版）
+    public static final String I18N_QUEUE_TIP = I18N_PREFIX + "queue.tip"; // 排队提示（旧版，保持兼容）
+    public static final String I18N_QUEUE_MESSAGE_TEMPLATE = I18N_PREFIX + "queue.message.template"; // 您前面还有{0}人排队（旧版）
     // 排队提示语模板（新版，支持模板变量）
-    // 支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数, {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
-    public static final String I18N_QUEUE_TIP_TEMPLATE = "您前面还有 {position} 人排队，预计等待 {waitTime}，请耐心等候。"; // 排队提示语模板
+    // 支持变量: {position}-排队位置, {queueSize}-队列总人数, {waitSeconds}-等待秒数,
+    // {waitMinutes}-等待分钟数, {waitTime}-格式化等待时间
+    public static final String I18N_QUEUE_TIP_TEMPLATE = I18N_PREFIX + "queue.tip.template"; // 排队提示语模板
     // 即将接入提示语（当排队位置为0时使用）
-    public static final String I18N_QUEUE_READY_TIP = "客服即将为您服务，请稍候..."; // 即将接入提示语
-    public static final String I18N_AUTO_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 会话已自动关闭
-    public static final String I18N_AGENT_CLOSE_TIP = "会话已结束，感谢您的咨询，祝您生活愉快！"; // 客服已关闭会话
-    public static final String I18N_AGENT_TRANSFER_TIP = "客服已将会话转接"; // 客服已将会话转接
-    public static final String I18N_AGENT_TIMEOUT_TIP = "超时未回复，请尽快回复客户"; // 超时未回复
+    public static final String I18N_QUEUE_READY_TIP = I18N_PREFIX + "queue.ready.tip"; // 即将接入提示语
+    public static final String I18N_AUTO_CLOSE_TIP = I18N_PREFIX + "auto.close.tip"; // 会话已自动关闭
+    public static final String I18N_AGENT_CLOSE_TIP = I18N_PREFIX + "agent.close.tip"; // 客服已关闭会话
+    public static final String I18N_AGENT_TRANSFER_TIP = I18N_PREFIX + "agent.transfer.tip"; // 客服已将会话转接
+    public static final String I18N_AGENT_TIMEOUT_TIP = I18N_PREFIX + "agent.timeout.tip"; // 超时未回复
     // 评价提示
-    public static final String I18N_INVITE_RATE_TIP = "邀请评价提示"; // 邀请评价提示
+    public static final String I18N_INVITE_RATE_TIP = I18N_PREFIX + "invite.rate.tip"; // 邀请评价提示
+    public static final String I18N_RATE_SUBMITTED_NOTICE = I18N_PREFIX + "rate.submitted.notice"; // 访客已提交评价
+        public static final String I18N_AUTO_RESOLVED_NOTICE = I18N_PREFIX + "auto.resolved.notice"; // 自动判定已解决通知
 
     // VOC 评价设置默认文案（FeedbackSettingsEntity 默认值）
-    public static final String I18N_FEEDBACK_SETTINGS_TITLE_DEFAULT = "请您对本次服务进行满意度评价";
-    public static final String I18N_FEEDBACK_SETTINGS_POSITIVE_QUESTION_DEFAULT = "您感到满意的原因是？";
-    public static final String I18N_FEEDBACK_SETTINGS_NEGATIVE_QUESTION_DEFAULT = "您在使用过程中遇到了哪些问题？";
-    public static final String I18N_FEEDBACK_SETTINGS_COMMENT_PLACEHOLDER_DEFAULT = "【使用场景】：\n【优化意见】：";
+    public static final String I18N_FEEDBACK_SETTINGS_TITLE_DEFAULT = I18N_PREFIX + "feedback.settings.title.default";
+    public static final String I18N_FEEDBACK_SETTINGS_POSITIVE_QUESTION_DEFAULT = I18N_PREFIX
+            + "feedback.settings.positive.question.default";
+    public static final String I18N_FEEDBACK_SETTINGS_NEGATIVE_QUESTION_DEFAULT = I18N_PREFIX
+            + "feedback.settings.negative.question.default";
+    public static final String I18N_FEEDBACK_SETTINGS_COMMENT_PLACEHOLDER_DEFAULT = I18N_PREFIX
+            + "feedback.settings.comment.placeholder.default";
     // 统一
-    public static final String I18N_UNIFIED_NICKNAME = "统一入口"; // 统一入口
-    public static final String I18N_UNIFIED_DESCRIPTION = "统一描述"; // 统一描述
+    public static final String I18N_UNIFIED_NICKNAME = I18N_PREFIX + "unified.nickname"; // 统一入口
+    public static final String I18N_UNIFIED_DESCRIPTION = I18N_PREFIX + "unified.description"; // 统一描述
     // 工作组
-    public static final String I18N_WORKGROUP_NICKNAME = "默认工作组"; // 工作组昵称
-    public static final String I18N_WORKGROUP_BEFORE_NICKNAME = "售前工作组"; // 工作组前缀昵称
-    public static final String I18N_WORKGROUP_AFTER_NICKNAME = "售后工作组"; // 工作组后缀昵称
-    public static final String I18N_WORKGROUP_TICKET_NICKNAME = "工单工作组"; // 工单工作组昵称
-    public static final String I18N_WORKGROUP_DESCRIPTION = "工作组描述"; // 工作组描述
-    public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = "售前工作组描述"; // 工作组前缀描述
-    public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = "售后工作组描述"; // 工作组后缀描述
-    public static final String I18N_WORKGROUP_TICKET_DESCRIPTION = "工单工作组描述"; // 工单工作组描述
+    public static final String I18N_WORKGROUP_NICKNAME = I18N_PREFIX + "workgroup.nickname"; // 工作组昵称
+    public static final String I18N_WORKGROUP_BOOKING_NICKNAME = I18N_PREFIX + "workgroup.booking.nickname"; // booking
+                                                                                                             // 工作组昵称
+    public static final String I18N_WORKGROUP_BEFORE_NICKNAME = I18N_PREFIX + "workgroup.before.nickname"; // 工作组前缀昵称
+    public static final String I18N_WORKGROUP_AFTER_NICKNAME = I18N_PREFIX + "workgroup.after.nickname"; // 工作组后缀昵称
+    public static final String I18N_WORKGROUP_TICKET_NICKNAME = I18N_PREFIX + "workgroup.ticket.nickname"; // 工单工作组昵称
+    public static final String I18N_WORKGROUP_DESCRIPTION = I18N_PREFIX + "workgroup.description"; // 工作组描述
+    public static final String I18N_WORKGROUP_BOOKING_DESCRIPTION = I18N_PREFIX + "workgroup.booking.description"; // booking
+                                                                                                                   // 工作组描述
+    public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = I18N_PREFIX + "workgroup.before.description"; // 工作组前缀描述
+    public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = I18N_PREFIX + "workgroup.after.description"; // 工作组后缀描述
+    public static final String I18N_WORKGROUP_TICKET_DESCRIPTION = I18N_PREFIX + "workgroup.ticket.description"; // 工单工作组描述
     // 客服相关
-    public static final String I18N_AGENT_NICKNAME = "客服昵称"; // 客服昵称
-    public static final String I18N_AGENT_DESCRIPTION = "客服描述"; // 客服描述
-    public static final String I18N_AGENT_OFFLINE = "客服离线"; // 客服离线
-    public static final String I18N_AGENT_UNAVAILABLE = "客服不可用"; // 客服不可用
-    public static final String I18N_AGENT_AVAILABLE = "客服可用"; // 客服可用
+    public static final String I18N_AGENT_NICKNAME = I18N_PREFIX + "agent.nickname"; // 客服昵称
+    public static final String I18N_AGENT_DESCRIPTION = I18N_PREFIX + "agent.description"; // 客服描述
+    public static final String I18N_AGENT_EXISTS = I18N_PREFIX + "agent.exists"; // 坐席已存在
+    public static final String I18N_AGENT_LIMIT_EXCEEDED = I18N_PREFIX + "agent.limit.exceeded"; // 坐席人数已达上限
+    public static final String I18N_AGENT_SEAT_LIMIT_EXCEEDED = I18N_PREFIX + "agent.seat.limit.exceeded"; // 坐席席位已达上限
+    public static final String I18N_AGENT_OFFLINE = I18N_PREFIX + "agent.offline"; // 客服离线
+    public static final String I18N_AGENT_UNAVAILABLE = I18N_PREFIX + "agent.unavailable"; // 客服不可用
+    public static final String I18N_AGENT_AVAILABLE = I18N_PREFIX + "agent.available"; // 客服可用
     // 用户相关
-    public static final String I18N_USER_NICKNAME = "用户昵称"; // 用户昵称
-    public static final String I18N_USER_DESCRIPTION = "用户描述"; // 用户描述
-    public static final String I18N_USER_NOT_FOUND = "用户未找到"; // 用户未找到
-    public static final String I18N_CREATE_FAILED = "创建失败"; // 创建失败
-    public static final String I18N_UPDATE_FAILED = "更新失败"; // 更新失败
+    public static final String I18N_USER_NICKNAME = I18N_PREFIX + "user.nickname"; // 用户昵称
+    public static final String I18N_USER_DESCRIPTION = I18N_PREFIX + "user.description"; // 用户描述
+    public static final String I18N_USER_NOT_FOUND = I18N_PREFIX + "user.not.found"; // 用户未找到
+    public static final String I18N_CREATE_FAILED = I18N_PREFIX + "create.failed"; // 创建失败
+    public static final String I18N_UPDATE_FAILED = I18N_PREFIX + "update.failed"; // 更新失败
     // 其他
-    public static final String I18N_DESCRIPTION = "描述"; // 描述
-    public static final String I18N_TODO = "待办事项"; // 待办事项
+    public static final String I18N_DESCRIPTION = I18N_PREFIX + "description"; // 描述
     // 机器人相关
-    public static final String I18N_ROBOT_NICKNAME = "默认机器人"; // 机器人昵称
-    public static final String I18N_ROBOT_NAME = "默认机器人名称"; // 机器人名称
-    public static final String I18N_ROBOT_DESCRIPTION = "默认机器人描述"; // 机器人描述
-    public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = "客服助理机器人昵称"; // 客服助理机器人昵称
-    public static final String I18N_ROBOT_DEFAULT_REPLY = "抱歉，我暂时无法回答这个问题。"; // 机器人回复
-    public static final String I18N_ROBOT_TO_AGENT_TIP = "正在为您转接人工客服，请稍候..."; // 机器人转人工提示
+    public static final String I18N_ROBOT_NICKNAME = I18N_PREFIX + "robot.nickname"; // 机器人昵称
+    public static final String I18N_ROBOT_NAME = I18N_PREFIX + "robot.name"; // 机器人名称
+    public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description"; // 机器人描述
+    public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = I18N_PREFIX + "robot.agent.assistant.nickname"; // 客服助理机器人昵称
+    public static final String I18N_ROBOT_DEFAULT_REPLY = I18N_PREFIX + "robot.noreply"; // 机器人回复
+    public static final String I18N_ROBOT_TO_AGENT_TIP = I18N_PREFIX + "robot.to.agent.tip"; // 机器人转人工提示
     // 角色相关
-    public static final String I18N_ADMIN = "管理员"; // 管理员
-    public static final String I18N_ADMIN_DESCRIPTION = "管理员描述"; // 管理员描述
-    public static final String I18N_MEMBER = "成员"; // 成员
-    public static final String I18N_MEMBER_DESCRIPTION = "成员描述"; // 成员描述
+    public static final String I18N_ADMIN = I18N_PREFIX + "admin"; // 管理员
+    public static final String I18N_ADMIN_DESCRIPTION = I18N_PREFIX + "admin.description"; // 管理员描述
+    public static final String I18N_MEMBER_LABEL = I18N_PREFIX + "member.label"; // 成员
+    public static final String I18N_MEMBER_DESCRIPTION = I18N_PREFIX + "member.description"; // 成员描述
     // 快捷回复分类
-    public static final String I18N_QUICK_REPLY_CATEGORY_CONTACT = "询问联系方式"; // 询问联系方式
-    public static final String I18N_QUICK_REPLY_CATEGORY_THANKS = "感谢"; // 感谢
-    public static final String I18N_QUICK_REPLY_CATEGORY_WELCOME = "问候"; // 问候
-    public static final String I18N_QUICK_REPLY_CATEGORY_BYE = "告别"; // 告别
+    public static final String I18N_QUICK_REPLY_CATEGORY_CONTACT = I18N_PREFIX + "contact"; // 询问联系方式
+    public static final String I18N_QUICK_REPLY_CATEGORY_THANKS = I18N_PREFIX + "thanks"; // 感谢
+    public static final String I18N_QUICK_REPLY_CATEGORY_WELCOME = I18N_PREFIX + "welcome"; // 问候
+    public static final String I18N_QUICK_REPLY_CATEGORY_BYE = I18N_PREFIX + "bye"; // 告别
     // 快捷回复内容
-    public static final String I18N_QUICK_REPLY_CONTACT_TITLE = "联系方式标题"; // 联系方式标题
-    public static final String I18N_QUICK_REPLY_CONTACT_CONTENT = "联系方式内容"; // 联系方式内容
-    public static final String I18N_QUICK_REPLY_THANKS_TITLE = "感谢标题"; // 感谢标题
-    public static final String I18N_QUICK_REPLY_THANKS_CONTENT = "感谢内容"; // 感谢内容
-    public static final String I18N_QUICK_REPLY_WELCOME_TITLE = "欢迎标题"; // 欢迎标题
-    public static final String I18N_QUICK_REPLY_WELCOME_CONTENT = "欢迎内容"; // 欢迎内容
-    public static final String I18N_QUICK_REPLY_BYE_TITLE = "再见标题"; // 再见标题
-    public static final String I18N_QUICK_REPLY_BYE_CONTENT = "再见内容"; // 再见内容
+    public static final String I18N_QUICK_REPLY_CONTACT_TITLE = I18N_PREFIX + "contact.title"; // 联系方式标题
+    public static final String I18N_QUICK_REPLY_CONTACT_CONTENT = I18N_PREFIX + "contact.content"; // 联系方式内容
+    public static final String I18N_QUICK_REPLY_THANKS_TITLE = I18N_PREFIX + "thanks.title"; // 感谢标题
+    public static final String I18N_QUICK_REPLY_THANKS_CONTENT = I18N_PREFIX + "thanks.content"; // 感谢内容
+    public static final String I18N_QUICK_REPLY_WELCOME_TITLE = I18N_PREFIX + "welcome.title"; // 欢迎标题
+    public static final String I18N_QUICK_REPLY_WELCOME_CONTENT = I18N_PREFIX + "welcome.content"; // 欢迎内容
+    public static final String I18N_QUICK_REPLY_BYE_TITLE = I18N_PREFIX + "bye.title"; // 再见标题
+    public static final String I18N_QUICK_REPLY_BYE_CONTENT = I18N_PREFIX + "bye.content"; // 再见内容
     // API相关
     public static final String I18N_VIP_REST_API = "VIP REST API"; // VIP REST API
-    // 初始化组织时使用
-    public static final String I18N_FAQ_CATEGORY_DEMO_1 = "FAQ示例分类1"; // FAQ示例分类1
-    public static final String I18N_FAQ_CATEGORY_DEMO_2 = "FAQ示例分类2"; // FAQ示例分类2
-    // FAQ示例
-    public static final String I18N_FAQ_DEMO_QUESTION_1 = "FAQ示例问题1"; // FAQ示例问题1
-    public static final String I18N_FAQ_DEMO_ANSWER_1 = "FAQ示例答案1"; // FAQ示例答案1
-    public static final String I18N_FAQ_DEMO_QUESTION_2 = "FAQ示例问题2"; // FAQ示例问题2
-    public static final String I18N_FAQ_DEMO_ANSWER_2 = "FAQ示例答案2"; // FAQ示例答案2
-    // 快捷按钮示例
-    public static final String I18N_QUICK_BUTTON_DEMO_TITLE_1 = "快捷按钮示例标题1"; // 快捷按钮示例标题1
-    public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_1 = "快捷按钮示例内容1"; // 快捷按钮示例内容1
-    public static final String I18N_QUICK_BUTTON_DEMO_TITLE_2 = "快捷按钮示例标题2"; // 快捷按钮示例标题2
-    public static final String I18N_QUICK_BUTTON_DEMO_CONTENT_2 = "快捷按钮示例内容2"; // 快捷按钮示例内容2
     // 群组相关
-    public static final String I18N_GROUP_NAME = "群组名称"; // 群组名称
-    public static final String I18N_GROUP_DESCRIPTION = "群组描述"; // 群组描述
+    public static final String I18N_GROUP_NAME = I18N_PREFIX + "group.name"; // 群组名称
+    public static final String I18N_GROUP_DESCRIPTION = I18N_PREFIX + "group.description"; // 群组描述
     // 工单相关
-    public static final String I18N_TICKET_SETTINGS_EXTERNAL_NAME = "默认外部工单配置"; // 外部工单配置名称
-    public static final String I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION = "系统默认外部工单配置"; // 外部工单配置描述
-    public static final String I18N_TICKET_SETTINGS_INTERNAL_NAME = "默认内部工单配置"; // 内部工单配置名称
-    public static final String I18N_TICKET_SETTINGS_INTERNAL_DESCRIPTION = "系统默认内部工单配置"; // 内部工单配置描述
+    public static final String I18N_TICKET_SETTINGS_EXTERNAL_NAME = I18N_PREFIX + "ticket.settings.external.name"; // 外部工单配置名称
+    public static final String I18N_TICKET_SETTINGS_EXTERNAL_DESCRIPTION = I18N_PREFIX
+            + "ticket.settings.external.description"; // 外部工单配置描述
+    public static final String I18N_TICKET_SETTINGS_INTERNAL_NAME = I18N_PREFIX + "ticket.settings.internal.name"; // 内部工单配置名称
+    public static final String I18N_TICKET_SETTINGS_INTERNAL_DESCRIPTION = I18N_PREFIX
+            + "ticket.settings.internal.description"; // 内部工单配置描述
 
     // 工单提示语默认文案（TicketBasicSettingsEntity 默认值）
-    public static final String I18N_TICKET_ACCESS_TIP = "您好，工单已接入，我们将尽快为您处理。"; // 工单接入提示语
-    public static final String I18N_TICKET_CLOSE_TIP = "本工单会话已关闭，如需继续请提交新工单。"; // 工单关闭提示语
-    public static final String I18N_TICKET_AGENT_TIMEOUT_TIP = "客服暂时未回复，我们正在处理中，请您稍候。"; // 工单客服超时未回复提示语
-    public static final String I18N_TICKET_VISITOR_TIMEOUT_TIP = "如您暂时不方便回复，后续可随时继续补充信息。"; // 工单访客超时未回复提示语
-    // 通知相关
-    public static final String I18N_NOTICE_TITLE = "通知标题"; // 通知标题
-    public static final String I18N_NOTICE_TYPE = "通知类型"; // 通知类型
-    public static final String I18N_NOTICE_CONTENT = "通知内容"; // 通知内容
-    public static final String I18N_NOTICE_IP = "通知IP"; // 通知IP
-    public static final String I18N_NOTICE_IP_LOCATION = "通知IP位置"; // 通知IP位置
-    public static final String I18N_NOTICE_URL = "通知URL"; // 通知URL
-    public static final String I18N_NOTICE_EXTRA = "通知额外信息"; // 通知额外信息
+    public static final String I18N_TICKET_ACCESS_TIP = I18N_PREFIX + "ticket.access.tip"; // 工单接入提示语
+    public static final String I18N_TICKET_CLOSE_TIP = I18N_PREFIX + "ticket.close.tip"; // 工单关闭提示语
+    public static final String I18N_TICKET_AGENT_TIMEOUT_TIP = I18N_PREFIX + "ticket.agent.timeout.tip"; // 工单客服超时未回复提示语
+    public static final String I18N_TICKET_VISITOR_TIMEOUT_TIP = I18N_PREFIX + "ticket.visitor.timeout.tip"; // 工单访客超时未回复提示语
     // 文件解析
-    public static final String I18N_NOTICE_PARSE_FILE_SUCCESS = "文件解析成功"; // 文件解析成功
-    public static final String I18N_NOTICE_PARSE_FILE_ERROR = "文件解析错误"; // 文件解析错误
-    // 会话状态,  用于更新thread.content
-    public static final String I18N_AUTO_CLOSED = "已自动关闭"; // 已自动关闭
-    public static final String I18N_AGENT_CLOSED = "已被客服关闭"; // 已被客服关闭
-    public static final String I18N_AGENT_TRANSFER = "已被客服转接"; // 已被客服转接
-    public static final String I18N_AGENT_TIMEOUT = "超时未回复"; // 超时未回复
+    public static final String I18N_NOTICE_PARSE_FILE_SUCCESS = I18N_PREFIX + "notice.parse.file.success"; // 文件解析成功
+    public static final String I18N_NOTICE_PARSE_FILE_ERROR = I18N_PREFIX + "notice.parse.file.error"; // 文件解析错误
+    // 会话状态, 用于更新thread.content
+    public static final String I18N_AUTO_CLOSED = I18N_PREFIX + "auto.closed"; // 已自动关闭
+    public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed"; // 已被客服关闭
+    public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer"; // 已被客服转接
+    public static final String I18N_AGENT_TIMEOUT = I18N_PREFIX + "agent.timeout"; // 超时未回复
     // 黑名单
-    public static final String I18N_BLACK_USER_ALREADY_EXISTS = "黑名单用户已存在"; // 黑名单用户已存在
+    public static final String I18N_BLACK_USER_ALREADY_EXISTS = I18N_PREFIX + "black.user.already.exists"; // 黑名单用户已存在
     // 输入状态
-    public static final String I18N_TYPING = "正在输入"; // 正在输入
+    public static final String I18N_TYPING = I18N_PREFIX + "typing"; // 正在输入
 
     // GlobalControllerAdvice 错误国际化常量
-    public static final String I18N_USER_SIGNUP_FIRST = "请先注册用户"; // 请先注册用户
-    public static final String I18N_EMAIL_SIGNUP_FIRST = "请先使用邮箱注册"; // 请先使用邮箱注册
-    public static final String I18N_MOBILE_SIGNUP_FIRST = "请先使用手机号注册"; // 请先使用手机号注册
-    public static final String I18N_RESOURCE_NOT_FOUND = "资源未找到"; // 资源未找到
+    public static final String I18N_USER_SIGNUP_FIRST = I18N_PREFIX + "user.signup.first"; // 请先注册用户
+    public static final String I18N_EMAIL_SIGNUP_FIRST = I18N_PREFIX + "email.signup.first"; // 请先使用邮箱注册
+    public static final String I18N_MOBILE_SIGNUP_FIRST = I18N_PREFIX + "mobile.signup.first"; // 请先使用手机号注册
+    public static final String I18N_RESOURCE_NOT_FOUND = I18N_PREFIX + "resource.not.found"; // 资源未找到
+    public static final String I18N_RESOURCE_NOT_FOUND_WITH_UID = I18N_PREFIX + "resource.not.found.with.uid"; // 按 uid
+                                                                                                               // 未找到资源
+    public static final String I18N_ROLE_NOT_FOUND = I18N_PREFIX + "role.not.found"; // 角色未找到
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID = I18N_PREFIX + "role.not.found.by.id"; // 按 id 未找到角色
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID_AND_UID = I18N_PREFIX + "role.not.found.by.id.and.uid"; // 按 id
+                                                                                                                 // 和
+                                                                                                                 // uid
+                                                                                                                 // 未找到角色
+    public static final String I18N_ROLE_NOT_FOUND_BY_ID_AND_NAME = I18N_PREFIX + "role.not.found.by.id.and.name"; // 按
+                                                                                                                   // id
+                                                                                                                   // 和
+                                                                                                                   // name
+                                                                                                                   // 未找到角色
+    public static final String I18N_TOKEN_NOT_FOUND_FOR_UID = I18N_PREFIX + "token.not.found.for.uid"; // 指定 uid 的 token
+                                                                                                       // 未找到
+    public static final String I18N_FILE_NOT_FOUND = I18N_PREFIX + "file.not.found"; // 文件未找到
     // public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
-    public static final String I18N_USER_DISABLED = "用户已被禁用"; // 用户已被禁用
-    public static final String I18N_FORBIDDEN_ACCESS = "禁止访问"; // 禁止访问
-    public static final String I18N_USER_BLOCKED = "用户已被封禁"; // 用户已被封禁
-    public static final String I18N_SENSITIVE_CONTENT = "包含敏感内容"; // 包含敏感内容
-    public static final String I18N_MESSAGE_PROCESSING_FAILED = "消息处理失败"; // 消息处理失败
-    public static final String I18N_NULL_POINTER_EXCEPTION = "空指针异常"; // 空指针异常
-    public static final String I18N_RESPONSE_STATUS_EXCEPTION = "响应状态异常"; // 响应状态异常
-    public static final String I18N_WEBSOCKET_TIMEOUT_EXCEPTION = "WebSocket超时异常"; // WebSocket超时异常
-    public static final String I18N_HTTP_METHOD_NOT_SUPPORTED = "不支持的HTTP请求方法"; // 不支持的HTTP请求方法
-    public static final String I18N_AUTHORIZATION_DENIED = "授权拒绝"; // 授权拒绝
-    public static final String I18N_REQUEST_REJECTED = "请求被拒绝"; // 请求被拒绝
-    public static final String I18N_ENTITY_NOT_FOUND = "实体未找到"; // 实体未找到
-    public static final String I18N_INVALID_REQUEST_BODY = "请求体格式错误"; // 请求体格式错误（JSON 不合法/不完整）
-    public static final String I18N_OPERATION_NOT_SUPPORTED = "不支持的操作"; // 不支持的操作/功能暂未实现
-    public static final String I18N_INTERNAL_SERVER_ERROR = "内部服务器错误"; // 内部服务器错误
+    public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled"; // 用户已被禁用
+    public static final String I18N_FORBIDDEN_ACCESS = I18N_PREFIX + "forbidden.access"; // 禁止访问
+    public static final String I18N_USER_BLOCKED = I18N_PREFIX + "user.blocked"; // 用户已被封禁
+    public static final String I18N_SENSITIVE_CONTENT = I18N_PREFIX + "sensitive.content"; // 包含敏感内容
+    public static final String I18N_MESSAGE_PROCESSING_FAILED = I18N_PREFIX + "message.processing.failed"; // 消息处理失败
+    public static final String I18N_NULL_POINTER_EXCEPTION = I18N_PREFIX + "null.pointer.exception"; // 空指针异常
+    public static final String I18N_RESPONSE_STATUS_EXCEPTION = I18N_PREFIX + "response.status.exception"; // 响应状态异常
+    public static final String I18N_WEBSOCKET_TIMEOUT_EXCEPTION = I18N_PREFIX + "websocket.timeout.exception"; // WebSocket超时异常
+    public static final String I18N_HTTP_METHOD_NOT_SUPPORTED = I18N_PREFIX + "http.method.not.supported"; // 不支持的HTTP请求方法
+    public static final String I18N_AUTHORIZATION_DENIED = I18N_PREFIX + "authorization.denied"; // 授权拒绝
+    public static final String I18N_REQUEST_REJECTED = I18N_PREFIX + "request.rejected"; // 请求被拒绝
+    public static final String I18N_ENTITY_NOT_FOUND = I18N_PREFIX + "entity.not.found"; // 实体未找到
+    public static final String I18N_INVALID_REQUEST_BODY = I18N_PREFIX + "invalid.request.body"; // 请求体格式错误（JSON
+                                                                                                 // 不合法/不完整）
+    public static final String I18N_CONNECTION_NO_LONGER_AVAILABLE = I18N_PREFIX + "connection.no.longer.available"; // 连接已不可用
+    public static final String I18N_EXTERNAL_SERVICE_TEMPORARILY_UNAVAILABLE = I18N_PREFIX
+            + "external.service.temporarily.unavailable"; // 外部服务暂时不可用
+    public static final String I18N_RESOURCE_CONCURRENTLY_MODIFIED = I18N_PREFIX + "resource.concurrently.modified"; // 资源已被并发修改
+    public static final String I18N_INPUT_TOO_LONG = I18N_PREFIX + "input.too.long"; // 输入内容过长
+    public static final String I18N_DATA_ALREADY_EXISTS = I18N_PREFIX + "data.already.exists"; // 数据已存在
+    public static final String I18N_DATA_RELATION_CONSTRAINT_VIOLATED = I18N_PREFIX
+            + "data.relation.constraint.violated"; // 数据关联约束冲突
+    public static final String I18N_DATA_SAVE_FAILED = I18N_PREFIX + "data.save.failed"; // 数据保存失败
+    public static final String I18N_OPERATION_NOT_SUPPORTED = I18N_PREFIX + "operation.not.supported"; // 不支持的操作/功能暂未实现
+    public static final String I18N_INTERNAL_SERVER_ERROR = I18N_PREFIX + "internal.server.error"; // 内部服务器错误
 
-    public static final String I18N_NO_ANSWER = "您的这个问题暂时无法回答，请提问其他问题。";
-    public static final String I18N_CANT_ANSWER = "您的这个问题我不能回答，请提问其他问题。"; 
+    public static final String I18N_NO_ANSWER = I18N_PREFIX + "no.answer";
+    public static final String I18N_CANT_ANSWER = I18N_PREFIX + "cant.answer";
 
-    public static final String I18N_NOT_AUTHORIZED = "您没有权限访问此资源"; // 您没有权限访问此资源
     public static final String I18N_SERVICE_TEMPORARILY_UNAVAILABLE = "请首先在管理后台配置大模型apiUrl和apiKey。如果已经配置，请检查大模型提供商账号是否欠费。"; // 服务暂时不可用，请稍后重试
     public static final String I18N_LLM_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体"; // 大模型配置提示
     public static final String I18N_LLM_THREAD_INTENTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》意图识别"; // 会话意图识别大模型配置提示
@@ -237,183 +668,218 @@ public class I18Consts {
     public static final String I18N_LLM_TICKET_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》工单生成"; // 工单大模型配置提示
     public static final String I18N_LLM_AGENT_INSPECTION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》客服质检"; // 客服质检大模型配置提示
     public static final String I18N_LLM_LANGUAGE_TRANSLATION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》语言翻译"; // 语言翻译大模型配置提示
+    public static final String I18N_LLM_KB_TRANSLATION_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》知识库翻译"; // 知识库翻译大模型配置提示
     public static final String I18N_FAQ_SIMILAR_QUESTIONS_CONFIG_TIP = "请首先在管理后台配置大模型apiUrl和apiKey，修改：智能助手-》智能体-》FAQ相似问题 faq_similar_questions 提示词 大模型"; // FAQ相似问题配置提示
-    
+
     // AI 服务相关常量
-    public static final String I18N_THINKING = "正在思考中..."; // 正在思考中...
-    public static final String I18N_SORRY_LLM_DISABLED = "抱歉，大模型功能未启用"; // 抱歉，大模型功能未启用
-    public static final String I18N_SORRY_SERVICE_UNAVAILABLE = "抱歉，服务暂时不可用，请稍后再试。"; // 抱歉，服务暂时不可用，请稍后再试。
-    public static final String I18N_CONTEXT_BASED_ANSWER = "请根据以下上下文回答问题：\n\n"; // 请根据以下上下文回答问题：
-    public static final String I18N_CONTEXT_LABEL = "上下文：\n"; // 上下文：
-    public static final String I18N_QUESTION_LABEL = "问题：\n"; // 问题：
-    public static final String I18N_SEARCH_RESULT_PREFIX = "搜索结果: "; // 搜索结果: 
-    public static final String I18N_SYSTEM_PREFIX = "[系统] "; // [系统] 
-    public static final String I18N_USER_PREFIX = "[用户] "; // [用户] 
-    public static final String I18N_ASSISTANT_PREFIX = "[助手] "; // [助手] 
-    public static final String I18N_DEFAULT_SYSTEM_PROMPT = "你是一个智能助手,请根据用户的问题提供有帮助的回答。"; // 默认系统提示词
+    public static final String I18N_THINKING = I18N_PREFIX + "thinking"; // 正在思考中...
+    public static final String I18N_SORRY_LLM_DISABLED = I18N_PREFIX + "sorry.llm.disabled"; // 抱歉，大模型功能未启用
+    public static final String I18N_SORRY_SERVICE_UNAVAILABLE = I18N_PREFIX + "sorry.service.unavailable"; // 抱歉，服务暂时不可用，请稍后再试。
+    public static final String I18N_CONTEXT_BASED_ANSWER = I18N_PREFIX + "context.based.answer";
+    public static final String I18N_CONTEXT_LABEL = I18N_PREFIX + "context.label";
+    public static final String I18N_QUESTION_LABEL = I18N_PREFIX + "question.label";
+    public static final String I18N_SEARCH_RESULT_PREFIX = I18N_PREFIX + "search.result.prefix";
+    public static final String I18N_SYSTEM_PREFIX = I18N_PREFIX + "system.prefix";
+    public static final String I18N_USER_PREFIX = I18N_PREFIX + "user.prefix";
+    public static final String I18N_ASSISTANT_PREFIX = I18N_PREFIX + "assistant.prefix";
+    public static final String I18N_DEFAULT_SYSTEM_PROMPT = I18N_PREFIX + "default.system.prompt";
 
     // 线程路由策略相关常量
     /** 默认欢迎消息 */
-    public static final String I18N_DEFAULT_WELCOME_MESSAGE = "您好，请问有什么可以帮助您？";
-    
+    public static final String I18N_DEFAULT_WELCOME_MESSAGE = I18N_PREFIX + "default.welcome.message";
+
     /** 默认离线消息 */
-    public static final String I18N_DEFAULT_OFFLINE_MESSAGE = "您好，请留言，我们会尽快回复您";
+    public static final String I18N_DEFAULT_OFFLINE_MESSAGE = I18N_PREFIX + "message.leave.tip";
 
     /** 工作组离线消息（兼容旧逻辑的兜底文案） */
-    public static final String I18N_WORKGROUP_OFFLINE_FALLBACK_MESSAGE = "请稍后，客服会尽快回复您";
+    public static final String I18N_WORKGROUP_OFFLINE_FALLBACK_MESSAGE = I18N_PREFIX
+            + "workgroup.offline.fallback.message";
 
     /** 工作组路由池（手动接入）等待提示 */
-    public static final String I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP = "等待客服手动接入";
-    
+    public static final String I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP = I18N_PREFIX
+            + "workgroup.manual.routing.pool.waiting.tip";
+
     /** 排队等待消息 - 下一个 */
-    public static final String I18N_QUEUE_NEXT_MESSAGE = "请稍后，下一个就是您";
-    
+    public static final String I18N_QUEUE_NEXT_MESSAGE = I18N_PREFIX + "queue.next.message";
+
     /** 排队等待消息模板 */
-    public static final String I18N_QUEUE_WAITING_MESSAGE_TEMPLATE = "当前排队人数：%d 大约等待时间：%d 分钟";
+    public static final String I18N_QUEUE_WAITING_MESSAGE_TEMPLATE = I18N_PREFIX + "queue.waiting.message.template";
 
     // "验证码发送过于频繁"
-    public static final String I18N_CAPTCHA_SEND_TOO_FREQUENT = "验证码发送过于频繁，请稍后再试"; // 验证码发送过于频繁，请稍后再试
+    public static final String I18N_CAPTCHA_SEND_TOO_FREQUENT = I18N_PREFIX + "auth.captcha.send.too.frequent"; // 验证码发送过于频繁，请稍后再试
 
     // "验证码已经发送，请勿重复发送"
-    public static final String I18N_CAPTCHA_ALREADY_SENT = "验证码已经发送，请勿重复发送"; // 验证码已经发送，请勿重复发送
+    public static final String I18N_CAPTCHA_ALREADY_SENT = I18N_PREFIX + "auth.captcha.already.send"; // 验证码已经发送，请勿重复发送
 
     // "不支持的发送类型"
-    public static final String I18N_CAPTCHA_UNSUPPORTED_TYPE = "不支持的发送类型"; // 不支持的发送类型
+    public static final String I18N_CAPTCHA_UNSUPPORTED_TYPE = I18N_PREFIX + "auth.captcha.unsupported.type"; // 不支持的发送类型
+
+    // "短信服务配置异常，请联系管理员"
+    // public static final String I18N_SMS_SERVICE_CONFIG_ERROR = "短信服务配置异常，请联系管理员";
+    // // 短信服务配置异常，请联系管理员
+
+    // "短信服务暂时不可用，请稍后重试"
+    public static final String I18N_SMS_PUSH_SERVICE_UNAVAILABLE = I18N_PREFIX + "sms.push.service.unavailable"; // 短信服务暂时不可用，请稍后重试
+
+    // "邮件服务配置异常，请联系管理员"
+    public static final String I18N_EMAIL_SERVICE_CONFIG_ERROR = I18N_PREFIX + "email.service.config.error"; // 邮件服务配置异常，请联系管理员
+
+    // "邮件服务暂时不可用，请稍后重试"
+    public static final String I18N_EMAIL_SERVICE_UNAVAILABLE = I18N_PREFIX + "email.service.unavailable"; // 邮件服务暂时不可用，请稍后重试
 
     // "处理请求时发生错误，请稍后重试"
-    public static final String I18N_ROBOT_PROCESSING_ERROR = "处理请求时发生错误，请稍后重试"; // 处理请求时发生错误，请稍后重试
+    public static final String I18N_ROBOT_PROCESSING_ERROR = I18N_PREFIX + "robot.processing.error"; // 处理请求时发生错误，请稍后重试
 
     // 消息类型国际化常量
-    public static final String I18N_MESSAGE_TYPE_WELCOME = "欢迎消息"; // 欢迎消息
-    public static final String I18N_MESSAGE_TYPE_CONTINUE = "继续消息"; // 继续消息
-    public static final String I18N_MESSAGE_TYPE_SYSTEM = "系统消息"; // 系统消息
-    public static final String I18N_MESSAGE_TYPE_DOCUMENT = "文档消息"; // 文档消息
-    public static final String I18N_MESSAGE_TYPE_QUEUE = "排队消息"; // 排队消息
-    public static final String I18N_MESSAGE_TYPE_QUEUE_NOTICE = "排队通知"; // 排队通知
-    public static final String I18N_MESSAGE_TYPE_QUEUE_UPDATE = "排队更新"; // 排队更新
-    public static final String I18N_MESSAGE_TYPE_QUEUE_ACCEPT = "排队接受"; // 排队接受
-    public static final String I18N_MESSAGE_TYPE_QUEUE_TIMEOUT = "排队超时"; // 排队超时
-    public static final String I18N_MESSAGE_TYPE_QUEUE_CANCEL = "排队取消"; // 排队取消
-    public static final String I18N_MESSAGE_TYPE_NOTICE = "通知消息"; // 通知消息
-    public static final String I18N_MESSAGE_TYPE_TEXT = "文本消息"; // 文本消息
-    public static final String I18N_MESSAGE_TYPE_IMAGE = "图片消息"; // 图片消息
-    public static final String I18N_MESSAGE_TYPE_FILE = "文件消息"; // 文件消息
-    public static final String I18N_MESSAGE_TYPE_EXTRA = "附加信息"; // 附加信息
-    public static final String I18N_MESSAGE_TYPE_AUDIO = "语音消息"; // 语音消息
-    public static final String I18N_MESSAGE_TYPE_VOICE = "语音通话"; // 语音通话
-    public static final String I18N_MESSAGE_TYPE_VIDEO = "视频消息"; // 视频消息
-    public static final String I18N_MESSAGE_TYPE_MUSIC = "音乐消息"; // 音乐消息
-    public static final String I18N_MESSAGE_TYPE_LOCATION = "位置消息"; // 位置消息
-    public static final String I18N_MESSAGE_TYPE_LINK = "链接消息"; // 链接消息
-    public static final String I18N_MESSAGE_TYPE_GOODS = "商品消息"; // 商品消息
-    public static final String I18N_MESSAGE_TYPE_CARD = "卡片消息"; // 卡片消息
-    public static final String I18N_MESSAGE_TYPE_EVENT = "事件消息"; // 事件消息
-    public static final String I18N_MESSAGE_TYPE_GUESS = "猜你想问"; // 猜你想问
-    public static final String I18N_MESSAGE_TYPE_HOT = "热门话题"; // 热门话题
-    public static final String I18N_MESSAGE_TYPE_SHORTCUT = "快捷路径"; // 快捷路径
-    public static final String I18N_MESSAGE_TYPE_ORDER = "订单消息"; // 订单消息
-    public static final String I18N_MESSAGE_TYPE_POLL = "投票消息"; // 投票消息
-    public static final String I18N_MESSAGE_TYPE_POLL_SUBMIT = "投票提交"; // 投票提交
-    public static final String I18N_MESSAGE_TYPE_FORM = "表单消息"; // 表单消息
-    public static final String I18N_MESSAGE_TYPE_FORM_SUBMIT = "表单提交"; // 表单提交
-    public static final String I18N_MESSAGE_TYPE_CHOICE = "选项消息"; // 选项消息
-    public static final String I18N_MESSAGE_TYPE_CHOICE_SUBMIT = "选项提交"; // 选项提交
-    public static final String I18N_MESSAGE_TYPE_CONFIRM = "确认消息"; // 确认消息
-    public static final String I18N_MESSAGE_TYPE_CONFIRM_SUBMIT = "确认提交"; // 确认提交
-    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG = "留言消息"; // 留言消息
-    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG_SUBMIT = "留言提交"; // 留言提交
-    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG_REPLIED = "留言回复"; // 留言回复
-    public static final String I18N_MESSAGE_TYPE_CUSTOMER_SUBMIT = "客户留资提交"; // 客户留资提交
-    public static final String I18N_MESSAGE_TYPE_SYSTEM_ALARM = "系统报警"; // 系统报警
-    public static final String I18N_MESSAGE_TYPE_TICKET = "工单消息"; // 工单消息
-    public static final String I18N_MESSAGE_TYPE_TICKET_SUBMIT = "工单提交"; // 工单提交
-    public static final String I18N_MESSAGE_TYPE_TYPING = "正在输入"; // 正在输入
-    public static final String I18N_MESSAGE_TYPE_PROCESSING = "处理中"; // 处理中
-    public static final String I18N_MESSAGE_TYPE_STICKER = "贴纸消息"; // 贴纸消息
-    public static final String I18N_MESSAGE_TYPE_EMAIL = "邮件消息"; // 邮件消息
-    public static final String I18N_MESSAGE_TYPE_BUTTON = "按钮消息"; // 按钮消息
-    public static final String I18N_MESSAGE_TYPE_BUTTON_SUBMIT = "按钮提交"; // 按钮提交
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM = "流式消息"; // 流式消息
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_START = "流式开始"; // 流式开始
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_END = "流式结束"; // 流式结束
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_CANCEL = "流式取消"; // 流式取消
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_UNANSWERED = "流式未回答"; // 流式未回答
-    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_ERROR = "流式错误"; // 流式错误
-    public static final String I18N_MESSAGE_TYPE_PREVIEW = "消息预览"; // 消息预览
-    public static final String I18N_MESSAGE_TYPE_RECALL = "消息撤回"; // 消息撤回
-    public static final String I18N_MESSAGE_TYPE_DELIVERED = "已送达"; // 已送达
-    public static final String I18N_MESSAGE_TYPE_READ = "已读"; // 已读
-    public static final String I18N_MESSAGE_TYPE_QUOTATION = "引用消息"; // 引用消息
-    public static final String I18N_MESSAGE_TYPE_KICKOFF = "踢出"; // 踢出
-    public static final String I18N_MESSAGE_TYPE_SHAKE = "窗口抖动"; // 窗口抖动
-    public static final String I18N_MESSAGE_TYPE_FAQ = "常见问题"; // 常见问题
-    public static final String I18N_MESSAGE_TYPE_FAQ_QUESTION = "常见问题问题"; // 常见问题问题
-    public static final String I18N_MESSAGE_TYPE_FAQ_ANSWER = "常见问题答案"; // 常见问题答案
-    public static final String I18N_MESSAGE_TYPE_ROBOT = "机器人回答"; // 机器人回答
-    public static final String I18N_MESSAGE_TYPE_ROBOT_CANCEL = "机器人回答取消"; // 机器人回答取消
-    public static final String I18N_MESSAGE_TYPE_ROBOT_UNANSWERED = "机器人未回答"; // 机器人未回答
-    public static final String I18N_MESSAGE_TYPE_ROBOT_ERROR = "机器人错误"; // 机器人错误
-    public static final String I18N_MESSAGE_TYPE_ROBOT_UP = "机器人点赞"; // 机器人点赞
-    public static final String I18N_MESSAGE_TYPE_ROBOT_DOWN = "机器人点踩"; // 机器人点踩
-    public static final String I18N_MESSAGE_TYPE_RATE = "评价"; // 评价
-    public static final String I18N_MESSAGE_TYPE_RATE_INVITE = "邀请评价"; // 邀请评价
-    public static final String I18N_MESSAGE_TYPE_RATE_SUBMIT = "评价提交"; // 评价提交
-    public static final String I18N_MESSAGE_TYPE_RATE_CANCEL = "评价取消"; // 评价取消
-    public static final String I18N_MESSAGE_TYPE_AUTO_CLOSED = "自动关闭"; // 自动关闭
-    public static final String I18N_MESSAGE_TYPE_AGENT_CLOSED = "客服关闭"; // 客服关闭
-    public static final String I18N_MESSAGE_TYPE_TRANSFER = "转接"; // 转接
-    public static final String I18N_MESSAGE_TYPE_TRANSFER_REJECT = "拒绝转接"; // 拒绝转接
-    public static final String I18N_MESSAGE_TYPE_TRANSFER_ACCEPT = "接受转接"; // 接受转接
-    public static final String I18N_MESSAGE_TYPE_TRANSFER_TIMEOUT = "转接超时"; // 转接超时
-    public static final String I18N_MESSAGE_TYPE_TRANSFER_CANCEL = "取消转接"; // 取消转接
-    public static final String I18N_MESSAGE_TYPE_INVITE = "邀请"; // 邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_REJECT = "拒绝邀请"; // 拒绝邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_ACCEPT = "接受邀请"; // 接受邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_TIMEOUT = "邀请超时"; // 邀请超时
-    public static final String I18N_MESSAGE_TYPE_INVITE_CANCEL = "取消邀请"; // 取消邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_EXIT = "邀请退出"; // 邀请退出
-    public static final String I18N_MESSAGE_TYPE_INVITE_REMOVE = "邀请移除"; // 邀请移除
-    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR = "邀请访客"; // 邀请访客
-    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_REJECT = "访客拒绝邀请"; // 访客拒绝邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_ACCEPT = "访客接受邀请"; // 访客接受邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_TIMEOUT = "访客邀请超时"; // 访客邀请超时
-    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_CANCEL = "访客邀请取消"; // 访客邀请取消
-    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP = "邀请群组"; // 邀请群组
-    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_REJECT = "群组拒绝邀请"; // 群组拒绝邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_ACCEPT = "群组接受邀请"; // 群组接受邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_TIMEOUT = "群组邀请超时"; // 群组邀请超时
-    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_CANCEL = "群组邀请取消"; // 群组邀请取消
-    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE = "邀请知识库"; // 邀请知识库
-    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_REJECT = "知识库拒绝邀请"; // 知识库拒绝邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_ACCEPT = "知识库接受邀请"; // 知识库接受邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_TIMEOUT = "知识库邀请超时"; // 知识库邀请超时
-    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_CANCEL = "知识库邀请取消"; // 知识库邀请取消
-    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION = "邀请组织"; // 邀请组织
-    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_REJECT = "组织拒绝邀请"; // 组织拒绝邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_ACCEPT = "组织接受邀请"; // 组织接受邀请
-    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_TIMEOUT = "组织邀请超时"; // 组织邀请超时
-    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_CANCEL = "组织邀请取消"; // 组织邀请取消
-    public static final String I18N_MESSAGE_TYPE_ARTICLE = "文章"; // 文章
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_AUDIO_INVITE = "音频通话邀请"; // 音频通话邀请
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_VIDEO_INVITE = "视频通话邀请"; // 视频通话邀请
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_AUDIO_INVITE_REJECT = "音频通话拒绝"; // 音频通话拒绝
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_VIDEO_INVITE_REJECT = "视频通话拒绝"; // 视频通话拒绝
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_AUDIO_INVITE_ACCEPT = "音频通话接受"; // 音频通话接受
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_VIDEO_INVITE_ACCEPT = "视频通话接受"; // 视频通话接受
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_AUDIO_INVITE_CANCEL = "音频通话取消"; // 音频通话取消
-    public static final String I18N_MESSAGE_TYPE_WEBRTC_VIDEO_INVITE_CANCEL = "视频通话取消"; // 视频通话取消
-    public static final String I18N_MESSAGE_TYPE_GROUP_CREATE = "创建群组"; // 创建群组
-    public static final String I18N_MESSAGE_TYPE_GROUP_INVITE = "邀请入群"; // 邀请入群
-    public static final String I18N_MESSAGE_TYPE_GROUP_DISMISS = "解散群组"; // 解散群组
-    public static final String I18N_MESSAGE_TYPE_NOTIFICATION_AGENT_REPLY_TIMEOUT = "客服回复超时提醒"; // 客服回复超时提醒
-    public static final String I18N_MESSAGE_TYPE_NOTIFICATION_RATE_SUBMITTED = "访客评价提交提醒"; // 访客评价提交提醒
-    public static final String I18N_MESSAGE_TYPE_ERROR = "错误消息"; // 错误消息
-    public static final String I18N_MESSAGE_TYPE_UNKNOWN = "未知类型"; // 未知类型
+    public static final String I18N_MESSAGE_TYPE_WELCOME = I18N_PREFIX + "message.type.welcome";
+    public static final String I18N_MESSAGE_TYPE_CONTINUE = I18N_PREFIX + "message.type.continue";
+    public static final String I18N_MESSAGE_TYPE_SYSTEM = I18N_PREFIX + "message.type.system";
+    public static final String I18N_MESSAGE_TYPE_DOCUMENT = I18N_PREFIX + "message.type.document";
+    public static final String I18N_MESSAGE_TYPE_QUEUE = I18N_PREFIX + "message.type.queue";
+    public static final String I18N_MESSAGE_TYPE_QUEUE_NOTICE = I18N_PREFIX + "message.type.queue.notice";
+    public static final String I18N_MESSAGE_TYPE_QUEUE_UPDATE = I18N_PREFIX + "message.type.queue.update";
+    public static final String I18N_MESSAGE_TYPE_QUEUE_ACCEPT = I18N_PREFIX + "message.type.queue.accept";
+    public static final String I18N_MESSAGE_TYPE_QUEUE_TIMEOUT = I18N_PREFIX + "message.type.queue.timeout";
+    public static final String I18N_MESSAGE_TYPE_QUEUE_CANCEL = I18N_PREFIX + "message.type.queue.cancel";
+    public static final String I18N_MESSAGE_TYPE_NOTICE = I18N_PREFIX + "message.type.notice";
+    public static final String I18N_MESSAGE_TYPE_TEXT = I18N_PREFIX + "message.type.text";
+    public static final String I18N_MESSAGE_TYPE_IMAGE = I18N_PREFIX + "message.type.image";
+    public static final String I18N_MESSAGE_TYPE_FILE = I18N_PREFIX + "message.type.file";
+    public static final String I18N_MESSAGE_TYPE_EXTRA = I18N_PREFIX + "message.type.extra";
+    public static final String I18N_MESSAGE_TYPE_AUDIO = I18N_PREFIX + "message.type.audio";
+    public static final String I18N_MESSAGE_TYPE_VOICE = I18N_PREFIX + "message.type.voice";
+    public static final String I18N_MESSAGE_TYPE_VIDEO = I18N_PREFIX + "message.type.video";
+    public static final String I18N_MESSAGE_TYPE_MUSIC = I18N_PREFIX + "message.type.music";
+    public static final String I18N_MESSAGE_TYPE_LOCATION = I18N_PREFIX + "message.type.location";
+    public static final String I18N_MESSAGE_TYPE_LINK = I18N_PREFIX + "message.type.link";
+    public static final String I18N_MESSAGE_TYPE_GOODS = I18N_PREFIX + "message.type.goods";
+    public static final String I18N_MESSAGE_TYPE_CARD = I18N_PREFIX + "message.type.card";
+    public static final String I18N_MESSAGE_TYPE_EVENT = I18N_PREFIX + "message.type.event";
+    public static final String I18N_MESSAGE_TYPE_GUESS = I18N_PREFIX + "message.type.guess";
+    public static final String I18N_MESSAGE_TYPE_HOT = I18N_PREFIX + "message.type.hot";
+    public static final String I18N_MESSAGE_TYPE_SHORTCUT = I18N_PREFIX + "message.type.shortcut";
+    public static final String I18N_MESSAGE_TYPE_ORDER = I18N_PREFIX + "message.type.order";
+    public static final String I18N_MESSAGE_TYPE_POLL = I18N_PREFIX + "message.type.poll";
+    public static final String I18N_MESSAGE_TYPE_POLL_SUBMIT = I18N_PREFIX + "message.type.poll.submit";
+    public static final String I18N_MESSAGE_TYPE_PREFORM = I18N_PREFIX + "message.type.preform";
+    public static final String I18N_MESSAGE_TYPE_FORM = I18N_PREFIX + "message.type.form";
+    public static final String I18N_MESSAGE_TYPE_FORM_SUBMIT = I18N_PREFIX + "message.type.form.submit";
+    public static final String I18N_MESSAGE_TYPE_CHOICE = I18N_PREFIX + "message.type.choice";
+    public static final String I18N_MESSAGE_TYPE_CHOICE_SUBMIT = I18N_PREFIX + "message.type.choice.submit";
+    public static final String I18N_MESSAGE_TYPE_CONFIRM = I18N_PREFIX + "message.type.confirm";
+    public static final String I18N_MESSAGE_TYPE_CONFIRM_SUBMIT = I18N_PREFIX + "message.type.confirm.submit";
+    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG = I18N_PREFIX + "message.type.leave.msg";
+    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG_SUBMIT = I18N_PREFIX + "message.type.leave.msg.submit";
+    public static final String I18N_MESSAGE_TYPE_LEAVE_MSG_REPLIED = I18N_PREFIX + "message.type.leave.msg.replied";
+    public static final String I18N_MESSAGE_TYPE_CUSTOMER_SUBMIT = I18N_PREFIX + "message.type.customer.submit";
+    public static final String I18N_MESSAGE_TYPE_THREAD = I18N_PREFIX + "message.type.thread";
+    public static final String I18N_MESSAGE_TYPE_SYSTEM_ALARM = I18N_PREFIX + "message.type.system.alarm";
+    public static final String I18N_MESSAGE_TYPE_TICKET = I18N_PREFIX + "message.type.ticket";
+    public static final String I18N_MESSAGE_TYPE_TICKET_SUBMIT = I18N_PREFIX + "message.type.ticket.submit";
+    public static final String I18N_MESSAGE_TYPE_TYPING = I18N_PREFIX + "message.type.typing";
+    public static final String I18N_MESSAGE_TYPE_PROCESSING = I18N_PREFIX + "message.type.processing";
+    public static final String I18N_MESSAGE_TYPE_STICKER = I18N_PREFIX + "message.type.sticker";
+    public static final String I18N_MESSAGE_TYPE_EMAIL = I18N_PREFIX + "message.type.email";
+    public static final String I18N_MESSAGE_TYPE_BUTTON = I18N_PREFIX + "message.type.button";
+    public static final String I18N_MESSAGE_TYPE_BUTTON_SUBMIT = I18N_PREFIX + "message.type.button.submit";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM = I18N_PREFIX + "message.type.robot.stream";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_START = I18N_PREFIX + "message.type.robot.stream.start";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_END = I18N_PREFIX + "message.type.robot.stream.end";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_CANCEL = I18N_PREFIX + "message.type.robot.stream.cancel";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_UNANSWERED = I18N_PREFIX
+            + "message.type.robot.stream.unanswered";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_STREAM_ERROR = I18N_PREFIX + "message.type.robot.stream.error";
+    public static final String I18N_MESSAGE_TYPE_PREVIEW = I18N_PREFIX + "message.type.preview";
+    public static final String I18N_MESSAGE_TYPE_RECALL = I18N_PREFIX + "message.type.recall";
+    public static final String I18N_MESSAGE_TYPE_DELIVERED = I18N_PREFIX + "message.type.delivered";
+    public static final String I18N_MESSAGE_TYPE_READ = I18N_PREFIX + "message.type.read";
+    public static final String I18N_MESSAGE_TYPE_QUOTATION = I18N_PREFIX + "message.type.quotation";
+    public static final String I18N_MESSAGE_TYPE_KICKOFF = I18N_PREFIX + "message.type.kickoff";
+    public static final String I18N_MESSAGE_TYPE_SHAKE = I18N_PREFIX + "message.type.shake";
+    public static final String I18N_MESSAGE_TYPE_FAQ = I18N_PREFIX + "message.type.faq";
+    public static final String I18N_MESSAGE_TYPE_FAQ_QUESTION = I18N_PREFIX + "message.type.faq.question";
+    public static final String I18N_MESSAGE_TYPE_FAQ_ANSWER = I18N_PREFIX + "message.type.faq.answer";
+    public static final String I18N_MESSAGE_TYPE_ROBOT = I18N_PREFIX + "message.type.robot";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_CANCEL = I18N_PREFIX + "message.type.robot.cancel";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_UNANSWERED = I18N_PREFIX + "message.type.robot.unanswered";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_ERROR = I18N_PREFIX + "message.type.robot.error";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_UP = I18N_PREFIX + "message.type.robot.up";
+    public static final String I18N_MESSAGE_TYPE_ROBOT_DOWN = I18N_PREFIX + "message.type.robot.down";
+    public static final String I18N_MESSAGE_TYPE_RATE = I18N_PREFIX + "message.type.rate";
+    public static final String I18N_MESSAGE_TYPE_RATE_INVITE = I18N_PREFIX + "message.type.rate.invite";
+    public static final String I18N_MESSAGE_TYPE_RATE_SUBMIT = I18N_PREFIX + "message.type.rate.submit";
+    public static final String I18N_MESSAGE_TYPE_RATE_CANCEL = I18N_PREFIX + "message.type.rate.cancel";
+    public static final String I18N_MESSAGE_TYPE_AUTO_CLOSED = I18N_PREFIX + "message.type.auto.closed";
+    public static final String I18N_MESSAGE_TYPE_AGENT_CLOSED = I18N_PREFIX + "message.type.agent.closed";
+    public static final String I18N_MESSAGE_TYPE_TRANSFER = I18N_PREFIX + "message.type.transfer";
+    public static final String I18N_MESSAGE_TYPE_TRANSFER_REJECT = I18N_PREFIX + "message.type.transfer.reject";
+    public static final String I18N_MESSAGE_TYPE_TRANSFER_ACCEPT = I18N_PREFIX + "message.type.transfer.accept";
+    public static final String I18N_MESSAGE_TYPE_TRANSFER_TIMEOUT = I18N_PREFIX + "message.type.transfer.timeout";
+    public static final String I18N_MESSAGE_TYPE_TRANSFER_CANCEL = I18N_PREFIX + "message.type.transfer.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE = I18N_PREFIX + "message.type.invite";
+    public static final String I18N_MESSAGE_TYPE_INVITE_REJECT = I18N_PREFIX + "message.type.invite.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ACCEPT = I18N_PREFIX + "message.type.invite.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_TIMEOUT = I18N_PREFIX + "message.type.invite.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_CANCEL = I18N_PREFIX + "message.type.invite.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_EXIT = I18N_PREFIX + "message.type.invite.exit";
+    public static final String I18N_MESSAGE_TYPE_INVITE_REMOVE = I18N_PREFIX + "message.type.invite.remove";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR = I18N_PREFIX + "message.type.invite.visitor";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_REJECT = I18N_PREFIX
+            + "message.type.invite.visitor.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_ACCEPT = I18N_PREFIX
+            + "message.type.invite.visitor.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.visitor.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VISITOR_CANCEL = I18N_PREFIX
+            + "message.type.invite.visitor.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP = I18N_PREFIX + "message.type.invite.group";
+    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_REJECT = I18N_PREFIX + "message.type.invite.group.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_ACCEPT = I18N_PREFIX + "message.type.invite.group.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.group.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_GROUP_CANCEL = I18N_PREFIX + "message.type.invite.group.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE = I18N_PREFIX + "message.type.invite.kbase";
+    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_REJECT = I18N_PREFIX + "message.type.invite.kbase.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_ACCEPT = I18N_PREFIX + "message.type.invite.kbase.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.kbase.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_KBASE_CANCEL = I18N_PREFIX + "message.type.invite.kbase.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION = I18N_PREFIX + "message.type.invite.organization";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_REJECT = I18N_PREFIX
+            + "message.type.invite.organization.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_ACCEPT = I18N_PREFIX
+            + "message.type.invite.organization.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.organization.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_ORGANIZATION_CANCEL = I18N_PREFIX
+            + "message.type.invite.organization.cancel";
+    public static final String I18N_MESSAGE_TYPE_ARTICLE = I18N_PREFIX + "message.type.article";
+    public static final String I18N_MESSAGE_TYPE_INVITE_AUDIO = I18N_PREFIX + "message.type.invite.audio";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO = I18N_PREFIX + "message.type.invite.video";
+    public static final String I18N_MESSAGE_TYPE_INVITE_AUDIO_REJECT = I18N_PREFIX + "message.type.invite.audio.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO_REJECT = I18N_PREFIX + "message.type.invite.video.reject";
+    public static final String I18N_MESSAGE_TYPE_INVITE_AUDIO_ACCEPT = I18N_PREFIX + "message.type.invite.audio.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO_ACCEPT = I18N_PREFIX + "message.type.invite.video.accept";
+    public static final String I18N_MESSAGE_TYPE_INVITE_AUDIO_CANCEL = I18N_PREFIX + "message.type.invite.audio.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO_CANCEL = I18N_PREFIX + "message.type.invite.video.cancel";
+    public static final String I18N_MESSAGE_TYPE_INVITE_AUDIO_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.audio.timeout";
+    public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO_TIMEOUT = I18N_PREFIX
+            + "message.type.invite.video.timeout";
+    public static final String I18N_MESSAGE_TYPE_GROUP_CREATE = I18N_PREFIX + "message.type.group.create";
+    public static final String I18N_MESSAGE_TYPE_GROUP_INVITE = I18N_PREFIX + "message.type.group.invite";
+    public static final String I18N_MESSAGE_TYPE_GROUP_DISMISS = I18N_PREFIX + "message.type.group.dismiss";
+    public static final String I18N_MESSAGE_TYPE_NOTIFICATION_AGENT_REPLY_TIMEOUT = I18N_PREFIX
+            + "message.type.notification.agent.reply.timeout";
+    public static final String I18N_MESSAGE_TYPE_NOTIFICATION_RATE_SUBMITTED = I18N_PREFIX
+            + "message.type.notification.rate.submitted";
+    public static final String I18N_MESSAGE_TYPE_ERROR = I18N_PREFIX + "message.type.error";
+    public static final String I18N_MESSAGE_TYPE_UNKNOWN = I18N_PREFIX + "message.type.unknown";
     // 补充的消息类型
-    public static final String I18N_MESSAGE_TYPE_URL = "网址消息"; // 网址消息
-    public static final String I18N_MESSAGE_TYPE_PHONE_NUMBER = "电话号码"; // 电话号码
-    public static final String I18N_MESSAGE_TYPE_EMAIL_ADDRESS = "邮箱地址"; // 邮箱地址
-    public static final String I18N_MESSAGE_TYPE_WECHAT_NUMBER = "微信号"; // 微信号
-    public static final String I18N_MESSAGE_TYPE_BLOG = "博客"; // 博客
+    public static final String I18N_MESSAGE_TYPE_URL = I18N_PREFIX + "message.type.url";
+    public static final String I18N_MESSAGE_TYPE_PHONE_NUMBER = I18N_PREFIX + "message.type.phone.number";
+    public static final String I18N_MESSAGE_TYPE_EMAIL_ADDRESS = I18N_PREFIX + "message.type.email.address";
+    public static final String I18N_MESSAGE_TYPE_WECHAT_NUMBER = I18N_PREFIX + "message.type.wechat.number";
+    public static final String I18N_MESSAGE_TYPE_BLOG = I18N_PREFIX + "message.type.blog";
 
 }

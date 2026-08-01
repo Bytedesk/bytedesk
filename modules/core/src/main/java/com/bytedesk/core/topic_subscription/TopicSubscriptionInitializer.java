@@ -16,7 +16,6 @@ package com.bytedesk.core.topic_subscription;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -26,16 +25,14 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class TopicSubscriptionInitializer implements SmartInitializingSingleton {
 
-    private final TopicSubscriptionRestService topic_subscriptionRestService;
-
     private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         // create default
-        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        topic_subscriptionRestService.initTopicSubscriptions(orgUid);
+        // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        // topic_subscriptionRestService.initTopicSubscriptions(orgUid);
     }
 
     private void initAuthority() {

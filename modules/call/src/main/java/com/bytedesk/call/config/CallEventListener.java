@@ -1,10 +1,23 @@
 package com.bytedesk.call.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
-import com.bytedesk.call.config.esl.client.internal.Context;
-import com.bytedesk.call.config.esl.client.transport.event.EslEvent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.bytedesk.call.call_settings.CallSettingsEntity;
+import com.bytedesk.call.call_settings.CallSettingsRepository;
+import com.bytedesk.call.esl.EslEventNames;
+import com.bytedesk.call.esl.client.inbound.IEslEventListener;
+import com.bytedesk.call.esl.client.internal.Context;
+import com.bytedesk.call.esl.client.transport.event.EslEvent;
+import com.bytedesk.call.esl_event.EslEventIngestService;
+import com.bytedesk.call.call_ip_blacklist.CallIpBlacklistService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,52 +29,64 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "bytedesk.call.freeswitch", name = "enabled", havingValue = "true", matchIfMissing = false)
-public class CallEventListener implements com.bytedesk.call.config.esl.client.inbound.IEslEventListener {
+public class CallEventListener implements IEslEventListener {
+
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final EslEventIngestService eslEventIngestService;
+    private final CallIpBlacklistService callIpBlacklistService;
+    private final CallSettingsRepository callSettingsRepository;
 
     // 实现 IEslEventListener 的回调
     @Override
     public void onEslEvent(Context ctx, EslEvent eslEvent) {
         String eventName = eslEvent.getEventName();
+        if (eventName == null || eventName.isBlank()) {
+            log.debug("收到空事件名事件: headers={}", eslEvent.getEventHeaders());
+            return;
+        }
+
+        eslEventIngestService.ingest(eslEvent);
+        publishSwitchEvent(eslEvent);
         // log.info("收到Call事件: {}", eventName); // HEARTBEAT/RE_SCHEDULE
 
         switch (eventName) {
-            case "CHANNEL_CREATE":
+            case EslEventNames.CHANNEL_CREATE:
                 handleChannelCreate(eslEvent);
                 break;
-            case "CHANNEL_ANSWER":
+            case EslEventNames.CHANNEL_ANSWER:
                 handleChannelAnswer(eslEvent);
                 break;
-            case "CHANNEL_HANGUP":
+            case EslEventNames.CHANNEL_HANGUP:
                 handleChannelHangup(eslEvent);
                 break;
-            case "CHANNEL_HANGUP_COMPLETE":
+            case EslEventNames.CHANNEL_HANGUP_COMPLETE:
                 handleChannelHangupComplete(eslEvent);
                 break;
-            case "CHANNEL_DESTROY":
+            case EslEventNames.CHANNEL_DESTROY:
                 handleChannelDestroy(eslEvent);
                 break;
-            case "DTMF":
+            case EslEventNames.DTMF:
                 handleDtmf(eslEvent);
                 break;
-            case "CUSTOM":
+            case EslEventNames.CUSTOM:
                 handleCustomEvent(eslEvent);
                 break;
-            case "CHANNEL_EXECUTE":
+            case EslEventNames.CHANNEL_EXECUTE:
                 handleChannelExecute(eslEvent);
                 break;
-            case "CHANNEL_EXECUTE_COMPLETE":
+            case EslEventNames.CHANNEL_EXECUTE_COMPLETE:
                 handleChannelExecuteComplete(eslEvent);
                 break;
-            case "CHANNEL_STATE":
+            case EslEventNames.CHANNEL_STATE:
                 handleChannelState(eslEvent);
                 break;
-            case "CHANNEL_CALLSTATE":
+            case EslEventNames.CHANNEL_CALLSTATE:
                 handleChannelCallState(eslEvent);
                 break;
-            case "PRESENCE_IN":
+            case EslEventNames.PRESENCE_IN:
                 handlePresenceIn(eslEvent);
                 break;
-            case "API":
+            case EslEventNames.API:
                 handleApiEvent(eslEvent);
                 break;
             default:
@@ -132,7 +157,7 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
         String uuid = eslEvent.getEventHeaders().get("Unique-ID");
         String hangupCause = eslEvent.getEventHeaders().get("Hangup-Cause");
 
-        log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
+        // log.info("通道挂断: UUID {} 原因 {}", uuid, hangupCause);
 
         // 更新CDR记录 - 设置结束时间和挂断原因
         try {
@@ -151,12 +176,12 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
      */
     private void handleChannelHangupComplete(EslEvent eslEvent) {
         String uuid = eslEvent.getEventHeaders().get("Unique-ID");
-        String hangupCause = eslEvent.getEventHeaders().getOrDefault("hangup_cause",
-                eslEvent.getEventHeaders().get("Hangup-Cause"));
-        String duration = eslEvent.getEventHeaders().getOrDefault("duration", "0");
-        String billsec = eslEvent.getEventHeaders().getOrDefault("billsec", "0");
+        // String hangupCause = eslEvent.getEventHeaders().getOrDefault("hangup_cause",
+        //         eslEvent.getEventHeaders().get("Hangup-Cause"));
+        // String duration = eslEvent.getEventHeaders().getOrDefault("duration", "0");
+        // String billsec = eslEvent.getEventHeaders().getOrDefault("billsec", "0");
 
-        log.info("通道挂断完成: UUID {} 原因 {} 通话时长(s) {} 计费时长(s) {}", uuid, hangupCause, duration, billsec);
+        // log.info("通道挂断完成: UUID {} 原因 {} 通话时长(s) {} 计费时长(s) {}", uuid, hangupCause, duration, billsec);
 
         try {
             // cdrService.finalizeCdr(uuid, hangupCause, Integer.parseInt(duration), Integer.parseInt(billsec));
@@ -185,13 +210,125 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
      * 处理自定义事件
      */
     private void handleCustomEvent(EslEvent eslEvent) {
-        // String eventSubclass = eslEvent.getEventSubclass();
-        log.info("自定义事件: {}", eslEvent.getEventHeaders());
+        Map<String, String> headers = eslEvent.getEventHeaders() == null ? Collections.emptyMap() : eslEvent.getEventHeaders();
+        String eventSubclass = eslEvent.getEventSubclass();
 
-        // if ("bytedesk::custom".equals(eventSubclass)) {
-        // // 处理自定义事件
-        // log.info("自定义事件: {}", eslEvent.getEventHeaders());
-        // }
+        // sofia::register 是高频注册心跳类事件，默认降到 DEBUG，避免刷屏。
+        if ("sofia::register".equals(eventSubclass)) {
+            // log.debug("自定义事件(注册): subclass={} fromUser={} toUser={} status={} contact={}",
+            //         eventSubclass,
+            //         headers.get("from-user"),
+            //         headers.get("to-user"),
+            //         headers.get("status"),
+            //         headers.get("contact"));
+            return;
+        }
+
+        if ("sofia::wrong_call_state".equals(eventSubclass)) {
+            String sourceIp = firstNonBlank(headers,
+                    "Caller-Network-Addr",
+                    "network_addr",
+                    "network_ip",
+                    "variable_network_addr",
+                    "variable_sip_network_ip",
+                    "sip_network_ip",
+                    "variable_sip_received_ip",
+                    "sip_received_ip",
+                    "variable_sip_via_host",
+                    "sip_via_host");
+            String sourcePort = firstNonBlank(headers,
+                    "Caller-Network-Port",
+                    "network_port",
+                    "variable_sip_received_port",
+                    "sip_received_port");
+                String callerNumber = firstNonBlank(headers,
+                    "from-user",
+                    "from_user",
+                    "Caller-Caller-ID-Number");
+                String orgUid = resolveOrgUid(headers, callerNumber);
+                if (StringUtils.hasText(sourceIp)) {
+                try {
+                    var blacklistEntity = callIpBlacklistService.blacklistSourceIp(
+                        orgUid,
+                        sourceIp,
+                        eslEvent.getEventName(),
+                        callerNumber,
+                        null,
+                        "Auto-blocked from CUSTOM sofia::wrong_call_state");
+                    log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp={} sourcePort={} orgUid={} blacklistUid={} function={} file={} line={}",
+                        eventSubclass,
+                        callerNumber,
+                        sourceIp,
+                        sourcePort,
+                        blacklistEntity.getOrgUid(),
+                        blacklistEntity.getUid(),
+                        headers.get("Event-Calling-Function"),
+                        headers.get("Event-Calling-File"),
+                        headers.get("Event-Calling-Line-Number"));
+                } catch (Exception ex) {
+                    log.warn("自定义事件(异常状态)自动拉黑失败: subclass={} fromUser={} sourceIp={} reason={}",
+                        eventSubclass,
+                        callerNumber,
+                        sourceIp,
+                        ex.getMessage());
+                }
+                } else {
+                log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp=<empty> sourcePort={} function={} file={} line={}",
+                    eventSubclass,
+                    callerNumber,
+                    sourcePort,
+                    headers.get("Event-Calling-Function"),
+                    headers.get("Event-Calling-File"),
+                    headers.get("Event-Calling-Line-Number"));
+                }
+            log.debug("自定义事件(异常状态)详情: headers={}", headers);
+            return;
+        }
+
+        // log.info("自定义事件: subclass={} headers={}", eventSubclass, headers);
+    }
+
+    private String firstNonBlank(Map<String, String> headers, String... keys) {
+        if (headers == null) {
+            return null;
+        }
+        for (String key : keys) {
+            String value = headers.get(key);
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private String resolveOrgUid(Map<String, String> headers, String callerNumber) {
+        if (!StringUtils.hasText(callerNumber)) {
+            return null;
+        }
+
+        String domain = firstNonBlank(headers,
+                "domain",
+                "Domain",
+                "domain_name",
+                "variable_domain_name",
+                "sip_from_host");
+        if (!StringUtils.hasText(domain)) {
+            domain = CallConstants.DIRECTORY_DOMAIN_DEFAULT;
+        }
+
+        Set<String> candidates = new LinkedHashSet<>();
+        String normalizedCallerNumber = callerNumber.trim();
+        candidates.add(normalizedCallerNumber);
+        candidates.add(normalizedCallerNumber + "@" + domain.trim());
+        candidates.add("sip:" + normalizedCallerNumber + "@" + domain.trim());
+        candidates.add("sip:" + normalizedCallerNumber + "@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT);
+
+        return callSettingsRepository.findAllByTargetInAndEnabledTrueAndDeletedFalse(candidates).stream()
+                .map(CallSettingsEntity::getOrgUid)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -233,26 +370,26 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
      * 处理通道状态事件
      */
     private void handleChannelState(EslEvent eslEvent) {
-        var headers = eslEvent.getEventHeaders();
-        String uuid = headers.get("Unique-ID");
-        String state = headers.get("Channel-State");
-        String callState = headers.get("Channel-Call-State");
-        String answerState = headers.get("Answer-State");
+        // var headers = eslEvent.getEventHeaders();
+        // String uuid = headers.get("Unique-ID");
+        // String state = headers.get("Channel-State");
+        // String callState = headers.get("Channel-Call-State");
+        // String answerState = headers.get("Answer-State");
 
-        log.info("通道状态: UUID {} State {} CallState {} AnswerState {}", uuid, state, callState, answerState);
+        // log.info("通道状态: UUID {} State {} CallState {} AnswerState {}", uuid, state, callState, answerState);
     }
 
     /**
      * 处理通话状态变更事件
      */
     private void handleChannelCallState(EslEvent eslEvent) {
-        var headers = eslEvent.getEventHeaders();
-        String uuid = headers.get("Unique-ID");
-        String callState = headers.get("Channel-Call-State");
-        String original = headers.get("Original-Channel-Call-State");
-        String hangupCause = headers.get("Hangup-Cause");
+        // var headers = eslEvent.getEventHeaders();
+        // String uuid = headers.get("Unique-ID");
+        // String callState = headers.get("Channel-Call-State");
+        // String original = headers.get("Original-Channel-Call-State");
+        // String hangupCause = headers.get("Hangup-Cause");
 
-        log.info("通话状态: UUID {} CallState {} -> {} Cause {}", uuid, original, callState, hangupCause);
+        // log.info("通话状态: UUID {} CallState {} -> {} Cause {}", uuid, original, callState, hangupCause);
     }
 
     /**
@@ -265,7 +402,12 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
         String infoState = headers.get("presence-call-info-state");
         String status = headers.get("status");
 
-        log.info("Presence: {} direction={} infoState={} status={}", presenceId, direction, infoState, status);
+        // 避免打印大量 null 字段的 INFO 日志
+        if (presenceId == null && direction == null && infoState == null) {
+            log.debug("Presence: status={}", status);
+        } else {
+            log.info("Presence: {} direction={} infoState={} status={}", presenceId, direction, infoState, status);
+        }
 
         // 可在此更新坐席/用户实时状态
         // presenceService.update(presenceId, direction, infoState, status);
@@ -278,7 +420,18 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
         var headers = eslEvent.getEventHeaders();
         String cmd = headers.get("API-Command");
         String arg = headers.get("API-Command-Argument");
-        log.info("API事件: command={} arg={} headers={}", cmd, arg, headers);
+        String uuid = headers.get("Unique-ID");
+        String eventSequence = headers.get("Event-Sequence");
+        String source = headers.get("Event-Calling-Function");
+
+        // status 是高频轮询命令，默认降到 DEBUG。
+        if ("status".equalsIgnoreCase(cmd)) {
+            log.debug("API事件(状态): command={} arg={}", cmd, arg);
+            return;
+        }
+
+        log.info("API事件: command={} arg={} uuid={} seq={} source={}", cmd, arg, uuid, eventSequence, source);
+        log.debug("API事件详情: headers={}", headers);
     }
 
     /**
@@ -287,8 +440,8 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
     private void handleChannelDestroy(EslEvent eslEvent) {
         var headers = eslEvent.getEventHeaders();
         String uuid = headers.get("Unique-ID");
-        String hangupCause = headers.getOrDefault("Hangup-Cause", headers.get("variable_hangup_cause"));
-        log.info("通道销毁: UUID {} 原因 {}", uuid, hangupCause);
+        // String hangupCause = headers.getOrDefault("Hangup-Cause", headers.get("variable_hangup_cause"));
+        // log.info("通道销毁: UUID {} 原因 {}", uuid, hangupCause);
 
         try {
             // cdrService.closeSession(uuid);
@@ -318,5 +471,18 @@ public class CallEventListener implements com.bytedesk.call.config.esl.client.in
         }
     }
 
-    
+    private void publishSwitchEvent(EslEvent eslEvent) {
+        try {
+            CallSwitchEvent event = new CallSwitchEvent(
+                    eslEvent.getEventName(),
+                    eslEvent.getEventSubclass(),
+                    eslEvent.getEventHeaders(),
+                    eslEvent.getEventBodyLines()
+            );
+            applicationEventPublisher.publishEvent(event);
+        } catch (Exception e) {
+            log.warn("发布CallSwitchEvent失败: {}", e.getMessage(), e);
+        }
+    }
+
 }

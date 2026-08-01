@@ -49,9 +49,24 @@ public class WorktimeSettingRequest extends BaseRequest {
     private List<WorktimeSlotValue> specialWorktimes;
 
     /**
-     * 节假日配置，存为 JSON 文本（key=date, value=name）
+     * 是否启用节假日特殊时间段
      */
-    private String holidays;
+    private Boolean holidaySettingsEnabled;
+
+    /**
+     * 节假日国家代码（暂时不启用，统一使用 CN）
+     */
+    // private String holidayCountryCode;
+
+    /**
+     * 节假日作用范围（暂时不启用，统一使用 ORG_ONLY）
+     */
+    // private String holidayScopeType;
+
+    /**
+     * 时区（暂时不启用，统一使用 Asia/Shanghai）
+     */
+    // private String timezone;
 
     /**
      * 非工作时间提示（用于引导访客留言/等待）

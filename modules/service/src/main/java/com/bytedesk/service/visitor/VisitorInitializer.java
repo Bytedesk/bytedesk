@@ -16,6 +16,7 @@ package com.bytedesk.service.visitor;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 
@@ -26,6 +27,7 @@ import lombok.AllArgsConstructor;
 public class VisitorInitializer implements SmartInitializingSingleton {
 
     private final AuthorityRestService authorityRestService;
+    private final VisitorRestService visitorRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -33,7 +35,10 @@ public class VisitorInitializer implements SmartInitializingSingleton {
         initAuthority();
     }
 
-    private void init() {}
+    private void init() {
+        String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        VisitorInitData.getDemoVisitors(orgUid).forEach(visitorRestService::create);
+    }
 
     private void initAuthority() {
         for (PermissionEnum permission : PermissionEnum.values()) {

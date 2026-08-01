@@ -32,13 +32,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/api/v1/message/unread")
 @AllArgsConstructor
-@Tag(name = "未读消息管理", description = "未读消息管理相关接口")
+@Tag(name = "Unread Message Management", description = "Unread message management APIs")
 public class MessageUnreadRestController extends BaseRestController<MessageUnreadRequest, MessageUnreadRestService> {
 
     private final MessageUnreadRestService messageUnreadRestService;
 
     @Override
-    @Operation(summary = "根据组织查询未读消息")
+    @Operation(summary = "Query Unread Messages by Organization")
     public ResponseEntity<?> queryByOrg(MessageUnreadRequest request) {
         
         Page<MessageUnreadResponse> messagePage = messageUnreadRestService.queryByOrg(request);
@@ -47,7 +47,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "根据用户查询未读消息")
+    @Operation(summary = "Query Unread Messages by User")
     public ResponseEntity<?> queryByUser(MessageUnreadRequest request) {
 
         Page<MessageUnreadResponse> messagePage = messageUnreadRestService.queryByUser(request);
@@ -56,7 +56,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "根据用户ID查询未读消息")
+    @Operation(summary = "Query Unread Message by User ID")
     public ResponseEntity<?> queryByUid(MessageUnreadRequest request) {
         
         MessageUnreadResponse messageUnread = messageUnreadRestService.queryByUid(request);
@@ -65,7 +65,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "创建未读消息")
+    @Operation(summary = "Create Unread Message")
     public ResponseEntity<?> create(MessageUnreadRequest request) {
         
         MessageUnreadResponse messageUnread = messageUnreadRestService.create(request);
@@ -74,7 +74,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "更新未读消息")
+    @Operation(summary = "Update Unread Message")
     public ResponseEntity<?> update(MessageUnreadRequest request) {
         
         MessageUnreadResponse messageUnread = messageUnreadRestService.update(request);
@@ -83,7 +83,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "删除未读消息")
+    @Operation(summary = "Delete Unread Message")
     public ResponseEntity<?> delete(MessageUnreadRequest request) {
         
         messageUnreadRestService.delete(request);
@@ -92,7 +92,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     @Override
-    @Operation(summary = "导出未读消息")
+    @Operation(summary = "Export Unread Messages")
     public Object export(MessageUnreadRequest request, HttpServletResponse response) {
         //
         // messageUnreadService.export(request, response);
@@ -102,7 +102,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
 
     // 获取未读消息数
     @GetMapping("/count")
-    @Operation(summary = "获取未读消息总数")
+    @Operation(summary = "Get Total Unread Message Count")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
 
         long count = messageUnreadRestService.getUnreadCount(request);
@@ -112,7 +112,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
 
     // 清空当前用户所有未读消息
     @PostMapping("/clear")
-    @Operation(summary = "清空当前用户所有未读消息")
+    @Operation(summary = "Clear All Unread Messages for Current User")
     public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
         // 
         messageUnreadRestService.clearUnreadMessages(request);

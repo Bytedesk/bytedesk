@@ -32,7 +32,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "评论管理", description = "评论管理相关接口")
+@Tag(name = "Comment Management", description = "Comment management APIs")
 @RestController
 @RequestMapping("/api/v1/kbase/comment")
 @AllArgsConstructor
@@ -40,8 +40,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
 
     private final KbaseCommentRestService commentService;
 
-    @Operation(summary = "查询组织下的评论", description = "根据组织ID查询评论列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Comments by Organization", description = "Query the list of comments by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseCommentResponse.class)))
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
@@ -53,8 +53,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @Operation(summary = "查询用户下的评论", description = "根据用户ID查询评论列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Comments by User", description = "Query the list of comments by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseCommentResponse.class)))
     @Override
@@ -65,8 +65,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
-    @Operation(summary = "创建评论", description = "创建新的评论")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Comment", description = "Create a new comment")
+    @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseCommentResponse.class)))
     @Override
@@ -77,8 +77,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @Operation(summary = "更新评论", description = "更新评论信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Comment", description = "Update comment information")
+    @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = KbaseCommentResponse.class)))
     @Override
@@ -89,8 +89,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
-    @Operation(summary = "删除评论", description = "删除指定的评论")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @Operation(summary = "Delete Comment", description = "Delete the specified comment")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
     @Override
     public ResponseEntity<?> delete(KbaseCommentRequest request) {
         
@@ -99,8 +99,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出评论", description = "导出评论数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @Operation(summary = "Export Comments", description = "Export comment data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
     public Object export(KbaseCommentRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

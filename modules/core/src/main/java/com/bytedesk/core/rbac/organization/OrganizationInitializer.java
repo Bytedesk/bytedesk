@@ -29,8 +29,6 @@ import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserInitializer;
 import com.bytedesk.core.rbac.user.UserService;
-import com.bytedesk.core.utils.BdDateUtils;
-
 // import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +74,7 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
         Optional<UserEntity> superOptional = userService.getSuper();
         if (superOptional.isPresent()) {
             UserEntity user = superOptional.get();
-                int defaultVipDays = resolveDefaultVipDays();
+                int defaultVipLevel = OrganizationDefaults.resolveDefaultVipLevel(bytedeskProperties);
                 int defaultMaxMembers = resolveDefaultMaxMembers();
                 int defaultMaxAgents = resolveDefaultMaxAgents();
                 int defaultMaxWorkgroups = resolveDefaultMaxWorkgroups();
@@ -86,8 +84,8 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
                     .name(bytedeskProperties.getOrganizationName())
                     .code(bytedeskProperties.getOrganizationCode())
                     .description(bytedeskProperties.getOrganizationName() + " Description")
-                    .vip(true)
-                    .vipExpireDate(BdDateUtils.now().plusDays(defaultVipDays))
+                    .vipLevel(defaultVipLevel)
+                    .vipExpireDate(OrganizationDefaults.resolveDefaultVipExpireDate(bytedeskProperties, defaultVipLevel))
                     .maxMembers(defaultMaxMembers)
                     .maxAgents(defaultMaxAgents)
                     .maxWorkgroups(defaultMaxWorkgroups)
@@ -111,14 +109,6 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             String permissionValue = OrganizationPermissions.ORGANIZATION_PREFIX + permission.name();
             authorityRestService.createForPlatform(permissionValue);
         }
-    }
-
-    private int resolveDefaultVipDays() {
-        Integer configured = bytedeskProperties.getOrganization().getDefaultVipDays();
-        if (configured == null || configured <= 0) {
-            return 365;
-        }
-        return configured;
     }
 
     private int resolveDefaultMaxMembers() {

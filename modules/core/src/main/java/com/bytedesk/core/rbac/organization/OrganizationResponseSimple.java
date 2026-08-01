@@ -49,6 +49,21 @@ public class OrganizationResponseSimple implements Serializable {
     // 是否启用，状态：启用/禁用
     private Boolean enabled;
 
+    // 是否已删除（逻辑删除）
+    private Boolean deleted;
+
+    // 会员等级：0=非会员，1及以上为会员等级
+    private Integer vipLevel;
+
+    // 组织成员最大数
+    private Integer maxMembers;
+
+    // 客服账号最大数
+    private Integer maxAgents;
+
+    // 工作组最大数
+    private Integer maxWorkgroups;
+
     // 会员截止日期
     private ZonedDateTime vipExpireDate;
 

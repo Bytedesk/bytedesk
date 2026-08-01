@@ -13,11 +13,19 @@
  */
 package com.bytedesk.core.thread;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseExtra;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 @Getter
@@ -28,9 +36,55 @@ public class ThreadExtra extends BaseExtra {
 
     private static final long serialVersionUID = 1L;
 
+    @Builder.Default
+    private Boolean showQuickButtons = false;
+
+    @Builder.Default
+    private List<WorkflowQuickButton> quickButtons = new ArrayList<>();
+
+    private String workflowCurrentNodeId;
+
+    private String workflowWaitingChoiceNodeId;
+
+    private String workflowWaitingQuestionNodeId;
+
+    private String workflowWaitingFormNodeId;
+
+    private String workflowQuestionVariable;
+
+    private String workflowQuestionAnswer;
+
+    private String workflowFormResponseData;
+
+    private String workflowSelectedOptionValue;
+
+    @Builder.Default
+    private Boolean workflowCompleted = false;
+
     public static ThreadExtra fromJson(String json) {
         ThreadExtra result = BaseExtra.fromJson(json, ThreadExtra.class);
         return result != null ? result : ThreadExtra.builder().build();
+    }
+
+    @Data
+    @Builder
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class WorkflowQuickButton implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private String uid;
+
+        private String title;
+
+        private String type;
+
+        private String content;
+
+        @Builder.Default
+        private Boolean enabled = true;
     }
     
 }

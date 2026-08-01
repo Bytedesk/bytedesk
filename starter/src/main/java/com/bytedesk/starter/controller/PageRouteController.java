@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.core.io.ClassPathResource;
 
@@ -26,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -38,8 +40,8 @@ import java.util.Properties;
 @Controller
 public class PageRouteController {
 
-    @Value("${bytedesk.custom.show-demo:true}")
-    private Boolean showDemo;
+    // @Value("${bytedesk.custom.show-demo:true}")
+    // private Boolean showDemo;
     
     @Value("${bytedesk.custom.enabled:false}")
     private Boolean customEnabled;
@@ -50,8 +52,11 @@ public class PageRouteController {
     @Value("${bytedesk.custom.logo:https://www.weiyuai.cn/logo.png}")
     private String customLogo;
     
-    @Value("${bytedesk.custom.description:重复工作自动化}")
+    @Value("${bytedesk.custom.description:解决客户问题}")
     private String customDescription;
+
+	@Value("${bytedesk.call.freeswitch.enabled:false}")
+	private Boolean callFreeswitchEnabled;
 
 	@Value("${bytedesk.custom.doc-url:https://www.weiyuai.cn/docs/zh-CN/}")
 	private String docUrl;
@@ -66,18 +71,13 @@ public class PageRouteController {
 	 */
 	@GetMapping({ "/", "/home" })
 	public String home(Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
+		// if (!showDemo) {
+			prepareDefaultPageModel(model);
 			return "default";
-		}
-		model.addAttribute("title", "微语");
-		model.addAttribute("chatUrl", "/chat/home");
-		return "home";
+		// }
+		// model.addAttribute("title", "微语");
+		// model.addAttribute("chatUrl", "/chat/home");
+		// return "home";
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/{lang:zh-CN|zh-TW|en}/index.html",
-		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
 		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms}.html"
 	})
 	public String multiLanguageStaticPages(
@@ -98,15 +98,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		// Add lang to model for template processing
 		model.addAttribute("lang", lang);
@@ -142,7 +137,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/index.html",
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}.html",
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
 		"/pages/{page:download|contact|about|privacy|terms}.html"
 	})
 	public String rootStaticPages(
@@ -150,15 +145,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String page,
 			Model model) {
 		
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		// Default language is zh-CN
 		model.addAttribute("lang", "zh-CN");
@@ -201,15 +191,10 @@ public class PageRouteController {
 			@PathVariable(required = false) String lang,
 			Model model) {
 		try {
-			if (!showDemo) {
-				// 添加自定义配置到模型
-				if (customEnabled) {
-					model.addAttribute("customName", customName);
-					model.addAttribute("customLogo", customLogo);
-					model.addAttribute("customDescription", customDescription);
-				}
-				return "default";
-			}
+			// if (!showDemo) {
+			// 	prepareDefaultPageModel(model);
+			// 	return "default";
+			// }
 			
 			// Set default language if not specified
 			if (lang == null || lang.isEmpty()) {
@@ -305,13 +290,14 @@ public class PageRouteController {
 			@PathVariable(required = false) String path,
 			@PathVariable(required = false) String path2) {
 
-		// 如果指定了语言，则使用对应语言的入口页面
-		if (lang != null) {
-			return "forward:/apidocs/" + lang + "/index.html";
-		}
+		return "redirect:https://www.weiyuai.cn/apidocs/";
 
-		// 默认使用英文入口页面
-		return "forward:/apidocs/index.html";
+		// 如果指定了语言，则使用对应语言的入口页面
+		// if (lang != null) {
+		// 	return "forward:/apidocs/" + lang + "/index.html";
+		// }
+		// // 默认使用英文入口页面
+		// return "forward:/apidocs/index.html";
 	}
 
 	/**
@@ -349,6 +335,23 @@ public class PageRouteController {
 	}
 
 	/**
+	 * agenth5
+	 * h5 web聊天/客服端
+	 * http://127.0.0.1:9003/agenth5
+	 */
+	@GetMapping({
+			"/agenth5",
+			"/agenth5/",
+			"/agenth5/{path:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/agenth5/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String agenth5(@PathVariable(required = false) String path) {
+		return "forward:/agenth5/index.html"; // 默认路径
+	}
+
+	/**
 	 * visitor
 	 * 访客对话窗口
 	 * http://127.0.0.1:9003/chat/demo
@@ -356,15 +359,10 @@ public class PageRouteController {
 	// 特定的chat/demo路径，放在通用chat路径之前
 	@GetMapping("/chat/demo")
 	public String chatDemo(Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		return "forward:/chat/index.html"; // 默认路径
 	}
 
@@ -399,15 +397,15 @@ public class PageRouteController {
 	}
 
 	@GetMapping({
-			"/video",
-			"/video/",
-			"/video/{path:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
-			"/video/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+			"/webrtc",
+			"/webrtc/",
+			"/webrtc/{path:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/webrtc/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
 		})
 	public String video() {
-		return "forward:/video/index.html";
+		return "forward:/webrtc/index.html";
 	}
 
 	@GetMapping({
@@ -501,6 +499,42 @@ public class PageRouteController {
 		return "forward:/forum/index.html";
 	}
 
+	@GetMapping({
+			"/call",
+			"/call/",
+			"/call/{path:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/call/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String call() {
+		return "forward:/call/index.html";
+	}
+
+	@GetMapping({
+			"/ippbx",
+			"/ippbx/",
+			"/ippbx/{path:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/ippbx/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String ippbx() {
+		return "forward:/ippbx/index.html";
+	}
+
+	@GetMapping({
+			"/meet",
+			"/meet/",
+			"/meet/{path:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/meet/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String meet() {
+		return "forward:/meet/index.html";
+	}
+
 	/**
 	 * Features pages - support both with and without /features/ prefix
 	 * For dynamic FTL template rendering (non-.html requests)
@@ -508,21 +542,16 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/features/office
 	 */
 	@GetMapping({ 
-		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}", 
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open}"
+		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}", 
+		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}"
 	})
 	public String handleFeatureRoutes(
 			@PathVariable(required = false) String feature, 
 			Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		
 		return "features/" + feature;
 	}
@@ -538,16 +567,51 @@ public class PageRouteController {
 		"/pages/{page:download|contact|about|privacy|terms}"
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
-		if (!showDemo) {
-			// 添加自定义配置到模型
-			if (customEnabled) {
-				model.addAttribute("customName", customName);
-				model.addAttribute("customLogo", customLogo);
-				model.addAttribute("customDescription", customDescription);
-			}
-			return "default";
-		}
+		// if (!showDemo) {
+		// 	prepareDefaultPageModel(model);
+		// 	return "default";
+		// }
 		return "pages/" + page;
+	}
+
+	private void prepareDefaultPageModel(Model model) {
+		if (customEnabled) {
+			model.addAttribute("customName", customName);
+			model.addAttribute("customLogo", customLogo);
+			model.addAttribute("customDescription", customDescription);
+		}
+
+		model.addAttribute("callFreeswitchEnabled", Boolean.TRUE.equals(callFreeswitchEnabled));
+
+		String resolvedLang = normalizeLang(LocaleContextHolder.getLocale());
+		model.addAttribute("lang", resolvedLang);
+
+		Map<String, String> i18nMap = loadI18nProperties(resolvedLang);
+		model.addAttribute("i18n", i18nMap.isEmpty() ? new HashMap<String, String>() : i18nMap);
+	}
+
+	private String normalizeLang(Locale locale) {
+		if (locale == null) {
+			return "zh-CN";
+		}
+
+		String languageTag = locale.toLanguageTag();
+		if (languageTag == null || languageTag.isBlank()) {
+			return "zh-CN";
+		}
+
+		String normalized = languageTag.replace('_', '-');
+		if (normalized.equalsIgnoreCase("zh") || normalized.equalsIgnoreCase("zh-CN")) {
+			return "zh-CN";
+		}
+		if (normalized.equalsIgnoreCase("zh-TW") || normalized.equalsIgnoreCase("zh-HK") || normalized.equalsIgnoreCase("zh-Hant")) {
+			return "zh-TW";
+		}
+		if (normalized.toLowerCase().startsWith("en")) {
+			return "en";
+		}
+
+		return "zh-CN";
 	}
 
 	/**

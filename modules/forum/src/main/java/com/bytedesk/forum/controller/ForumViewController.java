@@ -16,7 +16,6 @@ package com.bytedesk.forum.controller;
 // import com.bytedesk.core.category.CategoryRepository;
 // import com.bytedesk.forum.post.PostService;
 // import com.bytedesk.forum.user.ForumUserService;
-// import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.beans.factory.annotation.Value;
 // import org.springframework.data.domain.Pageable;
 // import org.springframework.data.domain.Sort;
@@ -43,7 +42,7 @@ package com.bytedesk.forum.controller;
 //     @Value("${bytedesk.custom.logo:https://www.weiyuai.cn/logo.png}")
 //     private String customLogo;
     
-//     @Value("${bytedesk.custom.description:重复工作自动化}")
+//     @Value("${bytedesk.custom.description:解决客户问题}")
 //     private String customDescription;
 
 //     @Autowired

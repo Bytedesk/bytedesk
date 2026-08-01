@@ -15,7 +15,7 @@ package com.bytedesk.ai.springai.providers.deepseek;
 
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
@@ -25,8 +25,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +39,6 @@ import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
@@ -50,17 +48,27 @@ import reactor.core.publisher.Flux;
 @Slf4j
 @RestController
 @RequestMapping("/deepseek")
-@RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "spring.ai.deepseek.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIDeepseekChatController {
 
+    public SpringAIDeepseekChatController(
+            @Qualifier("deepseekChatModel") ObjectProvider<ChatModel> deepseekChatModelProvider,
+            BytedeskProperties bytedeskProperties,
+            SpringAIDeepseekChatService springAIDeepseekChatService,
+            ExecutorService executorService) {
+        this.bytedeskProperties = bytedeskProperties;
+        this.springAIDeepseekChatService = springAIDeepseekChatService;
+        this.executorService = executorService;
+        this.deepseekChatModel = deepseekChatModelProvider.getIfAvailable();
+    }
+
+
     private final BytedeskProperties bytedeskProperties;
-    @Autowired(required = false)
-    @Qualifier("deepseekChatModel")
-    private ChatModel deepseekChatModel;
+    private final ChatModel deepseekChatModel;
     // 
     private final SpringAIDeepseekChatService springAIDeepseekChatService;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    @Qualifier("virtualAsyncExecutor")
+    private final ExecutorService executorService;
 
     // http://127.0.0.1:9003/deepseek/format?actor=
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html
@@ -244,8 +252,6 @@ public class SpringAIDeepseekChatController {
 
     // 在 Bean 销毁时关闭线程池
     public void destroy() {
-        if (executorService != null && !executorService.isShutdown()) {
-            executorService.shutdown();
-        }
+        // shared virtual executor managed by Spring container
     }
 }

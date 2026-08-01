@@ -18,7 +18,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -29,25 +28,23 @@ import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.llm_faq.FaqExcel;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * FAQ批处理作业配置
  */
+@RequiredArgsConstructor
 @Slf4j
 @Configuration
 public class FaqBatchJobConfig {
 
-    @Autowired
-    private JobRepository jobRepository;
+    private final JobRepository jobRepository;
     
-    @Autowired
-    private PlatformTransactionManager transactionManager;
+    private final PlatformTransactionManager transactionManager;
     
-    @Autowired
-    private FaqItemProcessor faqItemProcessor;
+    private final FaqItemProcessor faqItemProcessor;
     
-    @Autowired
-    private FaqItemWriter faqItemWriter;
+    private final FaqItemWriter faqItemWriter;
     
     /**
      * 配置FAQ导入作业

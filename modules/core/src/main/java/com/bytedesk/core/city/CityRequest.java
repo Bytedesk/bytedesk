@@ -49,4 +49,6 @@ public class CityRequest extends BaseRequestNoOrg {
     private Long parentId;
 
     private String pinyin;
+
+    private String telCode;
 }

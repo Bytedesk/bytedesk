@@ -52,6 +52,12 @@ public class WorkflowResponse extends BaseResponse {
 
     private String status;
 
+    private String settingsUid;
+
+    private String settingsName;
+
+    private String settingsDescription;
+
     private String categoryUid;
 
     private String currentNode;

@@ -29,6 +29,9 @@ public class ThreadConvertUtils {
 
     public static ThreadProtobuf convertToThreadProtobuf(ThreadEntity thread) {
         ThreadProtobuf threadProtobuf = getModelMapper().map(thread, ThreadProtobuf.class);
+        threadProtobuf.setAgent(thread.getAgent());
+        threadProtobuf.setRobot(thread.getRobot());
+        threadProtobuf.setWorkgroup(thread.getWorkgroup());
         //
         if (thread.getUser() != null) {
             UserProtobuf user = UserProtobuf.fromJson(thread.getUser());

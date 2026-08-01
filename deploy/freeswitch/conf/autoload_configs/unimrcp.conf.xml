@@ -1,0 +1,60 @@
+<configuration name="unimrcp.conf" description="mod_unimrcp configuration">
+  <settings>
+    <param name="max-connection-count" value="100" />
+    <param name="offer-new-connection" value="0" />
+    <param name="default-tts-profile" value="baidu" />
+    <param name="default-asr-profile" value="baidu" />
+    <param name="log-level" value="DEBUG" />
+    <param name="enable-profile-events" value="false" />
+    <param name="request-timeout" value="10000" />
+    <param name="connection-rx-buffer-size" value="1024" />
+    <param name="connection-tx-buffer-size" value="1024" />
+  </settings>
+
+  <profiles>
+    <profile name="baidu" version="2">
+      <param name="client-ip" value="$${local_ip_v4}" />
+      <param name="client-port" value="8062" />
+      <param name="server-ip" value="$${baidu_mrcp_server_host}" />
+      <param name="server-port" value="$${baidu_mrcp_sip_port}" />
+      <param name="sip-transport" value="udp" />
+      <param name="ua-name" value="FreeSWITCH" />
+      <param name="sdp-origin" value="FreeSWITCH" />
+      <param name="resource-location" value="media" />
+      <param name="rtp-ip" value="$${local_ip_v4}" />
+      <param name="rtp-port-min" value="4000" />
+      <param name="rtp-port-max" value="5000" />
+      <synthparams>
+      </synthparams>
+      <recogparams>
+        <param name="start-input-timers" value="false" />
+      </recogparams>
+    </profile>
+
+    <!-- Java MRCP server (bytedesk-enterprise-call) -->
+    <!--
+      Keep MRCP routing variables in vars.xml, similar to ai_bot_base_url, but do not reuse
+      ai_bot_base_url directly here: mod_unimrcp needs a reachable host/IP for SIP and RTP,
+      not an HTTPS callback URL.
+    -->
+    <profile name="java-mrcp" version="2">
+      <param name="client-ip" value="$${local_ip_v4}" />
+      <param name="client-port" value="8070" />
+      <param name="server-ip" value="$${ai_bot_mrcp_server_host}" />
+      <param name="server-port" value="$${ai_bot_mrcp_server_port}" />
+      <param name="sip-transport" value="tcp" />
+      <param name="ua-name" value="FreeSWITCH" />
+      <param name="sdp-origin" value="FreeSWITCH" />
+      <param name="resource-location" value="media" />
+      <param name="rtp-ip" value="$${local_ip_v4}" />
+      <param name="rtp-ext-ip" value="$${external_rtp_ip}" />
+      <param name="rtp-port-min" value="16000" />
+      <param name="rtp-port-max" value="16129" />
+      <synthparams>
+      </synthparams>
+      <recogparams>
+        <param name="start-input-timers" value="false" />
+      </recogparams>
+    </profile>
+  </profiles>
+</configuration>

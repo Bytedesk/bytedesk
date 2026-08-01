@@ -18,19 +18,22 @@ import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;
-import com.bytedesk.core.message.MessageStatusEnum;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.content.ChoiceContent;
 import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.RoutingPoolContent;
 import com.bytedesk.core.message.content.RoutingPoolNotification;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.message.content.WelcomeContent;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.settings_trigger.TriggerSettingsEntity;
 import com.bytedesk.kbase.trigger.TriggerKeyConsts;
+import com.bytedesk.service.message_leave.MessageLeaveExtra;
 
 import lombok.experimental.UtilityClass;
 
@@ -38,6 +41,10 @@ import lombok.experimental.UtilityClass;
 // 如果该方法不需要被Spring容器管理，则不需要此注解
 @UtilityClass
 public class ThreadMessageUtil {
+
+    private static String buildSystemContent(MessageTypeEnum type, String content) {
+        return SystemContent.of(type, content).toJson();
+    }
 
     /**
      * 结构化 WelcomeContent 的机器人欢迎消息
@@ -68,6 +75,7 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadWorkflowWelcomeMessage(WelcomeContent content, ThreadEntity thread) {
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
         String json = content != null ? content.toJson() : null;
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
@@ -76,7 +84,71 @@ public class ThreadMessageUtil {
                 .type(MessageTypeEnum.WELCOME.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
-                .user(thread.getWorkflow())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    /**
+     * 工作流文本消息
+     */
+    public static MessageEntity getThreadWorkflowTextMessage(String content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .thread(thread)
+                .type(MessageTypeEnum.TEXT.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    public static MessageEntity getThreadWorkflowChoiceMessage(ChoiceContent content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+        String json = content != null ? content.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .thread(thread)
+                .type(MessageTypeEnum.CHOICE.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
+                .orgUid(thread.getOrgUid())
+                .extra(extra.toJson())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .build();
+        return message;
+    }
+
+    public static MessageEntity getThreadWorkflowFormMessage(String content, ThreadEntity thread) {
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String workflowUser = ServiceConvertUtils.compactWorkflowProtobufString(thread.getWorkflow());
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(content)
+                .thread(thread)
+                .type(MessageTypeEnum.FORM.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(workflowUser)
                 .orgUid(thread.getOrgUid())
                 .extra(extra.toJson())
                 .createdAt(BdDateUtils.now())
@@ -192,6 +264,31 @@ public class ThreadMessageUtil {
         return buildAgentQueueMessage(MessageTypeEnum.QUEUE_ACCEPT, payload, thread);
     }
 
+    /**
+     * 构造发送给客服辅助线程的留言提交通知。
+     */
+    public static MessageProtobuf getAgentLeaveMsgSubmitMessage(MessageLeaveExtra payload, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String json = payload != null ? payload.toJson() : null;
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+                .content(json)
+                .type(MessageTypeEnum.LEAVE_MSG_SUBMIT.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+    }
+
     private static MessageProtobuf buildThreadQueueMessage(MessageTypeEnum messageType, QueueContent content,
             ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
@@ -260,10 +357,11 @@ public class ThreadMessageUtil {
     public static MessageEntity getAgentThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.LEAVE_MSG, content);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
+            .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -281,11 +379,34 @@ public class ThreadMessageUtil {
     public static MessageEntity getThreadOfflineMessage(String content, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.LEAVE_MSG, content);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-                .content(content)
+            .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
+                .status(MessageStatusEnum.READ.name())
+                .channel(ChannelEnum.SYSTEM.name())
+                .user(system.toJson())
+                .orgUid(thread.getOrgUid())
+                .createdAt(BdDateUtils.now())
+                .updatedAt(BdDateUtils.now())
+                .thread(thread)
+                .extra(extra.toJson())
+                .build();
+
+        return message;
+    }
+
+    public static MessageEntity getThreadSystemMessage(String content, ThreadEntity thread) {
+        UserProtobuf system = UserProtobuf.getSystemUser();
+        MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
+        String payload = buildSystemContent(MessageTypeEnum.SYSTEM, content);
+
+        MessageEntity message = MessageEntity.builder()
+                .uid(UidUtils.getInstance().getUid())
+            .content(payload)
+                .type(MessageTypeEnum.SYSTEM.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
                 .user(system.toJson())

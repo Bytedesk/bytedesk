@@ -16,7 +16,7 @@ package com.bytedesk.kbase.auto_reply.settings;
 import java.io.Serializable;
 
 import com.bytedesk.core.constant.BytedeskConsts;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -46,13 +46,13 @@ public class AutoReplySettingsRequest implements Serializable {
     @Builder.Default
     private String autoReplyType = AutoReplyTypeEnum.FIXED.name();
 
-    // 固定回复类型所需要字段
-    @Builder.Default
-    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
-    
     // 自动回复内容类型
     @Builder.Default
     private String autoReplyContentType = MessageTypeEnum.TEXT.name();
+
+     // 固定回复类型所需要字段
+    @Builder.Default
+    private String autoReplyUid = BytedeskConsts.EMPTY_STRING;
 
     // 自动回复内容
     @Builder.Default
@@ -62,11 +62,11 @@ public class AutoReplySettingsRequest implements Serializable {
     // 大模型回复类型所需要字段
     private String kbUid;
 
-    // 是否启用大模型接管会话
-    @Builder.Default
-    private Boolean takeoverEnabled = false;
+    // 暂时停用大模型接管会话配置
+    // @Builder.Default
+    // private Boolean takeoverEnabled = false;
 
-    // 接管会话的机器人 uid（RobotEntity.uid）
-    @Builder.Default
-    private String robotUid = BytedeskConsts.EMPTY_STRING;
+    // 暂时停用接管会话机器人配置
+    // @Builder.Default
+    // private String robotUid = BytedeskConsts.EMPTY_STRING;
 }

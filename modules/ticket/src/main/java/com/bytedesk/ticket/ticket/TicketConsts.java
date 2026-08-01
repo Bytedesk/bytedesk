@@ -25,11 +25,18 @@ public class TicketConsts {
 
     public static final String TICKET_PROCESS_PATH = "processes/ticket-process.bpmn20.xml";
 
+    public static final String TICKET_PROCESS_FLOWGRAM_PATH = "processes/ticket-process.json";
+
     public static final String TICKET_EXTERNAL_PROCESS_UID_SUFFIX = "_external";
     
     // task definition key
     public static final String TICKET_USER_TASK_CREATE_TICKET = "createTicket";
 
+    public static final String TICKET_USER_TASK_WAIT_CLAIM = "waitClaim";
+
+    public static final String TICKET_USER_TASK_PROCESS_TICKET = "processTicket";
+
+    // Old process instances may still use this task definition key.
     public static final String TICKET_USER_TASK_ASSIGN_TO_GROUP = "assignToGroup";
 
     public static final String TICKET_USER_TASK_CUSTOMER_VERIFY = "customerVerify";
@@ -64,9 +71,23 @@ public class TicketConsts {
 
     public static final String TICKET_VARIABLE_SLA_TIME = "slaTime"; // SLA时间
 
+    public static final String TICKET_VARIABLE_SLA_CLAIM_TIME = "slaClaimTime";
+
+    public static final String TICKET_VARIABLE_SLA_FIRST_RESPONSE_TIME = "slaFirstResponseTime";
+
+    public static final String TICKET_VARIABLE_SLA_RESOLUTION_TIME = "slaResolutionTime";
+
+    public static final String TICKET_VARIABLE_SLA_CUSTOMER_VERIFY_TIME = "slaCustomerVerifyTime";
+
+    public static final String TICKET_VARIABLE_SLA_TYPE = "slaType";
+
     public static final String TICKET_VARIABLE_ASSIGNEE = "assignee"; // 分配给谁
 
+    public static final String TICKET_VARIABLE_ASSIGNEE_UID = "assigneeUid"; // 分配给谁的 uid
+
     public static final String TICKET_VARIABLE_CLAIM_TIME = "claimTime"; // 认领时间
+
+    public static final String TICKET_VARIABLE_VERIFIED = "verified"; // 客户验证结果
 
     // 未分配
     public static final String TICKET_FILTER_UNASSIGNED = "UNASSIGNED";

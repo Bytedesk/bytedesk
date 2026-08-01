@@ -5,6 +5,7 @@ declare interface Animation_2 {
 }
 
 declare interface BrowseConfig {
+    referer?: string;
     referrer?: string;
     url?: string;
     title?: string;
@@ -16,7 +17,19 @@ declare interface BubbleConfig {
     icon?: string;
     title?: string;
     subtitle?: string;
+    messages?: BubbleMessageItem[];
+    autoRotate?: boolean;
+    rotateInterval?: number;
+    switchMode?: BubbleSwitchMode;
 }
+
+declare interface BubbleMessageItem {
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+}
+
+declare type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
 
 declare interface ButtonConfig {
     show?: boolean;
@@ -24,6 +37,9 @@ declare interface ButtonConfig {
     text?: string;
     width?: number;
     height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
     onClick?: () => void;
 }
 
@@ -32,6 +48,11 @@ declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
+    chatPath?: string;
+    threadPath?: string;
+    webrtcPath?: string;
+    callPath?: string;
+    ticketPath?: string;
     placement?: 'bottom-left' | 'bottom-right';
     marginBottom?: number;
     marginSide?: number;
@@ -43,16 +64,19 @@ declare interface BytedeskConfig {
     tabsConfig?: TabsConfig;
     bubbleConfig?: BubbleConfig;
     buttonConfig?: ButtonConfig;
+    buttonsConfig?: ButtonConfig[];
     feedbackConfig?: FeedbackConfig;
     chatConfig?: ChatConfig;
     browseConfig?: BrowseConfig;
     animation?: Animation_2;
     window?: WindowConfig;
+    minimizedBarConfig?: MinimizedBarConfig;
     theme?: Theme;
     onInit?: () => void;
     onShowChat?: () => void;
     onHideChat?: () => void;
     onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
     onConfigChange?: (config: BytedeskConfig) => void;
     onVisitorInfo?: (uid: string, visitorUid: string) => void;
 }
@@ -67,6 +91,7 @@ declare interface ChatConfig {
     org: string;
     t: string;
     sid: string;
+    title?: string;
     uid?: string;
     visitorUid?: string;
     nickname?: string;
@@ -74,6 +99,7 @@ declare interface ChatConfig {
     mobile?: string;
     email?: string;
     note?: string;
+    channel?: string;
     goodsInfo?: string;
     orderInfo?: string;
     extra?: string;
@@ -82,6 +108,8 @@ declare interface ChatConfig {
     draft?: boolean;
     settingsUid?: string;
     loadHistory?: boolean;
+    threadDetail?: string | boolean;
+    visitorProfile?: string | boolean;
     [key: string]: string | number | boolean | undefined;
 }
 
@@ -133,11 +161,24 @@ declare interface InviteConfig {
     onOpen?: () => void;
 }
 
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    navigateToPath?: string | null;
+    extra?: unknown;
+    position?: string;
+    status?: string;
+}
+
+declare interface MinimizedBarConfig {
+    text?: string;
+}
+
 declare interface TabsConfig {
-    home?: boolean;
     messages?: boolean;
+    thread?: boolean;
     help?: boolean;
-    news?: boolean;
 }
 
 declare interface Theme {

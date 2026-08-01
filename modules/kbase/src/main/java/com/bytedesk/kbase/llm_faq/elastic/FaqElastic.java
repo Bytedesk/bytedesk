@@ -13,6 +13,7 @@
  */
 package com.bytedesk.kbase.llm_faq.elastic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -22,7 +23,9 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
+import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,13 +42,13 @@ public class FaqElastic {
     @Id
     private String uid;
     
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String question;
     
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private String answer;
     
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_smart")
     private List<String> similarQuestions;
     
     @Field(type = FieldType.Keyword)
@@ -56,6 +59,21 @@ public class FaqElastic {
     
     @Field(type = FieldType.Keyword)
     private String kbUid;
+
+    @Field(type = FieldType.Keyword)
+    private String language;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceUid;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceLanguage;
+
+    @Field(type = FieldType.Keyword)
+    private String sourceType;
+
+    @Field(type = FieldType.Boolean)
+    private Boolean translated;
     
     @Field(type = FieldType.Keyword)
     private String categoryUid;
@@ -84,6 +102,7 @@ public class FaqElastic {
     // 从FaqEntity创建FaqElastic的静态方法
     public static FaqElastic fromFaqEntity(FaqEntity faq) {
         String kbUid = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+        String sourceLanguage = resolveSourceLanguage(faq);
         if (!StringUtils.hasText(kbUid)) {
             throw new IllegalArgumentException("kbUid is required for indexing faq uid=" + faq.getUid());
         }
@@ -96,6 +115,11 @@ public class FaqElastic {
             .tagList(faq.getTagList())
             .orgUid(faq.getOrgUid())
             .kbUid(kbUid)
+            .language(sourceLanguage)
+            .sourceUid(faq.getUid())
+            .sourceLanguage(sourceLanguage)
+            .sourceType("FAQ")
+            .translated(false)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
             // .startDate(faq.getStartDate())
@@ -105,6 +129,52 @@ public class FaqElastic {
             .upCount(faq.getUpCount())
             .downCount(faq.getDownCount())
             .build();
+    }
+
+        public static FaqElastic fromTranslation(FaqEntity faq, KbaseTranslationEntity translation) {
+        String kbUid = (faq.getKbase() != null) ? faq.getKbase().getUid() : null;
+        if (!StringUtils.hasText(kbUid)) {
+            throw new IllegalArgumentException("kbUid is required for indexing translated faq uid=" + faq.getUid());
+        }
+
+        String targetLanguage = StringUtils.hasText(translation.getTargetLanguage())
+            ? translation.getTargetLanguage().trim().toUpperCase()
+            : resolveSourceLanguage(faq);
+        String translatedQuestion = StringUtils.hasText(translation.getTitle()) ? translation.getTitle() : faq.getQuestion();
+        String translatedAnswer = StringUtils.hasText(translation.getContent())
+            ? translation.getContent()
+            : translation.getSummary();
+
+        return FaqElastic.builder()
+            .uid(translation.getUid())
+            .question(translatedQuestion)
+            .answer(translatedAnswer)
+            .similarQuestions(new ArrayList<>())
+            .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? faq.getTagList() : translation.getTagList())
+            .orgUid(faq.getOrgUid())
+            .kbUid(kbUid)
+            .language(targetLanguage)
+            .sourceUid(faq.getUid())
+            .sourceLanguage(resolveSourceLanguage(faq))
+            .sourceType("FAQ")
+            .translated(true)
+            .categoryUid(faq.getCategoryUid())
+            .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(faq.getEnabled()))
+            .viewCount(faq.getViewCount())
+            .clickCount(faq.getClickCount())
+            .upCount(faq.getUpCount())
+            .downCount(faq.getDownCount())
+            .build();
+        }
+
+    private static String resolveSourceLanguage(FaqEntity faq) {
+        if (faq.getKbase() != null && StringUtils.hasText(faq.getKbase().getSourceLanguage())) {
+            return faq.getKbase().getSourceLanguage();
+        }
+        if (faq.getKbase() != null && StringUtils.hasText(faq.getKbase().getLanguage())) {
+            return faq.getKbase().getLanguage();
+        }
+        return LanguageEnum.ZH_CN.name();
     }
 
 }

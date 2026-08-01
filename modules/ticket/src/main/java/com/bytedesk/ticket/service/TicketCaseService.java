@@ -13,7 +13,6 @@
  */
 package com.bytedesk.ticket.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,15 +22,15 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.task.api.Task;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class TicketCaseService {
     
-    @Autowired
-    private CmmnRuntimeService cmmnRuntimeService;
+    private final CmmnRuntimeService cmmnRuntimeService;
     
-    @Autowired
-    private CmmnTaskService cmmnTaskService;
+    private final CmmnTaskService cmmnTaskService;
     
     public CaseInstance startComplexTicket(Map<String, Object> variables) {
         return cmmnRuntimeService.createCaseInstanceBuilder()

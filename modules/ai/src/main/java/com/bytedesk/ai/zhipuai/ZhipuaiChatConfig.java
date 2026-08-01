@@ -20,18 +20,15 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.zhipu.oapi.ClientV4;
-
 import ai.z.openapi.ZhipuAiClient;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.ConnectionPool;
 
 /**
  * 智谱AI聊天配置类
- * 使用 oapi-java-sdk 的 ClientV4
+ * 使用 zai-sdk 的 ZhipuAiClient
  * 统一使用 spring.ai.zhipuai 配置
- * https://github.com/MetaGLM/zhipuai-sdk-java-v4
+ * https://github.com/zai-org/z-ai-sdk-java
  */
 @Slf4j
 @Data
@@ -54,6 +51,9 @@ public class ZhipuaiChatConfig {
     @Value("${spring.ai.zhipuai.chat.options.max-tokens:4096}")
     private int maxTokens;
 
+    @Value("${spring.ai.zhipuai.request-timeout:0}")
+    private int requestTimeout;
+
     @Value("${spring.ai.zhipuai.connection-timeout:30}")
     private int connectionTimeout;
 
@@ -63,45 +63,11 @@ public class ZhipuaiChatConfig {
     @Value("${spring.ai.zhipuai.write-timeout:10}")
     private int writeTimeout;
 
-    @Value("${spring.ai.zhipuai.ping-interval:10}")
-    private int pingInterval;
-
     @Value("${spring.ai.zhipuai.max-idle-connections:8}")
     private int maxIdleConnections;
 
     @Value("${spring.ai.zhipuai.keep-alive-duration:1}")
     private int keepAliveDuration;
-
-    /**
-     * 创建智谱AI聊天客户端
-     * 配置网络参数和连接池
-     */
-    @Bean("zhipuaiChatClient")
-    public ClientV4 zhipuaiChatClient() {
-        if (apiKey == null || apiKey.trim().isEmpty()) {
-            log.warn("Zhipuai API key is not configured");
-            return null;
-        }
-
-        log.info("Initializing Zhipuai chat client with model: {}", model);
-        
-        return new ClientV4.Builder(apiKey)
-                .enableTokenCache()
-                .networkConfig(
-                    connectionTimeout, 
-                    readTimeout, 
-                    writeTimeout, 
-                    pingInterval, 
-                    TimeUnit.SECONDS
-                )
-                .connectionPool(new ConnectionPool(
-                    maxIdleConnections, 
-                    keepAliveDuration, 
-                    TimeUnit.SECONDS
-                ))
-                .build();
-    }
-
 
     @Bean("zhipuAiClient")
     public ZhipuAiClient zhipuAiClient() {
@@ -113,12 +79,33 @@ public class ZhipuaiChatConfig {
         log.info("Initializing ZhipuAiClient with model: {}", model);
 
         try {
+            int effectiveRequestTimeout = requestTimeout > 0
+                    ? requestTimeout
+                    : connectionTimeout + readTimeout + writeTimeout + 5;
+
             return ZhipuAiClient.builder()
+                .ofZHIPU()
                     .apiKey(apiKey)
+                .enableTokenCache()
+                .networkConfig(
+                    effectiveRequestTimeout,
+                    connectionTimeout,
+                    readTimeout,
+                    writeTimeout,
+                    TimeUnit.SECONDS)
+                .connectionPool(
+                    maxIdleConnections,
+                    keepAliveDuration,
+                    TimeUnit.SECONDS)
                     .build();
         } catch (Exception e) {
             // zai-sdk 会在 setApiKey 时做格式校验；无效 key 不应阻塞应用启动
             log.warn("Failed to initialize ZhipuAiClient due to invalid api key, ZhipuAI features will be disabled: {}",
+                    e.getMessage());
+            return null;
+        } catch (LinkageError e) {
+            log.warn(
+                    "Failed to initialize ZhipuAiClient due to SDK/runtime incompatibility, ZhipuAI features will be disabled: {}",
                     e.getMessage());
             return null;
         }

@@ -27,5 +27,8 @@ public interface ProcessRepository extends JpaRepository<ProcessEntity, Long>, J
 
     List<ProcessEntity> findByOrgUidAndStatus(String orgUid, String status);
 
+    /** 查找有 BPMN schema 但缺少 flowgramSchema 的流程（用于迁移） */
+    List<ProcessEntity> findBySchemaIsNotNullAndFlowgramSchemaIsNull();
+
     // Boolean existsByPlatform(String platform);
 }

@@ -13,7 +13,8 @@
  */
 package com.bytedesk.service.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class ServicePlugin extends AbstractBytedeskPlugin {
+
+    public ServicePlugin(
+            @Qualifier("serviceHealthIndicator") ObjectProvider<HealthIndicator> serviceHealthIndicatorProvider) {
+        this.serviceHealthIndicator = serviceHealthIndicatorProvider.getIfAvailable();
+    }
+
     
     @Value("${bytedesk.service.enabled:true}")
     private boolean enabled;
@@ -36,8 +43,7 @@ public class ServicePlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.service.version:1.0.0}")
     private String version;
     
-    @Autowired(required = false)
-    private HealthIndicator serviceHealthIndicator;
+    private final HealthIndicator serviceHealthIndicator;
     
     @Override
     protected HealthIndicator getHealthIndicator() {

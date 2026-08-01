@@ -52,4 +52,6 @@ public class CityResponse extends BaseResponseNoOrg {
 
     private String pinyin;
 
+    private String telCode;
+
 }

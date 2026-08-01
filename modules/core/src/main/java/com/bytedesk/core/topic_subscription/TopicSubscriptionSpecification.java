@@ -29,33 +29,21 @@ import lombok.extern.slf4j.Slf4j;
 public class TopicSubscriptionSpecification extends BaseSpecification<TopicSubscriptionEntity, TopicSubscriptionRequest> {
     
     public static Specification<TopicSubscriptionEntity> search(TopicSubscriptionRequest request, AuthService authService) {
-        // log.info("request: {} orgUid: {} pageNumber: {} pageSize: {}", 
-        //     request, request.getOrgUid(), request.getPageNumber(), request.getPageSize());
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // 使用带层级过滤的基础条件
             predicates.addAll(getBasicPredicatesWithLevel(root, criteriaBuilder, request, authService, TopicSubscriptionPermissions.MODULE_NAME));
-            // name
-            if (StringUtils.hasText(request.getName())) {
-                predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
+            if (StringUtils.hasText(request.getTopic())) {
+                predicates.add(criteriaBuilder.equal(root.get("topic"), request.getTopic()));
             }
-            // description
-            if (StringUtils.hasText(request.getDescription())) {
-                predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
-            }
-            // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-            // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
-            // 
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
-            //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

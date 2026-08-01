@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
-import com.bytedesk.ticket.ticket.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingEntity;
 import com.bytedesk.ticket.ticket_settings_binding.TicketSettingsBindingRepository;
 import com.bytedesk.core.uid.UidUtils;

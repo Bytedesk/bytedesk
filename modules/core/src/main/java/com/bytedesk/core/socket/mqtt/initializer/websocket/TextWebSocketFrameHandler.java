@@ -18,6 +18,10 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
+import java.io.IOException;
+import java.net.SocketException;
+import java.util.Locale;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -66,8 +70,41 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        log.error("TextWebSocketFrameHandler exceptionCaught", cause);
+        if (cause == null) {
+            log.warn("TextWebSocketFrameHandler received null cause, closing channel");
+            ctx.close();
+            return;
+        }
+
+        if (isExpectedDisconnect(cause)) {
+            log.debug("TextWebSocketFrameHandler remote peer disconnected: {}", cause.toString());
+        } else {
+            log.error("TextWebSocketFrameHandler exceptionCaught", cause);
+        }
         ctx.close();
+    }
+
+    private boolean isExpectedDisconnect(Throwable cause) {
+        Throwable current = cause;
+        while (current != null) {
+            if (current instanceof SocketException || current instanceof IOException) {
+                String message = current.getMessage();
+                if (message == null) {
+                    return true;
+                }
+                String normalized = message.toLowerCase(Locale.ROOT);
+                if (normalized.contains("connection reset")
+                        || normalized.contains("broken pipe")
+                        || normalized.contains("forcibly closed")
+                        || normalized.contains("timed out")
+                        || normalized.contains("can't assign requested address")
+                        || normalized.contains("cannot assign requested address")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 
     @Override

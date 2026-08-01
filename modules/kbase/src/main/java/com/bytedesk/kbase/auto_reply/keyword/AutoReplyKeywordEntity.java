@@ -20,7 +20,7 @@ import java.util.List;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -48,8 +48,8 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({AutoReplyKeywordEntityListener.class})
 @Table(name = "bytedesk_kbase_auto_reply_keyword")
 public class AutoReplyKeywordEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     // 可以存储多个关键词："关键词1|关键词2|关键词3"
     // 或者存储正则表达式："^.*(关键词1|关键词2|关键词3).*$"

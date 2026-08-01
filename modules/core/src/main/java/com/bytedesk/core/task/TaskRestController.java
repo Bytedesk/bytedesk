@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,10 +42,11 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
 
     private final TaskRestService taskRestService;
 
-    @ActionAnnotation(title = "Task", action = "组织查询", description = "query task by org")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query task by org")
     @Operation(summary = "Query Tasks by Organization", description = "Retrieve tasks for the current organization")
     @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TaskRequest request) {
         
         Page<TaskResponse> tasks = taskRestService.queryByOrg(request);
@@ -52,10 +54,11 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(tasks));
     }
 
-    @ActionAnnotation(title = "Task", action = "用户查询", description = "query task by user")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query task by user")
     @Operation(summary = "Query Tasks by User", description = "Retrieve tasks for the current user")
     @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TaskRequest request) {
         
         Page<TaskResponse> tasks = taskRestService.queryByUser(request);
@@ -63,10 +66,11 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(tasks));
     }
 
-    @ActionAnnotation(title = "Task", action = "查询详情", description = "query task by uid")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query task by uid")
     @Operation(summary = "Query Task by UID", description = "Retrieve a specific task by its unique identifier")
     @PreAuthorize(TaskPermissions.HAS_TASK_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TaskRequest request) {
         
         TaskResponse task = taskRestService.queryByUid(request);
@@ -74,40 +78,43 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "新建", description = "create task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_CREATE, description = "create task")
     @Operation(summary = "Create Task", description = "Create a new task")
     @Override
     @PreAuthorize(TaskPermissions.HAS_TASK_CREATE)
-    public ResponseEntity<?> create(TaskRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<?> create(@RequestBody TaskRequest request) {
         
         TaskResponse task = taskRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "更新", description = "update task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_UPDATE, description = "update task")
     @Operation(summary = "Update Task", description = "Update an existing task")
     @Override
     @PreAuthorize(TaskPermissions.HAS_TASK_UPDATE)
-    public ResponseEntity<?> update(TaskRequest request) {
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody TaskRequest request) {
         
         TaskResponse task = taskRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "删除", description = "delete task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_DELETE, description = "delete task")
     @Operation(summary = "Delete Task", description = "Delete a task")
     @Override
     @PreAuthorize(TaskPermissions.HAS_TASK_DELETE)
-    public ResponseEntity<?> delete(TaskRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody TaskRequest request) {
         
         taskRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "Task", action = "导出", description = "export task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_EXPORT, description = "export task")
     @Operation(summary = "Export Tasks", description = "Export tasks to Excel format")
     @Override
     @PreAuthorize(TaskPermissions.HAS_TASK_EXPORT)
@@ -123,7 +130,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         );
     }
 
-    @ActionAnnotation(title = "Task", action = "点赞", description = "like task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_LIKE, description = "like task")
     @Operation(summary = "Like Task", description = "Like a task (idempotent)")
     @PostMapping("/like")
     public ResponseEntity<?> like(@RequestBody TaskRequest request) {
@@ -131,7 +138,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "取消点赞", description = "unlike task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_UNLIKE, description = "unlike task")
     @Operation(summary = "Unlike Task", description = "Cancel like for a task (idempotent)")
     @PostMapping("/unlike")
     public ResponseEntity<?> unlike(@RequestBody TaskRequest request) {
@@ -139,7 +146,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "收藏", description = "favorite task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_FAVORITE, description = "favorite task")
     @Operation(summary = "Favorite Task", description = "Favorite/collect a task (idempotent)")
     @PostMapping("/favorite")
     public ResponseEntity<?> favorite(@RequestBody TaskRequest request) {
@@ -147,7 +154,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
-    @ActionAnnotation(title = "Task", action = "取消收藏", description = "unfavorite task")
+    @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_UNFAVORITE, description = "unfavorite task")
     @Operation(summary = "Unfavorite Task", description = "Cancel favorite/collect for a task (idempotent)")
     @PostMapping("/unfavorite")
     public ResponseEntity<?> unfavorite(@RequestBody TaskRequest request) {

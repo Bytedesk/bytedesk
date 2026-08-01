@@ -41,11 +41,15 @@ public class WorkflowRequest extends BaseRequest {
 
     private String schema;
 
+    private String type;
+
     private List<String> nodeUids;
 
     private List<String> edgeUids;
 
     private String status;
+
+    private String settingsUid;
 
     private String currentNode;
 

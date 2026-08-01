@@ -1,0 +1,478 @@
+services:
+  bytedesk:
+    # image: bytedesk/bytedesk:latest # hub.docker.com enterprise
+    # image: bytedesk/bytedesk-ce:latest # hub.docker.com community
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest # aliyun enterprise
+    # mage: registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk-ce:latest # aliyun community
+    container_name: bytedesk
+    depends_on:
+      - bytedesk-db
+      - bytedesk-redis
+      - bytedesk-elasticsearch
+      - bytedesk-mq
+      - bytedesk-minio
+    environment:
+      TZ: Asia/Shanghai
+      SERVER_PORT: 9003
+      BYTEDESK_DEBUG: "false"
+      BYTEDESK_LICENSE_KEY: ${BYTEDESK_LICENSE_KEY:-}
+      # ===============================
+      # Custom config
+      # Enable this first; branding fields below only take effect when custom config is enabled. 启用后，下面的品牌配置才会生效。
+      # ===============================
+      BYTEDESK_CUSTOM_ENABLED: "false"
+      # Leave empty to use the default product name. 留空则使用默认名称。
+      BYTEDESK_CUSTOM_NAME:
+      # Leave empty to use the default logo. 留空则使用默认 logo。
+      BYTEDESK_CUSTOM_LOGO:
+      # Leave empty to use the default description: Chat As A Service. 留空则使用默认描述。
+      BYTEDESK_CUSTOM_DESCRIPTION:
+      # Leave empty to fall back to BYTEDESK_CUSTOM_LOGO. 留空则回退使用 BYTEDESK_CUSTOM_LOGO。
+      # BYTEDESK_CUSTOM_FAVICON:
+      BYTEDESK_CUSTOM_SHOW_RIGHT_CORNER_CHAT: "false"
+      # Floating chat placement: bottom-right / bottom-left. Only applies when the corner chat is enabled. 浮窗位置，仅在启用右下角对话框时生效。
+      # BYTEDESK_CUSTOM_RIGHT_CORNER_CHAT_PLACEMENT: bottom-left
+      # BYTEDESK_CUSTOM_SHOW_DEMO: "false"
+      BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
+      BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
+      # Public MQTT WebSocket URL, typically used behind nginx or another reverse proxy. 外网可访问的 MQTT WebSocket 完整地址。
+      BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL:
+      # Public upload API base URL without the upload path, useful for multi-node or reverse-proxy upload setups. 外网上传 API 基础地址，不带上传路径。
+      # BYTEDESK_CUSTOM_UPLOAD_API_URL: https://upload.example.com
+      # Public visitor ticket HTML base URL without trailing slash, used in ticket notification emails. 访客工单页面基础地址，不带末尾斜杠。
+      # BYTEDESK_CUSTOM_TICKET_HTML_URL: https://support.example.com/ticket
+      # Default WeChat Mini Program goods detail route. 微信小程序商品详情默认跳转路径。
+      BYTEDESK_CUSTOM_WECHAT_MINI_PROGRAM_GOODS_DETAIL_PATH: /pages/goods/detail/index
+      # Default WeChat Mini Program order detail route. 微信小程序订单详情默认跳转路径。
+      BYTEDESK_CUSTOM_WECHAT_MINI_PROGRAM_ORDER_DETAIL_PATH: /pages/order/detail/index
+      BYTEDESK_CUSTOM_LOGIN_USERNAME_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_2FA_ENABLE: "false"
+      BYTEDESK_CUSTOM_LOGIN_MAX_RETRY_COUNT: 3
+      # Lock duration in minutes after reaching max retry count; set to 0 to disable locking. Must match custom.loginMaxRetryLockTime binding. 超过最大重试次数后的锁定时长，需与 loginMaxRetryLockTime 字段绑定一致。
+      BYTEDESK_CUSTOM_LOGIN_MAX_RETRY_LOCK_TIME: 10
+      BYTEDESK_CUSTOM_LOGIN_MOBILE_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_SCAN_ENABLE: "true"
+      BYTEDESK_CUSTOM_LOGIN_GITHUB_ENABLE: "false"
+      BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
+      BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
+      # Login page language: zh-CN / en-US / zh-TW. 登录页语言。
+      BYTEDESK_CUSTOM_LANG: zh-CN
+      # Custom default LLM prompt; leave empty to fall back to the built-in RobotConsts default. 自定义默认 LLM Prompt，留空时回退到内置默认值。
+      BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT:
+      BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
+      # Auto-register users when they log in with mobile/email and no account exists yet. 手机号或邮箱登录时若用户不存在则自动注册。
+      BYTEDESK_CUSTOM_AUTO_REGISTER_ON_LOGIN: "true"
+      BYTEDESK_CUSTOM_FORCE_VALIDATE_MOBILE: "true"
+      BYTEDESK_CUSTOM_FORCE_VALIDATE_EMAIL: "true"
+      # Force visitor authentication; default is false. 是否强制访客身份认证，默认 false。
+      # BYTEDESK_CUSTOM_FORCE_VISITOR_AUTH: "false"
+      # ===============================
+      # Admin config
+      # ===============================
+      BYTEDESK_ADMIN_EMAIL: admin@email.com
+      BYTEDESK_ADMIN_PASSWORD: ${BYTEDESK_ADMIN_PASSWORD}
+      BYTEDESK_ADMIN_NICKNAME: SuperAdmin
+      BYTEDESK_ADMIN_MOBILE: 13345678000
+      BYTEDESK_ADMIN_MOBILE_WHITELIST: 18888888000,18888888001,18888888002,18888888003,18888888004,18888888005
+      BYTEDESK_ADMIN_EMAIL_WHITELIST: 100@email.com,101@email.com,102@email.com,103@email.com,104@email.com,105@email.com
+      # Verification code used for whitelisted mobile numbers/emails; non-whitelisted accounts get a random 6-digit code. 白名单使用固定验证码，其他账号使用随机 6 位验证码。
+      BYTEDESK_ADMIN_VALIDATE_CODE: ${BYTEDESK_ADMIN_VALIDATE_CODE}
+      # ===============================
+      # Member config
+      # ===============================
+      BYTEDESK_MEMBER_PASSWORD: ${BYTEDESK_MEMBER_PASSWORD}
+      # ===============================
+      # Performance Testing config
+      # ===============================
+      BYTEDESK_TESTING_ENABLED: "true"
+      BYTEDESK_TESTING_DISABLE_CAPTCHA: "true"
+      BYTEDESK_TESTING_DISABLE_IP_FILTER: "true"
+      # IP whitelist for performance testing, comma-separated. 性能测试白名单 IP，逗号分隔。
+      BYTEDESK_TESTING_IP_WHITELIST: 127.0.0.1,127.0.0.2
+      # ===============================
+      # Organization config
+      # ===============================
+      BYTEDESK_ORGANIZATION_NAME: MyCompany
+      BYTEDESK_ORGANIZATION_CODE: bytedesk
+      BYTEDESK_ORGANIZATION_ALLOW_CREATE_ORG: "true"
+      BYTEDESK_ORGANIZATION_ALLOW_JOIN_ORG: "true"
+      BYTEDESK_ORGANIZATION_DEFAULT_VIP_LEVEL: 0
+      BYTEDESK_ORGANIZATION_DEFAULT_VIP_DAYS: 365
+      BYTEDESK_ORGANIZATION_DEFAULT_MAX_MEMBERS: 20
+      BYTEDESK_ORGANIZATION_DEFAULT_MAX_AGENTS: 20
+      BYTEDESK_ORGANIZATION_DEFAULT_MAX_WORKGROUPS: 20
+      # ===============================
+      # service config
+      # ===============================
+      BYTEDESK_SERVICE_AGENT_SEAT_ENABLED: "false"
+      # ===============================
+      # IP location config
+      # Put classpath database files under starter/src/main/resources/ipdb/. classpath 文件建议放在 starter/src/main/resources/ipdb/。
+      # When fallback=true, the app automatically switches to another available provider if the default one is unavailable. fallback=true 时会自动回退到其他可用 provider。
+      # ===============================
+      BYTEDESK_IP_PROVIDER: ip2region
+      BYTEDESK_IP_FALLBACK_ENABLED: "true"
+      BYTEDESK_IP_IP2REGION_DB_FILE: ipdb/ip2region.xdb
+      BYTEDESK_IP_MAXMIND_CITY_DB_FILE: ipdb/GeoLite2-City.mmdb
+      BYTEDESK_IP_MAXMIND_LOCALES: zh-CN,en
+      # ===============================
+      # Features / JWT / Cache / Redis
+      # ===============================
+      BYTEDESK_FEATURES_JAVA_AI: "true"
+      BYTEDESK_FEATURES_EMAIL_TYPE: javamail
+      # Base URL for avatar access; change this to a publicly reachable address in real deployments. 头像访问基础地址，请改成对外可访问地址。
+      BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
+      BYTEDESK_JWT_SECRET_KEY: ${BYTEDESK_JWT_SECRET_KEY}
+      # 30 days in milliseconds. 30 天，单位毫秒。
+      BYTEDESK_JWT_EXPIRATION: 2592000000
+      # 60 days in milliseconds. 60 天，单位毫秒。
+      BYTEDESK_JWT_REFRESH_TOKEN_EXPIRATION: 5184000000
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Can be turned off during initial installation; recommended to turn on during upgrades to automatically run database migration scripts. 默认初始安装时可关闭，升级时建议开启以自动执行数据库迁移脚本。 
+      # SPRING_LIQUIBASE_ENABLED: "true"
+      # 
+      SPRING_DATA_REDIS_DATABASE: 0
+      SPRING_DATA_REDIS_HOST: redis-bytedesk
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_PASSWORD: ${REDIS_PASSWORD}
+      SPRING_DATA_REDIS_TIMEOUT: 10000
+      SPRING_DATA_REDIS_REPOSITORIES_ENABLED: "false"
+      # 
+      BYTEDESK_CACHE_LEVEL: 2
+      BYTEDESK_CACHE_PREFIX: bytedeskim
+      BYTEDESK_CACHE_REDIS_STREAM_KEY: bytedeskim:stream
+      SPRING_CACHE_TYPE: redis
+      SPRING_CACHE_REDIS_TIME_TO_LIVE: 1800000
+      SPRING_CACHE_REDIS_CACHE_NULL_VALUES: "false"
+      SPRING_CACHE_REDIS_USE_KEY_PREFIX: "true"
+      SPRING_CACHE_REDIS_KEY_PREFIX: "bytedeskim:cache:"
+      # 
+      BYTEDESK_AI_ASR_TTSASR_ENABLED: "true"
+      BYTEDESK_AI_ASR_TTSASR_BASE_URL: http://ttsasr-bytedesk:8000
+      BYTEDESK_AI_ASR_TTSASR_MODEL: funasr
+      BYTEDESK_AI_ASR_TTSASR_LANGUAGE: auto
+      # ===============================
+      # Upload config
+      # Final file URL = BYTEDESK_UPLOAD_URL + '/' + last segment of BYTEDESK_UPLOAD_DIR + generated relative path. 完整文件访问地址由上传 URL、目录最后一级和系统生成路径组成。
+      # ===============================
+      BYTEDESK_UPLOAD_TYPE: local
+      BYTEDESK_UPLOAD_DIR: /app/uploads
+      BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+      # Maximum file size in bytes; default is 10MB. 最大文件大小，单位字节。
+      BYTEDESK_UPLOAD_SECURITY_MAX_FILE_SIZE: 10485760
+      BYTEDESK_UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION: "true"
+      BYTEDESK_UPLOAD_SECURITY_ENABLE_FILE_NAME_FILTER: "true"
+      BYTEDESK_UPLOAD_SECURITY_FORCE_RENAME: "true"
+      BYTEDESK_UPLOAD_SECURITY_MAX_FILE_NAME_LENGTH: 255
+      BYTEDESK_UPLOAD_SECURITY_ENABLE_UPLOAD_LOG: "true"
+      BYTEDESK_UPLOAD_SECURITY_ENABLE_VIRUS_SCAN: "false"
+      # ===============================
+      # MinIO object storage config
+      # Keep this disabled when using local storage only. 仅使用本地存储时保持关闭。
+      # ===============================
+      BYTEDESK_MINIO_ENABLED: "false"
+      BYTEDESK_MINIO_ENDPOINT: http://bytedesk-minio:9000
+      BYTEDESK_MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      BYTEDESK_MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      BYTEDESK_MINIO_BUCKET_NAME: bytedesk
+      BYTEDESK_MINIO_REGION: us-east-1
+      BYTEDESK_MINIO_SECURE: false
+      # ===============================
+      # Knowledge base config
+      # Helpcenter and blog can be configured independently with their own theme, static output path, and public API URL. helpcenter 和 blog 可分别配置主题、目录和 API 地址。
+      # ===============================
+      BYTEDESK_KBASE_HELPCENTER_THEME: default
+      BYTEDESK_KBASE_HTML_PATH: /app/helpcenter
+      BYTEDESK_KBASE_HELPCENTER_API_URL: http://127.0.0.1:9003
+      BYTEDESK_KBASE_BLOG_THEME: default
+      BYTEDESK_KBASE_BLOG_HTML_PATH: /app/blog
+      BYTEDESK_KBASE_BLOG_API_URL: http://127.0.0.1:9003
+      # ===============================
+      # Socket config
+      # WebSocket service for realtime messaging. 实时消息 WebSocket 服务配置。
+      # ===============================
+      BYTEDESK_SOCKET_HOST: 0.0.0.0
+      BYTEDESK_SOCKET_WEBSOCKET_PORT: 9885
+      BYTEDESK_SOCKET_LEAK_DETECTOR_LEVEL: SIMPLE
+      BYTEDESK_SOCKET_PARENT_EVENT_LOOP_GROUP_THREAD_COUNT: 1
+      BYTEDESK_SOCKET_CHILD_EVENT_LOOP_GROUP_THREAD_COUNT: 8
+      BYTEDESK_SOCKET_MAX_PAYLOAD_SIZE: 10240
+      # ===============================
+      # Call / FreeSWITCH config
+      # Only required when voice/call integration is enabled. 仅在启用语音/呼叫集成时需要配置。
+      # ===============================
+      BYTEDESK_CALL_FREESWITCH_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_SERVER: 127.0.0.1
+      BYTEDESK_CALL_FREESWITCH_ESL_PORT: 8021
+      BYTEDESK_CALL_FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD}
+      BYTEDESK_CALL_FREESWITCH_SIP_PORT: 5060
+      BYTEDESK_CALL_FREESWITCH_WEBRTC_PORT: 7443
+      BYTEDESK_CALL_FREESWITCH_WS_PORT: 5066
+      BYTEDESK_CALL_FREESWITCH_CALL_TIMEOUT: 120
+      BYTEDESK_CALL_FREESWITCH_DOMAIN: example.com
+      # AI 会话并发守护（每个组织最大并发 AI 语音会话数，超限返回忙线）
+      BYTEDESK_CALL_AI_SESSION_MAX_CONCURRENCY_PER_ORG: 10
+      # 僵死会话 TTL（分钟），超时未释放的会话会被定时清理
+      BYTEDESK_CALL_AI_SESSION_STALE_TTL_MINUTES: 30
+      # 僵死会话清理间隔（毫秒）
+      BYTEDESK_CALL_AI_SESSION_SWEEP_INTERVAL_MS: 60000
+      # 分机导入来源：esl 或 directory。默认优先通过 ESL list_users 读取 FreeSWITCH 目录分机。
+      BYTEDESK_CALL_FREESWITCH_EXTENSION_IMPORT_SOURCE: esl
+      # 当 ESL list_users 不可用或返回空时，是否回退扫描应用容器内挂载的 FreeSWITCH conf/directory。
+      BYTEDESK_CALL_FREESWITCH_EXTENSION_IMPORT_DIRECTORY_FALLBACK_ENABLED: "false"
+      # AI hotline 动态入口路由同步：为已发布的 AI 分机自动创建/回填 CallRoute。
+      BYTEDESK_CALL_AI_HOTLINE_ROUTE_SYNC_ENABLED: "true"
+      # 调试开关：开启后仅记录将要同步的路由，不真正写入数据库。
+      BYTEDESK_CALL_AI_HOTLINE_ROUTE_SYNC_DRY_RUN: "false"
+      # xml_curl 功能开关：dialplan/directory/configuration/phrases 后备处理
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIALPLAN_ENABLED: "true"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIRECTORY_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_CONFIGURATION_ENABLED: "false"
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_PHRASES_ENABLED: "false"
+      # xml_curl directory 用户列表：user1@domain:password,...
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_DIRECTORY_USERS: "1000@default:1234"
+      # xml_curl configuration 白名单，逗号分隔（支持 100-200 范围写法）
+      BYTEDESK_CALL_FREESWITCH_XMLCURL_CONFIG_WHITELIST:
+      # 目录回退时扫描的 FreeSWITCH conf 根目录；需与下方 volumes 中的宿主机挂载保持一致。
+      BYTEDESK_CALL_FREESWITCH_CONF_DIR: /app/freeswitch/conf
+      # 
+      BYTEDESK_CALL_MRCP_ENABLED: "false"
+      BYTEDESK_CALL_MRCP_PROFILE: java-mrcp
+      BYTEDESK_CALL_MRCP_HOST: 0.0.0.0
+      BYTEDESK_CALL_MRCP_PORT: 1544
+      BYTEDESK_CALL_MRCP_TTS_PROVIDER: dashscope
+      BYTEDESK_CALL_MRCP_ASR_PROVIDER: dashscope
+      BYTEDESK_CALL_MRCP_ASR_MODE: recording-file
+      BYTEDESK_CALL_MRCP_TTS_VOICE: longanhuan
+      # ===============================
+      # WebRTC / Janus config
+      # Use service names on the Docker network instead of 127.0.0.1. 容器内请使用 Docker 网络服务名，而不是 127.0.0.1。
+      # Typically combined with compose-scenario-webrtc.yaml. 通常与 compose-scenario-webrtc.yaml 组合使用。
+      # ===============================
+      BYTEDESK_WEBRTC_JANUS_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_WS_URL: ws://bytedesk-janus:8188/janus
+      BYTEDESK_WEBRTC_JANUS_LOG_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_OPERATION_TIMEOUT_MS: 10000
+      BYTEDESK_WEBRTC_JANUS_HEALTH_TIMEOUT_MS: 3000
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_0_URLS: stun:bytedesk-coturn:3478
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_URLS: turn:bytedesk-coturn:3478?transport=udp
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_USERNAME: ${COTURN_USER:-bytedesk}
+      BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_1_CREDENTIAL: ${COTURN_PASS:-bytedesk123}
+      # Optional TLS/TCP TURN relay. 可选的 TLS/TCP TURN 中继。
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_URLS: turn:bytedesk-coturn:5349?transport=tcp
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_USERNAME: ${COTURN_USER:-bytedesk}
+      # BYTEDESK_WEBRTC_JANUS_ICE_SERVERS_2_CREDENTIAL: ${COTURN_PASS:-bytedesk123}
+      BYTEDESK_WEBRTC_JANUS_ADMIN_ENABLED: "true"
+      BYTEDESK_WEBRTC_JANUS_ADMIN_WS_URL: ws://bytedesk-janus:7188/janus
+      BYTEDESK_WEBRTC_JANUS_ADMIN_HTTP_URL: http://bytedesk-janus:8088/janus
+      BYTEDESK_WEBRTC_JANUS_ADMIN_SECRET: ${JANUS_ADMIN_SECRET:-janusoverlord}
+      BYTEDESK_WEBRTC_RECORD_DIR: /app/uploads/webrtc-video-recordings
+      BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PUBLISHERS: 6
+      BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PERMANENT: "false"
+      BYTEDESK_WEBRTC_JANUS_AUDIO_BRIDGE_DEFAULT_PERMANENT: "false"
+      # ===============================
+      # Management endpoints
+      # Current settings disable actuator web exposure by default and keep only the business port active. 当前配置默认关闭 actuator Web 暴露，仅保留业务端口。
+      # ===============================
+      MANAGEMENT_ENDPOINTS_ENABLED_BY_DEFAULT: "false"
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: ''
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_EXCLUDE: '*'
+      MANAGEMENT_ENDPOINT_HEALTH_ENABLED: "false"
+      MANAGEMENT_ENDPOINT_INFO_ENABLED: "false"
+      MANAGEMENT_SERVER_PORT: -1
+      MANAGEMENT_ENDPOINTS_WEB_BASE_PATH: '/management'
+      SPRING_SECURITY_BASIC_ENABLED: "true"
+      MANAGEMENT_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
+      MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
+      # ===============================
+      # Spring Boot Admin Client (bytedesk-monitor)
+      # Uncomment to register this instance with a monitor server. 取消注释以注册到监控服务端。
+      # ===============================
+      # SPRING_BOOT_ADMIN_CLIENT_URL: http://bytedesk-monitor:9103
+      # SPRING_BOOT_ADMIN_CLIENT_USERNAME: admin
+      # SPRING_BOOT_ADMIN_CLIENT_PASSWORD: admin
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_NAME: bytedesk-starter
+      # SPRING_BOOT_ADMIN_CLIENT_INSTANCE_SERVICE_BASE_URL: http://127.0.0.1:9003
+      # ===============================
+      # AI provider and model selection
+      # Select default providers first, then configure API keys and model options for the providers you actually use. 先选择默认 provider，再为实际使用的 provider 配置密钥和模型参数。
+      # ===============================
+      SPRING_AI_MODEL_CHAT: zhipuai
+      SPRING_AI_MODEL_EMBEDDING: zhipuai
+      SPRING_AI_MODEL_VISION: zhipuai
+      SPRING_AI_MODEL_AUDIO: zhipuai
+      SPRING_AI_MODEL_AUDIO_SPEECH: none
+      SPRING_AI_MODEL_AUDIO_TRANSCRIPTION: none
+      SPRING_AI_MODEL_RERANK: zhipuai
+      # 
+      SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
+      SPRING_AI_OLLAMA_CHAT_ENABLED: "false"
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: qwen3:0.6b
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OLLAMA_EMBEDDING_ENABLED: "false"
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL: bge-m3:latest
+      SPRING_AI_OLLAMA_INIT_PULL_MODEL_STRATEGY: when_missing
+      SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL_RERANK: bge-reranker-v2-m3:latest
+      # 
+      SPRING_AI_ZHIPUAI_API_KEY: ${SPRING_AI_ZHIPUAI_API_KEY:-}
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4.5-flash
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TOP_P: 0.9
+      SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MAX_TOKENS: 4096
+      SPRING_AI_ZHIPUAI_CONNECTION_TIMEOUT: 30
+      SPRING_AI_ZHIPUAI_READ_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_WRITE_TIMEOUT: 10
+      SPRING_AI_ZHIPUAI_PING_INTERVAL: 10
+      SPRING_AI_ZHIPUAI_MAX_IDLE_CONNECTIONS: 8
+      SPRING_AI_ZHIPUAI_KEEP_ALIVE_DURATION: 1
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "true"
+      SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
+      SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_DIMENSIONS: 1024
+      # 
+      SPRING_AI_DEEPSEEK_BASE_URL: https://api.deepseek.com
+      SPRING_AI_DEEPSEEK_API_KEY: ${SPRING_AI_DEEPSEEK_API_KEY:-}
+      SPRING_AI_DEEPSEEK_CHAT_ENABLED: "false"
+      SPRING_AI_DEEPSEEK_CHAT_OPTIONS_MODEL: deepseek-chat
+      SPRING_AI_DEEPSEEK_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_DEEPSEEK_EMBEDDING_ENABLED: "false"
+      # 
+      SPRING_AI_OPENAI_BASE_URL: https://api.openai.com
+      SPRING_AI_OPENAI_API_KEY: ${SPRING_AI_OPENAI_API_KEY:-}
+      SPRING_AI_OPENAI_CHAT_ENABLED: "false"
+      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: gpt-4o
+      SPRING_AI_OPENAI_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OPENAI_EMBEDDING_ENABLED: "false"
+      # 
+      SPRING_AI_DASHSCOPE_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_BASE_URL: https://dashscope.aliyuncs.com
+      SPRING_AI_DASHSCOPE_API_KEY: ${SPRING_AI_DASHSCOPE_API_KEY:-}
+      SPRING_AI_DASHSCOPE_CHAT_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_MODEL: qwen-max
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_DASHSCOPE_CHAT_OPTIONS_TOP_P: 3
+      # Optional dedicated API key for TTS; falls back to SPRING_AI_DASHSCOPE_API_KEY when empty. 可选语音合成专用 Key，留空时回退到通用 DashScope Key。
+      SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_API_KEY: ${SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_API_KEY:-}
+      SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_OPTIONS_MODEL: cosyvoice-v3-flash
+      SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_OPTIONS_VOICE: longanhuan
+      SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_API_KEY: ${SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_API_KEY:-}
+      SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_OPTIONS_MODEL: qwen3-asr-flash
+      SPRING_AI_DASHSCOPE_AUDIO_TRANSCRIPTION_REALTIME_MODEL: fun-asr-realtime
+      SPRING_AI_DASHSCOPE_IMAGE_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_EMBEDDING_ENABLED: "false"
+      SPRING_AI_DASHSCOPE_EMBEDDING_OPTIONS_MODEL: text-embedding-v1
+      SPRING_AI_DASHSCOPE_AUDIO_SYNTHESIS_ENABLED: "false"
+      # ===============================
+      # Bytedesk AI defaults
+      # Shared application defaults consumed by execution endpoints and admin forms. 执行接口与管理台表单共享的应用默认值。
+      # ===============================
+      BYTEDESK_AI_TTS_LANGUAGE: zh-CN
+      BYTEDESK_AI_TTS_AUDIO_FORMAT: mp3
+      # TTS Realtime WebSocket（Qwen-Audio Realtime 中继地址）
+      BYTEDESK_AI_TTS_REALTIME_WS_URL: ${BYTEDESK_AI_TTS_REALTIME_WS_URL:-wss://dashscope.aliyuncs.com/api-ws/v1/realtime}
+      BYTEDESK_AI_ASR_SOURCE_FORMAT: mp3
+      BYTEDESK_AI_ASR_TIMEOUT_MS: 180000
+      BYTEDESK_AI_ASR_POLL_INTERVAL_MS: 1500
+      # 
+      SPRING_AI_SILICONFLOW_BASE_URL: https://api.siliconflow.cn
+      SPRING_AI_SILICONFLOW_API_KEY: ${SPRING_AI_SILICONFLOW_API_KEY:-}
+      SPRING_AI_SILICONFLOW_CHAT_ENABLED: "false"
+      SPRING_AI_SILICONFLOW_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      SPRING_AI_SILICONFLOW_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # 
+      SPRING_AI_GITEE_BASE_URL: https://ai.gitee.com
+      SPRING_AI_GITEE_API_KEY: ${SPRING_AI_GITEE_API_KEY:-}
+      SPRING_AI_GITEE_CHAT_ENABLED: "false"
+      SPRING_AI_GITEE_CHAT_OPTIONS_MODEL: Qwen/QwQ-32B
+      SPRING_AI_GITEE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # 
+      SPRING_AI_TENCENT_BASE_URL: https://api.hunyuan.cloud.tencent.com
+      SPRING_AI_TENCENT_API_KEY: ${SPRING_AI_TENCENT_API_KEY:-}
+      SPRING_AI_TENCENT_CHAT_ENABLED: "false"
+      SPRING_AI_TENCENT_CHAT_OPTIONS_MODEL: hunyuan-t1-latest
+      SPRING_AI_TENCENT_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # 
+      SPRING_AI_BAIDU_BASE_URL: https://qianfan.baidubce.com/v2
+      SPRING_AI_BAIDU_API_KEY: ${SPRING_AI_BAIDU_API_KEY:-}
+      SPRING_AI_BAIDU_CHAT_ENABLED: "false"
+      SPRING_AI_BAIDU_CHAT_OPTIONS_MODEL: ernie-x1-32k-preview
+      SPRING_AI_BAIDU_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # 
+      SPRING_AI_VOLCENGINE_BASE_URL: https://ark.cn-beijing.volces.com/api/v3
+      SPRING_AI_VOLCENGINE_API_KEY: ${SPRING_AI_VOLCENGINE_API_KEY:-}
+      SPRING_AI_VOLCENGINE_CHAT_ENABLED: "false"
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_MODEL: doubao-1-5-pro-32k-250115
+      SPRING_AI_VOLCENGINE_CHAT_OPTIONS_TEMPERATURE: 0.7
+      # ===============================
+      # Vector store / MCP / logging
+      # Search/vector storage, MCP switches, and module-level log verbosity. 检索向量存储、MCP 开关以及模块日志级别。
+      # ===============================
+      SPRING_AI_VECTORSTORE_TYPE: elasticsearch
+      # 
+      SPRING_ELASTICSEARCH_URIS: http://elasticsearch-bytedesk:9200
+      SPRING_ELASTICSEARCH_USERNAME: elastic
+      SPRING_ELASTICSEARCH_PASSWORD: ${ELASTIC_PASSWORD}
+      # 
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_ENABLED: "true"
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INITIALIZE_SCHEMA: "true"
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_INDEX_NAME: bytedesk_vs_index
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_DIMENSIONS: 1024
+      SPRING_AI_VECTORSTORE_ELASTICSEARCH_SIMILARITY: cosine
+      # 
+      SPRING_AI_MCP_CLIENT_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_ENABLED: "false"
+      SPRING_AI_MCP_SERVER_STDIO: "false"
+      SPRING_AI_MCP_SERVER_TYPE: SYNC
+      SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: "false"
+      # 
+      LOGGING_LEVEL_COM_BYTEDESK_AI: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_CORE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_KBASE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SERVICE: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SOCIAL: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_WECHAT: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_SHOP: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_TEAM: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_TICKET: DEBUG
+      LOGGING_LEVEL_COM_BYTEDESK_STARTER: DEBUG
+      LOGGING_FILE_NAME: /app/logs/bytedeskim.log
+      LOGGING_PATTERN_FILE: '[RID:%X{requestId} TRACEID:%X{traceId}] %d{yyyy-MM-dd HH:mm:ss.SSS} %5p --- [%15.15t] %-40.40logger{39} : %m%n%wEx'
+      # 
+      WECHAT_PAY_ENABLED: "false"
+      WECHAT_PAY_CERTPATH: ''
+      ALIYUN_SMS_SIGNNAME: ''
+      ALIYUN_SMS_TEMPLATECODE: ''
+      ALIYUN_SMS_DOMAIN: dysmsapi.aliyuncs.com
+      ALIYUN_SMS_VERSION: 2017-05-25
+      ALIYUN_SMS_ACTION: SendSms
+      SPRINGDOC_SHOW_ACTUATOR: "false"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
+      SPRINGDOC_SWAGGER_UI_PATH: /index.html
+      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SPRINGDOC_API_DOCS_PATH: /v3/api-docs
+      BYTEDESK_TRANSLATE_BAIDU_APPID: ${BYTEDESK_TRANSLATE_BAIDU_APPID:-}
+      BYTEDESK_TRANSLATE_BAIDU_KEY: ${BYTEDESK_TRANSLATE_BAIDU_KEY:-}
+    ports:
+      - 9003:9003
+      - 9885:9885
+    volumes:
+      - upload_data:/app/uploads
+      - helpcenter_data:/app/helpcenter
+      - blog_data:/app/blog
+      - log_data:/app/logs
+      - ../freeswitch/conf:/app/freeswitch/conf:ro
+    networks:
+      - bytedesk-network
+
+volumes:
+  upload_data:
+    name: bytedesk_upload_data
+  helpcenter_data:
+    name: bytedesk_helpcenter_data
+  blog_data:
+    name: bytedesk_blog_data
+  log_data:
+    name: bytedesk_log_data

@@ -1,9 +1,8 @@
 package com.bytedesk.ai.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -20,8 +19,35 @@ import java.util.Map;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ChatClientInfoService {
+
+    public ChatClientInfoService(
+            @Qualifier("bytedeskZhipuaiChatClient") ObjectProvider<ChatClient> zhipuaiChatClientProvider,
+            @Qualifier("bytedeskOllamaChatClient") ObjectProvider<ChatClient> ollamaChatClientProvider,
+            @Qualifier("bytedeskDashscopeChatClient") ObjectProvider<ChatClient> dashscopeChatClientProvider,
+            @Qualifier("deepseekChatClient") ObjectProvider<ChatClient> deepseekChatClientProvider,
+            @Qualifier("baiduChatClient") ObjectProvider<ChatClient> baiduChatClientProvider,
+            @Qualifier("tencentChatClient") ObjectProvider<ChatClient> tencentChatClientProvider,
+            @Qualifier("volcengineChatClient") ObjectProvider<ChatClient> volcengineChatClientProvider,
+            @Qualifier("openaiChatClient") ObjectProvider<ChatClient> openaiChatClientProvider,
+            @Qualifier("openrouterChatClient") ObjectProvider<ChatClient> openrouterChatClientProvider,
+            @Qualifier("siliconFlowChatClient") ObjectProvider<ChatClient> siliconflowChatClientProvider,
+            @Qualifier("giteeChatClient") ObjectProvider<ChatClient> giteeChatClientProvider,
+            ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+        this.zhipuaiChatClient = zhipuaiChatClientProvider.getIfAvailable();
+        this.ollamaChatClient = ollamaChatClientProvider.getIfAvailable();
+        this.dashscopeChatClient = dashscopeChatClientProvider.getIfAvailable();
+        this.deepseekChatClient = deepseekChatClientProvider.getIfAvailable();
+        this.baiduChatClient = baiduChatClientProvider.getIfAvailable();
+        this.tencentChatClient = tencentChatClientProvider.getIfAvailable();
+        this.volcengineChatClient = volcengineChatClientProvider.getIfAvailable();
+        this.openaiChatClient = openaiChatClientProvider.getIfAvailable();
+        this.openrouterChatClient = openrouterChatClientProvider.getIfAvailable();
+        this.siliconflowChatClient = siliconflowChatClientProvider.getIfAvailable();
+        this.giteeChatClient = giteeChatClientProvider.getIfAvailable();
+    }
+
 
     private final ApplicationContext applicationContext;
     
@@ -29,59 +55,37 @@ public class ChatClientInfoService {
     private String primaryChatProvider;
 
     // ZhiPuAI ChatClient
-    @Autowired(required = false)
-    @Qualifier("bytedeskZhipuaiChatClient")
-    private ChatClient zhipuaiChatClient;
+    private final ChatClient zhipuaiChatClient;
 
     // Ollama ChatClient
-    @Autowired(required = false)
-    @Qualifier("bytedeskOllamaChatClient")
-    private ChatClient ollamaChatClient;
+    private final ChatClient ollamaChatClient;
 
     // Dashscope ChatClient
-    @Autowired(required = false)
-    @Qualifier("bytedeskDashscopeChatClient")
-    private ChatClient dashscopeChatClient;
+    private final ChatClient dashscopeChatClient;
 
     // Deepseek ChatClient
-    @Autowired(required = false)
-    @Qualifier("deepseekChatClient")
-    private ChatClient deepseekChatClient;
+    private final ChatClient deepseekChatClient;
 
     // Baidu ChatClient
-    @Autowired(required = false)
-    @Qualifier("baiduChatClient")
-    private ChatClient baiduChatClient;
+    private final ChatClient baiduChatClient;
 
     // Tencent ChatClient
-    @Autowired(required = false)
-    @Qualifier("tencentChatClient")
-    private ChatClient tencentChatClient;
+    private final ChatClient tencentChatClient;
 
     // Volcengine ChatClient
-    @Autowired(required = false)
-    @Qualifier("volcengineChatClient")
-    private ChatClient volcengineChatClient;
+    private final ChatClient volcengineChatClient;
 
     // OpenAI ChatClient
-    @Autowired(required = false)
-    @Qualifier("openaiChatClient")
-    private ChatClient openaiChatClient;
+    private final ChatClient openaiChatClient;
 
     // OpenRouter ChatClient
-    @Autowired(required = false)
-    @Qualifier("openrouterChatClient")
-    private ChatClient openrouterChatClient;
+    private final ChatClient openrouterChatClient;
 
     // SiliconFlow ChatClient
-    @Autowired(required = false)
-    @Qualifier("siliconFlowChatClient")
-    private ChatClient siliconflowChatClient;
+    private final ChatClient siliconflowChatClient;
 
     // Gitee ChatClient
-    @Autowired(required = false)
-    @Qualifier("giteeChatClient")
-    private ChatClient giteeChatClient;
+    private final ChatClient giteeChatClient;
 
     /**
      * 测试指定的ChatClient

@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,10 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
      */
     public Optional<PushEntity> findByDeviceUid(String deviceUid, String status, String type) {
         return pushRepository.findTopByDeviceUidAndStatusAndTypeOrderByUpdatedAtDesc(deviceUid, status, type);
+    }
+
+    public Optional<PushEntity> findTopByDeviceUidAndTypeOrderByUpdatedAtDesc(String deviceUid, String type) {
+        return pushRepository.findTopByDeviceUidAndTypeOrderByUpdatedAtDesc(deviceUid, type);
     }
 
     /**
@@ -70,7 +75,7 @@ public class PushRestService extends BaseRestService<PushEntity, PushRequest, Pu
 
         PushEntity savedPush = save(push);
         if (savedPush == null) {
-            throw new RuntimeException("create push failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         
         return convertToResponse(savedPush);

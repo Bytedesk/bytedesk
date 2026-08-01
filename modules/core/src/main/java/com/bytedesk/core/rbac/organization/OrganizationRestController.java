@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -39,9 +40,10 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
 
     private final OrganizationRestService organizationRestService;
 
-    @ActionAnnotation(title = "组织", action = "组织查询", description = "query organization by org")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query organization by org")
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(OrganizationRequest request) {
         
         Page<OrganizationResponse> orgPage = organizationRestService.queryByOrg(request);
@@ -49,9 +51,10 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
-    @ActionAnnotation(title = "组织", action = "用户查询", description = "query organization by user")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query organization by user")
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ)
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(OrganizationRequest request) {
         
         Page<OrganizationResponse> orgPage = organizationRestService.queryByUser(request);
@@ -59,9 +62,10 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(orgPage));
     }
 
-    @ActionAnnotation(title = "组织", action = "查询详情", description = "query organization by uid")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query organization by uid")
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_READ)
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(OrganizationRequest request) {
         //
         OrganizationResponse response = organizationRestService.queryByUid(request);
@@ -70,8 +74,9 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_CREATE)
-    @ActionAnnotation(title = "组织", action = "新建", description = "organization create")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_CREATE, description = "organization create")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody OrganizationRequest request) {
         //
         OrganizationResponse response = organizationRestService.create(request);
@@ -80,7 +85,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
-    @ActionAnnotation(title = "组织", action = "新建", description = "organization create by admin")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_CREATE, description = "organization create by admin")
     @PostMapping("/create/by/super")
     public ResponseEntity<?> createBySuper(@RequestBody OrganizationRequest request) {
         //
@@ -90,8 +95,9 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_UPDATE)
-    @ActionAnnotation(title = "组织", action = "更新", description = "organization update")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization update")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody OrganizationRequest request) {
         //
         OrganizationResponse response = organizationRestService.update(request);
@@ -100,7 +106,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @PreAuthorize(RolePermissions.ROLE_SUPER)
-    @ActionAnnotation(title = "组织", action = "更新", description = "organization update by super")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization update by super")
     @PostMapping("/update/by/super")
     public ResponseEntity<?> updateBySuper(@RequestBody OrganizationRequest request) {
         //
@@ -109,10 +115,21 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization enabled update by super")
+    @PostMapping("/update/enabled/by/super")
+    public ResponseEntity<?> updateEnabledBySuper(@RequestBody OrganizationRequest request) {
+
+        OrganizationResponse response = organizationRestService.updateEnabledBySuper(request);
+        
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_DELETE)
-    @ActionAnnotation(title = "组织", action = "删除", description = "organization delete")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_DELETE, description = "organization delete")
     @Override
-    public ResponseEntity<?> delete(OrganizationRequest request) {
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(@RequestBody OrganizationRequest request) {
         
         organizationRestService.delete(request);
 
@@ -120,7 +137,7 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
     }
 
     @PreAuthorize(OrganizationPermissions.HAS_ORGANIZATION_EXPORT)
-    @ActionAnnotation(title = "组织", action = "导出", description = "organization export")
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_EXPORT, description = "organization export")
     @GetMapping("/export")
     @Override
     public Object export(OrganizationRequest request, HttpServletResponse response) {

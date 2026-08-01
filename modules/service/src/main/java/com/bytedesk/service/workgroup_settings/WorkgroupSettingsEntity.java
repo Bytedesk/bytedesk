@@ -7,11 +7,13 @@ package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.worktime_settings.WorktimeSettingEntity;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -117,6 +119,18 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
     private RobotRoutingSettingsEntity draftRobotSettings;
 
     /**
+     * Auto reply settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private AutoReplySettingsEntity autoReplySettings;
+
+    /**
+     * Draft auto reply settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private AutoReplySettingsEntity draftAutoReplySettings;
+
+    /**
      * Queue settings
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
@@ -139,4 +153,16 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
     private RobotToAgentSettingsEntity draftRobotToAgentSettings;
+
+    /**
+     * WebRTC settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity webrtcSettings;
+
+    /**
+     * Draft WebRTC settings
+     */
+    @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE })
+    private WebrtcSettingsEntity draftWebrtcSettings;
 }

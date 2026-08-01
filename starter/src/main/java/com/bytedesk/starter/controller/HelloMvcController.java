@@ -15,8 +15,6 @@
 package com.bytedesk.starter.controller;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -30,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.uid.utils.NetUtils;
-import com.bytedesk.core.utils.BdPinyinUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.micrometer.core.instrument.Counter;
@@ -144,73 +141,6 @@ public class HelloMvcController {
 		MessageProtobuf message = new MessageProtobuf();
 		message.setContent("Hello, World!");
 		return message;
-	}
-
-	//
-	/**
-	 * 将中文转为普通格式拼音（不带声调）
-	 * http://127.0.0.1:9003/hello/pinyin/normal?text=你好世界
-	 * 
-	 * @param text 需要转换的中文文本
-	 * @return 转换结果
-	 */
-	@GetMapping("/pinyin/normal")
-	public Map<String, String> normalPinyin(@RequestParam String text) {
-		Map<String, String> result = new HashMap<>();
-		result.put("original", text);
-		result.put("pinyin", BdPinyinUtils.toPinYin(text));
-		return result;
-	}
-
-	/**
-	 * 将中文转为带声调的拼音
-	 * http://127.0.0.1:9003/hello/pinyin/tone?text=你好世界
-	 * 
-	 * @param text 需要转换的中文文本
-	 * @return 转换结果
-	 */
-	@GetMapping("/pinyin/tone")
-	public Map<String, String> toneStylePinyin(@RequestParam String text) {
-		Map<String, String> result = new HashMap<>();
-		result.put("original", text);
-		result.put("pinyin", BdPinyinUtils.toPinyinWithShengDiao(text));
-		return result;
-	}
-
-	/**
-	 * 获取单个汉字的多音字列表
-	 * http://127.0.0.1:9003/hello/pinyin/multiple?character=重
-	 * 
-	 * @param character 单个汉字
-	 * @return 多音字列表
-	 */
-	@GetMapping("/pinyin/multiple")
-	public Map<String, Object> multiplePinyin(@RequestParam String character) {
-		Map<String, Object> result = new HashMap<>();
-		if (character != null && character.length() > 0) {
-			char c = character.charAt(0);
-			List<String> pinyinList = BdPinyinUtils.toPinyinList(c);
-			result.put("character", character.substring(0, 1));
-			result.put("pinyinList", pinyinList);
-		} else {
-			result.put("error", "请提供一个汉字");
-		}
-		return result;
-	}
-
-	/**
-	 * 将中文转为首字母格式
-	 * http://127.0.0.1:9003/hello/pinyin/firstletter?text=你好世界
-	 * 
-	 * @param text 需要转换的中文文本
-	 * @return 转换结果
-	 */
-	@GetMapping("/pinyin/firstletter")
-	public Map<String, String> firstLetterPinyin(@RequestParam String text) {
-		Map<String, String> result = new HashMap<>();
-		result.put("original", text);
-		result.put("pinyin", BdPinyinUtils.firstLetterStyle(text));
-		return result;
 	}
 
 	// https://spring.io/guides/gs/rest-service-cors

@@ -16,11 +16,13 @@ package com.bytedesk.service.visitor_thread;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
-import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,7 +38,8 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
 
     private VisitorThreadService visitorThreadService;
  
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @GetMapping("/query/org")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_READ)
     @Operation(summary = "根据组织查询访客会话", description = "管理员查询组织的访客会话")
     @Override
     public ResponseEntity<?> queryByOrg(VisitorThreadRequest request) {
@@ -46,6 +49,8 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @GetMapping({ "/query", "/query/user" })
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_READ)
     @Operation(summary = "根据用户查询访客会话", description = "查询用户的访客会话")
     @Override
     public ResponseEntity<?> queryByUser(VisitorThreadRequest request) {
@@ -53,27 +58,35 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
         throw new UnsupportedOperationException("Unimplemented method 'query'");
     }
 
+    @PostMapping("/create")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_CREATE)
     @Operation(summary = "创建访客会话", description = "创建新的访客会话")
     @Override
-    public ResponseEntity<?> create(VisitorThreadRequest request) {
+    public ResponseEntity<?> create(@RequestBody VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
 
+    @PostMapping("/update")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_UPDATE)
     @Operation(summary = "更新访客会话", description = "更新现有的访客会话")
     @Override
-    public ResponseEntity<?> update(VisitorThreadRequest request) {
+    public ResponseEntity<?> update(@RequestBody VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
+    @PostMapping("/delete")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_DELETE)
     @Operation(summary = "删除访客会话", description = "删除指定的访客会话")
     @Override
-    public ResponseEntity<?> delete(VisitorThreadRequest request) {
+    public ResponseEntity<?> delete(@RequestBody VisitorThreadRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
+    @GetMapping("/export")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_EXPORT)
     @Operation(summary = "导出访客会话", description = "导出访客会话数据")
     @Override
     public Object export(VisitorThreadRequest request, HttpServletResponse response) {
@@ -81,6 +94,8 @@ public class VisitorThreadController extends BaseRestController<VisitorThreadReq
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @GetMapping("/query/uid")
+    @PreAuthorize(VisitorThreadPermissions.HAS_VISITOR_THREAD_READ)
     @Operation(summary = "根据UID查询访客会话", description = "通过UID查询具体的访客会话")
     @Override
     public ResponseEntity<?> queryByUid(VisitorThreadRequest request) {

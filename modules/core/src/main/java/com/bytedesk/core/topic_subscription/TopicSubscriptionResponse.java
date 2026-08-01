@@ -33,14 +33,14 @@ public class TopicSubscriptionResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    private String description;
+    private String topic;
 
     private String type;
 
-    private String color;
+    private String username;
 
-    private Integer order;
+    private String userNickname;
+
+    private String userAvatar;
 
 }

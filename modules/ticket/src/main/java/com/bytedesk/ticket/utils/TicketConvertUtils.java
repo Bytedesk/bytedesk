@@ -13,6 +13,9 @@
  */
 package com.bytedesk.ticket.utils;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
+
 import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,7 @@ public class TicketConvertUtils {
     public static TicketResponse convertToResponse(TicketEntity entity) {
         // 
         TicketResponse ticketResponse = getModelMapper().map(entity, TicketResponse.class);
+        ticketResponse.setProcessingDuration(resolveProcessingDurationSeconds(entity));
         // 
         // if (StringUtils.hasText(entity.getUserString())) {
         //     UserProtobuf user = entity.getUser();
@@ -82,6 +86,22 @@ public class TicketConvertUtils {
         // 
         return ticketResponse;
         
+    }
+
+    private static Long resolveProcessingDurationSeconds(TicketEntity entity) {
+        if (entity == null || entity.getCreatedAt() == null) {
+            return null;
+        }
+
+        ZonedDateTime endTime = entity.getResolvedTime();
+        if (endTime == null) {
+            endTime = entity.getClosedTime();
+        }
+        if (endTime == null) {
+            endTime = ZonedDateTime.now();
+        }
+
+        return Math.max(0L, Duration.between(entity.getCreatedAt(), endTime).getSeconds());
     }
     
     

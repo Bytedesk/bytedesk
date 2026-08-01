@@ -13,21 +13,18 @@
  */
 package com.bytedesk.service.workgroup;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,7 +37,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Tag(name = "工作组管理", description = "工作组管理相关接口")
+@Tag(name = "Workgroup Management", description = "Workgroup management APIs")
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/workgroup")
@@ -49,12 +46,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
 
     private final WorkgroupRestService workgroupRestService;
 
-    @ActionAnnotation(title = "工作组", action = "组织查询", description = "query workgroup by org")
-    @Operation(summary = "查询组织下的工作组", description = "根据组织ID查询工作组列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workgroup by org")
+    @Operation(summary = "Query Workgroups by Organization", description = "Retrieve workgroup list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WorkgroupRequest request) {
 
@@ -63,12 +61,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
-    @ActionAnnotation(title = "工作组", action = "用户查询", description = "query workgroup by user")
-    @Operation(summary = "查询用户下的工作组", description = "根据用户ID查询工作组列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workgroup by user")
+    @Operation(summary = "Query Workgroups by User", description = "Retrieve workgroup list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
+    @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WorkgroupRequest request) {
         
@@ -77,12 +76,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroups));
     }
 
-    @ActionAnnotation(title = "工作组", action = "查询详情", description = "query workgroup by uid")
-    @Operation(summary = "查询指定工作组", description = "根据UID查询工作组详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workgroup by uid")
+    @Operation(summary = "Query Workgroup by UID", description = "Retrieve workgroup details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ_OR_TICKET_READ)
+    @GetMapping("/query/uid")
     @Override
     public ResponseEntity<?> queryByUid(WorkgroupRequest request) {
         
@@ -91,12 +91,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    @ActionAnnotation(title = "工作组", action = "新建", description = "create workgroup")
-    @Operation(summary = "创建工作组", description = "创建新的工作组")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_CREATE, description = "create workgroup")
+    @Operation(summary = "Create Workgroup", description = "Create a new workgroup")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_CREATE)
+    @PostMapping("/create")
     @Override
     public ResponseEntity<?> create(@RequestBody WorkgroupRequest request) {
 
@@ -105,12 +106,13 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    @ActionAnnotation(title = "工作组", action = "更新", description = "update workgroup")
-    @Operation(summary = "更新工作组", description = "更新工作组信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_UPDATE, description = "update workgroup")
+    @Operation(summary = "Update Workgroup", description = "Update workgroup information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
+    @PostMapping("/update")
     @Override
     public ResponseEntity<?> update(@RequestBody WorkgroupRequest request) {
 
@@ -119,9 +121,9 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    @ActionAnnotation(title = "工作组", action = "updateAvatar", description = "update workgroup avatar")
-    @Operation(summary = "更新工作组头像", description = "更新工作组的头像")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_PREFIX + "action.update.avatar", description = "update workgroup avatar")
+    @Operation(summary = "Update Workgroup Avatar", description = "Update the workgroup avatar")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
@@ -133,9 +135,9 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    @ActionAnnotation(title = "工作组", action = "updateStatus", description = "update workgroup status")
-    @Operation(summary = "更新工作组状态", description = "更新工作组的状态")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update workgroup status")
+    @Operation(summary = "Update Workgroup Status", description = "Update the workgroup status")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkgroupResponse.class)))
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
@@ -147,10 +149,11 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(workgroup));
     }
 
-    @ActionAnnotation(title = "工作组", action = "删除", description = "delete workgroup")
-    @Operation(summary = "删除工作组", description = "删除指定的工作组")
-    @ApiResponse(responseCode = "200", description = "删除成功")
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_DELETE, description = "delete workgroup")
+    @Operation(summary = "Delete Workgroup", description = "Delete the specified workgroup")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_DELETE)
+    @PostMapping("/delete")
     @Override
     public ResponseEntity<?> delete(@RequestBody WorkgroupRequest request) {
 
@@ -159,9 +162,9 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
-    @ActionAnnotation(title = "工作组", action = "导出", description = "export workgroup")
-    @Operation(summary = "导出工作组", description = "导出工作组数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
+    @ActionAnnotation(title = I18Consts.I18N_PREFIX + "workgroup.management", action = I18Consts.I18N_ACTION_EXPORT, description = "export workgroup")
+    @Operation(summary = "Export Workgroups", description = "Export workgroup data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
     @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_EXPORT)
     @GetMapping("/export")
     @Override
@@ -175,54 +178,5 @@ public class WorkgroupRestController extends BaseRestController<WorkgroupRequest
             "workgroup"
         );
     }
-
-    @ActionAnnotation(title = "工作组", action = "查询管理员工作组", description = "query workgroup by admin agent uid")
-    @Operation(summary = "查询座席管理的工作组", description = "根据座席UID查询其作为管理员(监控/接管权限)的工作组列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = WorkgroupResponse.class)))
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
-    @GetMapping("/query/admin/agent")
-    public ResponseEntity<?> queryAdminWorkgroups(
-            @RequestParam("agentUid") String agentUid,
-            @RequestParam(value = "orgUid", required = false) String orgUid) {
-
-        List<WorkgroupResponse> workgroups = workgroupRestService.queryAdminWorkgroups(agentUid, orgUid);
-        return ResponseEntity.ok(JsonResult.success(workgroups));
-    }
-
-    @ActionAnnotation(title = "工作组", action = "查询管理员进行中会话", description = "query ongoing threads by admin workgroups")
-    @Operation(summary = "查询座席管理的工作组进行中会话", description = "根据座席UID查询其管理的工作组下进行中的会话")
-    @ApiResponse(responseCode = "200", description = "查询成功")
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_READ)
-    @GetMapping("/query/admin/threads/ongoing")
-    public ResponseEntity<?> queryAdminOngoingThreads(
-            @RequestParam("agentUid") String agentUid,
-            @RequestParam("orgUid") String orgUid,
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "0") int pageNumber,
-            @RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) {
-
-        Page<com.bytedesk.core.thread.ThreadResponse> threadPage = workgroupRestService.queryAdminOngoingThreads(
-            agentUid,
-            orgUid,
-            pageNumber,
-            pageSize);
-        return ResponseEntity.ok(JsonResult.success(threadPage));
-    }
-
-    @ActionAnnotation(title = "工作组", action = "批量设置管理员工作组", description = "batch update workgroups admin by agent")
-    @Operation(summary = "批量设置座席管理的工作组", description = "根据座席UID批量设置其作为管理员(监控/接管权限)的工作组列表，仅增删该座席关系，不影响其它管理员")
-    @ApiResponse(responseCode = "200", description = "更新成功")
-    @PreAuthorize(WorkgroupPermissions.HAS_WORKGROUP_UPDATE)
-    @PostMapping("/update/admin/agent/workgroups")
-    public ResponseEntity<?> updateAdminWorkgroupsForAgent(@RequestBody WorkgroupAdminRequest request) {
-        Map<String, Object> result = workgroupRestService.updateAdminWorkgroupsForAgent(request);
-        return ResponseEntity.ok(JsonResult.success(result));
-    }
-
-    
-    
-
-    
 
 }

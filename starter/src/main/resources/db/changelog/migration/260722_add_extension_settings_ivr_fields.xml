@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260722-create-extension-settings-ivr-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_extension_settings_ivr" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_call_extension_settings_ivr">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="uuid" type="varchar(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="org_uid" type="varchar(64)" />
+            <column name="user_uid" type="varchar(64)" />
+            <column name="level_type" type="varchar(32)" />
+            <column name="platform_type" type="varchar(32)" />
+            <column name="is_deleted" type="boolean" defaultValueBoolean="false" />
+            <column name="created_at" type="datetime" />
+            <column name="updated_at" type="datetime" />
+
+            <column name="is_enabled" type="boolean" defaultValueBoolean="false" />
+            <column name="ivr_mode" type="varchar(64)" defaultValue="AI_FIRST" />
+            <column name="ivr_menu_uid" type="varchar(64)" />
+            <column name="no_input_action" type="varchar(64)" defaultValue="CONTINUE_AI" />
+            <column name="no_match_action" type="varchar(64)" defaultValue="CONTINUE_AI" />
+            <column name="allow_return_to_ai" type="boolean" defaultValueBoolean="true" />
+            <column name="max_retry_count" type="int" defaultValueNumeric="2" />
+        </createTable>
+
+        <createIndex tableName="bytedesk_call_extension_settings_ivr" indexName="idx_ext_ivr_settings_uid">
+            <column name="uuid" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260722-fix-ivr-table-level-platform-columns" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension_settings_ivr" />
+            <columnExists tableName="bytedesk_call_extension_settings_ivr" columnName="level" />
+        </preConditions>
+        <renameColumn tableName="bytedesk_call_extension_settings_ivr" oldColumnName="level" newColumnName="level_type" columnDataType="varchar(32)" />
+        <renameColumn tableName="bytedesk_call_extension_settings_ivr" oldColumnName="platform" newColumnName="platform_type" columnDataType="varchar(32)" />
+    </changeSet>
+
+    <changeSet id="260722-add-extension-settings-ivr-fk-columns" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_call_extension_settings" />
+            <not>
+                <columnExists tableName="bytedesk_call_extension_settings" columnName="ivr_settings_uid" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_extension_settings">
+            <column name="ivr_settings_uid" type="varchar(64)" />
+        </addColumn>
+        <addColumn tableName="bytedesk_call_extension_settings">
+            <column name="draft_ivr_settings_uid" type="varchar(64)" />
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

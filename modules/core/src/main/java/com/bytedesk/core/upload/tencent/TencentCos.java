@@ -3,17 +3,17 @@ package com.bytedesk.core.upload.tencent;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.model.ObjectMetadata;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 /**
  * 腾讯云COS对象存储服务工具类
@@ -28,21 +28,16 @@ import java.net.URL;
  */
 @Component
 @ConditionalOnProperty(name = "bytedesk.tencent.enabled", havingValue = "true", matchIfMissing = false)
+@RequiredArgsConstructor
 @Slf4j
 public class TencentCos {
     
 
     private String uploadDirPrefix = "";
 
-    public TencentCos() {
-        // 构造函数
-    }
+    private final TencentProperties tencentProperties;
 
-    @Autowired
-    private TencentProperties tencentProperties;
-
-    @Autowired
-    private COSClient cosClient;
+    private final COSClient cosClient;
 
     public String uploadAttachment(MediaType mediaType, String fileName, int width, int height, String username, File file) {
 
@@ -154,7 +149,7 @@ public class TencentCos {
         String folder = "wechat/images/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -177,7 +172,7 @@ public class TencentCos {
         String folder = "wechat/avatars/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -198,7 +193,7 @@ public class TencentCos {
         String folder = "wechat/voices/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -219,7 +214,7 @@ public class TencentCos {
         String folder = "wechat/videos/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -240,7 +235,7 @@ public class TencentCos {
         String folder = "wechat/thumbs/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -254,7 +249,7 @@ public class TencentCos {
         String folder = "wechat/files/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -291,7 +286,7 @@ public class TencentCos {
         String folder = "school/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }
@@ -305,7 +300,7 @@ public class TencentCos {
         String folder = "course/logo/";
         InputStream inputStream = null;
         try {
-            inputStream = new URL(url).openStream();
+            inputStream = URI.create(url).toURL().openStream();
         } catch (IOException e) {
             log.error("Unhandled exception", e);
         }

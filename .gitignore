@@ -38,6 +38,7 @@ target/
 *.db
 deploy/ziOdjamB
 deploy/z*
+.env
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -67,6 +68,7 @@ back/
 uploads/
 *.tmp
 h2db/
+kamailio/
 .DS_Store
 modules/local/target/*
 .flattened-pom.xml
@@ -92,7 +94,8 @@ thread_summary/
 thread_rating/
 transfer_keyword/
 rating/
-taboo/
+custom/
+# taboo/
 taboo_message/
 unified/
 # agent_status/
@@ -111,7 +114,7 @@ visitor_rating/
 # robot_message/
 workgroup_message/
 visitor_message/
-holiday/
+# holiday/
 form/
 # settings_invite/
 # settings_intention/
@@ -128,3 +131,10 @@ local/
 prod/
 !deploy/freeswitch/bin/
 !deploy/freeswitch/bin/**
+
+# Keep Maven wrapper only for the startup project.
+**/.mvn/
+!starter/.mvn/
+!starter/.mvn/**
+TODO/
+secrets/

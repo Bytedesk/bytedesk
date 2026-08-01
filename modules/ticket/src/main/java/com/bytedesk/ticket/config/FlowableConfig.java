@@ -69,7 +69,12 @@ public class FlowableConfig {
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
         // engineConfiguration.setEnableProcessDefinitionInfoCache(true);
-        return configuration -> applyDbType(configuration);
+        return configuration -> {
+            applyDbType(configuration);
+            // 禁用部署时自动生成流程图，避免因 BPMN 文件缺少 DI (BPMNDiagram) 信息而导致 NPE
+            // 若需流程图可在 Flowable Modeler 中手动导出含完整 DI 的 BPMN 文件
+            configuration.setCreateDiagramOnDeploy(false);
+        };
     }
 
     @Bean

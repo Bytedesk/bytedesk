@@ -13,7 +13,12 @@
  */
 package com.bytedesk.core.topic_subscription;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,12 +29,18 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.permission.PermissionService;
+// import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,6 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class TopicSubscriptionRestService extends BaseRestServiceWithExport<TopicSubscriptionEntity, TopicSubscriptionRequest, TopicSubscriptionResponse, TopicSubscriptionExcel> {
 
+    private static final String CHAT_SUBSCRIPTION_TYPE = TopicSubscriptionTypeEnum.CHAT.name();
+
     private final TopicSubscriptionRepository topic_subscriptionRepository;
 
     private final ModelMapper modelMapper;
@@ -45,8 +58,12 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final UserRepository userRepository;
+
+    private final MemberRepository memberRepository;
     
-    private final PermissionService permissionService;
+    // private final PermissionService permissionService;
     
     @Override
     public Page<TopicSubscriptionEntity> queryByOrgEntity(TopicSubscriptionRequest request) {
@@ -65,6 +82,9 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
     public Page<TopicSubscriptionResponse> queryByUser(TopicSubscriptionRequest request) {
         UserEntity user = authService.getUser();
         request.setUserUid(user.getUid());
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            request.setOrgUid(user.getOrgUid());
+        }
         return queryByOrg(request);
     }
 
@@ -83,6 +103,107 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         return topic_subscriptionRepository.existsByUid(uid);
     }
 
+    @Transactional(readOnly = true)
+    public Set<String> findSubscriberUserUidsByTopic(String topic) {
+        if (!StringUtils.hasText(topic)) {
+            return Set.of();
+        }
+        return topic_subscriptionRepository.findByTopicAndDeletedFalse(topic).stream()
+                .map(TopicSubscriptionEntity::getUserUid)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toSet());
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> findSubscribedTopicsByUserUid(String userUid) {
+        if (!StringUtils.hasText(userUid)) {
+            return Set.of();
+        }
+        return topic_subscriptionRepository.findByUserUidAndDeletedFalse(userUid).stream()
+                .filter(this::isChatSubscription)
+                .map(TopicSubscriptionEntity::getTopic)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    @Transactional(readOnly = true)
+    public List<TopicSubscriptionEntity> findAllTopicSubscriptions() {
+        return topic_subscriptionRepository.findAll();
+    }
+
+    @Transactional
+    public void create(String topic, String userUid) {
+        create(topic, userUid, CHAT_SUBSCRIPTION_TYPE);
+    }
+
+    @Transactional
+    public TopicSubscriptionResponse create(String topic, String userUid, String type) {
+        return createTypedSubscription(topic, userUid, type);
+    }
+
+    @Transactional(readOnly = true)
+    public Boolean isSubscribed(TopicSubscriptionRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        return isTopicSubscribed(user.getUid(), request.getTopic(), type);
+    }
+
+    @Transactional
+    public TopicSubscriptionResponse subscribe(TopicSubscriptionRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        return createTypedSubscription(request.getTopic(), user.getUid(), type);
+    }
+
+    @Transactional
+    public void subscribe(String topic, String clientId) {
+        if (!StringUtils.hasText(clientId)) {
+            return;
+        }
+        String userUid = clientId.split("/")[0];
+        createChatSubscription(topic, userUid);
+    }
+
+    @Transactional
+    public void unsubscribe(TopicSubscriptionRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        String type = StringUtils.hasText(request.getType()) ? request.getType() : CHAT_SUBSCRIPTION_TYPE;
+        softDeleteTopicSubscriptionByType(request.getTopic(), user.getUid(), type);
+    }
+
+    @Transactional
+    public void unsubscribe(String topic, String clientId) {
+        if (!StringUtils.hasText(clientId)) {
+            return;
+        }
+        String userUid = clientId.split("/")[0];
+        softDeleteChatTopicSubscription(topic, userUid);
+    }
+
+    @Transactional
+    public void remove(TopicSubscriptionRequest request) {
+        softDeleteAllTopicSubscriptions(request.getTopic(), request.getUserUid());
+    }
+
+    @Transactional
+    public void remove(String topic, String userUid) {
+        softDeleteAllTopicSubscriptions(topic, userUid);
+    }
+
+    @Transactional
+    public void remove(String topic, String userUid, String type) {
+        softDeleteTopicSubscriptionByType(topic, userUid, type);
+    }
+
     @Transactional
     @Override
     public TopicSubscriptionResponse create(TopicSubscriptionRequest request) {
@@ -95,45 +216,63 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
     }
 
     private TopicSubscriptionResponse createInternal(TopicSubscriptionRequest request, boolean skipPermissionCheck) {
-        // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
-        // 检查name+orgUid+type是否已经存在
-        // if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-        //     Optional<TopicSubscriptionEntity> topic_subscription = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-        //     if (topic_subscription.isPresent()) {
-        //         return convertToResponse(topic_subscription.get());
-        //     }
-        // }
-        
-        // 获取用户信息
+
         UserEntity user = authService.getUser();
-        if (user != null) {
+        if (user != null && !StringUtils.hasText(request.getUserUid())) {
             request.setUserUid(user.getUid());
         }
+
+        if (!StringUtils.hasText(request.getUserUid())) {
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+        if (!StringUtils.hasText(request.getTopic())) {
+            throw new RuntimeException("topic is required");
+        }
+        if (!StringUtils.hasText(request.getType())) {
+            request.setType(TopicSubscriptionTypeEnum.CHAT.name());
+        }
+
+        Optional<TopicSubscriptionEntity> existing = findReusableSubscription(
+                request.getUserUid(),
+                request.getTopic(),
+                request.getType());
+        if (existing.isPresent()) {
+            TopicSubscriptionEntity entity = existing.get();
+            if (entity.isDeleted()) {
+                entity.setDeleted(false);
+                entity.setType(request.getType());
+                return convertToResponse(save(entity));
+            }
+            if (!StringUtils.hasText(entity.getType())) {
+                entity.setType(request.getType());
+                return convertToResponse(save(entity));
+            }
+            return convertToResponse(entity);
+        }
         
-        // 确定数据层级
         String level = request.getLevel();
         if (!StringUtils.hasText(level)) {
             level = LevelEnum.ORGANIZATION.name();
             request.setLevel(level);
         }
         
-        // 检查用户是否有权限创建该层级的数据
-        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TopicSubscriptionPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
-        }
+        // if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TopicSubscriptionPermissions.MODULE_NAME, level)) {
+        //     throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
+        // }
         
-        // 
         TopicSubscriptionEntity entity = modelMapper.map(request, TopicSubscriptionEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
-        // 
+        if (!StringUtils.hasText(entity.getType())) {
+            entity.setType(TopicSubscriptionTypeEnum.CHAT.name());
+        }
         TopicSubscriptionEntity savedEntity = save(entity);
         if (savedEntity == null) {
-            throw new RuntimeException("Create topic_subscription failed");
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -144,22 +283,18 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         Optional<TopicSubscriptionEntity> optional = topic_subscriptionRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             TopicSubscriptionEntity entity = optional.get();
-            
-            // 检查用户是否有权限更新该实体
-            // if (!permissionService.hasEntityPermission(TopicSubscriptionPermissions.MODULE_NAME, "UPDATE", entity)) {
-            //     throw new RuntimeException("无权限更新该标签数据");
-            // }
-            
             modelMapper.map(request, entity);
-            //
+            if (!StringUtils.hasText(entity.getType())) {
+                entity.setType(TopicSubscriptionTypeEnum.CHAT.name());
+            }
             TopicSubscriptionEntity savedEntity = save(entity);
             if (savedEntity == null) {
-                throw new RuntimeException("Update topic_subscription failed");
+                throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
             return convertToResponse(savedEntity);
         }
         else {
-            throw new RuntimeException("TopicSubscription not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -174,10 +309,9 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
             Optional<TopicSubscriptionEntity> latest = topic_subscriptionRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 TopicSubscriptionEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
+                latestEntity.setTopic(entity.getTopic());
+                latestEntity.setType(StringUtils.hasText(entity.getType()) ? entity.getType() : TopicSubscriptionTypeEnum.CHAT.name());
+                latestEntity.setDeleted(entity.isDeleted());
                 return topic_subscriptionRepository.save(latestEntity);
             }
         } catch (Exception ex) {
@@ -194,17 +328,14 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         if (optional.isPresent()) {
             TopicSubscriptionEntity entity = optional.get();
             
-            // 检查用户是否有权限删除该实体
-            // if (!permissionService.hasEntityPermission(TopicSubscriptionPermissions.MODULE_NAME, "DELETE", entity)) {
-            //     throw new RuntimeException("无权限删除该标签数据");
-            // }
+            // 权限校验当前未启用，保留删除逻辑。
             
             entity.setDeleted(true);
             save(entity);
             // topic_subscriptionRepository.delete(optional.get());
         }
         else {
-            throw new RuntimeException("TopicSubscription not found");
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
@@ -215,7 +346,29 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
 
     @Override
     public TopicSubscriptionResponse convertToResponse(TopicSubscriptionEntity entity) {
-        return modelMapper.map(entity, TopicSubscriptionResponse.class);
+        TopicSubscriptionResponse response = modelMapper.map(entity, TopicSubscriptionResponse.class);
+
+        if (StringUtils.hasText(entity.getUserUid())) {
+            userRepository.findByUid(entity.getUserUid())
+                    .ifPresentOrElse(
+                            user -> applyUserProfile(response, user),
+                            () -> memberRepository.findByUid(entity.getUserUid())
+                                    .ifPresent(member -> {
+                                        if (member.getUser() != null) {
+                                            response.setUsername(member.getUser().getUsername());
+                                        }
+                                        response.setUserNickname(member.getNickname());
+                                        response.setUserAvatar(member.getAvatar());
+                                    }));
+        }
+
+        return response;
+    }
+
+    private void applyUserProfile(TopicSubscriptionResponse response, UserEntity user) {
+        response.setUsername(user.getUsername());
+        response.setUserNickname(user.getNickname());
+        response.setUserAvatar(user.getAvatar());
     }
 
     @Override
@@ -235,18 +388,91 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
     
     public void initTopicSubscriptions(String orgUid) {
         // log.info("initTopicSubscriptionTopicSubscription");
-        // for (String topic_subscription : TopicSubscriptionInitData.getAllTopicSubscriptions()) {
-        //     TopicSubscriptionRequest topic_subscriptionRequest = TopicSubscriptionRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, topic_subscription))
-        //             .name(topic_subscription)
-        //             .order(0)
-        //             .type(TopicSubscriptionTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     createSystemTopicSubscription(topic_subscriptionRequest);
-        // }
+    }
+
+    private TopicSubscriptionResponse createChatSubscription(String topic, String userUid) {
+        return createTypedSubscription(topic, userUid, CHAT_SUBSCRIPTION_TYPE);
+    }
+
+    private TopicSubscriptionResponse createTypedSubscription(String topic, String userUid, String type) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+            return null;
+        }
+        TopicSubscriptionRequest request = TopicSubscriptionRequest.builder()
+                .topic(topic)
+                .userUid(userUid)
+                .type(StringUtils.hasText(type) ? type : CHAT_SUBSCRIPTION_TYPE)
+                .build();
+        return createSystemTopicSubscription(request);
+    }
+
+    private void softDeleteChatTopicSubscription(String topic, String userUid) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+        findReusableSubscription(userUid, topic, CHAT_SUBSCRIPTION_TYPE)
+                .filter(subscription -> !subscription.isDeleted())
+                .ifPresent(entity -> {
+                    entity.setDeleted(true);
+                    entity.setType(CHAT_SUBSCRIPTION_TYPE);
+                    save(entity);
+                });
+    }
+
+    private void softDeleteTopicSubscriptionByType(String topic, String userUid, String type) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid) || !StringUtils.hasText(type)) {
+            return;
+        }
+        findReusableSubscription(userUid, topic, type)
+                .filter(subscription -> !subscription.isDeleted())
+                .ifPresent(entity -> {
+                    entity.setDeleted(true);
+                    entity.setType(type);
+                    save(entity);
+                });
+    }
+
+    private void softDeleteAllTopicSubscriptions(String topic, String userUid) {
+        if (!StringUtils.hasText(topic) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+        topic_subscriptionRepository.findByUserUidAndTopic(userUid, topic).stream()
+                .filter(subscription -> !subscription.isDeleted())
+                .forEach(subscription -> {
+                    subscription.setDeleted(true);
+                    if (!StringUtils.hasText(subscription.getType())) {
+                        subscription.setType(CHAT_SUBSCRIPTION_TYPE);
+                    }
+                    save(subscription);
+                });
+    }
+
+    private Optional<TopicSubscriptionEntity> findReusableSubscription(String userUid, String topic, String type) {
+        List<TopicSubscriptionEntity> subscriptions = topic_subscriptionRepository.findByUserUidAndTopic(userUid, topic);
+        return subscriptions.stream()
+                .filter(item -> isCompatibleType(item, type))
+                .sorted(Comparator.comparing(TopicSubscriptionEntity::isDeleted))
+                .findFirst();
+    }
+
+    private boolean isTopicSubscribed(String userUid, String topic, String type) {
+        if (!StringUtils.hasText(userUid) || !StringUtils.hasText(topic)) {
+            return false;
+        }
+        return topic_subscriptionRepository.findByUserUidAndTopic(userUid, topic).stream()
+                .filter(subscription -> !subscription.isDeleted())
+                .anyMatch(subscription -> isCompatibleType(subscription, type));
+    }
+
+    private boolean isChatSubscription(TopicSubscriptionEntity entity) {
+        return isCompatibleType(entity, CHAT_SUBSCRIPTION_TYPE);
+    }
+
+    private boolean isCompatibleType(TopicSubscriptionEntity entity, String type) {
+        if (!StringUtils.hasText(entity.getType())) {
+            return CHAT_SUBSCRIPTION_TYPE.equals(type);
+        }
+        return entity.getType().equals(type);
     }
 
     

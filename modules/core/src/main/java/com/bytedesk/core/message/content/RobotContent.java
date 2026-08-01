@@ -148,6 +148,9 @@ public class RobotContent extends BaseContent {
         // 检索通道（FULLTEXT/VECTOR 等）
         private String searchChannel;
         
+        // 内容语言（如 ZH_CN, EN），方便前端区分原文/翻译
+        private String language;
+
         // 相似度评分
         private Double score;
         

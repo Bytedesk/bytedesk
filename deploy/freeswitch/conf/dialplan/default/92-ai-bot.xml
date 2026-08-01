@@ -1,0 +1,439 @@
+<include>
+  <!-- 9201：多轮对话机器人（最多 3 轮） -->
+  <extension name="92-ai-bot-multi" continue="false">
+    <condition field="destination_number" expression="^9201$">
+      <action application="set" data="hangup_after_bridge=true" />
+      <action application="answer" />
+      <action application="set"
+        data="ai_record_file=$${recordings_dir}/ai-bot-9201_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="voice_agent=true" />
+      <action application="set" data="conversation_id=${uuid}" />
+      <action application="log"
+        data="INFO [AI-BOT-MULTI] recording start file=${ai_record_file}" />
+      <action application="record_session" data="${ai_record_file}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] entry answered; playing safety tone" />
+      <action application="playback" data="tone_stream://%(300,1000,440);loops=1" />
+      <!-- multi 模式默认继续，避免 HTTAPI 未及时设置时被判定为不继续而挂断 -->
+      <action application="set" data="bot_continue=1" />
+
+      <action application="log" data="INFO [AI-BOT-MULTI] HTTAPI turn=1 greeting (voice agent)" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;bot_did=9201&amp;voice_agent=true&amp;conversation_id=${uuid},method=POST}" />
+      <!-- 轻微缓冲，确保尾音落地 -->
+      <action application="sleep" data="200" />
+
+      <action application="set"
+        data="turn_record_name=ai-bot-9201-r1_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R1 start record file=${turn_record_file}" />
+      <action application="record" data="${turn_record_file} 8 200 3" />
+      <action application="sleep" data="200" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=multi&amp;bot_did=9201&amp;voice_agent=true&amp;conversation_id=${uuid}&amp;file_url=${turn_record_url},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R1 bot_continue='${bot_continue}'" />
+      <action application="transfer" data="9211${bot_continue} XML default" />
+    </condition>
+  </extension>
+
+  <!-- 92111：9201 第 2 轮（仅在 bot_continue=1 时进入） -->
+  <extension name="92-ai-bot-multi-r2" continue="false">
+    <condition field="destination_number" expression="^92111$">
+      <action application="set"
+        data="turn_record_name=ai-bot-9201-r2_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R2 start record file=${turn_record_file}" />
+      <action application="record" data="${turn_record_file} 8 200 3" />
+      <action application="sleep" data="200" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=multi&amp;bot_did=9201&amp;voice_agent=true&amp;conversation_id=${uuid}&amp;file_url=${turn_record_url},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R2 bot_continue='${bot_continue}'" />
+      <action application="transfer" data="9212${bot_continue} XML default" />
+    </condition>
+  </extension>
+
+  <!-- 9211/92110：9201 在 R1 后结束 -->
+  <extension name="92-ai-bot-multi-r1-stop" continue="false">
+    <condition field="destination_number" expression="^9211$|^92110$">
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 92121：9201 第 3 轮（仅在 bot_continue=1 时进入） -->
+  <extension name="92-ai-bot-multi-r3" continue="false">
+    <condition field="destination_number" expression="^92121$">
+      <action application="set"
+        data="turn_record_name=ai-bot-9201-r3_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R3 start record file=${turn_record_file}" />
+      <action application="record" data="${turn_record_file} 8 200 3" />
+      <action application="sleep" data="200" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=multi&amp;bot_did=9201&amp;voice_agent=true&amp;conversation_id=${uuid}&amp;file_url=${turn_record_url},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-MULTI] R3 bot_continue='${bot_continue}'" />
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9212/92120：9201 在 R2 后结束 -->
+  <extension name="92-ai-bot-multi-r2-stop" continue="false">
+    <condition field="destination_number" expression="^9212$|^92120$">
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9203：不限轮对话机器人（直到用户说退出词或挂断） -->
+  <!-- 入口：只问候一次，然后转到 92030 进行循环 -->
+  <extension name="92-ai-bot-unlimited-entry" continue="false">
+    <condition field="destination_number" expression="^9203$">
+      <action application="set" data="hangup_after_bridge=true" />
+      <action application="answer" />
+      <action application="set"
+        data="ai_record_file=$${recordings_dir}/ai-bot-9203_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="voice_agent=true" />
+      <action application="set" data="conversation_id=${uuid}" />
+      <action application="log"
+        data="INFO [AI-BOT-9203] recording start file=${ai_record_file}" />
+      <action application="record_session" data="${ai_record_file}" />
+      <!-- 先播放一声安全提示音，确保下行媒体通路可用 -->
+      <action application="log" data="INFO [AI-BOT-9203] entry answered; playing safety tone" />
+      <action application="playback" data="tone_stream://%(300,1000,440);loops=1" />
+      <action application="log" data="INFO [AI-BOT-9203] greeting via HTTAPI turn=1 (voice agent)" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;bot_did=9203&amp;voice_agent=true&amp;conversation_id=${uuid},method=POST}" />
+      <!-- 轻微缓冲，确保尾音落地 -->
+      <action application="sleep" data="200" />
+      <!-- 进入循环扩展 92030 -->
+      <action application="transfer" data="92030 XML default" />
+    </condition>
+  </extension>
+
+  <!-- 92030：循环体（无限轮次） -->
+  <extension name="92-ai-bot-unlimited-loop" continue="false">
+    <condition field="destination_number" expression="^92030$">
+      <action application="set"
+        data="turn_record_name=ai-bot-9203_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
+      <action application="log" data="INFO [AI-BOT-9203] loop start record file=${turn_record_file}" />
+      <action application="record" data="${turn_record_file} 8 200 3" />
+      <action application="sleep" data="200" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=unlimited&amp;bot_did=9203&amp;voice_agent=true&amp;conversation_id=${uuid}&amp;file_url=${turn_record_url},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-9203] loop bot_continue='${bot_continue}'" />
+      <action application="transfer" data="92031${bot_continue} XML default" />
+    </condition>
+  </extension>
+
+  <!-- 920311：9203 继续下一轮 -->
+  <extension name="92-ai-bot-unlimited-loop-continue" continue="false">
+    <condition field="destination_number" expression="^920311$">
+      <action application="transfer" data="92030 XML default" />
+    </condition>
+  </extension>
+
+  <!-- 92031/920310：9203 结束对话 -->
+  <extension name="92-ai-bot-unlimited-loop-stop" continue="false">
+    <condition field="destination_number" expression="^92031$|^920310$">
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9205 实时媒体桥：默认关闭。需先安装/加载 mod_audio_stream，并设置 qwen_realtime_media_bridge_enabled=true。 -->
+  <extension name="92-ai-bot-qwen-realtime-media" continue="false">
+    <condition field="${destination_number}:$${qwen_realtime_media_bridge_enabled}" expression="^9205:(true|1|yes)$">
+      <action application="set" data="mrcp_profile=java-mrcp" />
+      <action application="set" data="hangup_after_bridge=true" />
+      <action application="set" data="STREAM_BUFFER_SIZE=100" />
+      <action application="set" data="STREAM_HEART_BEAT=15" />
+      <!-- <action application="set" data="STREAM_SUPPRESS_LOG=true" /> -->
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+      <action application="answer" />
+      <action application="speak"
+        data="unimrcp:${mrcp_profile}||&lt;speak version='1.0' xml:lang='zh-CN'&gt;您好，我是微语智能语音助手，请问有什么可以帮您的？&lt;/speak&gt;" />
+      <action application="lua" data="qwen_realtime_media_start.lua $${qwen_realtime_media_ws_url}" />
+      <action application="log" data="INFO [AI-BOT-9205-REALTIME] media bridge started after greeting uuid=${uuid} ws=$${qwen_realtime_media_ws_url}" />
+      <action application="park" />
+    </condition>
+  </extension>
+
+  <!-- 9205：Qwen-Audio-Realtime 回合制兜底。每轮录音回传后端，由 Qwen 实时语音模型生成回复，再转电话可播报音频。 -->
+  <extension name="92-ai-bot-qwen-realtime-entry" continue="false">
+    <condition field="destination_number" expression="^9205$">
+      <action application="set" data="hangup_after_bridge=true" />
+      <action application="answer" />
+      <action application="set" data="voice_agent=true" />
+      <action application="set" data="voice_agent_provider=qwen-audio-realtime" />
+      <action application="set" data="voice_agent_realtime_model=qwen-audio-3.0-realtime-plus" />
+      <action application="set" data="voice_agent_realtime_voice=longanqian" />
+      <action application="set" data="voice_agent_tts_model=cosyvoice-v3-flash" />
+      <action application="set" data="voice_agent_tts_voice=longanhuan" />
+      <action application="set" data="conversation_id=${uuid}" />
+      <action application="log" data="INFO [AI-BOT-9205] qwen realtime entry caller=${caller_id_number} uuid=${uuid}" />
+      <action application="playback" data="tone_stream://%(300,1000,440);loops=1" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true,method=POST}" />
+      <action application="sleep" data="200" />
+      <action application="transfer" data="92050 XML default" />
+    </condition>
+  </extension>
+
+  <extension name="92-ai-bot-qwen-realtime-loop" continue="false">
+    <condition field="destination_number" expression="^92050$">
+      <action application="set"
+        data="turn_record_name=ai-bot-9205_${caller_id_number}_${uuid}_${strftime(%Y-%m-%d-%H-%M-%S)}.wav" />
+      <action application="set" data="turn_record_file=/usr/local/freeswitch/recordings/${turn_record_name}" />
+      <action application="set" data="turn_record_url=$${ai_bot_base_url}/freeswitch-recordings/${turn_record_name}" />
+      <action application="log" data="INFO [AI-BOT-9205] record file=${turn_record_file}" />
+      <action application="record" data="${turn_record_file} 8 200 3" />
+      <action application="sleep" data="200" />
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;mode=unlimited&amp;bot_did=9205&amp;voice_agent=true&amp;file_url=${turn_record_url}&amp;conversation_id=${uuid},method=POST}" />
+      <action application="log" data="INFO [AI-BOT-9205] bot_continue='${bot_continue}'" />
+      <action application="transfer" data="92051${bot_continue} XML default" />
+    </condition>
+  </extension>
+
+  <extension name="92-ai-bot-qwen-realtime-continue" continue="false">
+    <condition field="destination_number" expression="^920511$">
+      <action application="transfer" data="92050 XML default" />
+    </condition>
+  </extension>
+
+  <extension name="92-ai-bot-qwen-realtime-stop" continue="false">
+    <condition field="destination_number" expression="^92051$|^920510$">
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9294：中文 ASR 回声测试（java-mrcp 变体）。 -->
+  <extension name="92-asr-echo-test-java-mrcp" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=java-mrcp" />
+    </condition>
+    <condition field="destination_number" expression="^9294$">
+      <action application="set" data="asr_engine=unimrcp" />
+      <action application="set" data="asr_profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:profile=${mrcp_profile}" />
+      <action application="set" data="RECOG-PROFILE=${mrcp_profile}" />
+      <action application="set" data="RECOG-BEEP=false" />
+      <action application="set"
+        data="RECOG-INIT-OPTIONS=language=zh-CN;no-input-timeout=7000;complete-timeout=1200" />
+
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+
+      <action application="answer" />
+      <action application="log" data="INFO [ASR-ECHO-JAVA-MRCP] hit 9294 profile=${mrcp_profile} test" />
+      <action application="speak"
+        data="unimrcp:java-mrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;中文语音测试。请在提示后说一句中文。&lt;/speak&gt;" />
+      <action application="sleep" data="1500" />
+
+      <action application="play_and_detect_speech"
+        data="silence_stream://8000 detect:unimrcp:${mrcp_profile} {language=zh-CN,no-input-timeout=7000,complete-timeout=1200}builtin:dictation" />
+
+      <action application="log"
+        data="INFO [ASR-ECHO-JAVA-MRCP] vars dsr='${detect_speech_result}' dsrt='${detect_speech_result_text}' dsrs='${detect_speech_results}' recog='${RECOG_RESULT}'" />
+      <action application="set"
+        data="asr_text=${RECOG_RESULT}${detect_speech_result_text}${speech_detection_result}" />
+      <action application="lua" data="nlsml_to_text.lua" />
+      <action application="log"
+        data="INFO [ASR-ECHO-JAVA-MRCP] concat asr_text='${asr_text}'" />
+      <action application="sleep" data="2000" />
+      <action application="speak"
+        data="unimrcp:java-mrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;&lt;p&gt;我听到：${asr_text_ssml}&lt;/p&gt;&lt;/speak&gt;" />
+      <action application="sleep" data="5000" />
+      <action application="park" />
+    </condition>
+  </extension>
+
+  <!-- 9295：ASR 回声测试。说一句中文，系统会识别并用 SSML 复述回来。 -->
+  <extension name="92-asr-echo-test" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=baidu" />
+    </condition>
+    <condition field="destination_number" expression="^9295$">
+      <action application="set" data="mrcp_profile=baidu" />
+      <!-- ASR 设置：使用 UniMRCP/Baidu，中文，超时参数适中 -->
+      <action application="set" data="asr_engine=unimrcp" />
+      <action application="set" data="asr_profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:profile=${mrcp_profile}" />
+      <action application="set" data="RECOG-PROFILE=${mrcp_profile}" />
+      <action application="set" data="RECOG-BEEP=false" />
+      <action application="set"
+        data="RECOG-INIT-OPTIONS=language=zh-CN;no-input-timeout=7000;complete-timeout=1200" />
+
+      <!-- TTS 设置：SSML，中文；避免传递 Voice-Name -->
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+
+      <action application="answer" />
+      <action application="log" data="INFO [ASR-ECHO] hit 9295 profile=${mrcp_profile} test" />
+      <action application="speak"
+        data="unimrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;请在提示后说一句中文。&lt;/speak&gt;" />
+      <action application="sleep" data="300" />
+
+      <!-- 采用 play_and_detect_speech：在静音播放 6 秒期间进行识别，更易触发结果赋值 -->
+      <action application="play_and_detect_speech"
+        data="silence_stream://8000 detect:unimrcp {language=zh-CN,no-input-timeout=7000,complete-timeout=1200}builtin:dictation" />
+
+      <!-- 复述识别结果，若为空则给出提示 -->
+      <action application="log"
+        data="INFO [ASR-ECHO] vars dsr='${detect_speech_result}' dsrt='${detect_speech_result_text}' dsrs='${detect_speech_results}' recog='${RECOG_RESULT}' sdr='${speech_detection_result}' cause='${RECOG_COMPLETION_CAUSE}' conf='${RECOG_CONFIDENCE}' asr_engine='${asr_engine}' asr_profile='${asr_profile}'" />
+      <!-- 优先选择 RECOG_RESULT（通常为纯文本）；其次 detect_speech_result_text；最后再用 speech_detection_result。
+           注意：避免使用 detect_speech_result/raw（XML 或 NLSML），以免破坏 SSML。 -->
+      <action application="set"
+        data="asr_text=${RECOG_RESULT}${detect_speech_result_text}${speech_detection_result}" />
+      <!-- 如果以上均为空，但 detect_speech_result 是 NLSML/XML，则调用 FreeSWITCH Lua 脚本解析为纯文本写入 asr_text -->
+      <action application="lua" data="nlsml_to_text.lua" />
+      <action application="log"
+        data="INFO [ASR-ECHO] concat asr_text='${asr_text}' ssml='${asr_text_ssml}'" />
+      <action application="speak"
+        data="unimrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;&lt;p&gt;我听到：${asr_text_ssml}&lt;/p&gt;&lt;/speak&gt;" />
+      <action application="sleep" data="5000" />
+      <action application="park" />
+    </condition>
+  </extension>
+
+  <!-- 9296：UniMRCP SSML 测试，使用 application/ssml+xml 避免部分引擎对 text/plain 的限制 -->
+  <extension name="92-tts-test-unimrcp-ssml" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=baidu" />
+    </condition>
+    <condition field="destination_number" expression="^9296$">
+      <action application="set" data="unimrcp:profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+      <action application="answer" />
+      <action application="log" data="INFO [TTS-UNIMRCP-SSML] hit 9296 profile=${mrcp_profile} test" />
+      <action application="speak"
+        data="unimrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;&lt;p&gt;你好，这是一段 SSML 合成测试。&lt;/p&gt;&lt;/speak&gt;" />
+      <action application="sleep" data="5000" />
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9297：长音连续播放，用于下行媒体通路验证（保持约30秒） -->
+  <extension name="92-long-tone-test" continue="false">
+    <condition field="destination_number" expression="^9297$">
+      <action application="answer" />
+      <action application="log" data="INFO [LONG-TONE] hit 9297 long tone test" />
+      <!-- 连续播放 30 秒 400Hz 音，验证浏览器是否能听到下行RTP（独立于TTS/MRCP） -->
+      <action application="playback" data="tone_stream://%(30000,0,440)" />
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9298：本地播放通路自检（避免依赖未加载的 TTS 引擎） -->
+  <extension name="92-tts-test-flite" continue="false">
+    <condition field="destination_number" expression="^9298$">
+      <action application="answer" />
+      <action application="log" data="INFO [TTS-FLITE] hit 9298 test" />
+      <!-- 使用内置提示音代替 flite，验证媒体下行是否可听见 -->
+      <action application="playback" data="tone_stream://%(400,1000,440);loops=3" />
+      <action application="sleep" data="500" />
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 9299：UniMRCP 最小化拨测，避免不被支持的 Voice-Name 造成 409 -->
+  <extension name="92-tts-test-unimrcp" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=baidu" />
+    </condition>
+    <condition field="destination_number" expression="^9299$">
+      <!-- 强制使用 baidu profile，并仅指定语言头，不指定 Voice-Name，让服务端走默认音色 -->
+      <action application="set" data="unimrcp:profile=${mrcp_profile}" />
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+      <action application="answer" />
+      <action application="log" data="INFO [TTS-UNIMRCP] hit 9299 profile=${mrcp_profile} test" />
+      <action application="speak"
+        data="unimrcp||&lt;speak version='1.0' xml:lang='zh-CN'&gt;&lt;p&gt;你好，这是一个最小化的语音合成测试。&lt;/p&gt;&lt;/speak&gt;" />
+      <!-- 给 TTS 足够播放时间 -->
+      <action application="sleep" data="5000" />
+      <action application="hangup" />
+    </condition>
+  </extension>
+
+  <!-- 通用 92xx 入口（排除 9201/9203/9205/9298/9299，避免测试分机被通配规则抢先命中） -->
+  <extension name="92-ai-bot" continue="false">
+    <condition field="${mrcp_profile}" expression="^$" inline="true" break="never">
+      <action application="set" data="mrcp_profile=baidu" />
+    </condition>
+    <condition field="destination_number" expression="^92(?!01|03|05|98|99)\d{2}$">
+      <action application="set" data="hangup_after_bridge=true" />
+      <action application="log"
+        data="INFO [AI-BOT] incoming call from ${caller_id_number} (${network_addr}) to ${destination_number}" />
+      <!-- 将被叫号码作为参数传给 HTTAPI（自定义 bot_did）。使用专用测试号段 92xx -->
+      <action application="set" data="bot_did=${destination_number}" />
+      <!-- MRCP/UniMRCP 相关变量（默认使用 baidu profile） -->
+      <action application="set" data="tts_engine=unimrcp" />
+      <action application="set" data="tts_profile=${mrcp_profile}" />
+      <!-- 明确告知 mod_unimrcp 使用的 Profile（更权威）： -->
+      <action application="set" data="unimrcp:profile=${mrcp_profile}" />
+      <!-- 避免发送 Voice-Name，统一使用供应商默认音色 -->
+      <!-- <action application="unset" data="tts_voice" /> -->
+      <action application="set" data="synth-content-type=application/ssml+xml" />
+      <action application="set" data="asr_engine=unimrcp" />
+      <action application="set" data="asr_profile=${mrcp_profile}" />
+      <!-- ASR 推荐同时设置 RECOG-PROFILE，避免引擎解析歧义： -->
+      <action application="set" data="RECOG-PROFILE=${mrcp_profile}" />
+      <!-- 为 TTS 指定语言头，避免后端默认英语导致拒绝或错误 -->
+      <action application="set" data="unimrcp:header:Speech-Language=zh-CN" />
+      <!-- ASR 参数：语言、VAD、静音超时，可按需调整 -->
+      <action application="set" data="RECOG-BEEP=false" />
+      <action application="set"
+        data="RECOG-INIT-OPTIONS=language=zh-CN;no-input-timeout=7000;complete-timeout=1200" />
+      <!-- 媒体通路快速自检：先接听并播放简短提示音，确保来电端能听见 -->
+      <action application="answer" />
+      <action application="playback" data="tone_stream://%(300,1000,440);loops=1" />
+      <!-- 直接进入 HTTAPI，服务端负责问候播放；通过 querystring 传参，或也可依赖 POST 表单里的 channel 变量 -->
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=1&amp;bot_did=${destination_number}&amp;mrcp_profile=${mrcp_profile},method=POST}" />
+      <!-- 注意：HTTAPI 的 <break/> 返回后继续在拨号计划执行。此处改为在拨号计划内进行 ASR 捕获，避免 HTTAPI 中使用 detect_speech+pause
+      无法触发结果变量的问题。 -->
+      <!-- 在静音流 8 秒期间执行识别，放宽 no-input 超时，使用与 9295 一致的参数 -->
+      <action application="sleep" data="200" />
+      <action application="play_and_detect_speech"
+        data="silence_stream://8000 detect:unimrcp {language=zh-CN,no-input-timeout=7000,complete-timeout=1200}builtin:dictation" />
+      <!-- 解析识别结果到 asr_text / asr_text_ssml，供第二轮 HTTAPI 使用 -->
+      <action application="log"
+        data="INFO [AI-BOT] turn1 vars dsr='${detect_speech_result}' dsrt='${detect_speech_result_text}' recog='${RECOG_RESULT}' cause='${RECOG_COMPLETION_CAUSE}' conf='${RECOG_CONFIDENCE}'" />
+      <action application="set"
+        data="asr_text=${RECOG_RESULT}${detect_speech_result_text}${speech_detection_result}" />
+      <action application="lua" data="nlsml_to_text.lua" />
+      <!-- 将识别结果导出为会话变量，确保后续 HTTAPI 可见（包含多个候选字段） -->
+      <action application="export" data="bot_user_text=${asr_text}" />
+      <action application="export" data="asr_text=${asr_text}" />
+      <action application="export" data="asr_text_ssml=${asr_text_ssml}" />
+      <action application="export" data="detect_speech_result_text=${detect_speech_result_text}" />
+      <action application="export" data="RECOG_RESULT=${RECOG_RESULT}" />
+      <action application="export" data="detect_speech_result=${detect_speech_result}" />
+      <action application="export" data="detect_speech_results=${detect_speech_results}" />
+      <!-- 关键导出变量快照，便于核查是否已在会话级可见 -->
+      <action application="log"
+        data="INFO [AI-BOT] exports bot_user_text='${bot_user_text}' asr_text='${asr_text}' asr_text_ssml='${asr_text_ssml}' dsrt='${detect_speech_result_text}' recog='${RECOG_RESULT}' dsr='${detect_speech_result}' dsrs='${detect_speech_results}'" />
+      <action application="log"
+        data="INFO [AI-BOT] turn1 asr_text='${asr_text}' ssml='${asr_text_ssml}'" />
+      <!-- 去掉 querystring 里的 bot_user_text，防止个别情况下中文被错误编码；HTTAPI 将优先读取 POST 的 variable_bot_user_text -->
+      <action application="httapi"
+        data="{url=$${ai_bot_base_url}/ai-bot?turn=2&amp;bot_did=${destination_number}&amp;mrcp_profile=${mrcp_profile},method=POST}" />
+    </condition>
+  </extension>
+
+  <!-- 其他扩展可继续在此添加 -->
+</include>

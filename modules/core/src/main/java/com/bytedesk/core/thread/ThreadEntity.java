@@ -55,12 +55,19 @@ import lombok.experimental.SuperBuilder;
 @EntityListeners({ ThreadEntityListener.class })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "messages"})
 @Table(name = "bytedesk_core_thread", indexes = {
-    @Index(name = "idx_thread_topic", columnList = "thread_topic")
+    @Index(name = "idx_thread_topic", columnList = "thread_topic"),
+    @Index(name = "idx_thread_org_updated", columnList = "org_uid, is_deleted, is_hide, updated_at"),
+    @Index(name = "idx_thread_org_status_updated", columnList = "org_uid, thread_status, is_deleted, is_hide, updated_at"),
+    @Index(name = "idx_thread_owner_updated", columnList = "owner_id, is_deleted, is_hide, updated_at"),
+    @Index(name = "idx_thread_topic_updated", columnList = "thread_topic, is_deleted, is_hide, updated_at")
 }
 )
 public class ThreadEntity extends AbstractThreadEntity {
 
     private static final long serialVersionUID = 1L;
+
+    @Transient
+    private String originalStatus;
 
     /**
      * Messages associated with this conversation thread
@@ -70,6 +77,16 @@ public class ThreadEntity extends AbstractThreadEntity {
     @OneToMany(mappedBy = "thread", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<MessageEntity> messages = new ArrayList<>();
+
+    @PostLoad
+    @PostPersist
+    public void captureOriginalStatus() {
+        originalStatus = getStatus();
+    }
+
+    public boolean hasStatusChanged() {
+        return originalStatus != null && !originalStatus.equals(getStatus());
+    }
 
     public Boolean isNew() {
         return ThreadProcessStatusEnum.NEW.name().equals(getStatus());

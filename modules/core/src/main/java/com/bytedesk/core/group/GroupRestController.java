@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.member.MemberProtobuf;
 
@@ -38,16 +39,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/group")
-@Tag(name = "群组管理", description = "群组管理相关接口")
+@Tag(name = "Group Management", description = "Group management APIs")
 public class GroupRestController extends BaseRestController<GroupRequest, GroupRestService> {
     
     private final GroupRestService groupRestService;
     
-    @Operation(summary = "查询组织下的群组", description = "根据组织ID查询群组列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Groups by Organization", description = "Retrieve group list by organization ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(GroupRequest request) {
         
         Page<GroupResponse> page = groupRestService.queryByOrg(request);
@@ -55,11 +57,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "查询用户下的群组", description = "根据用户ID查询群组列表")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Groups by User", description = "Retrieve group list by user ID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(GroupRequest request) {
 
         Page<GroupResponse> page = groupRestService.queryByUser(request);
@@ -67,11 +70,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
     
-    @Operation(summary = "查询指定群组", description = "根据UID查询群组详情")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Group by UID", description = "Retrieve group details by UID")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(GroupRequest request) {
         
         GroupResponse group = groupRestService.queryByUid(request);
@@ -79,8 +83,8 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
     
-    @Operation(summary = "查询群组成员", description = "分页查询群组成员")
-    @ApiResponse(responseCode = "200", description = "查询成功",
+    @Operation(summary = "Query Group Members", description = "Retrieve group members with pagination")
+    @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = MemberProtobuf.class)))
     /**
@@ -96,12 +100,13 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
-    @Operation(summary = "创建群组", description = "创建新的群组")
-    @ApiResponse(responseCode = "200", description = "创建成功",
+    @Operation(summary = "Create Group", description = "Create a new group")
+    @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "新建", description = "create group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_CREATE, description = "create group")
     @Override
+    @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.create(request);
@@ -109,12 +114,13 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "更新群组", description = "更新群组信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Group", description = "Update group information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "更新", description = "update group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group")
     @Override
+    @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody GroupRequest request) {
 
         GroupResponse group = groupRestService.update(request);
@@ -122,8 +128,8 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "更新群组名称", description = "更新群组的名称")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Group Name", description = "Update the group name")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     // update/name
@@ -135,8 +141,8 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "更新群组置顶提示", description = "更新群组的置顶提示信息")
-    @ApiResponse(responseCode = "200", description = "更新成功",
+    @Operation(summary = "Update Group Top Tip", description = "Update the group top-tip information")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     // update/topTip
@@ -148,11 +154,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "邀请成员", description = "邀请成员加入群组")
-    @ApiResponse(responseCode = "200", description = "邀请成功",
+    @Operation(summary = "Invite Members", description = "Invite members to join the group")
+    @ApiResponse(responseCode = "200", description = "Invited successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "invite", description = "invite members to group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_INVITE, description = "invite members to group")
     @PostMapping("/invite")
     public ResponseEntity<?> inviteMembers(@RequestBody GroupRequest request) {
         
@@ -161,11 +167,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
     
-    @Operation(summary = "加入群组", description = "加入指定的群组")
-    @ApiResponse(responseCode = "200", description = "加入成功",
+    @Operation(summary = "Join Group", description = "Join the specified group")
+    @ApiResponse(responseCode = "200", description = "Joined successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "join", description = "join group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_JOIN, description = "join group")
     @PostMapping("/join")
     public ResponseEntity<?> joinGroup(@RequestBody GroupRequest request) {
         
@@ -174,11 +180,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "移除成员", description = "从群组中移除成员")
-    @ApiResponse(responseCode = "200", description = "移除成功",
+    @Operation(summary = "Remove Members", description = "Remove members from the group")
+    @ApiResponse(responseCode = "200", description = "Removed successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "remove", description = "remove members from group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_REMOVE, description = "remove members from group")
     @PostMapping("/remove")
     public ResponseEntity<?> removeMembers(@RequestBody GroupRequest request) {
         
@@ -187,11 +193,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "退出群组", description = "退出指定的群组")
-    @ApiResponse(responseCode = "200", description = "退出成功",
+    @Operation(summary = "Leave Group", description = "Leave the specified group")
+    @ApiResponse(responseCode = "200", description = "Left successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
-    @ActionAnnotation(title = "群组", action = "leave", description = "leave group")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_LEAVE, description = "leave group")
     @PostMapping("/leave")
     public ResponseEntity<?> leaveGroup(@RequestBody GroupRequest request) {
         
@@ -200,9 +206,9 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
-    @Operation(summary = "解散群组", description = "解散指定的群组")
-    @ApiResponse(responseCode = "200", description = "解散成功")
-    @ActionAnnotation(title = "群组", action = "dismiss", description = "dismiss group")
+    @Operation(summary = "Dismiss Group", description = "Dismiss the specified group")
+    @ApiResponse(responseCode = "200", description = "Dismissed successfully")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DISMISS, description = "dismiss group")
     @PostMapping("/dismiss")
     public ResponseEntity<?> dismissGroup(@RequestBody GroupRequest request) {
 
@@ -211,10 +217,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "删除群组", description = "删除指定的群组")
-    @ApiResponse(responseCode = "200", description = "删除成功")
-    @ActionAnnotation(title = "群组", action = "删除", description = "delete group")
+    @Operation(summary = "Delete Group", description = "Delete the specified group")
+    @ApiResponse(responseCode = "200", description = "Deleted successfully")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DELETE, description = "delete group")
     @Override
+    @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody GroupRequest request) {
         
         groupRestService.delete(request);
@@ -222,10 +229,11 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @Operation(summary = "导出群组", description = "导出群组数据")
-    @ApiResponse(responseCode = "200", description = "导出成功")
-    @ActionAnnotation(title = "群组", action = "导出", description = "export group")
+    @Operation(summary = "Export Groups", description = "Export group data")
+    @ApiResponse(responseCode = "200", description = "Export successful")
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_EXPORT, description = "export group")
     @Override
+    @GetMapping("/export")
     public Object export(GroupRequest request, HttpServletResponse response) {
         return exportTemplate(
             request,

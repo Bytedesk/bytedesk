@@ -17,11 +17,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 // import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,9 +41,10 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
     private final RelationRestService relationRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
-    @ActionAnnotation(title = "关系", action = "组织查询", description = "query relation by org")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query relation by org")
     @Operation(summary = "Query Relations by Organization", description = "Retrieve relations for the current organization")
     @Override
+    @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(RelationRequest request) {
         
         Page<RelationResponse> relations = relationRestService.queryByOrg(request);
@@ -48,9 +52,10 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
         return ResponseEntity.ok(JsonResult.success(relations));
     }
 
-    @ActionAnnotation(title = "关系", action = "用户查询", description = "query relation by user")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query relation by user")
     @Operation(summary = "Query Relations by User", description = "Retrieve relations for the current user")
     @Override
+    @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(RelationRequest request) {
         
         Page<RelationResponse> relations = relationRestService.queryByUser(request);
@@ -58,9 +63,10 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
         return ResponseEntity.ok(JsonResult.success(relations));
     }
 
-    @ActionAnnotation(title = "关系", action = "查询详情", description = "query relation by uid")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query relation by uid")
     @Operation(summary = "Query Relation by UID", description = "Retrieve a specific relation by its unique identifier")
     @Override
+    @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(RelationRequest request) {
         
         RelationResponse relation = relationRestService.queryByUid(request);
@@ -68,40 +74,43 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
         return ResponseEntity.ok(JsonResult.success(relation));
     }
 
-    @ActionAnnotation(title = "关系", action = "新建", description = "create relation")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_CREATE, description = "create relation")
     @Operation(summary = "Create Relation", description = "Create a new relation")
     @Override
+    @PostMapping("/create")
     // @PreAuthorize("hasAuthority('TAG_CREATE')")
-    public ResponseEntity<?> create(RelationRequest request) {
+    public ResponseEntity<?> create(@RequestBody RelationRequest request) {
         
         RelationResponse relation = relationRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(relation));
     }
 
-    @ActionAnnotation(title = "关系", action = "更新", description = "update relation")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_UPDATE, description = "update relation")
     @Operation(summary = "Update Relation", description = "Update an existing relation")
     @Override
+    @PostMapping("/update")
     // @PreAuthorize("hasAuthority('TAG_UPDATE')")
-    public ResponseEntity<?> update(RelationRequest request) {
+    public ResponseEntity<?> update(@RequestBody RelationRequest request) {
         
         RelationResponse relation = relationRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(relation));
     }
 
-    @ActionAnnotation(title = "关系", action = "删除", description = "delete relation")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_DELETE, description = "delete relation")
     @Operation(summary = "Delete Relation", description = "Delete a relation")
     @Override
+    @PostMapping("/delete")
     // @PreAuthorize("hasAuthority('TAG_DELETE')")
-    public ResponseEntity<?> delete(RelationRequest request) {
+    public ResponseEntity<?> delete(@RequestBody RelationRequest request) {
         
         relationRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "关系", action = "导出", description = "export relation")
+    @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_EXPORT, description = "export relation")
     @Operation(summary = "Export Relations", description = "Export relations to Excel format")
     @Override
     // @PreAuthorize("hasAuthority('TAG_EXPORT')")

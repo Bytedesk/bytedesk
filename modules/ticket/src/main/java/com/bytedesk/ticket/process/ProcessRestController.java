@@ -103,6 +103,15 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(definition));
     }
 
+    // 校验流程结构和业务语义配置
+    @PostMapping("/validate")
+    public ResponseEntity<?> validateProcess(@RequestBody ProcessRequest request) {
+
+        ProcessValidationResponse validation = processRestService.validateProcess(request);
+
+        return ResponseEntity.ok(JsonResult.success(validation));
+    }
+
     // 取消部署流程
     @PostMapping("/undeploy")
     public ResponseEntity<?> undeployProcess(@RequestBody ProcessRequest request) {

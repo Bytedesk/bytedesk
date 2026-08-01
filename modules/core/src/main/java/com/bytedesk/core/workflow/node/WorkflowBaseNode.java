@@ -145,6 +145,11 @@ public abstract class WorkflowBaseNode implements Serializable {
          * 输出配置
          */
         private Map<String, Object> outputs;
+
+        /**
+         * 选择节点的选项列表
+         */
+        private List<Map<String, Object>> options;
         
         /**
          * 扩展属性

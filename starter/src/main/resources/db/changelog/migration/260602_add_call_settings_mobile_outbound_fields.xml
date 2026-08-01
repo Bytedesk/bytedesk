@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260602-add-call-settings-mobile-outbound-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <not>
+                    <columnExists tableName="bytedesk_call_settings" columnName="is_mobile_outbound_enabled" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_settings">
+            <column name="is_mobile_outbound_enabled" type="boolean" defaultValueBoolean="false" />
+            <column name="mobile_phone_number" type="varchar(32)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260602-backfill-call-settings-mobile-outbound-fields" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <columnExists tableName="bytedesk_call_settings" columnName="is_mobile_outbound_enabled" />
+            </and>
+        </preConditions>
+
+        <update tableName="bytedesk_call_settings">
+            <column name="is_mobile_outbound_enabled" valueBoolean="false" />
+            <where>is_mobile_outbound_enabled IS NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

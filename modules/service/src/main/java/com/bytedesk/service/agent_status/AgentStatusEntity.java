@@ -46,6 +46,9 @@ public class AgentStatusEntity extends BaseEntity {
 
     private String status;
 
+    @Column(name = "rest_reason", length = 255)
+    private String restReason;
+
     @Builder.Default
     @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;

@@ -20,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -35,13 +34,12 @@ import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.service.SseMessageJsonConsumer;
 import com.bytedesk.ai.service.SsePersistenceControl;
 import com.bytedesk.ai.utils.ConvertAiUtils;
-import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageService;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -301,7 +299,25 @@ public class RobotService extends AbstractRobotService {
             robot,
             validationResult.getMessageProtobuf());
 
-        if (shouldBypassRobotReply(threadEntity)) {
+        if (!shouldProcessVisitorSseMessage(validationResult.getMessageProtobuf(), query)) {
+            log.info("Skip visitor SSE AI processing for messageType={}, threadUid={}, reason=empty-or-non-ai-query",
+                    validationResult.getMessageProtobuf().getType(),
+                    validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+            sseMessageHelper.sendStreamEndMessage(
+                    validationResult.getMessageProtobuf(),
+                    messageProtobufReply,
+                    emitter,
+                    0,
+                    0,
+                    0,
+                    null,
+                    LlmProviderConstants.ZHIPUAI,
+                    "visitor-sse-skip",
+                    false);
+            return;
+        }
+
+        if (RobotUtils.shouldBypassRobotReply(threadEntity)) {
             log.info("Thread {} is transferring to agent, skip robot stream response", threadEntity.getUid());
             sendTransferInterceptionResponse(validationResult, messageProtobufReply, emitter);
             return;
@@ -359,8 +375,8 @@ public class RobotService extends AbstractRobotService {
         // } catch (Exception e) {
         //     log.warn("query rewrite failed, fallback to original: {}", e.getMessage());
         // }
-        List<String> tokens = preprocessAndSegment(rewritten);
-        String finalQuery = buildExpandedQuery(rewritten, tokens);
+        List<String> tokens = RobotUtils.preprocessAndSegment(rewritten, segmentService);
+        String finalQuery = RobotUtils.buildExpandedQuery(rewritten, tokens);
 
         // 使用公共方法处理AI消息（统一走fallback逻辑）
         String aiResponse = processSyncAIWithFallback(finalQuery, robot,
@@ -372,34 +388,6 @@ public class RobotService extends AbstractRobotService {
     }
 
     // ==================== Pipeline 风格接口已移除：逻辑已并入访客接口 ====================
-
-    private List<String> preprocessAndSegment(String content) {
-        if (content == null || content.isBlank()) {
-            return List.of();
-        }
-        // 使用 SegmentService 进行分词，并过滤标点符号，最小长度 1
-        List<String> words = segmentService.segmentWords(content);
-        return segmentService.filterWords(words, true, 1);
-    }
-
-    /**
-     * 基于分词结果构建扩展查询，提升召回。
-     * - 去重
-     * - 限制最大拼接词数，避免过长
-     */
-    private String buildExpandedQuery(String base, List<String> tokens) {
-        if (tokens == null || tokens.isEmpty()) {
-            return base;
-        }
-        // 去重并限制最多 8 个词
-        List<String> uniq = tokens.stream().distinct().limit(8).collect(Collectors.toList());
-        String extra = String.join(" ", uniq);
-        if (extra.isBlank()) {
-            return base;
-        }
-        // 简单拼接，保留原文，提高召回（必要时可改为加权语法由底层模型/检索解析）
-        return base + " " + extra;
-    }
 
     /**
      * 消息验证和解析的通用方法
@@ -498,28 +486,6 @@ public class RobotService extends AbstractRobotService {
         return robotBasic;
     }
 
-    private boolean shouldBypassRobotReply(ThreadEntity thread) {
-        if (thread == null || !thread.isWorkgroupType()) {
-            return false;
-        }
-        if (hasAgentAssigned(thread)) {
-            return true;
-        }
-        // String transferStatus = thread.getTransferStatus();
-        // boolean transferActive = StringUtils.hasText(transferStatus)
-        //         && !ThreadTransferStatusEnum.NONE.name().equals(transferStatus);
-        // return transferActive || !thread.isRoboting();
-        return !thread.isRoboting();
-    }
-
-    private boolean hasAgentAssigned(ThreadEntity thread) {
-        if (thread == null) {
-            return false;
-        }
-        String agentJson = thread.getAgent();
-        return StringUtils.hasText(agentJson) && !BytedeskConsts.EMPTY_JSON_STRING.equals(agentJson);
-    }
-
     private void sendTransferInterceptionResponse(
             MessageValidationResult validationResult,
             MessageProtobuf messageProtobufReply,
@@ -551,15 +517,39 @@ public class RobotService extends AbstractRobotService {
     private record RobotContext(ThreadEntity thread, RobotProtobuf robot) {
     }
 
-    /**
-     * AI提供商选择和处理的公共方法
-     */
-    private String getAIProviderName(RobotProtobuf robot) {
-        String provider = LlmProviderConstants.ZHIPUAI;
-        if (robot.getLlm() != null) {
-            provider = robot.getLlm().getTextProvider().toLowerCase();
+    private boolean shouldProcessVisitorSseMessage(MessageProtobuf messageProtobuf, String query) {
+        if (messageProtobuf == null) {
+            return false;
         }
-        return provider;
+
+        // 按消息类型过滤：参考前端 forceStomp 逻辑，以下类型不走 AI/SSE 机器人处理
+        MessageTypeEnum messageType = messageProtobuf.getType();
+        if (messageType == null) {
+            return false;
+        }
+
+        switch (messageType) {
+            case RATE:
+            case GOODS:
+            case ORDER:
+            case FORM:
+            case PREFORM:
+                log.info("Skip visitor SSE AI processing for messageType={}, threadUid={}, reason=non-ai-message-type",
+                        messageType,
+                        messageProtobuf.getThread() != null ? messageProtobuf.getThread().getUid() : null);
+                return false;
+            default:
+                break;
+        }
+
+        if (!StringUtils.hasText(query)) {
+            log.warn("Skip visitor SSE message with empty query, type={}, uid={}",
+                    messageType,
+                    messageProtobuf.getUid());
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -568,7 +558,7 @@ public class RobotService extends AbstractRobotService {
     private void processAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
 
-        String provider = getAIProviderName(robot);
+        String provider = RobotUtils.getAIProviderName(robot);
 
         try {
             // 使用SpringAIServiceRegistry获取对应的服务
@@ -593,7 +583,7 @@ public class RobotService extends AbstractRobotService {
     private String processSyncAIWithFallback(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply) {
 
-        String provider = getAIProviderName(robot);
+        String provider = RobotUtils.getAIProviderName(robot);
 
         try {
             // 使用SpringAIServiceRegistry获取对应的服务进行同步处理

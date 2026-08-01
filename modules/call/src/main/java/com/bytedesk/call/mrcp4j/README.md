@@ -2,7 +2,8 @@
 
 MRCP4J 是一个完整的 Media Resource Control Protocol Version 2 (MRCPv2) Java 实现库,用于构建语音识别(ASR)和语音合成(TTS)应用。
 
-[Github Mrcp4j](https://github.com/JVoiceXML/mrcp4j)
+- [Github Mrcp4j](https://github.com/JVoiceXML/mrcp4j)
+- [mod_unimrcp](https://github.com/freeswitch/mod_unimrcp)
 
 ## 📋 目录
 
@@ -26,7 +27,7 @@ MRCP4J 是一个完整的 Media Resource Control Protocol Version 2 (MRCPv2) Jav
 
 ## 🏗️ 架构概览
 
-```
+```bash
 mrcp4j/
 ├── client/              # 客户端实现
 │   ├── MrcpFactory      # 工厂类,创建客户端实例
@@ -206,7 +207,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 核心接口
 
 | 类/接口 | 说明 |
-|--------|------|
+| -------- | ------ |
 | `MrcpFactory` | 客户端工厂类,用于创建通道 |
 | `MrcpChannel` | MRCP 通道,管理与服务器的连接 |
 | `MrcpServerSocket` | MRCP 服务器实现 |
@@ -217,7 +218,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 资源类型
 
 | 类型 | 常量 | 说明 |
-|-----|------|------|
+| ----- | ------ | ------ |
 | 语音识别 | `MrcpResourceType.SPEECHRECOG` | ASR 服务 |
 | 语音合成 | `MrcpResourceType.SPEECHSYNTH` | TTS 服务 |
 | 录音 | `MrcpResourceType.RECORDER` | 录音服务 |
@@ -226,7 +227,7 @@ channel.addEventListener(new MrcpEventListener() {
 ### 方法名称
 
 | 方法 | 适用资源 | 说明 |
-|-----|---------|------|
+| ----- | --------- | ------ |
 | `RECOGNIZE` | SPEECHRECOG | 启动语音识别 |
 | `SPEAK` | SPEECHSYNTH | 启动语音合成 |
 | `STOP` | 所有 | 停止当前操作 |
@@ -269,6 +270,7 @@ server.setVerboseLogging(true);
 ### Q: 如何处理网络断线重连?
 
 A: 启用自动重连功能:
+
 ```java
 channel.setAutoReconnect(true);
 channel.setReconnectInterval(5000); // 5秒后重试
@@ -277,6 +279,7 @@ channel.setReconnectInterval(5000); // 5秒后重试
 ### Q: 如何设置识别置信度阈值?
 
 A: 在请求中设置 Confidence-Threshold 头:
+
 ```java
 request.setHeader(MrcpHeaderName.CONFIDENCE_THRESHOLD, "0.75");
 ```
@@ -284,6 +287,7 @@ request.setHeader(MrcpHeaderName.CONFIDENCE_THRESHOLD, "0.75");
 ### Q: 如何获取详细的错误信息?
 
 A: 捕获异常并检查响应状态:
+
 ```java
 try {
     MrcpResponse response = channel.sendRequest(request);
@@ -299,12 +303,14 @@ try {
 ### Q: 支持哪些音频格式?
 
 A: 支持以下格式:
+
 - PCM (Linear 16-bit)
 - G.711 (μ-law/A-law)
 - G.729
 - OPUS
 
 通过 `Content-Type` 头指定格式:
+
 ```java
 request.setHeader(MrcpHeaderName.CONTENT_TYPE, "audio/x-wav");
 ```

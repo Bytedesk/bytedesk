@@ -76,11 +76,11 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
     @Override
     public LlmModelResponse create(LlmModelRequest request) {
 
-        if (existsByNameAndProviderUid(request.getName(), request.getProviderUid())) {
-            Optional<LlmModelEntity> optional = llmModelRepository.findByNameAndProviderUid(request.getName(), request.getProviderUid());
-            if (optional.isPresent()) {
-                return convertToResponse(optional.get());
-            }
+        Optional<LlmModelEntity> existing = llmModelRepository.findByNameAndProviderUid(
+                request.getName(),
+                request.getProviderUid());
+        if (existing.isPresent()) {
+            return convertToResponse(existing.get());
         }
         //
         LlmModelEntity entity = modelMapper.map(request, LlmModelEntity.class);
@@ -154,10 +154,15 @@ public class LlmModelRestService extends BaseRestService<LlmModelEntity, LlmMode
         try {
             Optional<LlmModelEntity> latest = llmModelRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
-                LlmModelEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                // 根据业务需求合并实体
-                return llmModelRepository.save(latestEntity);
+                return latest.get();
+            }
+
+            // 并发初始化时，新实体的随机 uid 往往还不存在；此时退回到业务唯一键查找已落库记录。
+            Optional<LlmModelEntity> existing = llmModelRepository.findByNameAndProviderUid(
+                    entity.getName(),
+                    entity.getProviderUid());
+            if (existing.isPresent()) {
+                return existing.get();
             }
         } catch (Exception ex) {
             throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);

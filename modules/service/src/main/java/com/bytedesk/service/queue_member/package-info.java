@@ -1,8 +1,10 @@
 /**
- * 队列成员包
- * 管理客服系统的排队和会话分配
+ * Queue member package for queue participation and assignment membership.
+ * 队列成员包，负责排队参与者与分配成员管理。
+ *
+ * @author bytedesk.com
  */
 @NonNullApi
 package com.bytedesk.service.queue_member;
 
-import org.springframework.lang.NonNullApi; 
+import org.springframework.lang.NonNullApi;

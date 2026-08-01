@@ -16,6 +16,8 @@ package com.bytedesk.kbase.llm_faq;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
@@ -39,9 +41,12 @@ import com.bytedesk.core.category.CategoryResponse;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
-import com.bytedesk.core.message.MessageTypeEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
+import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -53,6 +58,7 @@ import com.bytedesk.kbase.llm_chunk.ChunkStatusEnum;
 import com.bytedesk.kbase.llm_faq.FaqJsonLoader.Faq;
 import com.bytedesk.kbase.llm_faq.FaqJsonLoader.FaqConfiguration;
 import com.bytedesk.kbase.llm_faq.event.FaqUpdateDocEvent;
+import com.bytedesk.kbase.translation.KbaseTranslationSyncService;
 import com.bytedesk.kbase.utils.KbaseConvertUtils;
 import com.bytedesk.kbase.utils.KbaseMessageUtils;
 import lombok.AllArgsConstructor;
@@ -81,8 +87,11 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
 
     private final BytedeskEventPublisher bytedeskEventPublisher;
 
+    private final KbaseTranslationSyncService kbaseTranslationSyncService;
+
     @Override
     protected Specification<FaqEntity> createSpecification(FaqRequest request) {
+        request.setCategoryUids(categoryRestService.collectSelfAndDescendantUids(request.getCategoryUid()));
         return FaqSpecification.search(request, authService);
     }
 
@@ -90,6 +99,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
     protected Page<FaqEntity> executePageQuery(Specification<FaqEntity> spec, Pageable pageable) {
         return faqRepository.findAll(spec, pageable);
     }
+
     @Transactional
     @Override
     public FaqResponse queryByUid(FaqRequest request) {
@@ -134,13 +144,19 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                     throw new RuntimeException("Failed to insert question message");
                 }
                 faqResponse.setQuestionMessage(ConvertUtils.convertToMessageResponse(savedQuestionMessage));
-                // 
+                //
                 MessageEntity answerMessage = KbaseMessageUtils.getFaqAnswerMessage(faqResponse, threadEntity);
                 MessageEntity savedAnswerMessage = messageRestService.save(answerMessage);
                 if (savedAnswerMessage == null) {
                     throw new RuntimeException("Failed to insert answer message");
                 }
                 faqResponse.setAnswerMessage(ConvertUtils.convertToMessageResponse(savedAnswerMessage));
+
+                // 仅在已对接人工客服时广播FAQ问答消息，确保desktop客服端实时同步展示。
+                if (shouldBroadcastFaqToAgent(threadEntity)) {
+                    publishMessageJsonEvent(faqResponse.getQuestionMessage());
+                    publishMessageJsonEvent(faqResponse.getAnswerMessage());
+                }
             }
             //
             return faqResponse;
@@ -211,17 +227,8 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
                 entity.setUserUid(user.getUid());
             }
             //
-            // 根据request.relatedFaqUids查找关联的FAQ
-            List<FaqEntity> relatedFaqs = new ArrayList<>();
-            for (String relatedFaqUid : request.getRelatedFaqUids()) {
-                Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
-                if (relatedFaq.isPresent()) {
-                    relatedFaqs.add(relatedFaq.get());
-                } else {
-                    throw new RuntimeException("relatedFaqUid not found");
-                }
-            }
-            entity.setRelatedFaqs(relatedFaqs);
+            // 根据 request.relatedFaqUids 查找关联 FAQ，并过滤空值/重复/自身引用
+            entity.setRelatedFaqs(resolveRelatedFaqs(request.getRelatedFaqUids(), entity.getUid()));
             //
             Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
             if (kbase.isPresent()) {
@@ -234,6 +241,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to create FAQ");
             }
+            kbaseTranslationSyncService.syncFaq(savedEntity);
             //
             return convertToResponse(savedEntity);
 
@@ -250,7 +258,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         Optional<FaqEntity> optional = findByUid(request.getUid());
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
-            // 
+            //
             // 判断question/answer/similarQuestions/answerList是否有变化，如果其中一个发生变化，发布UpdateDocEvent事件
             if (entity.hasChanged(request)) {
                 // 发布事件，更新文档
@@ -269,31 +277,20 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             entity.setTagList(request.getTagList());
             entity.setType(request.getType());
             entity.setEnabled(request.getEnabled());
+            entity.setRouteToRobot(request.getRouteToRobot());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
             entity.setCategoryUid(request.getCategoryUid());
 
-            // 处理相关FAQ
-            if (request.getRelatedFaqUids() != null && !request.getRelatedFaqUids().isEmpty()) {
-                List<FaqEntity> relatedFaqs = new ArrayList<>();
-                for (String relatedFaqUid : request.getRelatedFaqUids()) {
-                    try {
-                        Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
-                        if (relatedFaq.isPresent()) {
-                            relatedFaqs.add(relatedFaq.get());
-                        }
-                    } catch (Exception e) {
-                        log.warn("无法加载相关的FAQ: {}, 原因: {}", relatedFaqUid, e.getMessage());
-                        // 继续处理其他相关FAQ，不要中断
-                    }
-                }
-                entity.setRelatedFaqs(relatedFaqs);
-            }
+            // 处理相关 FAQ：允许空数组清空关系；忽略空值/重复/自身引用；单条异常不影响整体保存。
+            entity.setRelatedFaqs(resolveRelatedFaqs(request.getRelatedFaqUids(), entity.getUid()));
 
             FaqEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update FAQ");
             }
+
+            kbaseTranslationSyncService.syncFaq(savedEntity);
 
             return convertToResponse(savedEntity);
         } else {
@@ -306,7 +303,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         if (optional.isPresent()) {
             FaqEntity entity = optional.get();
             entity.setEnabled(request.getEnabled());
-            // 
+            //
             FaqEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Failed to update FAQ");
@@ -317,8 +314,6 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         }
     }
 
-    
-    
     @CachePut(value = "faq", key = "#entity.uid")
     @Override
     protected FaqEntity doSave(FaqEntity entity) {
@@ -358,19 +353,19 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             FaqEntity entity) {
         try {
             log.warn("处理乐观锁冲突: {}", entity.getUid());
-            
+
             // 引入随机延迟，避免并发冲突
             try {
-                Thread.sleep(100 + (long)(Math.random() * 400)); // 100-500ms随机延迟
+                Thread.sleep(100 + (long) (Math.random() * 400)); // 100-500ms随机延迟
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
             }
-            
+
             // 重新获取最新版本的实体
             Optional<FaqEntity> latest = faqRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 FaqEntity latestEntity = latest.get();
-                
+
                 // 保持原有实体的部分属性
                 latestEntity.setQuestion(entity.getQuestion());
                 latestEntity.setAnswer(entity.getAnswer());
@@ -602,7 +597,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
      * 从JSON文件加载数据并存储到数据库
      * 
      * @param orgUid 组织ID
-     * @param kbUid 知识库ID
+     * @param kbUid  知识库ID
      */
     @Transactional
     public void importFaqs(String orgUid, String kbUid) {
@@ -613,7 +608,8 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         try {
             // 加载JSON文件中的FAQ数据
             FaqConfiguration config = faqJsonLoader.loadFaqs();
-            // String llmQaKbUid = Utils.formatUid(orgUid, BytedeskConsts.DEFAULT_KB_LLM_UID);
+            // String llmQaKbUid = Utils.formatUid(orgUid,
+            // BytedeskConsts.DEFAULT_KB_LLM_UID);
 
             // 遍历并保存每个FAQ
             for (Faq faq : config.getFaqs()) {
@@ -644,7 +640,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
             throw new RuntimeException("Failed to import FAQs", e);
         }
     }
-    
+
     /**
      * 获取一个随机FAQ，用于测试
      * 
@@ -669,6 +665,55 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         }
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private List<FaqEntity> resolveRelatedFaqs(List<String> relatedFaqUids, String selfUid) {
+        if (relatedFaqUids == null || relatedFaqUids.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<String> normalizedUids = relatedFaqUids.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .filter(uid -> !uid.equals(selfUid))
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<FaqEntity> relatedFaqs = new ArrayList<>();
+        for (String relatedFaqUid : normalizedUids) {
+            try {
+                Optional<FaqEntity> relatedFaq = findByUid(relatedFaqUid);
+                if (relatedFaq.isPresent()) {
+                    relatedFaqs.add(relatedFaq.get());
+                } else {
+                    log.warn("relatedFaqUid not found: {}", relatedFaqUid);
+                }
+            } catch (Exception e) {
+                log.warn("无法加载相关FAQ: {}, 原因: {}", relatedFaqUid, e.getMessage());
+            }
+        }
+        return relatedFaqs;
+    }
+
+    private boolean shouldBroadcastFaqToAgent(ThreadEntity threadEntity) {
+        if (threadEntity == null || !threadEntity.isChatting()) {
+            return false;
+        }
+        try {
+            return threadEntity.getAgentProtobuf() != null
+                    && UserTypeEnum.AGENT.name().equals(threadEntity.getAgentProtobuf().getType());
+        } catch (Exception e) {
+            log.warn("判断FAQ消息是否需要广播失败, threadUid={}, reason={}", threadEntity.getUid(), e.getMessage());
+            return false;
+        }
+    }
+
+    private void publishMessageJsonEvent(MessageResponse messageResponse) {
+        if (messageResponse == null) {
+            return;
+        }
+        bytedeskEventPublisher.publishEvent(new MessageJsonEvent(this, messageResponse.toJson()));
     }
 
 }

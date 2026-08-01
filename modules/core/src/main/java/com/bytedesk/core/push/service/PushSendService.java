@@ -20,8 +20,8 @@ import org.springframework.util.Assert;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.email.EmailSendResult;
-import com.bytedesk.core.email.EmailSendService;
+import com.bytedesk.core.email_provider.EmailSendResult;
+import com.bytedesk.core.email_provider.EmailSendService;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.push.PushEntity;
@@ -33,8 +33,8 @@ import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
-import com.bytedesk.core.sms.SmsSendResult;
-import com.bytedesk.core.sms.SmsSendService;
+import com.bytedesk.core.sms_push.SmsPushSendService;
+import com.bytedesk.core.sms_push.SmsSendResult;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.core.push.PushFilterService;
 
@@ -52,7 +52,7 @@ public class PushSendService {
     
     private final AuthValidationStrategyFactory strategyFactory;
     private final EmailSendService emailSendService;
-    private final SmsSendService smsSendService;
+    private final SmsPushSendService smsPushSendService;
     private final BytedeskProperties bytedeskProperties;
     private final IpService ipService;
     private final PushFilterService pushFilterService;
@@ -93,16 +93,18 @@ public class PushSendService {
         String code = generateCode(receiver);
         
         // 保存验证码记录(会在内部发送并保存结果)
-        saveCodeRecord(authRequest, code, ip, request);
+        PushSendResult sendResult = saveCodeRecord(authRequest, code, ip, request);
         
-        // 更新IP最后发送验证码的时间
-        pushFilterService.updateIpLastSentTime(ip);
+        // 仅在实际发送成功后才更新IP最后发送时间，失败时允许修复配置后立即重试
+        if (sendResult.isSuccess()) {
+            pushFilterService.updateIpLastSentTime(ip);
+        }
 
-        return PushSendResult.success();
+        return sendResult;
     }
 
     private String generateCode(String receiver) {
-        if (bytedeskProperties.isInWhitelist(receiver) || bytedeskProperties.isSuperUser(receiver)) {
+        if (bytedeskProperties.isInWhitelist(receiver) || bytedeskProperties.isAdminIdentifier(receiver)) {
             return bytedeskProperties.getValidateCode();
         }
         return Utils.getRandomCode();
@@ -114,7 +116,7 @@ public class PushSendService {
             EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, code, request);
             return convertEmailResult(emailResult);
         } else if (authRequest.isMobile()) {
-            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, code, request);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, code, request);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_CAPTCHA_UNSUPPORTED_TYPE);
@@ -131,7 +133,7 @@ public class PushSendService {
     }
     
     /**
-     * 将SmsSendResult转换为PushSendResult
+     * 将SmsPushSendResult转换为PushSendResult
      */
     private PushSendResult convertSmsResult(SmsSendResult smsResult) {
         if (smsResult.isSuccess()) {
@@ -140,7 +142,7 @@ public class PushSendService {
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, smsResult.getErrorMessage());
     }
 
-    private void saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {
+    private PushSendResult saveCodeRecord(AuthRequest authRequest, String code, String ip, HttpServletRequest request) {
         String ipLocation = ipService.getIpLocation(ip);
         String country = authRequest.getCountry();
         String receiver = authRequest.getReceiver();
@@ -169,6 +171,8 @@ public class PushSendService {
         }
         // 
         pushRestService.create(pushRequest);
+
+        return sendResult;
     }
 
     // =============== 重新发送功能 ===============
@@ -225,7 +229,7 @@ public class PushSendService {
             EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, content, null);
             return convertEmailResult(emailResult);
         } else if (isMobileType(type)) {
-            SmsSendResult smsResult = smsSendService.sendSmsWithResult(receiver, country, content, null);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, content, null);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的推送类型");

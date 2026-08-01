@@ -47,12 +47,7 @@ public final class WelcomeContentUtils {
             if (faqs != null && !faqs.isEmpty()) {
                 List<WelcomeContent.QA> qas = new ArrayList<>();
                 for (FaqEntity f : faqs) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
+                    qas.add(toWelcomeQa(f));
                 }
                 builder.faqs(qas);
             }
@@ -86,17 +81,25 @@ public final class WelcomeContentUtils {
             if (faqs != null && !faqs.isEmpty()) {
                 List<WelcomeContent.QA> qas = new ArrayList<>();
                 for (FaqEntity f : faqs) {
-                    qas.add(WelcomeContent.QA.builder()
-                            .uid(f.getUid())
-                            .question(f.getQuestion())
-                            .answer(f.getAnswer())
-                            .type(f.getType())
-                            .build());
+                    qas.add(toWelcomeQa(f));
                 }
                 builder.faqs(qas);
             }
         }
         return builder.build();
+    }
+
+    private static WelcomeContent.QA toWelcomeQa(FaqEntity faq) {
+        if (faq == null) {
+            return WelcomeContent.QA.builder().build();
+        }
+        return WelcomeContent.QA.builder()
+                .uid(faq.getUid())
+                .question(faq.getQuestion())
+                .answer(faq.getAnswer())
+                .type(faq.getType())
+                .routeToRobot(faq.getRouteToRobot())
+                .build();
     }
 
     // ================= Workflow =================

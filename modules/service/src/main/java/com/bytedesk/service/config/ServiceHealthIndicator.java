@@ -13,7 +13,7 @@
  */
 package com.bytedesk.service.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,11 +34,17 @@ import java.time.Instant;
 @Component
 public class ServiceHealthIndicator implements HealthIndicator {
 
-    @Autowired(required = false)
-    private DataSource dataSource;
+    public ServiceHealthIndicator(
+            ObjectProvider<DataSource> dataSourceProvider,
+            ObjectProvider<RedisTemplate<String, Object>> redisTemplateProvider) {
+        this.dataSource = dataSourceProvider.getIfAvailable();
+        this.redisTemplate = redisTemplateProvider.getIfAvailable();
+    }
 
-    @Autowired(required = false)
-    private RedisTemplate<String, Object> redisTemplate;
+
+    private final DataSource dataSource;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private final Instant startTime = Instant.now();
 

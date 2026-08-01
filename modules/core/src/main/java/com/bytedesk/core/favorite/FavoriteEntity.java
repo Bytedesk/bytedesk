@@ -20,8 +20,8 @@ import com.bytedesk.core.base.BaseEntityNoOrg;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
-import com.bytedesk.core.message.MessageTypeEnum;
-import com.bytedesk.core.message.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.enums.ChannelEnum;
 
 import jakarta.persistence.Column;

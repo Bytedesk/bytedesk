@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260603-add-call-settings-signed-in" author="githubcopilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_call_settings" />
+                <not>
+                    <columnExists tableName="bytedesk_call_settings" columnName="is_signed_in" />
+                </not>
+            </and>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_call_settings">
+            <column name="is_signed_in" type="boolean" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

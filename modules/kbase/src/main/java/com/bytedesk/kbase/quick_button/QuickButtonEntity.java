@@ -8,7 +8,6 @@ package com.bytedesk.kbase.quick_button;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.base.BaseContent;
 import com.bytedesk.core.constant.TypeConsts;
-import com.bytedesk.core.message.MessageTypeEnum;
 import com.bytedesk.core.message.content.EmailAddressContent;
 import com.bytedesk.core.message.content.FaqContent;
 import com.bytedesk.core.message.content.FormContent;
@@ -18,6 +17,7 @@ import com.bytedesk.core.message.content.OrderContent;
 import com.bytedesk.core.message.content.PhoneNumberContent;
 import com.bytedesk.core.message.content.UrlContent;
 import com.bytedesk.core.message.content.WechatNumberContent;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

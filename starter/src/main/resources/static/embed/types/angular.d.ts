@@ -1,3 +1,195 @@
-export declare const BytedeskAngular: any;
+declare interface Animation_2 {
+    enabled?: boolean;
+    duration?: number;
+    type?: 'ease' | 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out';
+}
+
+declare interface BrowseConfig {
+    referer?: string;
+    referrer?: string;
+    url?: string;
+    title?: string;
+    [key: string]: string | number | undefined;
+}
+
+declare interface BubbleConfig {
+    show?: boolean;
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+    messages?: BubbleMessageItem[];
+    autoRotate?: boolean;
+    rotateInterval?: number;
+    switchMode?: BubbleSwitchMode;
+}
+
+declare interface BubbleMessageItem {
+    icon?: string;
+    title?: string;
+    subtitle?: string;
+}
+
+declare type BubbleSwitchMode = 'fade' | 'slide-up' | 'ticker';
+
+declare interface ButtonConfig {
+    show?: boolean;
+    icon?: string;
+    text?: string;
+    width?: number;
+    height?: number;
+    action?: 'chat' | 'thread' | 'webrtc' | 'call' | 'ticket';
+    previewImageUrl?: string;
+    previewImageAlt?: string;
+    onClick?: () => void;
+}
+
+export declare class BytedeskAngular {
+    config: BytedeskConfig;
+    ngOnInit(): void;
+    ngOnDestroy(): void;
+}
+
+declare interface BytedeskConfig {
+    isDebug?: boolean;
+    forceRefresh?: boolean;
+    apiUrl?: string;
+    htmlUrl?: string;
+    chatPath?: string;
+    threadPath?: string;
+    webrtcPath?: string;
+    callPath?: string;
+    ticketPath?: string;
+    placement?: 'bottom-left' | 'bottom-right';
+    marginBottom?: number;
+    marginSide?: number;
+    autoPopup?: boolean;
+    autoPopupDelay?: number;
+    draggable?: boolean;
+    locale?: string;
+    inviteConfig?: InviteConfig;
+    tabsConfig?: TabsConfig;
+    bubbleConfig?: BubbleConfig;
+    buttonConfig?: ButtonConfig;
+    buttonsConfig?: ButtonConfig[];
+    feedbackConfig?: FeedbackConfig;
+    chatConfig?: ChatConfig;
+    browseConfig?: BrowseConfig;
+    animation?: Animation_2;
+    window?: WindowConfig;
+    minimizedBarConfig?: MinimizedBarConfig;
+    theme?: Theme;
+    onInit?: () => void;
+    onShowChat?: () => void;
+    onHideChat?: () => void;
+    onMessage?: (message: string, type: string) => void;
+    onMessageBubbleClick?: (event: MessageBubbleClickEvent) => void;
+    onConfigChange?: (config: BytedeskConfig) => void;
+    onVisitorInfo?: (uid: string, visitorUid: string) => void;
+}
+
+declare interface ChatConfig {
+    org: string;
+    t: string;
+    sid: string;
+    title?: string;
+    uid?: string;
+    visitorUid?: string;
+    nickname?: string;
+    avatar?: string;
+    mobile?: string;
+    email?: string;
+    note?: string;
+    channel?: string;
+    goodsInfo?: string;
+    orderInfo?: string;
+    extra?: string;
+    vipLevel?: string;
+    debug?: boolean;
+    draft?: boolean;
+    settingsUid?: string;
+    loadHistory?: boolean;
+    threadDetail?: string | boolean;
+    visitorProfile?: string | boolean;
+    [key: string]: string | number | boolean | undefined;
+}
+
+declare interface FeedbackConfig {
+    enabled?: boolean;
+    trigger?: 'selection' | 'button' | 'both';
+    showOnSelection?: boolean;
+    selectionText?: string;
+    buttonText?: string;
+    dialogTitle?: string;
+    placeholder?: string;
+    submitText?: string;
+    cancelText?: string;
+    successMessage?: string;
+    categoryNames?: string[];
+    requiredTypes?: boolean;
+    typesSectionTitle?: string;
+    typesDescription?: string;
+    submitScreenshot?: boolean;
+    onSubmit?: (feedback: FeedbackData) => void;
+    onCancel?: () => void;
+}
+
+declare interface FeedbackData {
+    selectedText: string;
+    images?: string[];
+    content: string;
+    categoryNames?: string;
+    url: string;
+    title: string;
+    userAgent: string;
+    visitorUid?: string;
+    orgUid?: string;
+}
+
+declare interface InviteConfig {
+    show?: boolean;
+    text?: string;
+    icon?: string;
+    delay?: number;
+    loop?: boolean;
+    loopDelay?: number;
+    loopCount?: number;
+    acceptText?: string;
+    rejectText?: string;
+    onAccept?: () => void;
+    onReject?: () => void;
+    onClose?: () => void;
+    onOpen?: () => void;
+}
+
+declare interface MessageBubbleClickEvent {
+    uid?: string;
+    type?: string;
+    content?: unknown;
+    navigateToPath?: string | null;
+    extra?: unknown;
+    position?: string;
+    status?: string;
+}
+
+declare interface MinimizedBarConfig {
+    text?: string;
+}
+
+declare interface TabsConfig {
+    messages?: boolean;
+    thread?: boolean;
+    help?: boolean;
+}
+
+declare interface Theme {
+    mode?: 'light' | 'dark' | 'system';
+    textColor?: string;
+    backgroundColor?: string;
+}
+
+declare interface WindowConfig {
+    width?: number;
+    height?: number;
+}
 
 export { }

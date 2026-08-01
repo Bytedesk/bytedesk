@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +27,18 @@ import com.bytedesk.core.workflow.node.WorkflowNodeTypeEnum;
 import com.bytedesk.core.exception.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 工作流节点服务类
  * 提供节点的CRUD操作和格式转换功能
  */
+@RequiredArgsConstructor
 @Slf4j
 @Service
 public class WorkflowNodeService {
 
-    @Autowired
-    private WorkflowNodeRestService workflowNodeRestService;
+    private final WorkflowNodeRestService workflowNodeRestService;
 
     /**
      * 创建工作流节点

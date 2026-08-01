@@ -14,11 +14,13 @@
 package com.bytedesk.service.workgroup_settings;
 
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse;
+import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsResponse;
 import com.bytedesk.service.queue_settings.QueueSettingsResponse;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsResponse;
 import com.bytedesk.service.worktime_settings.WorktimeSettingResponse;
+import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -84,6 +86,15 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
     private QueueSettingsResponse draftQueueSettings;
 
     /**
+     * Auto reply settings (Workgroup-specific)
+     */
+    private AutoReplySettingsResponse autoReplySettings;
+    /**
+     * Draft auto reply settings (Workgroup-specific)
+     */
+    private AutoReplySettingsResponse draftAutoReplySettings;
+
+    /**
      * Robot to agent transition settings (Workgroup-specific)
      */
     private RobotToAgentSettingsResponse robotToAgentSettings;
@@ -91,4 +102,13 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
      * Draft robot to agent transition settings (Workgroup-specific)
      */
     private RobotToAgentSettingsResponse draftRobotToAgentSettings;
+
+    /**
+     * WebRTC settings (Workgroup-specific)
+     */
+    private WebrtcSettingsResponse webrtcSettings;
+    /**
+     * Draft WebRTC settings (Workgroup-specific)
+     */
+    private WebrtcSettingsResponse draftWebrtcSettings;
 }

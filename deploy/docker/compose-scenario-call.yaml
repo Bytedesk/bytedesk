@@ -1,0 +1,131 @@
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-call.yaml -f compose-call-db-<mysql|postgresql>.yaml up -d
+# 说明：call 场景包含 FreeSWITCH 语音组件和百度 MRCP Server；coturn/janus 已拆分到 compose-scenario-webrtc.yaml
+services:
+  # Baidu MRCP Server（ASR/TTS）
+  # 镜像来源：/Users/ningjinpeng/Desktop/Git/Github/open/bytedesk-mrcp
+  # Apple Silicon 本地运行时使用 amd64 镜像，由 Docker Desktop 负责模拟运行。
+  bytedesk-mrcp-server:
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/mrcp:latest
+    platform: ${MRCP_PLATFORM:-linux/amd64}
+    # pull_policy: always
+    container_name: ${MRCP_CONTAINER_NAME:-mrcp-server-bytedesk}
+    # restart: unless-stopped
+    # restart: always
+    ports:
+      - "${MRCP_HOST_PORT:-11544}:1544"
+      - "${MRCP_RTSP_HOST_PORT:-11554}:1554"
+      - "${MRCP_SIP_HOST_PORT:-25060}:5060/udp"
+      - "${MRCP_SIP_HOST_PORT:-25060}:5060/tcp"
+      - "${MRCP_RTP_HOST_PORT_RANGE:-14000-15000}:5000-6000/udp"
+    volumes:
+      - ${MRCP_CONF_DIR:-../freeswitch/mrcp/MRCPServer/mrcp-server/conf}:/opt/mrcp-server/conf:ro
+      - ${MRCP_LOG_DIR:-../freeswitch/mrcp/log}:/opt/mrcp-server/log
+      - ${MRCP_AUDIO_DIR:-../freeswitch/mrcp/audio}:/opt/mrcp-server/audio
+    networks:
+      - bytedesk-network
+
+  # FreeSwitch 语音通话服务
+  # 本地镜像Dockerfile地址：/Users/ningjinpeng/Desktop/git/github/bytedesk-freeswitch/docker/Dockerfile
+  # https://hub.docker.com/r/bytedesk/freeswitch
+  # https://github.com/Bytedesk/bytedesk-freeswitch
+  # 使用自定义构建的 FreeSWITCH 镜像（支持 ARM64/AMD64）
+  bytedesk-freeswitch:
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/freeswitch:latest
+    # image: bytedesk/freeswitch:latest
+    container_name: freeswitch-bytedesk
+    # restart: always
+    entrypoint: ["/usr/local/bin/bytedesk-entrypoint.sh"]
+    # FreeSWITCH 要求 -conf、-log、-db 同时指定；log 目录已挂载到宿主机 deploy/freeswitch/log
+    command: ["freeswitch", "-nf", "-conf", "/usr/local/freeswitch/conf", "-log", "/usr/local/freeswitch/log", "-db", "/usr/local/freeswitch/db"]
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "0"
+      net.ipv6.conf.default.disable_ipv6: "0"
+    environment:
+      TZ: Asia/Shanghai
+      DISABLE_IPV6: "true"
+      # 默认分机密码（对应 vars.xml 的 default_password）
+      FREESWITCH_DEFAULT_PASSWORD: ${FREESWITCH_DEFAULT_PASSWORD:-123456}
+      # SIP 注册/鉴权默认域名（对应 vars.xml 的 domain）
+      FREESWITCH_DOMAIN: ${FREESWITCH_DOMAIN}
+      # 本地 Docker 联调时，通过 entrypoint 覆盖 vars.xml，避免修改同一份 conf 后再推远端
+      # host.docker.internal 用于容器访问宿主机 HTTP；MRCP/RTP 建议填写宿主机真实可达 IP
+      FREESWITCH_AI_BOT_BASE_URL: ${FREESWITCH_AI_BOT_BASE_URL:-http://host.docker.internal:9003}
+      # Qwen-Audio-Realtime 电话实时媒体桥：当前默认关闭；启用前需确认镜像已安装/加载 mod_audio_stream
+      FREESWITCH_QWEN_REALTIME_MEDIA_BRIDGE_ENABLED: ${FREESWITCH_QWEN_REALTIME_MEDIA_BRIDGE_ENABLED:-false}
+      FREESWITCH_QWEN_REALTIME_MEDIA_WS_URL: ${FREESWITCH_QWEN_REALTIME_MEDIA_WS_URL:-ws://host.docker.internal:9003/visitor/api/v1/call/voice-agent/qwen-realtime/media?output=mod_audio_stream&events=false&model=qwen-audio-3.0-realtime-plus&voice=longanqian&outputSampleRate=24000}
+      FREESWITCH_MRCP_SERVER_HOST: ${FREESWITCH_MRCP_SERVER_HOST}
+      FREESWITCH_MRCP_SERVER_PORT: ${FREESWITCH_MRCP_SERVER_PORT:-1544}
+      FREESWITCH_MRCP_RTP_IP: ${FREESWITCH_MRCP_RTP_IP}
+      # 百度 MRCP Server 容器地址（用于 9295/9296/9299 等 baidu profile 测试分机）
+      FREESWITCH_BAIDU_MRCP_SERVER_HOST: ${FREESWITCH_BAIDU_MRCP_SERVER_HOST:-bytedesk-mrcp-server}
+      FREESWITCH_BAIDU_MRCP_SIP_PORT: ${FREESWITCH_BAIDU_MRCP_SIP_PORT:-5060}
+      FREESWITCH_RECORDINGS_PUBLIC_BASE: ${FREESWITCH_RECORDINGS_PUBLIC_BASE}
+      # 对外宣告给 SIP/SDP 的地址。局域网硬话机场景应固定为宿主机可达地址，避免容器 NAT/STUN 误判。
+      FREESWITCH_EXTERNAL_SIP_IP: ${FREESWITCH_EXTERNAL_SIP_IP}
+      FREESWITCH_EXTERNAL_RTP_IP: ${FREESWITCH_EXTERNAL_RTP_IP}
+      # ESL 入站口令（与 vars.xml 的 esl_password 对应）
+      FREESWITCH_ESL_PASSWORD: ${FREESWITCH_ESL_PASSWORD:-123456}
+      # xml_cdr Basic 凭据密码
+      FREESWITCH_CDR_PASSWORD: ${FREESWITCH_CDR_PASSWORD:-123456}
+      # mod_xml_curl 鉴权 token（需与应用侧配置一致）
+      FREESWITCH_XML_CURL_TOKEN: ${FREESWITCH_XML_CURL_TOKEN:-change_me_in_production}
+      # Kamailio 中继 IP（写入 ACL 白名单）
+      FREESWITCH_KAMAILIO_IP: ${FREESWITCH_KAMAILIO_IP:-}
+      # mod_xml_curl 回源地址（与 XmlCurlController 统一：/visitor/api/v1/xmlcurl）
+      FREESWITCH_XML_CURL_GATEWAY_URL: ${FREESWITCH_XML_CURL_GATEWAY_URL:-http://host.docker.internal:9003/visitor/api/v1/xmlcurl}
+      # 应用基础地址（用于 cdr_url/user_lookup_url 等派生）
+      FREESWITCH_API_BASE_URL: ${FREESWITCH_API_BASE_URL:-http://host.docker.internal:9003}
+      # FreeSWITCH 数据库连接参数
+      FREESWITCH_DB_HOST: ${FREESWITCH_DB_HOST:-bytedesk-db}
+      FREESWITCH_DB_PORT: ${FREESWITCH_DB_PORT:-3306}
+      FREESWITCH_DB_NAME: ${FREESWITCH_DB_NAME:-bytedesk_freeswitch}
+      FREESWITCH_DB_USERNAME: ${FREESWITCH_DB_USERNAME:-root}
+      FREESWITCH_DB_PASSWORD: ${FREESWITCH_DB_PASSWORD:-r8FqfdbWUaN3}
+      # WebRTC / RTP 参数（如需 WebRTC 能力，可与 compose-scenario-webrtc.yaml 组合使用）
+      FREESWITCH_STUN_SERVER: ${FREESWITCH_STUN_SERVER:-stun:bytedesk-coturn:3478}
+      FREESWITCH_RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-16000}
+      FREESWITCH_RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-16129}
+    ports:
+      - "15060:5060/tcp"
+      - "15060:5060/udp"
+      - "15080:5080/tcp"
+      - "15080:5080/udp"
+      - "15061:5061/tcp"
+      - "15081:5081/tcp"
+      - "15066:5066/tcp"
+      - "17443:7443/tcp"
+      - "18021:8021/tcp"
+      - "18081-18082:8081-8082/tcp"
+      - "16000-16129:16000-16129/udp"
+    volumes:
+      - ../freeswitch/conf:/usr/local/freeswitch/etc/freeswitch
+      - ../freeswitch/conf:/usr/local/freeswitch/conf
+      - ../freeswitch/scripts:/usr/local/freeswitch/share/freeswitch/scripts
+      - ../freeswitch/bin/bytedesk-entrypoint.sh:/usr/local/bin/bytedesk-entrypoint.sh:ro
+      - freeswitch_data:/usr/local/freeswitch/db
+      - ../freeswitch/log:/usr/local/freeswitch/log
+      - ../freeswitch/sounds:/usr/local/freeswitch/sounds
+      - ../freeswitch/recordings:/usr/local/freeswitch/recordings
+      - ../freeswitch/etc/odbc.ini:/etc/odbc.ini:ro
+      - ../freeswitch/etc/odbcinst.ini:/etc/odbcinst.ini:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      bytedesk-db:
+        condition: service_healthy
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "fs_cli -p $${FREESWITCH_ESL_PASSWORD:-123456} -x 'status' | grep -q 'UP' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  freeswitch_data:
+    name: bytedesk_freeswitch_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

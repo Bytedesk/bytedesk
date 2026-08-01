@@ -42,7 +42,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 // @EntityListeners({ConnectionEntityListener.class})
 @Table(name = "bytedesk_core_connection", indexes = {
-    @Index(name = "idx_core_conn_client_id", columnList = "clientId")
+    @Index(name = "idx_core_conn_client_id", columnList = "clientId"),
+    @Index(name = "idx_core_conn_user_status_deleted", columnList = "user_uid, status, is_deleted")
 })
 public class ConnectionEntity extends BaseEntity {
 
