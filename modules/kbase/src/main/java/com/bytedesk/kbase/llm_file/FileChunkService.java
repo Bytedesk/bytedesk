@@ -71,7 +71,7 @@ public class FileChunkService {
 
         // 默认 TOKEN
         try {
-            var tokenTextSplitter = new TokenTextSplitter();
+            var tokenTextSplitter = TokenTextSplitter.builder().build();
             return tokenTextSplitter.split(documents);
         } catch (UnsupportedOperationException e) {
             log.warn("TokenTextSplitter 分割失败，使用替代方案: {}", e.getMessage());

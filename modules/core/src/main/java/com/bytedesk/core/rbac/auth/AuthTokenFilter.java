@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -51,9 +50,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private final BytedeskProperties bytedeskProperties;
 
   @Override
-  protected void doFilterInternal(@NonNull HttpServletRequest request,
-      @NonNull HttpServletResponse response,
-      @NonNull FilterChain filterChain)
+  protected void doFilterInternal(HttpServletRequest request,
+      HttpServletResponse response,
+      FilterChain filterChain)
       throws ServletException, IOException {
     try {
       String accessToken = JwtUtils.parseAccessToken(request);

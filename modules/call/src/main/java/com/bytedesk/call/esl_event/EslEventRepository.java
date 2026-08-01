@@ -16,8 +16,12 @@ package com.bytedesk.call.esl_event;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface EslEventRepository extends JpaRepository<EslEventEntity, Long>, JpaSpecificationExecutor<EslEventEntity> {
 
@@ -27,7 +31,10 @@ public interface EslEventRepository extends JpaRepository<EslEventEntity, Long>,
 
     Optional<EslEventEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
 
-    long deleteByCreatedAtBefore(ZonedDateTime cutoffTime);
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("delete from EslEventEntity e where e.createdAt < :cutoffTime")
+    long deleteByCreatedAtBefore(@Param("cutoffTime") ZonedDateTime cutoffTime);
 
     // Boolean existsByPlatform(String platform);
 }

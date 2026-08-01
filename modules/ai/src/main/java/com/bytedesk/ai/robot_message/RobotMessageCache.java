@@ -13,9 +13,9 @@
  */
 package com.bytedesk.ai.robot_message;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -57,7 +57,7 @@ public class RobotMessageCache {
     // 模拟 push 操作：向列表中添加元素
     private void push(String listKey, String messageJSON) {
         stringRedisTemplate.opsForList().rightPush(listKey, messageJSON);
-        stringRedisTemplate.expire(listKey, EXPIRE_TIME, TimeUnit.DAYS);
+        stringRedisTemplate.expire(listKey, Duration.ofDays(EXPIRE_TIME));
     }
 
     private List<String> getList(String listKey) {

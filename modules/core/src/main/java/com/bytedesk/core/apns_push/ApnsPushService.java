@@ -36,7 +36,8 @@ import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
 import com.google.common.base.Strings;
 
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ApnsPushService {
 
-    private final EventLoopGroup apnsEventLoopGroup = new NioEventLoopGroup(1);
+    private final EventLoopGroup apnsEventLoopGroup = new MultiThreadIoEventLoopGroup(1, NioIoHandler.newFactory());
 
     private final Map<String, ApnsClient> apnsClientCache = new ConcurrentHashMap<>();
 

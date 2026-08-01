@@ -52,7 +52,6 @@ SCENARIO_FILE="${SCRIPT_DIR}/compose-scenario-${SCENARIO}.yaml"
 SCENARIO_FILES=()
 APP_FILE="${SCRIPT_DIR}/compose-app-bytedesk.yaml"
 APP_MQ_FILE="${SCRIPT_DIR}/compose-app-mq-${MQ}.yaml"
-CALL_DB_FILE=""
 
 case "${SCENARIO}" in
   call-webrtc)
@@ -68,9 +67,7 @@ esac
 
 if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
   case "${DB}" in
-    mysql|postgresql)
-      CALL_DB_FILE="${SCRIPT_DIR}/compose-call-db-${DB}.yaml"
-      ;;
+    mysql|postgresql) ;;
     oracle|kingbase9)
       echo "[ERROR] call scenario does not support ${DB}. Allowed db for call: mysql|postgresql"
       exit 1
@@ -92,11 +89,6 @@ for file in "${APP_FILE}" "${APP_MQ_FILE}"; do
   fi
 done
 
-if [[ -n "${CALL_DB_FILE}" && ! -f "${CALL_DB_FILE}" ]]; then
-  echo "[ERROR] Missing compose file: ${CALL_DB_FILE}"
-  exit 1
-fi
-
 compose_files=(
   -f "${BASE_FILE}"
   -f "${DB_FILE}"
@@ -106,10 +98,6 @@ compose_files=(
 for file in "${SCENARIO_FILES[@]}"; do
   compose_files+=( -f "${file}" )
 done
-
-if [[ -n "${CALL_DB_FILE}" ]]; then
-  compose_files+=( -f "${CALL_DB_FILE}" )
-fi
 
 compose_files+=(
   -f "${APP_FILE}"
@@ -194,11 +182,10 @@ ensure_kingbase_database() {
 }
 
 ensure_mysql_database() {
-  local db_user db_password db_name freeswitch_db_name
+  local db_user db_password db_name
   db_user="$(get_env_value "MYSQL_ROOT_USER" "root")"
   db_password="$(get_env_value "MYSQL_ROOT_PASSWORD" "")"
   db_name="$(get_env_value "MYSQL_DATABASE" "bytedesk")"
-  freeswitch_db_name="$(get_env_value "FREESWITCH_DATABASE" "bytedesk_freeswitch")"
 
   if [[ -z "${db_password}" ]]; then
     echo "[WARN] MYSQL_ROOT_PASSWORD is empty, skip auto database ensure for mysql"
@@ -207,12 +194,6 @@ ensure_mysql_database() {
 
   local check_sql="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${db_name}' LIMIT 1;"
   local create_sql="CREATE DATABASE IF NOT EXISTS ${db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-  local ensure_freeswitch_db="false"
-  local primary_ready="false"
-
-  if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
-    ensure_freeswitch_db="true"
-  fi
 
   local tries=30
   local query_output=""
@@ -225,11 +206,7 @@ ensure_mysql_database() {
 
     query_output="$(echo "${query_output}" | tr -d '[:space:]')"
     if [[ "${query_output}" == "${db_name}" ]]; then
-      primary_ready="true"
-      if [[ "${ensure_freeswitch_db}" == "false" ]]; then
-        return
-      fi
-      break
+      return
     fi
 
     if docker compose \
@@ -238,109 +215,20 @@ ensure_mysql_database() {
       "${compose_files[@]}" \
       exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${db_user} -p'${db_password}' -Nse \"${create_sql}\"" >/dev/null 2>&1; then
       echo "[INFO] MySQL database '${db_name}' created"
-      primary_ready="true"
-      if [[ "${ensure_freeswitch_db}" == "false" ]]; then
-        return
-      fi
-      break
-    fi
-
-    sleep 2
-  done
-
-  if [[ "${primary_ready}" != "true" ]]; then
-    echo "[WARN] Failed to auto-ensure MySQL database '${db_name}' after ${tries} retries"
-    return
-  fi
-
-  if [[ "${freeswitch_db_name}" == "${db_name}" ]]; then
-    return
-  fi
-
-  check_sql="SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${freeswitch_db_name}' LIMIT 1;"
-  create_sql="CREATE DATABASE IF NOT EXISTS ${freeswitch_db_name} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-  for ((i=1; i<=tries; i++)); do
-    query_output="$(docker compose \
-      --env-file "${SCRIPT_DIR}/.env" \
-      -p "${PROJECT_NAME}" \
-      "${compose_files[@]}" \
-      exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${db_user} -p'${db_password}' -Nse \"${check_sql}\"" 2>/dev/null || true)"
-
-    query_output="$(echo "${query_output}" | tr -d '[:space:]')"
-    if [[ "${query_output}" == "${freeswitch_db_name}" ]]; then
-      return
-    fi
-
-    if docker compose \
-      --env-file "${SCRIPT_DIR}/.env" \
-      -p "${PROJECT_NAME}" \
-      "${compose_files[@]}" \
-      exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${db_user} -p'${db_password}' -Nse \"${create_sql}\"" >/dev/null 2>&1; then
-      echo "[INFO] MySQL database '${freeswitch_db_name}' created for call scenario"
       return
     fi
 
     sleep 2
   done
 
-  echo "[WARN] Failed to auto-ensure MySQL database '${freeswitch_db_name}' for call scenario after ${tries} retries"
-}
-
-ensure_mysql_freeswitch_schema() {
-  if [[ "${SCENARIO}" != "call" && "${SCENARIO}" != "call-webrtc" ]]; then
-    return
-  fi
-
-  local db_user db_password freeswitch_db_name schema_file
-  db_user="$(get_env_value "MYSQL_ROOT_USER" "root")"
-  db_password="$(get_env_value "MYSQL_ROOT_PASSWORD" "")"
-  freeswitch_db_name="$(get_env_value "FREESWITCH_DATABASE" "bytedesk_freeswitch")"
-  schema_file="${SCRIPT_DIR}/../sql/freeswitch-1.10.12.sql"
-
-  if [[ -z "${db_password}" ]]; then
-    echo "[WARN] MYSQL_ROOT_PASSWORD is empty, skip FreeSWITCH schema initialization"
-    return
-  fi
-
-  if [[ ! "${freeswitch_db_name}" =~ ^[A-Za-z0-9_]+$ ]]; then
-    echo "[WARN] FREESWITCH_DATABASE contains unsafe characters, skip schema initialization: ${freeswitch_db_name}"
-    return
-  fi
-
-  if [[ ! -f "${schema_file}" ]]; then
-    echo "[WARN] FreeSWITCH schema file not found, skip initialization: ${schema_file}"
-    return
-  fi
-
-  local table_count
-  table_count="$(docker compose \
-    --env-file "${SCRIPT_DIR}/.env" \
-    -p "${PROJECT_NAME}" \
-    "${compose_files[@]}" \
-    exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${db_user} -p'${db_password}' -Nse \"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='${freeswitch_db_name}';\"" 2>/dev/null || true)"
-
-  table_count="$(echo "${table_count}" | tr -d '[:space:]')"
-  if [[ -n "${table_count}" && "${table_count}" != "0" ]]; then
-    return
-  fi
-
-  if docker compose \
-    --env-file "${SCRIPT_DIR}/.env" \
-    -p "${PROJECT_NAME}" \
-    "${compose_files[@]}" \
-    exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${db_user} -p'${db_password}' ${freeswitch_db_name}" < "${schema_file}" >/dev/null 2>&1; then
-    echo "[INFO] Initialized FreeSWITCH MySQL schema in '${freeswitch_db_name}' from freeswitch-1.10.12.sql"
-  else
-    echo "[WARN] Failed to initialize FreeSWITCH MySQL schema in '${freeswitch_db_name}'"
-  fi
+  echo "[WARN] Failed to auto-ensure MySQL database '${db_name}' after ${tries} retries"
 }
 
 ensure_postgresql_database() {
-  local db_user db_password db_name freeswitch_db_name
+  local db_user db_password db_name
   db_user="$(get_env_value "POSTGRES_USER" "postgres")"
   db_password="$(get_env_value "POSTGRES_PASSWORD" "")"
   db_name="$(get_env_value "POSTGRES_DB" "bytedesk")"
-  freeswitch_db_name="$(get_env_value "FREESWITCH_DATABASE" "bytedesk_freeswitch")"
 
   if [[ -z "${db_password}" ]]; then
     echo "[WARN] POSTGRES_PASSWORD is empty, skip auto database ensure for postgresql"
@@ -349,12 +237,6 @@ ensure_postgresql_database() {
 
   local check_sql="SELECT 1 FROM pg_database WHERE datname='${db_name}';"
   local create_sql="CREATE DATABASE \"${db_name}\";"
-  local ensure_freeswitch_db="false"
-  local primary_ready="false"
-
-  if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
-    ensure_freeswitch_db="true"
-  fi
 
   local tries=30
   local query_output=""
@@ -367,11 +249,7 @@ ensure_postgresql_database() {
 
     query_output="$(echo "${query_output}" | tr -d '[:space:]')"
     if [[ "${query_output}" == "1" ]]; then
-      primary_ready="true"
-      if [[ "${ensure_freeswitch_db}" == "false" ]]; then
-        return
-      fi
-      break
+      return
     fi
 
     if docker compose \
@@ -380,52 +258,13 @@ ensure_postgresql_database() {
       "${compose_files[@]}" \
       exec -T bytedesk-db sh -lc "PGPASSWORD='${db_password}' psql -h 127.0.0.1 -p ${POSTGRES_PORT:-5432} -U ${db_user} -d postgres -v ON_ERROR_STOP=1 -c \"${create_sql}\"" >/dev/null 2>&1; then
       echo "[INFO] PostgreSQL database '${db_name}' created"
-      primary_ready="true"
-      if [[ "${ensure_freeswitch_db}" == "false" ]]; then
-        return
-      fi
-      break
-    fi
-
-    sleep 2
-  done
-
-  if [[ "${primary_ready}" != "true" ]]; then
-    echo "[WARN] Failed to auto-ensure PostgreSQL database '${db_name}' after ${tries} retries"
-    return
-  fi
-
-  if [[ "${freeswitch_db_name}" == "${db_name}" ]]; then
-    return
-  fi
-
-  check_sql="SELECT 1 FROM pg_database WHERE datname='${freeswitch_db_name}';"
-  create_sql="CREATE DATABASE \"${freeswitch_db_name}\";"
-  for ((i=1; i<=tries; i++)); do
-    query_output="$(docker compose \
-      --env-file "${SCRIPT_DIR}/.env" \
-      -p "${PROJECT_NAME}" \
-      "${compose_files[@]}" \
-      exec -T bytedesk-db sh -lc "PGPASSWORD='${db_password}' psql -h 127.0.0.1 -p ${POSTGRES_PORT:-5432} -U ${db_user} -d postgres -t -A -c \"${check_sql}\"" 2>/dev/null || true)"
-
-    query_output="$(echo "${query_output}" | tr -d '[:space:]')"
-    if [[ "${query_output}" == "1" ]]; then
-      return
-    fi
-
-    if docker compose \
-      --env-file "${SCRIPT_DIR}/.env" \
-      -p "${PROJECT_NAME}" \
-      "${compose_files[@]}" \
-      exec -T bytedesk-db sh -lc "PGPASSWORD='${db_password}' psql -h 127.0.0.1 -p ${POSTGRES_PORT:-5432} -U ${db_user} -d postgres -v ON_ERROR_STOP=1 -c \"${create_sql}\"" >/dev/null 2>&1; then
-      echo "[INFO] PostgreSQL database '${freeswitch_db_name}' created for call scenario"
       return
     fi
 
     sleep 2
   done
 
-  echo "[WARN] Failed to auto-ensure PostgreSQL database '${freeswitch_db_name}' for call scenario after ${tries} retries"
+  echo "[WARN] Failed to auto-ensure PostgreSQL database '${db_name}' after ${tries} retries"
 }
 
 ensure_oracle_database() {
@@ -514,7 +353,6 @@ fi
 case "${DB}" in
   mysql)
     ensure_mysql_database
-    ensure_mysql_freeswitch_schema
     ;;
   postgresql)
     ensure_postgresql_database

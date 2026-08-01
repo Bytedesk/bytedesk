@@ -16,8 +16,7 @@ package com.bytedesk.core.socket.stomp.interceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
@@ -30,19 +29,19 @@ import java.util.Map;
 public class StompHandshakeInterceptor implements HandshakeInterceptor {
 
     @Override
-    public boolean beforeHandshake(@NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response,
-            @NonNull WebSocketHandler wsHandler,
-            @NonNull Map<String, Object> attributes) throws Exception {
+    public boolean beforeHandshake(ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes) throws Exception {
         log.debug("stomp before hand shake");
         return true;
     }
 
     @Override
     public void afterHandshake(
-            @NonNull ServerHttpRequest request,
-            @NonNull ServerHttpResponse response,
-            @NonNull WebSocketHandler wsHandler,
+            ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
             @Nullable Exception exception) {
         log.debug("stomp after hand shake");
     }

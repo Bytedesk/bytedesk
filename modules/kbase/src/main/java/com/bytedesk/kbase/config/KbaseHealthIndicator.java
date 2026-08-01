@@ -16,8 +16,8 @@ package com.bytedesk.kbase.config;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +33,13 @@ import java.sql.Connection;
 @Component
 public class KbaseHealthIndicator implements HealthIndicator {
 
+    private final ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider;
+
     public KbaseHealthIndicator(
             ObjectProvider<DataSource> dataSourceProvider,
             ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider) {
         this.dataSource = dataSourceProvider.getIfAvailable();
-        this.elasticsearchVectorStore = elasticsearchVectorStoreProvider.getIfAvailable();
+        this.elasticsearchVectorStoreProvider = elasticsearchVectorStoreProvider;
     }
 
 
@@ -51,8 +53,6 @@ public class KbaseHealthIndicator implements HealthIndicator {
     private boolean batchJobEnabled;
 
     private final DataSource dataSource;
-
-    private final ElasticsearchVectorStore elasticsearchVectorStore;
 
     @Override
     public Health health() {
@@ -74,6 +74,16 @@ public class KbaseHealthIndicator implements HealthIndicator {
 
             // 检查向量存储（Elasticsearch）
             if (vectorStoreEnabled) {
+                ElasticsearchVectorStore elasticsearchVectorStore = null;
+                try {
+                    elasticsearchVectorStore = elasticsearchVectorStoreProvider.getIfAvailable();
+                } catch (Exception e) {
+                    log.warn("Elasticsearch vector store is configured but unavailable", e);
+                    builder.down()
+                           .withDetail("vector-store-status", "Unavailable")
+                           .withDetail("vector-store-error", e.getMessage());
+                }
+
                 if (elasticsearchVectorStore != null) {
                     try {
                         // 尝试简单的检查

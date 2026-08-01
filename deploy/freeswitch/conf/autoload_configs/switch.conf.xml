@@ -178,10 +178,10 @@
 	   postgresql://other@localhost/otherdb?connect_timeout=10&application_name=myapp
 	   postgresql:///mydb?host=localhost&port=5433
     -->
-    <!-- <param name="core-db-dsn" value="mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" /> -->
-    <!-- <param name="core-db-dsn" value="mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" /> -->
-    <!-- <param name="core-db-dsn" value="mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" /> -->
-    <!-- <param name="core-db-dsn" value="mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" /> -->
+    <!-- <param name="core-db-dsn" value="pgsql://host=bytedesk-db dbname=bytedesk_freeswitch user=postgres password=r8FqfdbWUaN3 options='-c client_min_messages=NOTICE'" /> -->
+    <!-- <param name="core-db-dsn" value="pgsql://host=bytedesk-db dbname=bytedesk_freeswitch user=postgres password=r8FqfdbWUaN3 options='-c client_min_messages=NOTICE'" /> -->
+    <!-- <param name="core-db-dsn" value="pgsql://host=bytedesk-db dbname=bytedesk_freeswitch user=postgres password=r8FqfdbWUaN3 options='-c client_min_messages=NOTICE'" /> -->
+    <!-- <param name="core-db-dsn" value="pgsql://host=bytedesk-db dbname=bytedesk_freeswitch user=postgres password=r8FqfdbWUaN3 options='-c client_min_messages=NOTICE'" /> -->
 
     <!-- <param name="odbc-skip-autocommit-flip" value="true" /> -->
 

@@ -88,7 +88,7 @@ public class SpringAIOllamaChatController {
 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
-        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).options(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
@@ -133,7 +133,7 @@ public class SpringAIOllamaChatController {
 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
-        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).options(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
@@ -155,7 +155,7 @@ public class SpringAIOllamaChatController {
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
-        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).options(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }
@@ -181,7 +181,7 @@ public class SpringAIOllamaChatController {
         // 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
-        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).options(options).build();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -243,7 +243,7 @@ public class SpringAIOllamaChatController {
 
         OllamaApi ollamaApi = OllamaApi.builder().baseUrl(request.getBaseUrl()).build();
         OllamaChatOptions options = OllamaChatOptions.builder().model(request.getModel()).build();
-        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).defaultOptions(options).build();
+        OllamaChatModel model = OllamaChatModel.builder().ollamaApi(ollamaApi).options(options).build();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Ollama service is not available"));
         }

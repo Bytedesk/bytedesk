@@ -4,7 +4,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.crm.customer;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

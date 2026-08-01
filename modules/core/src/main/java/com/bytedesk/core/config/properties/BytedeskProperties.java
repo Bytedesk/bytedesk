@@ -19,7 +19,6 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -652,14 +651,14 @@ public class BytedeskProperties implements EnvironmentAware {
                Boolean.TRUE.equals(testing.getDisableCaptcha());
     }
 
-    public Boolean isAdminIdentifier(@NonNull String identifier) {
+    public Boolean isAdminIdentifier(String identifier) {
         if (identifier == null || identifier.isEmpty()) {
             return false;
         }
         return identifier.equals(admin.getMobile()) || identifier.equals(admin.getEmail());
     }
 
-    public Boolean isInWhitelist(@NonNull String user) {
+    public Boolean isInWhitelist(String user) {
         if (user == null || user.isEmpty()) {
             return false;
         }

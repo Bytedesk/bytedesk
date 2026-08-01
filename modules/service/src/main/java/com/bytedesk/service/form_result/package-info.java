@@ -4,7 +4,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.service.form_result;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

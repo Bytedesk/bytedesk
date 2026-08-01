@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,17 +41,11 @@ public class SpringAICustomChatConfig {
     @Value("${spring.ai.custom.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("customApi")
-    OpenAiApi customApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("customChatOptions")
     OpenAiChatOptions customChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -61,15 +54,14 @@ public class SpringAICustomChatConfig {
     @Bean("customChatModel")
     OpenAiChatModel customChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(customApi())
-                .defaultOptions(customChatOptions())
+                .options(customChatOptions())
                 .build();
     }
 
     @Bean("customChatClient")
     ChatClient customChatClient() {
         return  ChatClient.builder(customChatModel())
-                .defaultOptions(customChatOptions())
+                .defaultOptions(customChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.redis;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,7 @@ public class RedisService {
     public void push(String key, String value, long ttl) {
         // redisTemplate.opsForValue().get(key); // Returns the associated value
         redisTemplate.opsForValue().set(key, value); // Stores the key-value pair
-        redisTemplate.expire(key, ttl, TimeUnit.SECONDS); // Key is expired after specified time
+        redisTemplate.expire(key, Duration.ofSeconds(ttl)); // Key is expired after specified time
     }
     
     /**
@@ -58,7 +58,7 @@ public class RedisService {
         }
         String key = RedisConsts.MESSAGE_UNREAD_PREFIX + messageUid;
         redisTemplate.opsForValue().set(key, RedisConsts.MESSAGE_UNREAD_EXISTS_VALUE);
-        redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
+        redisTemplate.expire(key, Duration.ofSeconds(ttl));
     }
     
     /**
@@ -120,7 +120,7 @@ public class RedisService {
         }
         String key = RedisConsts.AUTO_REPLY_PROCESSED_PREFIX + messageUid;
         redisTemplate.opsForValue().set(key, RedisConsts.AUTO_REPLY_PROCESSED_VALUE);
-        redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
+        redisTemplate.expire(key, Duration.ofSeconds(ttl));
     }
     
     /**
@@ -182,7 +182,7 @@ public class RedisService {
         }
         try {
             String key = prefix + keyPart;
-            Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, ttl, TimeUnit.SECONDS);
+            Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, Duration.ofSeconds(ttl));
             return Boolean.TRUE.equals(result);
         } catch (Exception e) {
             return true;

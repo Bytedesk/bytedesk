@@ -132,11 +132,14 @@ public class FaqElasticService {
      */
     public Map<String, Object> syncElasticStatusByKbUid(FaqRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
 
         int successCount = 0;
@@ -156,6 +159,7 @@ public class FaqElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", faqList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -168,17 +172,22 @@ public class FaqElasticService {
      */
     public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(FaqRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(FaqElastic.class).exists();
 
         long deletedCount = 0;
 
         if (indexExists) {
-            Query query = NativeQuery.builder()
+            Query query = superUser
+                ? NativeQuery.builder().withQuery(QueryBuilders.matchAll().build()._toQuery()).build()
+                : NativeQuery.builder()
                     .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
                     .build();
             DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
@@ -194,6 +203,7 @@ public class FaqElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", faqList.size());
         result.put("indexExists", indexExists);
         result.put("deletedCount", deletedCount);
@@ -245,15 +255,19 @@ public class FaqElasticService {
 
     // update all elasticsearch index
     public void updateAllIndex(FaqRequest request) {
-        if (!StringUtils.hasText(request.getKbUid())) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(request.getKbUid())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(request.getKbUid());
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(request.getKbUid());
         faqList.forEach(faq -> {
             FaqEntity fixed = ensureFaqHasKbase(faq, request.getKbUid());
             indexFaq(fixed);
         });
+        log.info("Updated elasticsearch index for {} FAQs, superUser={}, kbUid={}", faqList.size(), superUser, request.getKbUid());
     }
 
     /**

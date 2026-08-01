@@ -33,7 +33,8 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    void deleteByThreadTopicContainsAndUserNotContains(String threadTopic, String userUid);
+    @Query("DELETE FROM MessageUnreadEntity mu WHERE mu.thread.topic LIKE CONCAT('%', :threadTopic, '%') AND mu.user NOT LIKE CONCAT('%', :userUid, '%')")
+    int deleteByThreadTopicContainsAndUserNotContains(@Param("threadTopic") String threadTopic, @Param("userUid") String userUid);
 
         @Query("SELECT COUNT(mu) FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
         long countByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
@@ -64,5 +65,6 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    void deleteByUid(String uid);
+    @Query("DELETE FROM MessageUnreadEntity mu WHERE mu.uid = :uid")
+    int deleteByUid(@Param("uid") String uid);
 }

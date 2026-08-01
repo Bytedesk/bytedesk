@@ -13,31 +13,33 @@
  */
 package com.bytedesk.ai.embedding_settings;
 
+import java.net.URI;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.elasticsearch.client.RestClient;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStoreOptions;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingModel;
 import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingOptions;
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.enums.LevelEnum;
@@ -45,16 +47,12 @@ import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 
-import org.springframework.beans.factory.ObjectProvider;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @Primary
 public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorStoreResolver {
-
-    private final ObjectProvider<RestClient> restClientProvider;
 
     private final ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider;
 
@@ -65,12 +63,10 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
     private final Environment environment;
 
     public EmbeddingSettingsKbaseVectorStoreResolver(
-            ObjectProvider<RestClient> restClientProvider,
             ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider,
             EmbeddingSettingsRestService embeddingSettingsRestService,
             KbaseRestService kbaseRestService,
             Environment environment) {
-        this.restClientProvider = restClientProvider;
         this.elasticsearchVectorStoreProvider = elasticsearchVectorStoreProvider;
         this.embeddingSettingsRestService = embeddingSettingsRestService;
         this.kbaseRestService = kbaseRestService;
@@ -85,12 +81,25 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
         return store;
     }
 
-    private RestClient getRestClient() {
-        RestClient client = restClientProvider.getIfAvailable();
-        if (client == null) {
-            throw new IllegalStateException("RestClient is not available");
+    private Rest5Client getRestClient() {
+        String uris = environment.getProperty("spring.elasticsearch.uris");
+        if (!StringUtils.hasText(uris)) {
+            throw new IllegalStateException("spring.elasticsearch.uris is not configured");
         }
-        return client;
+        var builder = Rest5Client.builder(Arrays.stream(StringUtils.commaDelimitedListToStringArray(uris))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .map(URI::create)
+                .toArray(URI[]::new));
+        String username = environment.getProperty("spring.elasticsearch.username");
+        String password = environment.getProperty("spring.elasticsearch.password");
+        if (StringUtils.hasText(username) && StringUtils.hasText(password)) {
+            org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider credentialsProvider = new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
+            credentialsProvider.setCredentials(new org.apache.hc.client5.http.auth.AuthScope((String) null, -1),
+                    new org.apache.hc.client5.http.auth.UsernamePasswordCredentials(username, password.toCharArray()));
+            builder.setHttpClientConfigCallback(httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
+        }
+        return builder.build();
     }
 
     @Override
@@ -183,9 +192,7 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
-        ZhiPuAiApi api = ZhiPuAiApi.builder()
-                .apiKey(resolveApiKey(settings))
-                .build();
+        ZhiPuAiApi api = new ZhiPuAiApi(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings));
         ZhiPuAiEmbeddingOptions options = ZhiPuAiEmbeddingOptions.builder()
                 .model(resolveModel(settings, "embedding-2"))
                 .build();
@@ -201,22 +208,20 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
                 .build();
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(api)
-                .defaultOptions(options)
+            .options(options)
                 .build();
     }
 
     private EmbeddingModel buildOpenAiCompatibleEmbeddingModel(EmbeddingSettingsEntity settings, String provider) {
-        OpenAiApi api = OpenAiApi.builder()
-                .baseUrl(resolveBaseUrl(settings, resolveProviderBaseUrl(provider)))
-                .apiKey(resolveApiKey(settings))
-                .build();
         OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
                 .model(resolveModel(settings, "text-embedding-3-small"));
         Integer dimensions = resolveModelDimensions(settings);
         if (dimensions != null && dimensions > 0) {
             optionsBuilder.dimensions(dimensions);
         }
-        return new OpenAiEmbeddingModel(api, MetadataMode.EMBED, optionsBuilder.build());
+        OpenAiEmbeddingOptions options = OpenAiCompatibleModelFactory.withConnection(optionsBuilder.build(),
+            resolveBaseUrl(settings, resolveProviderBaseUrl(provider)), resolveApiKey(settings));
+        return OpenAiCompatibleModelFactory.embeddingModel(options, MetadataMode.EMBED);
     }
 
     private String resolveProvider(EmbeddingSettingsEntity settings) {

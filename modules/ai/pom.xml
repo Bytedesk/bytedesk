@@ -18,11 +18,13 @@
 	<description>https://www.bytedesk.com</description>
 
 	<properties>
-		<ollama4j.version>1.0.100</ollama4j.version>
-		<jsonp.version>1.18.3</jsonp.version>
+		<ollama4j.version>1.1.7</ollama4j.version>
+		<jsonp.version>1.22.2</jsonp.version>
 		<okhttp.version>4.12.0</okhttp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
+		<spring-ai-minimax.version>1.0.0</spring-ai-minimax.version>
+		<spring-ai-zhipuai.version>1.0.0</spring-ai-zhipuai.version>
 		<zai-sdk.version>0.3.3</zai-sdk.version>
 	</properties>
 
@@ -51,10 +53,10 @@
 
 		<!-- rag -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-advisors-vector-store -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-vector-store-advisor -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-advisors-vector-store</artifactId>
+			<artifactId>spring-ai-vector-store-advisor</artifactId>
 			<version>${spring-ai.version}</version>
 			<!-- 排除 io.swagger.core.v3:swagger-annotations 依赖 -->
 			<exclusions>
@@ -109,14 +111,14 @@
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-minimax</artifactId>
-			<version>${spring-ai.version}</version>
+			<version>${spring-ai-minimax.version}</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
-			<version>${spring-ai.version}</version>
+			<version>${spring-ai-zhipuai.version}</version>
 		</dependency>
 
 		<!-- moonshot 已 vendor 到 modules/ai/src/main/java/org/springaicommunity/moonshot -->
@@ -153,6 +155,12 @@
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-vector-store-elasticsearch</artifactId>
 			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-client</artifactId>
+			<version>8.18.8</version>
 		</dependency>
 
 		<!-- https://spring.io/blog/2025/12/11/spring-ai-tool-search-tools-tzolov -->
@@ -230,6 +238,7 @@
 			<artifactId>rxjava</artifactId>
 			<version>3.1.12</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
@@ -326,15 +335,24 @@
 		</dependency>
 		-->
 		
+		<!-- https://github.com/ollama4j/ollama4j -->
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->
 		<dependency>
 			<groupId>io.github.ollama4j</groupId>
 			<artifactId>ollama4j</artifactId>
 			<version>${ollama4j.version}</version>
+			<exclusions>
+				<!-- 排除旧版 MCP SDK，避免与 spring-ai-mcp 2.0.0 的 mcp-core 冲突 -->
+				<exclusion>
+					<groupId>io.modelcontextprotocol.sdk</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- 抓取网页时使用 -->
 		<!-- https://jsoup.org/download -->
+		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>

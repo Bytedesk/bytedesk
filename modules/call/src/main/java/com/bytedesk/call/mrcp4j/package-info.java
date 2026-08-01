@@ -53,7 +53,7 @@
  * @version 1.0
  * @since 1.0
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.call.mrcp4j;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

@@ -29,8 +29,8 @@
 ├── compose-app-mq-rabbitmq.yaml # bytedesk 的 RabbitMQ 配置覆盖
 ├── compose-scenario-call.yaml # 呼叫中心语音场景扩展（freeswitch）
 ├── compose-scenario-webrtc.yaml # 音视频客服 WebRTC 组件（coturn/janus）
-├── compose-call-db-mysql.yaml # call 场景下 FreeSWITCH 的 MySQL DSN 覆盖
-├── compose-call-db-postgresql.yaml # call 场景下 FreeSWITCH 的 PostgreSQL DSN 覆盖
+├── compose-call-db-mysql.yaml # legacy: old call scenario FreeSWITCH MySQL DSN override
+├── compose-call-db-postgresql.yaml # legacy: old call scenario FreeSWITCH PostgreSQL DSN override
 ├── compose-scenario-noai.yaml # 不使用 AI 的场景覆盖
 ├── compose-scenario-standard.yaml # 标准场景覆盖
 ├── start.sh # 组合启动脚本：start.sh <db> <mq> <scenario> [all|middleware]
@@ -182,14 +182,14 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f comp
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-webrtc.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-mysql.yaml -f compose-scenario-webrtc.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml up -d
 
 # full stack (middleware + bytedesk image)
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 
 # database switch examples
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
@@ -205,9 +205,9 @@ docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # stop standard stack
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
 # stop call-center voice stack
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
 # stop call-center voice + webrtc stack
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml stop
 ```
 
 ## Sensitive variables (centralized in `.env`)
@@ -230,7 +230,7 @@ echo 'JASYPT_ENCRYPTOR_PASSWORD=please-change-me' >> .env
 
 # 2. Start any full stack as usual. The Bytedesk service will read the env var.
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 ```
 
 - Leave `JASYPT_ENCRYPTOR_PASSWORD` blank (or remove the line) when no encrypted values are in use—startup will fall back to plain text.

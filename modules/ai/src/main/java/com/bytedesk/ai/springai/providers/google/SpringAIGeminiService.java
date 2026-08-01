@@ -21,7 +21,6 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
@@ -86,13 +86,6 @@ public class SpringAIGeminiService extends BaseSpringAIService {
         }
     }
 
-    public OpenAiApi createOpenaiApi(String apiUrl, String apiKey) {
-        return OpenAiApi.builder()
-                .baseUrl(apiUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     /**
      * 根据机器人配置创建动态的OpenAiChatModel
      * 
@@ -120,17 +113,14 @@ public class SpringAIGeminiService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getType(),
                     provider.getUid());
-            // 使用动态的OpenAiApi实例
-            OpenAiApi openaiApi = createOpenaiApi(provider.getBaseUrl(), provider.getApiKey());
             OpenAiChatOptions options = createOpenaiOptions(llm);
             if (options == null) {
                 log.warn("Failed to create OpenAI options, using default chat model");
                 return defaultChatModel;
             }
-            return OpenAiChatModel.builder()
-                    .openAiApi(openaiApi)
-                    .defaultOptions(options)
-                    .build();
+            OpenAiChatOptions resolvedOptions = OpenAiCompatibleModelFactory.withConnection(options,
+                provider.getBaseUrl(), provider.getApiKey());
+            return OpenAiCompatibleModelFactory.chatModel(resolvedOptions);
         } catch (Exception e) {
             log.error("Failed to create dynamic OpenAI chat model for provider {}, using default chat model",
                     provider.getUid(), e);

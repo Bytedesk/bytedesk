@@ -33,6 +33,8 @@ public interface WebpageRepository extends JpaRepository<WebpageEntity, Long>, J
 
     List<WebpageEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
+    List<WebpageEntity> findByDeletedFalse();
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update WebpageEntity w set w.elasticStatus = :status where w.uid = :uid")
     int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);

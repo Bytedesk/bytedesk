@@ -1,6 +1,6 @@
 package com.bytedesk.service.worktime_settings;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;

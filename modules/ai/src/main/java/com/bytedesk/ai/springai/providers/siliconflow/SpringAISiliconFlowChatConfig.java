@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -44,17 +43,11 @@ public class SpringAISiliconFlowChatConfig {
     @Value("${spring.ai.siliconflow.chat.options.temperature:0.5}")
     private Double temperature;
 
-    @Bean("siliconFlowApi")
-    public OpenAiApi siliconFlowApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("siliconFlowChatOptions")
     OpenAiChatOptions siliconFlowChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -63,15 +56,14 @@ public class SpringAISiliconFlowChatConfig {
     @Bean("siliconFlowChatModel")
     OpenAiChatModel siliconFlowChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(siliconFlowApi())
-                .defaultOptions(siliconFlowChatOptions())
+                .options(siliconFlowChatOptions())
                 .build();
     }
 
     @Bean("siliconFlowChatClient")
     ChatClient siliconFlowChatClient() {
         return  ChatClient.builder(siliconFlowChatModel())
-                .defaultOptions(siliconFlowChatOptions())
+                .defaultOptions(siliconFlowChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

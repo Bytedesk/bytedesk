@@ -27,7 +27,7 @@
  * @see com.bytedesk.ai.service.BaseSpringAIService
  * @since 1.0.0
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.ai.springai.providers.tencent;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

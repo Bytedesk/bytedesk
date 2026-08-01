@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.redis;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class RedisLoginRetryService {
         Long count = redisTemplate.opsForValue().increment(key);
         if (count != null && count == 1) {
             // 第一次失败，设置过期时间
-            redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
+            redisTemplate.expire(key, Duration.ofSeconds(ttl));
         }
         return count != null ? count.intValue() : 0;
     }
@@ -106,7 +106,7 @@ public class RedisLoginRetryService {
         }
         String key = RedisConsts.LOGIN_LOCKED_PREFIX + username;
         redisTemplate.opsForValue().set(key, RedisConsts.LOGIN_LOCKED_VALUE);
-        redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
+        redisTemplate.expire(key, Duration.ofSeconds(ttl));
         log.info("User {} locked for {} seconds due to excessive login failures", username, ttl);
     }
     

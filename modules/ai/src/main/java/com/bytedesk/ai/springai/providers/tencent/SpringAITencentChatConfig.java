@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -44,17 +43,11 @@ public class SpringAITencentChatConfig {
     @Value("${spring.ai.tencent.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("tencentApi")
-    OpenAiApi tencentApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("tencentChatOptions")
     OpenAiChatOptions tencentChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -63,15 +56,14 @@ public class SpringAITencentChatConfig {
     @Bean("tencentChatModel")
     OpenAiChatModel tencentChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(tencentApi())
-                .defaultOptions(tencentChatOptions())
+                .options(tencentChatOptions())
                 .build();
     }
 
     @Bean("tencentChatClient")
     ChatClient tencentChatClient() {
         return  ChatClient.builder(tencentChatModel())
-                .defaultOptions(tencentChatOptions())
+                .defaultOptions(tencentChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

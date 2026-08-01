@@ -14,7 +14,6 @@
 package com.bytedesk.core.socket.stomp.listener;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionUnsubscribeEvent;
 
@@ -37,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class StompUnsubscribeListener implements ApplicationListener<SessionUnsubscribeEvent> {
 
     @Override
-    public void onApplicationEvent(@NonNull SessionUnsubscribeEvent event) {
+    public void onApplicationEvent(SessionUnsubscribeEvent event) {
         log.debug("SessionUnsubscribeEvent: {}", event.toString());
 
         //

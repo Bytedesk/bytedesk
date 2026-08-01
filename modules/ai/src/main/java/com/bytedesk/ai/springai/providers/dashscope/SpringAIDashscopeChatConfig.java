@@ -59,7 +59,7 @@ public class SpringAIDashscopeChatConfig {
     @Bean("bytedeskDashscopeChatClient")
     ChatClient bytedeskDashscopeChatClient() {
         return ChatClient.builder(bytedeskDashscopeChatModel())
-                .defaultOptions(bytedeskDashscopeChatOptions())
+                .defaultOptions(bytedeskDashscopeChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

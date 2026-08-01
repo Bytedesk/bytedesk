@@ -191,6 +191,11 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         return faqRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<FaqEntity> findAllNotDeletedNoCache() {
+        return faqRepository.findByDeletedFalse();
+    }
+
     @Cacheable(value = "faq", key = "#question", unless = "#result == null")
     public List<FaqEntity> findByQuestionContains(String question) {
         return faqRepository.findByQuestionContains(question);

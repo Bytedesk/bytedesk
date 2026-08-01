@@ -1,4 +1,4 @@
-@NonNullApi
+@NullMarked
 package com.bytedesk.ai.mcp;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

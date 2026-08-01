@@ -172,11 +172,14 @@ public class FaqVectorService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> syncVectorStatusByKbUid(FaqRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(kbUid);
 
         int successCount = 0;
         int newCount = 0;
@@ -202,6 +205,7 @@ public class FaqVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", faqList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -217,11 +221,14 @@ public class FaqVectorService {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(FaqRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(kbUid);
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(kbUid);
         int total = faqList.size();
 
         // 先尝试批量删除（更快）；失败时再回退到逐条删除以尽可能完成
@@ -239,34 +246,40 @@ public class FaqVectorService {
         int errorCount = 0;
 
         try {
-            if (!docIdsToDelete.isEmpty()) {
+            if (!superUser && !docIdsToDelete.isEmpty()) {
                 vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
+                for (FaqEntity faq : faqList) {
+                    faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
+                    faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+                }
+                successCount = total;
             }
-            for (FaqEntity faq : faqList) {
-                faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
-                faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
-            }
-            successCount = total;
         } catch (Exception e) {
             log.warn("批量删除向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+        }
+
+        if (superUser || successCount != total) {
+            successCount = 0;
+            errorCount = 0;
             for (FaqEntity faq : faqList) {
                 try {
+                    FaqEntity currentFaq = ensureFaqHasKbase(faq, faq.getKbase() != null ? faq.getKbase().getUid() : kbUid);
                     // 兼容：docIdList 为空时也尝试默认 docId
-                    if (faq.getDocIdList() == null || faq.getDocIdList().isEmpty()) {
-                        vectorStoreResolver.resolveByKbase(faq.getKbase()).delete(List.of("faq_" + faq.getUid()));
-                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
-                        faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+                    if (currentFaq.getDocIdList() == null || currentFaq.getDocIdList().isEmpty()) {
+                        vectorStoreResolver.resolveByKbase(currentFaq.getKbase()).delete(List.of("faq_" + currentFaq.getUid()));
+                        faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.NEW.name());
+                        faqRestService.updateDocIdListOnly(currentFaq.getUid(), new ArrayList<>());
                         successCount++;
                         continue;
                     }
 
-                    Boolean deleted = deleteFaqVector(faq);
+                    Boolean deleted = deleteFaqVector(currentFaq);
                     if (Boolean.TRUE.equals(deleted)) {
-                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.NEW.name());
-                        faqRestService.updateDocIdListOnly(faq.getUid(), new ArrayList<>());
+                        faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.NEW.name());
+                        faqRestService.updateDocIdListOnly(currentFaq.getUid(), new ArrayList<>());
                         successCount++;
                     } else {
-                        faqRestService.updateVectorStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
+                        faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.ERROR.name());
                         errorCount++;
                     }
                 } catch (Exception ex) {
@@ -280,6 +293,7 @@ public class FaqVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", total);
         result.put("success", successCount);
         result.put("error", errorCount);
@@ -517,11 +531,14 @@ public class FaqVectorService {
      * @param request FAQ请求对象，包含知识库ID
      */
     public void updateAllVectorIndex(FaqRequest request) {
-        if (!StringUtils.hasText(request.getKbUid())) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(request.getKbUid())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<FaqEntity> faqList = faqRestService.findByKbUidNoCache(request.getKbUid());
+        List<FaqEntity> faqList = superUser
+                ? faqRestService.findAllNotDeletedNoCache()
+                : faqRestService.findByKbUidNoCache(request.getKbUid());
         faqList.forEach(faq -> {
             try {
                 FaqEntity fixed = ensureFaqHasKbase(faq, request.getKbUid());
@@ -536,6 +553,7 @@ public class FaqVectorService {
                 log.error("更新FAQ向量索引失败: {}, 错误: {}", faq.getQuestion(), e.getMessage());
             }
         });
+        log.info("Updated vector index for {} FAQs, superUser={}, kbUid={}", faqList.size(), superUser, request.getKbUid());
     }
 
     /**

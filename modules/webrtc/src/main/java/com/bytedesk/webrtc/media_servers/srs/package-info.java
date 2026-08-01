@@ -2,7 +2,7 @@
  * https://github.com/ossrs/srs
  * SRS 包，负责 SRS 服务接入与流路由处理。
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.webrtc.media_servers.srs;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

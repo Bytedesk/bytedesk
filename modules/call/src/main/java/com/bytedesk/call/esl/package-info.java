@@ -40,10 +40,10 @@
  *
  * 包级约定：
  * <ul>
- *   <li>通过 {@link org.springframework.lang.NonNullApi} 约定：除非另有标注，参数与返回值默认非空。</li>
+ *   <li>通过 {@link org.jspecify.annotations.NullMarked} 约定：除非另有标注，参数与返回值默认非空。</li>
  * </ul>
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.call.esl;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

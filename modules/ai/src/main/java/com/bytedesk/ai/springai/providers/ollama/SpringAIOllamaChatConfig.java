@@ -39,7 +39,7 @@ public class SpringAIOllamaChatConfig {
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
 
-    @Value("${spring.ai.ollama.chat.options.model:qwen3:0.6b}")
+    @Value("${spring.ai.ollama.chat.model:qwen3:0.6b}")
     private String ollamaChatOptionsModel;
 
     @Bean("bytedeskOllamaApi")
@@ -64,14 +64,14 @@ public class SpringAIOllamaChatConfig {
     OllamaChatModel bytedeskOllamaChatModel() {
         return OllamaChatModel.builder()
                 .ollamaApi(bytedeskOllamaApi())
-                .defaultOptions(bytedeskOllamaChatOptions())
+                .options(bytedeskOllamaChatOptions())
                 .build();
     }
 
     @Bean("bytedeskOllamaChatClient")
     ChatClient bytedeskOllamaChatClient() {
         return ChatClient.builder(bytedeskOllamaChatModel())
-                .defaultOptions(bytedeskOllamaChatOptions())
+                .defaultOptions(bytedeskOllamaChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

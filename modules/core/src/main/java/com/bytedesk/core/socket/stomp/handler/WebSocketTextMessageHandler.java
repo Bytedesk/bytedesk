@@ -15,7 +15,6 @@ package com.bytedesk.core.socket.stomp.handler;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -38,7 +37,7 @@ public class WebSocketTextMessageHandler extends TextWebSocketHandler {
     List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
     @Override
-    public void afterConnectionClosed(@NonNull WebSocketSession session, @NonNull CloseStatus status) {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         // The WebSocket has been closed
         log.debug("session {}, status {}", session.toString(), status.toString());
 
@@ -46,7 +45,7 @@ public class WebSocketTextMessageHandler extends TextWebSocketHandler {
     }
 
     @Override
-    public void afterConnectionEstablished(@NonNull WebSocketSession session) throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         // The WebSocket has been opened
         // I might saveAdmin this session object so that I can send messages to it
         // outside of this method
@@ -60,7 +59,7 @@ public class WebSocketTextMessageHandler extends TextWebSocketHandler {
     }
 
     @Override
-    protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage textMessage) {
+    protected void handleTextMessage(WebSocketSession session, TextMessage textMessage) {
 
         String content = textMessage.getPayload();
         // A message has been received

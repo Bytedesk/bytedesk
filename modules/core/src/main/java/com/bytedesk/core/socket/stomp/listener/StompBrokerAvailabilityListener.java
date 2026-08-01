@@ -15,7 +15,6 @@ package com.bytedesk.core.socket.stomp.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.broker.BrokerAvailabilityEvent;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Component;
 public class StompBrokerAvailabilityListener implements ApplicationListener<BrokerAvailabilityEvent> {
 
     @Override
-    public void onApplicationEvent(@NonNull BrokerAvailabilityEvent brokerAvailabilityEvent) {
+    public void onApplicationEvent(BrokerAvailabilityEvent brokerAvailabilityEvent) {
         //
         if (brokerAvailabilityEvent.isBrokerAvailable()) {
             log.debug("stomp broker available: " + brokerAvailabilityEvent.toString());

@@ -235,7 +235,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 ? criteriaBuilder.equal(root.get("departmentUid"), request.getVisibilityCurrentUserDepartmentUid())
                 : criteriaBuilder.disjunction();
 
-        if ("DEPARTMENT_ONLY".equalsIgnoreCase(request.getVisibilityMode())) {
+        if ("DEPARTMENT_RESTRICTED".equalsIgnoreCase(request.getVisibilityMode())) {
             predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned, sameDepartment));
             return;
         }

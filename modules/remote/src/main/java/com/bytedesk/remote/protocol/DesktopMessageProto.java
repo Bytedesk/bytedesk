@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,6 +82,7 @@ public class DesktopMessageProto implements Serializable {
     /**
      * Timestamp when message was created
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private ZonedDateTime createdAt;
 
     /**
@@ -100,6 +103,7 @@ public class DesktopMessageProto implements Serializable {
     /**
      * Get formatted creation time
      */
+    @JsonIgnore
     public String getCreatedAt() {
         return BdDateUtils.formatDatetimeToString(createdAt);
     }

@@ -274,11 +274,11 @@
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson.annotation.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate5-jakarta -->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-hibernate7 -->
         <!-- 用于处理Hibernate懒加载代理对象的序列化 -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
+            <artifactId>jackson-datatype-hibernate7</artifactId>
             <version>${jackson.version}</version>
         </dependency>
         <!--  xml 格式处理 -->
@@ -310,7 +310,7 @@
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>3.2.0</version>
+            <version>${modelmapper.version}</version>
             <scope>provided</scope>
         </dependency>
 

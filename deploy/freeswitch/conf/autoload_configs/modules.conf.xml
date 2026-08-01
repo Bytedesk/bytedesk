@@ -58,7 +58,6 @@
     <!-- <load module="mod_curl"/> -->
     <!-- <load module="mod_mariadb" /> -->
     <!-- <load module="mod_pgsql" /> -->
-    <load module="mod_mariadb" />
     <load module="mod_db" />
     <load module="mod_dptools" />
     <load module="mod_expr" />

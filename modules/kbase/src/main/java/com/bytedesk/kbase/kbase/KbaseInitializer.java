@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.constant.BytedeskConsts;
@@ -33,14 +34,17 @@ import com.bytedesk.kbase.llm_faq.FaqInitializer;
 import com.bytedesk.kbase.llm_text.TextInitializer;
 import com.bytedesk.kbase.quick_reply.QuickReplyInitializer;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.utils.Utils;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class KbaseInitializer implements SmartInitializingSingleton {
+
+    @Value("${bytedesk.kbase.elasticsearch.startup-index-upgrade-enabled:true}")
+    private boolean startupIndexUpgradeEnabled;
 
     private final KbaseRestService kbaseRestService;
 
@@ -115,6 +119,11 @@ public class KbaseInitializer implements SmartInitializingSingleton {
     }
 
     private void autoUpgradeElasticIndexesIfNeeded() {
+        if (!startupIndexUpgradeEnabled) {
+            log.info("Skip Kbase Elasticsearch startup index upgrade because bytedesk.kbase.elasticsearch.startup-index-upgrade-enabled=false");
+            return;
+        }
+
         try {
             var result = kbaseElasticIndexUpgradeService.checkAndUpgradeIkIndexes();
             log.info("KbaseInitializer elastic index upgrade summary: {}", summarizeElasticUpgradeResult(result));

@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
@@ -208,7 +207,7 @@ public class MessagePersistService {
     }
 
     // 处理消息通知，已处理的消息返回true，未处理的消息返回false
-    public Boolean dealWithMessageNotification(@NonNull MessageTypeEnum type, MessageProtobuf messageProtobuf) {
+    public Boolean dealWithMessageNotification(MessageTypeEnum type, MessageProtobuf messageProtobuf) {
         // String content = messageProtobuf.getContent();
         // log.info("dealWithMessageNotification: {}, {}", type, content);
 

@@ -13,12 +13,12 @@
  */
 package com.bytedesk.kbase.llm_faq.batch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.explore.JobExplorer;
-import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.job.JobExecution;
+import org.springframework.batch.core.job.parameters.JobParameters;
+import org.springframework.batch.core.job.parameters.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -36,12 +36,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class FaqBatchService {
 
-    private final JobLauncher jobLauncher;
+    private final JobOperator jobOperator;
     
     @Qualifier("importFaqJob")
     private final Job importFaqJob;
     
-    private final JobExplorer jobExplorer;
+    private final JobRepository jobRepository;
     
     private final FaqItemProcessor faqItemProcessor;
     
@@ -83,7 +83,7 @@ public class FaqBatchService {
                 .toJobParameters();
         
         // 启动作业
-        JobExecution jobExecution = jobLauncher.run(importFaqJob, jobParameters);
+        JobExecution jobExecution = jobOperator.start(importFaqJob, jobParameters);
         
         log.info("FAQ导入作业启动成功, 执行ID: {}, 状态: {}", 
                 jobExecution.getId(), 
@@ -99,6 +99,6 @@ public class FaqBatchService {
      * @return 作业执行实例
      */
     public JobExecution getJobExecution(Long jobExecutionId) {
-        return jobExplorer.getJobExecution(jobExecutionId);
+        return jobRepository.getJobExecution(jobExecutionId);
     }
 }

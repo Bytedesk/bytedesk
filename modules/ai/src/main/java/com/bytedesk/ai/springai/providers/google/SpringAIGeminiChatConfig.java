@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,17 +41,11 @@ public class SpringAIGeminiChatConfig {
     @Value("${spring.ai.gemini.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("geminiApi")
-    OpenAiApi geminiApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("geminiChatOptions")
     OpenAiChatOptions geminiChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -61,15 +54,14 @@ public class SpringAIGeminiChatConfig {
     @Bean("geminiChatModel")
     OpenAiChatModel geminiChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(geminiApi())
-                .defaultOptions(geminiChatOptions())
+                .options(geminiChatOptions())
                 .build();
     }
 
     @Bean("geminiChatClient")
     ChatClient geminiChatClient() {
         return  ChatClient.builder(geminiChatModel())
-                .defaultOptions(geminiChatOptions())
+                .defaultOptions(geminiChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

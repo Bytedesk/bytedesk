@@ -2,7 +2,7 @@ package com.bytedesk.core.message;
 
 import java.time.ZonedDateTime;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Lightweight projection for ticket/message statistic aggregation.

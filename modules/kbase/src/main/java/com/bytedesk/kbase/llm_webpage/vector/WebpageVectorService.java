@@ -250,7 +250,14 @@ public class WebpageVectorService {
      * @param request 网页请求对象，包含知识库ID
      */
     public void updateAllVectorIndex(WebpageRequest request) {
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUid(request.getKbUid());
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(request.getKbUid())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUid(request.getKbUid());
         webpageList.forEach(webpage -> {
             try {
                 // 删除旧的向量索引
@@ -261,6 +268,7 @@ public class WebpageVectorService {
                 log.error("更新网页向量索引失败: {}, 错误: {}", webpage.getTitle(), e.getMessage());
             }
         });
+        log.info("Updated vector index for {} webpages, superUser={}, kbUid={}", webpageList.size(), superUser, request.getKbUid());
     }
 
     /**
@@ -297,11 +305,14 @@ public class WebpageVectorService {
      */
     public Map<String, Object> syncVectorStatusByKbUid(WebpageRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUidNoCache(kbUid);
 
         int successCount = 0;
         int newCount = 0;
@@ -327,6 +338,7 @@ public class WebpageVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", webpageList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -339,11 +351,14 @@ public class WebpageVectorService {
      */
     public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(WebpageRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUidNoCache(kbUid);
         int total = webpageList.size();
 
         List<String> docIdsToDelete = new ArrayList<>();
@@ -362,33 +377,39 @@ public class WebpageVectorService {
 
         try {
             List<String> sanitizedToDelete = sanitizeDocIds(docIdsToDelete);
-            if (!sanitizedToDelete.isEmpty()) {
+            if (!superUser && !sanitizedToDelete.isEmpty()) {
                 vectorStore.delete(sanitizedToDelete);
+                for (WebpageEntity webpage : webpageList) {
+                    webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
+                    webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+                }
+                successCount = total;
             }
-            for (WebpageEntity webpage : webpageList) {
-                webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
-                webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
-            }
-            successCount = total;
         } catch (Exception e) {
             log.warn("批量删除Webpage向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+        }
+
+        if (superUser || successCount != total) {
+            successCount = 0;
+            errorCount = 0;
             for (WebpageEntity webpage : webpageList) {
                 try {
-                    if (webpage.getDocIdList() == null || webpage.getDocIdList().isEmpty()) {
-                        vectorStore.delete(List.of(buildDefaultVectorDocId(webpage.getUid())));
-                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
-                        webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+                    WebpageEntity currentWebpage = webpageRestService.findByUidWithKbaseNoCache(webpage.getUid()).orElse(webpage);
+                    if (currentWebpage.getDocIdList() == null || currentWebpage.getDocIdList().isEmpty()) {
+                        resolveStoreByWebpage(currentWebpage).delete(List.of(buildDefaultVectorDocId(currentWebpage.getUid())));
+                        webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.NEW.name());
+                        webpageRestService.updateDocIdListOnly(currentWebpage.getUid(), new ArrayList<>());
                         successCount++;
                         continue;
                     }
 
-                    Boolean deleted = deleteWebpageVector(webpage);
+                    Boolean deleted = deleteWebpageVector(currentWebpage);
                     if (Boolean.TRUE.equals(deleted)) {
-                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.NEW.name());
-                        webpageRestService.updateDocIdListOnly(webpage.getUid(), new ArrayList<>());
+                        webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.NEW.name());
+                        webpageRestService.updateDocIdListOnly(currentWebpage.getUid(), new ArrayList<>());
                         successCount++;
                     } else {
-                        webpageRestService.updateVectorStatusOnly(webpage.getUid(), ChunkStatusEnum.ERROR.name());
+                        webpageRestService.updateVectorStatusOnly(currentWebpage.getUid(), ChunkStatusEnum.ERROR.name());
                         errorCount++;
                     }
                 } catch (Exception ex) {
@@ -402,6 +423,7 @@ public class WebpageVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", total);
         result.put("success", successCount);
         result.put("error", errorCount);

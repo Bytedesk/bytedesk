@@ -2,7 +2,7 @@ package com.bytedesk.ticket.ticket;
 
 import java.time.ZonedDateTime;
 
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Lightweight projection for ticket statistics batch aggregation.

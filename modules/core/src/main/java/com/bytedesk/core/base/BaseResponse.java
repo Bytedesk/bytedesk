@@ -18,6 +18,8 @@ import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,8 +46,10 @@ public abstract class BaseResponse implements Serializable {
 
     private String platform;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     protected ZonedDateTime createdAt;
     
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     protected ZonedDateTime updatedAt;
 
     public ZonedDateTime getCreatedAtRaw() {
@@ -56,10 +60,12 @@ public abstract class BaseResponse implements Serializable {
         return updatedAt;
     }
 
+    @JsonIgnore
     public String getCreatedAt() {
         return BdDateUtils.formatDatetimeToString(createdAt);
     }
 
+    @JsonIgnore
     public String getUpdatedAt() {
         return BdDateUtils.formatDatetimeToString(updatedAt);
     }

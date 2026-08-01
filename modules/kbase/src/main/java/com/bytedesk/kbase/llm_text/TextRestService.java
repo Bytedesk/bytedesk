@@ -111,6 +111,11 @@ public class TextRestService extends BaseRestServiceWithExport<TextEntity, TextR
         return textRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<TextEntity> findAllNotDeletedNoCache() {
+        return textRepository.findByDeletedFalse();
+    }
+
     public Boolean existsByTitleAndKbUidAndDeletedFalse(String title, String kbUid) {
         return textRepository.existsByTitleAndKbase_UidAndDeletedFalse(title, kbUid);
     }

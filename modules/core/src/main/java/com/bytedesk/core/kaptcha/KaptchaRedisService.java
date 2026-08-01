@@ -13,11 +13,10 @@
  */
 package com.bytedesk.core.kaptcha;
 
+import java.time.Duration;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
@@ -40,7 +39,7 @@ public class KaptchaRedisService {
     private final BytedeskProperties bytedeskProperties;
 
     public void putKaptcha(String key, String value) {
-        stringRedisTemplate.opsForValue().set(RedisConsts.KAPTCHA_PREFIX + key, value, EXPIRE_TIME, TimeUnit.MINUTES);
+        stringRedisTemplate.opsForValue().set(RedisConsts.KAPTCHA_PREFIX + key, value, Duration.ofMinutes(EXPIRE_TIME));
     }
 
     public Boolean hasKaptcha(String key) {
@@ -51,7 +50,7 @@ public class KaptchaRedisService {
         return stringRedisTemplate.opsForValue().get(RedisConsts.KAPTCHA_PREFIX + key);
     }
 
-    public Boolean checkKaptcha(String key, String value, @NonNull String channel) {
+    public Boolean checkKaptcha(String key, String value, String channel) {
         // 如果禁用验证码，则直接返回true
         if (bytedeskProperties.isDisableCaptcha()) {
             return true;

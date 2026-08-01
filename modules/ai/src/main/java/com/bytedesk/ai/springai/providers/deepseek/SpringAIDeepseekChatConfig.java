@@ -62,14 +62,14 @@ public class SpringAIDeepseekChatConfig {
     DeepSeekChatModel deepseekChatModel() {
         return DeepSeekChatModel.builder()
                 .deepSeekApi(deepseekApi())
-                .defaultOptions(deepseekChatOptions())
+                .options(deepseekChatOptions())
                 .build();
     }
 
     @Bean("deepseekChatClient")
     ChatClient deepseekChatClient() {
         return  ChatClient.builder(deepseekChatModel())
-                .defaultOptions(deepseekChatOptions())
+                .defaultOptions(deepseekChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

@@ -74,6 +74,29 @@ class TicketAssignmentServiceTest {
         assertEquals(TicketAssignmentModeEnum.LEAST_ACTIVE.name(), result.strategy());
     }
 
+        @Test
+        void resolveFromWorkflowNodeShouldPreferConfiguredDepartmentUidsOverTicketDepartment() {
+                Fixture fixture = new Fixture();
+                TicketEntity ticket = buildTicket();
+                ticket.setProcessEntityUid("process-2");
+
+                ProcessEntity process = ProcessEntity.builder()
+                                .uid("process-2")
+                                .flowgramSchema(buildDepartmentNodeSchema("task-2", List.of("dept-2")))
+                                .build();
+                MemberEntity ticketDepartmentMember = MemberEntity.builder().uid("member-ticket-dept").build();
+                MemberEntity configuredDepartmentMember = MemberEntity.builder().uid("member-configured-dept").build();
+
+                when(fixture.processRepository.findByUid("process-2")).thenReturn(Optional.of(process));
+                when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-1")).thenReturn(List.of(ticketDepartmentMember));
+                when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-2")).thenReturn(List.of(configuredDepartmentMember));
+
+                AssignmentResolutionResult result = fixture.service.resolveFromWorkflowNode(ticket, "task-2");
+
+                assertTrue(result.isResolved());
+                assertEquals("member-configured-dept", result.assigneeUid());
+        }
+
     private static TicketEntity buildTicket() {
         return TicketEntity.builder()
                 .uid("ticket-1")
@@ -83,7 +106,17 @@ class TicketAssignmentServiceTest {
     }
 
     private static String buildDepartmentNodeSchema(String nodeId) {
+        return buildDepartmentNodeSchema(nodeId, null);
+    }
+
+    private static String buildDepartmentNodeSchema(String nodeId, List<String> assigneeUids) {
         JSONObject root = new JSONObject();
+        JSONObject nodeData = new JSONObject()
+                .fluentPut("assigneeType", "department")
+                .fluentPut("assignmentMode", "");
+        if (assigneeUids != null) {
+            nodeData.fluentPut("assigneeUids", assigneeUids);
+        }
         root.put("nodes", List.of(
                 new JSONObject()
                         .fluentPut("id", "start")
@@ -91,9 +124,7 @@ class TicketAssignmentServiceTest {
                 new JSONObject()
                         .fluentPut("id", nodeId)
                         .fluentPut("type", "approval")
-                        .fluentPut("data", new JSONObject()
-                                .fluentPut("assigneeType", "department")
-                                .fluentPut("assignmentMode", ""))));
+                        .fluentPut("data", nodeData)));
         root.put("edges", List.of(
                 new JSONObject()
                         .fluentPut("sourceNodeId", "start")

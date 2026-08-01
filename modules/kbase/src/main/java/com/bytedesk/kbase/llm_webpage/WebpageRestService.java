@@ -98,6 +98,11 @@ public class WebpageRestService
         return webpageRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<WebpageEntity> findAllNotDeletedNoCache() {
+        return webpageRepository.findByDeletedFalse();
+    }
+
     @Override
     public WebpageResponse create(WebpageRequest request) {
 

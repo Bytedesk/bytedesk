@@ -53,8 +53,9 @@ public class MqttAuthService {
             if (bytedeskProperties.isDisableIpFilter()) {
                 return true;
             }
-            // 从数据库验证token是否有效（未被撤销且未过期）
-            Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessToken(accessToken);
+            // MQTT 鉴权避免读取缓存里的旧值或泛型反序列化结果，直接查库校验。
+            // 这里也保持与 TokenRestService.validateAccessToken 的失效语义一致。
+            Optional<TokenEntity> tokenOpt = tokenRestService.findByAccessTokenNoCache(accessToken);
             if (tokenOpt.isPresent() && tokenOpt.get().isValid()) {
                 return true;
             } else {

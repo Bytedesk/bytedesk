@@ -30,6 +30,8 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
 
     List<FaqEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
+    List<FaqEntity> findByDeletedFalse();
+
     // auto complete, 根据问题关键字查询
     List<FaqEntity> findByQuestionContains(String question);
     

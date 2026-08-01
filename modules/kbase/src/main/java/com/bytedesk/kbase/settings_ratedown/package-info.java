@@ -20,7 +20,7 @@
  * 此包的设计遵循客服行业最佳实践，旨在有效收集和处理负面反馈，
  * 促进服务质量持续改进。
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.settings_ratedown;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

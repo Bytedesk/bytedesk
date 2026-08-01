@@ -18,9 +18,11 @@ import java.util.List;
 
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.llm.LlmDefaults;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -183,6 +185,7 @@ public class RobotLlm {
     // tools list
     @Builder.Default
     @Column(name = "llm_tools")
+    @Convert(converter = StringListConverter.class)
     private List<String> tools = new ArrayList<>();
 
     // tool_choice
@@ -193,6 +196,7 @@ public class RobotLlm {
     // stop 停止词
     @Builder.Default
     @Column(name = "llm_stops")
+    @Convert(converter = StringListConverter.class)
     private List<String> stops = new ArrayList<>();
 
     /**

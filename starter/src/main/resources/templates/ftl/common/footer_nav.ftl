@@ -39,6 +39,7 @@
 						<img src="/assets/images/qrcode/wechat.png" style="height: 80px;" alt="微语微信联系方式二维码"/>
 					</a>
 				</div>
+
 			</div>
 			<!-- Widget 1 END -->
 
@@ -54,22 +55,6 @@
 					<li class="nav-item"><a class="nav-link text-white-50" href="${langPrefix}/pages/contact.html"><@t key="nav.contact">联系</@t></a></li>
 					<li class="nav-item"><a class="nav-link text-white-50" href="https://github.com/Bytedesk/bytedesk" target="_blank"><@t key="nav.github">Github</@t></a></li>
 				</ul>
-				
-				<!-- 微信公众号 -->
-				<div class="row mt-4">
-					<div class="col-6">
-						<h6 class="mb-2 text-white"><@t key="footer.serviceAccount">服务号</@t></h6>
-						<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
-							<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 80px;" alt="微语服务号"/>
-						</a>
-					</div>
-					<div class="col-6">
-						<h6 class="mb-2 text-white"><@t key="footer.subscribeAccount">订阅号</@t></h6>
-						<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
-							<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 80px;" alt="微语订阅号"/>
-						</a>
-					</div>
-				</div>
 			</div>
 			
 			<!-- Widget 3 START - 微语开源套件 -->
@@ -135,6 +120,22 @@
 					</div>
 					<div class="col-6 col-lg-3">
 						<a href="${langPrefix}/features/skill.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.skill">Skills 技能</@t></a>
+					</div>
+				</div>
+
+				<!-- 微信公众号 -->
+				<div class="row mt-4">
+					<div class="col-6">
+						<h6 class="mb-2 text-white"><@t key="footer.serviceAccount">服务号</@t></h6>
+						<a href="/assets/images/qrcode/weiyu/qrcode_1280.jpg" target="_blank">
+							<img src="/assets/images/qrcode/weiyu/qrcode_1280.jpg" style="height: 80px;" alt="微语服务号"/>
+						</a>
+					</div>
+					<div class="col-6">
+						<h6 class="mb-2 text-white"><@t key="footer.subscribeAccount">订阅号</@t></h6>
+						<a href="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" target="_blank">
+							<img src="/assets/images/qrcode/weiyuai/qrcode_1280.jpg" style="height: 80px;" alt="微语订阅号"/>
+						</a>
 					</div>
 				</div>
 			</div>

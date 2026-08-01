@@ -21,7 +21,6 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
@@ -103,12 +103,6 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         LlmProviderEntity provider = llmProviderOptional.get();
 
         try {
-            // 创建 OpenAiApi 实例
-            OpenAiApi openAiApi = OpenAiApi.builder()
-                    .baseUrl(provider.getBaseUrl())
-                    .apiKey(provider.getApiKey())
-                    .build();
-
             // 创建选项
             OpenAiChatOptions options = createDynamicOptions(llm);
             if (options == null) {
@@ -116,10 +110,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
                 return defaultChatModel;
             }
 
-            return OpenAiChatModel.builder()
-                    .openAiApi(openAiApi)
-                    .defaultOptions(options)
-                    .build();
+                OpenAiChatOptions resolvedOptions = OpenAiCompatibleModelFactory.withConnection(options,
+                    provider.getBaseUrl(), provider.getApiKey());
+                return OpenAiCompatibleModelFactory.chatModel(resolvedOptions);
         } catch (Exception e) {
             log.error("Failed to create dynamic Gitee chat model for provider {}, using default chat model",
                     provider.getUid(), e);

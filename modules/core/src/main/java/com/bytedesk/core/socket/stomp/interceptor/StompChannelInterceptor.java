@@ -15,7 +15,6 @@ package com.bytedesk.core.socket.stomp.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -29,7 +28,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 public class StompChannelInterceptor implements ChannelInterceptor {
 
     @Override
-    public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
         // ...

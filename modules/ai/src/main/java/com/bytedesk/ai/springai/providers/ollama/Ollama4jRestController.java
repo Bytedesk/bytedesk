@@ -24,10 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
 
-import io.github.ollama4j.models.ps.ModelsProcessResponse;
-import io.github.ollama4j.models.response.LibraryModel;
-import io.github.ollama4j.models.response.LibraryModelDetail;
-import io.github.ollama4j.models.response.LibraryModelTag;
+import io.github.ollama4j.models.ps.ModelProcessesResult;
 import io.github.ollama4j.models.response.Model;
 import io.github.ollama4j.models.response.ModelDetail;
 import lombok.RequiredArgsConstructor;
@@ -60,12 +57,12 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
-    // 远程模型列表
+    // 远程模型列表（ollama4j 1.1.7 已移除 Library API，此接口不再可用）
     // http://127.0.0.1:9003/api/v1/ollama4j/models
     @GetMapping("/models")
-    public ResponseEntity<JsonResult<List<LibraryModel>>> getModels(OllamaRequest request) {
+    public ResponseEntity<JsonResult<List<Model>>> getModels(OllamaRequest request) {
 
-        List<LibraryModel> models = ollama4jService.getModels(request);
+        List<Model> models = ollama4jService.getModels(request);
 
         return ResponseEntity.ok(JsonResult.success(models));
     }
@@ -73,20 +70,19 @@ public class Ollama4jRestController {
     // 当前运行的模型
     // http://127.0.0.1:9003/api/v1/ollama4j/ps
     @GetMapping("/ps")
-    public ResponseEntity<JsonResult<ModelsProcessResponse>> processModelsResponse(OllamaRequest request) {
+    public ResponseEntity<JsonResult<ModelProcessesResult>> processModelsResponse(OllamaRequest request) {
 
-        ModelsProcessResponse models = ollama4jService.getPs(request);
+        ModelProcessesResult models = ollama4jService.getPs(request);
 
         return ResponseEntity.ok(JsonResult.success(models));
     }
 
+    // ollama4j 1.1.7 已移除 Library Model 详情 API
     // http://127.0.0.1:9003/api/v1/ollama4j/library/models/{model}/details
     @GetMapping("/library/models/details")
-    public ResponseEntity<JsonResult<LibraryModelDetail>> getLibraryModelDetails(OllamaRequest request) {
+    public ResponseEntity<JsonResult<?>> getLibraryModelDetails(OllamaRequest request) {
         
-        LibraryModelDetail modelDetail = ollama4jService.getLibraryModelDetails(request);
-
-        return ResponseEntity.ok(JsonResult.success(modelDetail));
+        return ResponseEntity.ok(JsonResult.success("Library model details API removed in ollama4j 1.1.7"));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/details
@@ -98,13 +94,12 @@ public class Ollama4jRestController {
         return ResponseEntity.ok(JsonResult.success(modelDetail));
     }
 
+    // ollama4j 1.1.7 已移除 Model Tag API
     // http://127.0.0.1:9003/api/v1/ollama4j/models/{model}/tags/{tag}
     @GetMapping("/models/tags")
-    public ResponseEntity<JsonResult<LibraryModelTag>> getModelTag(OllamaRequest request) {
+    public ResponseEntity<JsonResult<?>> getModelTag(OllamaRequest request) {
 
-        LibraryModelTag modelTag = ollama4jService.getModelTag(request);
-
-        return ResponseEntity.ok(JsonResult.success(modelTag));
+        return ResponseEntity.ok(JsonResult.success("Model tag API removed in ollama4j 1.1.7"));
     }
 
     // http://127.0.0.1:9003/api/v1/ollama4j/models/pull

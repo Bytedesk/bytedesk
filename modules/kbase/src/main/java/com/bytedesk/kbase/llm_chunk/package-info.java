@@ -5,7 +5,7 @@
  * @author jackning
  * @since 2024
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.llm_chunk;
 
-import org.springframework.lang.NonNullApi; 
+import org.jspecify.annotations.NullMarked;

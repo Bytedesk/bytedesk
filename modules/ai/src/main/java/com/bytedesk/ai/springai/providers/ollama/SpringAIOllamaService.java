@@ -120,7 +120,7 @@ public class SpringAIOllamaService extends BaseSpringAIService {
             }
             return OllamaChatModel.builder()
                     .ollamaApi(ollamaApi)
-                    .defaultOptions(options)
+                    .options(options)
                     .build();
         } catch (Exception e) {
             log.error("Failed to create dynamic Ollama chat model for provider {}, using default chat model",

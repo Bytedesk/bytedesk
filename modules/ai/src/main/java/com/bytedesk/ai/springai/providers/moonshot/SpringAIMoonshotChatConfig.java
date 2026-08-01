@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.retry.support.RetryTemplate;
+import org.springframework.core.retry.RetryTemplate;
 
 import com.bytedesk.ai.springai.providers.moonshot.api.MoonshotApi;
 import com.bytedesk.ai.springai.providers.moonshot.api.MoonshotChatModel;
@@ -99,7 +99,7 @@ public class SpringAIMoonshotChatConfig {
     @Bean("moonshotChatClient")
     ChatClient moonshotChatClient() {
         return ChatClient.builder(moonshotChatModel())
-                .defaultOptions(moonshotChatOptions())
+                .defaultOptions(moonshotChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

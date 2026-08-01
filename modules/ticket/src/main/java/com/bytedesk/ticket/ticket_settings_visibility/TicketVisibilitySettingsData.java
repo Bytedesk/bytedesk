@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TicketVisibilitySettingsData implements Serializable {
 
+    private static final String LEGACY_DEPARTMENT_ONLY = "DEPARTMENT_ONLY";
+
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
@@ -31,21 +33,24 @@ public class TicketVisibilitySettingsData implements Serializable {
         mode = resolveMode(mode).name();
         if (categoryRules == null) {
             categoryRules = new ArrayList<>();
-            return;
+        } else {
+            Map<String, TicketVisibilityCategoryRuleData> deduplicated = new LinkedHashMap<>();
+            for (TicketVisibilityCategoryRuleData rule : categoryRules) {
+                if (rule == null || !StringUtils.hasText(rule.getCategoryUid())) {
+                    continue;
+                }
+                TicketVisibilityCategoryRuleData normalized = TicketVisibilityCategoryRuleData.builder()
+                        .categoryUid(rule.getCategoryUid().trim())
+                        .visibility(resolveRuleVisibility(rule.getVisibility()))
+                        .build();
+                deduplicated.put(normalized.getCategoryUid(), normalized);
+            }
+            categoryRules = new ArrayList<>(deduplicated.values());
         }
 
-        Map<String, TicketVisibilityCategoryRuleData> deduplicated = new LinkedHashMap<>();
-        for (TicketVisibilityCategoryRuleData rule : categoryRules) {
-            if (rule == null || !StringUtils.hasText(rule.getCategoryUid())) {
-                continue;
-            }
-            TicketVisibilityCategoryRuleData normalized = TicketVisibilityCategoryRuleData.builder()
-                    .categoryUid(rule.getCategoryUid().trim())
-                    .visibility(resolveRuleVisibility(rule.getVisibility()))
-                    .build();
-            deduplicated.put(normalized.getCategoryUid(), normalized);
+        if (!TicketVisibilityModeEnum.CATEGORY_BASED.name().equals(mode)) {
+            categoryRules = new ArrayList<>();
         }
-        categoryRules = new ArrayList<>(deduplicated.values());
     }
 
     public String resolveCategoryVisibility(String categoryUid) {
@@ -64,8 +69,12 @@ public class TicketVisibilitySettingsData implements Serializable {
         if (!StringUtils.hasText(rawMode)) {
             return TicketVisibilityModeEnum.ORG_WIDE;
         }
+        String normalizedMode = rawMode.trim().toUpperCase();
+        if (LEGACY_DEPARTMENT_ONLY.equals(normalizedMode)) {
+            return TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED;
+        }
         try {
-            return TicketVisibilityModeEnum.valueOf(rawMode.trim().toUpperCase());
+            return TicketVisibilityModeEnum.valueOf(normalizedMode);
         } catch (IllegalArgumentException ex) {
             return TicketVisibilityModeEnum.ORG_WIDE;
         }

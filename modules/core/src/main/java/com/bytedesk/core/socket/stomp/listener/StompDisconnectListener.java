@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 // import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -41,7 +40,7 @@ public class StompDisconnectListener implements ApplicationListener<SessionDisco
     private final ConnectionRestService connectionRestService;
 
     @Override
-    public void onApplicationEvent(@NonNull SessionDisconnectEvent event) {
+    public void onApplicationEvent(SessionDisconnectEvent event) {
         // log.debug("stomp sessionDisconnectEvent {}", event.toString());
         StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);
         if (headerAccessor == null) {

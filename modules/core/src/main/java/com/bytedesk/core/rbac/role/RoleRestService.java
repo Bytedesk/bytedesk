@@ -163,6 +163,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                 return roleRepository.findByUid(uid);
         }
 
+        public Optional<RoleEntity> findByUidNoCache(String uid) {
+                return roleRepository.findByUid(uid);
+        }
+
         @Cacheable(value = "role", key = "'nameOrg:' + #p0 + '-' + #p1", unless = "#result == null")
         public Optional<RoleEntity> findByNameAndOrgUid(String name, String orgUid) {
                 return roleRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);

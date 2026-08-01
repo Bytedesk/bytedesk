@@ -16,7 +16,7 @@ package com.bytedesk.ai.config;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.plugin.AbstractBytedeskPlugin;
@@ -31,9 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class AiPlugin extends AbstractBytedeskPlugin {
 
+    private final ObjectProvider<HealthIndicator> aiHealthIndicatorProvider;
+
     public AiPlugin(
             @Qualifier("aiHealthIndicator") ObjectProvider<HealthIndicator> aiHealthIndicatorProvider) {
-        this.aiHealthIndicator = aiHealthIndicatorProvider.getIfAvailable();
+        this.aiHealthIndicatorProvider = aiHealthIndicatorProvider;
     }
 
     
@@ -43,11 +45,9 @@ public class AiPlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.ai.version:1.0.0}")
     private String version;
     
-    private final HealthIndicator aiHealthIndicator;
-    
     @Override
     protected HealthIndicator getHealthIndicator() {
-        return aiHealthIndicator;
+        return aiHealthIndicatorProvider.getIfAvailable();
     }
     
     @Override

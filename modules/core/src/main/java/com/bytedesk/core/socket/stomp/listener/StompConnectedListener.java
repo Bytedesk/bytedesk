@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
@@ -43,7 +42,7 @@ public class StompConnectedListener implements ApplicationListener<SessionConnec
     private final ConnectionRestService connectionRestService;
     
     @Override
-    public void onApplicationEvent(@NonNull SessionConnectedEvent event) {
+    public void onApplicationEvent(SessionConnectedEvent event) {
         // log.debug("stomp sessionConnectedEvent {}", event.toString());
         // stomp sessionConnectedEvent SessionConnectedEvent[GenericMessage [payload=byte[0], headers={simpMessageType=CONNECT_ACK, simpConnectMessage=GenericMessage [payload=byte[0], headers={simpMessageType=CONNECT, stompCommand=CONNECT, nativeHeaders={login=[1513088171901063], accept-version=[1.2,1.1,1.0], heart-beat=[10000,10000]}, simpSessionAttributes={}, simpHeartbeat=[J@68e0e40, simpSessionId=18cf80bd-cbbb-4a62-7ac3-1eaa0a465184}], simpHeartbeat=[J@5ceab5fa, simpSessionId=18cf80bd-cbbb-4a62-7ac3-1eaa0a465184}]]
         // StompHeaderAccessor headerAccessor = MessageHeaderAccessor.getAccessor(event.getMessage(), StompHeaderAccessor.class);

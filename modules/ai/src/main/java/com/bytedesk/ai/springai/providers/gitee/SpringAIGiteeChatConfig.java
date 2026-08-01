@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,17 +41,11 @@ public class SpringAIGiteeChatConfig {
     @Value("${spring.ai.gitee.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("giteeApi")
-    OpenAiApi giteeApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("giteeChatOptions")
     OpenAiChatOptions giteeChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -61,15 +54,14 @@ public class SpringAIGiteeChatConfig {
     @Bean("giteeChatModel")
     OpenAiChatModel giteeChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(giteeApi())
-                .defaultOptions(giteeChatOptions())
+                .options(giteeChatOptions())
                 .build();
     }
 
     @Bean("giteeChatClient")
     ChatClient giteeChatClient() {
         return  ChatClient.builder(giteeChatModel())
-                .defaultOptions(giteeChatOptions())
+                .defaultOptions(giteeChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

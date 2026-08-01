@@ -24,7 +24,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
@@ -190,7 +189,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     @Caching(evict = {
             @CacheEvict(value = "message", key = "#message.uid"),
     })
-    public void delete(@NonNull MessageRequest message) {
+    public void delete(MessageRequest message) {
         deleteByUid(message.getUid());
     }
 
@@ -206,7 +205,7 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         });
     }
 
-    public MessageResponse restore(@NonNull MessageRequest request) {
+    public MessageResponse restore(MessageRequest request) {
         MessageEntity entity = messageRepository.findByUid(request.getUid())
                 .orElseThrow(ResourceI18nExceptions::messageNotFound);
         entity.setDeleted(false);

@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -38,7 +37,7 @@ public interface RoleRepository extends JpaRepository<RoleEntity, Long>, JpaSpec
     Boolean existsByNameAndLevel(String name, String level);
 
     @Transactional
-    void deleteById(@NonNull Long id);
+    void deleteById(Long id);
 
     Boolean existsByUid(String uid);
 }

@@ -16,7 +16,7 @@
  * 此包的设计旨在提升客户主动触达的个性化和精准度，
  * 优化用户体验并提高客服系统的转化率。
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.settings_invite;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

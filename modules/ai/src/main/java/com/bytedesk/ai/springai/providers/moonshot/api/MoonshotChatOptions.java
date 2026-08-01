@@ -19,10 +19,8 @@ package com.bytedesk.ai.springai.providers.moonshot.api;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -135,11 +133,8 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 	private Set<String> toolNames = new HashSet<>();
 
 	/**
-	 * Whether to enable the tool execution lifecycle internally in ChatModel.
+	 * Context values passed to tool callbacks during execution.
 	 */
-	@JsonIgnore
-	private Boolean internalToolExecutionEnabled;
-
 	@JsonIgnore
 	private Map<String, Object> toolContext = new HashMap<>();
 
@@ -167,7 +162,6 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			.toolCallbacks(
 					fromOptions.getToolCallbacks() != null ? new ArrayList<>(fromOptions.getToolCallbacks()) : null)
 			.toolNames(fromOptions.getToolNames() != null ? new HashSet<>(fromOptions.getToolNames()) : null)
-			.internalToolExecutionEnabled(fromOptions.getInternalToolExecutionEnabled())
 			.toolContext(fromOptions.getToolContext() != null ? new HashMap<>(fromOptions.getToolContext()) : null)
 			.build();
 	}
@@ -194,40 +188,30 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 		return this.toolCallbacks;
 	}
 
-	@Override
 	@JsonIgnore
 	public void setToolCallbacks(List<ToolCallback> toolCallbacks) {
-		Assert.notNull(toolCallbacks, "toolCallbacks cannot be null");
+		if (toolCallbacks == null) {
+			this.toolCallbacks = new ArrayList<>();
+			return;
+		}
 		Assert.noNullElements(toolCallbacks, "toolCallbacks cannot contain null elements");
-		this.toolCallbacks = toolCallbacks;
+		this.toolCallbacks = new ArrayList<>(toolCallbacks);
 	}
 
-	@Override
 	@JsonIgnore
 	public Set<String> getToolNames() {
 		return this.toolNames;
 	}
 
-	@Override
 	@JsonIgnore
 	public void setToolNames(Set<String> toolNames) {
-		Assert.notNull(toolNames, "toolNames cannot be null");
+		if (toolNames == null) {
+			this.toolNames = new HashSet<>();
+			return;
+		}
 		Assert.noNullElements(toolNames, "toolNames cannot contain null elements");
 		toolNames.forEach(tool -> Assert.hasText(tool, "toolNames cannot contain empty elements"));
-		this.toolNames = toolNames;
-	}
-
-	@Override
-	@Nullable
-	@JsonIgnore
-	public Boolean getInternalToolExecutionEnabled() {
-		return this.internalToolExecutionEnabled;
-	}
-
-	@Override
-	@JsonIgnore
-	public void setInternalToolExecutionEnabled(@Nullable Boolean internalToolExecutionEnabled) {
-		this.internalToolExecutionEnabled = internalToolExecutionEnabled;
+		this.toolNames = new HashSet<>(toolNames);
 	}
 
 	@Override
@@ -346,12 +330,31 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 		return this.toolContext;
 	}
 
-	@Override
 	public void setToolContext(Map<String, Object> toolContext) {
-		this.toolContext = toolContext;
+		this.toolContext = toolContext != null ? new HashMap<>(toolContext) : new HashMap<>();
 	}
 
 	@Override
+	public Builder mutate() {
+		return builder()
+				.model(this.model)
+				.frequencyPenalty(this.frequencyPenalty)
+				.maxTokens(this.maxTokens)
+				.presencePenalty(this.presencePenalty)
+				.stopSequences(this.stop)
+				.temperature(this.temperature)
+				.topP(this.topP)
+				.maxCompletionTokens(this.maxCompletionTokens)
+				.N(this.n)
+				.tools(this.tools != null ? new ArrayList<>(this.tools) : null)
+				.toolChoice(this.toolChoice)
+				.user(this.user)
+				.thinking(this.thinking)
+				.toolCallbacks(this.toolCallbacks != null ? new ArrayList<>(this.toolCallbacks) : null)
+				.toolNames(this.toolNames != null ? new HashSet<>(this.toolNames) : null)
+				.toolContext(this.toolContext != null ? new HashMap<>(this.toolContext) : null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T extends org.springframework.ai.chat.prompt.ChatOptions> T copy() {
 		return (T) MoonshotChatOptions.fromOptions(this);
@@ -361,8 +364,7 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 	public int hashCode() {
 		return Objects.hash(this.model, this.frequencyPenalty, this.maxTokens, this.maxCompletionTokens, this.n,
 				this.presencePenalty, this.stop, this.temperature, this.topP, this.tools, this.toolChoice, this.user,
-				this.thinking, this.toolCallbacks, this.toolNames,
-				this.internalToolExecutionEnabled, this.toolContext);
+				this.thinking, this.toolCallbacks, this.toolNames, this.toolContext);
 	}
 
 	@Override
@@ -383,16 +385,22 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 				&& Objects.equals(this.user, other.user) && Objects.equals(this.thinking, other.thinking)
 				&& Objects.equals(this.toolCallbacks, other.toolCallbacks)
 				&& Objects.equals(this.toolNames, other.toolNames)
-				&& Objects.equals(this.toolContext, other.toolContext)
-				&& Objects.equals(this.internalToolExecutionEnabled, other.internalToolExecutionEnabled);
+				&& Objects.equals(this.toolContext, other.toolContext);
 	}
 
 	@Override
 	public String toString() {
-		return "MoonshotChatOptions: " + ModelOptionsUtils.toJsonString(this);
+		return "MoonshotChatOptions{" +
+				"model='" + this.model + '\'' +
+				", maxTokens=" + this.maxTokens +
+				", maxCompletionTokens=" + this.maxCompletionTokens +
+				", temperature=" + this.temperature +
+				", topP=" + this.topP +
+				", user='" + this.user + '\'' +
+				'}';
 	}
 
-	public static class Builder {
+	public static class Builder implements ToolCallingChatOptions.Builder<Builder> {
 
 		protected MoonshotChatOptions options;
 
@@ -404,6 +412,7 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			this.options = options;
 		}
 
+		@Override
 		public Builder model(String model) {
 			this.options.model = model;
 			return this;
@@ -414,11 +423,13 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			return this;
 		}
 
+		@Override
 		public Builder frequencyPenalty(Double frequencyPenalty) {
 			this.options.frequencyPenalty = frequencyPenalty;
 			return this;
 		}
 
+		@Override
 		public Builder maxTokens(Integer maxTokens) {
 			this.options.maxTokens = maxTokens;
 			return this;
@@ -434,21 +445,35 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			return this;
 		}
 
+		@Override
 		public Builder presencePenalty(Double presencePenalty) {
 			this.options.presencePenalty = presencePenalty;
 			return this;
 		}
 
-		public Builder stop(List<String> stop) {
-			this.options.stop = stop;
+		@Override
+		public Builder stopSequences(List<String> stopSequences) {
+			this.options.stop = stopSequences != null ? new ArrayList<>(stopSequences) : null;
 			return this;
 		}
 
+		public Builder stop(List<String> stop) {
+			this.options.stop = stop != null ? new ArrayList<>(stop) : null;
+			return this;
+		}
+
+		@Override
 		public Builder temperature(Double temperature) {
 			this.options.temperature = temperature;
 			return this;
 		}
 
+		@Override
+		public Builder topK(Integer topK) {
+			return this;
+		}
+
+		@Override
 		public Builder topP(Double topP) {
 			this.options.topP = topP;
 			return this;
@@ -474,11 +499,13 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			return this;
 		}
 
+		@Override
 		public Builder toolCallbacks(List<ToolCallback> toolCallbacks) {
 			this.options.setToolCallbacks(toolCallbacks);
 			return this;
 		}
 
+		@Override
 		public Builder toolCallbacks(ToolCallback... toolCallbacks) {
 			Assert.notNull(toolCallbacks, "toolCallbacks cannot be null");
 			this.options.toolCallbacks.addAll(Arrays.asList(toolCallbacks));
@@ -497,21 +524,69 @@ public class MoonshotChatOptions implements ToolCallingChatOptions {
 			return this;
 		}
 
-		public Builder internalToolExecutionEnabled(@Nullable Boolean internalToolExecutionEnabled) {
-			this.options.setInternalToolExecutionEnabled(internalToolExecutionEnabled);
+		@Override
+		public Builder clone() {
+			return new Builder(MoonshotChatOptions.fromOptions(this.options));
+		}
+
+		@Override
+		public Builder combineWith(org.springframework.ai.chat.prompt.ChatOptions.Builder<?> other) {
+			if (other == null) {
+				return this;
+			}
+			org.springframework.ai.chat.prompt.ChatOptions otherOptions = other.build();
+			if (otherOptions instanceof MoonshotChatOptions moonshotChatOptions) {
+				this.options = MoonshotChatOptions.fromOptions(moonshotChatOptions);
+				return this;
+			}
+			if (otherOptions.getModel() != null) {
+				this.options.model = otherOptions.getModel();
+			}
+			if (otherOptions.getFrequencyPenalty() != null) {
+				this.options.frequencyPenalty = otherOptions.getFrequencyPenalty();
+			}
+			if (otherOptions.getMaxTokens() != null) {
+				this.options.maxTokens = otherOptions.getMaxTokens();
+			}
+			if (otherOptions.getPresencePenalty() != null) {
+				this.options.presencePenalty = otherOptions.getPresencePenalty();
+			}
+			if (otherOptions.getStopSequences() != null) {
+				this.options.stop = new ArrayList<>(otherOptions.getStopSequences());
+			}
+			if (otherOptions.getTemperature() != null) {
+				this.options.temperature = otherOptions.getTemperature();
+			}
+			if (otherOptions.getTopP() != null) {
+				this.options.topP = otherOptions.getTopP();
+			}
+			if (otherOptions instanceof ToolCallingChatOptions toolCallingChatOptions) {
+				this.toolCallbacks(toolCallingChatOptions.getToolCallbacks());
+				this.toolContext(toolCallingChatOptions.getToolContext());
+			}
 			return this;
 		}
 
+		@Override
 		public Builder toolContext(Map<String, Object> toolContext) {
 			if (this.options.toolContext == null) {
-				this.options.toolContext = toolContext;
+				this.options.toolContext = toolContext != null ? new HashMap<>(toolContext) : new HashMap<>();
 			}
-			else {
+			else if (toolContext != null) {
 				this.options.toolContext.putAll(toolContext);
 			}
 			return this;
 		}
 
+		@Override
+		public Builder toolContext(String key, Object value) {
+			Assert.hasText(key, "key cannot be null");
+			Assert.notNull(value, "value cannot be null");
+			this.options.toolContext.put(key, value);
+			return this;
+		}
+
+		@Override
 		public MoonshotChatOptions build() {
 			return this.options;
 		}

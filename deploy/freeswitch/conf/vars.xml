@@ -32,9 +32,11 @@
   <!-- 录音公开访问 URL；生产部署时通过 .env 中 FREESWITCH_RECORDINGS_PUBLIC_BASE 覆盖 -->
   <X-PRE-PROCESS cmd="set"
     data="recordings_public_base=http://192.168.0.102:15080/freeswitch-recordings" />
-  <X-PRE-PROCESS cmd="set" data="core_db_module=mod_mariadb" />
-  <X-PRE-PROCESS cmd="set" data="core_db_dsn=mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=r8FqfdbWUaN3;" />
-<X-PRE-PROCESS cmd="set" data="xml_curl_token=change_me_in_production" />
+     <!--
+-->
+     <!--
+-->
+     <X-PRE-PROCESS cmd="set" data="xml_curl_token=change_me_in_production" />
   <!-- external_rtp_ip / external_sip_ip
        容器启动时由 entrypoint 根据 .env 中 FREESWITCH_EXTERNAL_SIP_IP / FREESWITCH_EXTERNAL_RTP_IP 覆盖；
        此处默认值为 127.0.0.1，仅当未设置 .env 时生效。 -->

@@ -25,7 +25,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -245,7 +244,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
 
     @Cacheable(value = "visitor", key = "#uid", unless = "#result == null")
     @Override
-    public Optional<VisitorEntity> findByUid(@NonNull String uid) {
+    public Optional<VisitorEntity> findByUid(String uid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(uid)) {
             return Optional.empty();
@@ -255,7 +254,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     
     @Transactional(readOnly = true)
     @Cacheable(value = "visitor", key = "#visitorUid + '-' + #orgUid", unless = "#result == null")
-    public Optional<VisitorEntity> findByVisitorUidAndOrgUid(@NonNull String visitorUid, @NonNull String orgUid) {
+    public Optional<VisitorEntity> findByVisitorUidAndOrgUid(String visitorUid, String orgUid) {
         // 如果参数为空，则返回空
         if (!StringUtils.hasText(visitorUid) || !StringUtils.hasText(orgUid)) {
             return Optional.empty();
@@ -264,7 +263,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
 
     @Transactional(readOnly = true)
-    public VisitorResponse queryByVisitorUid(@NonNull VisitorRequest request) {
+    public VisitorResponse queryByVisitorUid(VisitorRequest request) {
         String orgUid = request.getOrgUid();
         String visitorUid = request.getVisitorUid();
         if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(visitorUid)) {
@@ -276,12 +275,12 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return convertToResponse(entity);
     }
 
-    public List<VisitorEntity> findByStatus(@NonNull String status) {
+    public List<VisitorEntity> findByStatus(String status) {
         return visitorRepository.findByStatusAndDeleted(status, false);
     }
 
     @Transactional
-    public int updateStatus(@NonNull String uid, @NonNull String newStatus) {
+    public int updateStatus(String uid, String newStatus) {
         if (!StringUtils.hasText(uid) || !StringUtils.hasText(newStatus)) {
             log.warn("skip visitor status update because uid or status is blank, uid: {}, status: {}", uid, newStatus);
             return 0;

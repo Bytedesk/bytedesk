@@ -2,7 +2,7 @@
  * 
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.url;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

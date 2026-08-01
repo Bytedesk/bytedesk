@@ -91,11 +91,14 @@ public class TextElasticService {
 
     // update all elasticsearch index
     public void updateAllIndex(TextRequest request) {
-        List<TextEntity> textList = textRestService.findByKbUid(request.getKbUid());
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUid(request.getKbUid());
         textList.forEach(text -> {
             indexText(text);
         });
-        log.info("Updated elasticsearch index for {} texts from knowledge base: {}", textList.size(), request.getKbUid());
+        log.info("Updated elasticsearch index for {} texts, superUser={}, kbUid={}", textList.size(), superUser, request.getKbUid());
     }
 
     /**
@@ -127,11 +130,14 @@ public class TextElasticService {
      */
     public Map<String, Object> syncElasticStatusByKbUid(TextRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
 
         int successCount = 0;
@@ -151,6 +157,7 @@ public class TextElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", textList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -163,18 +170,23 @@ public class TextElasticService {
      */
     public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(TextRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(TextElastic.class).exists();
 
         long deletedCount = 0;
         if (indexExists) {
-                Query query = NativeQuery.builder()
-                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
-                    .build();
+                Query query = superUser
+                    ? NativeQuery.builder().withQuery(QueryBuilders.matchAll().build()._toQuery()).build()
+                    : NativeQuery.builder()
+                        .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                        .build();
             DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
             var response = elasticsearchOperations.delete(deleteQuery, TextElastic.class);
             deletedCount = response.getDeleted();
@@ -187,6 +199,7 @@ public class TextElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", textList.size());
         result.put("indexExists", indexExists);
         result.put("deletedCount", deletedCount);

@@ -1,4 +1,4 @@
-# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-call.yaml -f compose-call-db-<mysql|postgresql>.yaml up -d
+# 用法：docker compose -p bytedesk -f compose-base.yaml -f compose-db-<mysql|postgresql>.yaml -f compose-mq-<artemis|rabbitmq>.yaml -f compose-scenario-call.yaml up -d
 # 说明：call 场景包含 FreeSWITCH 语音组件和百度 MRCP Server；coturn/janus 已拆分到 compose-scenario-webrtc.yaml
 services:
   # Baidu MRCP Server（ASR/TTS）

@@ -90,11 +90,14 @@ public class ChunkElasticService {
 
     // update all elasticsearch index
     public void updateAllIndex(ChunkRequest request) {
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUid(request.getKbUid());
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUid(request.getKbUid());
         chunkList.forEach(chunk -> {
             indexChunk(chunk);
         });
-        log.info("Updated elasticsearch index for {} chunks from knowledge base: {}", chunkList.size(), request.getKbUid());
+        log.info("Updated elasticsearch index for {} chunks, superUser={}, kbUid={}", chunkList.size(), superUser, request.getKbUid());
     }
 
     /**
@@ -124,11 +127,14 @@ public class ChunkElasticService {
      */
     public Map<String, Object> syncElasticStatusByKbUid(ChunkRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
 
         int successCount = 0;
@@ -148,6 +154,7 @@ public class ChunkElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", chunkList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -160,18 +167,23 @@ public class ChunkElasticService {
      */
     public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(ChunkRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(ChunkElastic.class).exists();
 
         long deletedCount = 0;
         if (indexExists) {
-                Query query = NativeQuery.builder()
-                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
-                    .build();
+                Query query = superUser
+                    ? NativeQuery.builder().withQuery(QueryBuilders.matchAll().build()._toQuery()).build()
+                    : NativeQuery.builder()
+                        .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                        .build();
             DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
             var response = elasticsearchOperations.delete(deleteQuery, ChunkElastic.class);
             deletedCount = response.getDeleted();
@@ -184,6 +196,7 @@ public class ChunkElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", chunkList.size());
         result.put("indexExists", indexExists);
         result.put("deletedCount", deletedCount);

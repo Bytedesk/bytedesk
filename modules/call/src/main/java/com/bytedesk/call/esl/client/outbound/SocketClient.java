@@ -20,7 +20,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,8 +49,8 @@ public class SocketClient extends AbstractService {
 	public SocketClient(SocketAddress bindAddress, IClientHandlerFactory clientHandlerFactory) {
 		this.bindAddress = bindAddress;
 		this.clientHandlerFactory = clientHandlerFactory;
-		this.bossGroup = new NioEventLoopGroup();
-		this.workerGroup = new NioEventLoopGroup();
+		this.bossGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
+		this.workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 	}
 
 	@Override

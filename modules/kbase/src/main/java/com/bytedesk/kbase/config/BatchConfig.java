@@ -15,16 +15,21 @@ package com.bytedesk.kbase.config;
 
 import javax.sql.DataSource;
 
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.launch.support.TaskExecutorJobOperator;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.support.DatabaseType;
+import org.springframework.batch.core.repository.support.JdbcJobRepositoryFactoryBean;
+import org.springframework.batch.infrastructure.support.DatabaseType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -55,7 +60,7 @@ public class BatchConfig {
     @Bean
     @Primary
     public JobRepository jobRepository() throws Exception {
-        JobRepositoryFactoryBean factoryBean = new JobRepositoryFactoryBean();
+        JdbcJobRepositoryFactoryBean factoryBean = new JdbcJobRepositoryFactoryBean();
         factoryBean.setDataSource(dataSource);
         factoryBean.setTransactionManager(transactionManager);
         factoryBean.setIsolationLevelForCreate("ISOLATION_READ_COMMITTED");
@@ -76,5 +81,20 @@ public class BatchConfig {
 
         factoryBean.afterPropertiesSet();
         return factoryBean.getObject();
+    }
+
+    @Bean
+    public JobRegistry jobRegistry() {
+        return new MapJobRegistry();
+    }
+
+    @Bean
+    public JobOperator jobOperator(JobRepository jobRepository, JobRegistry jobRegistry) throws Exception {
+        TaskExecutorJobOperator jobOperator = new TaskExecutorJobOperator();
+        jobOperator.setJobRepository(jobRepository);
+        jobOperator.setJobRegistry(jobRegistry);
+        jobOperator.setTaskExecutor(new SyncTaskExecutor());
+        jobOperator.afterPropertiesSet();
+        return jobOperator;
     }
 }

@@ -7,7 +7,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.apns_token;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

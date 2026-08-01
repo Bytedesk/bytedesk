@@ -68,7 +68,7 @@
  * @see org.springframework.ai.openai.OpenAiChatModel
  * @since 1.0.0
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.ai.springai.providers.openrouter;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

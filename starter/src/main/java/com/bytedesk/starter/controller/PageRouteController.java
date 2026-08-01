@@ -563,8 +563,8 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/pages/download
 	 */
 	@GetMapping({ 
-		"/{page:download|contact|about|privacy|terms}", 
-		"/pages/{page:download|contact|about|privacy|terms}"
+		"/{page:download|contact|about|privacy|terms|termshell}", 
+		"/pages/{page:download|contact|about|privacy|terms|termshell}"
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		// if (!showDemo) {

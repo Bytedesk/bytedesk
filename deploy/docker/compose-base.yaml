@@ -80,7 +80,7 @@ services:
       
   # ElasticSearch 向量数据库
   bytedesk-elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
     container_name: elasticsearch-bytedesk
     environment:
       - node.name=bytedesk-es01
@@ -94,27 +94,27 @@ services:
       memlock:
         soft: -1
         hard: -1
-    entrypoint: ["bash", "-c", "IK_PLUGIN_DIR=/tmp/ik-plugin-cache; IK_PLUGIN_FILE=$$IK_PLUGIN_DIR/elasticsearch-analysis-ik-8.18.0.zip; IK_PLUGIN_TMP=$$IK_PLUGIN_FILE.tmp; mkdir -p $$IK_PLUGIN_DIR; if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then echo 'Installing IK plugin...'; curl -fsSL -o $$IK_PLUGIN_TMP https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip && mv $$IK_PLUGIN_TMP $$IK_PLUGIN_FILE; /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file://$$IK_PLUGIN_FILE; fi; exec /usr/local/bin/docker-entrypoint.sh"]
+    entrypoint: ["bash", "-c", "IK_PLUGIN_DIR=/tmp/ik-plugin-cache; IK_PLUGIN_FILE=$$IK_PLUGIN_DIR/elasticsearch-analysis-ik-9.4.2.zip; IK_PLUGIN_TMP=$$IK_PLUGIN_FILE.tmp; mkdir -p $$IK_PLUGIN_DIR; if [ ! -d /usr/share/elasticsearch/plugins/analysis-ik ]; then if [ -f $$IK_PLUGIN_FILE ]; then echo 'Installing IK plugin from cache...'; /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file://$$IK_PLUGIN_FILE; elif curl -fsSL -o $$IK_PLUGIN_TMP https://www.weiyuai.cn/download/elasticsearch-analysis-ik-9.4.2.zip; then mv $$IK_PLUGIN_TMP $$IK_PLUGIN_FILE; echo 'Installing IK plugin from download...'; /usr/share/elasticsearch/bin/elasticsearch-plugin install --batch file://$$IK_PLUGIN_FILE; else echo 'WARNING: IK plugin not available, skipping...'; fi; fi; exec /usr/local/bin/docker-entrypoint.sh"]
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
-      # 默认安装 IK 分词插件（缓存目录中的 zip 文件）
-      # 如缓存目录中无 zip 文件，将自动从 https://www.weiyuai.cn/download/elasticsearch-analysis-ik-8.18.0.zip 下载
-      - ./elasticsearch-analysis-ik-8.18.0.zip:/tmp/ik-plugin-cache
+      # IK 分词插件缓存（可选：放入 elasticsearch-analysis-ik-9.4.2.zip 可离线安装）
+      - ./ik-plugin-cache:/tmp/ik-plugin-cache
     ports:
       - "19200:9200"
       - "19300:9300"
     networks:
       - bytedesk-network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -s -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:${ELASTIC_PASSWORD} -f http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
-  # https://www.elastic.co/guide/en/logstash/8.18/docker.html
+  # https://www.elastic.co/guide/en/logstash/9.4/docker.html
   # Logstash 日志采集中转
   bytedesk-logstash:
-    image: docker.elastic.co/logstash/logstash:8.18.0
+    image: docker.elastic.co/logstash/logstash:9.4.2
     container_name: logstash-bytedesk
     depends_on:
       - bytedesk-elasticsearch
@@ -136,7 +136,7 @@ services:
 
   # Kibana 日志查询界面
   bytedesk-kibana:
-    image: docker.elastic.co/kibana/kibana:8.18.0
+    image: docker.elastic.co/kibana/kibana:9.4.2
     container_name: kibana-bytedesk
     depends_on:
       - bytedesk-elasticsearch

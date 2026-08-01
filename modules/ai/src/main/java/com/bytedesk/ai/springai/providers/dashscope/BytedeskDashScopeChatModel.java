@@ -61,8 +61,8 @@ public class BytedeskDashScopeChatModel implements ChatModel {
     }
 
     @Override
-    public ChatOptions getDefaultOptions() {
-        return this.defaultOptions.copy();
+    public ChatOptions getOptions() {
+        return this.defaultOptions.mutate().build();
     }
 
     private com.alibaba.dashscope.aigc.generation.Generation createGeneration() {
@@ -95,7 +95,7 @@ public class BytedeskDashScopeChatModel implements ChatModel {
     }
 
     private BytedeskDashScopeChatOptions mergeOptions(ChatOptions runtimeOptions) {
-        BytedeskDashScopeChatOptions.BytedeskDashScopeChatOptionsBuilder builder = this.defaultOptions.toBuilder();
+        BytedeskDashScopeChatOptions.Builder builder = this.defaultOptions.mutate();
         if (runtimeOptions == null) {
             return builder.build();
         }

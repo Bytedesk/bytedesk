@@ -17,12 +17,12 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.Data;
@@ -50,18 +50,12 @@ public class SpringAIGiteeEmbeddingConfig {
     @Value("${spring.ai.gitee.embedding.options.dimensions:0}")
     private Integer embeddingDimensions;
 
-    @Bean("giteeEmbeddingApi")
-    OpenAiApi giteeEmbeddingApi() {
-        String resolvedApiKey = (embeddingApiKey != null && !embeddingApiKey.isEmpty()) ? embeddingApiKey : apiKey;
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(resolvedApiKey)
-                .build();
-    }
-
     @Bean("giteeEmbeddingOptions")
     OpenAiEmbeddingOptions giteeEmbeddingOptions() {
+        String resolvedApiKey = (embeddingApiKey != null && !embeddingApiKey.isEmpty()) ? embeddingApiKey : apiKey;
         OpenAiEmbeddingOptions.Builder builder = OpenAiEmbeddingOptions.builder()
+            .baseUrl(baseUrl)
+            .apiKey(resolvedApiKey)
                 .model(embeddingModel);
         if (embeddingDimensions != null && embeddingDimensions > 0) {
             builder.dimensions(embeddingDimensions);
@@ -72,7 +66,7 @@ public class SpringAIGiteeEmbeddingConfig {
     @Bean("giteeEmbeddingModel")
     @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.GITEE, matchIfMissing = false)
     OpenAiEmbeddingModel giteeEmbeddingModel() {
-        return new OpenAiEmbeddingModel(giteeEmbeddingApi(), MetadataMode.EMBED, giteeEmbeddingOptions());
+        return OpenAiCompatibleModelFactory.embeddingModel(giteeEmbeddingOptions(), MetadataMode.EMBED);
     }
 
 }

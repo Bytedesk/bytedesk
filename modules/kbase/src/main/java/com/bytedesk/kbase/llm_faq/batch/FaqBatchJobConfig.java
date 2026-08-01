@@ -13,8 +13,8 @@
  */
 package com.bytedesk.kbase.llm_faq.batch;
 
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -62,10 +62,11 @@ public class FaqBatchJobConfig {
     @Bean
     public Step importFaqStep() {
         return new StepBuilder("importFaqStep", jobRepository)
-                .<FaqExcel, FaqEntity>chunk(100, transactionManager)
+                .<FaqExcel, FaqEntity>chunk(100)
                 .reader(faqExcelReader(null))  // 读取器实例将在运行时设置
                 .processor(faqItemProcessor)
                 .writer(faqItemWriter)
+                .transactionManager(transactionManager)
                 .build();
     }
     

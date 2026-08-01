@@ -7,7 +7,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.task_list;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

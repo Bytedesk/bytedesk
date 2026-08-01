@@ -62,8 +62,8 @@ class LlmConfigUtilsTest {
         environment.setProperty("spring.ai.model.vision", "ollama");
         environment.setProperty("spring.ai.model.audio", "ollama");
         environment.setProperty("spring.ai.model.rerank", "ollama");
-        environment.setProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
-        environment.setProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
+        environment.setProperty("spring.ai.ollama.chat.model", "qwen3:0.6b");
+        environment.setProperty("spring.ai.ollama.embedding.model", "bge-m3:latest");
 
         // When
         LlmProviderConfigDefault config = LlmConfigUtils.getLlmProviderConfigDefault(environment);

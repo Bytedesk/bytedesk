@@ -16,8 +16,8 @@ package com.bytedesk.ai.config;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;

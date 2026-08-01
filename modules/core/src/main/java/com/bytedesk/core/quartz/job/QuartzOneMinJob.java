@@ -18,7 +18,6 @@ import java.io.Serializable;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.lang.NonNull;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import com.bytedesk.core.quartz.QuartzEventPublisher;
@@ -40,7 +39,7 @@ public class QuartzOneMinJob extends QuartzJobBean implements Serializable {
     private final QuartzEventPublisher quartzEventPublisher;
 
     @Override
-    protected void executeInternal(@NonNull JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         // log.info("OneMinJob");
         quartzEventPublisher.publishQuartzOneMinEvent();
     }

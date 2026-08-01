@@ -13,9 +13,9 @@
  */
 package com.bytedesk.core.message;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -78,7 +78,7 @@ public class MessagePersistCache {
     public void push(String listKey, String messageJSON) {
         try {
             stringRedisTemplate.opsForList().rightPush(listKey, messageJSON);
-            stringRedisTemplate.expire(listKey, EXPIRE_TIME_DAYS, TimeUnit.DAYS);
+            stringRedisTemplate.expire(listKey, Duration.ofDays(EXPIRE_TIME_DAYS));
             // log.debug("Message pushed to list: {}, message: {}", listKey, messageJSON);
         } catch (Exception e) {
             log.error("Failed to push message to list: {}", listKey, e);

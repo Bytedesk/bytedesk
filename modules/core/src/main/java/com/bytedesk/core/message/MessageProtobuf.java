@@ -26,6 +26,8 @@ import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,6 +59,7 @@ public class MessageProtobuf implements Serializable {
 
 	private MessageStatusEnum status;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
 	private ZonedDateTime createdAt;
 
 	private ChannelEnum channel;
@@ -71,6 +74,7 @@ public class MessageProtobuf implements Serializable {
 	 * 获取格式化的创建时间字符串，用于前端解析
 	 * @return 格式化的时间字符串 (yyyy-MM-dd HH:mm:ss)
 	 */
+	@JsonIgnore
 	public String getCreatedAt() {
 		return BdDateUtils.formatDatetimeToString(createdAt);
 	}

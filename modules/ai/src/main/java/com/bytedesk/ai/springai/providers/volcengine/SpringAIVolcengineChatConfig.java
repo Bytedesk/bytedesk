@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,15 +41,11 @@ public class SpringAIVolcengineChatConfig {
     @Value("${spring.ai.volcengine.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("volcengineApi")
-    OpenAiApi volcengineApi() {
-        // 使用VolcengineApi工厂方法创建API实例，自动配置正确的路径
-        return VolcengineApi.create(baseUrl, apiKey);
-    }
-
     @Bean("volcengineChatOptions")
     OpenAiChatOptions volcengineChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -59,15 +54,14 @@ public class SpringAIVolcengineChatConfig {
     @Bean("volcengineChatModel")
     OpenAiChatModel volcengineChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(volcengineApi())
-                .defaultOptions(volcengineChatOptions())
+                .options(volcengineChatOptions())
                 .build();
     }
 
     @Bean("volcengineChatClient")
     ChatClient volcengineChatClient() {
         return  ChatClient.builder(volcengineChatModel())
-                .defaultOptions(volcengineChatOptions())
+                .defaultOptions(volcengineChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

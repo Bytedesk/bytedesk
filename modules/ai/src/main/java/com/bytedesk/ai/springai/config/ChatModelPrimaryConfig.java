@@ -85,7 +85,7 @@ public class ChatModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = SpringAIModels.ZHIPUAI)
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.ZHIPUAI)
     public ChatModel primaryZhipuaiChatModel() {
         log.info("Setting ZhiPuAI chat model as Primary");
         if (zhipuaiChatModel == null) {

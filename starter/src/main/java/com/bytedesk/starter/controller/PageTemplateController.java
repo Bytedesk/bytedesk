@@ -53,6 +53,7 @@ public class PageTemplateController {
         pageTemplateService.toHtml("pages/contact");
         pageTemplateService.toHtml("pages/privacy");
         pageTemplateService.toHtml("pages/terms");
+        pageTemplateService.toHtml("pages/termshell");
         // features
         pageTemplateService.toHtml("features/office");
         pageTemplateService.toHtml("features/scrm");
@@ -79,6 +80,7 @@ public class PageTemplateController {
         pageTemplateService.toHtmlMulti("pages/contact");
         pageTemplateService.toHtmlMulti("pages/privacy");
         pageTemplateService.toHtmlMulti("pages/terms");
+        pageTemplateService.toHtmlMulti("pages/termshell");
         // features
         pageTemplateService.toHtmlMulti("features/office");
         pageTemplateService.toHtmlMulti("features/scrm");

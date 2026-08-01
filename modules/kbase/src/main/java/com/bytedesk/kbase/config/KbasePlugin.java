@@ -16,7 +16,7 @@ package com.bytedesk.kbase.config;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.plugin.AbstractBytedeskPlugin;
@@ -31,9 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class KbasePlugin extends AbstractBytedeskPlugin {
 
+    private final ObjectProvider<HealthIndicator> kbaseHealthIndicatorProvider;
+
     public KbasePlugin(
             @Qualifier("kbaseHealthIndicator") ObjectProvider<HealthIndicator> kbaseHealthIndicatorProvider) {
-        this.kbaseHealthIndicator = kbaseHealthIndicatorProvider.getIfAvailable();
+        this.kbaseHealthIndicatorProvider = kbaseHealthIndicatorProvider;
     }
 
     
@@ -43,11 +45,9 @@ public class KbasePlugin extends AbstractBytedeskPlugin {
     @Value("${bytedesk.kbase.version:1.0.0}")
     private String version;
     
-    private final HealthIndicator kbaseHealthIndicator;
-    
     @Override
     protected HealthIndicator getHealthIndicator() {
-        return kbaseHealthIndicator;
+        return kbaseHealthIndicatorProvider.getIfAvailable();
     }
     
     @Override

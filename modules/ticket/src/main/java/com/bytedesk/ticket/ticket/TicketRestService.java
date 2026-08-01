@@ -21,6 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -39,11 +41,13 @@ import com.bytedesk.core.category.CategoryTypeEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.role.RoleConsts;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.message.MessageRepository;
@@ -118,6 +122,7 @@ public class TicketRestService
 
     @Override
     public Page<TicketResponse> queryByOrg(TicketRequest request) {
+        bindCurrentUserScope(request);
         if (!StringUtils.hasText(request.getUserUid())) {
             String reporterUid = resolveReporterUid(request);
             if (StringUtils.hasText(reporterUid)) {
@@ -133,6 +138,7 @@ public class TicketRestService
 
     @Override
     public Page<TicketResponse> queryByUser(TicketRequest request) {
+        bindCurrentUserScope(request);
         if (!StringUtils.hasText(request.getUserUid())) {
             String reporterUid = resolveReporterUid(request);
             if (StringUtils.hasText(reporterUid)) {
@@ -148,6 +154,7 @@ public class TicketRestService
 
     @Override
     public TicketResponse queryByUid(TicketRequest request) {
+        bindCurrentUserScope(request);
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
         if (!ticketOptional.isPresent()) {
             throw new NotFoundException("ticket not found");
@@ -164,6 +171,7 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getThreadUid(), "thread uid required");
+        bindCurrentUserScope(request);
 
         Optional<TicketEntity> ticketOptional = ticketRepository
                 .findFirstByOrgUidAndThreadUidOrderByCreatedAtDesc(request.getOrgUid(), request.getThreadUid());
@@ -184,6 +192,7 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getThreadTopic(), "thread topic required");
 
+        bindCurrentUserScope(request);
         enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Page<TicketEntity> page = ticketRepository.findByOrgUidAndThreadTopic(request.getOrgUid(),
@@ -199,6 +208,7 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getVisitorThreadUid(), "visitor thread uid required");
 
+        bindCurrentUserScope(request);
         enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadUid(
@@ -214,6 +224,7 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         Assert.hasText(request.getVisitorThreadTopic(), "visitor thread topic required");
 
+        bindCurrentUserScope(request);
         enrichVisibilityContext(request);
         Pageable pageable = request.getPageable();
         Page<TicketEntity> page = ticketRepository.findByOrgUidAndVisitorThreadTopic(
@@ -310,11 +321,14 @@ public class TicketRestService
         Assert.hasText(request.getUid(), "ticket uid required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
 
+        bindCurrentUserScope(request);
+
         Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
         if (ticketOptional.isEmpty()) {
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        assertTicketVisible(ticket);
         populateUpdateDefaults(request, ticket);
         normalizeReporterType(request, false);
         Assert.hasText(request.getReporterJson(), "reporter info required");
@@ -515,6 +529,7 @@ public class TicketRestService
 
     @Override
     public void delete(TicketRequest request) {
+        bindCurrentUserScope(request);
         deleteByUid(request.getUid());
     }
 
@@ -525,12 +540,26 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        assertTicketVisible(ticket);
         ticket.setDeleted(true);
         save(ticket);
     }
 
     public void deleteByVisitor(TicketRequest request) {
-        deleteByUid(request.getUid());
+        bindCurrentUserScope(request);
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())
+                || !currentUser.getUid().equals(ticket.getUserUid())) {
+            throw new NotFoundException("ticket not found");
+        }
+        assertTicketVisible(ticket);
+        ticket.setDeleted(true);
+        save(ticket);
     }
 
     @Override
@@ -592,6 +621,7 @@ public class TicketRestService
         Assert.notNull(request, "ticket request required");
         Assert.hasText(request.getOrgUid(), "organization uid required");
 
+        bindCurrentUserScope(request);
         enrichVisibilityContext(request);
 
         if (Boolean.TRUE.equals(request.getVisibilityRestricted())) {
@@ -656,15 +686,30 @@ public class TicketRestService
         return new PageImpl<>(visible, page.getPageable(), visible.size());
     }
 
+    private void bindCurrentUserScope(TicketRequest request) {
+        if (request == null) {
+            return;
+        }
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            return;
+        }
+        if (!isVisitorPrincipal()) {
+            return;
+        }
+        request.setUserUid(currentUser.getUid());
+        request.setReporterUid(currentUser.getUid());
+        if (request.getReporter() != null) {
+            request.getReporter().setUid(currentUser.getUid());
+        }
+    }
+
     private void enrichVisibilityContext(TicketRequest request) {
         if (request == null || !StringUtils.hasText(request.getOrgUid())) {
             return;
         }
-        if (!TicketTypeEnum.INTERNAL.name().equals(TicketTypeEnum.fromValue(request.getType()).name())) {
-            request.setVisibilityRestricted(false);
-            request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
-            return;
-        }
+
+        bindCurrentUserScope(request);
 
         UserEntity currentUser = authService.getUser();
         if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
@@ -672,6 +717,15 @@ public class TicketRestService
             return;
         }
         request.setVisibilityCurrentUserUid(currentUser.getUid());
+
+        if (isVisitorPrincipal()) {
+            request.setVisibilityRestricted(false);
+            request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
+            return;
+        }
+
+        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
+        request.setType(ticketType.name());
 
         if (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser)) {
             request.setVisibilityOrgAdmin(true);
@@ -688,7 +742,7 @@ public class TicketRestService
         TicketVisibilitySettingsData visibilityData = resolveVisibilitySettingsData(request);
         request.setVisibilityMode(visibilityData.getMode());
         request.setVisibilityRestrictedCategoryUids(visibilityData.getCategoryRules().stream()
-                .filter(rule -> TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(rule.getVisibility()))
+            .filter(rule -> TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(rule.getVisibility()))
                 .map(rule -> rule.getCategoryUid())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toList()));
@@ -703,8 +757,9 @@ public class TicketRestService
                     .orElse(null);
         }
         if (visibilitySettings == null) {
+            TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
             visibilitySettings = ticketSettingsRestService
-                    .findDefaultByOrgUidAndType(request.getOrgUid(), TicketTypeEnum.INTERNAL.name())
+                .findDefaultByOrgUidAndType(request.getOrgUid(), ticketType.name())
                     .map(TicketSettingsEntity::getVisibilitySettings)
                     .orElse(null);
         }
@@ -735,9 +790,6 @@ public class TicketRestService
         if (ticket == null) {
             return false;
         }
-        if (!TicketTypeEnum.INTERNAL.name().equals(ticket.getType())) {
-            return true;
-        }
 
         UserEntity currentUser = authService.getUser();
         if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
@@ -753,8 +805,9 @@ public class TicketRestService
                 && ticket.getAssigneeString().contains("\"uid\":\"" + currentUser.getUid() + "\"")) {
             return true;
         }
-        if (!StringUtils.hasText(ticket.getDepartmentUid())) {
-            return true;
+
+        if (isVisitorPrincipal()) {
+            return false;
         }
 
         String currentDeptUid = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), ticket.getOrgUid())
@@ -767,14 +820,25 @@ public class TicketRestService
         visibilityRequest.setType(ticket.getType());
         TicketVisibilitySettingsData data = resolveVisibilitySettingsData(visibilityRequest);
 
-        if (TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(data.getMode())) {
+        if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(data.getMode())) {
+            if (!StringUtils.hasText(ticket.getDepartmentUid())) {
+                return true;
+            }
             return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
         }
         if (TicketVisibilityModeEnum.CATEGORY_BASED.name().equals(data.getMode())) {
             String categoryVisibility = data.resolveCategoryVisibility(ticket.getCategoryUid());
-            if (TicketVisibilityModeEnum.DEPARTMENT_ONLY.name().equals(categoryVisibility)) {
+            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(categoryVisibility)) {
+                if (!StringUtils.hasText(ticket.getDepartmentUid())) {
+                    return true;
+                }
                 return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
             }
+        }
+
+        if (!TicketTypeEnum.INTERNAL.name().equals(ticket.getType())
+                && TicketVisibilityModeEnum.ORG_WIDE.name().equals(data.getMode())) {
+            return true;
         }
         return true;
     }
@@ -896,6 +960,12 @@ public class TicketRestService
 
     private String resolveReporterUid(TicketRequest request) {
         Assert.notNull(request, "ticket request required");
+        UserEntity currentUser = authService.getUser();
+        if (currentUser != null
+                && StringUtils.hasText(currentUser.getUid())
+                && isVisitorPrincipal()) {
+            return currentUser.getUid();
+        }
         if (StringUtils.hasText(request.getReporterUid())) {
             return request.getReporterUid();
         }
@@ -937,6 +1007,18 @@ public class TicketRestService
             throw new IllegalArgumentException(
                     "invalid reporter.type: expected " + expectedType + ", actual " + reporter.getType());
         }
+    }
+
+    private boolean isVisitorPrincipal() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetailsImpl userDetails) {
+            return ChannelEnum.WEB_VISITOR.name().equalsIgnoreCase(userDetails.getChannel());
+        }
+        return false;
     }
 
 }

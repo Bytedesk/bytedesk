@@ -7,7 +7,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.clipboard;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

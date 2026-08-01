@@ -17,7 +17,6 @@ import com.alibaba.fastjson2.JSON;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -86,7 +85,7 @@ public class StompController {
     // @TabooFilter
     public void receiveTestMessage(Principal principal,
             @DestinationVariable(value = "topic") String topic,
-            @NonNull String message) {
+            String message) {
         log.debug("topic: test.{}, message: {}", topic, message);
         // 测试转发，客户端需要首先订阅此主题，如：test.thread.topic
         simpMessagingTemplate.convertAndSend("/topic/test." + topic, message);

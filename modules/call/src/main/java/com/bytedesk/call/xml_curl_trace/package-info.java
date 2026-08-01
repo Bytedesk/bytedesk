@@ -1,7 +1,7 @@
 /**
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.call.xml_curl_trace;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

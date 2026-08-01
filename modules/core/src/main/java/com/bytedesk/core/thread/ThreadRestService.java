@@ -33,7 +33,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
@@ -92,29 +91,29 @@ public class ThreadRestService
     private final MessageRestService messageRestService;
 
     // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
-    public Optional<ThreadEntity> findByUid(@NonNull String uid) {
+    public Optional<ThreadEntity> findByUid(String uid) {
         return threadRepository.findByUid(uid);
     }
 
-    public Boolean existsByUid(@NonNull String uid) {
+    public Boolean existsByUid(String uid) {
         return threadRepository.existsByUid(uid);
     }
 
     // @Cacheable(value = "thread", key = "#topic + '-' + #user.uid", unless =
     // "#result == null")
-    public Optional<ThreadEntity> findFirstByTopicAndOwner(@NonNull String topic, UserEntity user) {
+    public Optional<ThreadEntity> findFirstByTopicAndOwner(String topic, UserEntity user) {
         return threadRepository.findFirstByTopicAndOwnerAndDeletedOrderByUpdatedAtDesc(topic, user, false);
     }
 
     // 群聊同一个topic多条会话：IncorrectResultSizeDataAccessException: Query did not return a
     // unique result: 4 results were returned
     // @Cacheable(value = "threads", key = "#topic", unless = "#result == null")
-    public List<ThreadEntity> findListByTopic(@NonNull String topic) {
+    public List<ThreadEntity> findListByTopic(String topic) {
         return threadRepository.findByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
     // @Cacheable(value = "thread", key = "#topic", unless = "#result == null")
-    public Optional<ThreadEntity> findFirstByTopic(@NonNull String topic) {
+    public Optional<ThreadEntity> findFirstByTopic(String topic) {
         return threadRepository.findFirstByTopicAndDeletedOrderByCreatedAtDesc(topic, false);
     }
 
@@ -937,7 +936,7 @@ public class ThreadRestService
     }
 
     @Transactional
-    public ThreadSequenceResponse allocateMessageMetadata(@NonNull String threadUid) {
+    public ThreadSequenceResponse allocateMessageMetadata(String threadUid) {
         if (!StringUtils.hasText(threadUid)) {
             throw new IllegalArgumentException("thread uid is required");
         }
@@ -1120,11 +1119,11 @@ public class ThreadRestService
             @CacheEvict(value = "thread", key = "#p0.uid", condition = "#p0 != null && #p0.uid != null"),
             @CacheEvict(value = "thread", key = "#p0.topic", condition = "#p0 != null && #p0.topic != null")
     })
-    public void delete(@NonNull ThreadRequest entity) {
+    public void delete(ThreadRequest entity) {
         deleteByUid(entity.getUid());
     }
 
-    public ThreadResponse restore(@NonNull ThreadRequest request) {
+    public ThreadResponse restore(ThreadRequest request) {
         ThreadEntity thread = threadRepository.findByUid(request.getUid())
                 .orElseThrow(ResourceI18nExceptions::threadNotFound);
         thread.setDeleted(false);

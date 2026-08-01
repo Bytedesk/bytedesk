@@ -2,7 +2,7 @@
  * ByteDesk 文章管理包
  * 提供文章的CRUD、搜索等功能
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.article_archive;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

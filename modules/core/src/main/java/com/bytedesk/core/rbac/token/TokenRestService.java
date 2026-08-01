@@ -24,7 +24,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -321,7 +320,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * @param accessToken JWT访问令牌
      */
     @CacheEvict(cacheNames = "token", allEntries = true)
-    public void revokeAccessToken(@NonNull String accessToken, String reason) {
+    public void revokeAccessToken(String accessToken, String reason) {
         // 撤销后需要清理缓存（key 既有 uid 也有 accessToken，统一 allEntries 最简单可靠）
         // 注意：必须加在 public 方法上，避免类内自调用导致 @CacheEvict 不生效。
         Optional<TokenEntity> optional = findByAccessTokenNoCache(accessToken);
@@ -336,7 +335,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * 撤销指定 uid 的 token，使其立即失效（适合后台管理界面按行操作）。
      */
     @CacheEvict(cacheNames = "token", allEntries = true)
-    public void revokeByUid(@NonNull String uid, String reason) {
+    public void revokeByUid(String uid, String reason) {
         // 同 revokeAccessToken：撤销后清理缓存
         Optional<TokenEntity> optional = findByUid(uid);
         if (optional.isPresent()) {
@@ -351,7 +350,7 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
      * 为避免高频写库，只有 lastActiveAt 为空或超过最小间隔才会更新。
      */
     @Transactional
-    public void touchLastActiveAtIfNeeded(@NonNull TokenEntity entity) {
+    public void touchLastActiveAtIfNeeded(TokenEntity entity) {
         if (bytedeskProperties.isDisableIpFilter()) {
             // 性能测试模式可能不落库，这里不强制写库
             return;

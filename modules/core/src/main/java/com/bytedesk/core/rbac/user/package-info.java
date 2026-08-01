@@ -9,7 +9,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.rbac.user;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

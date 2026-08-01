@@ -13,9 +13,9 @@
  */
 package com.bytedesk.core.thread;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
@@ -66,7 +66,7 @@ public class ThreadPersistCache {
     // 模拟 push 操作：向列表中添加元素
     public void push(String listKey, String threadJSON) {
         stringRedisTemplate.opsForList().rightPush(listKey, threadJSON);
-        stringRedisTemplate.expire(listKey, EXPIRE_TIME, TimeUnit.DAYS);
+        stringRedisTemplate.expire(listKey, Duration.ofDays(EXPIRE_TIME));
     }
 
     public void pushGroup(String groupUid, String threadJSON) {

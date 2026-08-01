@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
@@ -41,7 +40,7 @@ public class StompSubscribeListener implements ApplicationListener<SessionSubscr
     private final Set<String> subscriptions = new HashSet<>();
 
     @Override
-    public void onApplicationEvent(@NonNull SessionSubscribeEvent event) {
+    public void onApplicationEvent(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         String destination = headerAccessor.getDestination();

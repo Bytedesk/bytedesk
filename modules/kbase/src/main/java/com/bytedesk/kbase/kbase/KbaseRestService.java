@@ -23,7 +23,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -79,11 +78,11 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
 
     @Cacheable(value = "kb", key = "#uid", unless = "#result==null")
     @Override
-    public Optional<KbaseEntity> findByUid(@NonNull String uid) {
+    public Optional<KbaseEntity> findByUid(String uid) {
         return kbaseRepository.findByUid(uid);
     }
 
-    public Boolean existsByUid(@NonNull String uid) {
+    public Boolean existsByUid(String uid) {
         return kbaseRepository.existsByUid(uid);
     }
 

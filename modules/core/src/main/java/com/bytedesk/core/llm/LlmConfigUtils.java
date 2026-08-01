@@ -60,7 +60,7 @@ public class LlmConfigUtils {
             case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.chat.options.model", "glm-4.5-flash");
             case LlmProviderConstants.OLLAMA:
-                return environment.getProperty("spring.ai.ollama.chat.options.model", "qwen3:0.6b");
+                return environment.getProperty("spring.ai.ollama.chat.model", "qwen3:0.6b");
             case LlmProviderConstants.DEEPSEEK:
                 return environment.getProperty("spring.ai.deepseek.chat.options.model", "deepseek-chat");
             case LlmProviderConstants.DASHSCOPE:
@@ -93,7 +93,7 @@ public class LlmConfigUtils {
             case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.embedding.options.model", "embedding-2");
             case LlmProviderConstants.OLLAMA:
-                return environment.getProperty("spring.ai.ollama.embedding.options.model", "bge-m3:latest");
+                return environment.getProperty("spring.ai.ollama.embedding.model", "bge-m3:latest");
             case LlmProviderConstants.DASHSCOPE:
                 return environment.getProperty("spring.ai.dashscope.embedding.options.model", "text-embedding-v1");
             default:
@@ -132,7 +132,7 @@ public class LlmConfigUtils {
             case LlmProviderConstants.ZHIPUAI:
                 return environment.getProperty("spring.ai.zhipuai.rerank.options.model", "linux6200/bge-reranker-v2-m3:latest");
             case LlmProviderConstants.OLLAMA:
-                return environment.getProperty("spring.ai.ollama.embedding.options.model.rerank", "linux6200/bge-reranker-v2-m3:latest");
+                return environment.getProperty("spring.ai.ollama.embedding.model.rerank", "linux6200/bge-reranker-v2-m3:latest");
             default:
                 return LlmDefaults.DEFAULT_RERANK_MODEL;
         }

@@ -21,7 +21,6 @@ import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,7 @@ import com.bytedesk.ai.provider.LlmProviderEntity;
 import com.bytedesk.ai.provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
@@ -64,10 +64,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
 
 
     /**
-     * 根据机器人配置创建动态的OpenAiChatOptions
-     * 
-     * @param llm 机器人LLM配置
-     * @return 根据机器人配置创建的选项
+     * 根据机器人配置创建 DeepSeek chat options。
      */
     private OpenAiChatOptions createDeepseekOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
@@ -84,13 +81,6 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             log.error("Error creating Deepseek options for model {}", llm.getTextModel(), e);
             return null;
         }
-    }
-
-    public OpenAiApi createDeepseekApi(String apiUrl, String apiKey) {
-        return OpenAiApi.builder()
-                .baseUrl(apiUrl)
-                .apiKey(apiKey)
-                .build();
     }
 
     /**
@@ -120,17 +110,14 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Deepseek chat model with provider: {} ({})", provider.getType(),
                     provider.getUid());
-            // 使用动态的OpenAiApi实例
-            OpenAiApi deepseekApi = createDeepseekApi(provider.getBaseUrl(), provider.getApiKey());
             OpenAiChatOptions options = createDeepseekOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Deepseek options, using default chat model");
                 return defaultChatModel;
             }
-            return OpenAiChatModel.builder()
-                    .openAiApi(deepseekApi)
-                    .defaultOptions(options)
-                    .build();
+            OpenAiChatOptions resolvedOptions = OpenAiCompatibleModelFactory.withConnection(options,
+                provider.getBaseUrl(), provider.getApiKey());
+            return OpenAiCompatibleModelFactory.chatModel(resolvedOptions);
         } catch (Exception e) {
             log.error("Failed to create dynamic Deepseek chat model for provider {}, using default chat model",
                     provider.getUid(), e);

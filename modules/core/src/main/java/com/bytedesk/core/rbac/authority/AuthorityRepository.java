@@ -18,7 +18,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -40,10 +39,10 @@ public interface AuthorityRepository extends JpaRepository<AuthorityEntity, Long
 
     Boolean existsByValue(String value);
 
-    boolean existsById(@NonNull Long id);
+    boolean existsById(Long id);
 
     @Transactional
-    void deleteById(@NonNull Long id);
+    void deleteById(Long id);
 
     List<AuthorityEntity> findByValueContainingIgnoreCaseAndDeletedFalse(String value);
 

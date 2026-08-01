@@ -8,7 +8,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.rbac.token;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

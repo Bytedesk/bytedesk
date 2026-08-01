@@ -18,7 +18,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 // import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -116,21 +115,18 @@ public class EslEventEntity extends BaseEntity {
     /**
      * API argument for API events
      */
-    @Lob
     @Column(name = "api_argument", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String apiArgument;
 
     /**
      * Serialized event headers in JSON format
      */
-    @Lob
     @Column(name = "headers_json", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String headersJson;
 
     /**
      * Serialized event body lines in JSON format
      */
-    @Lob
     @Column(name = "body_json", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String bodyJson;
 

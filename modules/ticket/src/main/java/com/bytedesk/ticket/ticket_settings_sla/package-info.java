@@ -5,7 +5,7 @@
  * @author bytedesk.com
  */
 
-@NonNullApi
+@NullMarked
 package com.bytedesk.ticket.ticket_settings_sla;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

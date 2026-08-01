@@ -15,8 +15,7 @@ package com.bytedesk.core.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.StringUtils;
 
 import java.util.regex.Pattern;
@@ -249,7 +248,7 @@ public class BdUploadUtils {
      * @param maxLength 最大长度
      * @return 截断后的文件名
      */
-    public static String truncateFileName(@NonNull String fileName, int maxLength) {
+    public static String truncateFileName(String fileName, int maxLength) {
         if (fileName.length() <= maxLength) {
             return fileName;
         }

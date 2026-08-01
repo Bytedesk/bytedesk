@@ -17,12 +17,12 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.Data;
@@ -50,18 +50,12 @@ public class SpringAISiliconFlowEmbeddingConfig {
     @Value("${spring.ai.siliconflow.embedding.options.dimensions:0}")
     private Integer embeddingDimensions;
 
-    @Bean("siliconFlowEmbeddingApi")
-    OpenAiApi siliconFlowEmbeddingApi() {
-        String resolvedApiKey = (embeddingApiKey != null && !embeddingApiKey.isEmpty()) ? embeddingApiKey : apiKey;
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(resolvedApiKey)
-                .build();
-    }
-
     @Bean("siliconFlowEmbeddingOptions")
     OpenAiEmbeddingOptions siliconFlowEmbeddingOptions() {
+        String resolvedApiKey = (embeddingApiKey != null && !embeddingApiKey.isEmpty()) ? embeddingApiKey : apiKey;
         OpenAiEmbeddingOptions.Builder builder = OpenAiEmbeddingOptions.builder()
+            .baseUrl(baseUrl)
+            .apiKey(resolvedApiKey)
                 .model(embeddingModel);
         if (embeddingDimensions != null && embeddingDimensions > 0) {
             builder.dimensions(embeddingDimensions);
@@ -72,7 +66,7 @@ public class SpringAISiliconFlowEmbeddingConfig {
     @Bean("siliconFlowEmbeddingModel")
     @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.SILICONFLOW, matchIfMissing = false)
     OpenAiEmbeddingModel siliconFlowEmbeddingModel() {
-        return new OpenAiEmbeddingModel(siliconFlowEmbeddingApi(), MetadataMode.EMBED, siliconFlowEmbeddingOptions());
+        return OpenAiCompatibleModelFactory.embeddingModel(siliconFlowEmbeddingOptions(), MetadataMode.EMBED);
     }
 
 }

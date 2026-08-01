@@ -40,8 +40,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.hibernate7.Hibernate7Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.hibernate5.jakarta.Hibernate5JakartaModule;
 
 /**
  * Jackson ObjectMapper 配置
@@ -180,10 +180,10 @@ public class JacksonConfig {
         objectMapper.registerModule(zonedDateTimeModule);
         
         // 添加Hibernate代理支持
-        objectMapper.registerModule(new Hibernate5JakartaModule()
-            .configure(Hibernate5JakartaModule.Feature.FORCE_LAZY_LOADING, false)
-            .configure(Hibernate5JakartaModule.Feature.USE_TRANSIENT_ANNOTATION, false)
-            .configure(Hibernate5JakartaModule.Feature.REPLACE_PERSISTENT_COLLECTIONS, true));
+        objectMapper.registerModule(new Hibernate7Module()
+            .configure(Hibernate7Module.Feature.FORCE_LAZY_LOADING, false)
+            .configure(Hibernate7Module.Feature.USE_TRANSIENT_ANNOTATION, false)
+            .configure(Hibernate7Module.Feature.REPLACE_PERSISTENT_COLLECTIONS, true));
         
         return objectMapper;
     }

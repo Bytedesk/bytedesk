@@ -14,7 +14,6 @@
 package com.bytedesk.core.socket.stomp.listener;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 
@@ -34,7 +33,7 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 public class StompConnectListener implements ApplicationListener<SessionConnectEvent> {
 
     @Override
-    public void onApplicationEvent(@NonNull SessionConnectEvent sessionConnectEvent) {
+    public void onApplicationEvent(SessionConnectEvent sessionConnectEvent) {
         // log.debug(sessionConnectEvent.toString());
     }
 }

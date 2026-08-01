@@ -15,7 +15,7 @@
  * 此包的设计旨在提高智能客服系统的用户意图理解能力，
  * 为客户提供更精准的服务和信息。
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.settings_intention;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

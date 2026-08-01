@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -42,17 +41,11 @@ public class SpringAIOpenrouterChatConfig {
     @Value("${spring.ai.openrouter.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("openrouterApi")
-    OpenAiApi openrouterApi() {
-        return OpenAiApi.builder()
-                .baseUrl(baseUrl)
-                .apiKey(apiKey)
-                .build();
-    }
-
     @Bean("openrouterChatOptions")
     OpenAiChatOptions openrouterChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -61,15 +54,14 @@ public class SpringAIOpenrouterChatConfig {
     @Bean("openrouterChatModel")
     OpenAiChatModel openrouterChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(openrouterApi())
-                .defaultOptions(openrouterChatOptions())
+                .options(openrouterChatOptions())
                 .build();
     }
 
     @Bean("openrouterChatClient")
     ChatClient openrouterChatClient() {
         return  ChatClient.builder(openrouterChatModel())
-                .defaultOptions(openrouterChatOptions())
+                .defaultOptions(openrouterChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

@@ -4,7 +4,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.kbase.kbase_invite;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

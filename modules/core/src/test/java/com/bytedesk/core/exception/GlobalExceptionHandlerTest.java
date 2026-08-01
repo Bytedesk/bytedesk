@@ -2,11 +2,14 @@ package com.bytedesk.core.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.io.IOException;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.client.ResourceAccessException;
@@ -99,11 +102,30 @@ class GlobalExceptionHandlerTest {
 
         ResponseEntity<?> response = handler.handleAsyncRequestNotUsableException(exception);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isInstanceOf(JsonResult.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+    }
 
-        JsonResult<?> body = (JsonResult<?>) response.getBody();
-        assertThat(body.getMessage()).isEqualTo(I18Consts.I18N_CONNECTION_NO_LONGER_AVAILABLE);
+    @Test
+    void handleHttpMessageNotWritableExceptionReturnsNoContentForBrokenPipe() {
+        HttpMessageNotWritableException exception = new HttpMessageNotWritableException(
+                "Could not write JSON",
+                new IOException("Broken pipe"));
+
+        ResponseEntity<?> response = handler.handleHttpMessageNotWritableException(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void handleExceptionReturnsNoContentForWrappedBrokenPipe() {
+        Exception exception = new Exception("write failed", new IOException("Broken pipe"));
+
+        ResponseEntity<?> response = handler.handleException(exception);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
     }
 
     @Test

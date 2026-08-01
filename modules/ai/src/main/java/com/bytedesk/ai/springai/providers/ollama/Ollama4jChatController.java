@@ -27,16 +27,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JsonResultCodeEnum;
 
-import io.github.ollama4j.OllamaAPI;
-import io.github.ollama4j.exceptions.OllamaBaseException;
+import io.github.ollama4j.Ollama;
+import io.github.ollama4j.exceptions.OllamaException;
 import io.github.ollama4j.models.chat.OllamaChatMessageRole;
 import io.github.ollama4j.models.chat.OllamaChatRequest;
-import io.github.ollama4j.models.chat.OllamaChatRequestBuilder;
 import io.github.ollama4j.models.chat.OllamaChatResult;
-import io.github.ollama4j.models.generate.OllamaStreamHandler;
+import io.github.ollama4j.models.generate.OllamaGenerateRequest;
+import io.github.ollama4j.models.generate.OllamaGenerateStreamObserver;
+import io.github.ollama4j.models.generate.OllamaGenerateTokenHandler;
 import io.github.ollama4j.models.response.OllamaAsyncResultStreamer;
 import io.github.ollama4j.models.response.OllamaResult;
-import io.github.ollama4j.utils.OptionsBuilder;
+import io.github.ollama4j.utils.Options;
 import lombok.extern.slf4j.Slf4j;
 
 // https://ollama4j.github.io/ollama4j/apis-generate/generate/
@@ -47,14 +48,13 @@ import lombok.extern.slf4j.Slf4j;
 public class Ollama4jChatController {
 
     public Ollama4jChatController(
-            @Qualifier("ollama4jApi") OllamaAPI ollama4jApi) {
+            @Qualifier("ollama4jApi") Ollama ollama4jApi) {
         this.ollama4jApi = ollama4jApi;
     }
 
+    private final Ollama ollama4jApi;
 
-    private final OllamaAPI ollama4jApi;
-
-    @Value("${spring.ai.ollama.chat.options.model}")
+    @Value("${spring.ai.ollama.chat.model}")
     private String ollamaDefaultModel;
 
     // 同步接口
@@ -64,7 +64,12 @@ public class Ollama4jChatController {
         //
         OllamaResult result;
         try {
-            result = ollama4jApi.generate(request.getModel(), request.getMessage(), false, new OptionsBuilder().build());
+            OllamaGenerateRequest generateRequest = OllamaGenerateRequest.builder()
+                    .withModel(request.getModel())
+                    .withPrompt(request.getMessage())
+                    .withOptions(Options.builder().build())
+                    .build();
+            result = ollama4jApi.generate(generateRequest, null);
 
             return ResponseEntity.ok(JsonResult.success(result.getResponse()));
         } catch (Exception e) {
@@ -78,16 +83,20 @@ public class Ollama4jChatController {
     @RequestMapping(value = "/stream")
     public ResponseEntity<?> getSyncAnswerStream(OllamaRequest request) {
         // define a stream handler (Consumer<String>)
-        OllamaStreamHandler streamHandler = (content) -> {
+        OllamaGenerateTokenHandler streamHandler = (content) -> {
             log.info("streamHandler: {}", content);
         };
         //
         try {
+            OllamaGenerateRequest generateRequest = OllamaGenerateRequest.builder()
+                    .withModel(request.getModel())
+                    .withPrompt(request.getMessage())
+                    .withStreaming(true)
+                    .withOptions(Options.builder().build())
+                    .build();
+            OllamaGenerateStreamObserver observer = new OllamaGenerateStreamObserver(streamHandler, null);
             // Should be called using separate thread to gain non blocking streaming effect.
-            OllamaResult result = ollama4jApi.generate(request.getModel(), request.getMessage(),
-                    false,
-                    new OptionsBuilder().build(),
-                    streamHandler);
+            OllamaResult result = ollama4jApi.generate(generateRequest, observer);
             log.info("getSyncAnswerStream result: {}", result);
             return ResponseEntity.ok(JsonResult.success(result.getResponse()));
         } catch (Exception e) {
@@ -105,7 +114,7 @@ public class Ollama4jChatController {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         // 定义一个stream handler来发送SSE事件
-        OllamaStreamHandler streamHandler = (content) -> {
+        OllamaGenerateTokenHandler streamHandler = (content) -> {
             try {
                 log.info("streamHandler: {}", content);
                 // 使用SseEmitter发送内容
@@ -135,7 +144,15 @@ public class Ollama4jChatController {
                         JsonResultCodeEnum.ROBOT_ANSWER_START.getValue(),
                         JsonResultCodeEnum.ROBOT_ANSWER_START.getName())));
 
-                ollama4jApi.generate(request.getModel(), request.getMessage(), false, new OptionsBuilder().build(), streamHandler);
+                OllamaGenerateRequest generateRequest = OllamaGenerateRequest.builder()
+                        .withModel(request.getModel())
+                        .withPrompt(request.getMessage())
+                        .withStreaming(true)
+                        .withOptions(Options.builder().build())
+                        .build();
+                OllamaGenerateStreamObserver observer = new OllamaGenerateStreamObserver(streamHandler, null);
+                ollama4jApi.generate(generateRequest, observer);
+
                 // 发送完成事件
                 emitter.send(SseEmitter.event().data(JsonResult.success(
                         JsonResultCodeEnum.ROBOT_ANSWER_END.getName(),
@@ -164,14 +181,14 @@ public class Ollama4jChatController {
     // http://127.0.0.1:9003/ollama4j/chat/async?message=Tell%20me%20a%2joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @GetMapping("/async")
     public ResponseEntity<?> getAsyncAnswer(OllamaRequest request)
-            throws InterruptedException {
+            throws OllamaException, InterruptedException {
 
-        OllamaAsyncResultStreamer streamer = ollama4jApi.generateAsync(request.getModel(), request.getMessage(), false);
+        OllamaAsyncResultStreamer streamer = ollama4jApi.generateAsync(request.getModel(), request.getMessage(), false, null);
         // Set the poll interval according to your needs.
         // Smaller the poll interval, more frequently you receive the tokens.
         int pollIntervalMilliseconds = 1000;
         while (true) {
-            String tokens = streamer.getStream().poll();
+            String tokens = streamer.getResponseStream().poll();
             log.info("getAsyncAnswer tokens {}", tokens);
             if (!streamer.isAlive()) {
                 break;
@@ -188,10 +205,10 @@ public class Ollama4jChatController {
     // http://127.0.0.1:9003/ollama4j/chat/context?message=Tell%20me%20a%2joke&apiUrl=http://127.0.0.1:11474&model=llama3
     @GetMapping("/context")
     public ResponseEntity<?> getChatWithContext(OllamaRequest request)
-            throws OllamaBaseException, IOException, InterruptedException {
-        OllamaChatRequestBuilder builder = OllamaChatRequestBuilder.getInstance(request.getModel());
+            throws OllamaException, IOException, InterruptedException {
         // create first user question
-        OllamaChatRequest requestModel = builder
+        OllamaChatRequest requestModel = OllamaChatRequest.builder()
+                .withModel(request.getModel())
                 .withMessage(OllamaChatMessageRole.USER, "What is the capital of France?")
                 .build();
         // start conversation with model
@@ -199,15 +216,18 @@ public class Ollama4jChatController {
         try {
 
             // "start" conversation with model
-            chatResult = ollama4jApi.chat(requestModel);
+            chatResult = ollama4jApi.chat(requestModel, null);
 
             log.info("First answer: {}", chatResult);
 
             // create next userQuestion
-            requestModel = builder.withMessages(chatResult.getChatHistory())
-                    .withMessage(OllamaChatMessageRole.USER, "And what is the second largest city?").build();
+            requestModel = OllamaChatRequest.builder()
+                    .withModel(request.getModel())
+                    .withMessages(chatResult.getChatHistory())
+                    .withMessage(OllamaChatMessageRole.USER, "And what is the second largest city?")
+                    .build();
             // "continue" conversation with model
-            chatResult = ollama4jApi.chat(requestModel);
+            chatResult = ollama4jApi.chat(requestModel, null);
             log.info("Second answer: {}", chatResult);
             log.info("Chat History: {}", chatResult.getChatHistory());
 

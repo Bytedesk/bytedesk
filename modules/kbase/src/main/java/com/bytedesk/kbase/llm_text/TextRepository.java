@@ -33,6 +33,8 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
 
     List<TextEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
+    List<TextEntity> findByDeletedFalse();
+
     Boolean existsByTitleAndKbase_UidAndDeletedFalse(String title, String kbUid);
     
     /**

@@ -13,7 +13,7 @@
  */
 package com.bytedesk.kbase.llm_faq.batch;
 
-import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.infrastructure.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;

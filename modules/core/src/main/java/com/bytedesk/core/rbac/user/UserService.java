@@ -24,7 +24,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -991,32 +990,32 @@ public class UserService {
     }
 
     @Cacheable(value = "user:exists", key = "#username + '-' + #platform", unless = "#result == null")
-    public Boolean existsByUsernameAndPlatform(@NonNull String username, @NonNull String platform) {
+    public Boolean existsByUsernameAndPlatform(String username, String platform) {
         return userRepository.existsByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
-    public Boolean existsByMobileAndPlatform(@NonNull String mobile, String country, @NonNull String platform) {
+    public Boolean existsByMobileAndPlatform(String mobile, String country, String platform) {
         return userRepository.existsByMobileAndCountryAndPlatformAndDeletedFalse(
                 mobile,
                 CountryCodeUtils.normalize(country),
                 platform);
     }
 
-    public Boolean existsByMobileAndPlatform(@NonNull String mobile, @NonNull String platform) {
+    public Boolean existsByMobileAndPlatform(String mobile, String platform) {
         return existsByMobileAndPlatform(mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
     @Cacheable(value = "user:exists", key = "#email + '-' + #platform", unless = "#result == null")
-    public Boolean existsByEmailAndPlatform(@NonNull String email, @NonNull String platform) {
+    public Boolean existsByEmailAndPlatform(String email, String platform) {
         return userRepository.existsByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
     // exists by username and mobile
     @Cacheable(value = "user:exists", key = "#username + '-' + #mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
-    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
+    public Boolean existsByUsernameAndMobileAndPlatform(String username, String mobile,
             String country,
-            @NonNull String platform) {
+            String platform) {
         return userRepository.existsByUsernameAndMobileAndCountryAndPlatformAndDeletedFalse(
                 username,
                 mobile,
@@ -1024,8 +1023,8 @@ public class UserService {
                 platform);
     }
 
-    public Boolean existsByUsernameAndMobileAndPlatform(@NonNull String username, @NonNull String mobile,
-            @NonNull String platform) {
+    public Boolean existsByUsernameAndMobileAndPlatform(String username, String mobile,
+            String platform) {
         return existsByUsernameAndMobileAndPlatform(username, mobile, CountryCodeUtils.DEFAULT_COUNTRY, platform);
     }
 
@@ -1044,7 +1043,7 @@ public class UserService {
             @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform", condition = "#user.mobile != null"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform", condition = "#user.email != null"),
     })
-    public UserEntity save(@NonNull UserEntity user) {
+    public UserEntity save(UserEntity user) {
         if (StringUtils.hasText(user.getMobile())) {
             user.setCountry(CountryCodeUtils.normalize(user.getCountry()));
         }
@@ -1068,7 +1067,7 @@ public class UserService {
             @CacheEvict(value = "user:exists", key = "#user.mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#user.country)) + '-' + #user.platform"),
             @CacheEvict(value = "user:exists", key = "#user.email + '-' + #user.platform"),
     })
-    public void delete(@NonNull UserEntity user) {
+    public void delete(UserEntity user) {
         user.setDeleted(true);
         save(user);
     }

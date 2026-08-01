@@ -2,8 +2,7 @@ package com.bytedesk.core.utils;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 import java.io.File;
@@ -79,7 +78,7 @@ public class BdFileUtils {
      * @param source source path must not be null
      * @param target target path must not be null
      */
-    public static void copyFolder(@NonNull Path source, @NonNull Path target) throws IOException {
+    public static void copyFolder(Path source, Path target) throws IOException {
         Assert.notNull(source, "Source path must not be null");
         Assert.notNull(target, "Target path must not be null");
 
@@ -108,7 +107,7 @@ public class BdFileUtils {
      *
      * @param deletingPath deleting path must not be null
      */
-    public static void deleteFolder(@NonNull Path deletingPath) throws IOException {
+    public static void deleteFolder(Path deletingPath) throws IOException {
         Assert.notNull(deletingPath, "Deleting path must not be null");
 
         log.debug("Deleting [{}]", deletingPath);
@@ -128,7 +127,7 @@ public class BdFileUtils {
      * @param targetPath target path must not be null and not empty
      * @throws IOException
      */
-    public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath) throws IOException {
+    public static void unzip(ZipInputStream zis, Path targetPath) throws IOException {
         Assert.notNull(zis, "Zip input stream must not be null");
         Assert.notNull(targetPath, "Target path must not be null");
 
@@ -166,7 +165,7 @@ public class BdFileUtils {
      * @return path containing base files
      * @throws IOException
      */
-    public static Path skipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
+    public static Path skipZipParentFolder(Path unzippedPath) throws IOException {
         Assert.notNull(unzippedPath, "Unzipped folder must not be  null");
 
         List<Path> childrenPath = Files.list(unzippedPath).collect(Collectors.toList());
@@ -184,7 +183,7 @@ public class BdFileUtils {
      * @param path path must not be null
      * @throws IOException
      */
-    public static void createIfAbsent(@NonNull Path path) throws IOException {
+    public static void createIfAbsent(Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
 
         if (Files.notExists(path)) {
@@ -202,7 +201,7 @@ public class BdFileUtils {
      * @return true if the given path is empty; false otherwise
      * @throws IOException
      */
-    public static boolean isEmpty(@NonNull Path path) throws IOException {
+    public static boolean isEmpty(Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
 
         return Files.list(path).count() == 0;
@@ -214,7 +213,7 @@ public class BdFileUtils {
      * @param path path must not be null
      * @throws IOException
      */
-    public static void mustBeEmpty(@NonNull Path path) throws IOException {
+    public static void mustBeEmpty(Path path) throws IOException {
         if (!isEmpty(path)) {
             throw new DirectoryNotEmptyException("Target directory: " + path + " was not empty");
         }
@@ -226,7 +225,7 @@ public class BdFileUtils {
      * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull String parentPath, @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(String parentPath, String pathToCheck) {
         checkDirectoryTraversal(Paths.get(parentPath), Paths.get(pathToCheck));
     }
 
@@ -236,7 +235,7 @@ public class BdFileUtils {
      * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath, @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath, String pathToCheck) {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
@@ -246,7 +245,7 @@ public class BdFileUtils {
      * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath, @NonNull Path pathToCheck) {
+    public static void checkDirectoryTraversal(Path parentPath, Path pathToCheck) {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 

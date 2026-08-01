@@ -25,7 +25,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 // import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 // import org.springframework.data.rest.core.annotation.RestResource;
-import org.springframework.lang.NonNull;
 import org.springframework.data.repository.query.Param;
 // import org.springframework.security.access.prepost.PreAuthorize;
 // import org.springframework.web.bind.annotation.CrossOrigin;
@@ -84,6 +83,6 @@ public interface OrganizationRepository
         Boolean existsByCodeAndDeletedAndUidNot(String code, Boolean deleted, String uid);
 
         // @RestResource(exported = false)
-        void deleteById(@NonNull Long id);
+        void deleteById(Long id);
 
 }

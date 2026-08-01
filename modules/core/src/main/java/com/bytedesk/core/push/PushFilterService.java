@@ -20,8 +20,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.RedisConsts;
 
-import java.util.concurrent.TimeUnit;
-
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -57,7 +56,7 @@ public class PushFilterService {
     // 更新IP最后发送验证码的时间
     public void updateIpLastSentTime(String ip) {
         String key = RedisConsts.PUSH_CODE_IP_PREFIX + ip;
-        stringRedisTemplate.opsForValue().set(key, "1", VALIDATE_CODE_SEND_INTERVAL_SECONDS, TimeUnit.SECONDS);
+        stringRedisTemplate.opsForValue().set(key, "1", Duration.ofSeconds(VALIDATE_CODE_SEND_INTERVAL_SECONDS));
     }
 
     // 删除发送验证码的ip

@@ -17,7 +17,6 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -45,15 +44,11 @@ public class SpringAIBaiduChatConfig {
     @Value("${spring.ai.baidu.chat.options.temperature:0.7}")
     private Double temperature;
 
-    @Bean("baiduApi")
-    OpenAiApi baiduApi() {
-        // 使用BaiduApi工厂方法创建API实例，自动配置正确的路径
-        return BaiduApi.create(baseUrl, apiKey);
-    }
-
     @Bean("baiduChatOptions")
     OpenAiChatOptions baiduChatOptions() {
         return OpenAiChatOptions.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
                 .model(model)
                 .temperature(temperature)
                 .build();
@@ -62,15 +57,14 @@ public class SpringAIBaiduChatConfig {
     @Bean("baiduChatModel")
     OpenAiChatModel baiduChatModel() {
         return OpenAiChatModel.builder()
-                .openAiApi(baiduApi())
-                .defaultOptions(baiduChatOptions())
+                .options(baiduChatOptions())
                 .build();
     }
 
     @Bean("baiduChatClient")
     ChatClient baiduChatClient() {
         return  ChatClient.builder(baiduChatModel())
-                .defaultOptions(baiduChatOptions())
+                .defaultOptions(baiduChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

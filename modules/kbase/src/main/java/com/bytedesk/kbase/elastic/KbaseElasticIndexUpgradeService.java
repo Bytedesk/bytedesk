@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.RestClient;
+import co.elastic.clients.transport.rest5_client.low_level.Request;
+import co.elastic.clients.transport.rest5_client.low_level.ResponseException;
+import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.IndexOperations;
@@ -64,7 +64,7 @@ public class KbaseElasticIndexUpgradeService {
 
     private final ElasticsearchOperations elasticsearchOperations;
 
-    private final ObjectProvider<RestClient> restClientProvider;
+    private final ObjectProvider<Rest5Client> restClientProvider;
 
     private final KbaseRestService kbaseRestService;
 
@@ -180,7 +180,7 @@ public class KbaseElasticIndexUpgradeService {
     }
 
     private Map<String, Object> checkIkAnalyzerAvailability() {
-        RestClient restClient = restClientProvider.getIfAvailable();
+        Rest5Client restClient = restClientProvider.getIfAvailable();
         if (restClient == null) {
             return Map.of(
                     "available", false,
@@ -200,14 +200,14 @@ public class KbaseElasticIndexUpgradeService {
         return Map.of("available", true);
     }
 
-    private String verifyAnalyzer(RestClient restClient, String analyzer) {
+    private String verifyAnalyzer(Rest5Client restClient, String analyzer) {
         try {
             Request request = new Request("POST", "/_analyze");
             request.setJsonEntity("{\"analyzer\":\"" + analyzer + "\",\"text\":\"bytedesk ik check\"}");
             restClient.performRequest(request);
             return null;
         } catch (ResponseException ex) {
-            int statusCode = ex.getResponse().getStatusLine().getStatusCode();
+            int statusCode = ex.getResponse().getStatusCode();
             return "IK analyzer unavailable: " + analyzer + ", status=" + statusCode + ", error=" + ex.getMessage();
         } catch (IOException ex) {
             return "Failed to verify IK analyzer " + analyzer + ": " + ex.getMessage();

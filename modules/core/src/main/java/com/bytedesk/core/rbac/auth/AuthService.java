@@ -13,7 +13,6 @@
 package com.bytedesk.core.rbac.auth;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -104,7 +103,7 @@ public class AuthService {
         return getUser();
     }
 
-    public UsernamePasswordAuthenticationToken getAuthentication(@NonNull HttpServletRequest request, String subject) {
+    public UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request, String subject) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsernameAndPlatform(subject);
 

@@ -54,10 +54,7 @@ public class SpringAIZhipuaiChatConfig {
 
     @Bean("bytedeskZhipuaiApi")
     ZhiPuAiApi bytedeskZhipuaiApi() {
-        // return new ZhiPuAiApi(zhipuaiBaseUrl, zhipuaiApiKey);
-        return ZhiPuAiApi.builder()
-                .apiKey(zhipuaiApiKey)
-                .build();
+        return new ZhiPuAiApi(zhipuaiBaseUrl, zhipuaiApiKey);
     }
 
     @Bean("bytedeskZhipuaiChatOptions")
@@ -82,7 +79,6 @@ public class SpringAIZhipuaiChatConfig {
     @Bean("bytedeskZhipuaiChatClient")
     ChatClient bytedeskZhipuaiChatClient() {
         return bytedeskZhipuaiChatClientBuilder()
-                .defaultOptions(bytedeskZhipuaiChatOptions())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

@@ -102,7 +102,7 @@ public class CityTelCodeInitializer {
                     updated += rows;
                 } else {
                     skipped++;
-                    log.debug("telCode init: no match for name='{}'", cityName);
+                    // log.debug("telCode init: no match for name='{}'", cityName);
                 }
             }
 

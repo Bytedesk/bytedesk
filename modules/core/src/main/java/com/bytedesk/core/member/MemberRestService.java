@@ -858,7 +858,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         Set<RoleResponseSimple> roles = new HashSet<>();
         for (String roleUid : roleUidSet) {
             try {
-                roleRestService.findByUid(roleUid)
+                roleRestService.findByUidNoCache(roleUid)
                         .map(role -> modelMapper.map(role, RoleResponseSimple.class))
                         .ifPresent(roles::add);
             } catch (Exception e) {

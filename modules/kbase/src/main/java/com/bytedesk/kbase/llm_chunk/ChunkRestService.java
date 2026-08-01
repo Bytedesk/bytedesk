@@ -99,8 +99,12 @@ public class ChunkRestService extends BaseRestServiceWithExport<ChunkEntity, Chu
     public List<ChunkEntity> findByKbUidNoCache(String kbUid) {
         return chunkRepository.findByKbase_UidAndDeletedFalse(kbUid);
     }
+
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public List<ChunkEntity> findAllNotDeletedNoCache() {
+        return chunkRepository.findByDeletedFalse();
+    }
     
-    // findByFileUid
     @Cacheable(value = "chunk", key = "#fileUid", unless = "#result==null")
     public List<ChunkEntity> findByFileUid(String fileUid) {
         return chunkRepository.findByFile_UidAndDeletedFalse(fileUid);

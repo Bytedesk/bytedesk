@@ -273,11 +273,14 @@ public class ChunkVectorService {
     // update all elasticsearch vector index
     public Map<String, Object> updateAllVectorIndex(ChunkRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUidNoCache(kbUid);
 
         int total = chunkList.size();
         int successCount = 0;
@@ -304,11 +307,12 @@ public class ChunkVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", total);
         result.put("success", successCount);
         result.put("error", errorCount);
 
-        log.info("Updated vector index for {} chunks from knowledge base: {}, success={}, error={}", total, kbUid, successCount, errorCount);
+        log.info("Updated vector index for {} chunks, superUser={}, kbUid={}, success={}, error={}", total, superUser, kbUid, successCount, errorCount);
         return result;
     }
 
@@ -346,11 +350,14 @@ public class ChunkVectorService {
      */
     public Map<String, Object> syncVectorStatusByKbUid(ChunkRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUidNoCache(kbUid);
 
         int successCount = 0;
         int newCount = 0;
@@ -376,6 +383,7 @@ public class ChunkVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", chunkList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -388,11 +396,14 @@ public class ChunkVectorService {
      */
     public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(ChunkRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<ChunkEntity> chunkList = chunkRestService.findByKbUidNoCache(kbUid);
+        List<ChunkEntity> chunkList = superUser
+                ? chunkRestService.findAllNotDeletedNoCache()
+                : chunkRestService.findByKbUidNoCache(kbUid);
         int total = chunkList.size();
 
         List<String> docIdsToDelete = new ArrayList<>();
@@ -404,19 +415,25 @@ public class ChunkVectorService {
         int errorCount = 0;
 
         try {
-            if (!docIdsToDelete.isEmpty()) {
+            if (!superUser && !docIdsToDelete.isEmpty()) {
                 vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
+                for (ChunkEntity chunk : chunkList) {
+                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+                }
+                successCount = total;
             }
-            for (ChunkEntity chunk : chunkList) {
-                chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
-            }
-            successCount = total;
         } catch (Exception e) {
             log.warn("批量删除Chunk向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+        }
+
+        if (superUser || successCount != total) {
+            successCount = 0;
+            errorCount = 0;
             for (ChunkEntity chunk : chunkList) {
                 try {
-                    vectorStoreResolver.resolveByKbase(chunk.getKbase()).delete(List.of("chunk_" + chunk.getUid()));
-                    chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.NEW.name());
+                    ChunkEntity currentChunk = chunkRestService.findByUidNoCache(chunk.getUid()).orElse(chunk);
+                    vectorStoreResolver.resolveByKbase(currentChunk.getKbase()).delete(List.of("chunk_" + currentChunk.getUid()));
+                    chunkRestService.updateVectorStatusOnly(currentChunk.getUid(), ChunkStatusEnum.NEW.name());
                     successCount++;
                 } catch (Exception ex) {
                     chunkRestService.updateVectorStatusOnly(chunk.getUid(), ChunkStatusEnum.ERROR.name());
@@ -429,6 +446,7 @@ public class ChunkVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", total);
         result.put("success", successCount);
         result.put("error", errorCount);

@@ -40,8 +40,8 @@ import org.springframework.ai.model.tool.*;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.ai.support.UsageCalculator;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -52,12 +52,12 @@ import com.bytedesk.ai.springai.providers.moonshot.api.MoonshotApi.ChatCompletio
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import static com.bytedesk.ai.springai.providers.moonshot.api.MoonshotConstants.MOONSHOT_PROVIDER_NAME;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -95,12 +95,6 @@ public class MoonshotChatModel implements ChatModel {
 	private final ToolCallingManager toolCallingManager;
 
 	/**
-	 * The tool execution eligibility predicate used to determine if a tool can be
-	 * executed.
-	 */
-	private final ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate;
-
-	/**
 	 * Conventions to use for generating observations.
 	 */
 	private ChatModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
@@ -108,25 +102,16 @@ public class MoonshotChatModel implements ChatModel {
 	public MoonshotChatModel(MoonshotApi moonshotApi, MoonshotChatOptions defaultOptions,
 			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate,
 			ObservationRegistry observationRegistry) {
-		this(moonshotApi, defaultOptions, toolCallingManager, retryTemplate, observationRegistry,
-				new DefaultToolExecutionEligibilityPredicate());
-	}
-
-	public MoonshotChatModel(MoonshotApi moonshotApi, MoonshotChatOptions defaultOptions,
-			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate, ObservationRegistry observationRegistry,
-			ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate) {
 		Assert.notNull(moonshotApi, "moonshotApi cannot be null");
 		Assert.notNull(defaultOptions, "defaultOptions cannot be null");
 		Assert.notNull(toolCallingManager, "toolCallingManager cannot be null");
 		Assert.notNull(retryTemplate, "retryTemplate cannot be null");
 		Assert.notNull(observationRegistry, "observationRegistry cannot be null");
-		Assert.notNull(toolExecutionEligibilityPredicate, "toolExecutionEligibilityPredicate cannot be null");
 		this.moonshotApi = moonshotApi;
 		this.defaultOptions = defaultOptions;
 		this.toolCallingManager = toolCallingManager;
 		this.retryTemplate = retryTemplate;
 		this.observationRegistry = observationRegistry;
-		this.toolExecutionEligibilityPredicate = toolExecutionEligibilityPredicate;
 	}
 
 	private static Generation buildGeneration(Choice choice, Map<String, Object> metadata) {
@@ -170,7 +155,7 @@ public class MoonshotChatModel implements ChatModel {
 			.observe(() -> {
 
 				ResponseEntity<ChatCompletion> completionEntity = this.retryTemplate
-					.execute(ctx -> this.moonshotApi.chatCompletionEntity(request));
+					.invoke(() -> this.moonshotApi.chatCompletionEntity(request));
 
 				var chatCompletion = completionEntity.getBody();
 
@@ -210,22 +195,6 @@ public class MoonshotChatModel implements ChatModel {
 
 			});
 
-		if (this.toolExecutionEligibilityPredicate.isToolExecutionRequired(prompt.getOptions(), response)) {
-			var toolExecutionResult = this.toolCallingManager.executeToolCalls(prompt, response);
-			if (toolExecutionResult.returnDirect()) {
-				// Return tool execution result directly to the client.
-				return ChatResponse.builder()
-					.from(response)
-					.generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
-					.build();
-			}
-			else {
-				// Send the tool execution result back to the model.
-				return this.internalCall(new Prompt(toolExecutionResult.conversationHistory(), prompt.getOptions()),
-						response);
-			}
-		}
-
 		return response;
 	}
 
@@ -234,8 +203,8 @@ public class MoonshotChatModel implements ChatModel {
 	}
 
 	@Override
-	public ChatOptions getDefaultOptions() {
-		return this.defaultOptions.copy();
+	public ChatOptions getOptions() {
+		return MoonshotChatOptions.fromOptions(this.defaultOptions);
 	}
 
 	@Override
@@ -298,29 +267,7 @@ public class MoonshotChatModel implements ChatModel {
 				}));
 
 			// @formatter:off
-			Flux<ChatResponse> flux = chatResponse.flatMap(response -> {
-						if (this.toolExecutionEligibilityPredicate.isToolExecutionRequired(prompt.getOptions(), response)) {
-							return Flux.defer(() -> {
-								// FIXME: bounded elastic needs to be used since tool calling
-								//  is currently only synchronous
-								var toolExecutionResult = this.toolCallingManager.executeToolCalls(prompt, response);
-								if (toolExecutionResult.returnDirect()) {
-									// Return tool execution result directly to the client.
-									return Flux.just(ChatResponse.builder().from(response)
-											.generations(ToolExecutionResult.buildGenerations(toolExecutionResult))
-											.build());
-								}
-								else {
-									// Send the tool execution result back to the model.
-									return this.internalStream(new Prompt(toolExecutionResult.conversationHistory(), prompt.getOptions()),
-											response);
-								}
-							}).subscribeOn(Schedulers.boundedElastic());
-						}
-						else {
-							return Flux.just(response);
-						}
-					})
+			Flux<ChatResponse> flux = chatResponse
 					.doOnError(observation::error)
 					.doFinally(s -> observation.stop())
 					.contextWrite(ctx -> ctx.put(ObservationThreadLocalAccessor.KEY, observation));
@@ -370,42 +317,53 @@ public class MoonshotChatModel implements ChatModel {
 	}
 
 	Prompt buildRequestPrompt(Prompt prompt) {
-		MoonshotChatOptions runtimeOptions = null;
+		MoonshotChatOptions requestOptions = MoonshotChatOptions.fromOptions(this.defaultOptions);
+
 		if (prompt.getOptions() != null) {
-			if (prompt.getOptions() instanceof ToolCallingChatOptions toolCallingChatOptions) {
-				runtimeOptions = ModelOptionsUtils.copyToTarget(toolCallingChatOptions, ToolCallingChatOptions.class,
-						MoonshotChatOptions.class);
-			}
-			else {
-				runtimeOptions = ModelOptionsUtils.copyToTarget(prompt.getOptions(), ChatOptions.class,
-						MoonshotChatOptions.class);
-			}
-		}
+			ChatOptions runtimeOptions = prompt.getOptions();
+			requestOptions.setModel(ModelOptionsUtils.mergeOption(runtimeOptions.getModel(), requestOptions.getModel()));
+			requestOptions.setFrequencyPenalty(ModelOptionsUtils.mergeOption(runtimeOptions.getFrequencyPenalty(),
+					requestOptions.getFrequencyPenalty()));
+			requestOptions.setMaxTokens(ModelOptionsUtils.mergeOption(runtimeOptions.getMaxTokens(),
+					requestOptions.getMaxTokens()));
+			requestOptions.setPresencePenalty(ModelOptionsUtils.mergeOption(runtimeOptions.getPresencePenalty(),
+					requestOptions.getPresencePenalty()));
+			requestOptions.setStop(ModelOptionsUtils.mergeOption(runtimeOptions.getStopSequences(), requestOptions.getStop()));
+			requestOptions.setTemperature(ModelOptionsUtils.mergeOption(runtimeOptions.getTemperature(),
+					requestOptions.getTemperature()));
+			requestOptions.setTopP(ModelOptionsUtils.mergeOption(runtimeOptions.getTopP(), requestOptions.getTopP()));
 
-		MoonshotChatOptions requestOptions = ModelOptionsUtils.merge(runtimeOptions, this.defaultOptions,
-				MoonshotChatOptions.class);
+			if (runtimeOptions instanceof ToolCallingChatOptions toolCallingChatOptions) {
+				requestOptions.setToolCallbacks(ToolCallingChatOptions.mergeToolCallbacks(
+						toolCallingChatOptions.getToolCallbacks(), requestOptions.getToolCallbacks()));
+				requestOptions.setToolContext(ToolCallingChatOptions.mergeToolContext(
+						toolCallingChatOptions.getToolContext(), requestOptions.getToolContext()));
+			}
 
-		if (runtimeOptions != null) {
-			requestOptions.setInternalToolExecutionEnabled(
-					ModelOptionsUtils.mergeOption(runtimeOptions.getInternalToolExecutionEnabled(),
-							this.defaultOptions.getInternalToolExecutionEnabled()));
-			requestOptions.setToolNames(ToolCallingChatOptions.mergeToolNames(runtimeOptions.getToolNames(),
-					this.defaultOptions.getToolNames()));
-			requestOptions.setToolCallbacks(ToolCallingChatOptions.mergeToolCallbacks(runtimeOptions.getToolCallbacks(),
-					this.defaultOptions.getToolCallbacks()));
-			requestOptions.setToolContext(ToolCallingChatOptions.mergeToolContext(runtimeOptions.getToolContext(),
-					this.defaultOptions.getToolContext()));
-		}
-		else {
-			requestOptions.setInternalToolExecutionEnabled(this.defaultOptions.getInternalToolExecutionEnabled());
-			requestOptions.setToolNames(this.defaultOptions.getToolNames());
-			requestOptions.setToolCallbacks(this.defaultOptions.getToolCallbacks());
-			requestOptions.setToolContext(this.defaultOptions.getToolContext());
+			if (runtimeOptions instanceof MoonshotChatOptions moonshotRuntimeOptions) {
+				requestOptions.setMaxCompletionTokens(ModelOptionsUtils.mergeOption(
+						moonshotRuntimeOptions.getMaxCompletionTokens(), requestOptions.getMaxCompletionTokens()));
+				requestOptions.setN(ModelOptionsUtils.mergeOption(moonshotRuntimeOptions.getN(), requestOptions.getN()));
+				requestOptions.setTools(ModelOptionsUtils.mergeOption(moonshotRuntimeOptions.getTools(), requestOptions.getTools()));
+				requestOptions.setToolChoice(ModelOptionsUtils.mergeOption(moonshotRuntimeOptions.getToolChoice(),
+						requestOptions.getToolChoice()));
+				requestOptions.setUser(ModelOptionsUtils.mergeOption(moonshotRuntimeOptions.getUser(), requestOptions.getUser()));
+				requestOptions.setThinking(ModelOptionsUtils.mergeOption(moonshotRuntimeOptions.getThinking(),
+						requestOptions.getThinking()));
+				requestOptions.setToolNames(mergeToolNames(moonshotRuntimeOptions.getToolNames(), requestOptions.getToolNames()));
+			}
 		}
 
 		ToolCallingChatOptions.validateToolCallbacks(requestOptions.getToolCallbacks());
 
 		return new Prompt(prompt.getInstructions(), requestOptions);
+	}
+
+	private Set<String> mergeToolNames(Set<String> runtimeToolNames, Set<String> defaultToolNames) {
+		if (CollectionUtils.isEmpty(runtimeToolNames)) {
+			return defaultToolNames != null ? Set.copyOf(defaultToolNames) : Set.of();
+		}
+		return Set.copyOf(runtimeToolNames);
 	}
 
 	/**
@@ -445,17 +403,20 @@ public class MoonshotChatModel implements ChatModel {
 			}
 		}).flatMap(List::stream).toList();
 
-		ChatCompletionRequest request = new ChatCompletionRequest(chatCompletionMessages, stream);
-
 		MoonshotChatOptions requestOptions = (MoonshotChatOptions) prompt.getOptions();
-		request = ModelOptionsUtils.merge(requestOptions, request, ChatCompletionRequest.class);
+		ChatCompletionRequest request = new ChatCompletionRequest(chatCompletionMessages, requestOptions.getModel(),
+				requestOptions.getMaxTokens(), requestOptions.getMaxCompletionTokens(), requestOptions.getTemperature(),
+				requestOptions.getTopP(), requestOptions.getN(), requestOptions.getFrequencyPenalty(),
+				requestOptions.getPresencePenalty(), requestOptions.getStop(), stream, requestOptions.getTools(),
+				requestOptions.getToolChoice(), requestOptions.getThinking());
 
 		// Add the tool definitions to the request's tools parameter.
 		List<ToolDefinition> toolDefinitions = this.toolCallingManager.resolveToolDefinitions(requestOptions);
 		if (!CollectionUtils.isEmpty(toolDefinitions)) {
-			request = ModelOptionsUtils.merge(
-					MoonshotChatOptions.builder().tools(this.getFunctionTools(toolDefinitions)).build(), request,
-					ChatCompletionRequest.class);
+			request = new ChatCompletionRequest(request.messages(), request.model(), request.maxTokens(),
+					request.maxCompletionTokens(), request.temperature(), request.topP(), request.n(),
+					request.frequencyPenalty(), request.presencePenalty(), request.stop(), request.stream(),
+					this.getFunctionTools(toolDefinitions), request.toolChoice(), request.thinking());
 		}
 
 		return request;
@@ -500,8 +461,6 @@ public class MoonshotChatModel implements ChatModel {
 
 		private ToolCallingManager toolCallingManager;
 
-		private ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate = new DefaultToolExecutionEligibilityPredicate();
-
 		private RetryTemplate retryTemplate = RetryUtils.DEFAULT_RETRY_TEMPLATE;
 
 		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
@@ -524,12 +483,6 @@ public class MoonshotChatModel implements ChatModel {
 			return this;
 		}
 
-		public Builder toolExecutionEligibilityPredicate(
-				ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate) {
-			this.toolExecutionEligibilityPredicate = toolExecutionEligibilityPredicate;
-			return this;
-		}
-
 		public Builder retryTemplate(RetryTemplate retryTemplate) {
 			this.retryTemplate = retryTemplate;
 			return this;
@@ -543,10 +496,10 @@ public class MoonshotChatModel implements ChatModel {
 		public MoonshotChatModel build() {
 			if (this.toolCallingManager != null) {
 				return new MoonshotChatModel(this.moonshotApi, this.defaultOptions, this.toolCallingManager,
-						this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+						this.retryTemplate, this.observationRegistry);
 			}
 			return new MoonshotChatModel(this.moonshotApi, this.defaultOptions, DEFAULT_TOOL_CALLING_MANAGER,
-					this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+					this.retryTemplate, this.observationRegistry);
 		}
 
 	}

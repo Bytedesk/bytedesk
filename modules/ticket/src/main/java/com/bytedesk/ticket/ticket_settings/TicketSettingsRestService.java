@@ -69,7 +69,9 @@ import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsRequest;
 import com.bytedesk.ticket.ticket_settings_sla.TicketSlaSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRuleData;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRuleRequest;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRuleResponse;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityModeEnum;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsRequest;
@@ -948,7 +950,7 @@ public class TicketSettingsRestService extends
         if (request == null) {
             return null;
         }
-        return request.getVisibilitySettings();
+        return sanitizeVisibilitySettingsRequest(request.getVisibilitySettings(), request.getType());
     }
 
     private TicketNotificationSettingsEntity createNotificationSettingsEntity(TicketNotificationSettingsRequest request,
@@ -980,6 +982,42 @@ public class TicketSettingsRestService extends
         entity.setOrgUid(orgUid);
         return entity;
     }
+
+        private TicketVisibilitySettingsRequest sanitizeVisibilitySettingsRequest(TicketVisibilitySettingsRequest request,
+            String rawType) {
+        if (request == null) {
+            return null;
+        }
+        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(rawType);
+        String mode = request.getMode();
+        List<TicketVisibilityCategoryRuleRequest> categoryRules = request.getCategoryRules() == null
+            ? new ArrayList<>()
+            : request.getCategoryRules().stream()
+                .filter(Objects::nonNull)
+                .map(rule -> TicketVisibilityCategoryRuleRequest.builder()
+                    .categoryUid(rule.getCategoryUid())
+                    .visibility(rule.getVisibility())
+                    .build())
+                .collect(Collectors.toList());
+
+        if (ticketType != TicketTypeEnum.INTERNAL) {
+            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equalsIgnoreCase(mode)) {
+            mode = TicketVisibilityModeEnum.ORG_WIDE.name();
+            }
+            categoryRules = categoryRules.stream()
+                .filter(rule -> !TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name()
+                    .equalsIgnoreCase(rule.getVisibility()))
+                .collect(Collectors.toList());
+        }
+
+        return TicketVisibilitySettingsRequest.builder()
+            .uid(request.getUid())
+            .orgUid(request.getOrgUid())
+            .userUid(request.getUserUid())
+            .mode(mode)
+            .categoryRules(categoryRules)
+            .build();
+        }
 
     private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request,
             String orgUid) {

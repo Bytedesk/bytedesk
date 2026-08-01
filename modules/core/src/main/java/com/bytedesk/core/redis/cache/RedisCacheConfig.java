@@ -17,7 +17,6 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.annotation.CachingConfigurer;
@@ -31,11 +30,9 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,11 +56,15 @@ public class RedisCacheConfig implements CachingConfigurer {
     @Value("${spring.cache.redis.key-prefix:bytedeskim:cache:}")
     private String keyPrefix;
     
-    private final ObjectMapper objectMapperBean;
+    // Spring Data Redis 4.1.0 uses tools.jackson (Jackson 3.x), incompatible with
+    // com.fasterxml.jackson (Jackson 2.x) ObjectMapper. BaseResponse fix instead.
+    // private final ObjectMapper redisObjectMapper;
 
-    public RedisCacheConfig(@Qualifier("redisObjectMapper") ObjectMapper objectMapperBean) {
-        this.objectMapperBean = objectMapperBean;
-    }
+    // public RedisCacheConfig(
+    //     @Qualifier("redisObjectMapper") ObjectMapper redisObjectMapper
+    // ) {
+    //     this.redisObjectMapper = redisObjectMapper;
+    // }
     
     /**
      * Redis缓存管理器配置
@@ -83,6 +84,8 @@ public class RedisCacheConfig implements CachingConfigurer {
         cacheConfigurations.put("presence", defaultCacheConfiguration().entryTtl(Duration.ofSeconds(5)));
         // 活跃连接列表缓存 - 5秒过期
         cacheConfigurations.put("activeConnections", defaultCacheConfiguration().entryTtl(Duration.ofSeconds(5)));
+        // 平台设置缓存 - 30分钟过期（用于邮件、短信、工单中心等平台级配置）
+        cacheConfigurations.put("platformSettings", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
         // 会话缓存 - 4小时过期
         // cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         // 
@@ -98,11 +101,9 @@ public class RedisCacheConfig implements CachingConfigurer {
      * 使用Jackson作为JSON序列化器，需要包含类型信息以便正确反序列化
      */
     private RedisCacheConfiguration defaultCacheConfiguration() {
-        // 使用Redis专用的ObjectMapper配置（包含类型信息）
-        ObjectMapper objectMapper = objectMapperBean;
-
-        // 使用配置好的Redis专用ObjectMapper创建序列化器
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer.builder()
+                .enableUnsafeDefaultTyping()
+                .build();
 
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMillis(timeToLive)) // 设置TTL

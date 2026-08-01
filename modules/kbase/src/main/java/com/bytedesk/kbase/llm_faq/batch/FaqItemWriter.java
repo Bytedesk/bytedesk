@@ -16,8 +16,8 @@ package com.bytedesk.kbase.llm_faq.batch;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.Chunk;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.infrastructure.item.Chunk;
+import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.kbase.llm_faq.FaqEntity;

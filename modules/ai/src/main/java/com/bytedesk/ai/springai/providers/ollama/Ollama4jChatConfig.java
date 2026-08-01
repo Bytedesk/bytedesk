@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.github.ollama4j.OllamaAPI;
+import io.github.ollama4j.Ollama;
 
 /**
  * https://github.com/ollama4j/ollama4j
@@ -35,10 +35,8 @@ public class Ollama4jChatConfig {
     private Integer ollamaRequestTimeoutSeconds;
 
     @Bean(name = "ollama4jApi")
-    OllamaAPI getOllamaAPI() {
-        OllamaAPI ollamaAPI = new OllamaAPI(ollamaBaseUrl);
-        // https://ollama4j.github.io/ollama4j/apis-extras/verbosity
-        ollamaAPI.setVerbose(true);
+    Ollama getOllamaAPI() {
+        Ollama ollamaAPI = new Ollama(ollamaBaseUrl);
         ollamaAPI.setRequestTimeoutSeconds(ollamaRequestTimeoutSeconds);
         return ollamaAPI;
     }

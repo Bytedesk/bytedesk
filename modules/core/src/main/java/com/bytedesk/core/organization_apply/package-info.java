@@ -8,7 +8,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.core.organization_apply;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

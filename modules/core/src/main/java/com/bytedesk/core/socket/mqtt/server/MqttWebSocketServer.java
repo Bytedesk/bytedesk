@@ -19,7 +19,8 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.ResourceLeakDetector;
 import jakarta.annotation.PostConstruct;
@@ -65,9 +66,9 @@ public class MqttWebSocketServer {
         ResourceLeakDetector
                 .setLevel(ResourceLeakDetector.Level.valueOf(mqttProperties.getLeakDetectorLevel().toUpperCase()));
 
-        parentEventLoopGroup = new NioEventLoopGroup(mqttProperties.getParentEventLoopGroupThreadCount());
+        parentEventLoopGroup = new MultiThreadIoEventLoopGroup(mqttProperties.getParentEventLoopGroupThreadCount(), NioIoHandler.newFactory());
 
-        childEventLoopGroup = new NioEventLoopGroup(mqttProperties.getChildEventLoopGroupThreadCount());
+        childEventLoopGroup = new MultiThreadIoEventLoopGroup(mqttProperties.getChildEventLoopGroupThreadCount(), NioIoHandler.newFactory());
 
         ServerBootstrap serverBootstrap = new ServerBootstrap();
 

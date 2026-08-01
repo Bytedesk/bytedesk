@@ -4,7 +4,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.service.visitor_token;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

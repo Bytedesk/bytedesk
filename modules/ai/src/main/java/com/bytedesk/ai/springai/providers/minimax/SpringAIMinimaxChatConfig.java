@@ -63,7 +63,6 @@ public class SpringAIMinimaxChatConfig {
     @Bean("minimaxChatClient")
     ChatClient minimaxChatClient() {
         return  ChatClient.builder(minimaxChatModel())
-                .defaultOptions(minimaxChatOptions())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();
     }

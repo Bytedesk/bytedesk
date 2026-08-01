@@ -20,7 +20,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -223,7 +222,7 @@ public class VisitorTokenRestService extends BaseRestService<VisitorTokenEntity,
      * 
      * @param accessVisitorToken JWT访问令牌
      */
-    public void revokeAccessVisitorToken(@NonNull String accessVisitorToken, String reason) {
+    public void revokeAccessVisitorToken(String accessVisitorToken, String reason) {
         Optional<VisitorTokenEntity> optional = findByAccessVisitorToken(accessVisitorToken);
         if (optional.isPresent()) {
             VisitorTokenEntity entity = optional.get();

@@ -1043,7 +1043,7 @@ public class WorkflowChatService {
         if (!StringUtils.hasText(body) || HttpMethod.GET.equals(httpMethod)) {
             return new HttpEntity<>(headers);
         }
-        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+        if (!headers.containsHeader(HttpHeaders.CONTENT_TYPE)) {
             headers.setContentType(looksLikeJson(body) ? MediaType.APPLICATION_JSON : MediaType.TEXT_PLAIN);
         }
         return new HttpEntity<>(body, headers);

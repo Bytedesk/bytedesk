@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Optional;
-import org.springframework.lang.NonNull;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttFixedHeader;
@@ -31,7 +30,7 @@ public class MqttChannelUtils {
     /**
      * Fetches the clientId from the channel attributes of the passed channel
      */
-    public static String getClientId(final @NonNull Channel channel) {
+    public static String getClientId(final Channel channel) {
         return (String) channel.attr(AttributeKey.valueOf(MqttConsts.MQTT_CLIENT_ID)).get();
     }
 
@@ -83,16 +82,16 @@ public class MqttChannelUtils {
     }
     
     
-    // public static ClientToken tokenFromChannel(@NonNull final Channel channel, @NonNull final Long disconnectTimestamp) {
+    // public static ClientToken tokenFromChannel(final Channel channel, final Long disconnectTimestamp) {
     //     checkNotNull(disconnectTimestamp, "disconnectTimestamp must not be null");
     //     return getClientToken(channel, disconnectTimestamp);
     // }
     
-    // public static ClientToken tokenFromChannel(@NonNull final Channel channel) {
+    // public static ClientToken tokenFromChannel(final Channel channel) {
         // return getClientToken(channel, null);
     // }
     
-    // public static boolean messagesInFlight(@NonNull final Channel channel) {
+    // public static boolean messagesInFlight(final Channel channel) {
     //     final boolean inFlightMessagesSent = channel.attr(ChannelAttributes.IN_FLIGHT_MESSAGES_SENT).get() != null;
     //     if (!inFlightMessagesSent) {
     //         return true;
@@ -104,7 +103,7 @@ public class MqttChannelUtils {
     //     return inFlightMessages.get() > 0;
     // }
     
-    // private static ClientToken getClientToken(@NonNull final Channel channel, @Nullable final Long disconnectTimestamp) {
+    // private static ClientToken getClientToken(final Channel channel, @Nullable final Long disconnectTimestamp) {
     //     checkNotNull(channel, "channel must not be null");
     //     final String clientId = getClientId(channel);
         

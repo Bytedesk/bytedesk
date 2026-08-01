@@ -7,7 +7,7 @@
  * 
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.ai.robot_message;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

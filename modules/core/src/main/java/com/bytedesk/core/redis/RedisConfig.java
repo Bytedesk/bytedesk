@@ -15,24 +15,21 @@ package com.bytedesk.core.redis;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.ConnectionPoolConfig;
 
 // https://docs.spring.io/spring-data/redis/reference/redis/getting-started.html
 @Configuration
@@ -44,22 +41,24 @@ public class RedisConfig {
 
     private final RedisClusterSwitchProperties redisClusterSwitchProperties;
     
-    private final ObjectMapper objectMapperBean;
+    // private final ObjectMapper objectMapperBean;
 
     public RedisConfig(JedisProperties jedisProperties,
             JedisPoolProperties jedisPoolProperties,
-            RedisClusterSwitchProperties redisClusterSwitchProperties,
-            @Qualifier("redisObjectMapper") ObjectMapper objectMapperBean) {
+            RedisClusterSwitchProperties redisClusterSwitchProperties
+            // @Qualifier("redisObjectMapper") ObjectMapper objectMapperBean
+        ) {
         this.jedisProperties = jedisProperties;
         this.jedisPoolProperties = jedisPoolProperties;
         this.redisClusterSwitchProperties = redisClusterSwitchProperties;
-        this.objectMapperBean = objectMapperBean;
+        // this.objectMapperBean = objectMapperBean;
     }
     
     // https://github.com/redis/jedis
+    // JedisPoolConfig is deprecated since Jedis 7.x — use ConnectionPoolConfig instead.
     @Bean
-    public JedisPoolConfig jedisPoolConfig() {
-        JedisPoolConfig poolConfig = new JedisPoolConfig();
+    public ConnectionPoolConfig jedisPoolConfig() {
+        ConnectionPoolConfig poolConfig = new ConnectionPoolConfig();
         poolConfig.setMaxIdle(jedisPoolProperties.getMaxIdle());
         poolConfig.setMaxTotal(jedisPoolProperties.getMaxTotal());
         poolConfig.setMinIdle(jedisPoolProperties.getMinIdle());
@@ -68,13 +67,8 @@ public class RedisConfig {
         return poolConfig;
     }
 
-    public JedisPool getJedisPool() {
-        return new JedisPool(jedisPoolConfig(), jedisProperties.getHost(), jedisProperties.getPort());
-    }
-
     // https://github.com/redis/jedis
     // https://docs.spring.io/spring-data/redis/reference/redis/connection-modes.html
-    @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisClientConfiguration clientConfiguration = JedisClientConfiguration.builder()
                 .usePooling()
@@ -121,15 +115,13 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setConnectionFactory(redisConnectionFactory);
         
-        // 使用共享的ObjectMapper配置
-        ObjectMapper objectMapper = objectMapperBean;
-        
-        // 使用配置好的共享ObjectMapper创建序列化器
-        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+        GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer.builder()
+                .enableUnsafeDefaultTyping()
+                .build();
         
         // 设置序列化器
         redisTemplate.setKeySerializer(new StringRedisSerializer());
@@ -148,8 +140,8 @@ public class RedisConfig {
      * @return
      */
     // @Bean
-    // // // Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer
-    // public GenericJackson2JsonRedisSerializer jackson2JsonSerializer() {
+    // // // GenericJacksonJsonRedisSerializer jackson2JsonRedisSerializer
+    // public GenericJacksonJsonRedisSerializer jackson2JsonSerializer() {
     //     // 初始化objectmapper
     //     ObjectMapper objectMapper = new ObjectMapper();
     //     objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -159,7 +151,7 @@ public class RedisConfig {
     //             JsonTypeInfo.As.WRAPPER_ARRAY);
     //     // 
     //     // return new Jackson2JsonRedisSerializer(objectMapper, Object.class);
-    //     return new GenericJackson2JsonRedisSerializer(objectMapper);
+    //     return new GenericJacksonJsonRedisSerializer(objectMapper);
     // }
 
     // /**
@@ -172,7 +164,7 @@ public class RedisConfig {
     // @Bean
     // // Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer
     // public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory,
-    //         GenericJackson2JsonRedisSerializer jackson2JsonRedisSerializer) {
+    //         GenericJacksonJsonRedisSerializer jackson2JsonRedisSerializer) {
 
     //     RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
     //     redisTemplate.setConnectionFactory(connectionFactory);

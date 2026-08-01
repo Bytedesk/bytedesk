@@ -39,7 +39,7 @@ public class SpringAIOllamaEmbeddingConfig {
     @Value("${spring.ai.ollama.base-url:http://host.docker.internal:11434}")
     private String ollamaBaseUrl;
 
-    @Value("${spring.ai.ollama.embedding.options.model:bge-m3:latest}")
+    @Value("${spring.ai.ollama.embedding.model:bge-m3:latest}")
     private String ollamaEmbeddingOptionsModel;
 
     @Value("${spring.ai.ollama.service.auto-check:true}")
@@ -64,7 +64,7 @@ public class SpringAIOllamaEmbeddingConfig {
     OllamaEmbeddingModel ollamaEmbeddingModel() {
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(bytedeskOllamaEmbeddingApi())
-                .defaultOptions(bytedeskOllamaEmbeddingOptions())
+                .options(bytedeskOllamaEmbeddingOptions())
                 .build();
     }
 

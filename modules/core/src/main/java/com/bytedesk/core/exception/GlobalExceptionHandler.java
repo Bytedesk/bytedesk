@@ -13,6 +13,9 @@
  */
 package com.bytedesk.core.exception;
 
+import java.io.IOException;
+import java.util.Locale;
+
 import org.eclipse.jetty.websocket.core.exception.WebSocketTimeoutException; // jetty
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -21,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.jms.listener.adapter.ListenerExecutionFailedException;
@@ -94,9 +98,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException e) {
         String message = resolveUploadSizeExceededMessage();
         log.warn("Upload exceeded max size: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+        return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error(message, HttpStatus.PAYLOAD_TOO_LARGE.value()));
+                .body(JsonResult.error(message, HttpStatus.CONTENT_TOO_LARGE.value()));
     }
 
     @ExceptionHandler(MultipartException.class)
@@ -242,6 +246,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<?> handleRuntimeException(RuntimeException e) {
+        if (isClientDisconnectException(e)) {
+            log.debug("Client disconnected before runtime error response could be written: {}", e.getMessage());
+            return ResponseEntity.noContent().build();
+        }
+
         String rawMessage = e.getMessage();
         String resolvedMessage = resolveRuntimeMessage(rawMessage);
 
@@ -579,9 +588,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_ENTITY_NOT_FOUND, 400));
     }
 
+    @ExceptionHandler(HttpMessageNotWritableException.class)
+    public ResponseEntity<?> handleHttpMessageNotWritableException(HttpMessageNotWritableException ex) {
+        if (isClientDisconnectException(ex)) {
+            log.debug("Client disconnected while writing response: {}", ex.getMessage());
+            return ResponseEntity.noContent().build();
+        }
+
+        log.error("HttpMessageNotWritableException while writing response", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR, HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    }
+
     // 添加对异步请求不可用异常的处理
     @ExceptionHandler(AsyncRequestNotUsableException.class)
     public ResponseEntity<?> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex) {
+        if (isClientDisconnectException(ex)) {
+            log.debug("Async request is no longer usable because the client disconnected: {}", ex.getMessage());
+            return ResponseEntity.noContent().build();
+        }
+
         log.warn("AsyncRequestNotUsableException: SSE connection is no longer usable - {}", ex.getMessage());
         
         // 获取当前请求上下文
@@ -610,9 +637,46 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     // @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<?> handleException(Exception e) {
+        if (isClientDisconnectException(e)) {
+            log.debug("Client disconnected before error response could be written: {}", e.getMessage());
+            return ResponseEntity.noContent().build();
+        }
+
         // if (bytedeskProperties.getDebug()) {
         log.error("not handled exception 3:", e);
         // }
         return ResponseEntity.badRequest().body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR));
+    }
+
+    private boolean isClientDisconnectException(Throwable throwable) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (current instanceof AsyncRequestNotUsableException) {
+                return true;
+            }
+
+            String className = current.getClass().getName();
+            if (className.contains("DisconnectedClient") || className.endsWith("EofException")) {
+                return true;
+            }
+
+            if (current instanceof IOException) {
+                String message = current.getMessage();
+                if (message == null) {
+                    return true;
+                }
+
+                String normalized = message.toLowerCase(Locale.ROOT);
+                if (normalized.contains("broken pipe")
+                        || normalized.contains("connection reset")
+                        || normalized.contains("forcibly closed")
+                        || normalized.contains("response not usable after response errors")) {
+                    return true;
+                }
+            }
+
+            current = current.getCause();
+        }
+        return false;
     }
 }

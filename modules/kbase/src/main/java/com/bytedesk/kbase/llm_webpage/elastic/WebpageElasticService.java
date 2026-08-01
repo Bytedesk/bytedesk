@@ -97,10 +97,14 @@ public class WebpageElasticService {
      * @param request 网页请求对象，包含知识库UID
      */
     public void updateAllIndex(WebpageRequest request) {
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUid(request.getKbUid());
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUid(request.getKbUid());
         webpageList.forEach(webpage -> {
             indexWebpage(webpage); 
         });
+        log.info("Updated elasticsearch index for {} webpages, superUser={}, kbUid={}", webpageList.size(), superUser, request.getKbUid());
     }
 
     /**
@@ -130,11 +134,14 @@ public class WebpageElasticService {
      */
     public Map<String, Object> syncElasticStatusByKbUid(WebpageRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
 
         int successCount = 0;
@@ -154,6 +161,7 @@ public class WebpageElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", webpageList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -166,18 +174,23 @@ public class WebpageElasticService {
      */
     public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(WebpageRequest request) {
         String kbUid = request.getKbUid();
-        if (!StringUtils.hasText(kbUid)) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<WebpageEntity> webpageList = webpageRestService.findByKbUidNoCache(kbUid);
+        List<WebpageEntity> webpageList = superUser
+                ? webpageRestService.findAllNotDeletedNoCache()
+                : webpageRestService.findByKbUidNoCache(kbUid);
         boolean indexExists = elasticsearchOperations.indexOps(WebpageElastic.class).exists();
 
         long deletedCount = 0;
         if (indexExists) {
-            Query query = NativeQuery.builder()
-                .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
-                .build();
+            Query query = superUser
+                ? NativeQuery.builder().withQuery(QueryBuilders.matchAll().build()._toQuery()).build()
+                : NativeQuery.builder()
+                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                    .build();
             DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
             var response = elasticsearchOperations.delete(deleteQuery, WebpageElastic.class);
             deletedCount = response.getDeleted();
@@ -190,6 +203,7 @@ public class WebpageElasticService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", webpageList.size());
         result.put("indexExists", indexExists);
         result.put("deletedCount", deletedCount);

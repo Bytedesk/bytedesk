@@ -61,7 +61,6 @@ SCENARIO_FILE="${SCRIPT_DIR}/compose-scenario-${SCENARIO}.yaml"
 SCENARIO_FILES=()
 APP_FILE="${SCRIPT_DIR}/compose-app-bytedesk.yaml"
 APP_MQ_FILE="${SCRIPT_DIR}/compose-app-mq-${MQ}.yaml"
-CALL_DB_FILE=""
 
 case "${SCENARIO}" in
   call-webrtc)
@@ -77,9 +76,7 @@ esac
 
 if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
   case "${DB}" in
-    mysql|postgresql)
-      CALL_DB_FILE="${SCRIPT_DIR}/compose-call-db-${DB}.yaml"
-      ;;
+    mysql|postgresql) ;;
     oracle|kingbase9)
       echo "[ERROR] call scenario does not support ${DB}. Allowed db for call: mysql|postgresql"
       exit 1
@@ -101,11 +98,6 @@ for file in "${APP_FILE}" "${APP_MQ_FILE}"; do
   fi
 done
 
-if [[ -n "${CALL_DB_FILE}" && ! -f "${CALL_DB_FILE}" ]]; then
-  echo "[ERROR] Missing compose file: ${CALL_DB_FILE}"
-  exit 1
-fi
-
 compose_files=(
   -f "${BASE_FILE}"
   -f "${DB_FILE}"
@@ -115,10 +107,6 @@ compose_files=(
 for file in "${SCENARIO_FILES[@]}"; do
   compose_files+=( -f "${file}" )
 done
-
-if [[ -n "${CALL_DB_FILE}" ]]; then
-  compose_files+=( -f "${CALL_DB_FILE}" )
-fi
 
 compose_files+=(
   -f "${APP_FILE}"

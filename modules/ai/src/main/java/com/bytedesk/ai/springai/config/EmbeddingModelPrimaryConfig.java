@@ -41,7 +41,7 @@ public class EmbeddingModelPrimaryConfig {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = SpringAIModels.ZHIPUAI)
+    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.ZHIPUAI)
     public EmbeddingModel primaryZhipuaiEmbeddingModel() {
         return requireEmbeddingModel("zhiPuAiEmbeddingModel", "ZhiPuAI", "spring.ai.zhipuai.embedding.enabled=true");
     }

@@ -15,7 +15,6 @@ package com.bytedesk.ai.springai.providers.zhipuai;
 
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.model.SpringAIModelProperties;
-import org.springframework.ai.model.SpringAIModels;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
@@ -23,6 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.bytedesk.core.llm.LlmProviderConstants;
+
 import lombok.Data;
 
 /**
@@ -53,13 +55,9 @@ public class SpringAIZhipuaiEmbeddingConfig {
     @Bean("bytedeskZhipuaiEmbeddingApi")
     ZhiPuAiApi bytedeskZhipuaiEmbeddingApi() {
         if (zhipuaiEmbeddingApiKey != null && !zhipuaiEmbeddingApiKey.isEmpty()) {
-            return ZhiPuAiApi.builder()
-                    .apiKey(zhipuaiEmbeddingApiKey)
-                    .build();
+            return new ZhiPuAiApi(zhipuaiBaseUrl, zhipuaiEmbeddingApiKey);
         } else {
-            return ZhiPuAiApi.builder()
-                    .apiKey(zhipuaiApiKey)
-                    .build();
+            return new ZhiPuAiApi(zhipuaiBaseUrl, zhipuaiApiKey);
         }
     }
 
@@ -73,7 +71,7 @@ public class SpringAIZhipuaiEmbeddingConfig {
     }
 
     @Bean("zhiPuAiEmbeddingModel")
-    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = SpringAIModels.ZHIPUAI, matchIfMissing = false)
+    @ConditionalOnProperty(name = SpringAIModelProperties.EMBEDDING_MODEL, havingValue = LlmProviderConstants.ZHIPUAI, matchIfMissing = false)
     ZhiPuAiEmbeddingModel zhiPuAiEmbeddingModel() {
         return new ZhiPuAiEmbeddingModel(bytedeskZhipuaiEmbeddingApi(), MetadataMode.EMBED, bytedeskZhipuaiEmbeddingOptions());
     }

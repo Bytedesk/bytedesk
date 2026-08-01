@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket.assignment;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -210,13 +211,65 @@ public class TicketAssignmentService {
 
         return switch (assigneeType) {
             case "user" -> resolveSpecificUser(assigneeUids);
-            case "department" -> resolveDepartmentMemberWithStrategy(ticket, nodeAssignmentMode);
+            case "department" -> resolveNodeDepartment(assigneeUids, ticket, nodeAssignmentMode);
             case "role" -> resolveRoleMember(ticket, data.getString("roleUid"), nodeAssignmentMode);
             case "reporter" -> resolveReporter(ticket);
             case "leader" -> resolveLeader(ticket);
             default -> AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "unsupported assigneeType: " + assigneeType);
         };
+    }
+
+    private AssignmentResolutionResult resolveNodeDepartment(JSONArray assigneeUids,
+                                                             TicketEntity ticket,
+                                                             String nodeAssignmentMode) {
+        if (assigneeUids == null || assigneeUids.isEmpty()) {
+            return resolveDepartmentMemberWithStrategy(ticket, nodeAssignmentMode);
+        }
+
+        Map<String, MemberEntity> candidateMap = new LinkedHashMap<>();
+        List<String> configuredDepartmentUids = new ArrayList<>();
+        List<String> emptyDepartmentUids = new ArrayList<>();
+
+        for (int i = 0; i < assigneeUids.size(); i++) {
+            String departmentUid = assigneeUids.getString(i);
+            if (!StringUtils.hasText(departmentUid)) {
+                continue;
+            }
+            configuredDepartmentUids.add(departmentUid);
+            List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(departmentUid);
+            if (members == null || members.isEmpty()) {
+                emptyDepartmentUids.add(departmentUid);
+                continue;
+            }
+            for (MemberEntity member : members) {
+                if (member != null && StringUtils.hasText(member.getUid())) {
+                    candidateMap.putIfAbsent(member.getUid(), member);
+                }
+            }
+        }
+
+        if (candidateMap.isEmpty()) {
+            return AssignmentResolutionResult.unresolved(
+                    AssignmentSource.NODE_CONFIG,
+                    "no members found in configured departments: " + configuredDepartmentUids
+                            + (emptyDepartmentUids.isEmpty() ? "" : ", empty=" + emptyDepartmentUids));
+        }
+
+        String strategy = StringUtils.hasText(nodeAssignmentMode)
+            ? TicketAssignmentModeEnum.normalize(nodeAssignmentMode)
+            : getAssignmentMode(ticket);
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+        List<MemberEntity> candidates = new ArrayList<>(candidateMap.values());
+        String chosenUid = applyStrategy(mode, ticket, candidates);
+        if (!StringUtils.hasText(chosenUid)) {
+            return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
+                    "strategy returned no result for configured department members");
+        }
+        return AssignmentResolutionResult.resolved(chosenUid, AssignmentSource.NODE_CONFIG,
+                strategy,
+                "节点部门 " + configuredDepartmentUids + " 按 " + strategy + " 分配",
+                "候选部门 " + configuredDepartmentUids.size() + " 个，成员 " + candidates.size() + " 人");
     }
 
     private AssignmentResolutionResult resolveSpecificUser(JSONArray assigneeUids) {

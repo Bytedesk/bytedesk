@@ -4,7 +4,7 @@
  *
  * @author bytedesk.com
  */
-@NonNullApi
+@NullMarked
 package com.bytedesk.ai.springai.providers.bedrock;
 
-import org.springframework.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;

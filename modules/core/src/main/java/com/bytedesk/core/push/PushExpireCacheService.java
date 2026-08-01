@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -76,8 +77,7 @@ public class PushExpireCacheService {
             Boolean ok = stringRedisTemplate.opsForValue().setIfAbsent(
                     RedisConsts.PUSH_EXPIRE_BACKFILL_LOCK_KEY,
                     "1",
-                    ttlSeconds,
-                    TimeUnit.SECONDS);
+                    Expiration.seconds(ttlSeconds));
             return Boolean.TRUE.equals(ok);
         } catch (DataAccessException e) {
             // Redis 不可用时，返回 false 让上层选择其它兜底策略

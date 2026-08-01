@@ -129,7 +129,7 @@ at com.bytedesk.core.member.mq.MemberBatchConsumer.onMessage(MemberBatchConsumer
 
 原因分析：
 
-- 我们使用了 MappingJackson2MessageConverter 将消息转换为 JSON 文本，但在消费者端直接使用 `message.getBody(MemberBatchMessage.class)` 尝试获取 Java 对象
+- 我们使用了 JacksonJsonMessageConverter 将消息转换为 JSON 文本，但在消费者端直接使用 `message.getBody(MemberBatchMessage.class)` 尝试获取 Java 对象
 - JMS 消息体实际上是 TextMessage 类型，而不是直接序列化的 Java 对象
 - MessageConverter 配置与消息获取方式不匹配
 

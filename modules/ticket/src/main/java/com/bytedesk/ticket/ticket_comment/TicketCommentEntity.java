@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 
 import jakarta.persistence.CascadeType;
@@ -58,10 +59,10 @@ public class TicketCommentEntity extends BaseEntity {
     private String ticketUid;
 
     /**
-     * 评论/备注内容 (LONGTEXT)
+     * 评论/备注内容 (TEXT)
      */
     @Builder.Default
-    @Column(name = "content", columnDefinition = "longtext")
+    @Column(name = "content", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content = "";
 
     /**
@@ -75,7 +76,7 @@ public class TicketCommentEntity extends BaseEntity {
      * 提交人信息快照 (JSON: {"uid","nickname","avatar"})
      */
     @Builder.Default
-    @Column(name = "user_info", columnDefinition = "json")
+    @Column(name = "user_info", columnDefinition = TypeConsts.COLUMN_TYPE_JSON)
     private String user = "{}";
 
     /**

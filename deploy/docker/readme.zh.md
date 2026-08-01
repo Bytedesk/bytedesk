@@ -29,8 +29,8 @@
 ├── compose-app-mq-rabbitmq.yaml # bytedesk 的 RabbitMQ 配置覆盖
 ├── compose-scenario-call.yaml # 呼叫中心语音场景扩展（freeswitch）
 ├── compose-scenario-webrtc.yaml # 音视频客服 WebRTC 组件（coturn/janus）
-├── compose-call-db-mysql.yaml # call 场景下 FreeSWITCH 的 MySQL DSN 覆盖
-├── compose-call-db-postgresql.yaml # call 场景下 FreeSWITCH 的 PostgreSQL DSN 覆盖
+├── compose-call-db-mysql.yaml # 历史保留：旧版 call 场景 FreeSWITCH 的 MySQL DSN 覆盖
+├── compose-call-db-postgresql.yaml # 历史保留：旧版 call 场景 FreeSWITCH 的 PostgreSQL DSN 覆盖
 ├── compose-scenario-noai.yaml # 不使用 AI 的场景覆盖
 ├── compose-scenario-standard.yaml # 标准场景覆盖
 ├── start.sh # 组合启动脚本：start.sh <db> <mq> <scenario> [all|middleware]
@@ -126,6 +126,14 @@ cp .env.example .env
 ./stop.sh mysql artemis call-webrtc stop middleware
 ./stop.sh mysql artemis call-webrtc down middleware
 
+./start.sh postgresql artemis call-webrtc middleware
+./stop.sh postgresql artemis call-webrtc stop middleware
+./stop.sh postgresql artemis call-webrtc down middleware
+
+./start.sh oracle artemis call-webrtc middleware
+./stop.sh oracle artemis call-webrtc stop middleware
+./stop.sh oracle artemis call-webrtc down middleware
+
 ./start.sh postgresql rabbitmq call-webrtc middleware
 ./stop.sh postgresql rabbitmq call-webrtc stop middleware
 ./stop.sh postgresql rabbitmq call-webrtc down middleware
@@ -182,8 +190,9 @@ cp .env.example .env
 # db 也支持别名：pg -> postgresql，kingbase -> kingbase9
 # 可通过环境变量自定义 compose 项目名（默认 bytedesk）：
 # PROJECT_NAME=bytedesk-dev ./start.sh mysql artemis standard middleware
-# mysql/postgresql/oracle/kingbase9 场景下：start.sh 会自动确保对应数据库存在（不存在则创建）
+# mysql/postgresql/oracle/kingbase9 场景下：start.sh 会自动确保 bytedesk 应用数据库存在（不存在则创建）
 # 默认数据库变量分别为：MYSQL_DATABASE / POSTGRES_DB / ORACLE_DATABASE / KINGBASE_DATABASE
+# FreeSWITCH 当前仅作为媒体通道，默认不启用 MySQL/PostgreSQL core-db，也不会再随 mysql/postgresql 场景切换 conf
 # 如需同时启用 FreeSWITCH 与 WebRTC，可使用 call-webrtc 场景，脚本会自动组合 compose-scenario-call.yaml 与 compose-scenario-webrtc.yaml
 
 # 启动docker compose容器, -f标志来指定文件路径, -d标志表示在后台模式下启动容器
@@ -193,14 +202,14 @@ docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f comp
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-webrtc.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-mysql.yaml -f compose-scenario-webrtc.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml up -d
 
 # 全量启动（中间件 + bytedesk 镜像）
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-rabbitmq.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-rabbitmq.yaml up -d
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 
 # 切换数据库示例
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml up -d
@@ -217,9 +226,9 @@ docker exec ollama-bytedesk ollama pull linux6200/bge-reranker-v2-m3:latest
 # 停止标准模式
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
 # 停止呼叫中心语音模式
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
 # 停止呼叫中心语音 + WebRTC 模式
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
 # 停止（noai）
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml down
 ```
@@ -245,9 +254,9 @@ echo 'JASYPT_ENCRYPTOR_PASSWORD=请修改成强口令' >> .env
 # 2. 正常启动全量 compose 文件，服务会自动读取变量
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-standard.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 # 或
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 # 或
-docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
+docker compose -p bytedesk -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-scenario-webrtc.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 # 或
 docker compose -p bytedesk -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-noai.yaml -f compose-app-bytedesk.yaml -f compose-app-mq-artemis.yaml up -d
 ```
@@ -331,45 +340,15 @@ docker compose -p bytedesk --env-file .env -f compose-base.yaml logs -f bytedesk
 - 在顶部搜索框输入例如 `requestId : "a9d759fa-f7af-4551-b219-9d358403553d"`
 - 或输入 `message : "Completed 200 OK"` 查看某次请求链路
 
-## FreeSWITCH 数据库兼容说明（MySQL / PostgreSQL）
+## FreeSWITCH 媒体模式说明
 
-数据库端口、账号、密码等信息已统一从 `deploy/docker/.env` 读取，不再写死在 compose 覆盖文件和 `switch.conf.*.xml` 中。
+当前 FreeSWITCH 仅作为媒体通道使用，默认不启用 MySQL/PostgreSQL core-db，也不再根据 mysql/postgresql 场景切换 FreeSWITCH conf。
 
-建议至少配置以下变量：
+说明：
 
-```dotenv
-MYSQL_DATABASE=bytedesk
-MYSQL_ROOT_USER=root
-MYSQL_ROOT_PASSWORD=请改成强密码
-MYSQL_PORT=3306
-MYSQL_HOST_PORT=13306
-
-POSTGRES_DB=bytedesk
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=请改成强密码
-POSTGRES_PORT=5432
-POSTGRES_HOST_PORT=15432
-
-FREESWITCH_DB_HOST=bytedesk-db
-FREESWITCH_DATABASE=bytedesk_freeswitch
-```
-
-说明：`start.sh` 在 `call` 场景下会自动确保业务库（`MYSQL_DATABASE` / `POSTGRES_DB`）与 `FREESWITCH_DATABASE` 同时存在。
-
-补充（MySQL + call）：`start.sh` 会在 `FREESWITCH_DATABASE` 为空库时，自动导入 `deploy/sql/freeswitch-1.10.12.sql` 完成 FreeSWITCH 全量结构初始化；若目标库已有表，则会跳过初始化以避免重复执行 `DROP TABLE`。
-
-为避免 FreeSWITCH 在不同数据库场景下出现 `core-db-dsn` 初始化失败，`call` 场景使用了按数据库覆盖的方式：
-
-- MySQL：
-  - 覆盖文件：`compose-call-db-mysql.yaml`
-  - 关键挂载：`switch.conf.mysql.xml`、`modules.conf.mysql.xml`、`pre_load_modules.conf.mysql.xml`
-  - 关键 DSN：`mariadb://Server=bytedesk-db;Port=3306;Database=bytedesk_freeswitch;Uid=root;Pwd=...;`
-
-- PostgreSQL：
-  - 覆盖文件：`compose-call-db-postgresql.yaml`
-  - 关键挂载：`switch.conf.pgsql.xml`、`modules.conf.pgsql.xml`、`pre_load_modules.conf.pgsql.xml`
-  - 关键 DSN：`pgsql://host=bytedesk-db dbname=bytedesk_freeswitch user=postgres password=...`
-  - 注意：`hostaddr` 只能写 IP，不能写服务名；容器网络服务名应使用 `host=bytedesk-db`。
+- `start.sh` 仍会自动确保 bytedesk 应用数据库存在，即 `MYSQL_DATABASE` / `POSTGRES_DB` / `ORACLE_DATABASE` / `KINGBASE_DATABASE`。
+- `call` / `call-webrtc` 场景下，FreeSWITCH 不再依赖 `FREESWITCH_DATABASE`、`FS_CORE_DB_MODULE`、`FS_CORE_DB_DSN`。
+- 仓库中的 `compose-call-db-mysql.yaml`、`compose-call-db-postgresql.yaml` 仅作历史保留，当前启动脚本不会再自动加载。
 
 ### 向 bytedesk_freeswitch 插入测试数据
 
@@ -389,28 +368,6 @@ cd deploy/docker
 - `message`: 要插入的文本内容
 - `mq`: `artemis | rabbitmq`（默认 `artemis`）
 
-脚本会自动：
-
-- 连接 call 场景 compose 组合
-- 在 `FREESWITCH_DATABASE`（默认 `bytedesk_freeswitch`）创建 `fs_input_log`（不存在时）
-- 插入一条消息并回查最近 5 条
-
-MySQL:
-
-```bash
-docker compose -p bytedesk \
-  -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-mysql.yaml \
-  exec -T bytedesk-db sh -lc "mysql -h 127.0.0.1 -P ${MYSQL_PORT:-3306} -u${MYSQL_ROOT_USER:-root} -p'${MYSQL_ROOT_PASSWORD}' -e \"CREATE TABLE IF NOT EXISTS ${FREESWITCH_DATABASE:-bytedesk_freeswitch}.fs_input_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, content VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP); INSERT INTO ${FREESWITCH_DATABASE:-bytedesk_freeswitch}.fs_input_log(content) VALUES ('hello-freeswitch'); SELECT * FROM ${FREESWITCH_DATABASE:-bytedesk_freeswitch}.fs_input_log ORDER BY id DESC LIMIT 5;\""
-```
-
-PostgreSQL:
-
-```bash
-docker compose -p bytedesk \
-  -f compose-base.yaml -f compose-db-postgresql.yaml -f compose-mq-artemis.yaml -f compose-scenario-call.yaml -f compose-call-db-postgresql.yaml \
-  exec -T bytedesk-db sh -lc "PGPASSWORD='${POSTGRES_PASSWORD}' psql -h 127.0.0.1 -p ${POSTGRES_PORT:-5432} -U ${POSTGRES_USER:-postgres} -d ${FREESWITCH_DATABASE:-bytedesk_freeswitch} -v ON_ERROR_STOP=1 -c \"CREATE TABLE IF NOT EXISTS fs_input_log (id BIGSERIAL PRIMARY KEY, content VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP); INSERT INTO fs_input_log(content) VALUES ('hello-freeswitch'); SELECT * FROM fs_input_log ORDER BY id DESC LIMIT 5;\""
-```
-
 ### 常见问题排查
 
 ```bash
@@ -429,7 +386,6 @@ docker compose -p bytedesk \
  -f compose-db-mysql.yaml \
  -f compose-mq-rabbitmq.yaml \
  -f compose-scenario-call.yaml \
- -f compose-call-db-mysql.yaml \
  -f compose-app-bytedesk.yaml \
  -f compose-app-mq-rabbitmq.yaml \
  up -d --force-recreate --remove-orphans bytedesk-db bytedesk-freeswitch

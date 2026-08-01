@@ -239,7 +239,14 @@ public class TextVectorService {
      * @param request 文本请求对象，包含知识库ID
      */
     public void updateAllVectorIndex(TextRequest request) {
-        List<TextEntity> textList = textRestService.findByKbUidNoCache(request.getKbUid());
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(request.getKbUid())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUidNoCache(request.getKbUid());
         textList.forEach(text -> {
             textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.PROCESSING.name());
             try {
@@ -254,6 +261,7 @@ public class TextVectorService {
             }
         });
         textRestService.evictTextCacheAllEntries();
+        log.info("Updated vector index for {} texts, superUser={}, kbUid={}", textList.size(), superUser, request.getKbUid());
     }
 
     /**
@@ -292,11 +300,14 @@ public class TextVectorService {
      */
     public Map<String, Object> syncVectorStatusByKbUid(TextRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUidNoCache(kbUid);
 
         int successCount = 0;
         int newCount = 0;
@@ -322,6 +333,7 @@ public class TextVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", textList.size());
         result.put("success", successCount);
         result.put("new", newCount);
@@ -334,11 +346,14 @@ public class TextVectorService {
      */
     public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(TextRequest request) {
         String kbUid = request.getKbUid();
-        if (kbUid == null || kbUid.isBlank()) {
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
             throw new RuntimeException("kbUid is required");
         }
 
-        List<TextEntity> textList = textRestService.findByKbUidNoCache(kbUid);
+        List<TextEntity> textList = superUser
+                ? textRestService.findAllNotDeletedNoCache()
+                : textRestService.findByKbUidNoCache(kbUid);
         int total = textList.size();
 
         List<String> docIdsToDelete = new ArrayList<>();
@@ -355,33 +370,39 @@ public class TextVectorService {
         int errorCount = 0;
 
         try {
-            if (!docIdsToDelete.isEmpty()) {
+            if (!superUser && !docIdsToDelete.isEmpty()) {
                 vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
+                for (TextEntity text : textList) {
+                    textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
+                    textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+                }
+                successCount = total;
             }
-            for (TextEntity text : textList) {
-                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
-                textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
-            }
-            successCount = total;
         } catch (Exception e) {
             log.warn("批量删除Text向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+        }
+
+        if (superUser || successCount != total) {
+            successCount = 0;
+            errorCount = 0;
             for (TextEntity text : textList) {
                 try {
-                    if (text.getDocIdList() == null || text.getDocIdList().isEmpty()) {
-                        vectorStoreResolver.resolveByKbase(text.getKbase()).delete(List.of("text_" + text.getUid()));
-                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
-                        textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+                    TextEntity currentText = textRestService.findByUidWithKbaseNoCache(text.getUid()).orElse(text);
+                    if (currentText.getDocIdList() == null || currentText.getDocIdList().isEmpty()) {
+                        vectorStoreResolver.resolveByKbase(currentText.getKbase()).delete(List.of("text_" + currentText.getUid()));
+                        textRestService.updateVectorStatusOnly(currentText.getUid(), ChunkStatusEnum.NEW.name());
+                        textRestService.updateDocIdListOnly(currentText.getUid(), new ArrayList<>());
                         successCount++;
                         continue;
                     }
 
-                    Boolean deleted = deleteTextVector(text);
+                    Boolean deleted = deleteTextVector(currentText);
                     if (Boolean.TRUE.equals(deleted)) {
-                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.NEW.name());
-                        textRestService.updateDocIdListOnly(text.getUid(), new ArrayList<>());
+                        textRestService.updateVectorStatusOnly(currentText.getUid(), ChunkStatusEnum.NEW.name());
+                        textRestService.updateDocIdListOnly(currentText.getUid(), new ArrayList<>());
                         successCount++;
                     } else {
-                        textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.ERROR.name());
+                        textRestService.updateVectorStatusOnly(currentText.getUid(), ChunkStatusEnum.ERROR.name());
                         errorCount++;
                     }
                 } catch (Exception ex) {
@@ -395,6 +416,7 @@ public class TextVectorService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
         result.put("total", total);
         result.put("success", successCount);
         result.put("error", errorCount);

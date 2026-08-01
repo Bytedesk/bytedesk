@@ -19,9 +19,11 @@ package com.bytedesk.ai.springai.providers.moonshot.api;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.ChatModelDescription;
-import org.springframework.ai.model.ModelOptionsUtils;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.retry.RetryUtils;
 import org.springframework.http.HttpHeaders;
@@ -57,6 +59,8 @@ import java.util.function.Predicate;
  */
 public class MoonshotApi {
 
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
 	public static final String DEFAULT_CHAT_MODEL = ChatModel.MOONSHOT_V1_8K.getValue();
 
 	private static final Predicate<String> SSE_DONE_PREDICATE = "[DONE]"::equals;
@@ -68,6 +72,25 @@ public class MoonshotApi {
 	private final WebClient webClient;
 
 	private final MoonshotStreamFunctionCallingHelper chunkMerger = new MoonshotStreamFunctionCallingHelper();
+
+	private static ChatCompletionChunk parseChunk(String content) {
+		try {
+			return OBJECT_MAPPER.readValue(content, ChatCompletionChunk.class);
+		}
+		catch (JsonProcessingException e) {
+			throw new IllegalArgumentException("Failed to parse Moonshot streaming chunk", e);
+		}
+	}
+
+	private static Map<String, Object> parseJsonSchema(String jsonSchema) {
+		try {
+			return OBJECT_MAPPER.readValue(jsonSchema, new TypeReference<Map<String, Object>>() {
+			});
+		}
+		catch (JsonProcessingException e) {
+			throw new IllegalArgumentException("Failed to parse Moonshot JSON schema", e);
+		}
+	}
 
 	/**
 	 * Create a new chat completion api.
@@ -91,7 +114,7 @@ public class MoonshotApi {
 		Consumer<HttpHeaders> finalHeaders = h -> {
 			h.setBearerAuth(apiKey.getValue());
 			h.setContentType(MediaType.APPLICATION_JSON);
-			h.addAll(headers);
+			headers.forEach(h::addAll);
 		};
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
 				.defaultHeaders(finalHeaders)
@@ -138,7 +161,7 @@ public class MoonshotApi {
 			.takeUntil(SSE_DONE_PREDICATE)
 			// filters out the "[DONE]" message.
 			.filter(SSE_DONE_PREDICATE.negate())
-			.map(content -> ModelOptionsUtils.jsonToObject(content, ChatCompletionChunk.class))
+			.map(MoonshotApi::parseChunk)
 			// Detect is the chunk is part of a streaming function call.
 			.map(chunk -> {
 				if (this.chunkMerger.isStreamingToolFunctionCall(chunk)) {
@@ -638,7 +661,7 @@ public class MoonshotApi {
 			 * @param jsonSchema tool function schema as json.
 			 */
 			public Function(String description, String name, String jsonSchema) {
-				this(description, name, ModelOptionsUtils.jsonToMap(jsonSchema));
+				this(description, name, MoonshotApi.parseJsonSchema(jsonSchema));
 			}
 
 		}

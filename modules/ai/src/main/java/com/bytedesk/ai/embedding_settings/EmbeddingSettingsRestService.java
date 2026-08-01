@@ -23,9 +23,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
 import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
@@ -40,8 +38,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingModel;
 import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingOptions;
+import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -341,9 +341,7 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
-        ZhiPuAiApi api = ZhiPuAiApi.builder()
-                .apiKey(resolveApiKey(settings))
-                .build();
+        ZhiPuAiApi api = new ZhiPuAiApi(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings));
         ZhiPuAiEmbeddingOptions options = ZhiPuAiEmbeddingOptions.builder()
                 .model(resolveModel(settings, "embedding-2"))
                 .build();
@@ -359,22 +357,20 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
                 .build();
         return OllamaEmbeddingModel.builder()
                 .ollamaApi(api)
-                .defaultOptions(options)
+            .options(options)
                 .build();
     }
 
     private EmbeddingModel buildOpenAiCompatibleEmbeddingModel(EmbeddingSettingsEntity settings, String provider) {
-        OpenAiApi api = OpenAiApi.builder()
-                .baseUrl(resolveBaseUrl(settings, resolveProviderBaseUrl(provider)))
-                .apiKey(resolveApiKey(settings))
-                .build();
         OpenAiEmbeddingOptions.Builder optionsBuilder = OpenAiEmbeddingOptions.builder()
                 .model(resolveModel(settings, "text-embedding-3-small"));
         Integer dimensions = settings.getDimensions();
         if (dimensions != null && dimensions > 0) {
             optionsBuilder.dimensions(dimensions);
         }
-        return new OpenAiEmbeddingModel(api, MetadataMode.EMBED, optionsBuilder.build());
+        OpenAiEmbeddingOptions options = OpenAiCompatibleModelFactory.withConnection(optionsBuilder.build(),
+            resolveBaseUrl(settings, resolveProviderBaseUrl(provider)), resolveApiKey(settings));
+        return OpenAiCompatibleModelFactory.embeddingModel(options, MetadataMode.EMBED);
     }
 
     private String resolveProvider(EmbeddingSettingsEntity settings) {

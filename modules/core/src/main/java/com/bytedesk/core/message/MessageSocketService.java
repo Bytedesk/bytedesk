@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -61,7 +60,7 @@ public class MessageSocketService {
     private final ConnectionRestService connectionRestService;
 
     // 发送消息给stomp访客端
-    public void sendStompMessage(@NonNull String messageJson) {
+    public void sendStompMessage(String messageJson) {
         Assert.notNull(messageJson, "messageJson is null");
         //
         MessageProtobuf messageObject = JSON.parseObject(messageJson, MessageProtobuf.class);
@@ -83,7 +82,7 @@ public class MessageSocketService {
     }
 
     // 发送消息给mqtt客户端
-    public void sendMqttMessage(@NonNull MessageProto.Message messageProto) {
+    public void sendMqttMessage(MessageProto.Message messageProto) {
         // log.debug("send proto message");
         ThreadProto.Thread thread = messageProto.getThread(); // 提取线程信息到临时变量
         ThreadTypeEnum threadType = ThreadTypeEnum.valueOf(thread.getType());
@@ -113,8 +112,8 @@ public class MessageSocketService {
         doSendToSubscribers(topic, messageProto);
     }
 
-    public void sendMqttMessageToUser(@NonNull String userUid, @NonNull String topic,
-            @NonNull MessageProto.Message messageProto) {
+    public void sendMqttMessageToUser(String userUid, String topic,
+            MessageProto.Message messageProto) {
         Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(Set.of(userUid));
         Set<String> clientIds = clientIdsByUserUid.get(userUid);
         if (clientIds == null || clientIds.isEmpty()) {
@@ -124,7 +123,7 @@ public class MessageSocketService {
         clientIds.forEach(clientId -> doSendMessage(topic, messageProto, clientId));
     }
 
-    private void doSendToSubscribers(String topic, @NonNull MessageProto.Message messageProto) {
+    private void doSendToSubscribers(String topic, MessageProto.Message messageProto) {
         // log.debug("doSendToSubscribers: topic={}", topic);
         Set<String> subscriberUserUids = topicSubscriptionRestService.findSubscriberUserUidsByTopic(topic);
         Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(subscriberUserUids);
@@ -149,7 +148,7 @@ public class MessageSocketService {
         });
     }
 
-    private void doSendMessage(String topic, @NonNull MessageProto.Message messageProto, String clientId) {
+    private void doSendMessage(String topic, MessageProto.Message messageProto, String clientId) {
         log.debug("doSendMessage: topic {} clientId {}", topic, clientId);
         MqttQoS mqttQoS = MqttQoS.AT_LEAST_ONCE;
         boolean dup = false;
