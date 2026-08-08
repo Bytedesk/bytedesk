@@ -31,7 +31,17 @@ public class RobotToolsSettingsResponse extends BaseResponse {
 
     private Integer maxToolInvocations;
 
-    private String defaultToolPrompt;
+    private Boolean intentRecognitionEnabled;
+
+    private String intentModel;
+
+    private String intentProviderUid;
+
+    private String toolModel;
+
+    private String toolProviderUid;
+
+    private Integer intentTimeoutMs;
 
     private List<RobotToolConfig> toolConfigs;
 }

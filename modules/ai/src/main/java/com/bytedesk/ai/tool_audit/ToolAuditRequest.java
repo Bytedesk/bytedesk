@@ -31,10 +31,31 @@ public class ToolAuditRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
+    private String toolCallUid;
+
+    private String toolUid;
+
+    private String toolKey;
+
     private String name;
 
     private String description;
 
-    // @Builder.Default
-    // private String type = ToolAuditTypeEnum.CUSTOMER.name();
+    private String type;
+
+    private String status;
+
+    private String action;
+
+    private Boolean approved;
+
+    private String requesterUserUid;
+
+    private String approverUserUid;
+
+    private String requestPayload;
+
+    private String decisionComment;
+
+    private String auditContext;
 }

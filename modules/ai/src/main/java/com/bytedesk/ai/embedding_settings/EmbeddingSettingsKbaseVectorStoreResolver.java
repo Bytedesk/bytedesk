@@ -27,9 +27,6 @@ import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStoreOptions;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
-import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
@@ -37,9 +34,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
-import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingModel;
-import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingOptions;
-import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
+
+import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.providers.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.providers.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.enums.LevelEnum;
@@ -62,15 +61,19 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
 
     private final Environment environment;
 
+    private final io.micrometer.observation.ObservationRegistry observationRegistry;
+
     public EmbeddingSettingsKbaseVectorStoreResolver(
             ObjectProvider<ElasticsearchVectorStore> elasticsearchVectorStoreProvider,
             EmbeddingSettingsRestService embeddingSettingsRestService,
             KbaseRestService kbaseRestService,
-            Environment environment) {
+            Environment environment,
+            io.micrometer.observation.ObservationRegistry observationRegistry) {
         this.elasticsearchVectorStoreProvider = elasticsearchVectorStoreProvider;
         this.embeddingSettingsRestService = embeddingSettingsRestService;
         this.kbaseRestService = kbaseRestService;
         this.environment = environment;
+        this.observationRegistry = observationRegistry;
     }
 
     private ElasticsearchVectorStore getElasticsearchVectorStore() {
@@ -179,24 +182,24 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
     }
 
     private EmbeddingModel buildDashscopeEmbeddingModel(EmbeddingSettingsEntity settings) {
-        BytedeskDashScopeEmbeddingOptions.BytedeskDashScopeEmbeddingOptionsBuilder optionsBuilder = BytedeskDashScopeEmbeddingOptions.builder()
+        DashScopeEmbeddingOptions.DashScopeEmbeddingOptionsBuilder optionsBuilder = DashScopeEmbeddingOptions.builder()
             .model(resolveModel(settings, "text-embedding-v4"));
         Integer dimensions = resolveModelDimensions(settings);
         if (dimensions != null && dimensions > 0) {
             optionsBuilder.dimensions(dimensions);
         }
-        return new BytedeskDashScopeEmbeddingModel(
+        return new DashScopeEmbeddingModel(
             resolveBaseUrl(settings, "https://dashscope.aliyuncs.com"),
             resolveApiKey(settings),
-            optionsBuilder.build());
+            optionsBuilder.build(),
+            observationRegistry);
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
-        ZhiPuAiApi api = new ZhiPuAiApi(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings));
-        ZhiPuAiEmbeddingOptions options = ZhiPuAiEmbeddingOptions.builder()
-                .model(resolveModel(settings, "embedding-2"))
-                .build();
-        return new ZhiPuAiEmbeddingModel(api, MetadataMode.EMBED, options);
+        return new ZhipuaiEmbeddingModel(
+            new ai.z.openapi.ZhipuAiClient.Builder(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings)).build(),
+            resolveModel(settings, "embedding-2"),
+            resolveModelDimensions(settings));
     }
 
     private EmbeddingModel buildOllamaEmbeddingModel(EmbeddingSettingsEntity settings) {

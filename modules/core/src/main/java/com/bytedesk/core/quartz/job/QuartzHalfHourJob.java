@@ -14,7 +14,7 @@
 package com.bytedesk.core.quartz.job;
 
 import lombok.AllArgsConstructor;
-// import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -29,7 +29,7 @@ import java.io.Serializable;
  *
  * @author kefux.com on 2019/4/20
  */
-// @Slf4j
+@Slf4j
 @AllArgsConstructor
 @DisallowConcurrentExecution
 public class QuartzHalfHourJob extends QuartzJobBean implements Serializable {
@@ -40,9 +40,16 @@ public class QuartzHalfHourJob extends QuartzJobBean implements Serializable {
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) {
-        // log.info("HalfHourJob");
-        quartzEventPublisher.publishQuartzHalfHourEvent();
+        long startTime = System.currentTimeMillis();
+        log.info("HalfHourJob started");
+        try {
+            quartzEventPublisher.publishQuartzHalfHourEvent();
+        } catch (Exception e) {
+            // 注意：catch(Exception) 无法拦截 OutOfMemoryError
+            // OOM 场景应依赖 JVM 参数和进程重启策略解决
+            log.error("HalfHourJob execution failed, will retry next schedule", e);
+        }
+        log.info("HalfHourJob finished in {} ms", System.currentTimeMillis() - startTime);
     }
 
-   
 }

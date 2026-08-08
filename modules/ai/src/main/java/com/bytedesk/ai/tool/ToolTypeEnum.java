@@ -14,8 +14,6 @@
 package com.bytedesk.ai.tool;
 
 public enum ToolTypeEnum {
-    THREAD,
-    VISITOR,
-    CUSTOMER,
-    TICKET
+    BUILTIN,
+    CUSTOM
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260808-add-mcp-exposure-mode-to-ai-tool" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <not>
+                <columnExists tableName="bytedesk_ai_tool" columnName="mcp_exposure_mode" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_ai_tool">
+            <column name="mcp_exposure_mode" type="VARCHAR(32)" defaultValue="NONE" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260808-add-allowed-methods-to-ai-tool" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <not>
+                <columnExists tableName="bytedesk_ai_tool" columnName="allowed_methods" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_ai_tool">
+            <column name="allowed_methods" type="TEXT" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

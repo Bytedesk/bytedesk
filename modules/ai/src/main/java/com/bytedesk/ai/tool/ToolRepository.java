@@ -14,6 +14,7 @@
 package com.bytedesk.ai.tool;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -25,6 +26,15 @@ public interface ToolRepository extends JpaRepository<ToolEntity, Long>, JpaSpec
     Boolean existsByUid(String uid);
 
     Optional<ToolEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+
+    Optional<ToolEntity> findByKeyAndOrgUidAndDeletedFalse(String key, String orgUid);
+
+    List<ToolEntity> findAllByOrgUidAndLevelAndDeletedFalse(String orgUid, String level);
+
+    Optional<ToolEntity> findByBeanNameAndOrgUidAndDeletedFalse(String beanName, String orgUid);
+
+    Optional<ToolEntity> findByClassNameAndMethodNameAndOrgUidAndDeletedFalse(String className, String methodName,
+            String orgUid);
 
     // Boolean existsByPlatform(String platform);
 }

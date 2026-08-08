@@ -1,4 +1,4 @@
-import { JSX } from 'react/jsx-runtime';
+import { JSX } from 'react';
 
 declare interface Animation_2 {
     enabled?: boolean;
@@ -50,6 +50,7 @@ declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
+    embedUrl?: string;
     chatPath?: string;
     threadPath?: string;
     webrtcPath?: string;
@@ -120,6 +121,7 @@ declare interface FeedbackConfig {
     trigger?: 'selection' | 'button' | 'both';
     showOnSelection?: boolean;
     selectionText?: string;
+    askAiText?: string;
     buttonText?: string;
     dialogTitle?: string;
     placeholder?: string;
@@ -133,6 +135,7 @@ declare interface FeedbackConfig {
     submitScreenshot?: boolean;
     onSubmit?: (feedback: FeedbackData) => void;
     onCancel?: () => void;
+    onAskAi?: (selectedText: string) => void;
 }
 
 declare interface FeedbackData {

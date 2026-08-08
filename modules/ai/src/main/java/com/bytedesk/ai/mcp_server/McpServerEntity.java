@@ -80,6 +80,15 @@ public class McpServerEntity extends BaseEntity {
     private Boolean enabled = false;
 
     /**
+     * Direction of this MCP definition:
+     * SERVER for exposing Bytedesk tools,
+     * CLIENT for calling external MCP servers,
+     * DUAL for both roles.
+     */
+    @Builder.Default
+    private String direction = McpServerDirectionEnum.SERVER.name();
+
+    /**
      * Category UID for organizing servers (optional)
      */
     private String categoryUid;

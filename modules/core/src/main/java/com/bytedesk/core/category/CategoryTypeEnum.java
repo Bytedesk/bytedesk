@@ -32,5 +32,7 @@ public enum CategoryTypeEnum {
     VOC_COMMENT,
     COMPLAINT,
     OPINION,
+    MCP_CLIENT,
     MCP_SERVER,
+    TOOL
 }

@@ -13,19 +13,39 @@
  */
 package com.bytedesk.ai.springai.observability;
 
+import java.util.List;
+
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
-import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
+import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.observation.ChatClientObservationContext;
+import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.observation.conventions.AiOperationType;
 import org.springframework.ai.observation.conventions.AiProvider;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 /**
- * 自定义聊天客户端观察约定
+ * Bytedesk 自定义 ChatClient 观测约定.
+ *
+ * <p>阶段 7A 调整：不再硬编码 {@code "ollama"} 模型名，而是从 {@link ChatClientRequest#prompt()}
+ * 中动态解析 {@link ChatOptions#getModel()}；消息数也从 {@code prompt().getInstructions()}
+ * 中真实统计，避免观测指标失真。</p>
+ *
+ * <p>同时采用 OpenTelemetry Gen AI 语义约定的标准键名（{@code gen_ai.*} / {@code spring.ai.*}），
+ * 便于 Grafana / Zipkin 等后端直接识别：</p>
+ * <ul>
+ *   <li>低基数：{@code gen_ai.operation.name}、{@code gen_ai.system}、{@code spring.ai.kind}、
+ *       {@code spring.ai.chat.client.stream}</li>
+ *   <li>高基数：{@code spring.ai.chat.client.conversation.id}、{@code gen_ai.request.model}</li>
+ * </ul>
  */
 public class CustomChatClientObservationConvention implements ChatClientObservationConvention {
 
-    // 输出格式的键名常量，替代ChatClientAttributes.OUTPUT_FORMAT.getKey()
+    /** 历史保留：输出格式上下文键，向后兼容旧版本 ChatClientAttributes.OUTPUT_FORMAT. */
     private static final String OUTPUT_FORMAT_KEY = "spring.ai.chat.client.output.format";
 
     @Override
@@ -35,71 +55,94 @@ public class CustomChatClientObservationConvention implements ChatClientObservat
 
     @Override
     public String getContextualName(ChatClientObservationContext context) {
-        return "bytedesk.ai.chat.client." + getModelInfo(context);
+        return "bytedesk.ai.chat.client." + resolveModel(context);
     }
 
     @Override
     public KeyValues getLowCardinalityKeyValues(ChatClientObservationContext context) {
         return KeyValues.of(
-                KeyValue.of("model", getModelInfo(context)),
-                KeyValue.of("provider", getProviderInfo(context)),
-                KeyValue.of("format", getFormatFromContext(context)),
-                KeyValue.of("stream", String.valueOf(context.isStream())),
-                KeyValue.of("success", String.valueOf(context.getError() == null))
+                KeyValue.of("gen_ai.operation.name", AiOperationType.FRAMEWORK.value()),
+                KeyValue.of("gen_ai.system", AiProvider.SPRING_AI.value()),
+                KeyValue.of("spring.ai.kind", "chat_client"),
+                KeyValue.of("spring.ai.chat.client.stream", String.valueOf(context.isStream())),
+                KeyValue.of("bytedesk.ai.chat.client.format", resolveFormat(context)),
+                KeyValue.of("bytedesk.ai.chat.client.success", String.valueOf(context.getError() == null))
         );
     }
 
     @Override
     public KeyValues getHighCardinalityKeyValues(ChatClientObservationContext context) {
-        return KeyValues.of(
-                KeyValue.of("messageCount", String.valueOf(getMessageCount(context))),
-                KeyValue.of("operationType", AiOperationType.FRAMEWORK.value()),
-                KeyValue.of("errorMessage", context.getError() != null ? context.getError().getMessage() : "")
+        KeyValues keyValues = KeyValues.of(
+                KeyValue.of("gen_ai.request.model", resolveModel(context)),
+                KeyValue.of("bytedesk.ai.chat.client.message.count", String.valueOf(resolveMessageCount(context))),
+                KeyValue.of("bytedesk.ai.chat.client.error.message",
+                        context.getError() != null ? String.valueOf(context.getError().getMessage()) : "")
         );
-    }
-    
-    // 辅助方法，从上下文中获取格式信息，替代废弃的getFormat()方法和ChatClientAttributes类
-    private String getFormatFromContext(ChatClientObservationContext context) {
-        if (context.getRequest() != null && context.getRequest().context() != null) {
-            Object format = context.getRequest().context().get(OUTPUT_FORMAT_KEY);
-            if (format instanceof String) {
-                return (String) format;
-            }
+        String conversationId = resolveConversationId(context);
+        if (StringUtils.hasText(conversationId)) {
+            keyValues = keyValues.and(KeyValue.of("spring.ai.chat.client.conversation.id", conversationId));
         }
-        return "";
+        return keyValues;
     }
-    
-    // 辅助方法，从上下文中获取模型信息
-    private String getModelInfo(ChatClientObservationContext context) {
-        // 尝试从操作元数据或请求中获取模型信息
-        // 这里使用一个默认值，实际应用中可能需要从请求对象中提取
-        return "ollama";
-    }
-    
-    // 辅助方法，从上下文中获取提供商信息
-    private String getProviderInfo(ChatClientObservationContext context) {
-        // AiOperationMetadata 没有 getProvider() 方法
-        // 查看 ChatClientObservationContext 类中的初始化，使用了 AiProvider.SPRING_AI.value()
-        return AiProvider.SPRING_AI.value(); // 返回默认值
-        // 或者根据需要指定自定义值
-        // return "bytedesk-ai-provider";
-    }
-    
-    // 辅助方法，获取消息数量
-    private Integer getMessageCount(ChatClientObservationContext context) {
-        // 修复getPrompt()方法未定义的问题
-        try {
-            if (context.getRequest() != null) {
-                // 在Spring AI的新版本中，DefaultChatClientRequestSpec可能有不同的API
-                // 以下是一个安全的实现，返回默认值
-                return 1; // 返回默认消息数
-                
-                // 如果能够访问到messages属性，可以使用以下代码
-                // return context.getRequest().getMessages().size();
-            }
-        } catch (Exception e) {
-            // 忽略异常，使用默认值
+
+    /**
+     * 从 {@link ChatClientObservationContext#getRequest()} 中安全解析模型名。
+     * 若 prompt / options 不存在，回退到 {@code "unknown"}，不再硬编码 {@code "ollama"}。
+     */
+    private String resolveModel(ChatClientObservationContext context) {
+        ChatClientRequest request = context.getRequest();
+        if (request == null) {
+            return "unknown";
         }
-        return 0;
+        Prompt prompt = request.prompt();
+        if (prompt == null) {
+            return "unknown";
+        }
+        ChatOptions options = prompt.getOptions();
+        if (options != null && StringUtils.hasText(options.getModel())) {
+            return options.getModel();
+        }
+        return "unknown";
+    }
+
+    /**
+     * 从 prompt 的 instructions 中统计消息数。
+     * 不再硬编码返回 {@code 1}。
+     */
+    private int resolveMessageCount(ChatClientObservationContext context) {
+        ChatClientRequest request = context.getRequest();
+        if (request == null) {
+            return 0;
+        }
+        Prompt prompt = request.prompt();
+        if (prompt == null) {
+            return 0;
+        }
+        List<Message> instructions = prompt.getInstructions();
+        return CollectionUtils.isEmpty(instructions) ? 0 : instructions.size();
+    }
+
+    /**
+     * 从请求 context map 中读取历史遗留的输出格式信息，向后兼容。
+     */
+    private String resolveFormat(ChatClientObservationContext context) {
+        ChatClientRequest request = context.getRequest();
+        if (request == null || request.context() == null) {
+            return "";
+        }
+        Object format = request.context().get(OUTPUT_FORMAT_KEY);
+        return format instanceof String s ? s : "";
+    }
+
+    /**
+     * 从请求 context map 中读取会话 ID（若 ChatMemory 设置了 conversation id）。
+     */
+    private String resolveConversationId(ChatClientObservationContext context) {
+        ChatClientRequest request = context.getRequest();
+        if (request == null || request.context() == null) {
+            return null;
+        }
+        Object conversationId = request.context().get("spring.ai.chat.client.conversation.id");
+        return conversationId instanceof String s ? s : null;
     }
 }

@@ -474,7 +474,10 @@ public class RobotService extends AbstractRobotService {
         try {
             RobotEntity robotEntity = robotRestService.findByUid(robotBasic.getUid()).orElse(null);
             if (robotEntity != null) {
-                RobotProtobuf fullRobot = RobotProtobuf.fromEntity(robotEntity, robotBasic.getType());
+                RobotProtobuf fullRobot = ConvertAiUtils.convertToRobotProtobuf(robotEntity);
+                if (StringUtils.hasText(robotBasic.getType())) {
+                    fullRobot.setType(robotBasic.getType());
+                }
                 log.debug("Got full robot config from database for uid: {}", robotEntity.getUid());
                 return fullRobot;
             }

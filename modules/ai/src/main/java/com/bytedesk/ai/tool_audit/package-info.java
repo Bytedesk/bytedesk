@@ -1,6 +1,6 @@
 /**
- * Tool audit package for tool invocation auditing and trace records.
- * 工具审计包，负责工具调用审计与追踪记录。
+ * Tool audit package for tool usage audits and review states.
+ * 工具审批包，负责工具使用审批与审核状态管理。
  *
  * @author bytedesk.com
  */

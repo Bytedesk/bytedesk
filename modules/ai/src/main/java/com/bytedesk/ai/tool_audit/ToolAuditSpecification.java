@@ -39,23 +39,27 @@ public class ToolAuditSpecification extends BaseSpecification<ToolAuditEntity, T
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
-            // description
+            if (StringUtils.hasText(request.getToolKey())) {
+                predicates.add(criteriaBuilder.like(root.get("toolKey"), "%" + request.getToolKey() + "%"));
+            }
+            if (StringUtils.hasText(request.getToolCallUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("toolCallUid"), request.getToolCallUid()));
+            }
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
-            // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
             }
-            // level - 如果指定了level则精确过滤
+            if (StringUtils.hasText(request.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            }
             if (StringUtils.hasText(request.getLevel())) {
                 predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));
             }
-            // 
             if (StringUtils.hasText(request.getUserUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("userUid"), request.getUserUid()));
             }
-            //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

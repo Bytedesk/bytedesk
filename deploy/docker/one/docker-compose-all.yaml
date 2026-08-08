@@ -1,6 +1,6 @@
 services:
   bytedesk-mysql:
-    image: mysql:latest
+    image: mysql:9.3.0
     container_name: mysql-bytedesk
     environment:
       MYSQL_DATABASE: bytedesk
@@ -19,7 +19,7 @@ services:
     #   retries: 5
 
   bytedesk-redis:
-    image: redis:latest
+    image: redis:8.2.1
     container_name: redis-bytedesk
     ports:
       - "16379:6379"
@@ -37,7 +37,7 @@ services:
   # ActiveMQ Artemis 消息队列
   # http://localhost:18161/console，使用 admin/admin 作为登录凭据
   bytedesk-artemis:
-    image: apache/activemq-artemis:latest
+    image: apache/activemq-artemis:2.40.0
     container_name: artemis-bytedesk
     environment:
       - ARTEMIS_USER=admin
@@ -94,27 +94,12 @@ services:
     #   timeout: 10s
     #   retries: 5
 
-  # Zipkin 分布式追踪系统- Spring Ai Observability
-  bytedesk-zipkin:
-    image: 'openzipkin/zipkin:latest'
-    container_name: zipkin-bytedesk
-    ports:
-      - '19411:9411'
-    volumes:
-      - zipkin_data:/data
-    networks:
-      - bytedesk-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
   # MinIO 对象存储服务
   # http://localhost:19000 - MinIO Console
   # http://localhost:19001 - MinIO API
   bytedesk-minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2025-07-31T00-00-00Z
     container_name: minio-bytedesk
     environment:
       - MINIO_ROOT_USER=minioadmin
@@ -140,7 +125,7 @@ services:
   # 说明：TURN 需要开放一段 UDP 中继端口范围（RFC 5766）。Docker 对超大端口段映射性能较差，
   # 这里按官方示例收敛到 49160-49200（可按需调整）。
   bytedesk-coturn:
-    image: coturn/coturn:latest
+    image: coturn/coturn:4.6.3
     container_name: coturn-bytedesk
     restart: always
     ports:
@@ -230,7 +215,6 @@ services:
       - bytedesk-redis
       - bytedesk-elasticsearch
       - bytedesk-artemis
-      - bytedesk-zipkin
       - bytedesk-minio
       # bytedesk-mysql:
       #   condition: service_healthy
@@ -733,10 +717,7 @@ volumes:
   blog_data:
     name: bytedesk_blog_data
   artemis_data:
-    name: bytedesk_artemis_data
-  zipkin_data:
-    name: bytedesk_zipkin_data
-  minio_data:
+    name: bytedesk_artemis_data  minio_data:
     name: bytedesk_minio_data
   coturn_data:
     name: bytedesk_coturn_data

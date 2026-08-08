@@ -35,6 +35,41 @@ public class ToolRequest extends BaseRequest {
 
     private String description;
 
-    // @Builder.Default
-    // private String type = ToolTypeEnum.CUSTOMER.name();
+    private String key;
+
+    private String category;
+
+    private String icon;
+
+    private Boolean enabled;
+
+    private String bindingType;
+
+    private String beanName;
+
+    private String className;
+
+    private String methodName;
+
+    private String endpoint;
+
+    private String inputSchema;
+
+    private String outputSchema;
+
+    private String systemPrompt;
+
+    private Integer orderIndex;
+
+    private Boolean requiresApproval;
+
+    private String intentKeywords;
+
+    private String intentMatchMode;
+
+    private String mcpExposureMode;
+
+    private String allowedMethods;
+
+    private String metadata;
 }

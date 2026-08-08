@@ -39,6 +39,10 @@ public class ToolSpecification extends BaseSpecification<ToolEntity, ToolRequest
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
+            // key
+            if (StringUtils.hasText(request.getKey())) {
+                predicates.add(criteriaBuilder.like(root.get("key"), "%" + request.getKey() + "%"));
+            }
             // description
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
@@ -46,6 +50,18 @@ public class ToolSpecification extends BaseSpecification<ToolEntity, ToolRequest
             // type
             if (StringUtils.hasText(request.getType())) {
                 predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            }
+            // category
+            if (StringUtils.hasText(request.getCategory())) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), request.getCategory()));
+            }
+            // bindingType
+            if (StringUtils.hasText(request.getBindingType())) {
+                predicates.add(criteriaBuilder.equal(root.get("bindingType"), request.getBindingType()));
+            }
+            // enabled
+            if (request.getEnabled() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
             }
             // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {

@@ -15,6 +15,8 @@ package com.bytedesk.core.utils;
 
 import java.io.Serializable;
 
+import org.springframework.data.domain.Page;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -48,15 +50,15 @@ public class JsonResult<T> implements Serializable {
     }
 
     public static <T> JsonResult<T> success(T data) {
-        return new JsonResult<T>().setCode(200).setMessage("success").setData(data);
+        return new JsonResult<T>().setCode(200).setMessage("success").setData(normalizeData(data));
     }
 
     public static <T> JsonResult<T> success(String message, T data) {
-        return new JsonResult<T>().setCode(200).setMessage(message).setData(data);
+        return new JsonResult<T>().setCode(200).setMessage(message).setData(normalizeData(data));
     }
 
     public static <T> JsonResult<T> success(String message, int code, T data) {
-        return new JsonResult<T>().setCode(code).setMessage(message).setData(data);
+        return new JsonResult<T>().setCode(code).setMessage(message).setData(normalizeData(data));
     }
 
     public static JsonResult<Boolean> error() {
@@ -73,6 +75,14 @@ public class JsonResult<T> implements Serializable {
 
     public static <T> JsonResult<T> error(String message, int code, T data) {
         return new JsonResult<T>().setCode(code).setMessage(message).setData(data);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T normalizeData(T data) {
+        if (data instanceof Page<?> page) {
+            return (T) StablePageResult.from(page);
+        }
+        return data;
     }
 
 }

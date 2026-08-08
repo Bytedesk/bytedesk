@@ -27,17 +27,21 @@ import lombok.Data;
 @Data
 public class ToolAuditExcel {
 
-    @ExcelProperty(index = 0, value = "标签名称")
+    @ExcelProperty(index = 0, value = "工具名称")
     @ColumnWidth(20)
     private String name;
 
-    @ExcelProperty(index = 1, value = "类型")
+    @ExcelProperty(index = 1, value = "工具调用UID")
     @ColumnWidth(20)
-    private String type;
+    private String toolCallUid;
 
-    @ExcelProperty(index = 2, value = "颜色")
+    @ExcelProperty(index = 2, value = "审批状态")
     @ColumnWidth(20)
-    private String color;
+    private String status;
+
+    @ExcelProperty(index = 3, value = "审批人")
+    @ColumnWidth(20)
+    private String approverUserUid;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)

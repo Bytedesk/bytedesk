@@ -8,4 +8,4 @@ var e = (e) => typeof e == "string" && e.trim() || void 0, t = (t) => {
 	return Object.keys(n).length > 0 ? JSON.stringify(n) : void 0;
 };
 //#endregion
-export { n as serializeBrowseConfig };
+export { t as normalizeBrowseConfig, n as serializeBrowseConfig };

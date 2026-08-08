@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260803-add-agent-guideline-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_agent_guideline" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_agent_guideline">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_ai_agent_guideline" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_ai_agent_guideline_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(32)" />
+            <column name="platform_type" type="VARCHAR(32)" />
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="TEXT" />
+            <column name="condition_text" type="TEXT" />
+            <column name="action_text" type="TEXT" />
+            <column name="priority" type="INT" defaultValueNumeric="0" />
+            <column name="criticality" type="VARCHAR(32)" defaultValue="LOW" />
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true" />
+            <column name="apply_once" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="composition_mode" type="VARCHAR(32)" defaultValue="FLUID" />
+            <column name="source_type" type="VARCHAR(32)" defaultValue="MANUAL" />
+            <column name="lifecycle_status" type="VARCHAR(32)" defaultValue="DRAFT" />
+            <column name="language" type="VARCHAR(16)" defaultValue="ZH_CN" />
+            <column name="tags_json" type="TEXT" />
+            <column name="metadata_json" type="TEXT" />
+        </createTable>
+
+        <createIndex tableName="bytedesk_ai_agent_guideline" indexName="idx_ai_agent_guideline_org_enabled">
+            <column name="org_uid" />
+            <column name="is_enabled" />
+        </createIndex>
+
+        <createIndex tableName="bytedesk_ai_agent_guideline" indexName="idx_ai_agent_guideline_org_priority">
+            <column name="org_uid" />
+            <column name="priority" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260803-add-agent-guideline-binding-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_agent_guideline_binding" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_agent_guideline_binding">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_ai_agent_guideline_binding" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_ai_agent_guideline_binding_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(32)" />
+            <column name="platform_type" type="VARCHAR(32)" />
+            <column name="guideline_uid" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="target_type" type="VARCHAR(32)" defaultValue="ORG">
+                <constraints nullable="false" />
+            </column>
+            <column name="target_uid" type="VARCHAR(64)">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true" />
+            <column name="metadata_json" type="TEXT" />
+        </createTable>
+
+        <createIndex tableName="bytedesk_ai_agent_guideline_binding" indexName="idx_ai_agent_binding_org_target">
+            <column name="org_uid" />
+            <column name="target_type" />
+            <column name="target_uid" />
+        </createIndex>
+
+        <createIndex tableName="bytedesk_ai_agent_guideline_binding" indexName="idx_ai_agent_binding_guideline">
+            <column name="guideline_uid" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260803-add-agent-canned-response-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_agent_canned_response" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_agent_canned_response">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_ai_agent_canned_response" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_ai_agent_canned_response_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(32)" />
+            <column name="platform_type" type="VARCHAR(32)" />
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false" />
+            </column>
+            <column name="description" type="TEXT" />
+            <column name="template_text" type="TEXT" />
+            <column name="signals_json" type="TEXT" />
+            <column name="required_fields_json" type="TEXT" />
+            <column name="criticality" type="VARCHAR(32)" defaultValue="HIGH" />
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true" />
+            <column name="source_type" type="VARCHAR(32)" defaultValue="MANUAL" />
+            <column name="lifecycle_status" type="VARCHAR(32)" defaultValue="DRAFT" />
+            <column name="language" type="VARCHAR(16)" defaultValue="ZH_CN" />
+            <column name="metadata_json" type="TEXT" />
+        </createTable>
+
+        <createIndex tableName="bytedesk_ai_agent_canned_response" indexName="idx_ai_canned_response_org_enabled">
+            <column name="org_uid" />
+            <column name="is_enabled" />
+        </createIndex>
+
+        <createIndex tableName="bytedesk_ai_agent_canned_response" indexName="idx_ai_canned_response_org_criticality">
+            <column name="org_uid" />
+            <column name="criticality" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260803-add-agent-turn-trace-table" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_agent_turn_trace" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_agent_turn_trace">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_ai_agent_turn_trace" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_ai_agent_turn_trace_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(32)" />
+            <column name="platform_type" type="VARCHAR(32)" />
+            <column name="trace_id" type="VARCHAR(64)" />
+            <column name="thread_uid" type="VARCHAR(64)" />
+            <column name="message_uid" type="VARCHAR(64)" />
+            <column name="robot_uid" type="VARCHAR(64)" />
+            <column name="workgroup_uid" type="VARCHAR(64)" />
+            <column name="visitor_uid" type="VARCHAR(64)" />
+            <column name="provider_name" type="VARCHAR(64)" />
+            <column name="model_name" type="VARCHAR(128)" />
+            <column name="response_status" type="VARCHAR(32)" />
+            <column name="latency_ms" type="BIGINT" defaultValueNumeric="0" />
+            <column name="matched_guideline_uids_json" type="TEXT" />
+            <column name="knowledge_sources_json" type="TEXT" />
+            <column name="tool_decisions_json" type="TEXT" />
+            <column name="prompt_snapshot" type="TEXT" />
+            <column name="error_stage" type="VARCHAR(64)" />
+            <column name="error_message" type="TEXT" />
+        </createTable>
+
+        <createIndex tableName="bytedesk_ai_agent_turn_trace" indexName="idx_ai_turn_trace_org_thread">
+            <column name="org_uid" />
+            <column name="thread_uid" />
+        </createIndex>
+
+        <createIndex tableName="bytedesk_ai_agent_turn_trace" indexName="idx_ai_turn_trace_robot_created">
+            <column name="robot_uid" />
+            <column name="created_at" />
+        </createIndex>
+
+        <createIndex tableName="bytedesk_ai_agent_turn_trace" indexName="idx_ai_turn_trace_message">
+            <column name="message_uid" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

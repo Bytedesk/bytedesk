@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.bytedesk.ai.providers.zhipuai.ZhipuaiConfig;
+
 class ZhipuaiSdkMigrationTest {
 
     private static final Path MAIN_SOURCE_DIR = Path.of("src/main/java/com/bytedesk/ai/zhipuai");
@@ -35,7 +37,7 @@ class ZhipuaiSdkMigrationTest {
 
     @Test
     void zhipuaiClientBeanShouldGracefullyHandleSdkRuntimeIncompatibility() {
-        ZhipuaiChatConfig config = new ZhipuaiChatConfig();
+        ZhipuaiConfig config = new ZhipuaiConfig();
         ReflectionTestUtils.setField(config, "apiKey", "sk-test-compatibility-check");
         ReflectionTestUtils.setField(config, "connectionTimeout", 30);
         ReflectionTestUtils.setField(config, "readTimeout", 10);

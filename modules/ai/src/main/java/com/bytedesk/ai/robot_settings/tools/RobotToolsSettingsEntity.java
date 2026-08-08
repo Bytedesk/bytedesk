@@ -40,22 +40,39 @@ public class RobotToolsSettingsEntity extends BaseEntity {
 
     @Builder.Default
     @Column(name = "is_tools_enabled")
-    private Boolean enabled = true;
+    private Boolean enabled = false;
 
     @Builder.Default
     @Column(name = "invocation_mode")
-    private String invocationMode = "AUTO";
+    private String invocationMode = ToolInvocationMode.AUTO.name();
 
     @Builder.Default
     @Column(name = "tool_choice")
-    private String toolChoice = "AUTO";
+    private String toolChoice = ToolChoice.AUTO.name();
 
     @Builder.Default
     @Column(name = "max_tool_invocations")
     private Integer maxToolInvocations = 3;
 
-    @Column(name = "default_tool_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private String defaultToolPrompt;
+    @Builder.Default
+    @Column(name = "intent_recognition_enabled")
+    private Boolean intentRecognitionEnabled = false;
+
+    @Column(name = "intent_model")
+    private String intentModel;
+
+    @Column(name = "intent_provider")
+    private String intentProviderUid;
+
+    @Column(name = "tool_model")
+    private String toolModel;
+
+    @Column(name = "tool_provider")
+    private String toolProviderUid;
+
+    @Builder.Default
+    @Column(name = "intent_timeout_ms")
+    private Integer intentTimeoutMs = 1500;
 
     @Builder.Default
     @Convert(converter = RobotToolConfigListConverter.class)

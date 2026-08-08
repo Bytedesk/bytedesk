@@ -5,5 +5,29 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="db/changelog/migration/260730_drop_ticket_basic_settings_unused_timeout_tips.xml" />
-    
+
+    <include file="db/changelog/migration/260803_add_queue_member_statistic_indexes.xml" />
+
+    <include file="db/changelog/migration/260803_add_agent_guidance_tables.xml" />
+
+    <include file="db/changelog/migration/260803_fix_ai_robot_llm_varbinary_to_varchar.xml" />
+
+    <include file="db/changelog/migration/260805_add_direction_to_mcp_server.xml" />
+
+    <include file="db/changelog/migration/260806_add_tool_intent_fields.xml" />
+
+    <include file="db/changelog/migration/260806_add_robot_tools_settings_intent_runtime_fields.xml" />
+
+    <include file="db/changelog/migration/260806_add_robot_llm_intent_tool_model_fields.xml" />
+
+    <include file="db/changelog/migration/260806_drop_robot_tools_settings_default_tool_prompt.xml" />
+
+    <include file="db/changelog/migration/260806_backfill_robot_intent_provider_uids.xml" />
+
+    <include file="db/changelog/migration/260807_drop_robot_llm_intent_columns.xml" />
+
+    <include file="db/changelog/migration/260807_drop_robot_llm_tool_columns.xml" />
+
+    <include file="db/changelog/migration/260808_add_tool_mcp_exposure_fields.xml" />
+
 </databaseChangeLog>

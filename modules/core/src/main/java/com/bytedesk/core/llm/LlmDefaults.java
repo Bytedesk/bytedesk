@@ -28,7 +28,10 @@ public class LlmDefaults {
     // 默认文字对话模型提供商
     public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.DASHSCOPE;
     public static final String DEFAULT_TEXT_MODEL = "qwen3-max";
-    
+
+    // DeepSeek 默认模型
+    public static final String DEFAULT_DEEPSEEK_CHAT_MODEL = "deepseek-v4-flash";
+
     // 默认视觉对话模型提供商
     public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.DASHSCOPE;
     public static final String DEFAULT_VISION_MODEL = "qwen3-vl-plus";

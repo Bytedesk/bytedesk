@@ -16,7 +16,7 @@ services:
     #   retries: 5
 
   # bytedesk-ollama:
-  #   image: ollama/ollama:latest
+  #   image: ollama/ollama:0.11.14
   #   container_name: ollama-bytedesk
   #   ports:
   #     - "21434:11434"
@@ -155,22 +155,6 @@ services:
     networks:
       - bytedesk-network
 
-  # Zipkin 分布式追踪系统- Spring Ai Observability
-  # bytedesk-zipkin:
-  #   image: 'openzipkin/zipkin:latest'
-  #   container_name: zipkin-bytedesk
-  #   ports:
-  #     - '19411:9411'
-  #   volumes:
-  #     - zipkin_data:/data
-  #   networks:
-  #     - bytedesk-network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9411/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 5
-
   # MinIO 对象存储服务
   # http://localhost:19000 - MinIO Console
   # http://localhost:19001 - MinIO API
@@ -210,8 +194,6 @@ volumes:
     name: bytedesk_logstash_data
   kibana_data:
     name: bytedesk_kibana_data
-  # zipkin_data:
-  #   name: bytedesk_zipkin_data
   minio_data:
     name: bytedesk_minio_data
 

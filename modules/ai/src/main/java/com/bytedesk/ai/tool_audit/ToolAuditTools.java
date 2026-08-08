@@ -27,7 +27,7 @@ public class ToolAuditTools extends BaseTools<ToolAuditRequest, ToolAuditRespons
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query tool_audit by user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(description = "Query tool_audit by user with request json")
     public Object tool_auditQueryByUser(@ToolParam(description = "ToolRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }

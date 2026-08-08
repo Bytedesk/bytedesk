@@ -20,7 +20,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.springai.providers.custom.SpringAICustomService;
+import com.bytedesk.ai.providers.custom.SpringAICustomService;
+
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

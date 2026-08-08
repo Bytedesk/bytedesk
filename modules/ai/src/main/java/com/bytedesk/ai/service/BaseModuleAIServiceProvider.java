@@ -18,20 +18,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.springai.providers.baidu.SpringAIBaiduService;
-import com.bytedesk.ai.springai.providers.custom.SpringAICustomService;
-import com.bytedesk.ai.springai.providers.dashscope.SpringAIDashscopeService;
-import com.bytedesk.ai.springai.providers.deepseek.SpringAIDeepseekService;
-import com.bytedesk.ai.springai.providers.gitee.SpringAIGiteeService;
-import com.bytedesk.ai.springai.providers.minimax.SpringAIMinimaxService;
-import com.bytedesk.ai.springai.providers.moonshot.SpringAIMoonshotService;
-import com.bytedesk.ai.springai.providers.ollama.SpringAIOllamaService;
-import com.bytedesk.ai.springai.providers.siliconflow.SpringAISiliconFlowService;
-import com.bytedesk.ai.springai.providers.tencent.SpringAITencentService;
-import com.bytedesk.ai.springai.providers.volcengine.SpringAIVolcengineService;
-import com.bytedesk.ai.zhipuai.ZhipuaiMultiModelService;
+import com.bytedesk.ai.providers.baidu.SpringAIBaiduService;
+import com.bytedesk.ai.providers.custom.SpringAICustomService;
+import com.bytedesk.ai.providers.dashscope.DashscopeService;
+import com.bytedesk.ai.providers.deepseek.SpringAIDeepseekService;
+import com.bytedesk.ai.providers.gitee.SpringAIGiteeService;
+import com.bytedesk.ai.providers.minimax.SpringAIMinimaxService;
+import com.bytedesk.ai.providers.moonshot.SpringAIMoonshotService;
+import com.bytedesk.ai.providers.ollama.SpringAIOllamaService;
+import com.bytedesk.ai.providers.siliconflow.SpringAISiliconFlowService;
+import com.bytedesk.ai.providers.tencent.SpringAITencentService;
+import com.bytedesk.ai.providers.volcengine.SpringAIVolcengineService;
+import com.bytedesk.ai.providers.zhipuai.ZhipuaiService;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import jakarta.annotation.PostConstruct;
@@ -48,20 +49,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
 
-    private final Optional<SpringAIDeepseekService> springAIDeepseekService;
+    @Lazy private final Optional<SpringAIDeepseekService> springAIDeepseekService;
     // private final Optional<ZhipuaiService> zhipuaiService;
-    private final Optional<ZhipuaiMultiModelService> zhipuaiService;
-    private final Optional<SpringAIDashscopeService> springAIDashscopeService;
-    private final Optional<SpringAIOllamaService> springAIOllamaService;
-    private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
-    private final Optional<SpringAIGiteeService> springAIGiteeService;
-    private final Optional<SpringAITencentService> springAITencentService;
-    private final Optional<SpringAIBaiduService> springAIBaiduService;
-    private final Optional<SpringAIVolcengineService> springAIVolcengineService;
-    private final Optional<SpringAIMinimaxService> springAIMinimaxService;
-    private final Optional<SpringAIMoonshotService> springAIMoonshotService;
+    @Lazy private final Optional<ZhipuaiService> zhipuaiService;
+    @Lazy private final Optional<DashscopeService> springAIDashscopeService;
+    @Lazy private final Optional<SpringAIOllamaService> springAIOllamaService;
+    @Lazy private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
+    @Lazy private final Optional<SpringAIGiteeService> springAIGiteeService;
+    @Lazy private final Optional<SpringAITencentService> springAITencentService;
+    @Lazy private final Optional<SpringAIBaiduService> springAIBaiduService;
+    @Lazy private final Optional<SpringAIVolcengineService> springAIVolcengineService;
+    @Lazy private final Optional<SpringAIMinimaxService> springAIMinimaxService;
+    @Lazy private final Optional<SpringAIMoonshotService> springAIMoonshotService;
     
-    private final Optional<SpringAICustomService> springAICustomService;
+    @Lazy private final Optional<SpringAICustomService> springAICustomService;
 
     // 服务注册表，用于存储各种AI服务提供商的实现
     private final Map<String, SpringAIService> serviceRegistry = new HashMap<>();

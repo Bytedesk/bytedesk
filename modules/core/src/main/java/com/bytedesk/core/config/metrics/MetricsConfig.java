@@ -15,18 +15,4 @@ public class MetricsConfig {
                 .description("Number of online users")
                 .register(registry);
     }
-
-    @Bean
-    public Counter messageCounter(MeterRegistry registry) {
-        return Counter.builder("bytedesk.messages")
-                .description("Number of messages processed")
-                .register(registry);
-    }
-
-    @Bean
-    public Counter aiRequestCounter(MeterRegistry registry) {
-        return Counter.builder("bytedesk.ai.requests")
-                .description("Number of AI requests processed")
-                .register(registry);
-    }
 } 

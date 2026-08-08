@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.mcp_server;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +27,8 @@ public interface McpServerRepository extends JpaRepository<McpServerEntity, Long
     Boolean existsByUid(String uid);
 
     Optional<McpServerEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
+
+    List<McpServerEntity> findByEnabledTrueAndDirectionInAndDeletedFalse(Collection<String> directions);
 
     // Boolean existsByPlatform(String platform);
 }

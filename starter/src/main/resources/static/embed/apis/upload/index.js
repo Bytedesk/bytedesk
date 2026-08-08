@@ -26,4 +26,4 @@ async function r(e, t) {
 	})).data?.fileUrl || "";
 }
 //#endregion
-export { r as uploadScreenshot };
+export { n as handleUpload, r as uploadScreenshot };

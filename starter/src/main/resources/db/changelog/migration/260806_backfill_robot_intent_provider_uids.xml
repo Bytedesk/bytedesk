@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260806-backfill-robot-llm-intent-provider-uids-mysql" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+            <tableExists tableName="bytedesk_ai_provider" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_intent_provider" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="uuid" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="provider_type" />
+        </preConditions>
+        <comment>将 bytedesk_ai_robot.llm_intent_provider 中历史保存的 provider type 回填为 provider uid，优先匹配同组织 provider，其次回退平台 provider。</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot r
+            SET r.llm_intent_provider = (
+                SELECT p.uuid
+                FROM bytedesk_ai_provider p
+                WHERE p.is_deleted = 0
+                  AND p.provider_type = r.llm_intent_provider
+                  AND (
+                    COALESCE(p.org_uid, '') = COALESCE(r.org_uid, '')
+                    OR COALESCE(p.org_uid, '') = ''
+                  )
+                ORDER BY CASE WHEN COALESCE(p.org_uid, '') = COALESCE(r.org_uid, '') THEN 0 ELSE 1 END, p.id
+                LIMIT 1
+            )
+            WHERE r.llm_intent_provider IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p0
+                WHERE p0.uuid = r.llm_intent_provider
+              )
+              AND EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p1
+                WHERE p1.is_deleted = 0
+                  AND p1.provider_type = r.llm_intent_provider
+                  AND (
+                    COALESCE(p1.org_uid, '') = COALESCE(r.org_uid, '')
+                    OR COALESCE(p1.org_uid, '') = ''
+                  )
+              );
+        </sql>
+    </changeSet>
+
+    <changeSet id="260806-backfill-robot-tools-intent-provider-uids-mysql" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_tools_settings" />
+            <tableExists tableName="bytedesk_ai_provider" />
+            <columnExists tableName="bytedesk_ai_robot_tools_settings" columnName="intent_provider" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="uuid" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="provider_type" />
+        </preConditions>
+        <comment>将 bytedesk_ai_robot_tools_settings.intent_provider 中历史保存的 provider type 回填为 provider uid，优先匹配同组织 provider，其次回退平台 provider。</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot_tools_settings s
+            SET s.intent_provider = (
+                SELECT p.uuid
+                FROM bytedesk_ai_provider p
+                WHERE p.is_deleted = 0
+                  AND p.provider_type = s.intent_provider
+                  AND (
+                    COALESCE(p.org_uid, '') = COALESCE(s.org_uid, '')
+                    OR COALESCE(p.org_uid, '') = ''
+                  )
+                ORDER BY CASE WHEN COALESCE(p.org_uid, '') = COALESCE(s.org_uid, '') THEN 0 ELSE 1 END, p.id
+                LIMIT 1
+            )
+            WHERE s.intent_provider IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p0
+                WHERE p0.uuid = s.intent_provider
+              )
+              AND EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p1
+                WHERE p1.is_deleted = 0
+                  AND p1.provider_type = s.intent_provider
+                  AND (
+                    COALESCE(p1.org_uid, '') = COALESCE(s.org_uid, '')
+                    OR COALESCE(p1.org_uid, '') = ''
+                  )
+              );
+        </sql>
+    </changeSet>
+
+    <changeSet id="260806-backfill-robot-llm-intent-provider-uids-postgresql" author="githubcopilot" dbms="postgresql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+            <tableExists tableName="bytedesk_ai_provider" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_intent_provider" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="uuid" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="provider_type" />
+        </preConditions>
+        <comment>PostgreSQL: 将 bytedesk_ai_robot.llm_intent_provider 中历史 provider type 回填为 provider uid。</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot r
+            SET llm_intent_provider = candidate.uuid
+            FROM LATERAL (
+                SELECT p.uuid
+                FROM bytedesk_ai_provider p
+                WHERE p.is_deleted = false
+                  AND p.provider_type = r.llm_intent_provider
+                  AND (
+                    COALESCE(p.org_uid, '') = COALESCE(r.org_uid, '')
+                    OR COALESCE(p.org_uid, '') = ''
+                  )
+                ORDER BY CASE WHEN COALESCE(p.org_uid, '') = COALESCE(r.org_uid, '') THEN 0 ELSE 1 END, p.id
+                LIMIT 1
+            ) candidate
+            WHERE r.llm_intent_provider IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p0
+                WHERE p0.uuid = r.llm_intent_provider
+              );
+        </sql>
+    </changeSet>
+
+    <changeSet id="260806-backfill-robot-tools-intent-provider-uids-postgresql" author="githubcopilot" dbms="postgresql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_tools_settings" />
+            <tableExists tableName="bytedesk_ai_provider" />
+            <columnExists tableName="bytedesk_ai_robot_tools_settings" columnName="intent_provider" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="uuid" />
+            <columnExists tableName="bytedesk_ai_provider" columnName="provider_type" />
+        </preConditions>
+        <comment>PostgreSQL: 将 bytedesk_ai_robot_tools_settings.intent_provider 中历史 provider type 回填为 provider uid。</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot_tools_settings s
+            SET intent_provider = candidate.uuid
+            FROM LATERAL (
+                SELECT p.uuid
+                FROM bytedesk_ai_provider p
+                WHERE p.is_deleted = false
+                  AND p.provider_type = s.intent_provider
+                  AND (
+                    COALESCE(p.org_uid, '') = COALESCE(s.org_uid, '')
+                    OR COALESCE(p.org_uid, '') = ''
+                  )
+                ORDER BY CASE WHEN COALESCE(p.org_uid, '') = COALESCE(s.org_uid, '') THEN 0 ELSE 1 END, p.id
+                LIMIT 1
+            ) candidate
+            WHERE s.intent_provider IS NOT NULL
+              AND NOT EXISTS (
+                SELECT 1
+                FROM bytedesk_ai_provider p0
+                WHERE p0.uuid = s.intent_provider
+              );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

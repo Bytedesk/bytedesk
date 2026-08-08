@@ -23,9 +23,8 @@
 		<okhttp.version>4.12.0</okhttp.version>
 		<!-- <selenium.version>4.30.0</selenium.version> -->
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
-		<spring-ai-minimax.version>1.0.0</spring-ai-minimax.version>
-		<spring-ai-zhipuai.version>1.0.0</spring-ai-zhipuai.version>
-		<zai-sdk.version>0.3.3</zai-sdk.version>
+		<zai-sdk.version>0.3.5</zai-sdk.version>
+		<elasticsearch.version>9.4.2</elasticsearch.version>
 	</properties>
 
 	<dependencies>
@@ -82,6 +81,15 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- moonshot 已 vendor 到 modules/ai/src/main/java/org/springaicommunity/moonshot -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-anthropic</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
 		<!-- openai sdk Official -->
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/openai-sdk-chat.html -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-openai-sdk -->
@@ -107,29 +115,7 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-minimax -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-minimax</artifactId>
-			<version>${spring-ai-minimax.version}</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-zhipuai -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-zhipuai</artifactId>
-			<version>${spring-ai-zhipuai.version}</version>
-		</dependency>
-
-		<!-- moonshot 已 vendor 到 modules/ai/src/main/java/org/springaicommunity/moonshot -->
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat/anthropic-chat.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-anthropic -->
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-anthropic</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency> -->
+		<!-- ZhipuAI now uses in-repo ai.z.openapi integration instead of Spring AI starter -->
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat/vertexai-gemini-chat.html -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-vertex-ai-gemini -->
@@ -157,28 +143,51 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-client</artifactId>
-			<version>8.18.8</version>
+			<version>${elasticsearch.version}</version>
 		</dependency>
 
-		<!-- https://spring.io/blog/2025/12/11/spring-ai-tool-search-tools-tzolov -->
-		<!-- 智能工具选择：通过 Spring AI 的动态工具发现实现 34-64%的 Token 节省 -->
-		<!-- https://github.com/spring-ai-community/spring-ai-tool-search-tool/tree/1.0.x -->
-		<!-- https://mvnrepository.com/artifact/org.springaicommunity/tool-search-tool -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/chat-memory.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-chat-memory-repository-jdbc -->
 		<!-- <dependency>
-			<groupId>org.springaicommunity</groupId>
-			<artifactId>tool-search-tool</artifactId>
-			<version>1.0.1</version>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency> -->
-		<!-- Choose a search strategy -->
-		<!-- https://mvnrepository.com/artifact/org.springaicommunity/tool-searcher-lucene -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-chat-memory-repository-redis -->
 		<!-- <dependency>
-			<groupId>org.springaicommunity</groupId>
-			<artifactId>tool-searcher-lucene</artifactId>
-			<version>1.0.1</version>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-chat-memory-repository-redis</artifactId>
+			<version>${spring-ai.version}</version>
 		</dependency> -->
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server-webmvc -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-mcp-client</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency>
+
+		<!-- https://github.com/spring-ai-community/spring-ai-agent-utils -->
+		<!-- Source: https://mvnrepository.com/artifact/org.springaicommunity/spring-ai-agent-utils -->
+		<dependency>
+			<groupId>org.springaicommunity</groupId>
+			<artifactId>spring-ai-agent-utils</artifactId>
+			<version>0.10.0</version>
+			<scope>compile</scope>
+		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
@@ -205,92 +214,6 @@
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->
 
-		<!-- https://github.com/zai-org/z-ai-sdk-java -->
-		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
-		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
-		<!-- 已将 zai-sdk 源码 vendor 到 modules/ai/src/main/java/ai/z/openapi，
-			为避免与项目内同包源码重复，禁用外部二进制依赖。
-		<dependency>
-			<groupId>ai.z.openapi</groupId>
-			<artifactId>zai-sdk</artifactId>
-			<version>${zai-sdk.version}</version>
-		</dependency>
-		-->
-
-		<!-- vendored zai-sdk 运行/编译所需基础依赖 -->
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>retrofit</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>converter-jackson</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.retrofit2</groupId>
-			<artifactId>adapter-rxjava3</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
-			<groupId>io.reactivex.rxjava3</groupId>
-			<artifactId>rxjava</artifactId>
-			<version>3.1.12</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp-sse</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>logging-interceptor</artifactId>
-			<version>${okhttp.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>4.4.0</version>
-		</dependency>
-
-		<!-- Google Gemini Java SDK -->
-		 <!-- https://mvnrepository.com/artifact/com.google.genai/google-genai -->
-        <dependency>
-            <groupId>com.google.genai</groupId>
-            <artifactId>google-genai</artifactId>
-			<version>1.56.0</version>
-        </dependency>
-
-        <!-- Anthropic Java SDK -->
-		<!-- https://mvnrepository.com/artifact/com.anthropic/anthropic-java -->
-        <dependency>
-            <groupId>com.anthropic</groupId>
-            <artifactId>anthropic-java</artifactId>
-			<version>2.35.0</version>
-        </dependency>
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server-webmvc -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-
-		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
-		<dependency>
-            <groupId>io.fabric8</groupId>
-            <artifactId>kubernetes-client</artifactId>
-			<version>7.7.0</version>
-        </dependency>
-
 		<!-- https://github.com/dashscope/dashscope-sdk-java -->
 		<!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
 		 <dependency>
@@ -313,27 +236,15 @@
 			</exclusions>
 		</dependency>
 
-		<!-- https://java2ai.com/docs/quick-start -->
-		<!-- https://github.com/alibaba/spring-ai-alibaba -->
-		<!-- https://github.com/spring-ai-alibaba/spring-ai-extensions -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-dashscope -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-starter-dashscope -->
-		<!-- 阶段 1：已由 BytedeskDashScopeChatModel / BytedeskDashScopeEmbeddingModel 替代，暂时注释保留便于回滚。
+		<!-- https://github.com/zai-org/z-ai-sdk-java -->
+		<!-- https://github.com/pengjinning/z-ai-sdk-java -->
+		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
+		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
 		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
+			<groupId>ai.z.openapi</groupId>
+			<artifactId>zai-sdk</artifactId>
+			<version>${zai-sdk.version}</version>
 		</dependency>
-		-->
-		<!-- Spring AI Alibaba Agent Framework -->
-		<!-- https://mvnrepository.com/artifact/com.alibaba.cloud.ai/spring-ai-alibaba-agent-framework -->
-		<!-- 阶段 2：Agent Framework 仅服务已停用演示代码，暂时注释保留便于回滚。
-		<dependency>
-			<groupId>com.alibaba.cloud.ai</groupId>
-			<artifactId>spring-ai-alibaba-agent-framework</artifactId>
-			<version>${spring-ai-alibaba.version}</version>
-		</dependency>
-		-->
 		
 		<!-- https://github.com/ollama4j/ollama4j -->
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
@@ -350,6 +261,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<!-- 抓取网页时使用 -->
 		<!-- https://jsoup.org/download -->
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
@@ -386,6 +298,7 @@
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-bridge-brave</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>io.zipkin.reporter2</groupId>
 			<artifactId>zipkin-reporter-brave</artifactId>

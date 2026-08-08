@@ -18,9 +18,9 @@ import java.util.List;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.ai.provider.LlmProviderEntity;
-import com.bytedesk.ai.provider.LlmProviderRestService;
-import com.bytedesk.ai.provider.event.LlmProviderCreateEvent;
+import com.bytedesk.ai.llm_provider.LlmProviderEntity;
+import com.bytedesk.ai.llm_provider.LlmProviderRestService;
+import com.bytedesk.ai.llm_provider.event.LlmProviderCreateEvent;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.llm.LlmProviderConstants;
 

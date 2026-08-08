@@ -13,9 +13,11 @@
  */
 package com.bytedesk.ai.tool_audit;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,12 +26,22 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.ai.tool.ToolInvocationAuditService;
+import com.bytedesk.ai.tool.ToolTypeEnum;
+import com.bytedesk.ai.tool_call.ToolCallEntity;
+import com.bytedesk.ai.tool_call.ToolCallRepository;
+import com.bytedesk.ai.tool_call.ToolCallStatusEnum;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEntity, ToolAuditRequest, ToolAuditResponse, ToolAuditExcel> {
 
-    private final ToolAuditRepository tool_auditRepository;
+    private final ToolAuditRepository toolAuditRepository;
 
     private final ModelMapper modelMapper;
 
@@ -47,18 +59,22 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final ToolCallRepository toolCallRepository;
+
+    private final ObjectProvider<ToolInvocationAuditService> toolInvocationAuditServiceProvider;
     
     @Override
     public Page<ToolAuditEntity> queryByOrgEntity(ToolAuditRequest request) {
         Pageable pageable = request.getPageable();
         Specification<ToolAuditEntity> specs = ToolAuditSpecification.search(request, authService);
-        return tool_auditRepository.findAll(specs, pageable);
+        return toolAuditRepository.findAll(specs, pageable);
     }
 
     @Override
     public Page<ToolAuditResponse> queryByOrg(ToolAuditRequest request) {
-        Page<ToolAuditEntity> tool_auditPage = queryByOrgEntity(request);
-        return tool_auditPage.map(this::convertToResponse);
+        Page<ToolAuditEntity> toolAuditPage = queryByOrgEntity(request);
+        return toolAuditPage.map(this::convertToResponse);
     }
 
     @Override
@@ -68,19 +84,14 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
         return queryByOrg(request);
     }
 
-    @Cacheable(value = "tool_audit", key = "#uid", unless="#result==null")
+    @Cacheable(value = "tool_audit", key = "#uid", unless = "#result==null")
     @Override
     public Optional<ToolAuditEntity> findByUid(String uid) {
-        return tool_auditRepository.findByUid(uid);
-    }
-
-    @Cacheable(value = "tool_audit", key = "#name + '_' + #orgUid + '_' + #type", unless="#result==null")
-    public Optional<ToolAuditEntity> findByNameAndOrgUidAndType(String name, String orgUid, String type) {
-        return tool_auditRepository.findByNameAndOrgUidAndTypeAndDeletedFalse(name, orgUid, type);
+        return toolAuditRepository.findByUid(uid);
     }
 
     public Boolean existsByUid(String uid) {
-        return tool_auditRepository.existsByUid(uid);
+        return toolAuditRepository.existsByUid(uid);
     }
 
     @Transactional
@@ -95,42 +106,33 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
     }
 
     private ToolAuditResponse createInternal(ToolAuditRequest request, boolean skipPermissionCheck) {
-        // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
             return convertToResponse(findByUid(request.getUid()).get());
         }
-        // 检查name+orgUid+type是否已经存在
-        if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
-            Optional<ToolAuditEntity> tool_audit = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
-            if (tool_audit.isPresent()) {
-                return convertToResponse(tool_audit.get());
-            }
-        }
-        
-        // 获取用户信息
+
         UserEntity user = authService.getUser();
         if (user != null) {
             request.setUserUid(user.getUid());
+            if (!StringUtils.hasText(request.getOrgUid())) {
+                request.setOrgUid(user.getOrgUid());
+            }
         }
-        
-        // 确定数据层级
+
         String level = request.getLevel();
         if (!StringUtils.hasText(level)) {
             level = LevelEnum.ORGANIZATION.name();
             request.setLevel(level);
         }
-        
-        // 检查用户是否有权限创建该层级的数据
+
         if (!skipPermissionCheck && !permissionService.canCreateAtLevel(ToolAuditPermissions.MODULE_NAME, level)) {
-            throw new RuntimeException("无权限创建该层级的标签数据");
+            throw new RuntimeException("无权限创建该层级的工具审批记录");
         }
-        
-        // 
+
         ToolAuditEntity entity = modelMapper.map(request, ToolAuditEntity.class);
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
-        // 
+        normalizeEntity(entity);
         ToolAuditEntity savedEntity = save(entity);
         if (savedEntity == null) {
             throw new RuntimeException("Create tool_audit failed");
@@ -141,20 +143,28 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
     @Transactional
     @Override
     public ToolAuditResponse update(ToolAuditRequest request) {
-        Optional<ToolAuditEntity> optional = tool_auditRepository.findByUid(request.getUid());
+        Optional<ToolAuditEntity> optional = toolAuditRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             ToolAuditEntity entity = optional.get();
             
-            // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(ToolAuditPermissions.MODULE_NAME, "UPDATE", entity)) {
-                throw new RuntimeException("无权限更新该标签数据");
+                throw new RuntimeException("无权限更新该工具审批记录");
             }
             
+            String previousStatus = entity.getStatus();
             modelMapper.map(request, entity);
-            //
+            boolean shouldExecuteApprovedCall = applyAuditDecisionMetadata(entity, previousStatus);
+            normalizeEntity(entity);
             ToolAuditEntity savedEntity = save(entity);
             if (savedEntity == null) {
                 throw new RuntimeException("Update tool_audit failed");
+            }
+
+            if (shouldExecuteApprovedCall) {
+                ToolInvocationAuditService toolInvocationAuditService = toolInvocationAuditServiceProvider.getIfAvailable();
+                if (toolInvocationAuditService != null) {
+                    toolInvocationAuditService.executeApprovedToolCall(savedEntity.getToolCallUid());
+                }
             }
             return convertToResponse(savedEntity);
         }
@@ -165,20 +175,17 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
 
     @Override
     protected ToolAuditEntity doSave(ToolAuditEntity entity) {
-        return tool_auditRepository.save(entity);
+        return toolAuditRepository.save(entity);
     }
 
     @Override
     public ToolAuditEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, ToolAuditEntity entity) {
         try {
-            Optional<ToolAuditEntity> latest = tool_auditRepository.findByUid(entity.getUid());
+            Optional<ToolAuditEntity> latest = toolAuditRepository.findByUid(entity.getUid());
             if (latest.isPresent()) {
                 ToolAuditEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
-                return tool_auditRepository.save(latestEntity);
+                copyMutableFields(latestEntity, entity);
+                return toolAuditRepository.save(latestEntity);
             }
         } catch (Exception ex) {
             log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
@@ -190,22 +197,19 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
     @Transactional
     @Override
     public void deleteByUid(String uid) {
-        Optional<ToolAuditEntity> optional = tool_auditRepository.findByUid(uid);
+        Optional<ToolAuditEntity> optional = toolAuditRepository.findByUid(uid);
         if (optional.isPresent()) {
             ToolAuditEntity entity = optional.get();
             
-            // 检查用户是否有权限删除该实体
             if (!permissionService.hasEntityPermission(ToolAuditPermissions.MODULE_NAME, "DELETE", entity)) {
-                throw new RuntimeException("无权限删除该标签数据");
+                throw new RuntimeException("无权限删除该工具审批记录");
             }
             
             entity.setDeleted(true);
             save(entity);
-            // tool_auditRepository.delete(optional.get());
+            return;
         }
-        else {
-            throw new RuntimeException("ToolAudit not found");
-        }
+        throw new RuntimeException("ToolAudit not found");
     }
 
     @Override
@@ -230,25 +234,112 @@ public class ToolAuditRestService extends BaseRestServiceWithExport<ToolAuditEnt
 
     @Override
     protected Page<ToolAuditEntity> executePageQuery(Specification<ToolAuditEntity> spec, Pageable pageable) {
-        return tool_auditRepository.findAll(spec, pageable);
-    }
-    
-    public void initToolAudits(String orgUid) {
-        // log.info("initToolAuditToolAudit");
-        // for (String tool_audit : ToolAuditInitData.getAllToolAudits()) {
-        //     ToolAuditRequest tool_auditRequest = ToolAuditRequest.builder()
-        //             .uid(Utils.formatUid(orgUid, tool_audit))
-        //             .name(tool_audit)
-        //             .order(0)
-        //             .type(ToolAuditTypeEnum.THREAD.name())
-        //             .level(LevelEnum.ORGANIZATION.name())
-        //             .platform(BytedeskConsts.PLATFORM_BYTEDESK)
-        //             .orgUid(orgUid)
-        //             .build();
-        //     createSystemToolAudit(tool_auditRequest);
-        // }
+        return toolAuditRepository.findAll(spec, pageable);
     }
 
-    
-    
+    @Transactional
+    public ToolAuditEntity createApprovalRequest(ToolCallEntity toolCallEntity, Map<String, Object> context) {
+        ToolAuditEntity entity = ToolAuditEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(toolCallEntity.getOrgUid())
+                .userUid(toolCallEntity.getUserUid())
+                .level(LevelEnum.ORGANIZATION.name())
+                .toolCallUid(toolCallEntity.getUid())
+                .toolUid(toolCallEntity.getToolUid())
+                .toolKey(toolCallEntity.getToolKey())
+                .name(toolCallEntity.getName())
+                .description(toolCallEntity.getDescription())
+                .type(toolCallEntity.getType())
+                .status(ToolAuditStatusEnum.PENDING.name())
+                .action("SUBMITTED")
+                .approved(false)
+                .requesterUserUid(toolCallEntity.getUserUid())
+                .requestPayload(toolCallEntity.getRequestPayload())
+                .auditContext(toJson(context))
+                .build();
+        normalizeEntity(entity);
+        return save(entity);
+    }
+
+    private boolean applyAuditDecisionMetadata(ToolAuditEntity entity, String previousStatus) {
+        if (!StringUtils.hasText(entity.getStatus()) || entity.getStatus().equals(previousStatus)) {
+            return false;
+        }
+
+        UserEntity user = authService.getUser();
+        boolean approved = ToolAuditStatusEnum.APPROVED.name().equalsIgnoreCase(entity.getStatus());
+        boolean rejected = ToolAuditStatusEnum.REJECTED.name().equalsIgnoreCase(entity.getStatus());
+        if (!approved && !rejected) {
+            return false;
+        }
+
+        entity.setApproved(approved);
+        entity.setAction(approved ? "APPROVED" : "REJECTED");
+        entity.setAuditedAt(BdDateUtils.now());
+        if (user != null) {
+            entity.setApproverUserUid(user.getUid());
+        }
+
+        if (StringUtils.hasText(entity.getToolCallUid())) {
+            toolCallRepository.findByUid(entity.getToolCallUid()).ifPresent(toolCall -> {
+                toolCall.setApproved(approved);
+                toolCall.setStatus(approved ? ToolCallStatusEnum.APPROVED.name() : ToolCallStatusEnum.REJECTED.name());
+                toolCall.setCompletedAt(BdDateUtils.now());
+                toolCallRepository.save(toolCall);
+            });
+        }
+
+        return approved && StringUtils.hasText(entity.getToolCallUid());
+    }
+
+    private void normalizeEntity(ToolAuditEntity entity) {
+        if (!StringUtils.hasText(entity.getName())) {
+            entity.setName(entity.getToolKey());
+        }
+        if (!StringUtils.hasText(entity.getDescription())) {
+            entity.setDescription(I18Consts.I18N_DESCRIPTION);
+        }
+        if (!StringUtils.hasText(entity.getType())) {
+            entity.setType(ToolTypeEnum.CUSTOM.name());
+        }
+        if (!StringUtils.hasText(entity.getStatus())) {
+            entity.setStatus(ToolAuditStatusEnum.PENDING.name());
+        }
+        if (!StringUtils.hasText(entity.getAction())) {
+            entity.setAction("SUBMITTED");
+        }
+        if (entity.getApproved() == null) {
+            entity.setApproved(false);
+        }
+    }
+
+    private void copyMutableFields(ToolAuditEntity target, ToolAuditEntity source) {
+        target.setToolCallUid(source.getToolCallUid());
+        target.setToolUid(source.getToolUid());
+        target.setToolKey(source.getToolKey());
+        target.setName(source.getName());
+        target.setDescription(source.getDescription());
+        target.setType(source.getType());
+        target.setStatus(source.getStatus());
+        target.setAction(source.getAction());
+        target.setApproved(source.getApproved());
+        target.setRequesterUserUid(source.getRequesterUserUid());
+        target.setApproverUserUid(source.getApproverUserUid());
+        target.setRequestPayload(source.getRequestPayload());
+        target.setDecisionComment(source.getDecisionComment());
+        target.setAuditContext(source.getAuditContext());
+        target.setAuditedAt(source.getAuditedAt());
+        normalizeEntity(target);
+    }
+
+    private String toJson(Map<String, Object> context) {
+        if (context == null || context.isEmpty()) {
+            return null;
+        }
+        return JSON.toJSONString(context);
+    }
+
+    public void initToolAudits(String orgUid) {
+        log.debug("Tool audit logs are runtime-generated; no initializer seeding for orgUid={}", orgUid);
+    }
 }

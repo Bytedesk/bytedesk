@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260807-drop-robot-llm-tool-columns" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot"/>
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_tool_provider"/>
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_tool_model"/>
+        </preConditions>
+        <comment>移除 bytedesk_ai_robot 中已迁移至 bytedesk_ai_robot_tools_settings 的工具执行 provider/model 字段。</comment>
+        <dropColumn tableName="bytedesk_ai_robot" columnName="llm_tool_provider"/>
+        <dropColumn tableName="bytedesk_ai_robot" columnName="llm_tool_model"/>
+    </changeSet>
+
+</databaseChangeLog>

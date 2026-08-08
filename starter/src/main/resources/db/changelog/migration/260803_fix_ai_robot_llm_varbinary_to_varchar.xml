@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        修复 bytedesk_ai_robot.llm_stops / llm_tools 列的历史遗留类型不匹配问题。
+
+        背景：
+        - 早期版本这两个 List<String> 字段未声明 @Convert，JPA 默认把整个 ArrayList
+          以 Java 序列化字节流写入，列类型被建为 varbinary(255)，数据以 0xACED0005
+          (Java 序列化 magic number) 开头。
+        - 现在 RobotLlm 实体加了 @Convert(StringListConverter.class)，Hibernate
+          推断目标列为 varchar(255)，ddl-auto=update 启动时尝试
+          ALTER TABLE ... MODIFY COLUMN ... varchar(255)，MySQL 校验旧二进制
+          数据非合法 UTF-8 字符串，报 Incorrect string value: '\xAC\xED\x00\x05sr...'。
+
+        处理思路（仅 MySQL，其他数据库列类型问题各自独立，不在此处理）：
+        1. 仅清除以 0xACED0005 开头的 Java 序列化遗留数据，已迁移为合法逗号分隔
+           字符串的行不受影响。
+        2. 将列类型改为 varchar(255)，与实体 @Convert 推断类型对齐，消除启动期告警。
+    -->
+
+    <changeSet id="260803-clear-ai-robot-legacy-serialized-llm-columns" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_stops" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_tools" />
+        </preConditions>
+        <comment>清除 llm_stops / llm_tools 中遗留的 Java 序列化二进制数据（0xACED0005 magic），为 varbinary -> varchar 改类型做准备。仅清理序列化遗留数据，已迁移为合法字符串的行不受影响。</comment>
+        <sql>
+            UPDATE bytedesk_ai_robot
+            SET llm_stops = NULL
+            WHERE llm_stops IS NOT NULL
+              AND HEX(llm_stops) LIKE 'ACED0005%';
+
+            UPDATE bytedesk_ai_robot
+            SET llm_tools = NULL
+            WHERE llm_tools IS NOT NULL
+              AND HEX(llm_tools) LIKE 'ACED0005%';
+        </sql>
+    </changeSet>
+
+    <changeSet id="260803-alter-ai-robot-llm-columns-to-varchar" author="githubcopilot" dbms="mysql">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_stops" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_tools" />
+        </preConditions>
+        <comment>将 llm_stops / llm_tools 从 varbinary(255) 改为 varchar(255)，与 RobotLlm 实体 @Convert(StringListConverter) 推断类型对齐。</comment>
+        <sql>
+            ALTER TABLE bytedesk_ai_robot MODIFY COLUMN llm_stops varchar(255) DEFAULT NULL;
+            ALTER TABLE bytedesk_ai_robot MODIFY COLUMN llm_tools varchar(255) DEFAULT NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

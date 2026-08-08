@@ -109,7 +109,7 @@ class LlmConfigUtilsTest {
         // Given
         MockEnvironment environment = new MockEnvironment();
         environment.setProperty("spring.ai.model.chat", "deepseek");
-        environment.setProperty("spring.ai.deepseek.chat.options.model", "deepseek-chat");
+        environment.setProperty("spring.ai.deepseek.chat.options.model", LlmDefaults.DEFAULT_DEEPSEEK_CHAT_MODEL);
 
         // When
         LlmProviderConfigDefault config = LlmConfigUtils.getLlmProviderConfigDefault(environment);
@@ -117,6 +117,6 @@ class LlmConfigUtilsTest {
         // Then
         assertNotNull(config);
         assertEquals("deepseek", config.getDefaultChatProvider());
-        assertEquals("deepseek-chat", config.getDefaultChatModel());
+        assertEquals(LlmDefaults.DEFAULT_DEEPSEEK_CHAT_MODEL, config.getDefaultChatModel());
     }
 } 

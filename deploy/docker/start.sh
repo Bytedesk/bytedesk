@@ -9,6 +9,7 @@ DB="${1:-mysql}"
 MQ="${2:-artemis}"
 SCENARIO="${3:-standard}"
 TARGET="${4:-all}"
+OBSERVABILITY="${5:-}"
 
 case "${DB}" in
   mysql|postgresql|oracle|kingbase9) ;;
@@ -45,6 +46,15 @@ case "${TARGET}" in
     ;;
 esac
 
+case "${OBSERVABILITY}" in
+  ""|false|no) OBSERVABILITY="" ;;
+  obs|observability|true|yes) OBSERVABILITY="obs" ;;
+  *)
+    echo "[ERROR] Unsupported observability: ${OBSERVABILITY}. Allowed: obs|observability|true|yes"
+    exit 1
+    ;;
+esac
+
 BASE_FILE="${SCRIPT_DIR}/compose-base.yaml"
 DB_FILE="${SCRIPT_DIR}/compose-db-${DB}.yaml"
 MQ_FILE="${SCRIPT_DIR}/compose-mq-${MQ}.yaml"
@@ -52,6 +62,7 @@ SCENARIO_FILE="${SCRIPT_DIR}/compose-scenario-${SCENARIO}.yaml"
 SCENARIO_FILES=()
 APP_FILE="${SCRIPT_DIR}/compose-app-bytedesk.yaml"
 APP_MQ_FILE="${SCRIPT_DIR}/compose-app-mq-${MQ}.yaml"
+OBS_FILE="${SCRIPT_DIR}/compose-observability.yaml"
 
 case "${SCENARIO}" in
   call-webrtc)
@@ -89,6 +100,13 @@ for file in "${APP_FILE}" "${APP_MQ_FILE}"; do
   fi
 done
 
+if [[ -n "${OBSERVABILITY}" ]]; then
+  if [[ ! -f "${OBS_FILE}" ]]; then
+    echo "[ERROR] Missing compose file: ${OBS_FILE}"
+    exit 1
+  fi
+fi
+
 compose_files=(
   -f "${BASE_FILE}"
   -f "${DB_FILE}"
@@ -103,6 +121,10 @@ compose_files+=(
   -f "${APP_FILE}"
   -f "${APP_MQ_FILE}"
 )
+
+if [[ -n "${OBSERVABILITY}" ]]; then
+  compose_files+=( -f "${OBS_FILE}" )
+fi
 
 get_env_value() {
   local key="$1"
@@ -318,7 +340,7 @@ ensure_oracle_database() {
   echo "[WARN] Failed to auto-ensure Oracle PDB '${db_name_upper}' after ${tries} retries"
 }
 
-echo "[INFO] Starting stack: db=${DB}, mq=${MQ}, scenario=${SCENARIO}, target=${TARGET}, project=${PROJECT_NAME}"
+echo "[INFO] Starting stack: db=${DB}, mq=${MQ}, scenario=${SCENARIO}, target=${TARGET}, project=${PROJECT_NAME}, observability=${OBSERVABILITY:-false}"
 
 if [[ "${TARGET}" == "all" ]]; then
   docker compose \

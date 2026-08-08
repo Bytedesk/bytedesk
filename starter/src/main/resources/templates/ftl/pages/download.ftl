@@ -64,7 +64,20 @@ Listed course START -->
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
-
+		<!-- Item: Linux -->
+		<div class="col-sm-6 col-md-4 col-xl-3">
+			<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<!-- Image -->
+				<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+					<img src="/assets/images/element/coding.svg" alt="<@t key='alt.download.linuxIcon'>Linux客户端下载图标</@t>">
+				</div>
+				<!-- Title -->
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" target="_blank"><@t key="page.download.linux">Linux客户端</@t></a></h5>
+					<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" target="_blank">AppImage (x86_64)</a></h5>
+					<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-arm64.AppImage" target="_blank">AppImage (arm64)</a></h5>
+				<#--  <span class="mb-0">即将开放下载.</span>  -->
+			</div>
+		</div>
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
 				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
@@ -104,22 +117,6 @@ Listed course START -->
 					<h5 class="mb-1"><a href="https://apps.apple.com/cn/app/%E5%BE%AE%E8%AF%AD/id6470106586" class="stretched-link" target="_blank"><@t key="page.download.ios">iPhone苹果</@t></a></h5>
 					<a href="/assets/qr/qr_ios.png" target="_blank">
 						<img src="/assets/qr/qr_ios.png" style="height: 100px" alt="<@t key='alt.download.iosQR'>iPhone苹果版本下载二维码</@t>"/>
-					</a>
-				</div>
-			</div>
-
-			<!-- Item: Softphone -->
-			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
-					<!-- Image -->
-					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="/assets/images/element/contact.svg" alt="<@t key='alt.download.softphoneIcon'>微语软电话下载图标</@t>">
-					</div>
-					<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/siphone-android.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话(安卓)</@t></a></h5>
-					<#--  <h5 class="mb-0"><a href="https://www.weiyuai.cn/download/siphone-flutter-macos.dmg" class="stretched-link" target="_blank"><@t key="page.download.softphone.macOS">微语软电话(Mac)</@t></a></h5>  -->
-					<a href="/assets/qr/qr_softphone.png" target="_blank">
-						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
 					</a>
 				</div>
 			</div>
@@ -177,6 +174,55 @@ Listed course START -->
 </section>
 <!-- =======================
 Listed course END -->
+
+<!-- =======================
+Other Software START -->
+<section class="position-relative pt-0 pt-sm-4 pb-0 pb-sm-5">
+	<div class="container">
+		<!-- Title -->
+		<div class="row mb-4">
+			<div class="col-lg-8 mx-auto text-center">
+				<h3><@t key="page.download.otherSoftware">其他微语软件下载</@t></h3>
+			</div>
+		</div>
+
+		<div class="row g-4">
+
+			<!-- Item: Softphone -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/contact.svg" alt="<@t key='alt.download.softphoneIcon'>微语软电话下载图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/siphone-android.apk" class="stretched-link" target="_blank"><@t key="page.download.softphone">微语软电话(安卓)</@t></a></h5>
+					<#--  <h5 class="mb-0"><a href="https://www.weiyuai.cn/download/siphone-flutter-macos.dmg" class="stretched-link" target="_blank"><@t key="page.download.softphone.macOS">微语软电话(Mac)</@t></a></h5>  -->
+					<a href="/assets/qr/qr_softphone.png" target="_blank">
+						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
+					</a>
+				</div>
+			</div>
+
+			<!-- Item: Termshell -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/online.svg" alt="<@t key='alt.download.termshellIcon'>Termshell SSH终端下载图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="/pages/termshell.html" class="stretched-link"><@t key="page.download.termshell">Termshell - SSH终端</@t></a></h5>
+					<p class="mb-1 small text-muted"><@t key="page.download.termshell.desc">随身SSH终端，手机管理服务器</@t></p>
+					<a href="https://www.weiyuai.cn/download/termshell-android.apk" target="_blank" class="btn btn-sm btn-outline-primary mt-2 position-relative" style="z-index:2;"><@t key="page.download.termshell.apk">Android APK 下载</@t></a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</section>
+<!-- =======================
+Other Software END -->
 
 <!-- =======================
 Download START -->

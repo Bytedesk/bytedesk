@@ -33,8 +33,9 @@
 ├── compose-call-db-postgresql.yaml # legacy: old call scenario FreeSWITCH PostgreSQL DSN override
 ├── compose-scenario-noai.yaml # 不使用 AI 的场景覆盖
 ├── compose-scenario-standard.yaml # 标准场景覆盖
-├── start.sh # 组合启动脚本：start.sh <db> <mq> <scenario> [all|middleware]
-└── stop.sh # 组合停止脚本：stop.sh <db> <mq> <scenario> [stop|down] [all|middleware]
+├── compose-observability.yaml # 可观测性栈（Prometheus + Grafana + Zipkin，独立 overlay）
+├── start.sh # 组合启动脚本：start.sh <db> <mq> <scenario> [all|middleware] [obs]
+└── stop.sh # 组合停止脚本：stop.sh <db> <mq> <scenario> [stop|down] [all|middleware] [obs]
 ```
 
 ## docker compose
@@ -53,8 +54,9 @@ cp .env.example .env
 
 # script examples (recommended)
 # format:
-# start.sh <db> <mq> <scenario> <target>
-# stop.sh  <db> <mq> <scenario> <action> <target>
+# start.sh <db> <mq> <scenario> <target> [obs]
+# stop.sh  <db> <mq> <scenario> <action> <target> [obs]
+# obs (optional, last arg): obs | observability | true | yes   enables compose-observability.yaml (Prometheus + Grafana + Zipkin)
 
 # local testing (middleware only)
 # 1) MySQL + Artemis + standard (local source development)
@@ -114,6 +116,10 @@ cp .env.example .env
 ./stop.sh mysql artemis call-webrtc stop middleware
 ./stop.sh mysql artemis call-webrtc down middleware
 
+./start.sh mysql artemis call-webrtc middleware obs
+./stop.sh mysql artemis call-webrtc stop middleware obs
+./stop.sh mysql artemis call-webrtc down middleware obs
+
 ./start.sh postgresql rabbitmq call-webrtc middleware
 ./stop.sh postgresql rabbitmq call-webrtc stop middleware
 ./stop.sh postgresql rabbitmq call-webrtc down middleware
@@ -162,6 +168,7 @@ cp .env.example .env
 # call-webrtc also supports the webrtc-call alias
 # target: middleware | all
 # action: stop (stop containers) | down (remove containers, keep volumes)
+# obs (optional): obs | observability | true | yes   enable compose-observability.yaml (Prometheus + Grafana + Zipkin); default off
 
 # composition guide (quick keep)
 # defaults when args are omitted:
@@ -346,3 +353,58 @@ config docker engine
   ]
 }
 ```
+
+## Observability（可观测性）
+
+微语提供独立的可观测性 overlay compose 文件 `compose-observability.yaml`，包含 Prometheus（指标采集）、Grafana（可视化）、Zipkin（分布式追踪）三个服务，通过 Docker `external` 网络接入现有 `bytedesk-network`，不侵入 `compose-base.yaml`。
+
+### 启动观测栈
+
+`start.sh` / `stop.sh` 的最后一个参数可选 `obs`（或 `observability` / `true` / `yes`），用于一键启停 `compose-observability.yaml`：
+
+```bash
+cd deploy/docker
+
+# 方式 A（推荐）：在启动中间件/应用栈时附带观测栈
+./start.sh mysql artemis standard middleware obs
+./start.sh mysql artemis standard all       obs   # 线上全量 + 观测栈
+./stop.sh  mysql artemis standard stop middleware obs
+./stop.sh  mysql artemis standard down middleware obs
+
+# 方式 B：仅观测栈（需先确保 bytedesk-network 存在）
+docker compose -f compose-observability.yaml up -d
+
+# 方式 C：与现有 compose 组合
+./start.sh mysql artemis standard middleware
+docker compose -f compose-observability.yaml up -d
+```
+
+### 访问地址
+
+| 服务 | 地址 | 默认账密 |
+| --- | --- | --- |
+| Prometheus | http://localhost:19090 | 无 |
+| Grafana | http://localhost:13000 | admin / admin（可通过 `.env` 覆盖） |
+| Zipkin | http://localhost:19411 | 无 |
+
+### 启用 Zipkin 分布式追踪
+
+Zipkin 默认不随 compose-base 启动。需要时通过 `compose-observability.yaml` 启动，并在应用侧设置环境变量：
+
+```bash
+docker compose -f compose-observability.yaml up -d bytedesk-zipkin
+export MANAGEMENT_TRACING_ENABLED=true
+export MANAGEMENT_ZIPKIN_TRACING_ENABLED=true
+export MANAGEMENT_TRACING_SAMPLING_PROBABILITY=1.0
+```
+
+### 验证指标
+
+```bash
+# 应用指标端点
+curl http://localhost:9003/actuator/prometheus | grep gen_ai
+```
+
+更多指标参考、PromQL 示例、告警规则与故障排查，请参阅 [AI Observability 文档](../../docs/docs/ops-monitoring/ai-observability.md)。
+
+> Zipkin 容器已从 `one/` 下 5 个 compose 文件中移除，统一由 `compose-observability.yaml` 按需提供，与应用侧 `management.tracing.enabled=false` 的默认策略对齐。

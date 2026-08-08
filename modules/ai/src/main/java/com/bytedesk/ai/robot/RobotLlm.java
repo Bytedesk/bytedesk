@@ -16,6 +16,7 @@ package com.bytedesk.ai.robot;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
@@ -24,6 +25,7 @@ import com.bytedesk.core.llm.LlmDefaults;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -237,5 +239,8 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_use_when_kb_empty")
     private Boolean useLlmWhenKbEmpty = true;
+
+    @Transient
+    private RobotToolIntentContext toolIntentContext;
     
 }

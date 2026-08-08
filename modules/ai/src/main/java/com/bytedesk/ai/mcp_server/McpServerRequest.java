@@ -42,6 +42,8 @@ public class McpServerRequest extends BaseRequest {
 
     private Boolean enabled;
 
+    private String direction;
+
     private String categoryUid;
 
     /**

@@ -21,18 +21,22 @@ Spring AI WebMVC MCP uses SSE transport by default:
 
 ## Tool Exposure
 
-Bytedesk registers existing Spring AI `@Tool` beans through `BytedeskMcpToolConfiguration`.
-The first release is conservative and exposes only read-oriented tools from Bytedesk packages.
+Bytedesk now uses the platform tool registry as the single MCP exposure control plane.
+Code-defined Spring AI `@Tool` methods and `ToolCallback` beans are first synchronized into `ToolEntity`, and then the MCP bridge decides whether they are exposed externally.
 
 ```properties
 bytedesk.ai.mcp.tools.enabled=true
-bytedesk.ai.mcp.tools.read-only=true
-bytedesk.ai.mcp.tools.include-packages=com.bytedesk
-bytedesk.ai.mcp.tools.read-only-include-pattern=.*(Query|Search|Find|Get|List|Count).*
-bytedesk.ai.mcp.tools.exclude-pattern=.*(Create|Update|Delete|Remove|Cancel|Change|Optimize|Reset|Score|Set|Send).*
 ```
 
-To narrow the exposure scope, replace `bytedesk.ai.mcp.tools.include-packages` with more specific package prefixes, such as `com.bytedesk.ai` or `com.bytedesk.service`. Keep write operations behind permission, approval, and audit controls.
+Registry governance rules:
+
+- `enabled=false`: the tool is not available to the MCP bridge.
+- `mcpExposureMode=NONE`: the tool stays internal only.
+- `mcpExposureMode=READONLY`: the tool is exposed only when its runtime name follows the read-oriented naming convention such as `Query`, `Search`, `Find`, `Get`, `List`, or `Count`.
+- `mcpExposureMode=DUAL`: the tool may be exposed to MCP even if it is not read-only.
+- `allowedMethods`: optional comma-separated or line-separated runtime tool names/method names for additional narrowing.
+
+Use the admin ToolTable to review and edit platform tool governance after running the platform sync action. Keep write operations behind permission, approval, and audit controls.
 
 ## Verification
 
@@ -51,6 +55,6 @@ http://127.0.0.1:9003/sse
 ## Security Notes
 
 - Keep MCP disabled unless an external agent integration is required.
-- Keep `read-only=true` for initial deployments.
+- Prefer `mcpExposureMode=READONLY` for initial external exposure.
 - Do not expose write tools without token-based authentication, organization scoping, approval, and audit logging.
 - Avoid returning secrets, tokens, licenses, passwords, or internal configuration fields from tool responses.

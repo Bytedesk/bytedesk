@@ -16,6 +16,9 @@ package com.bytedesk.ai.mcp_server;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.core.enums.PermissionEnum;
+import com.bytedesk.core.rbac.authority.AuthorityRestService;
+
 import lombok.AllArgsConstructor;
 
 @Component
@@ -23,6 +26,8 @@ import lombok.AllArgsConstructor;
 public class McpServerInitializer implements SmartInitializingSingleton {
 
     // private final McpServerRestService mcpServerRestService;
+
+    private final AuthorityRestService authorityRestService;
 
     @Override
     public void afterSingletonsInstantiated() {
@@ -33,10 +38,10 @@ public class McpServerInitializer implements SmartInitializingSingleton {
     }
 
     private void initAuthority() {
-        // for (PermissionEnum permission : PermissionEnum.values()) {
-        //     String permissionValue = McpServerPermissions.ARTICLE_PREFIX + permission.name();
-        //     authorityService.createForPlatform(permissionValue);
-        // }
+        for (PermissionEnum permission : PermissionEnum.values()) {
+            String permissionValue = McpServerPermissions.MCPSERVER_PREFIX + permission.name();
+            authorityRestService.createForPlatform(permissionValue);
+        }
     }
 
     

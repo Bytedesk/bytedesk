@@ -60,7 +60,6 @@ public class ChatClientPrimaryConfig {
         this.giteeChatClient = giteeChatClientProvider.getIfAvailable();
     }
 
-
     // @Value("${spring.ai.model.chat:none}")
     // private String chatModel;
 

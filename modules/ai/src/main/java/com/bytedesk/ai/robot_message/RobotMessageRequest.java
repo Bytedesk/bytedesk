@@ -70,6 +70,9 @@ public class RobotMessageRequest extends BaseRequest {
     // 存储传入到大模型的完整prompt内容
     private String prompt;
 
+    // 单独存储历史聊天记录，不包含系统提示词和当前用户问题
+    private String historyMessages;
+
     // 大模型提供商（如：openai、zhipuai、baidu等）
     private String aiProvider;
 

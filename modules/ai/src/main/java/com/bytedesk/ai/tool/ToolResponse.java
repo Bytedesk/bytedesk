@@ -33,9 +33,47 @@ public class ToolResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
+    private String key;
+
     private String name;
 
     private String description;
 
     private String type;
+
+    private String category;
+
+    private String icon;
+
+    private Boolean enabled;
+
+    private String bindingType;
+
+    private String beanName;
+
+    private String className;
+
+    private String methodName;
+
+    private String endpoint;
+
+    private String inputSchema;
+
+    private String outputSchema;
+
+    private String systemPrompt;
+
+    private Integer orderIndex;
+
+    private Boolean requiresApproval;
+
+    private String intentKeywords;
+
+    private String intentMatchMode;
+
+    private String mcpExposureMode;
+
+    private String allowedMethods;
+
+    private String metadata;
 }

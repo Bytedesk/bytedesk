@@ -15,6 +15,9 @@ package com.bytedesk.ai.tool;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.ai.tool.utils.McpExposureModeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 // import jakarta.persistence.EntityListeners;
@@ -28,11 +31,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Tool entity for content categorization and organization
- * Provides toolging functionality for various system entities
- * 
- * Database Table: bytedesk_core_tool
- * Purpose: Stores tool definitions, colors, and organization settings
+ * Registry entry for an AI tool binding that can be exposed to robots or other
+ * orchestration flows.
  */
 @Entity
 @Data
@@ -48,21 +48,91 @@ public class ToolEntity extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Name of the tool
+     * Stable unique key used by the frontend and runtime for deduplication.
+     */
+    @Column(name = "tool_key")
+    private String key;
+
+    /**
+     * Display name of the tool.
      */
     private String name;
 
     /**
-     * Description of the tool
+     * Description of the tool.
      */
     @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String description = I18Consts.I18N_DESCRIPTION;
 
     /**
-     * Type of tool (CUSTOMER, TICKET, ARTICLE, etc.)
+     * Registry type such as BUILTIN or CUSTOM.
      */
     @Builder.Default
     @Column(name = "tool_type")
-    private String type = ToolTypeEnum.CUSTOMER.name();
-    
+    private String type = ToolTypeEnum.CUSTOM.name();
+
+    /**
+     * Functional category shown in admin UI (utility, workflow, data, etc.).
+     */
+    @Column(name = "category_name")
+    private String category;
+
+    /**
+     * Optional emoji/icon marker.
+     */
+    private String icon;
+
+    @Builder.Default
+    @Column(name = "is_enabled")
+    private Boolean enabled = true;
+
+    @Column(name = "binding_type")
+    private String bindingType;
+
+    @Column(name = "bean_name")
+    private String beanName;
+
+    @Column(name = "class_name")
+    private String className;
+
+    @Column(name = "method_name")
+    private String methodName;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String endpoint;
+
+    @Column(name = "input_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String inputSchema;
+
+    @Column(name = "output_schema", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String outputSchema;
+
+    @Column(name = "system_prompt", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String systemPrompt;
+
+    @Builder.Default
+    @Column(name = "order_index")
+    private Integer orderIndex = 0;
+
+    @Builder.Default
+    @Column(name = "requires_approval")
+    private Boolean requiresApproval = false;
+
+    @Column(name = "intent_keywords", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String intentKeywords;
+
+    @Builder.Default
+    @Column(name = "intent_match_mode")
+    private String intentMatchMode = "KEYWORD";
+
+    @Builder.Default
+    @Column(name = "mcp_exposure_mode")
+    private String mcpExposureMode = McpExposureModeEnum.NONE.name();
+
+    @Column(name = "allowed_methods", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String allowedMethods;
+
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String metadata;
 }

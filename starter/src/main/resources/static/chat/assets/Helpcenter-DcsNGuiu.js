@@ -1,1 +1,0 @@
-import{a as e}from"./intl-vendor-Bhvc1tMG.js";var t=e(),n=()=>(0,t.jsxs)(`div`,{style:{padding:20},children:[(0,t.jsx)(`h1`,{children:`Helpcenter`}),(0,t.jsx)(`p`,{children:`This is the Helpcenter page.`})]});export{n as default};

@@ -24,9 +24,6 @@ import org.springframework.ai.ollama.OllamaEmbeddingModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingOptions;
-import org.springframework.ai.zhipuai.api.ZhiPuAiApi;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
@@ -39,9 +36,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingModel;
-import com.bytedesk.ai.springai.providers.dashscope.BytedeskDashScopeEmbeddingOptions;
-import com.bytedesk.ai.springai.providers.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.providers.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.providers.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -80,6 +78,8 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final io.micrometer.observation.ObservationRegistry observationRegistry;
     
     @Override
     public Page<EmbeddingSettingsEntity> queryByOrgEntity(EmbeddingSettingsRequest request) {
@@ -328,24 +328,24 @@ public class EmbeddingSettingsRestService extends BaseRestServiceWithExport<Embe
     }
 
     private EmbeddingModel buildDashscopeEmbeddingModel(EmbeddingSettingsEntity settings) {
-        BytedeskDashScopeEmbeddingOptions.BytedeskDashScopeEmbeddingOptionsBuilder optionsBuilder = BytedeskDashScopeEmbeddingOptions.builder()
+        DashScopeEmbeddingOptions.DashScopeEmbeddingOptionsBuilder optionsBuilder = DashScopeEmbeddingOptions.builder()
             .model(resolveModel(settings, "text-embedding-v4"));
         Integer dimensions = settings.getDimensions();
         if (dimensions != null && dimensions > 0) {
             optionsBuilder.dimensions(dimensions);
         }
-        return new BytedeskDashScopeEmbeddingModel(
+        return new DashScopeEmbeddingModel(
             resolveBaseUrl(settings, "https://dashscope.aliyuncs.com"),
             resolveApiKey(settings),
-            optionsBuilder.build());
+            optionsBuilder.build(),
+            observationRegistry);
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
-        ZhiPuAiApi api = new ZhiPuAiApi(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings));
-        ZhiPuAiEmbeddingOptions options = ZhiPuAiEmbeddingOptions.builder()
-                .model(resolveModel(settings, "embedding-2"))
-                .build();
-        return new ZhiPuAiEmbeddingModel(api, MetadataMode.EMBED, options);
+        return new ZhipuaiEmbeddingModel(
+            new ai.z.openapi.ZhipuAiClient.Builder(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings)).build(),
+            resolveModel(settings, "embedding-2"),
+            settings.getDimensions());
     }
 
     private EmbeddingModel buildOllamaEmbeddingModel(EmbeddingSettingsEntity settings) {

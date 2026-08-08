@@ -1,31 +1,31 @@
 //#region src/utils/bizMessageCallbackDebug.ts
-var e = "BIZ_MESSAGE_CALLBACK_DEBUG", t = ["bizMessageCallbackDebug", "bizCallbackDebug"], n = "[biz-callback]", r = (e) => {
+var e = ["bizMessageCallbackDebug", "bizCallbackDebug"], t = "[biz-callback]", n = (e) => {
 	if (!e) return !1;
 	let t = e.trim().toLowerCase();
 	return t === "1" || t === "true" || t === "yes" || t === "on";
-}, i = () => {
+}, r = () => {
 	if (typeof window > "u") return null;
 	try {
-		let e = new URLSearchParams(window.location.search);
-		for (let n of t) {
-			let t = e.get(n);
-			if (t !== null) return t;
+		let t = new URLSearchParams(window.location.search);
+		for (let n of e) {
+			let e = t.get(n);
+			if (e !== null) return e;
 		}
 	} catch {
 		return null;
 	}
 	return null;
-}, a = () => {
-	let t = i();
-	if (t !== null) return r(t);
+}, i = () => {
+	let e = r();
+	if (e !== null) return n(e);
 	if (typeof window > "u") return !1;
 	try {
-		return r(window.localStorage?.getItem(e));
+		return n(window.localStorage?.getItem("BIZ_MESSAGE_CALLBACK_DEBUG"));
 	} catch {
 		return !1;
 	}
-}, o = (e, t) => {
-	a() && console.log(`${n} ${e}`, t || {});
+}, a = (e, n) => {
+	i() && console.log(`${t} ${e}`, n || {});
 };
 //#endregion
-export { o as logBizMessageCallbackDebug };
+export { i as isBizMessageCallbackDebugEnabled, a as logBizMessageCallbackDebug };

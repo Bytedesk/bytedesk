@@ -27,17 +27,45 @@ import lombok.Data;
 @Data
 public class ToolExcel {
 
-    @ExcelProperty(index = 0, value = "标签名称")
+    @ExcelProperty(index = 0, value = "工具标识")
+    @ColumnWidth(20)
+    private String key;
+
+    @ExcelProperty(index = 1, value = "工具名称")
     @ColumnWidth(20)
     private String name;
 
-    @ExcelProperty(index = 1, value = "类型")
+    @ExcelProperty(index = 2, value = "类型")
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(index = 2, value = "颜色")
+    @ExcelProperty(index = 3, value = "分类")
     @ColumnWidth(20)
-    private String color;
+    private String category;
+
+    @ExcelProperty(index = 4, value = "绑定类型")
+    @ColumnWidth(20)
+    private String bindingType;
+
+    @ExcelProperty(index = 5, value = "启用")
+    @ColumnWidth(12)
+    private Boolean enabled;
+
+    @ExcelProperty(index = 6, value = "顺序")
+    @ColumnWidth(12)
+    private Integer orderIndex;
+
+    @ExcelProperty(index = 7, value = "描述")
+    @ColumnWidth(40)
+    private String description;
+
+    @ExcelProperty(index = 8, value = "MCP暴露模式")
+    @ColumnWidth(18)
+    private String mcpExposureMode;
+
+    @ExcelProperty(index = 9, value = "允许方法")
+    @ColumnWidth(30)
+    private String allowedMethods;
 
     @DateTimeFormat("yyyy-MM-dd HH:mm:ss")
     @ExcelProperty(value = "创建时间", converter = com.bytedesk.core.converter.ZonedDateTimeConverter.class)

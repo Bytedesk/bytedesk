@@ -86,7 +86,7 @@ public class MessageLeaveSettingsEntity extends BaseEntity {
      * 默认允许，只有显式配置为 false 时才阻断。
      */
     @Builder.Default
-    private Boolean messageLeaveAllowVisitorSendWhenOffline = false;
+    private Boolean messageLeaveAllowVisitorSendWhenOffline = true;
 
     /**
      * 是否使用自定义留言表单（关联 FormEntity.uid）：

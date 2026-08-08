@@ -62,7 +62,7 @@ public class LlmConfigUtils {
             case LlmProviderConstants.OLLAMA:
                 return environment.getProperty("spring.ai.ollama.chat.model", "qwen3:0.6b");
             case LlmProviderConstants.DEEPSEEK:
-                return environment.getProperty("spring.ai.deepseek.chat.options.model", "deepseek-chat");
+                return environment.getProperty("spring.ai.deepseek.chat.options.model", LlmDefaults.DEFAULT_DEEPSEEK_CHAT_MODEL);
             case LlmProviderConstants.DASHSCOPE:
                 return environment.getProperty("spring.ai.dashscope.chat.options.model", "deepseek-r1");
             case LlmProviderConstants.SILICONFLOW:
@@ -82,7 +82,10 @@ public class LlmConfigUtils {
             case LlmProviderConstants.MOONSHOT:
                 return environment.getProperty("spring.ai.moonshot.chat.options.model", "kimi-k2.6");
             case LlmProviderConstants.MINIMAX:
-                return environment.getProperty("spring.ai.minimax.chat.options.model", "minimax-v1");
+                return environment.getProperty("spring.ai.minimax.chat.options.model",
+                        environment.getProperty("spring.ai.minimax.chat.model",
+                                environment.getProperty("spring.ai.anthropic.chat.model",
+                                        environment.getProperty("spring.ai.anthropic.chat.options.model", "MiniMax-M3"))));
             default:
                 return LlmDefaults.DEFAULT_TEXT_MODEL;
         }

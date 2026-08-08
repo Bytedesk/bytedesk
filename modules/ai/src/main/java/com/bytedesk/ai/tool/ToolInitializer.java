@@ -26,16 +26,15 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ToolInitializer implements SmartInitializingSingleton {
 
-    private final ToolRestService toolRestService;
-
     private final AuthorityRestService authorityRestService;
+
+    private final ToolRegistrySyncService toolRegistrySyncService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
-        // create default
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        toolRestService.initTools(orgUid);
+        toolRegistrySyncService.syncPlatformTools(orgUid);
     }
 
     private void initAuthority() {

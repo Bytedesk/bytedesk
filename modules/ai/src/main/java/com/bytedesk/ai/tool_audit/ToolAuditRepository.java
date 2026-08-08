@@ -24,7 +24,5 @@ public interface ToolAuditRepository extends JpaRepository<ToolAuditEntity, Long
 
     Boolean existsByUid(String uid);
 
-    Optional<ToolAuditEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);
-
     // Boolean existsByPlatform(String platform);
 }

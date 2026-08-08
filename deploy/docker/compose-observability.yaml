@@ -1,0 +1,100 @@
+# Bytedesk Observability Stack
+# Prometheus + Grafana + Zipkin — 独立的可观测性基础设施 overlay
+#
+# 使用方式：
+#   1. 纯启动观测栈：
+#      docker compose -f compose-observability.yaml up -d
+#   2. 与现有中间件组合（观测栈自动接入 bytedesk-network）：
+#      docker compose -f compose-base.yaml -f compose-db-mysql.yaml -f compose-mq-artemis.yaml -f compose-observability.yaml up -d
+#
+# 注意：
+#   - 应用需暴露 /actuator/prometheus（已默认开启）
+#   - Zipkin 需要设置 MANAGEMENT_TRACING_ENABLED=true 才会向 Zipkin 上报 span
+#   - Grafana 默认账密：admin/admin（可在 .env 中通过 GRAFANA_ADMIN_USER/GRAFANA_ADMIN_PASSWORD 覆盖）
+
+services:
+
+  # Prometheus 指标采集
+  # http://localhost:9003/actuator/prometheus
+  bytedesk-prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-bytedesk
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - '19090:9090'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Grafana 可视化仪表板
+  # 访问 http://localhost:13000，使用 admin / admin 登录
+  bytedesk-grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-bytedesk
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/ai-observability.json
+    ports:
+      - '13000:3000'
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    networks:
+      - bytedesk-network
+    depends_on:
+      bytedesk-prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Zipkin 分布式追踪（可选）
+  # http://localhost:19411
+  # 启用后需设置 MANAGEMENT_TRACING_ENABLED=true 让应用向 Zipkin 上报 span
+  bytedesk-zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-bytedesk
+    ports:
+      - '19411:9411'
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+      - STORAGE_TYPE=mem
+      - ZIPKIN_UI_QUERY_LIMIT=100
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  prometheus_data:
+    name: bytedesk_prometheus_data
+  grafana_data:
+    name: bytedesk_grafana_data
+
+networks:
+  bytedesk-network:
+    # 声明为 external 表示预期由 compose-base.yaml 创建，本文件只接入
+    # 如果单独启动观测栈（不与其他 compose 组合），需先启动 compose-base.yaml 或改为 driver: bridge
+    external: true

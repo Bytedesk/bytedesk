@@ -3,7 +3,7 @@ services:
   # ActiveMQ Artemis 消息队列
   # http://localhost:18161/console，使用 admin/admin 作为登录凭据
   bytedesk-mq:
-    image: apache/activemq-artemis:latest
+    image: apache/activemq-artemis:2.40.0
     container_name: artemis-bytedesk
     environment:
       - ARTEMIS_USER=${ARTEMIS_USER}

@@ -13,7 +13,7 @@ var o = (e) => Array.isArray(e) ? e.map(o) : typeof e == "function" ? e.toString
 		locale: t
 	})
 }), l = null, u = 0, d = (e) => {
-	let i = r(null), a = r(!1), { onInit: o, ...c } = e;
+	let i = r(null), a = r(!1), { onInit: o, ...c } = e, d = s(c);
 	return n(() => (u++, l ? (i.current = l, window.bytedesk = l, l.setConfig(c, {
 		replaceChatConfig: !0,
 		replaceTabsConfig: !0
@@ -25,7 +25,7 @@ var o = (e) => Array.isArray(e) ? e.map(o) : typeof e == "function" ? e.toString
 		u--, i.current = null, u <= 0 && setTimeout(() => {
 			l && u <= 0 && (l.destroy(), l = null, delete window.bytedesk, u = 0);
 		}, 100);
-	}), [s(c)]), null;
+	}), [d]), null;
 };
 //#endregion
 export { c as BytedeskReact };

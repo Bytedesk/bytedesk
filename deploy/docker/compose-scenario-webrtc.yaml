@@ -7,7 +7,7 @@ services:
   # 说明：TURN 需要开放一段 UDP 中继端口范围（RFC 5766）。Docker 对超大端口段映射性能较差，
   # 这里按官方示例收敛到 49160-49200（可按需调整）。
   bytedesk-coturn:
-    image: coturn/coturn:latest
+    image: coturn/coturn:4.6.3
     container_name: coturn-bytedesk
     restart: always
     ports:

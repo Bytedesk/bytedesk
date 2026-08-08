@@ -29,8 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.context.annotation.Description;
 
-import com.bytedesk.ai.provider.LlmProviderEntity;
-import com.bytedesk.ai.provider.LlmProviderRestService;
+import com.bytedesk.ai.llm_provider.LlmProviderEntity;
+import com.bytedesk.ai.llm_provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;

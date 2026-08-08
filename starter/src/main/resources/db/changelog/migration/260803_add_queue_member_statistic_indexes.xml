@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- 索引：org_uid + is_deleted + created_at -->
+    <!-- 用于 ServiceStatisticService 的 organization 级别统计查询 -->
+    <changeSet id="260803-add-queue-member-statistic-index-org" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_qm_org_deleted_created" />
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_qm_org_deleted_created">
+            <column name="org_uid" />
+            <column name="is_deleted" />
+            <column name="created_at" />
+        </createIndex>
+    </changeSet>
+
+    <!-- 索引：org_uid + workgroup_queue_id + is_deleted + created_at -->
+    <!-- 用于 ServiceStatisticService 的 workgroup 级别统计查询 -->
+    <changeSet id="260803-add-queue-member-statistic-index-workgroup" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_qm_org_workgroup_deleted_created" />
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_qm_org_workgroup_deleted_created">
+            <column name="org_uid" />
+            <column name="workgroup_queue_id" />
+            <column name="is_deleted" />
+            <column name="created_at" />
+        </createIndex>
+    </changeSet>
+
+    <!-- 索引：org_uid + agent_queue_id + is_deleted + created_at -->
+    <!-- 用于 ServiceStatisticService 的 agent 级别统计查询 -->
+    <changeSet id="260803-add-queue-member-statistic-index-agent" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_qm_org_agent_deleted_created" />
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_qm_org_agent_deleted_created">
+            <column name="org_uid" />
+            <column name="agent_queue_id" />
+            <column name="is_deleted" />
+            <column name="created_at" />
+        </createIndex>
+    </changeSet>
+
+    <!-- 索引：org_uid + robot_queue_id + is_deleted + created_at -->
+    <!-- 用于 ServiceStatisticService 的 robot 级别统计查询 -->
+    <changeSet id="260803-add-queue-member-statistic-index-robot" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_service_queue_member" />
+            <not>
+                <indexExists tableName="bytedesk_service_queue_member" indexName="idx_qm_org_robot_deleted_created" />
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_service_queue_member" indexName="idx_qm_org_robot_deleted_created">
+            <column name="org_uid" />
+            <column name="robot_queue_id" />
+            <column name="is_deleted" />
+            <column name="created_at" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

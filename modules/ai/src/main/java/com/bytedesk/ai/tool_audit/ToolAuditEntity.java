@@ -13,8 +13,13 @@
  */
 package com.bytedesk.ai.tool_audit;
 
+import java.time.ZonedDateTime;
+
+import com.bytedesk.ai.tool.ToolTypeEnum;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.constant.TypeConsts;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -26,13 +31,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
-/**
- * ToolAudit entity for content categorization and organization
- * Provides tool_auditging functionality for various system entities
- * 
- * Database Table: bytedesk_core_tool_audit
- * Purpose: Stores tool_audit definitions, colors, and organization settings
- */
 @Entity
 @Data
 @SuperBuilder
@@ -40,28 +38,57 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-// @EntityListeners({ToolAuditEntityListener.class})
-@Table(name = "bytedesk_ai_tool_audit") // 暂时注释掉，后期启用再开启
+@Table(name = "bytedesk_ai_tool_audit")
 public class ToolAuditEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Name of the tool_audit
-     */
+    @Column(name = "tool_call_uid")
+    private String toolCallUid;
+
+    @Column(name = "tool_uid")
+    private String toolUid;
+
+    @Column(name = "tool_key")
+    private String toolKey;
+
     private String name;
 
-    /**
-     * Description of the tool_audit
-     */
     @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String description = I18Consts.I18N_DESCRIPTION;
 
-    /**
-     * Type of tool_audit (CUSTOMER, TICKET, ARTICLE, etc.)
-     */
     @Builder.Default
     @Column(name = "tool_audit_type")
-    private String type = ToolAuditTypeEnum.CUSTOMER.name();
-    
+    private String type = ToolTypeEnum.CUSTOM.name();
+
+    @Builder.Default
+    @Column(name = "audit_status")
+    private String status = ToolAuditStatusEnum.PENDING.name();
+
+    @Builder.Default
+    @Column(name = "audit_action")
+    private String action = "SUBMITTED";
+
+    @Builder.Default
+    @Column(name = "is_approved")
+    private Boolean approved = false;
+
+    @Column(name = "requester_user_uid")
+    private String requesterUserUid;
+
+    @Column(name = "approver_user_uid")
+    private String approverUserUid;
+
+    @Column(name = "request_payload", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String requestPayload;
+
+    @Column(name = "decision_comment", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String decisionComment;
+
+    @Column(name = "audit_context", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String auditContext;
+
+    @Column(name = "audited_at")
+    private ZonedDateTime auditedAt;
 }

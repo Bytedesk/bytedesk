@@ -75,6 +75,9 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/ai/agent", "agent", "user", "/ai", "menu.robot.agent"));
                 seeds.add(MenuSeed.child("/ai/prompt", "prompt", "message", "/ai", "menu.robot.prompt"));
                 seeds.add(MenuSeed.child("/ai/model", "model", "bulb", "/ai", "menu.robot.model"));
+                seeds.add(MenuSeed.child("/ai/tools", "tools", "tool", "/ai", "menu.robot.tools"));
+                seeds.add(MenuSeed.child("/ai/mcp", "mcp", "api", "/ai", "menu.robot.mcp"));
+                seeds.add(MenuSeed.child("/ai/skill", "skill", "rocket", "/ai", "menu.robot.skill"));
                 seeds.add(MenuSeed.child("/ai/message", "message", "mail", "/ai", "menu.robot.message"));
 
                 seeds.add(MenuSeed.root("/kb", "kbase", "book", "menu.kbase"));
@@ -90,7 +93,6 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/ticket/process", "process", "branches", "/ticket", "menu.ticket.process"));
                 seeds.add(MenuSeed.child("/ticket/settings", "settings", "setting", "/ticket", "menu.ticket.settings"));
 
-                
                 seeds.add(MenuSeed.root("/voc", "voc", "muted", "menu.voc"));
                 seeds.add(MenuSeed.child("/voc/feedback", "feedback", "message", "/voc", "menu.voc.feedback"));
                 seeds.add(MenuSeed.child("/voc/comment", "comment", "comment", "/voc", "menu.voc.comment"));

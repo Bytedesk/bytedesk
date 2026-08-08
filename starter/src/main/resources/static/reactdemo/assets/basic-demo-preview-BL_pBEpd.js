@@ -1,1 +1,0 @@
-var e=`bytedesk-react-demo-basic-preview:`,t=t=>`${e}${t}`,n=e=>{try{let t=new URL(e);return t.protocol===`http:`||t.protocol===`https:`}catch{return!1}};export{n,t};

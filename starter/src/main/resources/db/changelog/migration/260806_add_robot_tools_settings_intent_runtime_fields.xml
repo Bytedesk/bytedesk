@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="260806-2-add-robot-tools-settings-intent-runtime-fields" author="copilot">
+        <addColumn tableName="bytedesk_ai_robot_tools_settings">
+            <column name="intent_model" type="varchar(255)" />
+            <column name="intent_provider" type="varchar(64)" />
+            <column name="intent_timeout_ms" type="int" defaultValueNumeric="1500" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

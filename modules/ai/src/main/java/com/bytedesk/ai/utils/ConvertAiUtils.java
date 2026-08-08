@@ -13,16 +13,34 @@
  */
 package com.bytedesk.ai.utils;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
+
 import lombok.experimental.UtilityClass;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotResponse;
 import com.bytedesk.ai.robot_message.RobotMessageEntity;
 import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotProtobufBasic;
+import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
+import com.bytedesk.ai.robot_settings.tools.RobotToolConfig;
+import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
+import com.bytedesk.ai.robot_settings.tools.RobotToolIntentResolver;
+import com.bytedesk.ai.robot_settings.tools.ToolChoice;
+import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
@@ -46,7 +64,135 @@ public class ConvertAiUtils {
     public static RobotProtobuf convertToRobotProtobuf(RobotEntity entity) {
         RobotProtobuf robotProtobuf = getModelMapper().map(entity, RobotProtobuf.class);
         robotProtobuf.setType(UserTypeEnum.ROBOT.name());
+        applyPublishedToolSettings(entity, robotProtobuf);
         return robotProtobuf;
+    }
+
+    private static void applyPublishedToolSettings(RobotEntity entity, RobotProtobuf robotProtobuf) {
+        if (entity == null || robotProtobuf == null) {
+            return;
+        }
+
+        RobotSettingsEntity settings = entity.getSettings();
+        if (settings == null) {
+            return;
+        }
+
+        RobotToolsSettingsEntity toolsSettings = settings.getToolsSettings();
+        if (toolsSettings == null || Boolean.FALSE.equals(toolsSettings.getEnabled())) {
+            return;
+        }
+
+        RobotLlm llm = robotProtobuf.getLlm();
+        if (llm == null) {
+            llm = RobotLlm.builder().build();
+            robotProtobuf.setLlm(llm);
+        }
+
+        Set<String> mergedTools = new LinkedHashSet<>();
+        if (llm.getTools() != null) {
+            mergedTools.addAll(llm.getTools());
+        }
+
+        for (RobotToolConfig toolConfig : safeToolConfigs(toolsSettings)) {
+            mergedTools.addAll(resolveToolNames(toolConfig));
+        }
+
+        llm.setTools(new ArrayList<>(mergedTools));
+        llm.setToolIntentContext(resolveToolIntentContext(entity, toolsSettings));
+
+        if (StringUtils.hasText(toolsSettings.getToolChoice())) {
+            llm.setToolChoice(normalizeToolChoice(toolsSettings.getToolChoice()));
+        }
+    }
+
+    private static RobotToolIntentContext resolveToolIntentContext(RobotEntity entity,
+            RobotToolsSettingsEntity toolsSettings) {
+        if (!ApplicationContextHolder.isInitialized()) {
+            return RobotToolIntentContext.empty();
+        }
+
+        RobotToolIntentResolver resolver = ApplicationContextHolder.getBean(RobotToolIntentResolver.class);
+        return resolver.resolve(entity != null ? entity.getOrgUid() : null, toolsSettings);
+    }
+
+    private static List<RobotToolConfig> safeToolConfigs(RobotToolsSettingsEntity toolsSettings) {
+        List<RobotToolConfig> toolConfigs = toolsSettings.getToolConfigs();
+        return toolConfigs != null ? toolConfigs : List.of();
+    }
+
+    private static List<String> resolveToolNames(RobotToolConfig toolConfig) {
+        if (toolConfig == null || Boolean.FALSE.equals(toolConfig.getEnabled())) {
+            return List.of();
+        }
+
+        String bindingType = toolConfig.getBindingType();
+        if (!StringUtils.hasText(bindingType)) {
+            return fallbackToolName(toolConfig);
+        }
+
+        return switch (bindingType.trim().toUpperCase(Locale.ROOT)) {
+            case "CLASS" -> resolveClassToolNames(toolConfig);
+            case "SPRING_BEAN", "FUNCTION_BEAN" -> valueAsList(toolConfig.getBeanName(), toolConfig);
+            case "MCP_TOOL" -> valueAsList(firstNonBlank(toolConfig.getMethodName(), toolConfig.getBeanName()), toolConfig);
+            case "WEB_SEARCH" -> fallbackToolName(toolConfig);
+            default -> fallbackToolName(toolConfig);
+        };
+    }
+
+    private static List<String> resolveClassToolNames(RobotToolConfig toolConfig) {
+        if (StringUtils.hasText(toolConfig.getMethodName())) {
+            return List.of(toolConfig.getMethodName().trim());
+        }
+        if (!StringUtils.hasText(toolConfig.getClassName())) {
+            return fallbackToolName(toolConfig);
+        }
+
+        try {
+            Class<?> toolClass = Class.forName(toolConfig.getClassName().trim());
+            List<String> toolNames = new ArrayList<>();
+            for (Method method : toolClass.getMethods()) {
+                if (AnnotationUtils.findAnnotation(method, Tool.class) != null) {
+                    toolNames.add(method.getName());
+                }
+            }
+            return toolNames.isEmpty() ? fallbackToolName(toolConfig) : toolNames;
+        } catch (ClassNotFoundException ex) {
+            return fallbackToolName(toolConfig);
+        }
+    }
+
+    private static List<String> fallbackToolName(RobotToolConfig toolConfig) {
+        if (StringUtils.hasText(toolConfig.getKey())) {
+            return List.of(toolConfig.getKey().trim());
+        }
+        if (StringUtils.hasText(toolConfig.getName())) {
+            return List.of(toolConfig.getName().trim());
+        }
+        return List.of();
+    }
+
+    private static List<String> valueAsList(String value, RobotToolConfig toolConfig) {
+        if (StringUtils.hasText(value)) {
+            return List.of(value.trim());
+        }
+        return fallbackToolName(toolConfig);
+    }
+
+    private static String firstNonBlank(String... values) {
+        if (values == null) {
+            return null;
+        }
+        for (String value : values) {
+            if (StringUtils.hasText(value)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private static String normalizeToolChoice(String toolChoice) {
+        return ToolChoice.normalize(toolChoice);
     }
 
     public static String convertToRobotProtobufString(RobotEntity entity) {

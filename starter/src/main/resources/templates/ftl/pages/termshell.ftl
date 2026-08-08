@@ -35,7 +35,7 @@ Hero Banner START -->
 				<h1 class="mb-3">Termshell</h1>
 				<h4 class="mb-3">随身 SSH 终端 — 手机管理服务器</h4>
 				<p class="mb-4">开源免费的 Android SSH 客户端，支持密码/私钥认证、交互式 Shell、常用命令，随时随地安全连接您的远程服务器。</p>
-				<a href="https://www.weiyuai.cn/termshell/download/termshell-android.apk" class="btn btn-primary" target="_blank">📱 立即下载 Android 版</a>
+				<a href="https://www.weiyuai.cn/download/termshell-android.apk" class="btn btn-primary" target="_blank">📱 立即下载 Android 版</a>
 			</div>
 			<div class="col-md-7">
 				<img src="/assets/images/element/05.svg" alt="Termshell SSH 终端客户端">
@@ -162,7 +162,7 @@ Download Section START -->
 				<h2>下载 Termshell</h2>
 				<p>当前仅提供 Android 版本。iOS 版本开发中，敬请期待。</p>
 				<div class="d-flex gap-3 align-items-center mt-3">
-					<a href="https://www.weiyuai.cn/termshell/download/termshell-android.apk" class="btn btn-lg btn-primary" target="_blank">
+					<a href="https://www.weiyuai.cn/download/termshell-android.apk" class="btn btn-lg btn-primary" target="_blank">
 						📱 下载 Android APK
 					</a>
 				</div>

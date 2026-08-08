@@ -60,6 +60,10 @@ public class McpServerSpecification extends BaseSpecification<McpServerEntity, M
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), request.getEnabled()));
             }
 
+            if (StringUtils.hasText(request.getDirection())) {
+                predicates.add(criteriaBuilder.equal(root.get("direction"), request.getDirection()));
+            }
+
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));

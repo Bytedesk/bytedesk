@@ -17,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
@@ -39,6 +40,8 @@ import lombok.AllArgsConstructor;
 public class ToolRestController extends BaseRestController<ToolRequest, ToolRestService> {
 
     private final ToolRestService toolRestService;
+
+    private final ToolRegistrySyncService toolRegistrySyncService;
 
     @ActionAnnotation(title = I18Consts.I18N_TOOL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query tool by org")
     @Operation(summary = "Query Tools by Organization", description = "Retrieve tools for the current organization")
@@ -120,6 +123,15 @@ public class ToolRestController extends BaseRestController<ToolRequest, ToolRest
             "Tool",
             "tool"
         );
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_TOOL, action = I18Consts.I18N_ACTION_UPDATE, description = "sync platform tools")
+    @Operation(summary = "Sync Platform Tools", description = "Rescan code-defined tools and sync them into the platform registry")
+    @PreAuthorize(ToolPermissions.HAS_TOOL_UPDATE)
+    @PostMapping("/sync/platform")
+    public ResponseEntity<?> syncPlatformTools(ToolRequest request) {
+        int syncedCount = toolRegistrySyncService.syncPlatformTools(com.bytedesk.core.constant.BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        return ResponseEntity.ok(JsonResult.success(syncedCount));
     }
 
     

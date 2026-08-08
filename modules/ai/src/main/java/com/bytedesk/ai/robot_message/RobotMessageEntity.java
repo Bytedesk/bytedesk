@@ -99,6 +99,11 @@ public class RobotMessageEntity extends AbstractMessageEntity {
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String prompt = "";
 
+    // 单独存储历史聊天记录，不包含系统提示词和当前用户问题
+    @Builder.Default
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String historyMessages = "";
+
     // 召回率
     @Builder.Default
     private Double recall = 0.0;

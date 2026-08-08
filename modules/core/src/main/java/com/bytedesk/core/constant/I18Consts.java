@@ -54,6 +54,7 @@ public class I18Consts {
     public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
     public static final String I18N_TOOL = I18N_PREFIX + "tool";
     public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
+    public static final String I18N_TOOL_CALL = I18N_PREFIX + "tool.call";
     public static final String I18N_TOOL_AUDIT = I18N_PREFIX + "tool.audit";
     public static final String I18N_TOOL_GUARD = I18N_PREFIX + "tool.guard";
     public static final String I18N_TOOL_RULE = I18N_PREFIX + "tool.rule";

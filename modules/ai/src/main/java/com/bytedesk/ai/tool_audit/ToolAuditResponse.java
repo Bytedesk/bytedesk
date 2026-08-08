@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.tool_audit;
 
+import java.time.ZonedDateTime;
 
 import com.bytedesk.core.base.BaseResponse;
 
@@ -33,9 +34,33 @@ public class ToolAuditResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
+    private String toolCallUid;
+
+    private String toolUid;
+
+    private String toolKey;
+
     private String name;
 
     private String description;
 
     private String type;
+
+    private String status;
+
+    private String action;
+
+    private Boolean approved;
+
+    private String requesterUserUid;
+
+    private String approverUserUid;
+
+    private String requestPayload;
+
+    private String decisionComment;
+
+    private String auditContext;
+
+    private ZonedDateTime auditedAt;
 }

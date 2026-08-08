@@ -48,6 +48,7 @@ export declare interface BytedeskConfig {
     forceRefresh?: boolean;
     apiUrl?: string;
     htmlUrl?: string;
+    embedUrl?: string;
     chatPath?: string;
     threadPath?: string;
     webrtcPath?: string;
@@ -92,6 +93,9 @@ declare class BytedeskWeb {
     private buttonPreviewElement;
     private buttonPreviewHideTimer;
     private window;
+    private embedNavBar;
+    private isEmbedMode;
+    private embedCurrentUrl;
     private inviteDialog;
     private contextMenu;
     private hideTimeout;
@@ -194,6 +198,17 @@ declare class BytedeskWeb {
     private startBubbleMessageRotation;
     private createBubble;
     private createChatWindow;
+    private createEmbedNavBar;
+    private createEmbedNavButton;
+    private updateEmbedUrlDisplay;
+    private showEmbedNavBar;
+    /**
+     * 确保嵌入导航栏存在并适配窗口布局。
+     * - 新窗口：createChatWindow 已创建，直接复用
+     * - 旧窗口（无导航栏）：动态注入导航栏并调整布局
+     */
+    private ensureEmbedNavBar;
+    private hideEmbedNavBar;
     private getEnabledEmbeddedTabs;
     private getDefaultEmbeddedTab;
     private generateChatUrl;
@@ -212,6 +227,12 @@ declare class BytedeskWeb {
     showWebrtc(config?: Partial<BytedeskConfig>): void;
     showCall(config?: Partial<BytedeskConfig>): void;
     showTicket(config?: Partial<BytedeskConfig>): void;
+    /**
+     * 嵌入式显示外部网页（如帮助文档、产品页面等）
+     * @param url - 要嵌入显示的外部网页完整 URL
+     * @param title - 导航栏自定义标题，未传时兜底显示网址
+     */
+    showEmbed(url: string, title?: string): void;
     private minimizeWindow;
     private toggleMaximize;
     private handleWindowDragStart;
@@ -248,7 +269,7 @@ declare class BytedeskWeb {
      */
     private handleTextSelection;
     /**
-     * 创建反馈提示框
+     * 创建反馈提示框（含"问AI"和"文档反馈"两个按钮）
      */
     private createFeedbackTooltip;
     /**
@@ -308,6 +329,11 @@ declare class BytedeskWeb {
      * 公共方法：显示反馈对话框
      */
     showDocumentFeedback(selectedText?: string): void;
+    /**
+     * 公共方法：显示聊天窗口并自动发送选中的文本
+     * @param text - 要自动发送的文本内容
+     */
+    showChatAndSendText(text: string): void;
     /**
      * 公共方法：重新初始化反馈功能
      */
@@ -385,6 +411,7 @@ export declare interface FeedbackConfig {
     trigger?: 'selection' | 'button' | 'both';
     showOnSelection?: boolean;
     selectionText?: string;
+    askAiText?: string;
     buttonText?: string;
     dialogTitle?: string;
     placeholder?: string;
@@ -398,6 +425,7 @@ export declare interface FeedbackConfig {
     submitScreenshot?: boolean;
     onSubmit?: (feedback: FeedbackData) => void;
     onCancel?: () => void;
+    onAskAi?: (selectedText: string) => void;
 }
 
 export declare interface FeedbackData {

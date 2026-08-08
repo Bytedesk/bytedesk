@@ -22,19 +22,28 @@ import com.bytedesk.ai.springai.observability.CustomChatClientObservationConvent
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.aop.ObservedAspect;
 
+/**
+ * Bytedesk AI Observability 基础设施配置.
+ *
+ * <p>阶段 7A 调整：不再通过 {@code ObservationRegistry.create()} 创建独立 Registry，
+ * 而是注入 Spring Boot 自动配置的 {@link ObservationRegistry}，确保所有观测指标
+ * （ChatClient / ChatModel / EmbeddingModel / VectorStore / Tool Calling）
+ * 都汇聚到同一个 Registry，供 Prometheus、Zipkin 等后端统一采集。</p>
+ */
 @Configuration
 public class ObservationConfig {
 
+    /**
+     * 支持 {@code @Observed} 注解的 AOP 切面，复用 Boot 自动配置的 ObservationRegistry。
+     */
     @Bean
     public ObservedAspect observedAspect(ObservationRegistry observationRegistry) {
         return new ObservedAspect(observationRegistry);
     }
 
-    @Bean
-    public ObservationRegistry observationRegistry() {
-        return ObservationRegistry.create();
-    }
-
+    /**
+     * 自定义 ChatClient 观测命名约定，注册为 Spring Bean 后由 Spring AI 自动发现。
+     */
     @Bean
     public ChatClientObservationConvention chatClientObservationConvention() {
         return new CustomChatClientObservationConvention();

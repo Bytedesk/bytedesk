@@ -5,7 +5,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.ollama.OllamaEmbeddingModel;
-import org.springframework.ai.zhipuai.ZhiPuAiEmbeddingModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.Map;
 public class EmbeddingModelInfoService {
 
     public EmbeddingModelInfoService(
-            ObjectProvider<ZhiPuAiEmbeddingModel> zhipuaiEmbeddingModelProvider,
+            @Qualifier("zhiPuAiEmbeddingModel") ObjectProvider<EmbeddingModel> zhipuaiEmbeddingModelProvider,
             ObjectProvider<OllamaEmbeddingModel> ollamaEmbeddingModelProvider,
             @Qualifier("dashscopeEmbeddingModel")
             ObjectProvider<EmbeddingModel> dashscopeEmbeddingModelProvider,
@@ -41,7 +40,7 @@ public class EmbeddingModelInfoService {
     @Value("${spring.ai.model.embedding:none}")
     private String primaryEmbeddingProvider;
 
-    private final ZhiPuAiEmbeddingModel zhipuaiEmbeddingModel;
+    private final EmbeddingModel zhipuaiEmbeddingModel;
 
     private final OllamaEmbeddingModel ollamaEmbeddingModel;
 

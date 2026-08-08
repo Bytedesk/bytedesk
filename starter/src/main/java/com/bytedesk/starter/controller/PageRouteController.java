@@ -90,7 +90,7 @@ public class PageRouteController {
 	@GetMapping({
 		"/{lang:zh-CN|zh-TW|en}/index.html",
 		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
-		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms}.html"
+		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms|termshell}.html"
 	})
 	public String multiLanguageStaticPages(
 			@PathVariable String lang,
@@ -138,7 +138,7 @@ public class PageRouteController {
 	@GetMapping({
 		"/index.html",
 		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
-		"/pages/{page:download|contact|about|privacy|terms}.html"
+		"/pages/{page:download|contact|about|privacy|terms|termshell}.html"
 	})
 	public String rootStaticPages(
 			@PathVariable(required = false) String feature,

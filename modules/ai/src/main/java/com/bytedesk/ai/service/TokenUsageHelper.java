@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.springai.event.LlmTokenUsageEvent;
+import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
 
 import lombok.extern.slf4j.Slf4j;
@@ -75,13 +76,13 @@ public class TokenUsageHelper {
                 return new BigDecimal("0.005");
             }
         } else if (LlmProviderConstants.DASHSCOPE.equalsIgnoreCase(aiProvider)) {
-            if ("qwen-turbo".equalsIgnoreCase(aiModelType)) {
+            if (LlmDefaults.DEFAULT_CHAT_MODEL.equalsIgnoreCase(aiModelType)) {
                 return new BigDecimal("0.002");
             } else if ("qwen-plus".equalsIgnoreCase(aiModelType)) {
                 return new BigDecimal("0.01");
             }
         } else if (LlmProviderConstants.DEEPSEEK.equalsIgnoreCase(aiProvider)) {
-            if ("deepseek-chat".equalsIgnoreCase(aiModelType)) {
+            if (LlmDefaults.DEFAULT_DEEPSEEK_CHAT_MODEL.equalsIgnoreCase(aiModelType)) {
                 return new BigDecimal("0.002");
             } else if ("deepseek-coder".equalsIgnoreCase(aiModelType)) {
                 return new BigDecimal("0.005");

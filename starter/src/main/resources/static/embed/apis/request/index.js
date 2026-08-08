@@ -1,6 +1,6 @@
 import { ACCESS_TOKEN as e, ANONYMOUS as t, EVENT_BUS_HTTP_ERROR as n, EVENT_BUS_SERVER_ERROR_500 as r } from "../../utils/constants/index.js";
 import i from "../../utils/logger/index.js";
-import a from "../../node_modules/.pnpm/axios@1.16.1/node_modules/axios/lib/axios/index.js";
+import a from "../../node_modules/.pnpm/axios@1.19.0/node_modules/axios/lib/axios/index.js";
 import o from "../../utils/eventsEmitter/index.js";
 //#region src/apis/request.ts
 var s = "";
@@ -29,9 +29,7 @@ u.interceptors.request.use((t) => {
 		case 403:
 			i.error("axios interception error 403"), o.emit(n, "403");
 			break;
-		case 500:
-			i.error("axios interception error 500"), o.emit(r, "500");
-			break;
+		case 500: i.error("axios interception error 500"), o.emit(r, "500");
 	}
 	return "return axios interception error";
 });
