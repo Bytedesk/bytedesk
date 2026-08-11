@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -37,6 +39,8 @@ import com.bytedesk.ai.service.agent.AgentCannedResponseRequest;
 import com.bytedesk.ai.service.agent.AgentCannedResponseResolver;
 import com.bytedesk.ai.service.agent.AgentCannedResponseTraceContext;
 import com.bytedesk.ai.service.agent.AgentResponseTimingContext;
+import com.bytedesk.ai.springai.adviser.AdvisorChainFactory;
+import com.bytedesk.ai.springai.adviser.RagQueryRewriteHelper;
 import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
 import com.bytedesk.ai.springai.service.ChatClientInfoService;
 import com.bytedesk.ai.tool.utils.RobotToolCallbackResolver;
@@ -139,7 +143,22 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected CannedResponseEvidenceHelper cannedResponseEvidenceHelper;
 
+    // Spring AI Advisor 链组装工厂（阶段2/3 横切关注点）。
+    // 集中管理 SafeGuard / ReReading / Logging / Memory，从基类抽取以精简实现。
+    // 可选注入：工厂内部所有依赖均为 ObjectProvider 优雅降级，bean 不存在时 buildAdvisorChain 返回空 list。
+    // 经 setBaseDependencies setter 注入（与其它 30+ 依赖一致），保持子类无参 super() 不受影响。
+    protected AdvisorChainFactory advisorChainFactory;
+
+    // RAG Query 增强助手（阶段4）。可选注入：开关关闭时行为零变化。
+    // 仅在 robot.llm.ragRewriteEnabled/ragMultiQueryEnabled=true 时生效，KB 搜索流程本身不改动。
+    protected RagQueryRewriteHelper ragQueryRewriteHelper;
+
     private final ThreadLocal<Map<String, Object>> providerToolRuntimeContextHolder = new ThreadLocal<>();
+
+    // Sync 路径的 conversationId 载体（threadTopic，与 PromptHelper 手动历史同键）。
+    // SSE 路径是异步流式（.subscribe() 跨线程），ThreadLocal 不可靠，故 SSE 用显式 invokePromptStream(.., conversationId)；
+    // Sync 是同步同线程，用 ThreadLocal 在 sendSyncMessage 入口设置、2 参 invokePromptSync 读取，避免改动 30 个抽象方法签名。
+    private final ThreadLocal<String> conversationIdHolder = new ThreadLocal<>();
 
     // 保留一个无参构造函数，或者只接收特定的必需依赖
     protected BaseSpringAIService() {
@@ -179,7 +198,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             ObjectProvider<LlmProviderRestService> llmProviderRestServiceProvider,
             ObjectProvider<ProviderToolServiceDispatcher> providerToolServiceDispatcherProvider,
             ObjectProvider<ReasoningContentHelper> reasoningContentHelperProvider,
-            ObjectProvider<CannedResponseEvidenceHelper> cannedResponseEvidenceHelperProvider) {
+            ObjectProvider<CannedResponseEvidenceHelper> cannedResponseEvidenceHelperProvider,
+            ObjectProvider<AdvisorChainFactory> advisorChainFactoryProvider,
+            ObjectProvider<RagQueryRewriteHelper> ragQueryRewriteHelperProvider) {
         this.faqElasticService = faqElasticService;
         this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
         this.textElasticService = textElasticService;
@@ -213,6 +234,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
         this.providerToolServiceDispatcher = providerToolServiceDispatcherProvider.getIfAvailable();
         this.reasoningContentHelper = reasoningContentHelperProvider.getIfAvailable();
         this.cannedResponseEvidenceHelper = cannedResponseEvidenceHelperProvider.getIfAvailable();
+        this.advisorChainFactory = advisorChainFactoryProvider.getIfAvailable();
+        this.ragQueryRewriteHelper = ragQueryRewriteHelperProvider.getIfAvailable();
     }
 
     protected String tryProcessPromptSyncWithProviderToolService(String message, RobotProtobuf robot) {
@@ -363,7 +386,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // SearchResultWithSources aggregated = knowledgeBaseSearchHelper
             // .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query,
             // robot), robot);
-            SearchResultWithSources aggregated = knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
+            SearchResultWithSources aggregated = searchKnowledgeBaseWithSourcesRag(query, robot,
+                    extractConversationId(messageProtobufQuery),
+                    messageProtobufQuery != null ? messageProtobufQuery.getUid() : null);
             List<FaqProtobuf> kbResults = aggregated.getSearchResults();
             List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
                     ? aggregated.getSourceReferences()
@@ -397,7 +422,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // SearchResultWithSources aggregated = knowledgeBaseSearchHelper
         // .rerankMergeTopK(knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query,
         // robot), robot);
-        SearchResultWithSources aggregated = knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
+        SearchResultWithSources aggregated = searchKnowledgeBaseWithSourcesRag(query, robot,
+                extractConversationId(messageProtobufQuery),
+                messageProtobufQuery != null ? messageProtobufQuery.getUid() : null);
         List<FaqProtobuf> kbResults = aggregated.getSearchResults();
         List<RobotContent.SourceReference> sourceReferences = Boolean.TRUE.equals(robot.getKbSourceEnabled())
                 ? aggregated.getSourceReferences()
@@ -459,6 +486,10 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         long startedAtNanos = System.nanoTime();
 
+        // Sync 路径 conversationId（threadTopic）经 ThreadLocal 传给下游 invokePromptSync，使 Memory Advisor 生效
+        String conversationId = extractConversationId(messageProtobufQuery);
+        conversationIdHolder.set(conversationId);
+
         try {
             boolean kbEnabled = StringUtils.hasText(robot.getKbUid()) && robot.getKbEnabled();
             boolean llmEnabled = robot.getLlm() != null && robot.getLlm().getEnabled();
@@ -493,7 +524,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
             }
 
             // 其余场景需要 KB 结果
-            List<FaqProtobuf> kbResults = knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot);
+            List<FaqProtobuf> kbResults = searchKnowledgeBaseRag(query, robot,
+                    extractConversationId(messageProtobufQuery),
+                    messageProtobufQuery != null ? messageProtobufQuery.getUid() : null);
             log.info("sendSyncMessage kbResults {}", kbResults.size());
 
             if (llmEnabled) {
@@ -623,6 +656,9 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     elapsedMillis(startedAtNanos), 0, 0, 0, null, "", "");
             messageSendService.sendProtobufMessage(messageProtobufReply);
             return errorMessage;
+        } finally {
+            // 清除 Sync 路径 conversationId ThreadLocal，避免线程池复用时串会话
+            conversationIdHolder.remove();
         }
     }
 
@@ -684,7 +720,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
         // 根据参数决定是否查询知识库
         if (searchKnowledgeBase) {
-            searchResultList = knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot);
+            searchResultList = searchKnowledgeBaseRag(query, robot);
             log.info("processDirectLlmRequest searchResultList {}", searchResultList);
         } else {
             log.info("跳过知识库查询，直接使用提示词处理");
@@ -797,7 +833,33 @@ public abstract class BaseSpringAIService implements SpringAIService {
                 : new Prompt(List.of(new UserMessage(message)));
     }
 
+    /**
+     * 构建 ChatClient（保留旧签名，向后兼容）。
+     *
+     * <p>内部委托给 {@link #createChatClient(ChatModel, Prompt, RobotProtobuf)}，
+     * 以 {@code robot=null} 调用，即不注入任何 Advisor，行为与改造前完全一致。</p>
+     *
+     * @deprecated 请改用 {@link #createChatClient(ChatModel, Prompt, RobotProtobuf)}，
+     *             以便根据机器人配置注入 SafeGuard / Logging / Memory 等 Advisor。
+     */
+    @Deprecated
     protected ChatClient createChatClient(ChatModel chatModel, Prompt prompt) {
+        return createChatClient(chatModel, prompt, null);
+    }
+
+    /**
+     * 构建 ChatClient 并根据机器人配置注入 Advisor 链。
+     *
+     * <p>当 {@code robot != null} 时，会调用 {@link #buildAdvisorChain(RobotProtobuf)}
+     * 组装 Advisor 链（SafeGuard / ReReading / Logging / Memory 等），并通过
+     * {@link ChatClient.Builder#defaultAdvisors(java.util.List)} 注入；当
+     * {@code robot == null} 时 {@link #buildAdvisorChain(RobotProtobuf)} 返回空 list，
+     * 行为与改造前完全一致，保证向后兼容。</p>
+     *
+     * <p>子类无需逐一手动修改调用点：旧签名 {@link #createChatClient(ChatModel, Prompt)}
+     * 已 {@code @Deprecated} 并委托本方法；按 provider 分批迁移到本重载即可逐步启用 Advisor。</p>
+     */
+    protected ChatClient createChatClient(ChatModel chatModel, Prompt prompt, RobotProtobuf robot) {
         Assert.notNull(chatModel, "ChatModel must not be null");
 
         ChatClient.Builder builder = chatClientBuilderFactory != null
@@ -806,14 +868,153 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (prompt != null && prompt.getOptions() != null) {
             builder = builder.defaultOptions(prompt.getOptions().mutate());
         }
+        // 注入 Advisor 链（根据 RobotProtobuf 配置，robot=null 时返回空 list，完全向后兼容）
+        List<Advisor> advisors = buildAdvisorChain(robot);
+        if (!advisors.isEmpty()) {
+            builder = builder.defaultAdvisors(advisors);
+        }
         return builder.build();
     }
 
+    /**
+     * 组装 Advisor 链（委托给 {@link AdvisorChainFactory}）。
+     *
+     * <p>实现细节（SafeGuard / ReReading / Logging / Memory 组装、敏感词缓存、order 推导等）
+     * 已抽取到 {@link AdvisorChainFactory}，基类仅保留此委托入口以便子类按需 override。</p>
+     *
+     * <p>当工厂 bean 不存在（测试环境等）时返回空 list，保证行为零变化。</p>
+     *
+     * @param robot 机器人配置（含 llm 配置）；{@code null} 表示不注入任何 Advisor
+     * @return 组装后的 Advisor 链；无 Advisor 时返回空 list
+     */
+    protected List<Advisor> buildAdvisorChain(RobotProtobuf robot) {
+        if (advisorChainFactory == null) {
+            return Collections.emptyList();
+        }
+        return advisorChainFactory.buildAdvisorChain(robot);
+    }
+
+    // ===== 阶段4：RAG Query 增强（KB 检索前改写/扩展 query，不替代 KB 搜索）=====
+    // 以下两个方法仅在 robot.llm.ragRewriteEnabled/ragMultiQueryEnabled=true 时生效，
+    // 否则（含 ragQueryRewriteHelper==null）直接委托 KnowledgeBaseSearchHelper，行为零变化。
+
+    /**
+     * 带 RAG Query 增强的 KB 检索（带来源引用）。
+     *
+     * <p>开关关闭或 {@code ragQueryRewriteHelper} 不可用时，等价于
+     * {@code knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot)}。</p>
+     */
+    protected SearchResultWithSources searchKnowledgeBaseWithSourcesRag(String query, RobotProtobuf robot) {
+        return searchKnowledgeBaseWithSourcesRag(query, robot, null, null);
+    }
+
+    /**
+     * 带 RAG Query 增强的 KB 检索（带来源引用，含上下文用于持久化记录）。
+     *
+     * <p>开关关闭或 {@code ragQueryRewriteHelper} 不可用时，等价于
+     * {@code knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot)}。</p>
+     *
+     * @param threadTopic 会话主题（可为空，用于 RAG 记录持久化）
+     * @param messageUid  触发消息 UID（可为空，用于 RAG 记录持久化）
+     */
+    protected SearchResultWithSources searchKnowledgeBaseWithSourcesRag(String query, RobotProtobuf robot,
+            String threadTopic, String messageUid) {
+        if (ragQueryRewriteHelper == null) {
+            // 诊断：helper bean 未注入时给出明确警告（避免静默降级难以排查）
+            log.warn("searchKnowledgeBaseWithSourcesRag: ragQueryRewriteHelper is null (bean not injected), "
+                    + "falling back to plain KB search. RAG switches will NOT take effect.");
+            return knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
+        }
+        return ragQueryRewriteHelper.searchWithRagEnhancement(query, robot, threadTopic, messageUid);
+    }
+
+    /**
+     * 带 RAG Query 增强的 KB 检索（仅 Faq 列表，兼容返回 {@code List<FaqProtobuf>} 的调用点）。
+     *
+     * <p>开关关闭或 {@code ragQueryRewriteHelper} 不可用时，等价于
+     * {@code knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot)}。</p>
+     */
+    protected List<FaqProtobuf> searchKnowledgeBaseRag(String query, RobotProtobuf robot) {
+        return searchKnowledgeBaseRag(query, robot, null, null);
+    }
+
+    /**
+     * 带 RAG Query 增强的 KB 检索（仅 Faq 列表，含上下文用于持久化记录）。
+     *
+     * <p>开关关闭或 {@code ragQueryRewriteHelper} 不可用时，等价于
+     * {@code knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot)}。</p>
+     *
+     * @param threadTopic 会话主题（可为空，用于 RAG 记录持久化）
+     * @param messageUid  触发消息 UID（可为空，用于 RAG 记录持久化）
+     */
+    protected List<FaqProtobuf> searchKnowledgeBaseRag(String query, RobotProtobuf robot,
+            String threadTopic, String messageUid) {
+        if (ragQueryRewriteHelper == null) {
+            log.warn("searchKnowledgeBaseRag: ragQueryRewriteHelper is null (bean not injected), "
+                    + "falling back to plain KB search. RAG switches will NOT take effect.");
+            return knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot);
+        }
+        return ragQueryRewriteHelper.searchKnowledgeBaseWithRag(query, robot, threadTopic, messageUid);
+    }
+
+    /**
+     * 从 messageProtobuf 提取 conversationId（= threadTopic，与 PromptHelper 手动历史同键，见规划 v3.2）。
+     * messageProtobufQuery 或其 thread 为 null 时返回 null（健康检查、无 thread 请求走无记忆路径）。
+     */
+    protected String extractConversationId(MessageProtobuf messageProtobufQuery) {
+        if (messageProtobufQuery == null || messageProtobufQuery.getThread() == null) {
+            return null;
+        }
+        return messageProtobufQuery.getThread().getTopic();
+    }
+
+    /**
+     * 在 ThreadLocal 中设置 Sync 路径的 conversationId，并执行 invocation，结束后清除。
+     * 供 sendSyncMessage 等同步入口使用，使下游 2 参 invokePromptSync 自动获得 conversationId。
+     */
+    protected <T> T withConversationId(String conversationId, ProviderToolInvocation<T> invocation) {
+        String previous = conversationIdHolder.get();
+        if (StringUtils.hasText(conversationId)) {
+            conversationIdHolder.set(conversationId);
+        } else {
+            conversationIdHolder.remove();
+        }
+        try {
+            return invocation.invoke();
+        } finally {
+            if (previous != null) {
+                conversationIdHolder.set(previous);
+            } else {
+                conversationIdHolder.remove();
+            }
+        }
+    }
+
+    /**
+     * 同步调用（2 参）。conversationId 从 {@link #conversationIdHolder} ThreadLocal 读取（Sync 路径）。
+     *
+     * <p>Sync 是同步同线程，sendSyncMessage 在入口设置 ThreadLocal，本方法读取后传给 3 参重载。
+     * SSE 不走本方法（异步跨线程，ThreadLocal 不可靠），用显式 {@link #invokePromptStream(ChatClient, Prompt, String)}。</p>
+     */
     protected ChatResponse invokePromptSync(ChatClient chatClient, Prompt prompt) {
+        return invokePromptSync(chatClient, prompt, conversationIdHolder.get());
+    }
+
+    /**
+     * 同步调用并可选地传入 conversationId（用于 Memory Advisor 的会话隔离）。
+     *
+     * <p>conversationId 为 {@code null} 或空时不传 advisor param，行为与旧签名一致（健康检查、无 thread 请求
+     * 走无记忆路径，避免 Spring AI 在缺少 CONVERSATION_ID 时断言失败）。</p>
+     *
+     * @param conversationId 会话标识，约定取 {@code threadTopic}（与 PromptHelper 手动历史同键，见规划 v3.2）
+     */
+    protected ChatResponse invokePromptSync(ChatClient chatClient, Prompt prompt, String conversationId) {
         Assert.notNull(chatClient, "ChatClient must not be null");
-        return prompt != null
-                ? chatClient.prompt(prompt).call().chatResponse()
-                : chatClient.prompt().call().chatResponse();
+        var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
+        if (StringUtils.hasText(conversationId)) {
+            request = request.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
+        }
+        return request.call().chatResponse();
     }
 
     protected ChatResponse invokePromptSync(ChatModel chatModel, Prompt prompt) {
@@ -821,10 +1022,23 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     protected Flux<ChatResponse> invokePromptStream(ChatClient chatClient, Prompt prompt) {
+        return invokePromptStream(chatClient, prompt, null);
+    }
+
+    /**
+     * 流式调用并可选地传入 conversationId（用于 Memory Advisor 的会话隔离）。
+     *
+     * <p>conversationId 为 {@code null} 或空时不传 advisor param，行为与旧签名一致。</p>
+     *
+     * @param conversationId 会话标识，约定取 {@code threadTopic}（与 PromptHelper 手动历史同键，见规划 v3.2）
+     */
+    protected Flux<ChatResponse> invokePromptStream(ChatClient chatClient, Prompt prompt, String conversationId) {
         Assert.notNull(chatClient, "ChatClient must not be null");
-        return prompt != null
-                ? chatClient.prompt(prompt).stream().chatResponse()
-                : chatClient.prompt().stream().chatResponse();
+        var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
+        if (StringUtils.hasText(conversationId)) {
+            request = request.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
+        }
+        return request.stream().chatResponse();
     }
 
     protected Flux<ChatResponse> invokePromptStream(ChatModel chatModel, Prompt prompt) {

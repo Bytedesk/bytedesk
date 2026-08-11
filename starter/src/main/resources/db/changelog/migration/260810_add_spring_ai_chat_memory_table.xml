@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        阶段3（Memory Advisor）：创建 Spring AI 2.0.0 ChatMemory JDBC 持久化表。
+        对应 spring-ai-starter-model-chat-memory-repository-jdbc 自动配置。
+
+        注意：
+        1. 同时关闭 Spring AI 自动 schema 初始化（spring.ai.chat.memory.repository.jdbc.initialize-schema=never），
+           由本 Liquibase 脚本统一建表，避免多环境启动时 schema 行为不一致。
+        2. 列定义与 Spring AI 2.0.0 内置 schema-mysql.sql / schema-postgresql.sql 对齐：
+           - conversation_id  VARCHAR(255) NOT NULL
+             （bytedesk 用 threadTopic 如 org/robot/{uid}/{uid}（44+字符）作为 conversationId，
+              超过 Spring AI 官方默认 VARCHAR(36)（UUID 长度），故放宽至 255）
+           - content          TEXT/CLOB   NOT NULL
+           - type             VARCHAR(10) NOT NULL + CHECK（USER/ASSISTANT/SYSTEM/TOOL）
+             （MySQL 用 VARCHAR(10) + CHECK 替代 ENUM，PG 原生即 VARCHAR+CHECK，跨库兼容）
+           - timestamp        TIMESTAMP   NOT NULL
+           - sequence_id      BIGINT      NOT NULL
+        3. 索引：(conversation_id, timestamp)、(conversation_id, sequence_id)
+    -->
+    <changeSet id="260810-2-create-spring-ai-chat-memory-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SPRING_AI_CHAT_MEMORY"/>
+            </not>
+        </preConditions>
+        <createTable tableName="SPRING_AI_CHAT_MEMORY">
+            <column name="conversation_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sequence_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- type 列取值约束：USER / ASSISTANT / SYSTEM / TOOL（与 Spring AI MessageType 对齐）。
+             Liquibase 无 addCheckConstraint 标签，用原生 SQL（MySQL 8.0+ 与 PostgreSQL 均支持 ALTER TABLE ... ADD CONSTRAINT ... CHECK）。 -->
+        <sql>ALTER TABLE SPRING_AI_CHAT_MEMORY ADD CONSTRAINT ck_spring_ai_chat_memory_type CHECK (type IN ('USER', 'ASSISTANT', 'SYSTEM', 'TOOL'))</sql>
+
+        <createIndex tableName="SPRING_AI_CHAT_MEMORY"
+            indexName="SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_TIMESTAMP_IDX">
+            <column name="conversation_id"/>
+            <column name="timestamp"/>
+        </createIndex>
+        <createIndex tableName="SPRING_AI_CHAT_MEMORY"
+            indexName="SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_SEQUENCE_ID_IDX">
+            <column name="conversation_id"/>
+            <column name="sequence_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

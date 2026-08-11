@@ -46,17 +46,22 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "is_thinking_enabled")
-    private Boolean enableThinking = true;
+    private Boolean thinking = true;
 
     // enable streaming
     @Builder.Default
     @Column(name = "is_streaming_enabled")
-    private Boolean enableStreaming = false;
+    private Boolean stream = false;
 
     // 启用搜索
     @Builder.Default
     @Column(name = "is_search_enabled")
-    private Boolean enableSearch = false;
+    private Boolean search = false;
+
+    // 推理努力程度（reasoning effort）：low/high/xhigh/max
+    @Builder.Default
+    @Column(name = "llm_reasoning_effort")
+    private String reasoningEffort = RobotReasoningEffortEnum.LOW.name();
 
     // 文本对话模型提供商
     @Builder.Default
@@ -242,5 +247,42 @@ public class RobotLlm {
 
     @Transient
     private RobotToolIntentContext toolIntentContext;
-    
+
+    // ===== Spring AI Advisor 控制字段 =====
+    // 注：敏感词不再按 robot 存储，统一复用 TabooService 数据库源（按 orgUid 隔离），
+    // 与现有消息层 taboo（TabooFilterHelper）共用同一份词库，避免双份维护。
+
+    // SafeGuard（内容安全/敏感词拦截）开关。默认关闭。
+    // 开启后命中敏感词时不转发 LLM，直接返回拦截文案（与消息层 TabooFilterHelper「替换后继续发送」语义不同）。
+    @Builder.Default
+    @Column(name = "llm_safe_guard_enabled")
+    private Boolean safeGuardEnabled = false;
+
+    // 机器人级自定义拦截语（可选，空值时回退到 TabooService.resolveReplyForContent 或 Spring AI 默认文案）。
+    @Builder.Default
+    @Column(name = "llm_safe_guard_failure_response", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String safeGuardFailureResponse = "";
+
+    // Re-Reading(Re2) 输入增强开关。默认关闭。
+    // 开启后用户输入被「重读一遍」改写，增强推理（response 透传）。
+    @Builder.Default
+    @Column(name = "llm_re_reading_enabled")
+    private Boolean reReadingEnabled = false;
+
+    // 多轮记忆开关。默认开启（向后兼容）。阶段3 启用 MessageChatMemoryAdvisor 时生效。
+    @Builder.Default
+    @Column(name = "llm_memory_enabled")
+    private Boolean memoryEnabled = true;
+
+    // Query 改写开关（阶段4 RAG 增强）。默认关闭。
+    // 开启后在 KB 检索前用 RewriteQueryTransformer 改写用户 query（不替代 KB 搜索）。
+    @Builder.Default
+    @Column(name = "llm_rag_rewrite_enabled")
+    private Boolean ragRewriteEnabled = false;
+
+    // 多查询扩展开关（阶段4 RAG 增强）。默认关闭。
+    @Builder.Default
+    @Column(name = "llm_rag_multi_query_enabled")
+    private Boolean ragMultiQueryEnabled = false;
+
 }

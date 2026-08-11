@@ -180,7 +180,7 @@ public class ZhipuaiConfig {
     // ─────────────────── Spring AI EmbeddingModel 适配 Bean ─────────────────────────
 
     @Bean("zhiPuAiEmbeddingModel")
-    @ConditionalOnProperty(name = "spring.ai.embedding.model", havingValue = LlmProviderConstants.ZHIPUAI, matchIfMissing = false)
+    @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = LlmProviderConstants.ZHIPUAI, matchIfMissing = false)
     @ConditionalOnProperty(prefix = "spring.ai.zhipuai.embedding", name = "enabled", havingValue = "true", matchIfMissing = false)
     EmbeddingModel zhiPuAiEmbeddingModel(
             ObjectProvider<ZhipuAiClient> clientProvider,

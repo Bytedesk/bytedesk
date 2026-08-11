@@ -12,6 +12,12 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.kbase.article.elastic.ArticleElastic;
+import com.bytedesk.kbase.article.elastic.ArticleElasticSearchResult;
+import com.bytedesk.kbase.article.elastic.ArticleElasticService;
+import com.bytedesk.kbase.article.vector.ArticleVector;
+import com.bytedesk.kbase.article.vector.ArticleVectorSearchResult;
+import com.bytedesk.kbase.article.vector.ArticleVectorService;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticSearchResult;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
@@ -54,18 +60,22 @@ public class KnowledgeBaseSearchHelper {
             ObjectProvider<TextVectorService> textVectorServiceProvider,
             ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
             ObjectProvider<WebpageVectorService> webpageVectorServiceProvider,
+            ObjectProvider<ArticleVectorService> articleVectorServiceProvider,
             FaqElasticService faqElasticService,
             TextElasticService textElasticService,
             ChunkElasticService chunkElasticService,
-            WebpageElasticService webpageElasticService) {
+            WebpageElasticService webpageElasticService,
+            ArticleElasticService articleElasticService) {
         this.faqElasticService = faqElasticService;
         this.textElasticService = textElasticService;
         this.chunkElasticService = chunkElasticService;
         this.webpageElasticService = webpageElasticService;
+        this.articleElasticService = articleElasticService;
         this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
         this.textVectorService = textVectorServiceProvider.getIfAvailable();
         this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
         this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
+        this.articleVectorService = articleVectorServiceProvider.getIfAvailable();
     }
 
 
@@ -79,11 +89,13 @@ public class KnowledgeBaseSearchHelper {
     private final TextElasticService textElasticService;
     private final ChunkElasticService chunkElasticService;
     private final WebpageElasticService webpageElasticService;
+    private final ArticleElasticService articleElasticService;
 
     private final FaqVectorService faqVectorService;
     private final TextVectorService textVectorService;
     private final ChunkVectorService chunkVectorService;
     private final WebpageVectorService webpageVectorService;
+    private final ArticleVectorService articleVectorService;
 
     // 2. 知识库搜索相关方法
     protected List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
@@ -277,6 +289,7 @@ public class KnowledgeBaseSearchHelper {
         boolean allowText = allowAll || "TEXT".equalsIgnoreCase(sourceTypeFilter);
         boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
         boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowArticle = allowAll || "ARTICLE".equalsIgnoreCase(sourceTypeFilter);
 
         int recallLimit = DEFAULT_FULLTEXT_RECALL_LIMIT;
         try {
@@ -386,6 +399,31 @@ public class KnowledgeBaseSearchHelper {
                 }
             }
 
+            if (allowArticle) {
+                // Article 没有 language 维度，不受 preferredLanguages 影响
+                List<ArticleElasticSearchResult> articleResults = articleElasticService.searchArticle(query, kbUid,
+                        null, null, recallLimit);
+                for (ArticleElasticSearchResult withScore : articleResults) {
+                    ArticleElastic article = withScore.getArticleElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromArticle(article);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.ARTICLE)
+                            .sourceUid(StringUtils.hasText(article.getUid()) ? article.getUid() : article.getUid())
+                            .sourceName(article.getTitle())
+                            .contentSummary(getContentSummary(
+                                    article.getContentMarkdown() != null ? article.getContentMarkdown()
+                                            : article.getSummary(),
+                                    200))
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
             if (searchResultList.size() > resultSizeBefore) {
                 log.debug("Fulltext language fallback hit: language={}, results={}", language,
                         searchResultList.size() - resultSizeBefore);
@@ -424,6 +462,7 @@ public class KnowledgeBaseSearchHelper {
         boolean allowText = allowAll || "TEXT".equalsIgnoreCase(sourceTypeFilter);
         boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
         boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowArticle = allowAll || "ARTICLE".equalsIgnoreCase(sourceTypeFilter);
 
         // Vector 召回数量：默认 5；若配置了 topK，则至少取 topK；并设置上限防止过大查询
         int recallLimit = DEFAULT_VECTOR_RECALL_LIMIT;
@@ -545,6 +584,35 @@ public class KnowledgeBaseSearchHelper {
                     }
                 } catch (Exception e) {
                     log.warn("WebpageVectorService search failed: {}", e.getMessage());
+                }
+            }
+
+            if (allowArticle && articleVectorService != null) {
+                try {
+                    // Article 没有 language 维度，不受 preferredLanguages 影响
+                    List<ArticleVectorSearchResult> articleResults = articleVectorService.searchArticleVector(query,
+                            kbUid, null, null, recallLimit);
+                    for (ArticleVectorSearchResult withScore : articleResults) {
+                        ArticleVector articleVector = withScore.getArticleVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromArticleVector(articleVector);
+                        searchResultList.add(faqProtobuf);
+
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.ARTICLE)
+                                .sourceUid(StringUtils.hasText(articleVector.getUid()) ? articleVector.getUid() : articleVector.getUid())
+                                .sourceName(articleVector.getTitle())
+                                .contentSummary(getContentSummary(
+                                        articleVector.getContentMarkdown() != null ? articleVector.getContentMarkdown()
+                                                : articleVector.getSummary(),
+                                        200))
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("ArticleVectorService search failed: {}", e.getMessage());
                 }
             }
 

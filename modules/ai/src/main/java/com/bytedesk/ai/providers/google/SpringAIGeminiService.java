@@ -234,7 +234,7 @@ public class SpringAIGeminiService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(chatModel, requestPrompt);
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -289,8 +289,9 @@ public class SpringAIGeminiService extends BaseSpringAIService {
             sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
                     I18Consts.I18N_THINKING);
 
-            var chatClient = createChatClient(chatModel, prompt);
-            invokePromptStream(chatClient, prompt).subscribe(
+            var chatClient = createChatClient(chatModel, prompt, robot);
+            String conversationId = extractConversationId(messageProtobufQuery);
+            invokePromptStream(chatClient, prompt, conversationId).subscribe(
                     response -> {
                         try {
                             if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {

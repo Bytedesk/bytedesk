@@ -98,6 +98,7 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.RATE_CANCEL.name(), I18Consts.I18N_MESSAGE_TYPE_RATE_CANCEL);
         typeToChineseMap.put(MessageTypeEnum.AUTO_CLOSED.name(), I18Consts.I18N_MESSAGE_TYPE_AUTO_CLOSED);
         typeToChineseMap.put(MessageTypeEnum.AGENT_CLOSED.name(), I18Consts.I18N_MESSAGE_TYPE_AGENT_CLOSED);
+        typeToChineseMap.put(MessageTypeEnum.VISITOR_CLOSED.name(), I18Consts.I18N_MESSAGE_TYPE_VISITOR_CLOSED);
         typeToChineseMap.put(MessageTypeEnum.TRANSFER.name(), I18Consts.I18N_MESSAGE_TYPE_TRANSFER);
         typeToChineseMap.put(MessageTypeEnum.TRANSFER_REJECT.name(), I18Consts.I18N_MESSAGE_TYPE_TRANSFER_REJECT);
         typeToChineseMap.put(MessageTypeEnum.TRANSFER_ACCEPT.name(), I18Consts.I18N_MESSAGE_TYPE_TRANSFER_ACCEPT);

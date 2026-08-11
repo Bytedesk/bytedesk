@@ -479,7 +479,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
             boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+                    && Boolean.TRUE.equals(robot.getLlm().getThinking());
             ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
                     .model(model)
                     // https://docs.bigmodel.cn/cn/guide/capabilities/struct-output
@@ -546,7 +546,7 @@ public class ZhipuaiService extends BaseSpringAIService {
 
             // 启用思维模式（如果配置了）
             boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+                    && Boolean.TRUE.equals(robot.getLlm().getThinking());
 
             // 构建请求
             ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
@@ -629,7 +629,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                 return;
             }
             boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getEnableThinking());
+                    && Boolean.TRUE.equals(robot.getLlm().getThinking());
             ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
                     .model(model)
                     .messages(zaiMessages)

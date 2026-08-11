@@ -159,6 +159,26 @@ public class ServiceSettingsResponse implements Serializable {
 
     private Boolean showLogo;
 
+    /**
+     * 访客端是否显示客服/机器人头像（左侧消息）
+     */
+    private Boolean showAgentAvatar;
+
+    /**
+     * 访客端是否显示客服/机器人昵称（左侧消息）
+     */
+    private Boolean showAgentNickname;
+
+    /**
+     * 访客端是否显示访客自己头像（右侧消息）
+     */
+    private Boolean showVisitorAvatar;
+
+    /**
+     * 访客端是否显示访客自己昵称（右侧消息）
+     */
+    private Boolean showVisitorNickname;
+
     // 有效日期
     private Date validateUntil;
 
@@ -216,6 +236,10 @@ public class ServiceSettingsResponse implements Serializable {
                 // .showHotFaqs(settings.getShowHotFaqs())
                 // .showShortcutFaqs(settings.getShowShortcutFaqs())
                 .showLogo(settings.getShowLogo())
+                .showAgentAvatar(settings.getShowAgentAvatar())
+                .showAgentNickname(settings.getShowAgentNickname())
+                .showVisitorAvatar(settings.getShowVisitorAvatar())
+                .showVisitorNickname(settings.getShowVisitorNickname())
                 .validateUntil(settings.getValidateUntil())
                 .toolbar(settings.getToolbar())
                 .build();

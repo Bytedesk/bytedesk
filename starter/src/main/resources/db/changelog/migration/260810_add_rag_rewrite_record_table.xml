@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        创建 RAG Query 增强记录表 bytedesk_ai_rag_rewrite_record。
+        用于持久化 ragRewriteEnabled（单 query 改写）与 ragMultiQueryEnabled（多查询扩展）的执行过程与结果，
+        便于后续分析改写效果、召回率提升情况，以及排查改写偏离原意等问题。
+
+        记录内容：
+        - 原始 query、改写后 query、多查询扩展结果
+        - 最终用于 KB 检索的 effective query
+        - KB 检索命中条数与结果摘要
+        - 增强类型（REWRITE/MULTI_QUERY/NONE）、状态（SUCCESS/FAILED/SKIPPED）
+        - 执行耗时、是否降级、错误信息
+
+        异步持久化：通过 RagRewriteEvent 事件 + @Async 监听器写入，不阻塞主请求链路。
+    -->
+    <changeSet id="260810-add-rag-rewrite-record-table" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_rag_rewrite_record" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="bytedesk_ai_rag_rewrite_record">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_ai_rag_rewrite_record" nullable="false" />
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_ai_rag_rewrite_record_uuid" />
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0" />
+            <column name="created_at" type="TIMESTAMP" />
+            <column name="updated_at" type="TIMESTAMP" />
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="org_uid" type="VARCHAR(64)" />
+            <column name="user_uid" type="VARCHAR(64)" />
+            <column name="level_type" type="VARCHAR(32)" />
+            <column name="platform_type" type="VARCHAR(32)" />
+
+            <!-- 业务字段 -->
+            <column name="robot_uid" type="VARCHAR(64)" />
+            <column name="thread_topic" type="VARCHAR(255)" />
+            <column name="message_uid" type="VARCHAR(64)" />
+            <column name="original_query" type="TEXT">
+                <constraints nullable="false" />
+            </column>
+            <column name="rewrite_type" type="VARCHAR(32)" defaultValue="NONE" />
+            <column name="status" type="VARCHAR(32)" defaultValue="SKIPPED" />
+            <column name="rewritten_query" type="TEXT" />
+            <column name="expanded_queries" type="TEXT" />
+            <column name="effective_query" type="TEXT" />
+            <column name="result_count" type="INT" defaultValueNumeric="0" />
+            <column name="result_summary" type="TEXT" />
+            <column name="error_message" type="TEXT" />
+            <column name="latency_ms" type="BIGINT" />
+            <column name="fallback_used" type="BOOLEAN" defaultValueBoolean="false" />
+        </createTable>
+
+        <!-- 索引：uuid（与 BaseEntity 约定一致）、org+robot（按机器人统计）、thread_topic（按会话查询） -->
+        <createIndex indexName="idx_rag_rewrite_uid" tableName="bytedesk_ai_rag_rewrite_record">
+            <column name="uuid" />
+        </createIndex>
+        <createIndex indexName="idx_rag_rewrite_org_robot" tableName="bytedesk_ai_rag_rewrite_record">
+            <column name="org_uid" />
+            <column name="robot_uid" />
+        </createIndex>
+        <createIndex indexName="idx_rag_rewrite_thread" tableName="bytedesk_ai_rag_rewrite_record">
+            <column name="thread_topic" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

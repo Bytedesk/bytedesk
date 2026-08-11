@@ -22,7 +22,9 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.observation.AdvisorObservationConvention;
 import org.springframework.ai.chat.client.advisor.observation.DefaultAdvisorObservationConvention;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
+import org.springframework.ai.template.st.StTemplateRenderer;
 import org.springframework.ai.chat.client.observation.DefaultChatClientObservationConvention;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -37,6 +39,8 @@ import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQ
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
+import org.springframework.ai.rag.retrieval.join.ConcatenationDocumentJoiner;
+import org.springframework.ai.rag.retrieval.join.DocumentJoiner;
 import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -429,6 +433,262 @@ public class RagTestController {
         // Query augmentedQuery = queryAugmenter.augment(query);
 
         return ResponseEntity.ok(JsonResult.success(queryAugmenter));
+    }
+
+    // ============================================================
+    // 以下为 retrieval-augmented-generation.adoc 中尚未覆盖的进阶演示
+    // ============================================================
+
+    // 自定义模板 Custom PromptTemplate for QuestionAnswerAdvisor
+    // 通过 .promptTemplate() 自定义“检索到的上下文”与用户问题的拼装方式
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_custom_template
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/custom-template?message=什么时间考试？
+    @GetMapping("/custom-template")
+    ResponseEntity<JsonResult<?>> customTemplate(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        // 自定义 PromptTemplate，使用 <> 作为分隔符（StTemplateRenderer = StringTemplate 引擎）
+        // 模板必须包含 query 与 question_answer_context 两个占位符
+        PromptTemplate customPromptTemplate = PromptTemplate.builder()
+                .renderer(StTemplateRenderer.builder()
+                        .startDelimiterToken('<')
+                        .endDelimiterToken('>')
+                        .build())
+                .template("""
+                        <query>
+
+                        Context information is below.
+                        ---------------------
+                        <question_answer_context>
+                        ---------------------
+
+                        Given the context information and no prior knowledge, answer the query.
+
+                        Follow these rules:
+                        1. If the answer is not in the context, just say that you don't know.
+                        2. Avoid statements like "Based on the context..." or "The provided information...".
+                        """)
+                .build();
+
+        var qaAdvisor = QuestionAnswerAdvisor.builder(this.vectorStore)
+                .promptTemplate(customPromptTemplate)
+                .searchRequest(SearchRequest.builder()
+                        .similarityThreshold(0.8d)
+                        .topK(6)
+                        .build())
+                .build();
+
+        String content = ChatClient.builder(primaryChatModel)
+                .build()
+                .prompt()
+                .advisors(qaAdvisor)
+                .user(message)
+                .call()
+                .content();
+
+        return ResponseEntity.ok(JsonResult.success(content));
+    }
+
+    // 允许空上下文 Allow Empty Context
+    // 默认 RetrievalAugmentationAdvisor 检索为空时会拒绝回答；开启 allowEmptyContext 后允许回答
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_naive_rag
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/allow-empty-context?message=什么时间考试？
+    @GetMapping("/allow-empty-context")
+    ResponseEntity<JsonResult<?>> allowEmptyContext(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                        .similarityThreshold(0.50)
+                        .vectorStore(vectorStore)
+                        .build())
+                .queryAugmenter(ContextualQueryAugmenter.builder()
+                        .allowEmptyContext(true) // 检索为空时仍允许模型作答
+                        .build())
+                .build();
+
+        String answer = ChatClient.builder(primaryChatModel)
+                .defaultAdvisors(retrievalAugmentationAdvisor)
+                .build()
+                .prompt()
+                .user(message)
+                .call()
+                .content();
+
+        return ResponseEntity.ok(JsonResult.success(answer));
+    }
+
+    // 动态过滤表达式 Dynamic Filter Expression via Supplier
+    // filterExpression 接受 Supplier，可在每次检索时动态计算（如按租户、按 kbUid 过滤）
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_vectorstoredocumentretriever
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/dynamic-filter?message=什么时间考试？&kbUid=DEMO_KB
+    @GetMapping("/dynamic-filter")
+    ResponseEntity<JsonResult<?>> dynamicFilter(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "DEMO_KB") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        final String filterValue = kbUid.isEmpty() ? "default" : kbUid;
+
+        DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .similarityThreshold(0.50)
+                .topK(5)
+                // Supplier 方式：每次检索都会调用，适合按租户上下文等动态过滤
+                .filterExpression(() -> new FilterExpressionBuilder()
+                        .eq("kbUid", filterValue)
+                        .build())
+                .build();
+
+        Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(retriever)
+                .build();
+
+        String answer = ChatClient.builder(primaryChatModel)
+                .defaultAdvisors(retrievalAugmentationAdvisor)
+                .build()
+                .prompt()
+                .user(message)
+                .call()
+                .content();
+
+        return ResponseEntity.ok(JsonResult.success(Map.of(
+                "response", answer,
+                "filterValue", filterValue)));
+    }
+
+    // 请求级过滤 Request-specific Filter via Advisor Context
+    // 检索器本身不设过滤，运行时通过 FILTER_EXPRESSION 上下文参数按请求注入过滤条件
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_vectorstoredocumentretriever
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/query-context-filter?message=什么时间考试？&filter=type%20==%20'Spring'
+    @GetMapping("/query-context-filter")
+    ResponseEntity<JsonResult<?>> queryContextFilter(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "filter", defaultValue = "type == 'Spring'") String filter) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                        .vectorStore(vectorStore)
+                        .similarityThreshold(0.50)
+                        .topK(5)
+                        .build())
+                .build();
+
+        // 运行时通过 advisor context 传入 FILTER_EXPRESSION（优先级高于检索器自带过滤）
+        String answer = ChatClient.builder(primaryChatModel)
+                .defaultAdvisors(retrievalAugmentationAdvisor)
+                .build()
+                .prompt()
+                .user(message)
+                .advisors(a -> a.param(VectorStoreDocumentRetriever.FILTER_EXPRESSION, filter))
+                .call()
+                .content();
+
+        return ResponseEntity.ok(JsonResult.success(Map.of(
+                "response", answer,
+                "filterExpression", filter)));
+    }
+
+    // 文档合并 Document Join —— ConcatenationDocumentJoiner
+    // 多查询检索后，用 ConcatenationDocumentJoiner 合并、去重
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_concatenationdocumentjoiner
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/document-join?message=什么时间考试？
+    @GetMapping("/document-join")
+    ResponseEntity<JsonResult<?>> documentJoin(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        // 1. 用 MultiQueryExpander 把一个问题扩写成多个语义变体
+        MultiQueryExpander queryExpander = MultiQueryExpander.builder()
+                .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
+                .numberOfQueries(2)
+                .build();
+        List<Query> queries = queryExpander.expand(new Query(message));
+
+        // 2. 对每个变体查询检索文档
+        DocumentRetriever retriever = VectorStoreDocumentRetriever.builder()
+                .vectorStore(vectorStore)
+                .similarityThreshold(0.50)
+                .topK(5)
+                .build();
+
+        Map<Query, List<List<Document>>> documentsForQuery = new HashMap<>();
+        for (Query q : queries) {
+            List<Document> docs = retriever.retrieve(q);
+            documentsForQuery.put(q, List.of(docs));
+        }
+
+        // 3. 用 ConcatenationDocumentJoiner 合并：拼接 + 去重（保留首次出现）
+        DocumentJoiner documentJoiner = new ConcatenationDocumentJoiner();
+        List<Document> joinedDocuments = documentJoiner.join(documentsForQuery);
+
+        return ResponseEntity.ok(JsonResult.success(Map.of(
+                "queries", queries.stream().map(Query::text).toList(),
+                "queryCount", queries.size(),
+                "joinedDocuments", joinedDocuments,
+                "joinedDocumentCount", joinedDocuments.size())));
+    }
+
+    // 完整 RAG 流水线 Full Pipeline
+    // 组合 Pre-Retrieval(Rewrite) + Retrieval(VectorStore) + Generation(ContextualAugmenter)
+    // https://docs.spring.io/spring-ai/reference/api/retrieval-augmented-generation.html#_advanced_rag
+    // http://127.0.0.1:9003/spring/ai/api/v1/rag/full-pipeline?message=什么时间考试？
+    @GetMapping("/full-pipeline")
+    ResponseEntity<JsonResult<?>> fullPipeline(
+            @RequestParam(value = "message", defaultValue = "什么时间考试？") String message,
+            @RequestParam(value = "kbUid", defaultValue = "") String kbUid) {
+
+        if (!bytedeskProperties.getDebug()) {
+            return ResponseEntity.ok(JsonResult.error("Service is not available"));
+        }
+
+        Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                // Pre-Retrieval: 重写查询以提升检索质量
+                .queryTransformers(RewriteQueryTransformer.builder()
+                        .chatClientBuilder(ChatClient.builder(primaryChatModel).build().mutate())
+                        .build())
+                // Retrieval: 向量检索
+                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                        .similarityThreshold(0.50)
+                        .vectorStore(vectorStore)
+                        .topK(5)
+                        .build())
+                // Generation: 把检索到的上下文拼到用户问题中，允许空上下文
+                .queryAugmenter(ContextualQueryAugmenter.builder()
+                        .allowEmptyContext(true)
+                        .build())
+                .build();
+
+        String answer = ChatClient.builder(primaryChatModel)
+                .defaultAdvisors(retrievalAugmentationAdvisor)
+                .build()
+                .prompt()
+                .user(message)
+                .call()
+                .content();
+
+        return ResponseEntity.ok(JsonResult.success(answer));
     }
 
     // 测试向量搜索

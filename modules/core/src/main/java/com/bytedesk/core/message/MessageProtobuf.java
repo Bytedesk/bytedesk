@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 import com.alibaba.fastjson2.JSON;
-// import com.alibaba.fastjson2.annotation.JSONField;
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -27,7 +27,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,6 +59,7 @@ public class MessageProtobuf implements Serializable {
 	private MessageStatusEnum status;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+	@JSONField(format = "yyyy-MM-dd HH:mm:ss")
 	private ZonedDateTime createdAt;
 
 	private ChannelEnum channel;
@@ -71,18 +71,10 @@ public class MessageProtobuf implements Serializable {
 	private String extra;
 
 	/**
-	 * 获取格式化的创建时间字符串，用于前端解析
-	 * @return 格式化的时间字符串 (yyyy-MM-dd HH:mm:ss)
-	 */
-	@JsonIgnore
-	public String getCreatedAt() {
-		return BdDateUtils.formatDatetimeToString(createdAt);
-	}
-
-	/**
-	 * 获取原始的创建时间
+	 * 获取原始的创建时间（供后端业务代码使用，不参与 fastjson2 序列化）
 	 * @return ZonedDateTime 原始时间对象
 	 */
+	@JSONField(serialize = false, deserialize = false)
 	public ZonedDateTime getCreatedAtDateTime() {
 		return createdAt;
 	}
@@ -96,6 +88,7 @@ public class MessageProtobuf implements Serializable {
     }
 
 	// 将createdAt转换为时间戳
+    @JSONField(serialize = false, deserialize = false)
     public Long getTimestamp() {
         return BdDateUtils.toTimestamp(this.createdAt);
     }

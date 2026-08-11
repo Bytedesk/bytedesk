@@ -102,7 +102,7 @@ public class SpringAIDeepseekChatService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(deepseekChatModel, requestPrompt);
+            var chatClient = createChatClient(deepseekChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -147,8 +147,12 @@ public class SpringAIDeepseekChatService extends BaseSpringAIService {
         final boolean[] success = { false };
         final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
-        var chatClient = createChatClient(deepseekChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(deepseekChatModel, requestPrompt, robot);
+        // 阶段3（Memory Advisor 灰度）：conversationId 取 threadTopic，与 PromptHelper 手动历史同键。
+        // messageProtobufQuery 可能为 null（健康检查等），此时传 null 走无记忆路径，避免 Spring AI 断言失败。
+        String conversationId = messageProtobufQuery != null && messageProtobufQuery.getThread() != null
+                ? messageProtobufQuery.getThread().getTopic() : null;
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

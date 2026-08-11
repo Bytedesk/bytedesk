@@ -112,7 +112,7 @@ public class SpringAIAnthropicChatService extends BaseSpringAIService {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
 
-            var chatClient = createChatClient(anthropicChatModel, requestPrompt);
+            var chatClient = createChatClient(anthropicChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -160,8 +160,9 @@ public class SpringAIAnthropicChatService extends BaseSpringAIService {
         final boolean[] success = { false };
         final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
-        var chatClient = createChatClient(anthropicChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(anthropicChatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

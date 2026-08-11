@@ -1,0 +1,1 @@
+import{Fi as e,Pi as t}from"./configUtils-oxlMx_jh.js";import{d as n,f as r,p as i,u as a}from"./react-vendor-rPwhrvYH.js";var o=i()(n(r(a((e,n)=>({accessToken:``,setAccessToken(n){localStorage.setItem(t,n),e({accessToken:n})},getAccessToken(){return n().accessToken},removeAccessToken(){localStorage.removeItem(t),e({accessToken:``})}})),{name:e})));export{o as t};

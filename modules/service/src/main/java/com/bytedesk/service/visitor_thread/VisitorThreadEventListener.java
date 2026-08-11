@@ -77,6 +77,7 @@ public class VisitorThreadEventListener {
         // 使用closeType替代autoClose
         String closeType = thread.getCloseType();
         boolean autoClose = ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType);
+        boolean visitorClose = ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType);
 
         // 更新队列成员状态
         updateQueueMemberOnClose(thread, autoClose);
@@ -88,12 +89,21 @@ public class VisitorThreadEventListener {
 
         // 获取关闭提示语
         String content = getCloseTip(thread, closeType);
+        if (!StringUtils.hasText(content)) {
+            // 兜底：提示语为空时按关闭来源回退到通用提示语，避免消息内容为空导致前端展示原始 JSON
+            content = resolveGenericCloseTip(closeType);
+        }
         String resolvedPromptExtra = buildResolvedPromptExtra(thread);
 
         // 发送消息
-        MessageProtobuf messageProtobuf = autoClose
-            ? MessageUtils.createAutoCloseMessage(thread, content, resolvedPromptExtra)
-            : MessageUtils.createAgentCloseMessage(thread, content, resolvedPromptExtra);
+        MessageProtobuf messageProtobuf;
+        if (autoClose) {
+            messageProtobuf = MessageUtils.createAutoCloseMessage(thread, content, resolvedPromptExtra);
+        } else if (visitorClose) {
+            messageProtobuf = MessageUtils.createVisitorCloseMessage(thread, content, resolvedPromptExtra);
+        } else {
+            messageProtobuf = MessageUtils.createAgentCloseMessage(thread, content, resolvedPromptExtra);
+        }
         messageSendService.sendProtobufMessage(messageProtobuf);
     }
 
@@ -182,7 +192,7 @@ public class VisitorThreadEventListener {
         } else if (ThreadTypeEnum.AGENT.name().equals(thread.getType())) {
             return getAgentCloseTip(topic, autoClose, closeType);
         } else if (ThreadTypeEnum.ROBOT.name().equals(thread.getType())) {
-            return getRobotCloseTip(topic);
+            return getRobotCloseTip(topic, closeType);
         }
         return resolveGenericCloseTip(closeType);
     }
@@ -198,7 +208,8 @@ public class VisitorThreadEventListener {
             WorkgroupEntity workgroup = workgroupOptional.get();
             if (workgroup.getSettings() != null && workgroup.getSettings().getServiceSettings() != null) {
                 if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
-                    return workgroup.getSettings().getServiceSettings().getAgentCloseTip();
+                    String visitorCloseTip = workgroup.getSettings().getServiceSettings().getVisitorCloseTip();
+                    return StringUtils.hasText(visitorCloseTip) ? visitorCloseTip : resolveGenericCloseTip(closeType);
                 }
                 return autoClose ? workgroup.getSettings().getServiceSettings().getAutoCloseTip()
                         : workgroup.getSettings().getServiceSettings().getAgentCloseTip();
@@ -218,7 +229,8 @@ public class VisitorThreadEventListener {
             AgentEntity agent = agentOptional.get();
             if (agent.getSettings() != null && agent.getSettings().getServiceSettings() != null) {
                 if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
-                    return agent.getSettings().getServiceSettings().getAgentCloseTip();
+                    String visitorCloseTip = agent.getSettings().getServiceSettings().getVisitorCloseTip();
+                    return StringUtils.hasText(visitorCloseTip) ? visitorCloseTip : resolveGenericCloseTip(closeType);
                 }
                 return autoClose ? agent.getSettings().getServiceSettings().getAutoCloseTip()
                         : agent.getSettings().getServiceSettings().getAgentCloseTip();
@@ -230,18 +242,22 @@ public class VisitorThreadEventListener {
     /**
      * 获取机器人关闭提示语
      */
-    private String getRobotCloseTip(String topic) {
+    private String getRobotCloseTip(String topic, String closeType) {
         String robotUid = TopicUtils.getRobotUidFromThreadTopic(topic);
         Optional<RobotEntity> robotOptional = robotRestService.findByUid(robotUid);
 
         if (robotOptional.isPresent()) {
             RobotEntity robot = robotOptional.get();
             if (robot.getSettings() != null && robot.getSettings().getServiceSettings() != null) {
+                if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                    String visitorCloseTip = robot.getSettings().getServiceSettings().getVisitorCloseTip();
+                    return StringUtils.hasText(visitorCloseTip) ? visitorCloseTip : resolveGenericCloseTip(closeType);
+                }
                 return robot.getSettings().getServiceSettings().getAutoCloseTip();
             }
         }
 
-        return I18Consts.I18N_AUTO_CLOSE_TIP;
+        return resolveGenericCloseTip(closeType);
     }
 
     private String resolveGenericCloseTip(String closeType) {
@@ -250,7 +266,7 @@ public class VisitorThreadEventListener {
         } else if (ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
         } else if (ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
-            return I18Consts.I18N_AGENT_CLOSE_TIP; // 访客关闭复用客服关闭提示
+            return I18Consts.I18N_VISITOR_CLOSE_TIP; // 访客关闭提示
         } else if (ThreadCloseTypeEnum.SYSTEM.name().equalsIgnoreCase(closeType)) {
             return I18Consts.I18N_AGENT_CLOSE_TIP;
         }

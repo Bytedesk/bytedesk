@@ -28,7 +28,7 @@ class SpringAIMoonshotProviderTest {
     //             .maxTokens(4096)
     //         .temperature(0.2D)
     //             .topP(-0.2D)
-    //             .enableThinking(false)
+    //             .thinking(false)
     //             .build();
 
     //     MoonshotChatOptions options = ReflectionTestUtils.invokeMethod(service, "createDynamicOptions", llm);

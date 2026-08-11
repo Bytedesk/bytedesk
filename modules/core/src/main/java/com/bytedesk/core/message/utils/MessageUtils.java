@@ -151,6 +151,20 @@ public class MessageUtils {
                 buildSystemContent(MessageTypeEnum.AGENT_CLOSED, content, extra));
     }
 
+    public static MessageProtobuf createVisitorCloseMessage(ThreadEntity thread, String content) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.VISITOR_CLOSED,
+                buildSystemContent(MessageTypeEnum.VISITOR_CLOSED, content));
+    }
+
+    public static MessageProtobuf createVisitorCloseMessage(ThreadEntity thread, String content, String extra) {
+        return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
+                thread,
+                MessageTypeEnum.VISITOR_CLOSED,
+                buildSystemContent(MessageTypeEnum.VISITOR_CLOSED, content, extra));
+    }
+
     public static String buildResolvedPromptExtra(String threadUid, String orgUid, boolean submitted, Boolean resolved) {
         JSONObject resolvedPrompt = new JSONObject();
         resolvedPrompt.put("show", true);

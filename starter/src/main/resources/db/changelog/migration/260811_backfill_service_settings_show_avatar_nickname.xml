@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        回填历史数据：将 bytedesk_kbase_service_settings 中为 NULL 或 FALSE(0) 的
+        头像/昵称显隐字段更新为 true。
+
+        背景：
+        - 260811_add_service_settings_show_avatar_nickname.xml 通过 ADD COLUMN 新增了
+          show_agent_avatar / show_agent_nickname / show_visitor_avatar / show_visitor_nickname 四列。
+        - 虽设置了 defaultValueBoolean=true，但 MySQL 对已有行实际填充了 0(false) 而非 1(true)。
+        - 该 backfill 最初写在同一文件第二个 changeSet 中，由于文件被多次修改且期间多次重启，
+          Liquibase 已将原 changeSet id 记录为“已执行”，导致后续修改不会重新运行，
+          数据库中历史记录这几个字段仍为 0。
+        - 为彻底解决，此处拆分到独立迁移文件，使用全新的 changeSet id，
+          Liquibase 会将其视为从未执行过的新 changeSet，下次启动时执行。
+
+        说明：
+        - 此为新功能刚上线，用户尚未显式关闭头像/昵称，故全量修正为 true，
+          恢复“功能上线前头像/昵称始终显示”的原有行为。
+        - 仅更新 NULL 或 FALSE 的记录，已经是 true 的记录不受影响。
+        - 幂等：重复执行无副作用。
+    -->
+    <changeSet id="260811-3-backfill-service-settings-show-avatar-nickname" author="jackning">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings"/>
+            <or>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_agent_avatar"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_agent_nickname"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_visitor_avatar"/>
+                <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_visitor_nickname"/>
+            </or>
+        </preConditions>
+        <sql dbms="mysql,mariadb">
+            UPDATE bytedesk_kbase_service_settings
+            SET show_agent_avatar = b'1'
+            WHERE show_agent_avatar IS NULL OR show_agent_avatar = b'0';
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_agent_nickname = b'1'
+            WHERE show_agent_nickname IS NULL OR show_agent_nickname = b'0';
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_visitor_avatar = b'1'
+            WHERE show_visitor_avatar IS NULL OR show_visitor_avatar = b'0';
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_visitor_nickname = b'1'
+            WHERE show_visitor_nickname IS NULL OR show_visitor_nickname = b'0';
+        </sql>
+        <sql dbms="postgresql,h2,oracle,kingbase">
+            UPDATE bytedesk_kbase_service_settings
+            SET show_agent_avatar = TRUE
+            WHERE show_agent_avatar IS NULL OR show_agent_avatar = FALSE;
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_agent_nickname = TRUE
+            WHERE show_agent_nickname IS NULL OR show_agent_nickname = FALSE;
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_visitor_avatar = TRUE
+            WHERE show_visitor_avatar IS NULL OR show_visitor_avatar = FALSE;
+
+            UPDATE bytedesk_kbase_service_settings
+            SET show_visitor_nickname = TRUE
+            WHERE show_visitor_nickname IS NULL OR show_visitor_nickname = FALSE;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

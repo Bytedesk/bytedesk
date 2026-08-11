@@ -38,7 +38,7 @@ public class SpringAIDeepseekChatConfig {
     @Value("${spring.ai.deepseek.api-key:sk-xxx}")
     private String apiKey;
 
-    @Value("${spring.ai.deepseek.chat.options.model:deepseek-chat}")
+    @Value("${spring.ai.deepseek.chat.options.model:deepseek-v4-flash}")
     private String model;
 
     @Value("${spring.ai.deepseek.chat.options.temperature:0.7}")

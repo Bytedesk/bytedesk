@@ -14,6 +14,7 @@
 package com.bytedesk.kbase.article.vector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +33,7 @@ import com.bytedesk.kbase.config.KbaseConst;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.ArticleRequest;
+import com.bytedesk.kbase.article.ArticleStatusEnum;
 import com.bytedesk.kbase.vector.KbaseVectorStoreResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -299,6 +302,266 @@ public class ArticleVectorService {
         }
 
         return resultList;
+    }
+
+    /**
+     * 查询文章在向量存储中的索引文档（供前端查看向量索引详情）。
+     */
+    public Map<String, Object> queryVectorByUid(ArticleRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.eq("uid", uid).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query("ping")
+                .filterExpression(expression)
+                .topK(10)
+                .build();
+
+        List<Document> docs = resolveStoreByKbUid(request.getKbUid()).similaritySearch(searchRequest);
+        List<Map<String, Object>> docMaps = new ArrayList<>();
+        if (docs != null) {
+            for (Document doc : docs) {
+                Map<String, Object> docMap = new HashMap<>();
+                docMap.put("id", doc.getId());
+                docMap.put("content", doc.getText());
+                Map<String, Object> metadata = new HashMap<>(doc.getMetadata());
+                if (!metadata.containsKey(KbaseConst.KBASE_KB_UID)
+                        && metadata.containsKey(KbaseConst.KBASE_KB_UID_LEGACY)) {
+                    metadata.put(KbaseConst.KBASE_KB_UID, metadata.get(KbaseConst.KBASE_KB_UID_LEGACY));
+                    metadata.remove(KbaseConst.KBASE_KB_UID_LEGACY);
+                }
+                docMap.put("metadata", metadata);
+                docMaps.add(docMap);
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("exists", docs != null && !docs.isEmpty());
+        result.put("total", docMaps.size());
+        result.put("docs", docMaps);
+        if (docs == null || docs.isEmpty()) {
+            result.put("message", "未查询到相关向量化信息");
+        }
+        return result;
+    }
+
+    /**
+     * 同步文章向量索引状态到数据库：
+     * - 向量存储中存在该uid文档：vectorStatus 置为 SUCCESS
+     * - 否则：vectorStatus 置为 NEW
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public ArticleEntity syncVectorStatus(ArticleRequest request) {
+        Optional<ArticleEntity> articleOpt = articleRestService.findByUidNoCache(request.getUid());
+        if (articleOpt.isEmpty()) {
+            throw new RuntimeException("Article not found with UID: " + request.getUid());
+        }
+
+        ArticleEntity article = articleOpt.get();
+
+        boolean exists;
+        try {
+            exists = existsVectorDocumentByUid(article.getUid(),
+                    article.getTitle() != null ? article.getTitle() : "ping",
+                    article.getKbase() != null ? article.getKbase().getUid() : request.getKbUid());
+        } catch (Exception e) {
+            log.error("同步文章向量状态失败: uid={}, error={}", article.getUid(), e.getMessage(), e);
+            articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+            return articleRestService.findByUidNoCache(article.getUid())
+                    .orElseThrow(() -> new RuntimeException("Article not found with UID: " + article.getUid()));
+        }
+
+        String nextStatus = exists ? ArticleStatusEnum.SUCCESS.name() : ArticleStatusEnum.NEW.name();
+        articleRestService.updateVectorStatusOnly(article.getUid(), nextStatus);
+        return articleRestService.findByUidNoCache(article.getUid())
+                .orElseThrow(() -> new RuntimeException("Article not found with UID: " + article.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步文章向量索引状态到数据库。支持 superUser=true 同步全平台。
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Map<String, Object> syncVectorStatusByKbUid(ArticleRequest request) {
+        String kbUid = request.getKbUid();
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ArticleEntity> articleList = superUser
+                ? articleRestService.findAllNotDeletedNoCache()
+                : articleRestService.findByKbUidNoCache(kbUid);
+
+        int successCount = 0;
+        int newCount = 0;
+        int errorCount = 0;
+
+        for (ArticleEntity article : articleList) {
+            try {
+                String effectiveKbUid = article.getKbase() != null ? article.getKbase().getUid() : kbUid;
+                boolean exists = existsVectorDocumentByUid(article.getUid(),
+                        article.getTitle() != null ? article.getTitle() : "ping", effectiveKbUid);
+                if (exists) {
+                    articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.SUCCESS.name());
+                    successCount++;
+                } else {
+                    articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+                    newCount++;
+                }
+            } catch (Exception e) {
+                articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+                errorCount++;
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
+        result.put("total", articleList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    /**
+     * 删除文章向量索引，并同步更新数据库状态：
+     * - 删除成功/或无文档：vectorStatus 置为 NEW，清空 docIdList
+     * - 删除失败：vectorStatus 置为 ERROR
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Boolean deleteVectorIndexAndSyncStatus(ArticleRequest request) {
+        Optional<ArticleEntity> articleOpt = articleRestService.findByUidNoCache(request.getUid());
+        if (articleOpt.isEmpty()) {
+            throw new RuntimeException("Article not found with UID: " + request.getUid());
+        }
+
+        ArticleEntity article = articleOpt.get();
+
+        // 兼容历史数据：docIdList 为空时，按默认规则尝试删除 article_<uid>
+        if (article.getDocIdList() == null || article.getDocIdList().isEmpty()) {
+            try {
+                String defaultDocId = "article_" + article.getUid();
+                resolveStoreByArticle(article).delete(List.of(defaultDocId));
+            } catch (Exception e) {
+                log.warn("按默认docId删除文章向量索引失败: uid={}, error={}", article.getUid(), e.getMessage());
+            }
+        }
+
+        Boolean deleted = deleteArticle(article);
+        if (Boolean.TRUE.equals(deleted)) {
+            articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+            articleRestService.updateDocIdListOnly(article.getUid(), new ArrayList<>());
+        } else {
+            articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+        }
+
+        return deleted;
+    }
+
+    /**
+     * 按知识库kbUid批量删除文章向量索引，并同步更新数据库状态。支持 superUser=true 删除全平台。
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Map<String, Object> deleteAllVectorIndexByKbUidAndSyncStatus(ArticleRequest request) {
+        String kbUid = request.getKbUid();
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && (kbUid == null || kbUid.isBlank())) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ArticleEntity> articleList = superUser
+                ? articleRestService.findAllNotDeletedNoCache()
+                : articleRestService.findByKbUidNoCache(kbUid);
+        int total = articleList.size();
+
+        // 先尝试批量删除（更快）；失败时再回退到逐条删除以尽可能完成
+        List<String> docIdsToDelete = new ArrayList<>();
+        for (ArticleEntity article : articleList) {
+            List<String> docIdList = article.getDocIdList();
+            if (docIdList == null || docIdList.isEmpty()) {
+                docIdsToDelete.add("article_" + article.getUid());
+            } else {
+                docIdsToDelete.addAll(docIdList);
+            }
+        }
+
+        int successCount = 0;
+        int errorCount = 0;
+
+        try {
+            if (!superUser && !docIdsToDelete.isEmpty()) {
+                vectorStoreResolver.resolveByKbUid(kbUid).delete(docIdsToDelete);
+                for (ArticleEntity article : articleList) {
+                    articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+                    articleRestService.updateDocIdListOnly(article.getUid(), new ArrayList<>());
+                }
+                successCount = total;
+            }
+        } catch (Exception e) {
+            log.warn("批量删除文章向量索引失败，将回退逐条删除: kbUid={}, error={}", kbUid, e.getMessage());
+        }
+
+        if (superUser || successCount != total) {
+            successCount = 0;
+            errorCount = 0;
+            for (ArticleEntity article : articleList) {
+                try {
+                    if (article.getDocIdList() == null || article.getDocIdList().isEmpty()) {
+                        try {
+                            resolveStoreByArticle(article).delete(List.of("article_" + article.getUid()));
+                        } catch (Exception ignoreEx) {
+                            log.debug("按默认docId删除文章向量索引异常（忽略）: uid={}", article.getUid());
+                        }
+                        articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+                        articleRestService.updateDocIdListOnly(article.getUid(), new ArrayList<>());
+                        successCount++;
+                        continue;
+                    }
+
+                    Boolean deleted = deleteArticle(article);
+                    if (Boolean.TRUE.equals(deleted)) {
+                        articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+                        articleRestService.updateDocIdListOnly(article.getUid(), new ArrayList<>());
+                        successCount++;
+                    } else {
+                        articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+                        errorCount++;
+                    }
+                } catch (Exception ex) {
+                    articleRestService.updateVectorStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+                    errorCount++;
+                }
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
+        result.put("total", total);
+        result.put("success", successCount);
+        result.put("error", errorCount);
+        return result;
+    }
+
+    private boolean existsVectorDocumentByUid(String uid, String queryHint, String kbUid) {
+        FilterExpressionBuilder expressionBuilder = new FilterExpressionBuilder();
+        Expression expression = expressionBuilder.eq("uid", uid).build();
+
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query((queryHint == null || queryHint.isBlank()) ? "ping" : queryHint)
+                .filterExpression(expression)
+                .topK(1)
+                .build();
+
+        List<Document> docs = resolveStoreByKbUid(kbUid).similaritySearch(searchRequest);
+        return docs != null && !docs.isEmpty();
     }
 
     /**

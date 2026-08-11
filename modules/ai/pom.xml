@@ -151,12 +151,15 @@
 		</dependency>
 
 		<!-- https://docs.spring.io/spring-ai/reference/api/chat-memory.html -->
+		<!-- 阶段3（Memory Advisor）：启用 JDBC chat-memory-repository，与项目主库（MySQL/PostgreSQL）一致，无需额外中间件。
+		     配套 Liquibase 建表 260810_add_spring_ai_chat_memory_table.xml（SPRING_AI_CHAT_MEMORY 表）。
+		     ChatMemoryRepository bean 由本 starter 自动配置，BaseSpringAIService 用 @Autowired(required=false) 优雅降级。 -->
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-chat-memory-repository-jdbc -->
-		<!-- <dependency>
+		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
 			<version>${spring-ai.version}</version>
-		</dependency> -->
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-model-chat-memory-repository-redis -->
 		<!-- <dependency>
 			<groupId>org.springframework.ai</groupId>
@@ -186,7 +189,6 @@
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>
 			<version>0.10.0</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->

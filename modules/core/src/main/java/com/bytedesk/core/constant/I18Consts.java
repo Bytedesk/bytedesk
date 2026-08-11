@@ -505,6 +505,7 @@ public class I18Consts {
     public static final String I18N_QUEUE_READY_TIP = I18N_PREFIX + "queue.ready.tip"; // 即将接入提示语
     public static final String I18N_AUTO_CLOSE_TIP = I18N_PREFIX + "auto.close.tip"; // 会话已自动关闭
     public static final String I18N_AGENT_CLOSE_TIP = I18N_PREFIX + "agent.close.tip"; // 客服已关闭会话
+    public static final String I18N_VISITOR_CLOSE_TIP = I18N_PREFIX + "visitor.close.tip"; // 访客已关闭会话
     public static final String I18N_AGENT_TRANSFER_TIP = I18N_PREFIX + "agent.transfer.tip"; // 客服已将会话转接
     public static final String I18N_AGENT_TIMEOUT_TIP = I18N_PREFIX + "agent.timeout.tip"; // 超时未回复
     // 评价提示
@@ -603,6 +604,7 @@ public class I18Consts {
     // 会话状态, 用于更新thread.content
     public static final String I18N_AUTO_CLOSED = I18N_PREFIX + "auto.closed"; // 已自动关闭
     public static final String I18N_AGENT_CLOSED = I18N_PREFIX + "agent.closed"; // 已被客服关闭
+    public static final String I18N_VISITOR_CLOSED = I18N_PREFIX + "visitor.closed"; // 已被访客关闭
     public static final String I18N_AGENT_TRANSFER = I18N_PREFIX + "agent.transfer"; // 已被客服转接
     public static final String I18N_AGENT_TIMEOUT = I18N_PREFIX + "agent.timeout"; // 超时未回复
     // 黑名单
@@ -812,6 +814,7 @@ public class I18Consts {
     public static final String I18N_MESSAGE_TYPE_RATE_CANCEL = I18N_PREFIX + "message.type.rate.cancel";
     public static final String I18N_MESSAGE_TYPE_AUTO_CLOSED = I18N_PREFIX + "message.type.auto.closed";
     public static final String I18N_MESSAGE_TYPE_AGENT_CLOSED = I18N_PREFIX + "message.type.agent.closed";
+    public static final String I18N_MESSAGE_TYPE_VISITOR_CLOSED = I18N_PREFIX + "message.type.visitor.closed";
     public static final String I18N_MESSAGE_TYPE_TRANSFER = I18N_PREFIX + "message.type.transfer";
     public static final String I18N_MESSAGE_TYPE_TRANSFER_REJECT = I18N_PREFIX + "message.type.transfer.reject";
     public static final String I18N_MESSAGE_TYPE_TRANSFER_ACCEPT = I18N_PREFIX + "message.type.transfer.accept";

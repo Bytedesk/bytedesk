@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
@@ -77,8 +78,55 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
         return articleRepository.findByUid(uid);
     }
 
+    /**
+     * 不走缓存的按 UID 查询，用于索引状态同步等需要读取最新数据的场景。
+     */
+    public Optional<ArticleEntity> findByUidNoCache(String uid) {
+        return articleRepository.findByUid(uid);
+    }
+
     public List<ArticleEntity> findByKbUid(String kbUid) {
         return articleRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    /**
+     * 不走缓存的按 kbUid 查询，用于向量/全文索引状态批量同步。
+     */
+    public List<ArticleEntity> findByKbUidNoCache(String kbUid) {
+        return articleRepository.findByKbase_UidAndDeletedFalse(kbUid);
+    }
+
+    /**
+     * 查询所有未删除的文章（不走缓存），用于超级管理员全平台索引状态同步。
+     */
+    public List<ArticleEntity> findAllNotDeletedNoCache() {
+        return articleRepository.findByDeletedFalse();
+    }
+
+    @Transactional
+    public void updateElasticStatusOnly(String uid, String elasticStatus) {
+        articleRepository.updateElasticStatusByUid(uid, elasticStatus);
+    }
+
+    @Transactional
+    public void updateVectorStatusOnly(String uid, String vectorStatus) {
+        articleRepository.updateVectorStatusByUid(uid, vectorStatus);
+    }
+
+    @Transactional
+    public void updateDocIdListOnly(String uid, List<String> docIdList) {
+        articleRepository.updateDocIdListByUid(uid, docIdList);
+    }
+
+    /**
+     * 清除 article 缓存中的全部条目（用于状态变更后强制失效）。
+     * 由于 article 缓存以 uid 为 key，这里按已知 uid 失效；
+     * 调用方在状态同步前已通过 findByUidNoCache 读取，缓存失效主要保证下次 findByUid 拿到最新值。
+     */
+    public void evictArticleCache(String uid) {
+        // 通过自行触发 @CacheEvict 的 deleteByUid 不合适，这里借助 Spring 容器内代理调用；
+        // 简化处理：直接依赖 updateXxxStatusOnly 的 clearAutomatically 与后续 findByUidNoCache 读取。
+        // 占位方法，保持与 FAQ 接口一致便于未来扩展。
     }
 
     @Override

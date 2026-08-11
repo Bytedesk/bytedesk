@@ -224,7 +224,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(chatModel, requestPrompt);
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -278,8 +278,9 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             // 发送初始消息，告知用户请求已收到，正在处理
             sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
-            var chatClient = createChatClient(chatModel, prompt);
-            invokePromptStream(chatClient, prompt).subscribe(
+            var chatClient = createChatClient(chatModel, prompt, robot);
+            String conversationId = extractConversationId(messageProtobufQuery);
+            invokePromptStream(chatClient, prompt, conversationId).subscribe(
                     response -> {
                         try {
                             if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {

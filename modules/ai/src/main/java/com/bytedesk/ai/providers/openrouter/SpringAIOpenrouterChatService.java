@@ -156,7 +156,7 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(openrouterChatModel, requestPrompt);
+            var chatClient = createChatClient(openrouterChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -198,8 +198,9 @@ public class SpringAIOpenrouterChatService extends BaseSpringAIService {
         final boolean[] success = {false};
         final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
 
-        var chatClient = createChatClient(openrouterChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(openrouterChatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

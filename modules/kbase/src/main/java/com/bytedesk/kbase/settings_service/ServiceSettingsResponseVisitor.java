@@ -135,6 +135,26 @@ public class ServiceSettingsResponseVisitor implements Serializable {
 
     private Boolean showLogo;
 
+    /**
+     * 访客端是否显示客服/机器人头像（左侧消息）
+     */
+    private Boolean showAgentAvatar;
+
+    /**
+     * 访客端是否显示客服/机器人昵称（左侧消息）
+     */
+    private Boolean showAgentNickname;
+
+    /**
+     * 访客端是否显示访客自己头像（右侧消息）
+     */
+    private Boolean showVisitorAvatar;
+
+    /**
+     * 访客端是否显示访客自己昵称（右侧消息）
+     */
+    private Boolean showVisitorNickname;
+
     // 是否允许访客主动转人工
     private Boolean allowVisitorManualTransfer;
 

@@ -185,7 +185,7 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
 
-            var chatClient = createChatClient(baiduChatModel, requestPrompt);
+            var chatClient = createChatClient(baiduChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = extractBaiduTokenUsage(response);
             success = true;
@@ -236,8 +236,9 @@ public class SpringAIBaiduChatService extends BaseSpringAIService {
         // 用于累积所有响应文本
         final StringBuilder[] fullResponseText = { new StringBuilder() };
 
-        var chatClient = createChatClient(baiduChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(baiduChatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

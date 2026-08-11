@@ -30,4 +30,16 @@
 
     <include file="db/changelog/migration/260808_add_tool_mcp_exposure_fields.xml" />
 
+    <include file="db/changelog/migration/260810_add_robot_llm_advisor_fields.xml" />
+
+    <include file="db/changelog/migration/260810_add_spring_ai_chat_memory_table.xml" />
+
+    <include file="db/changelog/migration/260810_add_rag_rewrite_record_table.xml" />
+
+    <include file="db/changelog/migration/260811_add_service_settings_show_avatar_nickname.xml" />
+
+    <include file="db/changelog/migration/260811_backfill_service_settings_show_avatar_nickname.xml" />
+
+    <include file="db/changelog/migration/260811_add_service_settings_visitor_close_tip.xml" />
+
 </databaseChangeLog>

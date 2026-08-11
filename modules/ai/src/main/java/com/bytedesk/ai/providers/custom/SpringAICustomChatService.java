@@ -150,7 +150,7 @@ public class SpringAICustomChatService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(customChatModel, requestPrompt);
+            var chatClient = createChatClient(customChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -193,8 +193,9 @@ public class SpringAICustomChatService extends BaseSpringAIService {
             requestPrompt = processPromptWithOptions(prompt, customOptions);
         }
 
-        var chatClient = createChatClient(customChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(customChatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

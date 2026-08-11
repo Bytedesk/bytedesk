@@ -142,6 +142,7 @@ public enum MessageTypeEnum {
     // 
     AUTO_CLOSED, // 自动关闭
     AGENT_CLOSED, // 客服关闭
+    VISITOR_CLOSED, // 访客关闭
     // 
     TRANSFER, // 会话转接
     TRANSFER_REJECT, // 转接拒绝

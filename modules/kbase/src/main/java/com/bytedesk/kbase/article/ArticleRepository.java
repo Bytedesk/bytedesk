@@ -18,6 +18,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ArticleRepository extends JpaRepository<ArticleEntity, Long>, JpaSpecificationExecutor<ArticleEntity> {
 
@@ -25,6 +28,20 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Long>, J
 
     List<ArticleEntity> findByKbase_UidAndDeletedFalse(String kbUid);
 
+    List<ArticleEntity> findByDeletedFalse();
+
     boolean existsByUid(String uid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ArticleEntity a set a.elasticStatus = :status where a.uid = :uid")
+    int updateElasticStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ArticleEntity a set a.vectorStatus = :status where a.uid = :uid")
+    int updateVectorStatusByUid(@Param("uid") String uid, @Param("status") String status);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update ArticleEntity a set a.docIdList = :docIdList where a.uid = :uid")
+    int updateDocIdListByUid(@Param("uid") String uid, @Param("docIdList") List<String> docIdList);
 
 }

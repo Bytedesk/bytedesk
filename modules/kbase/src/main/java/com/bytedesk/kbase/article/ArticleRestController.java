@@ -251,4 +251,119 @@ public class ArticleRestController extends BaseRestController<ArticleRequest, Ar
 
         return ResponseEntity.ok(JsonResult.success(suggestList));
     }
+
+    @Operation(summary = "Delete Article Index", description = "Delete the article index in Elasticsearch and sync the article entity index status")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete article elastic index")
+    @PostMapping("/deleteIndex")
+    public ResponseEntity<?> deleteIndex(@RequestBody ArticleRequest request) {
+        Boolean deleted = articleElasticService.deleteIndexAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(deleted));
+    }
+
+    @Operation(summary = "Sync Article Index Status", description = "Check whether the article index exists in Elasticsearch and sync the article entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync article elastic status")
+    @PostMapping("/syncIndexStatus")
+    public ResponseEntity<?> syncIndexStatus(@RequestBody ArticleRequest request) {
+        var article = articleElasticService.syncElasticStatus(request);
+        return ResponseEntity.ok(JsonResult.success(article.getElasticStatus()));
+    }
+
+    @Operation(summary = "Batch Sync Article Index Status", description = "Batch check whether article indexes exist in Elasticsearch by knowledge base kbUid and sync the article entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync article elastic status by kb")
+    @PostMapping("/syncIndexStatusByKbUid")
+    public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody ArticleRequest request) {
+        var result = articleElasticService.syncElasticStatusByKbUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "Delete All Article Indexes by Knowledge Base", description = "Delete article indexes in Elasticsearch by knowledge base kbUid and sync the article entity elasticStatus")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete article elastic index by kb")
+    @PostMapping("/deleteAllIndexByKbUid")
+    public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody ArticleRequest request) {
+        var result = articleElasticService.deleteAllIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "Delete Article Vector Index", description = "Delete the article index in vector storage and sync the article entity vector index status")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete article vector index")
+    @PostMapping("/deleteVectorIndex")
+    public ResponseEntity<?> deleteVectorIndex(@RequestBody ArticleRequest request) {
+        if (articleVectorService != null) {
+            Boolean deleted = articleVectorService.deleteVectorIndexAndSyncStatus(request);
+            return ResponseEntity.ok(JsonResult.success(deleted));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @Operation(summary = "Sync Article Vector Status", description = "Check whether the article vector index exists in vector storage and sync the article entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync article vector status")
+    @PostMapping("/syncVectorStatus")
+    public ResponseEntity<?> syncVectorStatus(@RequestBody ArticleRequest request) {
+        if (articleVectorService != null) {
+            var article = articleVectorService.syncVectorStatus(request);
+            return ResponseEntity.ok(JsonResult.success(article.getVectorStatus()));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @Operation(summary = "Batch Sync Article Vector Status", description = "Batch check whether article vector indexes exist in vector storage by knowledge base kbUid and sync the article entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Sync successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync article vector status by kb")
+    @PostMapping("/syncVectorStatusByKbUid")
+    public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody ArticleRequest request) {
+        if (articleVectorService != null) {
+            var result = articleVectorService.syncVectorStatusByKbUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
+
+    @Operation(summary = "Delete All Article Vector Indexes by Knowledge Base", description = "Delete all article vector indexes under the current knowledge base by kbUid and sync the article entity vectorStatus")
+    @ApiResponse(responseCode = "200", description = "Deletion successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete article vector index by kbUid")
+    @PostMapping("/deleteAllVectorIndexByKbUid")
+    public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody ArticleRequest request) {
+        if (articleVectorService == null) {
+            return ResponseEntity.ok(JsonResult.error("vector store not enabled"));
+        }
+        var result = articleVectorService.deleteAllVectorIndexByKbUidAndSyncStatus(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "Query Article Full-Text Index", description = "Query the index document in Elasticsearch by article UID")
+    @ApiResponse(responseCode = "200", description = "Query successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query article elastic by uid")
+    @PostMapping("/queryElasticByUid")
+    public ResponseEntity<?> queryElasticByUid(@RequestBody ArticleRequest request) {
+        var result = articleElasticService.queryElasticByUid(request);
+        return ResponseEntity.ok(JsonResult.success(result));
+    }
+
+    @Operation(summary = "Query Article Vector Index", description = "Query the index document in vector storage by article UID")
+    @ApiResponse(responseCode = "200", description = "Query successful")
+    @PreAuthorize(ArticlePermissions.HAS_ARTICLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_ARTICLE, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query article vector by uid")
+    @PostMapping("/queryVectorByUid")
+    public ResponseEntity<?> queryVectorByUid(@RequestBody ArticleRequest request) {
+        if (articleVectorService != null) {
+            var result = articleVectorService.queryVectorByUid(request);
+            return ResponseEntity.ok(JsonResult.success(result));
+        }
+        return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
+    }
 }

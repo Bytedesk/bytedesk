@@ -139,6 +139,9 @@ public class ServiceSettingsRequest  implements Serializable {
     @Builder.Default
     private String agentCloseTip = I18Consts.I18N_AGENT_CLOSE_TIP;
 
+    @Builder.Default
+    private String visitorCloseTip = I18Consts.I18N_VISITOR_CLOSE_TIP;
+
     // 桌面版聊天窗口右侧iframe
     @Builder.Default
     private Boolean showRightIframe = false;
@@ -215,6 +218,30 @@ public class ServiceSettingsRequest  implements Serializable {
     // 访客对话底部页面显示logo
     @Builder.Default
     private Boolean showLogo = true;
+
+    /**
+     * 访客端是否显示客服/机器人头像（左侧消息）
+     */
+    @Builder.Default
+    private Boolean showAgentAvatar = true;
+
+    /**
+     * 访客端是否显示客服/机器人昵称（左侧消息）
+     */
+    @Builder.Default
+    private Boolean showAgentNickname = true;
+
+    /**
+     * 访客端是否显示访客自己头像（右侧消息）
+     */
+    @Builder.Default
+    private Boolean showVisitorAvatar = true;
+
+    /**
+     * 访客端是否显示访客自己昵称（右侧消息）
+     */
+    @Builder.Default
+    private Boolean showVisitorNickname = true;
 
     // 有效日期
     private Date validateUntil;

@@ -279,6 +279,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
         // 设置llm相关属性
         if (request.getLlm() != null) {
+            // 诊断日志：确认 rag/advisor 字段是否从前端正确传递到后端
+            log.info("update robot llm: ragRewriteEnabled={}, ragMultiQueryEnabled={}, safeGuardEnabled={}, memoryEnabled={}, reReadingEnabled={}",
+                    request.getLlm().getRagRewriteEnabled(),
+                    request.getLlm().getRagMultiQueryEnabled(),
+                    request.getLlm().getSafeGuardEnabled(),
+                    request.getLlm().getMemoryEnabled(),
+                    request.getLlm().getReReadingEnabled());
             robot.setLlm(request.getLlm());
         }
         //

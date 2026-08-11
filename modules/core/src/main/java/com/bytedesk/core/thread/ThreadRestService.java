@@ -811,13 +811,18 @@ public class ThreadRestService
         } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
             content = I18Consts.I18N_AGENT_CLOSED;
         } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
-            content = I18Consts.I18N_AGENT_CLOSE_TIP; // 复用通用提示
+            content = I18Consts.I18N_VISITOR_CLOSED;
         } else {
             content = I18Consts.I18N_AGENT_CLOSED;
         }
-        MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)
-                ? MessageTypeEnum.AUTO_CLOSED
-                : MessageTypeEnum.AGENT_CLOSED;
+        MessageTypeEnum mt;
+        if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+            mt = MessageTypeEnum.AUTO_CLOSED;
+        } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+            mt = MessageTypeEnum.VISITOR_CLOSED;
+        } else {
+            mt = MessageTypeEnum.AGENT_CLOSED;
+        }
         thread.setContent(ThreadContent.of(mt, content, content).toJson());
         //
         ThreadEntity updateThread = save(thread);
@@ -876,15 +881,19 @@ public class ThreadRestService
             } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AGENT.name().equalsIgnoreCase(closeType)) {
                 content = I18Consts.I18N_AGENT_CLOSED;
             } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
-                content = I18Consts.I18N_AGENT_CLOSE_TIP;
+                content = I18Consts.I18N_VISITOR_CLOSED;
             } else {
                 content = I18Consts.I18N_AGENT_CLOSED;
             }
 
-            MessageTypeEnum mt = com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name()
-                    .equalsIgnoreCase(closeType)
-                            ? MessageTypeEnum.AUTO_CLOSED
-                            : MessageTypeEnum.AGENT_CLOSED;
+            MessageTypeEnum mt;
+            if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.AUTO.name().equalsIgnoreCase(closeType)) {
+                mt = MessageTypeEnum.AUTO_CLOSED;
+            } else if (com.bytedesk.core.thread.enums.ThreadCloseTypeEnum.VISITOR.name().equalsIgnoreCase(closeType)) {
+                mt = MessageTypeEnum.VISITOR_CLOSED;
+            } else {
+                mt = MessageTypeEnum.AGENT_CLOSED;
+            }
             thread.setContent(ThreadContent.of(mt, content, content).toJson());
 
             ThreadEntity updateThread = save(thread);

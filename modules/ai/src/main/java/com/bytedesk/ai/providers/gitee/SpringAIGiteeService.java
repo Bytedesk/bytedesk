@@ -216,7 +216,7 @@ public class SpringAIGiteeService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(giteeChatModel, requestPrompt);
+            var chatClient = createChatClient(giteeChatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -271,8 +271,9 @@ public class SpringAIGiteeService extends BaseSpringAIService {
         final boolean[] success = { false };
         final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
 
-        var chatClient = createChatClient(giteeChatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(giteeChatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {

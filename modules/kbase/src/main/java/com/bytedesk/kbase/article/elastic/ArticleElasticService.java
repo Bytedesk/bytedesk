@@ -16,7 +16,9 @@ package com.bytedesk.kbase.article.elastic;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -26,10 +28,12 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.data.elasticsearch.core.query.DeleteQuery;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleRequest;
 import com.bytedesk.kbase.article.ArticleRestService;
+import com.bytedesk.kbase.article.ArticleStatusEnum;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.DateRangeQuery;
@@ -149,6 +153,165 @@ public class ArticleElasticService {
             log.error("删除文章索引时发生错误: {}, 错误消息: {}", articleUid, e.getMessage(), e);
             return false;
         }
+    }
+
+    /**
+     * 查询文章在Elasticsearch中的索引文档（供前端查看全文索引详情）。
+     */
+    public Map<String, Object> queryElasticByUid(ArticleRequest request) {
+        String uid = request.getUid();
+        if (!StringUtils.hasText(uid)) {
+            throw new RuntimeException("uid is required");
+        }
+
+        boolean indexExists = elasticsearchOperations.indexOps(ArticleElastic.class).exists();
+        ArticleElastic doc = null;
+        if (indexExists) {
+            doc = elasticsearchOperations.get(uid, ArticleElastic.class);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("uid", uid);
+        result.put("indexExists", indexExists);
+        result.put("exists", doc != null);
+        result.put("doc", doc);
+        return result;
+    }
+
+    /**
+     * 同步文章的Elasticsearch索引状态到数据库：
+     * - 索引不存在或文档不存在：elasticStatus 置为 NEW
+     * - 文档存在：elasticStatus 置为 SUCCESS
+     */
+    public ArticleEntity syncElasticStatus(ArticleRequest request) {
+        Optional<ArticleEntity> articleOpt = articleRestService.findByUidNoCache(request.getUid());
+        if (articleOpt.isEmpty()) {
+            throw new RuntimeException("Article not found with UID: " + request.getUid());
+        }
+
+        ArticleEntity article = articleOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(ArticleElastic.class).exists();
+        boolean docExists = indexExists && elasticsearchOperations.exists(article.getUid(), ArticleElastic.class);
+
+        String nextStatus = docExists ? ArticleStatusEnum.SUCCESS.name() : ArticleStatusEnum.NEW.name();
+        articleRestService.updateElasticStatusOnly(article.getUid(), nextStatus);
+
+        return articleRestService.findByUidNoCache(article.getUid())
+                .orElseThrow(() -> new RuntimeException("Article not found with UID: " + article.getUid()));
+    }
+
+    /**
+     * 根据知识库kbUid批量同步文章的Elasticsearch索引状态到数据库。
+     * 支持 superUser=true 同步全平台。
+     */
+    public Map<String, Object> syncElasticStatusByKbUid(ArticleRequest request) {
+        String kbUid = request.getKbUid();
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ArticleEntity> articleList = superUser
+                ? articleRestService.findAllNotDeletedNoCache()
+                : articleRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(ArticleElastic.class).exists();
+
+        int successCount = 0;
+        int newCount = 0;
+
+        for (ArticleEntity article : articleList) {
+            boolean docExists = indexExists && elasticsearchOperations.exists(article.getUid(), ArticleElastic.class);
+            if (docExists) {
+                articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.SUCCESS.name());
+                successCount++;
+            } else {
+                articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+                newCount++;
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
+        result.put("total", articleList.size());
+        result.put("success", successCount);
+        result.put("new", newCount);
+        result.put("indexExists", indexExists);
+        return result;
+    }
+
+    /**
+     * 删除文章在Elasticsearch中的索引，并同步更新数据库状态：
+     * - 删除成功/文档不存在：elasticStatus 置为 NEW
+     * - 删除失败：elasticStatus 置为 ERROR
+     */
+    public Boolean deleteIndexAndSyncStatus(ArticleRequest request) {
+        Optional<ArticleEntity> articleOpt = articleRestService.findByUidNoCache(request.getUid());
+        if (articleOpt.isEmpty()) {
+            throw new RuntimeException("Article not found with UID: " + request.getUid());
+        }
+
+        ArticleEntity article = articleOpt.get();
+
+        boolean indexExists = elasticsearchOperations.indexOps(ArticleElastic.class).exists();
+        if (!indexExists) {
+            articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+            return true;
+        }
+
+        Boolean deleted = deleteArticle(request.getUid());
+
+        if (Boolean.TRUE.equals(deleted)) {
+            articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+        } else {
+            articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.ERROR.name());
+        }
+
+        return deleted;
+    }
+
+    /**
+     * 根据知识库kbUid一键删除Elasticsearch中的文章索引，并同步更新文章实体elasticStatus。
+     * 支持 superUser=true 删除全平台。
+     */
+    public Map<String, Object> deleteAllIndexByKbUidAndSyncStatus(ArticleRequest request) {
+        String kbUid = request.getKbUid();
+        boolean superUser = Boolean.TRUE.equals(request.getSuperUser());
+        if (!superUser && !StringUtils.hasText(kbUid)) {
+            throw new RuntimeException("kbUid is required");
+        }
+
+        List<ArticleEntity> articleList = superUser
+                ? articleRestService.findAllNotDeletedNoCache()
+                : articleRestService.findByKbUidNoCache(kbUid);
+        boolean indexExists = elasticsearchOperations.indexOps(ArticleElastic.class).exists();
+
+        long deletedCount = 0;
+
+        if (indexExists) {
+            Query query = superUser
+                ? NativeQuery.builder().withQuery(QueryBuilders.matchAll().build()._toQuery()).build()
+                : NativeQuery.builder()
+                    .withQuery(QueryBuilders.term().field("kbUid").value(kbUid).build()._toQuery())
+                    .build();
+            DeleteQuery deleteQuery = DeleteQuery.builder(query).build();
+            var response = elasticsearchOperations.delete(deleteQuery, ArticleElastic.class);
+            deletedCount = response.getDeleted();
+        }
+
+        // 无论索引是否存在，都把数据库状态同步为 NEW
+        for (ArticleEntity article : articleList) {
+            articleRestService.updateElasticStatusOnly(article.getUid(), ArticleStatusEnum.NEW.name());
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("kbUid", kbUid);
+        result.put("superUser", superUser);
+        result.put("total", articleList.size());
+        result.put("indexExists", indexExists);
+        result.put("deletedCount", deletedCount);
+        return result;
     }
     
     /**
@@ -271,6 +434,18 @@ public class ArticleElasticService {
 
     public List<ArticleElasticSearchResult> searchArticle(ArticleRequest request) {
         return searchArticle(request.getSearchText(), request.getKbUid(), request.getCategoryUid(), request.getOrgUid());
+    }
+
+    /**
+     * 带召回上限的文章全文搜索（供 KnowledgeBaseSearchHelper 调用，限制返回数量）。
+     */
+    public List<ArticleElasticSearchResult> searchArticle(String query, String kbUid, String categoryUid,
+            String orgUid, Integer limit) {
+        List<ArticleElasticSearchResult> results = searchArticle(query, kbUid, categoryUid, orgUid);
+        if (limit != null && limit > 0 && results.size() > limit) {
+            return new ArrayList<>(results.subList(0, limit));
+        }
+        return results;
     }
 
 

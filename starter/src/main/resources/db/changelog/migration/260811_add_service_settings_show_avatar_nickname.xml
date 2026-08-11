@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_kbase_service_settings 新增访客端头像/昵称显隐控制字段。
+        - show_agent_avatar: 访客端是否显示客服/机器人头像（左侧消息，默认 true）
+        - show_agent_nickname: 访客端是否显示客服/机器人昵称（左侧消息，默认 true）
+        - show_visitor_avatar: 访客端是否显示访客自己头像（右侧消息，默认 true）
+        - show_visitor_nickname: 访客端是否显示访客自己昵称（右侧消息，默认 true）
+        默认值均为 true，保持现有行为，向后兼容。
+    -->
+    <changeSet id="260811-1-add-service-settings-show-avatar-nickname" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_kbase_service_settings"/>
+            <not>
+                <and>
+                    <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_agent_avatar"/>
+                    <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_agent_nickname"/>
+                    <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_visitor_avatar"/>
+                    <columnExists tableName="bytedesk_kbase_service_settings" columnName="show_visitor_nickname"/>
+                </and>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_kbase_service_settings">
+            <column name="show_agent_avatar" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_agent_nickname" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_visitor_avatar" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="show_visitor_nickname" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

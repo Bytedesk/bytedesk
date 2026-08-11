@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_ai_robot 新增 Spring AI Advisor 控制字段（RobotLlm embeddable）。
+        - llm_safe_guard_enabled: SafeGuard 内容安全/敏感词拦截开关（默认 false）
+        - llm_safe_guard_failure_response: 机器人级自定义拦截语（默认空）
+        - llm_re_reading_enabled: Re2 输入增强开关（默认 false）
+        - llm_memory_enabled: 多轮记忆开关（默认 true，向后兼容）
+        - llm_rag_rewrite_enabled: Query 改写开关（默认 false，阶段4）
+        - llm_rag_multi_query_enabled: 多查询扩展开关（默认 false，阶段4）
+        注：敏感词不再按 robot 存储，统一复用 TabooService 数据库源（按 orgUid 隔离）。
+    -->
+    <changeSet id="260810-1-add-robot-llm-advisor-fields" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot"/>
+            <not>
+                <and>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_safe_guard_enabled"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_safe_guard_failure_response"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_re_reading_enabled"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_memory_enabled"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_rag_rewrite_enabled"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_rag_multi_query_enabled"/>
+                </and>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_robot">
+            <column name="llm_safe_guard_enabled" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="llm_safe_guard_failure_response" type="text" />
+            <column name="llm_re_reading_enabled" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="llm_memory_enabled" type="BOOLEAN" defaultValueBoolean="true" />
+            <column name="llm_rag_rewrite_enabled" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="llm_rag_multi_query_enabled" type="BOOLEAN" defaultValueBoolean="false" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

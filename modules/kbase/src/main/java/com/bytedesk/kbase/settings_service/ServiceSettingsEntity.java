@@ -190,6 +190,9 @@ public class ServiceSettingsEntity extends BaseEntity {
     @Builder.Default
     private String agentCloseTip = I18Consts.I18N_AGENT_CLOSE_TIP;
 
+    @Builder.Default
+    private String visitorCloseTip = I18Consts.I18N_VISITOR_CLOSE_TIP;
+
     //-----------------------------------------------------------------------------------
 
     // 桌面版聊天窗口右侧iframe
@@ -251,6 +254,38 @@ public class ServiceSettingsEntity extends BaseEntity {
     @NotNull
     @Builder.Default
     private Boolean showLogo = true;
+
+    /**
+     * 访客端是否显示客服/机器人头像（左侧消息）
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "show_agent_avatar")
+    private Boolean showAgentAvatar = true;
+
+    /**
+     * 访客端是否显示客服/机器人昵称（左侧消息）
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "show_agent_nickname")
+    private Boolean showAgentNickname = true;
+
+    /**
+     * 访客端是否显示访客自己头像（右侧消息）
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "show_visitor_avatar")
+    private Boolean showVisitorAvatar = true;
+
+    /**
+     * 访客端是否显示访客自己昵称（右侧消息）
+     */
+    @NotNull
+    @Builder.Default
+    @Column(name = "show_visitor_nickname")
+    private Boolean showVisitorNickname = true;
 
     // validate until date, when expire the service will be disabled
     private Date validateUntil;

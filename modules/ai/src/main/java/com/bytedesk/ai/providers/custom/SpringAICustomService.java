@@ -265,7 +265,7 @@ public class SpringAICustomService extends BaseSpringAIService {
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
-            var chatClient = createChatClient(chatModel, requestPrompt);
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
             var response = invokePromptSync(chatClient, requestPrompt);
             tokenUsage = tokenUsageHelper.extractTokenUsage(response);
             success = true;
@@ -327,8 +327,9 @@ public class SpringAICustomService extends BaseSpringAIService {
         // 用于累积所有响应文本
         final StringBuilder[] fullResponseText = { new StringBuilder() };
 
-        var chatClient = createChatClient(chatModel, requestPrompt);
-        invokePromptStream(chatClient, requestPrompt).subscribe(
+        var chatClient = createChatClient(chatModel, requestPrompt, robot);
+        String conversationId = extractConversationId(messageProtobufQuery);
+        invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
                         if (response != null) {
