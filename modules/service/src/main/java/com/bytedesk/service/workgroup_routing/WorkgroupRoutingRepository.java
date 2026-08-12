@@ -30,5 +30,11 @@ public interface WorkgroupRoutingRepository extends JpaRepository<WorkgroupRouti
 
     List<WorkgroupRoutingEntity> findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(String workgroupUid, Pageable pageable);
 
+    /**
+     * 查询某个工作组的全部未删除路由状态行（按 updatedAt DESC, id DESC 排序）。
+     * 用于检测并清理同一工作组的多条路由状态（重复行），不分页。
+     */
+    List<WorkgroupRoutingEntity> findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(String workgroupUid);
+
     // Boolean existsByPlatform(String platform);
 }

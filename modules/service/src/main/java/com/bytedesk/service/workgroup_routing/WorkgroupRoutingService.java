@@ -5,8 +5,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +51,12 @@ public class WorkgroupRoutingService {
     private final ThreadRestService threadRestService;
 
     private final PresenceFacadeService presenceFacadeService;
+
+    /**
+     * 每个工作组创建路由状态时的细粒度锁，避免并发“检查-创建”竞态产生重复行。
+     * 锁以 workgroupUid 为 key，锁对象本身常驻（占用极小）。
+     */
+    private final ConcurrentHashMap<String, Object> createStateLocks = new ConcurrentHashMap<>();
 
     /**
      * 根据工作组路由模式选择客服（兼容原有调用方，如 WorkgroupThreadRoutingStrategy）。
@@ -279,31 +285,53 @@ public class WorkgroupRoutingService {
     }
 
     private WorkgroupRoutingEntity getOrCreateRoutingState(WorkgroupEntity workgroup) {
+        // 每个工作组只允许有一条路由状态行。这里先查询全部未删除的行，
+        // 若存在重复（历史并发竞态产生），则保留最新一条并将其余软删除，避免反复告警。
         List<WorkgroupRoutingEntity> existing = workgroupRoutingRepository
-            .findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(workgroup.getUid(), PageRequest.of(0, 2));
+            .findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(workgroup.getUid());
         if (existing != null && !existing.isEmpty()) {
-            if (existing.size() > 1) {
             WorkgroupRoutingEntity kept = existing.get(0);
-            WorkgroupRoutingEntity extra = existing.get(1);
-            log.warn("multiple routing state rows found, keeping latest one: workgroupUid={}, keptUid={}, keptUpdatedAt={}, extraUid={}, extraUpdatedAt={}",
-                workgroup.getUid(),
-                kept != null ? kept.getUid() : "null",
-                kept != null ? kept.getUpdatedAtString() : "null",
-                extra != null ? extra.getUid() : "null",
-                extra != null ? extra.getUpdatedAtString() : "null");
+            if (existing.size() > 1) {
+                WorkgroupRoutingEntity extra = existing.get(1);
+                log.warn("multiple routing state rows found, keeping latest one: workgroupUid={}, keptUid={}, keptUpdatedAt={}, extraUid={}, extraUpdatedAt={}",
+                    workgroup.getUid(),
+                    kept != null ? kept.getUid() : "null",
+                    kept != null ? kept.getUpdatedAtString() : "null",
+                    extra != null ? extra.getUid() : "null",
+                    extra != null ? extra.getUpdatedAtString() : "null");
+                // 软删除所有多余的行（kept 之外的），保存后下次不再重复告警
+                List<WorkgroupRoutingEntity> toDelete = new ArrayList<>(existing.subList(1, existing.size()));
+                for (WorkgroupRoutingEntity dup : toDelete) {
+                    if (dup != null) {
+                        dup.setDeleted(true);
+                    }
+                }
+                if (!toDelete.isEmpty()) {
+                    workgroupRoutingRepository.saveAll(toDelete);
+                }
             }
-            return existing.get(0);
+            return kept;
         }
 
-        WorkgroupRoutingEntity created = WorkgroupRoutingEntity.builder()
-            .uid(uidUtils.getUid())
-            .orgUid(workgroup.getOrgUid())
-            .userUid(workgroup.getUserUid())
-            .name("routing_state_" + workgroup.getUid())
-            .workgroupUid(workgroup.getUid())
-            .cursor(0L)
-            .build();
-        return workgroupRoutingRepository.save(created);
+        // 未找到已有路由状态：在按 workgroupUid 的锁内创建，避免并发线程同时创建重复行。
+        // 锁内再次查询（double-check），防止等待期间已有其他线程创建成功。
+        Object lock = createStateLocks.computeIfAbsent(workgroup.getUid(), k -> new Object());
+        synchronized (lock) {
+            List<WorkgroupRoutingEntity> recheck = workgroupRoutingRepository
+                .findByWorkgroupUidAndDeletedFalseOrderByUpdatedAtDescIdDesc(workgroup.getUid());
+            if (recheck != null && !recheck.isEmpty()) {
+                return recheck.get(0);
+            }
+            WorkgroupRoutingEntity created = WorkgroupRoutingEntity.builder()
+                .uid(uidUtils.getUid())
+                .orgUid(workgroup.getOrgUid())
+                .userUid(workgroup.getUserUid())
+                .name("routing_state_" + workgroup.getUid())
+                .workgroupUid(workgroup.getUid())
+                .cursor(0L)
+                .build();
+            return workgroupRoutingRepository.save(created);
+        }
     }
 
     private void resetStateForMode(WorkgroupRoutingEntity state, WorkgroupEntity workgroup, String routingMode) {

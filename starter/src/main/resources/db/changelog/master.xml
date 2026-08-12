@@ -18,15 +18,7 @@
 
     <include file="db/changelog/migration/260806_add_robot_tools_settings_intent_runtime_fields.xml" />
 
-    <include file="db/changelog/migration/260806_add_robot_llm_intent_tool_model_fields.xml" />
-
     <include file="db/changelog/migration/260806_drop_robot_tools_settings_default_tool_prompt.xml" />
-
-    <include file="db/changelog/migration/260806_backfill_robot_intent_provider_uids.xml" />
-
-    <include file="db/changelog/migration/260807_drop_robot_llm_intent_columns.xml" />
-
-    <include file="db/changelog/migration/260807_drop_robot_llm_tool_columns.xml" />
 
     <include file="db/changelog/migration/260808_add_tool_mcp_exposure_fields.xml" />
 
