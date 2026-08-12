@@ -66,11 +66,13 @@ public class PromptHelper {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
 
-        if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0
+        // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
+        Integer contextMsgCount = robot.getLlm().getContextMsgCount();
+        if (contextMsgCount != null && contextMsgCount > 0
                 && messageProtobufQuery != null
                 && messageProtobufQuery.getThread() != null) {
             String threadTopic = messageProtobufQuery.getThread().getTopic();
-            int limit = robot.getLlm().getContextMsgCount();
+            int limit = contextMsgCount;
             List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
             if (!recentMessages.isEmpty()) {
                 log.info("添加 {} 条历史聊天记录", recentMessages.size());
@@ -112,11 +114,13 @@ public class PromptHelper {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
 
-        if (robot.getLlm() != null && robot.getLlm().getContextMsgCount() > 0
+        // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
+        Integer contextMsgCount = robot.getLlm().getContextMsgCount();
+        if (contextMsgCount != null && contextMsgCount > 0
                 && messageProtobufQuery != null
                 && messageProtobufQuery.getThread() != null) {
             String threadTopic = messageProtobufQuery.getThread().getTopic();
-            int limit = robot.getLlm().getContextMsgCount();
+            int limit = contextMsgCount;
             List<MessageEntity> recentMessages = messageRestService.getRecentMessages(threadTopic, limit);
             if (!recentMessages.isEmpty()) {
                 log.info("添加 {} 条历史聊天记录", recentMessages.size());

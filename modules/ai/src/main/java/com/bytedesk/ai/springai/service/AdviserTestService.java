@@ -26,6 +26,7 @@ import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
+import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -35,6 +36,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
+import org.springframework.ai.tool.toolsearch.ToolIndex;
+import org.springframework.ai.tool.toolsearch.index.regex.RegexToolIndex;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
@@ -49,6 +52,8 @@ import com.bytedesk.ai.springai.adviser.SelfRefineEvaluationAdvisor;
 import com.bytedesk.ai.springai.adviser.TagAdvisor;
 import com.bytedesk.ai.springai.adviser.WeatherTools;
 import com.bytedesk.ai.springai.controller.AdviserTestController;
+import com.bytedesk.ai.tool.test.DateTimeTools;
+import com.bytedesk.ai.tool.test.MathTools;
 import com.bytedesk.ai.tool.test.WeatherService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -638,6 +643,138 @@ public class AdviserTestService {
 		result.put("explain", "工具参数增强：透明地向工具 schema 注入 AgentThinking（innerThought/confidence/memoryNotes），"
 				+ "LLM 在调用工具时同步输出推理过程，消费后剥离再调实际工具。查看服务端 TOOL-AUGMENT-DEMO 日志。");
 		result.put("available", true);
+		return result;
+	}
+
+	// ============================================================
+	// 13. ToolSearchToolCallingAdvisor —— LLM 按需动态发现工具
+	// ============================================================
+
+	/**
+	 * 演示 {@link ToolSearchToolCallingAdvisor}：注册多个工具（天气 + 数学 + 日期），
+	 * LLM 先调用 {@code toolSearchTool} 元工具按自然语言搜索合适工具，再调用找到的工具完成任务。
+	 *
+	 * <p>核心价值：让 LLM 按需动态发现工具，而非事先全量注册。当工具集较大时，
+	 * 可避免上下文膨胀、function calling 准确性下降、Token 浪费等问题。</p>
+	 *
+	 * <p>首版固定使用 {@link RegexToolIndex}（纯内存、零额外依赖、按 token/正则匹配），
+	 * 不依赖外部存储或 Lucene 调优，足够支撑天气/计算/日期这类演示工具的发现流程。</p>
+	 *
+	 * <p>调用示例：</p>
+	 * <ul>
+	 *   <li>{@code 帮我算 3+5} → toolSearchTool → MathTools</li>
+	 *   <li>{@code 北京天气} → toolSearchTool → WeatherTools</li>
+	 *   <li>{@code 今天星期几} → toolSearchTool → DateTimeTools</li>
+	 * </ul>
+	 *
+	 * @param message 用户输入
+	 * @return 结果 map（含 advisor / message / response / candidateTools / indexImpl / explain）
+	 */
+	public Map<String, Object> toolSearch(String message) {
+		log.info("[advisor] tool-search request: {}", message);
+
+		// 首版固定使用 RegexToolIndex：纯内存、零额外依赖、按 token/正则匹配
+		ToolIndex toolIndex = new RegexToolIndex();
+
+		ToolSearchToolCallingAdvisor toolSearchAdvisor = ToolSearchToolCallingAdvisor.builder()
+			.toolIndex(toolIndex)
+			.maxResults(5)
+			.advisorOrder(0)
+			.build();
+
+		// 注册多个候选工具：LLM 不会一次性看到全部工具 schema，
+		// 而是通过 toolSearchTool 元工具按需搜索，再调用匹配的工具。
+		ChatClient chatClient = ChatClient.builder(chatModel)
+			.defaultTools(new WeatherTools(weatherService), new MathTools(), new DateTimeTools())
+			.defaultAdvisors(toolSearchAdvisor,
+					MyLoggingAdvisor.builder().order(1).showAvailableTools(true).build())
+			.build();
+
+		String content = chatClient.prompt().user(message).call().content();
+
+		Map<String, Object> result = buildResult("ToolSearchToolCallingAdvisor(RegexToolIndex)", message, content);
+		result.put("candidateTools", List.of("WeatherTools", "MathTools", "DateTimeTools"));
+		result.put("indexImpl", "RegexToolIndex");
+		result.put("explain", "LLM 按需动态发现工具：先调用 toolSearchTool 元工具搜索相关工具，"
+				+ "再调用找到的工具完成任务。候选工具集较大时可避免上下文膨胀与 Token 浪费。");
+		result.put("available", true);
+		return result;
+	}
+
+	// ============================================================
+	// 14. VectorStoreChatMemory vs MessageChatMemory 对比演示
+	// ============================================================
+
+	/**
+	 * 对比 {@link MessageChatMemoryAdvisor}（窗口模式，最近 N 条）与
+	 * {@link VectorStoreChatMemoryAdvisor}（语义检索 Top-K）两种记忆模式。
+	 *
+	 * <p>用同一段输入分别走两种记忆 Advisor，返回各自的回复，便于直观对比：</p>
+	 * <ul>
+	 *   <li>窗口记忆：保留最近 N 条历史，超长对话会截断早期信息，重启即丢失。</li>
+	 *   <li>语义记忆：按语义相似度召回相关历史片段，适合长会话与跨会话上下文。</li>
+	 * </ul>
+	 *
+	 * <p>需要运行环境配置了 VectorStore，否则语义记忆分支返回 unavailable。</p>
+	 *
+	 * @param message        用户输入
+	 * @param conversationId 会话 ID，同一 ID 的多轮消息会被两种记忆各自关联
+	 * @return 结果 map（含 messageMode / window / vector / explain）
+	 */
+	public Map<String, Object> vectorMemoryCompare(String message, String conversationId) {
+		log.info("[advisor] vector-memory-compare request: conversationId={}, message={}", conversationId, message);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("advisor", "VectorStoreChatMemory vs MessageChatMemory (compare)");
+		result.put("message", message);
+		result.put("conversationId", conversationId);
+		result.put("timestamp", System.currentTimeMillis());
+
+		// 1) 窗口记忆：MessageChatMemoryAdvisor（最近 20 条）
+		ChatClient windowClient = ChatClient.builder(chatModel)
+			.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory)
+				.order(Ordered.HIGHEST_PRECEDENCE + 1000)
+				.build())
+			.build();
+		String windowContent = windowClient.prompt()
+			.user(message)
+			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+			.call()
+			.content();
+		Map<String, Object> window = new HashMap<>();
+		window.put("mode", "MessageChatMemoryAdvisor (window=20)");
+		window.put("response", windowContent);
+		window.put("persist", "JVM 内存，重启丢失（生产建议替换为 JDBC/Redis repository）");
+		window.put("available", true);
+		result.put("window", window);
+
+		// 2) 语义记忆：VectorStoreChatMemoryAdvisor（按语义相似度召回）
+		Map<String, Object> vector = new HashMap<>();
+		if (vectorStore == null) {
+			vector.put("mode", "VectorStoreChatMemoryAdvisor (semantic top-K)");
+			vector.put("response", null);
+			vector.put("available", false);
+			vector.put("explain", "当前环境未配置 VectorStore，语义记忆分支不可用");
+		}
+		else {
+			VectorStoreChatMemoryAdvisor vectorAdvisor = VectorStoreChatMemoryAdvisor.builder(vectorStore)
+				.defaultTopK(5)
+				.build();
+			ChatClient vectorClient = ChatClient.builder(chatModel).defaultAdvisors(vectorAdvisor).build();
+			String vectorContent = vectorClient.prompt()
+				.user(message)
+				.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+				.call()
+				.content();
+			vector.put("mode", "VectorStoreChatMemoryAdvisor (semantic top-K)");
+			vector.put("response", vectorContent);
+			vector.put("available", true);
+			vector.put("persist", "持久化到 VectorStore（项目已有 Elasticsearch 向量库）");
+		}
+		result.put("vector", vector);
+
+		result.put("explain", "窗口记忆按最近 N 条截断，语义记忆按相似度召回相关片段；"
+				+ "同一 conversationId 多轮提问可观察两者差异。");
 		return result;
 	}
 

@@ -46,7 +46,7 @@ public class RobotLlm {
 
     @Builder.Default
     @Column(name = "is_thinking_enabled")
-    private Boolean thinking = true;
+    private Boolean thinking = false;
 
     // enable streaming
     @Builder.Default
@@ -170,7 +170,7 @@ public class RobotLlm {
     // do_sample
     @Builder.Default
     @Column(name = "llm_do_sample")
-    private Boolean doSample = true;
+    private Boolean doSample = false;
 
     // 最大输出长度
     // 最大token数
@@ -234,6 +234,15 @@ public class RobotLlm {
     @Builder.Default
     @Column(name = "llm_context_msg_count")
     private Integer contextMsgCount = 0;
+
+    /**
+     * 安全获取上下文消息数，兼容历史数据（数据库列可能为 null）。
+     * 注意：@Builder.Default 仅在使用 builder 构造时生效，JPA 从数据库加载实体时直接反射赋值，
+     * 对于本字段新增前创建的历史 robot 行，该字段在数据库中为 null。
+     */
+    public int getContextMsgCountSafe() {
+        return contextMsgCount != null ? contextMsgCount : 0;
+    }
 
     // 如果未匹配到关键词，默认回复内容
     @Builder.Default

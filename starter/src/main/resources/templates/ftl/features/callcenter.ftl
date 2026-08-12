@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.callcenter.title">智能呼叫中心</@t></h1>
-				<p class="lead"><@t key="page.callcenter.subtitle">AI赋能的云呼叫中心解决方案</@t></p>
+				<p class="lead"><@t key="page.callcenter.subtitle">开源 AI 赋能云呼叫中心解决方案</@t></p>
 			</div>
 			<!-- Main content END -->
 

@@ -164,6 +164,16 @@ public class ServiceSettingsResponseVisitor implements Serializable {
     // 访客端是否隐藏机器人思考过程
     private Boolean hideThinkingProcess;
 
+    /**
+     * 访客端是否隐藏 AI 免责声明（如 "内容由AI生成"）
+     */
+    private Boolean hideAIDisclaimer;
+
+    /**
+     * 自定义 AI 免责声明文案，为空时访客端使用 i18n 默认值
+     */
+    private String aiDisclaimerText;
+
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
 

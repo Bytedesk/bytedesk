@@ -1,8 +1,7 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2026-08-11
- * @Description: Spring AI ChatMemory 查询服务（只读 + 按会话删除）。
- *   走 {@link ChatMemoryJdbcDao} 原生 SQL，与官方 JdbcChatMemoryRepository 同风格。
+ * @Description: ChatMemory 查询服务（只读 + 按会话删除）。
  */
 package com.bytedesk.ai.chat_memory;
 

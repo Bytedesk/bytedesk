@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1>微语AI文档</h1>
-				<p class="lead">革命性的AI驱动文档编辑体验，支持Word、Excel、PPT等多种格式，让您的文档创作更加智能高效</p>
+				<p class="lead">开源 AI 驱动文档编辑体验，支持Word、Excel、PPT等多种格式，让您的文档创作更加智能高效</p>
 			</div>
 			<!-- Main content END -->
 

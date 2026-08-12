@@ -33,13 +33,26 @@ public class PushSpecification extends BaseSpecification<PushEntity, PushRequest
             List<Predicate> predicates = new ArrayList<>();
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
             // 
-            // searchText
+            // searchText (通用搜索：发送人、内容、接收人、IP)
             String searchText = request.getSearchText();
             if (StringUtils.hasText(searchText)) {
                 Predicate p1 = criteriaBuilder.like(root.get("sender"), "%" + searchText + "%");
                 Predicate p2 = criteriaBuilder.like(root.get("content"), "%" + searchText + "%");
                 Predicate p3 = criteriaBuilder.like(root.get("receiver"), "%" + searchText + "%");
-                predicates.add(criteriaBuilder.or(p1, p2, p3));
+                Predicate p4 = criteriaBuilder.like(root.get("ip"), "%" + searchText + "%");
+                predicates.add(criteriaBuilder.or(p1, p2, p3, p4));
+            }
+            // ip (精确按 IP 列筛选)
+            if (StringUtils.hasText(request.getIp())) {
+                predicates.add(criteriaBuilder.like(root.get("ip"), "%" + request.getIp() + "%"));
+            }
+            // receiver (按接收人列筛选)
+            if (StringUtils.hasText(request.getReceiver())) {
+                predicates.add(criteriaBuilder.like(root.get("receiver"), "%" + request.getReceiver() + "%"));
+            }
+            // content (按内容列筛选)
+            if (StringUtils.hasText(request.getContent())) {
+                predicates.add(criteriaBuilder.like(root.get("content"), "%" + request.getContent() + "%"));
             }
             // type
             if (StringUtils.hasText(request.getType())) {

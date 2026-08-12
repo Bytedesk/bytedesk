@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.kbase.title">企业知识库 / 帮助中心</@t></h1>
-				<p class="lead"><@t key="page.kbase.subtitle">AI赋能的企业知识管理与服务平台</@t></p>
+				<p class="lead"><@t key="page.kbase.subtitle">开源 AI 赋能企业知识管理与服务平台</@t></p>
 			</div>
 			<!-- Main content END -->
 

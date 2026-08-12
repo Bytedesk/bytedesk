@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -447,12 +448,31 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         Optional<MemberEntity> memberOptional = memberRepository.findByUid(uid);
         if (memberOptional.isPresent()) {
             MemberEntity member = memberOptional.get();
-            // 预加载user，确保user数据被包含在缓存中
-            if (member.getUser() != null) {
-                member.getUser().getUid();
-            }
+            // 预加载 user 及其懒加载集合，确保 Redis 反序列化时不会报
+            // "Cannot lazily initialize collection (no session)" (user.currentRoles)
+            initializeUserRelations(member);
         }
         return memberOptional;
+    }
+
+    /**
+     * 预初始化 MemberEntity.user 的代理及其懒加载集合 (currentRoles/userOrganizationRoles)，
+     * 避免实体序列化进 Redis 后反序列化时 "Cannot lazily initialize collection (no session)"。
+     * 必须在事务内/持久化上下文存活时调用。
+     */
+    private void initializeUserRelations(MemberEntity member) {
+        if (member == null || member.getUser() == null) {
+            return;
+        }
+        // 初始化 user 代理本身
+        Hibernate.initialize(member.getUser());
+        // 初始化 user 的懒加载集合
+        if (member.getUser().getCurrentRoles() != null) {
+            Hibernate.initialize(member.getUser().getCurrentRoles());
+        }
+        if (member.getUser().getUserOrganizationRoles() != null) {
+            Hibernate.initialize(member.getUser().getUserOrganizationRoles());
+        }
     }
 
     public Optional<MemberEntity> findByUserUidAndOrgUid(String uid, String orgUid) {

@@ -237,11 +237,34 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
     }
 
+    @ExceptionHandler(IpInWhitelistException.class)
+    public ResponseEntity<?> handleIpInWhitelistException(IpInWhitelistException e) {
+        // IP 在白名单中，不能加入黑名单：属于可预期的业务冲突，warn 级别不打印堆栈
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        log.warn("IP {} is in whitelist, cannot be added to blacklist", e.getIp());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
+    }
+
     @ExceptionHandler(LicenseException.class)
     public ResponseEntity<?> handleLicenseException(LicenseException e) {
         // License 签名/密钥相关的错误属于环境配置问题，warn 级别，不打印堆栈
         log.warn("License error: {}", e.getMessage());
         return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+    }
+
+    /**
+     * 黑名单 IP 拦截：属于已知的访问控制业务异常，仅以 WARN 记录摘要，
+     * 不打印完整堆栈，避免每次拦截都刷屏 error 日志。
+     */
+    @ExceptionHandler(BlackIpException.class)
+    public ResponseEntity<?> handleBlackIpException(BlackIpException e) {
+        log.warn("Black IP blocked: {}", e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.FORBIDDEN.value()));
     }
 
     @ExceptionHandler(RuntimeException.class)

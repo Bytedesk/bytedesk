@@ -84,6 +84,14 @@ public class ProviderToolServiceDispatcher {
         String provider = resolveToolExecutionProvider(robot);
         String model = resolveToolExecutionModel(robot);
         String runtimeToolName = resolveProviderRuntimeToolName(robot, userMessage, callback);
+
+        // ToolEntity 治理校验：禁用的工具、不满足 allowedMethods 的工具不走 provider-native 链路
+        if (!isProviderToolCallAllowed(robot, runtimeToolName)) {
+            log.debug("Skip provider tool service: tool not allowed by registry governance, runtimeToolName={}, message={}",
+                    runtimeToolName, userMessage);
+            return null;
+        }
+
         ResolvedRobotToolIntent resolvedToolIntent = findResolvedToolIntent(robot, runtimeToolName);
         Map<String, Object> toolContext = buildProviderToolCallContext(robot, provider, model, runtimeContext);
         enrichProviderToolCallContext(toolContext, resolvedToolIntent, userMessage);
@@ -284,6 +292,81 @@ public class ProviderToolServiceDispatcher {
                 .filter(toolName -> toolRestService.isRuntimeToolEnabled(toolName, orgUid))
                 .distinct()
                 .toList();
+    }
+
+    /**
+     * ToolEntity 治理校验：provider-native 工具调用前，检查目标工具是否被注册表允许调用。
+     *
+     * <p>校验规则（与 {@link ToolRestService#isRuntimeToolEnabled} 互补）：
+     * <ol>
+     *   <li>解析 {@link ToolEntity}；未注册的工具默认放行（向后兼容，保持原有行为）。</li>
+     *   <li>{@code enabled=false} 的工具拒绝调用。</li>
+     *   <li>配置了 {@code allowedMethods} 且当前 runtimeToolName 不在白名单内的，拒绝调用。</li>
+     * </ol>
+     *
+     * <p>注意：{@code mcpExposureMode} 仅约束 MCP 对外暴露，不影响内部 provider-native 链路，
+     * 因此本方法不检查 {@code mcpExposureMode}。
+     *
+     * @param robot           机器人（用于获取 orgUid）
+     * @param runtimeToolName 运行时工具名（可能为 null，此时直接放行）
+     * @return true 表示允许调用，false 表示被治理策略拒绝
+     */
+    private boolean isProviderToolCallAllowed(RobotProtobuf robot, String runtimeToolName) {
+        if (!StringUtils.hasText(runtimeToolName)) {
+            return true;
+        }
+
+        String orgUid = robot != null ? robot.getOrgUid() : null;
+        java.util.Optional<ToolEntity> toolEntityOpt = toolRestService.resolveRuntimeTool(runtimeToolName, orgUid);
+        if (toolEntityOpt.isEmpty()) {
+            // 未注册到 ToolEntity 表的工具保持原有行为（向后兼容）
+            return true;
+        }
+
+        ToolEntity toolEntity = toolEntityOpt.get();
+
+        // enabled=false 直接拒绝
+        if (Boolean.FALSE.equals(toolEntity.getEnabled())) {
+            log.info("Provider tool call blocked: tool disabled by registry, tool={}, orgUid={}",
+                    runtimeToolName, orgUid);
+            return false;
+        }
+
+        // allowedMethods 白名单校验（委托 ToolRestService 已有的 isToolExposedToMcp 中的逻辑不适用，
+        // 因为 mcpExposureMode 仅约束 MCP；这里单独检查 allowedMethods）
+        if (!isAllowedMethodForProvider(toolEntity, runtimeToolName)) {
+            log.info("Provider tool call blocked: method not in allowedMethods, tool={}, allowedMethods={}, orgUid={}",
+                    runtimeToolName, toolEntity.getAllowedMethods(), orgUid);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 检查 runtimeToolName 是否在 ToolEntity.allowedMethods 白名单内。
+     * allowedMethods 为空时视为不限制（向后兼容）。
+     */
+    private boolean isAllowedMethodForProvider(ToolEntity toolEntity, String runtimeToolName) {
+        String allowedMethods = toolEntity.getAllowedMethods();
+        if (!StringUtils.hasText(allowedMethods)) {
+            return true;
+        }
+
+        java.util.Set<String> allowed = java.util.Arrays.stream(allowedMethods.split("[,\n\r]+"))
+                .map(String::trim)
+                .filter(StringUtils::hasText)
+                .map(String::toLowerCase)
+                .collect(java.util.stream.Collectors.toSet());
+        if (allowed.isEmpty()) {
+            return true;
+        }
+
+        String candidate = runtimeToolName.trim().toLowerCase();
+        return allowed.contains(candidate)
+                || (StringUtils.hasText(toolEntity.getMethodName()) && allowed.contains(toolEntity.getMethodName().trim().toLowerCase()))
+                || (StringUtils.hasText(toolEntity.getName()) && allowed.contains(toolEntity.getName().trim().toLowerCase()))
+                || (StringUtils.hasText(toolEntity.getKey()) && allowed.contains(toolEntity.getKey().trim().toLowerCase()));
     }
 
     private ResolvedRobotToolIntent findResolvedToolIntent(RobotProtobuf robot, String runtimeToolName) {

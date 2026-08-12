@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.kanban.title">任务管理 - 看板系统</@t></h1>
-				<p class="lead"><@t key="page.kanban.subtitle">敏捷项目管理与团队协作平台</@t></p>
+				<p class="lead"><@t key="page.kanban.subtitle">开源敏捷项目管理与团队协作平台</@t></p>
 			</div>
 			<!-- Main content END -->
 

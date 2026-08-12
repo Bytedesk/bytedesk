@@ -50,6 +50,17 @@ public class WorkgroupSettingsRequest extends BaseSettingsRequest {
     private String manualRoutingTip;
 
     /**
+     * Hide AI-generated content disclaimer from visitor UI.
+     * Default: false (show disclaimer).
+     */
+    private Boolean hideAIDisclaimer;
+
+    /**
+     * Custom AI disclaimer text. When empty, visitor uses i18n default.
+     */
+    private String aiDisclaimerText;
+
+    /**
      * Message leave settings (Workgroup-specific)
      */
     private MessageLeaveSettingsRequest messageLeaveSettings;

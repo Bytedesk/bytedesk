@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_service_workgroup_settings 新增 AI 免责声明相关字段。
+        - hide_ai_disclaimer: 是否隐藏访客端机器人消息底部的"内容由AI生成"提示，默认 false（显示）。
+        - ai_disclaimer_text: 自定义免责声明文案，为空时访客端回退到 i18n 默认值。
+        背景：将 RobotSettings 已有的 AI 免责声明能力扩展到 WorkgroupSettings 工作组配置。
+        字段挂在 WorkgroupSettingsEntity 顶层（与 RobotSettingsEntity 对称），不放入共享的 ServiceSettingsEntity。
+    -->
+    <changeSet id="260812-4-add-workgroup-settings-hide-ai-disclaimer" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_workgroup_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="hide_ai_disclaimer"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="hide_ai_disclaimer" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260812-5-add-workgroup-settings-ai-disclaimer-text" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_workgroup_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_service_workgroup_settings" columnName="ai_disclaimer_text"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="ai_disclaimer_text" type="VARCHAR(500)" defaultValue="">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        回填历史数据：将 hide_ai_disclaimer 为 NULL 的记录设为 false。
+        幂等。
+    -->
+    <changeSet id="260812-6-backfill-workgroup-settings-hide-ai-disclaimer" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_service_workgroup_settings"/>
+            <columnExists tableName="bytedesk_service_workgroup_settings" columnName="hide_ai_disclaimer"/>
+        </preConditions>
+        <update tableName="bytedesk_service_workgroup_settings">
+            <column name="hide_ai_disclaimer" valueBoolean="false"/>
+            <where>hide_ai_disclaimer IS NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

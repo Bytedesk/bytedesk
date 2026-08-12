@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1>微语AI客户管理</h1>
-				<p class="lead">革命性的AI驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度</p>
+				<p class="lead">开源 AI 驱动客户关系管理系统，整合多渠道客户数据，智能分析客户行为，提升销售转化率和客户满意度</p>
 			</div>
 			<!-- Main content END -->
 

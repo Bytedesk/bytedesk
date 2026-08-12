@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.video.title">视频会议 / 视频客服</@t></h1>
-				<p class="lead"><@t key="page.video.subtitle">基于WebRTC的实时音视频通信解决方案</@t></p>
+				<p class="lead"><@t key="page.video.subtitle">开源 WebRTC 实时音视频通信解决方案</@t></p>
 			</div>
 			<!-- Main content END -->
 

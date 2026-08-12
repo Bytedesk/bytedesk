@@ -219,9 +219,13 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         llm.getRerankModel() != null ? llm.getRerankModel() : modelConfig.getDefaultRerankModel());
             }
 
+            // 回填 textProviderUid：保证新建机器人后即可直接对话，无需用户在抽屉里手动选择模型
+            resolveTextProviderUid(llm, request.getOrgUid());
             robot.setLlm(llm);
         } else {
             RobotLlm robotLlm = RobotLlm.builder().build();
+            // 默认 RobotLlm 仅设置了 textProvider/textModel，textProviderUid 为空，这里同样回填
+            resolveTextProviderUid(robotLlm, request.getOrgUid());
             robot.setLlm(robotLlm);
         }
 
@@ -286,7 +290,10 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                     request.getLlm().getSafeGuardEnabled(),
                     request.getLlm().getMemoryEnabled(),
                     request.getLlm().getReReadingEnabled());
-            robot.setLlm(request.getLlm());
+            // 回填 textProviderUid：编辑保存时若 UID 缺失也尝试按 type 补全，避免历史数据对话失败
+            RobotLlm requestLlm = request.getLlm();
+            resolveTextProviderUid(requestLlm, robot.getOrgUid());
+            robot.setLlm(requestLlm);
         }
         //
         RobotEntity updateRobot = save(robot);
@@ -895,6 +902,61 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         return convertToResponse(savedEntity);
     }
 
+    /**
+     * 仅更新机器人的文本模型配置（textProvider / textProviderUid / textModel）。
+     * <p>用于在机器人列表中快速切换模型供应商与模型，而无需加载完整 RobotLlm 编辑抽屉。
+     * 该接口会保留机器人原有的其他 LLM 参数（temperature/topP/prompt 等），仅覆盖模型相关字段。
+     * 若传入的 textProviderUid 为空但 textProvider(type) 有值，会调用 resolveTextProviderUid 尝试回填。
+     */
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CACHE_ENTITY, key = "'uid_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_EXISTS, key = "'exists_' + #request.uid", condition = "#request != null && #request.uid != null", beforeInvocation = true),
+            @CacheEvict(value = CACHE_NAME_ORG, allEntries = true, beforeInvocation = true)
+    }, put = {
+            @CachePut(value = CACHE_RESP, key = "'uid_' + #result.uid", unless = "#result == null")
+    })
+    public RobotResponse updateModel(RobotRequest request) {
+        if (!StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("robot uid is required");
+        }
+        Optional<RobotEntity> robotOptional = findByUid(request.getUid());
+        if (!robotOptional.isPresent()) {
+            throw new NotFoundException("Robot not found with UID: " + request.getUid());
+        }
+        RobotEntity robot = robotOptional.get();
+
+        // 仅更新模型相关字段，保留其他 LLM 配置
+        RobotLlm llm = robot.getLlm();
+        if (llm == null) {
+            llm = RobotLlm.builder().build();
+        }
+        if (request.getLlm() != null) {
+            RobotLlm requestLlm = request.getLlm();
+            if (StringUtils.hasText(requestLlm.getTextProvider())) {
+                llm.setTextProvider(requestLlm.getTextProvider());
+            }
+            if (StringUtils.hasText(requestLlm.getTextProviderUid())) {
+                llm.setTextProviderUid(requestLlm.getTextProviderUid());
+            } else {
+                // 前端切换了 provider(type) 但未带 UID 时清空，由 resolveTextProviderUid 重新回填
+                llm.setTextProviderUid(null);
+            }
+            if (StringUtils.hasText(requestLlm.getTextModel())) {
+                llm.setTextModel(requestLlm.getTextModel());
+            }
+        }
+        // 回填 textProviderUid：保证切换后即可直接对话
+        resolveTextProviderUid(llm, robot.getOrgUid());
+        robot.setLlm(llm);
+
+        RobotEntity savedEntity = save(robot);
+        if (savedEntity == null) {
+            throw new RuntimeException("update robot model failed");
+        }
+        return convertToResponse(savedEntity);
+    }
+
     @Override
     public RobotExcel convertToExcel(RobotEntity entity) {
         RobotExcel robotExcel = modelMapper.map(entity, RobotExcel.class);
@@ -917,6 +979,58 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         robot.setOrgUid(orgUid);
 
         return robot;
+    }
+
+    /**
+     * 解析并回填 textProviderUid。
+     * <p>当 textProviderUid 为空但 textProvider（type）有值时，按 type 从「组织级 → 平台级」provider
+     * 中查找并回填 UID。这样无论是通过 RobotModal 快速新建（不传 llm）还是通过抽屉编辑保存，
+     * 只要存在对应类型的 provider 记录，机器人即可直接对话，避免 DashscopeService.resolveProvider
+     * 抛出 "RobotLlm or textProviderUid is null"。
+     *
+     * <p>注意：本方法仅做尽力补全，找不到时不抛异常（保持原有行为，由上层服务统一报错提示）。
+     */
+    private void resolveTextProviderUid(RobotLlm llm, String orgUid) {
+        if (llm == null) {
+            return;
+        }
+        if (StringUtils.hasText(llm.getTextProviderUid())) {
+            return;
+        }
+        String type = llm.getTextProvider();
+        if (!StringUtils.hasText(type)) {
+            return;
+        }
+        // 1) 组织级 provider 优先
+        if (StringUtils.hasText(orgUid)) {
+            try {
+                Optional<LlmProviderEntity> orgProvider = llmProviderRestService.findByTypeAndOrgUid(type, orgUid);
+                if (orgProvider.isPresent()) {
+                    llm.setTextProviderUid(orgProvider.get().getUid());
+                    log.info("resolveTextProviderUid: bound org provider uid={} type={} orgUid={}",
+                            orgProvider.get().getUid(), type, orgUid);
+                    return;
+                }
+            } catch (Exception ex) {
+                log.warn("resolveTextProviderUid findByTypeAndOrgUid failed, type={}, orgUid={}, err={}",
+                        type, orgUid, ex.getMessage());
+            }
+        }
+        // 2) 回退到平台级 provider（取第一个）
+        try {
+            List<LlmProviderEntity> platformProviders = llmProviderRestService.findByType(type, LevelEnum.PLATFORM.name());
+            if (platformProviders != null && !platformProviders.isEmpty()) {
+                String platformUid = platformProviders.get(0).getUid();
+                llm.setTextProviderUid(platformUid);
+                log.info("resolveTextProviderUid: bound platform provider uid={} type={} orgUid={}",
+                        platformUid, type, orgUid);
+                return;
+            }
+        } catch (Exception ex) {
+            log.warn("resolveTextProviderUid findByType(platform) failed, type={}, err={}", type, ex.getMessage());
+        }
+        log.warn("resolveTextProviderUid: no provider found for type={} orgUid={}, textProviderUid remains null",
+                type, orgUid);
     }
 
     private String resolvePromptValue(RobotRequest request) {

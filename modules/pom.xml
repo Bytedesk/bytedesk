@@ -24,11 +24,11 @@
         <module>disk</module>
         <module>forum</module>
         <module>kbase</module>
+        <module>mall</module>
         <module>marketing</module>
         <module>meet</module>
         <module>opinion</module>
         <module>service</module>
-        <module>shop</module>
         <module>remote</module>
         <module>social</module>
         <module>team</module>

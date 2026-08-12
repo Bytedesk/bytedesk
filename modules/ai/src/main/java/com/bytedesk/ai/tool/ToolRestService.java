@@ -61,6 +61,9 @@ public class ToolRestService extends BaseRestServiceWithExport<ToolEntity, ToolR
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    /** 工具注册表热路径本地缓存（resolveRuntimeTool / isRuntimeToolEnabled）。 */
+    private final ToolRegistryCacheService toolRegistryCacheService;
     
     @Override
     public Page<ToolEntity> queryByOrgEntity(ToolRequest request) {
@@ -108,6 +111,22 @@ public class ToolRestService extends BaseRestServiceWithExport<ToolEntity, ToolR
             return Optional.empty();
         }
 
+        // 优先走 Caffeine 本地缓存，避免每条消息都 findAll()
+        Optional<ToolEntity> cached = toolRegistryCacheService.getRuntimeTool(runtimeToolName, orgUid);
+        if (cached != null) {
+            return cached;
+        }
+
+        // 回源查询
+        Optional<ToolEntity> resolved = resolveRuntimeToolFromDb(runtimeToolName, orgUid);
+        toolRegistryCacheService.putRuntimeTool(runtimeToolName, orgUid, resolved);
+        return resolved;
+    }
+
+    /**
+     * 从数据库解析运行时工具（不走缓存）。供 {@link #resolveRuntimeTool} 回源使用。
+     */
+    private Optional<ToolEntity> resolveRuntimeToolFromDb(String runtimeToolName, String orgUid) {
         String normalizedToolName = runtimeToolName.trim();
         List<ToolEntity> matchingTools = toolRepository.findAll().stream()
                 .filter(tool -> tool != null && !tool.isDeleted())
@@ -144,8 +163,16 @@ public class ToolRestService extends BaseRestServiceWithExport<ToolEntity, ToolR
     }
 
     public boolean isRuntimeToolEnabled(String runtimeToolName, String orgUid) {
+        // 优先走 Caffeine 本地缓存
+        Boolean cached = toolRegistryCacheService.getRuntimeToolEnabled(runtimeToolName, orgUid);
+        if (cached != null) {
+            return cached;
+        }
+
         Optional<ToolEntity> toolEntity = resolveRuntimeTool(runtimeToolName, orgUid);
-        return toolEntity.map(tool -> !Boolean.FALSE.equals(tool.getEnabled())).orElse(true);
+        boolean enabled = toolEntity.map(tool -> !Boolean.FALSE.equals(tool.getEnabled())).orElse(true);
+        toolRegistryCacheService.putRuntimeToolEnabled(runtimeToolName, orgUid, enabled);
+        return enabled;
     }
 
     public List<ToolEntity> listPlatformTools(String orgUid) {

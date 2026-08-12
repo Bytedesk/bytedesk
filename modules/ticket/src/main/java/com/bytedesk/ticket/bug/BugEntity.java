@@ -17,6 +17,7 @@ import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 // import jakarta.persistence.EntityListeners;
 // import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -44,7 +45,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({BugEntityListener.class})
-// @Table(name = "bytedesk_ticket_bug") // 简版ticket，暂不启用
+@Table(name = "bytedesk_ticket_bug") // 简版ticket，暂不启用
 public class BugEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

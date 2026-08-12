@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.voc.title">客户之声 (VoC)</@t></h1>
-				<p class="lead"><@t key="page.voc.subtitle">聆听客户声音，驱动产品优化与服务提升</@t></p>
+				<p class="lead"><@t key="page.voc.subtitle">开源客户之声平台，聆听客户声音，驱动产品优化与服务提升</@t></p>
 			</div>
 			<!-- Main content END -->
 

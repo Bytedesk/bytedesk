@@ -18,10 +18,8 @@ import java.util.List;
 import com.bytedesk.ai.utils.AIFileUtils;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -131,31 +129,34 @@ public class ZhipuaiService extends BaseSpringAIService {
         if (prompt == null || prompt.getInstructions() == null) {
             return messages;
         }
+        // 通过 Spring AI Message 接口的 getMessageType() 统一分发，避免直接依赖 SystemMessage/UserMessage/AssistantMessage 子类
         for (Message m : prompt.getInstructions()) {
-            if (m instanceof SystemMessage) {
+            MessageType type = m.getMessageType();
+            String text = m.getText();
+            if (type == MessageType.SYSTEM) {
                 messages.add(ChatMessage.builder()
                         .role(ZAI_ROLE_SYSTEM)
                         .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(m.getText()).build()))
+                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
                         .build());
-            } else if (m instanceof UserMessage) {
+            } else if (type == MessageType.USER) {
                 messages.add(ChatMessage.builder()
                         .role(ChatMessageRole.USER.value())
-                        .content(buildUserContents(m.getText()))
+                        .content(buildUserContents(text))
                         .build());
-            } else if (m instanceof AssistantMessage) {
+            } else if (type == MessageType.ASSISTANT) {
                 // 将历史助手消息也带上，利于多轮
                 messages.add(ChatMessage.builder()
                         .role(ChatMessageRole.ASSISTANT.value())
                         .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(m.getText()).build()))
+                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
                         .build());
             } else {
-                // 兜底按系统文本处理
+                // 兜底按系统文本处理（含 TOOL 等其它类型）
                 messages.add(ChatMessage.builder()
                         .role(ZAI_ROLE_SYSTEM)
                         .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(m.getText()).build()))
+                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
                         .build());
             }
         }
@@ -387,51 +388,36 @@ public class ZhipuaiService extends BaseSpringAIService {
     private String extractDeltaText(Delta delta) {
         if (delta == null)
             return null;
-        try {
-            // 优先尝试 content 字段
-            // 部分 SDK 提供 getContent()，否则回退 toString() 简单提取
-            try {
-                java.lang.reflect.Method m = delta.getClass().getMethod("getContent");
-                Object v = m.invoke(delta);
-                if (v instanceof String s && !s.isEmpty()) {
-                    String trimmed = s.trim();
-                    if ("null".equalsIgnoreCase(trimmed)) {
-                        log.debug("extractDeltaText: ignoring literal 'null' from getContent(), delta={}", delta);
-                        return null;
-                    }
-                    return trimmed;
-                }
-            } catch (NoSuchMethodException ignore) {
-            }
-            String s = delta.toString();
-            // 尝试从形如 "content=..." 里粗略抽取
-            int idx = s.indexOf("content=");
-            if (idx >= 0) {
-                int start = idx + 8;
-                int end = s.indexOf(',', start);
-                if (end < 0)
-                    end = s.length();
-                String sub = s.substring(start, end).trim();
-                // 去掉可能的引号
-                if ((sub.startsWith("\"") && sub.endsWith("\"")) || (sub.startsWith("'") && sub.endsWith("'"))) {
-                    sub = sub.substring(1, sub.length() - 1);
-                }
-                if ("null".equalsIgnoreCase(sub)) {
-                    log.debug("extractDeltaText: ignoring literal 'null' from toString() content field, delta={}",
-                            delta);
-                    return null;
-                }
-                return sub;
-            }
-            String sTrim = s == null ? null : s.trim();
-            if ("null".equalsIgnoreCase(sTrim)) {
-                log.debug("extractDeltaText: ignoring literal 'null' from toString() fallback, delta={}", delta);
-                return null;
-            }
-            return sTrim;
-        } catch (Exception e) {
-            return delta.toString();
+        // 直接使用 zai-sdk Delta.getContent()（Lombok @Data 生成）。
+        // 过滤掉字符串 "null"（部分模型会在 reasoning-only chunk 下发字面量 null）。
+        String s = delta.getContent();
+        if (s == null || s.isEmpty()) {
+            return null;
         }
+        String trimmed = s.trim();
+        if ("null".equalsIgnoreCase(trimmed)) {
+            log.debug("extractDeltaText: ignoring literal 'null' from getContent(), delta={}", delta);
+            return null;
+        }
+        return trimmed;
+    }
+
+    /**
+     * 直接使用 zai-sdk Delta.getReasoningContent()（Lombok @Data 生成，映射 reasoning_content 字段）。
+     * 返回非空的 reasoning 文本，否则返回 null。
+     */
+    private String extractDeltaReasoning(Delta delta) {
+        if (delta == null)
+            return null;
+        String r = delta.getReasoningContent();
+        if (r == null || r.isEmpty()) {
+            return null;
+        }
+        String trimmed = r.trim();
+        if ("null".equalsIgnoreCase(trimmed)) {
+            return null;
+        }
+        return trimmed;
     }
 
     // 统一移除 <think>...</think>
@@ -647,19 +633,8 @@ public class ZhipuaiService extends BaseSpringAIService {
                                 if (data.getChoices() != null && !data.getChoices().isEmpty()) {
                                     Delta delta = data.getChoices().get(0).getDelta();
                                     String piece = extractDeltaText(delta);
-                                    // 提取模型推理内容（reasoningContent）
-                                    String reasoning = null;
-                                    try {
-                                        java.lang.reflect.Method getReasoning = delta.getClass()
-                                                .getMethod("getReasoningContent");
-                                        Object rv = getReasoning.invoke(delta);
-                                        if (rv instanceof String rs && !rs.isEmpty()) {
-                                            reasoning = rs;
-                                        }
-                                    } catch (NoSuchMethodException ignore) {
-                                        // 某些SDK版本没有该字段
-                                    } catch (Exception ignore) {
-                                    }
+                                    // 提取模型推理内容（reasoningContent），直接调用 SDK getter，不再反射
+                                    String reasoning = extractDeltaReasoning(delta);
                                     if (piece != null) {
                                         String pieceTrim = piece.trim();
                                         if (pieceTrim.equalsIgnoreCase("null")) {

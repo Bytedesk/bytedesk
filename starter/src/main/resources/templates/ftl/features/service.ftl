@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.service.title">在线客服 - 智能客户服务平台</@t></h1>
-				<p class="lead"><@t key="page.service.subtitle">多渠道对接、AI智能辅助，提供7x24小时优质客户服务</@t></p>
+				<p class="lead"><@t key="page.service.subtitle">开源智能客服平台，多渠道对接、AI 智能辅助，提供 7x24 小时优质客户服务</@t></p>
 			</div>
 			<!-- Main content END -->
 

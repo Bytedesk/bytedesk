@@ -33,6 +33,8 @@ public class PushRequest extends BaseRequest {
 
     private String sender;
 
+    private String content;
+
     private String country;
     private String receiver; // email or mobile
 

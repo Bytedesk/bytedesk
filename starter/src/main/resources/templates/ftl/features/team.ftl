@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.team.title">企业IM - 智能即时通讯平台</@t></h1>
-				<p class="lead"><@t key="page.team.subtitle">面向中大型团队打造的企业级即时通讯解决方案</@t></p>
+				<p class="lead"><@t key="page.team.subtitle">开源企业级即时通讯解决方案，面向中大型团队</@t></p>
 			</div>
 			<!-- Main content END -->
 

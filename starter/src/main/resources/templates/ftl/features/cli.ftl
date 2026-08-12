@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.cli.title">微语 CLI - 命令行工具</@t></h1>
-				<p class="lead"><@t key="page.cli.subtitle">在终端中直接操作微语系统，查询知识库、管理工单、查看会话，效率翻倍</@t></p>
+				<p class="lead"><@t key="page.cli.subtitle">开源命令行工具，在终端中直接操作微语系统，查询知识库、管理工单、查看会话，效率翻倍</@t></p>
 			</div>
 			<!-- Main content END -->
 

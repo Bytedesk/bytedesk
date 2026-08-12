@@ -70,6 +70,21 @@ public class RobotSettingsEntity extends BaseSettingsEntity {
         private Boolean hideThinkingProcess = false;
 
         /**
+         * Hide AI-generated content disclaimer from visitor UI.
+         * Default: false (show disclaimer).
+         */
+        @Builder.Default
+        @Column(name = "hide_ai_disclaimer")
+        private Boolean hideAIDisclaimer = false;
+
+        /**
+         * Custom AI disclaimer text. When empty, visitor uses i18n default.
+         */
+        @Builder.Default
+        @Column(name = "ai_disclaimer_text", length = 500)
+        private String aiDisclaimerText = "";
+
+        /**
          * Rating down settings
          */
         @ManyToOne(fetch = FetchType.LAZY, optional = true, cascade = { CascadeType.PERSIST, CascadeType.MERGE,

@@ -145,10 +145,12 @@
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.grpc/spring-grpc-spring-boot-starter -->
 		<!-- 版本由 spring-grpc-dependencies BOM 管理 -->
+		<!--
 		<dependency>
 			<groupId>org.springframework.grpc</groupId>
 			<artifactId>spring-grpc-spring-boot-starter</artifactId>
 		</dependency>
+		-->
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<!-- https://wizardforcel.gitbooks.io/guava-tutorial/content/1.html -->

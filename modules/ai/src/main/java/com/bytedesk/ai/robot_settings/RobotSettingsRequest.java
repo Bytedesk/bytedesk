@@ -40,6 +40,16 @@ public class RobotSettingsRequest extends BaseSettingsRequest {
     private Boolean hideThinkingProcess;
 
     /**
+     * Hide AI-generated content disclaimer from visitor UI.
+     */
+    private Boolean hideAIDisclaimer;
+
+    /**
+     * Custom AI disclaimer text. When empty, visitor uses i18n default.
+     */
+    private String aiDisclaimerText;
+
+    /**
      * Rating down settings (Robot-specific)
      */
     private RatedownSettingsRequest rateDownSettings;

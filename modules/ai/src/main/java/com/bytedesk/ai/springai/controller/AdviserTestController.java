@@ -399,6 +399,77 @@ public class AdviserTestController {
 		}
 	}
 
+	// ============================================================
+	// 13. ToolSearchToolCallingAdvisor —— LLM 按需动态发现工具
+	// ============================================================
+
+	/**
+	 * <p>演示 {@code ToolSearchToolCallingAdvisor}：注册多个候选工具（天气 + 数学 + 日期），
+	 * LLM 先调用 {@code toolSearchTool} 元工具按自然语言搜索合适工具，再调用找到的工具完成任务。</p>
+	 *
+	 * <p>核心价值：让 LLM 按需动态发现工具，而非事先全量注册。首版固定使用 {@code RegexToolIndex}
+	 * （纯内存、零额外依赖、按 token/正则匹配）。</p>
+	 *
+	 * <p>调用示例：</p>
+	 * <pre>
+	 *   GET .../tool-search?message=帮我算 3+5      → toolSearchTool → MathTools
+	 *   GET .../tool-search?message=北京天气         → toolSearchTool → WeatherTools
+	 *   GET .../tool-search?message=今天星期几       → toolSearchTool → DateTimeTools
+	 * </pre>
+	 *
+	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/tool-search?message=帮我算 3+5
+	 */
+	@GetMapping("/tool-search")
+	public ResponseEntity<JsonResult<?>> toolSearch(
+			@RequestParam(value = "message", defaultValue = "帮我算 3+5") String message) {
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		try {
+			return ResponseEntity.ok(JsonResult.success(adviserTestService.toolSearch(message)));
+		}
+		catch (Exception e) {
+			log.error("tool-search advisor failed", e);
+			return ResponseEntity.ok(JsonResult.error("Failed: " + e.getMessage()));
+		}
+	}
+
+	// ============================================================
+	// 14. VectorStoreChatMemory vs MessageChatMemory 对比演示
+	// ============================================================
+
+	/**
+	 * <p>对比 {@code MessageChatMemoryAdvisor}（窗口模式，最近 N 条）与
+	 * {@code VectorStoreChatMemoryAdvisor}（语义检索 Top-K）两种记忆模式。</p>
+	 *
+	 * <p>用同一段输入分别走两种记忆 Advisor，返回各自的回复，便于直观对比窗口记忆与语义记忆的差异。
+	 * 需要运行环境配置了 VectorStore，否则语义记忆分支返回 unavailable。</p>
+	 *
+	 * <p>调用示例（同一 conversationId 内多轮）：</p>
+	 * <pre>
+	 *   GET .../vector-memory-compare?message=我叫张三&amp;conversationId=cmp1
+	 *   GET .../vector-memory-compare?message=我刚才说叫什么名字？&amp;conversationId=cmp1
+	 * </pre>
+	 *
+	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/vector-memory-compare?message=你好&conversationId=compare-demo
+	 */
+	@GetMapping("/vector-memory-compare")
+	public ResponseEntity<JsonResult<?>> vectorMemoryCompare(
+			@RequestParam(value = "message", defaultValue = "你好，请记住我叫张三") String message,
+			@RequestParam(value = "conversationId", defaultValue = "compare-demo") String conversationId) {
+		if (!bytedeskProperties.getDebug()) {
+			return ResponseEntity.ok(JsonResult.error("Service is not available"));
+		}
+		try {
+			return ResponseEntity
+				.ok(JsonResult.success(adviserTestService.vectorMemoryCompare(message, conversationId)));
+		}
+		catch (Exception e) {
+			log.error("vector-memory-compare advisor failed", e);
+			return ResponseEntity.ok(JsonResult.error("Failed: " + e.getMessage()));
+		}
+	}
+
 	private static String str(Object obj, String defaultValue) {
 		if (obj == null) {
 			return defaultValue;

@@ -232,6 +232,12 @@ public class RobotSettingsRestService
         if (request.getHideThinkingProcess() != null) {
             entity.setHideThinkingProcess(request.getHideThinkingProcess());
         }
+        if (request.getHideAIDisclaimer() != null) {
+            entity.setHideAIDisclaimer(request.getHideAIDisclaimer());
+        }
+        if (request.getAiDisclaimerText() != null) {
+            entity.setAiDisclaimerText(request.getAiDisclaimerText());
+        }
         // 使用静态工厂方法更新嵌套设置,只在非 null 时更新
         if (request.getServiceSettings() != null) {
             ServiceSettingsEntity draft = entity.getDraftServiceSettings();

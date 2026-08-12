@@ -16,6 +16,7 @@ package com.bytedesk.core.rbac.role;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -160,7 +161,10 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
         @Cacheable(value = "role", key = "'uid:' + #p0", unless = "#result == null")
         @Override
         public Optional<RoleEntity> findByUid(String uid) {
-                return roleRepository.findByUid(uid);
+                Optional<RoleEntity> roleOptional = roleRepository.findByUid(uid);
+                // 预初始化懒加载的 authorities 集合，避免 Redis 反序列化时 "Cannot lazily initialize collection (no session)"
+                roleOptional.ifPresent(this::initializeLazyCollections);
+                return roleOptional;
         }
 
         public Optional<RoleEntity> findByUidNoCache(String uid) {
@@ -169,7 +173,9 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
         @Cacheable(value = "role", key = "'nameOrg:' + #p0 + '-' + #p1", unless = "#result == null")
         public Optional<RoleEntity> findByNameAndOrgUid(String name, String orgUid) {
-                return roleRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+                Optional<RoleEntity> roleOptional = roleRepository.findByNameAndOrgUidAndDeletedFalse(name, orgUid);
+                roleOptional.ifPresent(this::initializeLazyCollections);
+                return roleOptional;
         }
 
         @Cacheable(value = "role", key = "'namePlatform:' + #p0", unless = "#result == null")
@@ -178,6 +184,7 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
 
                 Optional<RoleEntity> roleOptional = roleRepository.findByNameAndLevel(name, preferredLevel.name());
                 if (roleOptional.isPresent()) {
+                        roleOptional.ifPresent(this::initializeLazyCollections);
                         return roleOptional;
                 }
 
@@ -187,11 +194,24 @@ public class RoleRestService extends BaseRestService<RoleEntity, RoleRequest, Ro
                         }
                         roleOptional = roleRepository.findByNameAndLevel(name, level.name());
                         if (roleOptional.isPresent()) {
+                                roleOptional.ifPresent(this::initializeLazyCollections);
                                 return roleOptional;
                         }
                 }
 
                 return Optional.empty();
+        }
+
+        /**
+         * 预初始化 RoleEntity 的懒加载集合，避免实体被序列化到 Redis 缓存后
+         * 反序列化时报 "Cannot lazily initialize collection (no session)" 错误。
+         * 与 MemberRestService.findByUid 预初始化 user 的做法一致。
+         * 必须在事务内/持久化上下文存活时调用。
+         */
+        private void initializeLazyCollections(RoleEntity role) {
+                if (role != null && role.getAuthorities() != null) {
+                        Hibernate.initialize(role.getAuthorities());
+                }
         }
 
         public Boolean existsByUid(String uid) {

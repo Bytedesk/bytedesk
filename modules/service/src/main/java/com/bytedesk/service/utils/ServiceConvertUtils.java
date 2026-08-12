@@ -338,8 +338,17 @@ public class ServiceConvertUtils {
         ServiceSettingsResponseVisitor resp = getModelMapper().map(svc, ServiceSettingsResponseVisitor.class);
         if (settingsContainer instanceof RobotSettingsEntity robotSettings) {
             resp.setHideThinkingProcess(Boolean.TRUE.equals(robotSettings.getHideThinkingProcess()));
+            resp.setHideAIDisclaimer(Boolean.TRUE.equals(robotSettings.getHideAIDisclaimer()));
+            resp.setAiDisclaimerText(robotSettings.getAiDisclaimerText());
+        } else if (settingsContainer instanceof WorkgroupSettingsEntity workgroupSettings) {
+            // Workgroup 顶层字段，与 RobotSettings 对称；Workgroup 暂无思考过程字段
+            resp.setHideThinkingProcess(false);
+            resp.setHideAIDisclaimer(Boolean.TRUE.equals(workgroupSettings.getHideAIDisclaimer()));
+            resp.setAiDisclaimerText(workgroupSettings.getAiDisclaimerText());
         } else {
             resp.setHideThinkingProcess(false);
+            resp.setHideAIDisclaimer(false);
+            resp.setAiDisclaimerText("");
         }
         resp.setShowPreForm(Boolean.TRUE.equals(svc.getShowPreForm()));
         resp.setPreFormRequired(Boolean.TRUE.equals(svc.getPreFormRequired()));

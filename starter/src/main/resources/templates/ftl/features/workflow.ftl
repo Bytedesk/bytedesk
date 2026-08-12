@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.workflow.title">智能工作流平台</@t></h1>
-				<p class="lead"><@t key="page.workflow.subtitle">AI驱动的流程自动化与编排引擎</@t></p>
+				<p class="lead"><@t key="page.workflow.subtitle">开源 AI 驱动流程自动化与编排引擎</@t></p>
 			</div>
 			<!-- Main content END -->
 

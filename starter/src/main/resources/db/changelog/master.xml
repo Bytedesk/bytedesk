@@ -42,4 +42,8 @@
 
     <include file="db/changelog/migration/260811_add_service_settings_visitor_close_tip.xml" />
 
+    <include file="db/changelog/migration/260812_add_robot_settings_ai_disclaimer.xml" />
+
+    <include file="db/changelog/migration/260812_add_workgroup_settings_ai_disclaimer.xml" />
+
 </databaseChangeLog>

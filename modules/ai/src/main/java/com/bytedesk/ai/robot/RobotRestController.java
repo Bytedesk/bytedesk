@@ -221,6 +221,20 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         return ResponseEntity.ok(JsonResult.success(robotResponse));
     }
 
+    @Operation(summary = "Update Robot Model", description = "Update the robot text model provider and model (textProvider / textProviderUid / textModel)")
+    @ApiResponse(responseCode = "200", description = "Update successful",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = RobotResponse.class)))
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_UPDATE_MODEL, description = "update robot text model")
+    @PostMapping("/update/model")
+    public ResponseEntity<?> updateModel(@RequestBody RobotRequest request) {
+
+        RobotResponse robotResponse = robotRestService.updateModel(request);
+
+        return ResponseEntity.ok(JsonResult.success(robotResponse));
+    }
+
     @Operation(summary = "Delete Robot", description = "Delete the specified robot")
     @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PreAuthorize(RobotPermissions.HAS_ROBOT_DELETE)

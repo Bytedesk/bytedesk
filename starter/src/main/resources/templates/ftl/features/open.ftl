@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.open.title">开放平台 - API与SDK</@t></h1>
-				<p class="lead"><@t key="page.open.subtitle">强大的API接口和SDK工具，快速集成微语能力到您的应用</@t></p>
+				<p class="lead"><@t key="page.open.subtitle">开源 API 接口和 SDK 工具，快速集成微语能力到您的应用</@t></p>
 			</div>
 			<!-- Main content END -->
 

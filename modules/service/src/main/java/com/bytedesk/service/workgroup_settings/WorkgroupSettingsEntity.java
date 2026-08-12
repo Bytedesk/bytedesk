@@ -18,6 +18,7 @@ import com.bytedesk.webrtc.webrtc_settings.WebrtcSettingsEntity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -80,6 +81,22 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @lombok.Builder.Default
     private String manualRoutingTip = I18Consts.I18N_WORKGROUP_MANUAL_ROUTING_POOL_WAITING_TIP;
+
+    /**
+     * Hide AI-generated content disclaimer from visitor UI.
+     * Default: false (show disclaimer).
+     * 与 RobotSettingsEntity 保持对称，控制访客端 RobotBubble 底部"内容由AI生成"提示。
+     */
+    @lombok.Builder.Default
+    @Column(name = "hide_ai_disclaimer")
+    private Boolean hideAIDisclaimer = false;
+
+    /**
+     * Custom AI disclaimer text. When empty, visitor uses i18n default.
+     */
+    @lombok.Builder.Default
+    @Column(name = "ai_disclaimer_text", length = 500)
+    private String aiDisclaimerText = "";
 
     /**
      * Message leave settings

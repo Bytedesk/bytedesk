@@ -1,1 +1,0 @@
-function e(e){let t=e.keyword.trim();return!(!e.hasInitialized&&t.length===0)}export{e as t};

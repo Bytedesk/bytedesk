@@ -397,6 +397,7 @@ public class I18Consts {
     public static final String I18N_ACTION_UPDATE_PROMPT = I18N_PREFIX + "action.update.prompt";
     public static final String I18N_ACTION_UPDATE_PROMPT_TEXT = I18N_PREFIX + "action.update.prompt.text";
     public static final String I18N_ACTION_UPDATE_KB_UID = I18N_PREFIX + "action.update.kb.uid";
+    public static final String I18N_ACTION_UPDATE_MODEL = I18N_PREFIX + "action.update.model";
     public static final String I18N_EMBEDDING_SETTINGS = I18N_PREFIX + "embedding.settings";
 
     // 角色描述（用于 RoleInitializer 默认角色 description，前端通过 translateString 翻译）

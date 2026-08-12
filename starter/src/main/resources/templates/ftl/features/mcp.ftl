@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.mcp.title">MCP 服务 - Model Context Protocol</@t></h1>
-				<p class="lead"><@t key="page.mcp.subtitle">基于 MCP 协议对外开放微语核心能力，让 AI Agent 无缝调用客服、知识库、工单等业务接口</@t></p>
+				<p class="lead"><@t key="page.mcp.subtitle">开源 MCP 服务，基于 MCP 协议对外开放微语核心能力，让 AI Agent 无缝调用客服、知识库、工单等业务接口</@t></p>
 			</div>
 			<!-- Main content END -->
 

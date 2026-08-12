@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.skill.title">微语 Skills - 可复用技能包</@t></h1>
-				<p class="lead"><@t key="page.skill.subtitle">将客服经验沉淀为标准化技能，让 AI Agent 像人类专家一样处理客户问题</@t></p>
+				<p class="lead"><@t key="page.skill.subtitle">开源可复用技能包，将客服经验沉淀为标准化技能，让 AI Agent 像人类专家一样处理客户问题</@t></p>
 			</div>
 			<!-- Main content END -->
 

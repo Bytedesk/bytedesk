@@ -32,7 +32,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.ai.title">AI Agent - 智能代理平台</@t></h1>
-				<p class="lead"><@t key="page.ai.subtitle">对接主流大模型，打造企业智能助手</@t></p>
+				<p class="lead"><@t key="page.ai.subtitle">开源 AI Agent 平台，对接主流大模型，打造企业智能助手</@t></p>
 			</div>
 			<!-- Main content END -->
 

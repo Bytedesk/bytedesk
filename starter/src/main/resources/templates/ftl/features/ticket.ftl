@@ -27,7 +27,7 @@ Page Banner START -->
 			<div class="col-lg-8">
 				<!-- Title -->
 				<h1><@t key="page.ticket.title">智能工单系统</@t></h1>
-				<p class="lead"><@t key="page.ticket.subtitle">高效的工单管理与协作平台</@t></p>
+				<p class="lead"><@t key="page.ticket.subtitle">开源高效的工单管理与协作平台</@t></p>
 			</div>
 			<!-- Main content END -->
 
