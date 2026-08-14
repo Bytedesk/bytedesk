@@ -260,7 +260,7 @@ public class FeedbackSettingsRestService extends BaseRestServiceWithExport<Feedb
         try {
             String type = FeedbackTypeEnum.NPS.name();
 
-            Optional<FeedbackSettingsEntity> existing = findByNameAndOrgUidAndType("工单管理满意度", orgUid, type);
+            Optional<FeedbackSettingsEntity> existing = findByNameAndOrgUidAndType("意见反馈", orgUid, type);
             if (existing.isPresent()) {
                 return;
             }
@@ -268,11 +268,11 @@ public class FeedbackSettingsRestService extends BaseRestServiceWithExport<Feedb
             FeedbackSettingsRequest request = FeedbackSettingsRequest.builder()
                     .orgUid(orgUid)
                     .type(type)
-                    .name("工单管理满意度")
+                    .name("意见反馈")
                     .enabled(Boolean.TRUE)
                     .positiveScoreMin(9)
                     .maxReasons(3)
-                    .title("请您对\"工单管理\"进行满意度评价")
+                    .title("请您对\"意见反馈\"进行满意度评价")
                     .positiveQuestion("您感到满意的原因是？")
                     .negativeQuestion("您在使用过程中遇到哪些问题？")
                     .commentPlaceholder("【使用场景】：\n【优化意见】：")

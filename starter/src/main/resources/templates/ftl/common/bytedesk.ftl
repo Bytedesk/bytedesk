@@ -50,6 +50,7 @@ chatUrl: 'https://www.weiyuai.cn/chat?org=df_org_uid&t=1&sid=df_wg_uid&',
     baseUrl: 'https://www.weiyuai.cn/chat',
     placement: 'bottom-right',
     autoPopup: false,
+    showToggleViewModeButton: true,
     inviteConfig: {
       show: false,
       text: '${inviteText?trim}',

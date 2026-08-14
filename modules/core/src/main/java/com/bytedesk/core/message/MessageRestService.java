@@ -20,6 +20,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 // import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -184,6 +185,15 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
     @Recover
     public MessageEntity recover(ObjectOptimisticLockingFailureException e, MessageEntity entity) {
         return handleOptimisticLockingFailureException(e, entity);
+    }
+
+    @Recover
+    public MessageEntity recover(DataIntegrityViolationException e, MessageEntity entity) {
+        if (entity != null && StringUtils.hasText(entity.getUid()) && messageRepository.existsByUid(entity.getUid())) {
+            log.info("message save duplicate detected after concurrent insert, treat as success, uid: {}", entity.getUid());
+            return messageRepository.findByUid(entity.getUid()).orElse(entity);
+        }
+        throw e;
     }
 
     @Caching(evict = {

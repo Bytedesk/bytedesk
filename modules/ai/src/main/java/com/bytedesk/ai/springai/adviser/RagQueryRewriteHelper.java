@@ -26,12 +26,12 @@ import org.springframework.util.StringUtils;
 
 import jakarta.annotation.PostConstruct;
 
+import com.bytedesk.ai.kbase.KbaseSearchHelper;
 import com.bytedesk.ai.rag_rewrite.RagRewriteService;
 import com.bytedesk.ai.rag_rewrite.RagRewriteStatusEnum;
 import com.bytedesk.ai.rag_rewrite.RagRewriteTypeEnum;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.service.KnowledgeBaseSearchHelper;
 import com.bytedesk.ai.service.SearchResultWithSources;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * RAG Query 增强助手（阶段4）。
  *
- * <p>在 KB 检索【前】对用户 query 做改写/扩展，提升 {@link KnowledgeBaseSearchHelper} 的召回率。
+ * <p>在 KB 检索【前】对用户 query 做改写/扩展，提升 {@link KbaseSearchHelper} 的召回率。
  * <b>不替代 KB 搜索</b>（规划 §0 v3.4）：增强后的 query 仍交由 {@code KnowledgeBaseSearchHelper}
  * 执行现有的多数据源聚合 + kbUid 隔离 + 混合检索 + 自定义重排 + 来源引用流程。</p>
  *
@@ -61,12 +61,12 @@ import lombok.extern.slf4j.Slf4j;
 public class RagQueryRewriteHelper {
 
     private final ChatModel chatModel;
-    private final KnowledgeBaseSearchHelper knowledgeBaseSearchHelper;
+    private final KbaseSearchHelper knowledgeBaseSearchHelper;
     private final RagRewriteService RagRewriteService;
 
     public RagQueryRewriteHelper(
             ObjectProvider<ChatModel> chatModelProvider,
-            KnowledgeBaseSearchHelper knowledgeBaseSearchHelper,
+            KbaseSearchHelper knowledgeBaseSearchHelper,
             RagRewriteService RagRewriteService) {
         this.chatModel = chatModelProvider.getIfAvailable();
         this.knowledgeBaseSearchHelper = knowledgeBaseSearchHelper;
@@ -162,7 +162,7 @@ public class RagQueryRewriteHelper {
      * <p>分支逻辑：</p>
      * <ol>
      *   <li>{@code ragMultiQueryEnabled=true}：扩展为多个 query，分别检索后按 sourceUid 合并去重，
-     *       再交由 {@link KnowledgeBaseSearchHelper#rerankMergeTopK} 统一重排 TopK</li>
+     *       再交由 {@link KbaseSearchHelper#rerankMergeTopK} 统一重排 TopK</li>
      *   <li>{@code ragRewriteEnabled=true}：改写 query 后单次检索</li>
      *   <li>均关闭：直接走 {@code searchKnowledgeBaseWithSources(query, robot)}（行为零变化）</li>
      * </ol>
@@ -243,7 +243,7 @@ public class RagQueryRewriteHelper {
      * 执行带 RAG Query 增强的 KB 检索（仅 Faq 列表，便于兼容返回 {@code List<FaqProtobuf>} 的调用点）。
      *
      * <p>内部委托 {@link #searchWithRagEnhancement(String, RobotProtobuf)} 后做聚合/TopK，
-     * 与 {@link KnowledgeBaseSearchHelper#searchKnowledgeBase(String, RobotProtobuf)} 行为对齐。</p>
+     * 与 {@link KbaseSearchHelper#searchKnowledgeBase(String, RobotProtobuf)} 行为对齐。</p>
      */
     public List<FaqProtobuf> searchKnowledgeBaseWithRag(String query, RobotProtobuf robot) {
         return searchKnowledgeBaseWithRag(query, robot, null, null);
@@ -253,7 +253,7 @@ public class RagQueryRewriteHelper {
      * 执行带 RAG Query 增强的 KB 检索（仅 Faq 列表，含上下文用于持久化记录）。
      *
      * <p>内部委托 {@link #searchWithRagEnhancement(String, RobotProtobuf, String, String)} 后做聚合/TopK，
-     * 与 {@link KnowledgeBaseSearchHelper#searchKnowledgeBase(String, RobotProtobuf)} 行为对齐。</p>
+     * 与 {@link KbaseSearchHelper#searchKnowledgeBase(String, RobotProtobuf)} 行为对齐。</p>
      */
     public List<FaqProtobuf> searchKnowledgeBaseWithRag(String query, RobotProtobuf robot,
             String threadTopic, String messageUid) {

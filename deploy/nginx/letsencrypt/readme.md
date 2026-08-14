@@ -64,6 +64,7 @@ Please enter the domain name(s) you would like on your certificate (comma and/or
 space separated) (Enter 'c' to cancel): weiyuai.cn,*.weiyuai.cn
 <!-- sudo certbot certonly --manual --preferred-challenges dns-01 -d bytedesk.com -d '*.bytedesk.com' -->
 bytedesk.com,*.bytedesk.com
+liangshibao.com,*.liangshibao.com
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 <!-- 添加域名解析TXT记录 -->

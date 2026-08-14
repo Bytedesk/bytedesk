@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -52,14 +53,25 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ProviderToolServiceDispatcher {
 
-    private final DashScopeToolService dashScopeToolService;
-    private final ZhipuaiToolService zhipuaiToolService;
+    // dashscope / zhipuai 工具服务可选注入：对应 provider 未启用时 bean 可能不存在，
+    // 使用 ObjectProvider 优雅降级（调用处均有 null 检查），避免启动失败。
+    private final ObjectProvider<DashScopeToolService> dashScopeToolServiceProvider;
+    private final ObjectProvider<ZhipuaiToolService> zhipuaiToolServiceProvider;
     private final ToolCallRestService toolCallRestService;
     private final ToolRestService toolRestService;
     private final IntentRecognitionHelper intentRecognitionHelper;
 
     private static final Pattern MATH_EXPRESSION_PATTERN = Pattern.compile(
             "\\b\\d+(?:\\.\\d+)?\\s*[+\\-*/xX]\\s*\\d+(?:\\.\\d+)?\\b");
+
+    // 可选依赖的便捷访问器：provider 未启用时返回 null。
+    private DashScopeToolService dashScopeToolService() {
+        return dashScopeToolServiceProvider.getIfAvailable();
+    }
+
+    private ZhipuaiToolService zhipuaiToolService() {
+        return zhipuaiToolServiceProvider.getIfAvailable();
+    }
 
     // ────────────────────────── public entry points ──────────────────────────
 
@@ -99,6 +111,8 @@ public class ProviderToolServiceDispatcher {
         long startedAtNanos = System.nanoTime();
 
         try {
+            DashScopeToolService dashScopeToolService = dashScopeToolService();
+            ZhipuaiToolService zhipuaiToolService = zhipuaiToolService();
             if (LlmProviderConstants.DASHSCOPE.equalsIgnoreCase(provider) && dashScopeToolService != null) {
                 DashScopeToolCallingResult result = dashScopeToolService.chat(userMessage, model);
                 String reply = result != null ? result.getFinalReply() : null;
@@ -140,6 +154,7 @@ public class ProviderToolServiceDispatcher {
         }
 
         if (LlmProviderConstants.DASHSCOPE.equalsIgnoreCase(provider)) {
+            DashScopeToolService dashScopeToolService = dashScopeToolService();
             if (dashScopeToolService == null || !dashScopeToolService.isSupported()) {
                 log.debug("Skip provider tool service: DashScopeToolService unavailable, toolChoice={}, tools={}, message={}",
                         toolChoice, tools, message);
@@ -148,6 +163,7 @@ public class ProviderToolServiceDispatcher {
             return shouldUseProviderToolServiceInternal(robot, message, callback);
         }
         if (LlmProviderConstants.ZHIPUAI.equalsIgnoreCase(provider)) {
+            ZhipuaiToolService zhipuaiToolService = zhipuaiToolService();
             if (zhipuaiToolService == null || !zhipuaiToolService.isSupported()) {
                 log.debug("Skip provider tool service: ZhipuaiToolService unavailable, toolChoice={}, tools={}, message={}",
                         toolChoice, tools, message);

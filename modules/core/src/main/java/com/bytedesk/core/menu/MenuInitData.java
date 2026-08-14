@@ -59,6 +59,7 @@ public final class MenuInitData {
 
                 seeds.add(MenuSeed.root("/audio", "audio", "audio", "menu.audio"));
                 seeds.add(MenuSeed.child("/audio/data", "data", "fileText", "/audio", "menu.audio.data"));
+                seeds.add(MenuSeed.child("/audio/voicemail", "voicemail", "message", "/audio", "menu.audio.voicemail"));
 
                 seeds.add(MenuSeed.root("/video", "video", "videoCamera", "menu.video"));
                 seeds.add(MenuSeed.child("/video/data", "data", "fileText", "/video", "menu.video.data"));
@@ -126,13 +127,13 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/message", "message", "mail", "/super", "menu.super.message"));
                 seeds.add(MenuSeed.child("/super/action", "action", "lock", "/super", "menu.super.action"));
                 seeds.add(MenuSeed.child("/super/task", "task", "calendar", "/super", "menu.super.task"));
-                seeds.add(MenuSeed.child("/super/quartz", "quartz", "clockCircle", "/super", "menu.super.quartz"));
                 seeds.add(MenuSeed.child("/super/agent", "agent", "user", "/super", "menu.super.agent"));
                 seeds.add(MenuSeed.child("/super/workgroup", "workgroup", "apartment", "/super", "menu.super.workgroup"));
+                seeds.add(MenuSeed.child("/super/audio", "audio", "audio", "/super", "menu.super.audio"));
+                seeds.add(MenuSeed.child("/super/video", "video", "videoCamera", "/super", "menu.super.video"));
                 seeds.add(MenuSeed.child("/super/robot", "robot", "robot", "/super", "menu.super.robot"));
                 seeds.add(MenuSeed.child("/super/robotagent", "robotagent", "user", "/super", "menu.super.robotagent"));
                 seeds.add(MenuSeed.child("/super/skills", "skills", "rocket", "/super", "menu.super.skills"));
-                seeds.add(MenuSeed.child("/super/mcp", "mcp", "api", "/super", "menu.super.mcp"));
                 seeds.add(MenuSeed.child("/super/prompt", "prompt", "message", "/super", "menu.super.prompt"));
                 seeds.add(MenuSeed.child("/super/ticket", "ticket", "profile", "/super", "menu.super.ticket"));
                 seeds.add(MenuSeed.child("/super/menu", "menu", "menu", "/super", "menu.super.menu"));

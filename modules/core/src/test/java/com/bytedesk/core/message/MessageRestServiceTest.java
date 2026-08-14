@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -64,5 +65,26 @@ class MessageRestServiceTest {
         assertThat(response.getUid()).isEqualTo("msg-1");
         assertThat(response.getContent()).contains("ocrText").contains("hello");
         assertThat(message.getContent()).contains("ocrText").contains("hello");
+    }
+
+    @Test
+    void recoverShouldReturnExistingMessageForConcurrentDuplicateInsert() {
+        MessageEntity existing = MessageEntity.builder()
+                .uid("msg-1")
+                .content("stored")
+                .build();
+        MessageEntity incoming = MessageEntity.builder()
+                .uid("msg-1")
+                .content("incoming")
+                .build();
+
+        when(messageRepository.existsByUid("msg-1")).thenReturn(true);
+        when(messageRepository.findByUid("msg-1")).thenReturn(Optional.of(existing));
+
+        MessageEntity recovered = messageRestService.recover(
+                new DataIntegrityViolationException("Duplicate entry 'msg-1'"),
+                incoming);
+
+        assertThat(recovered).isSameAs(existing);
     }
 }

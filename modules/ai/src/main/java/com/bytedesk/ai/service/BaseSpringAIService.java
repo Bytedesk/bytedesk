@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.kbase.KbaseSearchHelper;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.providers.dashscope.tool.DashScopeToolService;
@@ -45,6 +46,7 @@ import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
 import com.bytedesk.ai.springai.service.ChatClientInfoService;
 import com.bytedesk.ai.tool.utils.RobotToolCallbackResolver;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.utils.I18nTextResolver;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -53,15 +55,7 @@ import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
-import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
-import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
-import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
-import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
-import com.bytedesk.kbase.llm_text.vector.TextVectorService;
-import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
-import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.tool_call.ToolCallRestService;
 
@@ -70,28 +64,6 @@ import reactor.core.publisher.Flux;
 
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
-
-    protected FaqElasticService faqElasticService;
-
-    protected FaqVectorService faqVectorService;
-
-    protected TextElasticService textElasticService;
-
-    protected TextVectorService textVectorService;
-
-    protected ChunkElasticService chunkElasticService;
-
-    protected ChunkVectorService chunkVectorService;
-
-    protected WebpageElasticService webpageElasticService;
-
-    protected WebpageVectorService webpageVectorService;
-
-    // @Autowired
-    // protected ArticleElasticService articleElasticService;
-
-    // @Autowired(required = false)
-    // protected ArticleVectorService articleVectorService;
 
     protected IMessageSendService messageSendService;
 
@@ -109,7 +81,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected ApplicationEventPublisher applicationEventPublisher;
 
-    protected KnowledgeBaseSearchHelper knowledgeBaseSearchHelper;
+    protected KbaseSearchHelper knowledgeBaseSearchHelper;
 
     protected PromptHelper promptHelper;
 
@@ -166,14 +138,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     @Autowired
-    protected void setBaseDependencies(FaqElasticService faqElasticService,
-            ObjectProvider<FaqVectorService> faqVectorServiceProvider,
-            TextElasticService textElasticService,
-            ObjectProvider<TextVectorService> textVectorServiceProvider,
-            ChunkElasticService chunkElasticService,
-            ObjectProvider<ChunkVectorService> chunkVectorServiceProvider,
-            WebpageElasticService webpageElasticService,
-            ObjectProvider<WebpageVectorService> webpageVectorServiceProvider,
+    protected void setBaseDependencies(
             IMessageSendService messageSendService,
             UidUtils uidUtils,
             RobotRestService robotRestService,
@@ -182,7 +147,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             RobotMessageCache robotMessageCache,
             MessageRestService messageRestService,
             ApplicationEventPublisher applicationEventPublisher,
-            KnowledgeBaseSearchHelper knowledgeBaseSearchHelper,
+            KbaseSearchHelper knowledgeBaseSearchHelper,
             PromptHelper promptHelper,
             MessagePersistenceHelper messagePersistenceHelper,
             SseMessageHelper sseMessageHelper,
@@ -201,14 +166,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
             ObjectProvider<CannedResponseEvidenceHelper> cannedResponseEvidenceHelperProvider,
             ObjectProvider<AdvisorChainFactory> advisorChainFactoryProvider,
             ObjectProvider<RagQueryRewriteHelper> ragQueryRewriteHelperProvider) {
-        this.faqElasticService = faqElasticService;
-        this.faqVectorService = faqVectorServiceProvider.getIfAvailable();
-        this.textElasticService = textElasticService;
-        this.textVectorService = textVectorServiceProvider.getIfAvailable();
-        this.chunkElasticService = chunkElasticService;
-        this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
-        this.webpageElasticService = webpageElasticService;
-        this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
         this.messageSendService = messageSendService;
         this.uidUtils = uidUtils;
         this.robotRestService = robotRestService;
@@ -1073,9 +1030,11 @@ public abstract class BaseSpringAIService implements SpringAIService {
     }
 
     protected String resolveRobotDefaultReply(RobotProtobuf robot) {
-        return robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
+        String reply = robot.getLlm() != null && robot.getLlm().getDefaultReply() != null
                 ? robot.getLlm().getDefaultReply()
                 : I18Consts.I18N_ROBOT_DEFAULT_REPLY;
+        // 将 i18n key（如 "i18n.robot.noreply"）解析为本地化文本，避免 key 直接泄漏给前端
+        return I18nTextResolver.resolveIfKey(reply);
     }
 
     protected Map<String, String> buildCannedResponseEvidenceFields(String query, MessageProtobuf messageProtobufQuery,
