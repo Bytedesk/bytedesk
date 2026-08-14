@@ -124,6 +124,8 @@ jobs:
           context: ./starter
           file: ./starter/Dockerfile
           push: true
+          provenance: false
+          sbom: false
           tags: |
             bytedesk/bytedesk-ce:latest
             bytedesk/bytedesk-ce:${{ steps.version.outputs.VERSION }}
