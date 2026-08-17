@@ -27,6 +27,7 @@ import org.flowable.task.api.Task;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.message.MessageEntity;
@@ -85,6 +86,7 @@ public class TicketEventListener {
         ticketRestService.initTicketCategory(orgUid);
     }
 
+    @Transactional
     @EventListener
     public void handleTicketCreateEvent(TicketCreateEvent event) {
         TicketEntity ticket = event.getTicket();
@@ -153,14 +155,17 @@ public class TicketEventListener {
         if (ticketOptional.isPresent()) {
             TicketEntity ticketEntity = ticketOptional.get();
             ticketEntity.setProcessInstanceId(processInstance.getId());
-            ticketRestService.save(ticketEntity);
+            // 使用 save 返回的受管实体继续后续流程，避免游离态旧版本引用在 merge 时触发乐观锁失败
+            ticketEntity = ticketRestService.save(ticketEntity);
             ticketSLAService.initializeSlaRecords(ticketEntity);
 
             // 7. 自动分配处理人
             ticketAssignmentService.autoAssign(ticketEntity, processInstance.getId());
-        }
 
-        ticketNotificationService.notifyNewTicket(ticket);
+            ticketNotificationService.notifyNewTicket(ticketEntity);
+        } else {
+            ticketNotificationService.notifyNewTicket(ticket);
+        }
     }
 
     // 监听工单更新事件

@@ -34,6 +34,11 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.workgroup.WorkgroupEntity;
+import com.bytedesk.service.workgroup.WorkgroupRestService;
+import com.bytedesk.service.workgroup_routing.WorkgroupRoutingService;
 import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
@@ -41,7 +46,9 @@ import com.bytedesk.ticket.ticket.TicketConsts;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
@@ -58,10 +65,14 @@ public class TicketAssignmentService {
     private final MemberRepository memberRepository;
     private final TicketRepository ticketRepository;
     private final TicketSettingsRepository ticketSettingsRepository;
+    private final TicketSettingsRestService ticketSettingsRestService;
     private final TaskService taskService;
     private final TicketAssignmentLogRepository assignmentLogRepository;
     private final TicketUserOrgRoleRepository userOrgRoleRepository;
     private final TicketNotificationService ticketNotificationService;
+    private final WorkgroupRestService workgroupRestService;
+    private final WorkgroupRoutingService workgroupRoutingService;
+    private final UidUtils uidUtils;
 
     private static final Random RANDOM = new Random();
     private static final String DEFAULT_ASSIGNMENT_MODE = TicketAssignmentModeEnum.DEFAULT.name();
@@ -97,6 +108,7 @@ public class TicketAssignmentService {
         }
 
         Task activeTask = activeTasks.get(0);
+        ensureWaitClaimCandidateUsers(ticket, activeTask);
 
         // 2. Try explicit assignment from workflow node configuration
         AssignmentResolutionResult result = resolveFromWorkflowNode(ticket, activeTask.getTaskDefinitionKey());
@@ -139,6 +151,7 @@ public class TicketAssignmentService {
         }
 
         for (Task activeTask : activeTasks) {
+            ensureWaitClaimCandidateUsers(ticket, activeTask);
             AssignmentResolutionResult result = resolveFromWorkflowNode(ticket, activeTask.getTaskDefinitionKey());
 
             if (!result.isResolved()) {
@@ -347,6 +360,9 @@ public class TicketAssignmentService {
                                                                             String nodeAssignmentMode) {
         String departmentUid = ticket.getDepartmentUid();
         if (!StringUtils.hasText(departmentUid)) {
+            if (isExternalWorkgroupTicket(ticket)) {
+                return resolveWorkgroupMemberWithStrategy(ticket, nodeAssignmentMode, AssignmentSource.NODE_CONFIG);
+            }
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "no department uid for type=department");
         }
@@ -422,6 +438,10 @@ public class TicketAssignmentService {
                     "manual mode — no auto-assignment");
         }
 
+        if (isExternalWorkgroupTicket(ticket)) {
+            return resolveWorkgroupMemberWithStrategy(ticket, assignmentMode, AssignmentSource.GLOBAL_STRATEGY);
+        }
+
         List<MemberEntity> candidates = getCandidates(ticket);
         if (candidates.isEmpty()) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.GLOBAL_STRATEGY,
@@ -467,6 +487,22 @@ public class TicketAssignmentService {
                 }
             }
         }
+
+        if (isExternalWorkgroupTicket(ticket)) {
+            try {
+                TicketSettingsEntity settings = ticketSettingsRestService.resolveEntityByWorkgroup(
+                        ticket.getOrgUid(),
+                        ticket.getWorkgroupUid(),
+                        ticket.getType());
+                TicketBasicSettingsEntity basic = settings != null ? settings.getBasicSettings() : null;
+                if (basic != null && StringUtils.hasText(basic.getAssignmentMode())) {
+                    return TicketAssignmentModeEnum.normalize(basic.getAssignmentMode());
+                }
+            } catch (Exception ex) {
+                log.debug("getAssignmentMode: failed to resolve workgroup settings for ticket={}", ticket.getUid(), ex);
+            }
+        }
+
         return DEFAULT_ASSIGNMENT_MODE;
     }
 
@@ -477,7 +513,89 @@ public class TicketAssignmentService {
         if (StringUtils.hasText(ticket.getDepartmentUid())) {
             return memberRepository.findByDeptUidAndDeletedFalse(ticket.getDepartmentUid());
         }
+        if (isExternalWorkgroupTicket(ticket)) {
+            return getWorkgroupMembers(ticket);
+        }
         return List.of();
+    }
+
+    private AssignmentResolutionResult resolveWorkgroupMemberWithStrategy(TicketEntity ticket,
+            String assignmentMode,
+            AssignmentSource source) {
+        WorkgroupEntity workgroup = getWorkgroup(ticket);
+        if (workgroup == null) {
+            return AssignmentResolutionResult.unresolved(source,
+                    "workgroup not found: " + ticket.getWorkgroupUid());
+        }
+
+        String strategy = StringUtils.hasText(assignmentMode)
+                ? TicketAssignmentModeEnum.normalize(assignmentMode)
+                : getAssignmentMode(ticket);
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+        if (mode == TicketAssignmentModeEnum.MANUAL) {
+            return AssignmentResolutionResult.unresolved(source, "manual mode — no auto-assignment");
+        }
+
+        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, null, mode.name());
+        if (selectedAgent == null || selectedAgent.getMember() == null
+                || !StringUtils.hasText(selectedAgent.getMember().getUid())) {
+            return AssignmentResolutionResult.unresolved(source,
+                    "no available workgroup agents: " + workgroup.getUid());
+        }
+
+        return AssignmentResolutionResult.resolved(
+                selectedAgent.getMember().getUid(),
+                source,
+                mode.name(),
+                "工作组 " + workgroup.getUid() + " 按 " + mode.name() + " 分配",
+                "工作组可用客服 " + workgroup.getAvailableAgentCount() + " 人");
+    }
+
+    private boolean isExternalWorkgroupTicket(TicketEntity ticket) {
+        return ticket != null
+                && TicketTypeEnum.EXTERNAL.name().equalsIgnoreCase(ticket.getType())
+                && StringUtils.hasText(ticket.getWorkgroupUid());
+    }
+
+    private WorkgroupEntity getWorkgroup(TicketEntity ticket) {
+        if (!isExternalWorkgroupTicket(ticket)) {
+            return null;
+        }
+        return workgroupRestService.findByUid(ticket.getWorkgroupUid()).orElse(null);
+    }
+
+    private List<MemberEntity> getWorkgroupMembers(TicketEntity ticket) {
+        WorkgroupEntity workgroup = getWorkgroup(ticket);
+        if (workgroup == null || workgroup.getAgents() == null || workgroup.getAgents().isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, MemberEntity> candidateMap = new LinkedHashMap<>();
+        for (AgentEntity agent : workgroup.getAgents()) {
+            if (agent == null || agent.getMember() == null || !StringUtils.hasText(agent.getMember().getUid())) {
+                continue;
+            }
+            candidateMap.putIfAbsent(agent.getMember().getUid(), agent.getMember());
+        }
+        return new ArrayList<>(candidateMap.values());
+    }
+
+    private void ensureWaitClaimCandidateUsers(TicketEntity ticket, Task activeTask) {
+        if (activeTask == null || !isExternalWorkgroupTicket(ticket) || !isWaitClaimTask(ticket, activeTask)) {
+            return;
+        }
+
+        for (MemberEntity candidate : getWorkgroupMembers(ticket)) {
+            if (candidate == null || !StringUtils.hasText(candidate.getUid())) {
+                continue;
+            }
+            try {
+                taskService.addCandidateUser(activeTask.getId(), candidate.getUid());
+            } catch (Exception ex) {
+                log.debug("ensureWaitClaimCandidateUsers: candidate already linked or invalid, taskId={}, uid={}",
+                        activeTask.getId(), candidate.getUid());
+            }
+        }
     }
 
     // ==================== Strategy Implementations ====================
@@ -585,41 +703,48 @@ public class TicketAssignmentService {
             }
             MemberEntity member = memberOpt.get();
 
+            // 重新加载最新工单实体：调用方传入的可能是游离态旧版本引用，
+            // 直接 merge 会因版本过期触发 ObjectOptimisticLockingFailureException
+            TicketEntity current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
             UserProtobuf assigneeProtobuf = buildAssigneeProtobuf(member);
-            ticket.setAssignee(assigneeProtobuf.toJson());
+            current.setAssignee(assigneeProtobuf.toJson());
 
-            if (isWaitClaimTask(ticket, activeTask)) {
+            if (isWaitClaimTask(current, activeTask)) {
                 if (!StringUtils.hasText(activeTask.getAssignee())) {
                     taskService.claim(activeTask.getId(), assigneeUid);
                 } else if (!assigneeUid.equals(activeTask.getAssignee())) {
                     taskService.setAssignee(activeTask.getId(), assigneeUid);
                 }
                 Map<String, Object> variables = new HashMap<>();
-                variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssigneeString());
+                variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, current.getAssigneeString());
                 variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, assigneeUid);
                 variables.put(TicketConsts.TICKET_VARIABLE_STATUS, TicketStatusEnum.PROCESSING.name());
                 variables.put(TicketConsts.TICKET_VARIABLE_CLAIM_TIME, new Date());
                 taskService.complete(activeTask.getId(), variables);
-                Task processTask = findNextTaskByStage(ticket, activeTask.getProcessInstanceId(), "PROCESSING");
+                Task processTask = findNextTaskByStage(current, activeTask.getProcessInstanceId(), "PROCESSING");
                 if (processTask != null && !assigneeUid.equals(processTask.getAssignee())) {
                     taskService.setAssignee(processTask.getId(), assigneeUid);
                 }
-                ticket.setStatus(TicketStatusEnum.PROCESSING.name());
+                current.setStatus(TicketStatusEnum.PROCESSING.name());
             } else {
                 if (StringUtils.hasText(activeTask.getAssignee())) {
                     taskService.setAssignee(activeTask.getId(), assigneeUid);
                 } else {
                     taskService.claim(activeTask.getId(), assigneeUid);
                 }
-                ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+                current.setStatus(TicketStatusEnum.ASSIGNED.name());
             }
-            ticketRepository.save(ticket);
+            TicketEntity savedTicket = ticketRepository.save(current);
+
+            // 回写调用方引用，保证后续分配日志/通知读取到最新处理人与状态
+            ticket.setAssignee(savedTicket.getAssigneeString());
+            ticket.setStatus(savedTicket.getStatus());
 
             log.info("applyAssignment: assigned ticket={} to member={} (nickname={})",
                     ticket.getUid(), assigneeUid, member.getNickname());
             // Send notification to the new assignee
             try {
-                ticketNotificationService.notifyTicketAssigned(ticket);
+                ticketNotificationService.notifyTicketAssigned(savedTicket);
             } catch (Exception ex) {
                 log.warn("applyAssignment: notification failed for ticket={}", ticket.getUid(), ex);
             }
@@ -637,8 +762,10 @@ public class TicketAssignmentService {
             }
             MemberEntity member = memberOpt.get();
 
+            // 与 applyAssignment 相同：重新加载最新实体，规避游离态旧版本 merge 失败
+            TicketEntity current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
             UserProtobuf assigneeProtobuf = buildAssigneeProtobuf(member);
-            ticket.setAssignee(assigneeProtobuf.toJson());
+            current.setAssignee(assigneeProtobuf.toJson());
 
             if (!StringUtils.hasText(activeTask.getAssignee())) {
                 taskService.claim(activeTask.getId(), assigneeUid);
@@ -647,12 +774,13 @@ public class TicketAssignmentService {
             }
 
             Map<String, Object> variables = new HashMap<>();
-            variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssigneeString());
+            variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, current.getAssigneeString());
             variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, assigneeUid);
-            variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+            variables.put(TicketConsts.TICKET_VARIABLE_STATUS, current.getStatus());
             taskService.setVariables(activeTask.getId(), variables);
 
-            ticketRepository.save(ticket);
+            TicketEntity savedTicket = ticketRepository.save(current);
+            ticket.setAssignee(savedTicket.getAssigneeString());
 
             log.info("applyAssignmentForNextNode: assigned ticket={} next task to member={} (nickname={})",
                     ticket.getUid(), assigneeUid, member.getNickname());
@@ -684,6 +812,7 @@ public class TicketAssignmentService {
                                      AssignmentResolutionResult result) {
         try {
             TicketAssignmentLogEntity logEntry = TicketAssignmentLogEntity.builder()
+                    .uid(uidUtils.getUid())
                     .ticketUid(ticket.getUid())
                     .processInstanceId(processInstanceId)
                     .taskDefinitionKey(taskDefinitionKey)
@@ -711,6 +840,7 @@ public class TicketAssignmentService {
                                           String assignmentType, String reason) {
         try {
             TicketAssignmentLogEntity logEntry = TicketAssignmentLogEntity.builder()
+                    .uid(uidUtils.getUid())
                     .ticketUid(ticket.getUid())
                     .processInstanceId(processInstanceId)
                     .taskDefinitionKey(taskDefinitionKey)

@@ -933,6 +933,13 @@ public class TicketRestService
             settings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
                     .orElseThrow(() -> new NotFoundException(
                             "ticket settings not found: " + request.getTicketSettingsUid()));
+        } else if (TicketTypeEnum.EXTERNAL.name().equals(ticket.getType())
+            && StringUtils.hasText(ticket.getWorkgroupUid())) {
+            settings = ticketSettingsRestService.resolveEntityByWorkgroup(
+                request.getOrgUid(),
+                ticket.getWorkgroupUid(),
+                request.getType());
+            request.setTicketSettingsUid(settings.getUid());
         } else {
             settings = ticketSettingsRestService.getOrCreateDefault(request.getOrgUid(), request.getType());
             request.setTicketSettingsUid(settings.getUid());

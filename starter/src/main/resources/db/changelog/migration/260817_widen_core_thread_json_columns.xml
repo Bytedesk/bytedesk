@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        加宽 bytedesk_core_thread 中存储 JSON 快照的 varchar(2048) 列为大字段类型。
+
+        背景：
+        - RobotRestService.createLlmThread / updateLlmThread 会将完整 RobotProtobuf JSON
+          （包含 llm.prompt、rewritePrompt、defaultReply、tools 等大字段）写入
+          thread_user / agent / robot 列；
+        - 这些列历史定义为 varchar(2048)，机器人提示词稍长即超过 2048 字符，
+          MySQL 报错 1406 "Data too long for column 'agent'"，
+          导致创建 LLM 会话（如 AI 客服助手 AssistantCopilot）失败；
+        - 实体侧已同步改为 columnDefinition=TEXT（新库由 ddl-auto 直接创建 TEXT 列），
+          本迁移负责将存量库中的旧 varchar(2048) 列加宽。
+
+        说明：
+        - newDataType=clob 由 Liquibase 按数据库自动映射方言类型：
+          MySQL/MariaDB -> LONGTEXT，PostgreSQL/Kingbase -> TEXT，H2/Oracle -> CLOB；
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体定义直接创建 TEXT 列，无需本迁移；
+        - 每个列独立 changeSet，并分别校验 tableExists + columnExists：
+          某一列在特定部署中缺失时仅跳过该列，不影响其余列加宽；
+        - 仅加宽类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="260817-1-widen-core-thread-user-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_thread" />
+            <columnExists tableName="bytedesk_core_thread" columnName="thread_user" />
+        </preConditions>
+        <comment>将 bytedesk_core_thread.thread_user 由 varchar(2048) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="thread_user" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="260817-2-widen-core-thread-agent-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_thread" />
+            <columnExists tableName="bytedesk_core_thread" columnName="agent" />
+        </preConditions>
+        <comment>将 bytedesk_core_thread.agent 由 varchar(2048) 加宽为大字段类型，修复完整 RobotProtobuf JSON 写入时报 Data too long for column 'agent' 的问题。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="agent" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="260817-3-widen-core-thread-robot-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_thread" />
+            <columnExists tableName="bytedesk_core_thread" columnName="robot" />
+        </preConditions>
+        <comment>将 bytedesk_core_thread.robot 由 varchar(2048) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="robot" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="260817-4-widen-core-thread-workgroup-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_thread" />
+            <columnExists tableName="bytedesk_core_thread" columnName="workgroup" />
+        </preConditions>
+        <comment>将 bytedesk_core_thread.workgroup 由 varchar(2048) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="workgroup" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="260817-5-widen-core-thread-transfer-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_thread" />
+            <columnExists tableName="bytedesk_core_thread" columnName="transfer" />
+        </preConditions>
+        <comment>将 bytedesk_core_thread.transfer 由 varchar(2048) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="transfer" newDataType="clob" />
+    </changeSet>
+
+</databaseChangeLog>

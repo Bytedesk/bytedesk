@@ -50,11 +50,11 @@ import com.bytedesk.ai.springai.adviser.PrefixUppercaseAdvisor;
 import com.bytedesk.ai.springai.adviser.ReReadingAdvisor;
 import com.bytedesk.ai.springai.adviser.SelfRefineEvaluationAdvisor;
 import com.bytedesk.ai.springai.adviser.TagAdvisor;
-import com.bytedesk.ai.springai.adviser.WeatherTools;
 import com.bytedesk.ai.springai.controller.AdviserTestController;
-import com.bytedesk.ai.tool.test.DateTimeTools;
-import com.bytedesk.ai.tool.test.MathTools;
-import com.bytedesk.ai.tool.test.WeatherService;
+import com.bytedesk.ai.springai.tool.DateTimeTools;
+import com.bytedesk.ai.springai.tool.MathTools;
+import com.bytedesk.ai.springai.tool.WeatherService;
+import com.bytedesk.ai.springai.tool.WeatherTools;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -248,7 +248,9 @@ public class AdviserTestService {
 			.order(Ordered.HIGHEST_PRECEDENCE)
 			.build();
 
-		ChatClient chatClient = ChatClient.builder(chatModel).defaultAdvisors(safeGuardAdvisor).build();
+		ChatClient chatClient = ChatClient.builder(chatModel)
+							.defaultAdvisors(safeGuardAdvisor)
+							.build();
 
 		String content = chatClient.prompt().user(message).call().content();
 		Map<String, Object> result = buildResult("SafeGuardAdvisor", message, content);
@@ -690,7 +692,13 @@ public class AdviserTestService {
 					MyLoggingAdvisor.builder().order(1).showAvailableTools(true).build())
 			.build();
 
-		String content = chatClient.prompt().user(message).call().content();
+		// ToolSearchToolCallingAdvisor 按会话（conversationId）缓存/索引工具，
+		// 必须提供 chat_memory_conversation_id，否则 initializeSession 抛 IllegalArgumentException。
+		String content = chatClient.prompt()
+			.user(message)
+			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "tool-search-demo"))
+			.call()
+			.content();
 
 		Map<String, Object> result = buildResult("ToolSearchToolCallingAdvisor(RegexToolIndex)", message, content);
 		result.put("candidateTools", List.of("WeatherTools", "MathTools", "DateTimeTools"));

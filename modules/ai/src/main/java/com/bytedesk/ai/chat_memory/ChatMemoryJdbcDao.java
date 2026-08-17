@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 
+import com.bytedesk.core.utils.BdDateUtils;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -179,7 +181,11 @@ public class ChatMemoryJdbcDao {
             // timestampColumn 含 SQL 引号（反引号/双引号）仅用于拼接 SELECT/ORDER BY 文本，
             // 不能传给 rs.getTimestamp()，否则 MySQL 会查找名为 "`timestamp`"（含反引号）的列。
             Timestamp ts = rs.getTimestamp("timestamp");
-            LocalDateTime timestamp = ts != null ? ts.toLocalDateTime() : null;
+            // 统一转换为显示时区（默认北京时间 Asia/Shanghai），避免随 JVM/数据库时区漂移，
+            // 序列化时再由 @JsonFormat 格式化为 yyyy-MM-dd HH:mm:ss
+            LocalDateTime timestamp = ts != null
+                    ? LocalDateTime.ofInstant(ts.toInstant(), BdDateUtils.getDisplayZoneId())
+                    : null;
             return ChatMemoryRecord.builder()
                     .conversationId(rs.getString("conversation_id"))
                     .content(rs.getString("content"))

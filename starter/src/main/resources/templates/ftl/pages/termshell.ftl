@@ -166,7 +166,7 @@ Download Section START -->
 						📱 下载 Android APK
 					</a>
 				</div>
-				<p class="mt-2 small text-muted">版本 1.0.0 · 适用于 Android 5.0+</p>
+				<p class="mt-2 small text-body">版本 1.0.0 · 适用于 Android 5.0+</p>
 			</div>
 
 			<div class="col-md-7 text-md-end position-relative">

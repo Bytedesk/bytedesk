@@ -149,27 +149,29 @@ public abstract class AbstractThreadEntity extends BaseEntity {
      * 群组会话中，存储群组信息
      * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
      * @{UserProtobuf}
+     * 注意：LLM 会话会写入完整 RobotProtobuf JSON（含 llm.prompt 等大字段），需使用 TEXT 类型
      */
     @Builder.Default
-    @Column(name = "thread_user", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String user = BytedeskConsts.EMPTY_JSON_STRING;
 
     /**
      * 一对一客服对话中，存储客服信息
+     * LLM 会话中存储完整 RobotProtobuf JSON（含 llm 配置），需使用 TEXT 类型
      * @{UserProtobuf}
      */
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 机器人对话中，存储机器人信息
+    // 机器人对话中，存储机器人信息，LLM 会话写入完整 RobotProtobuf JSON，需使用 TEXT 类型
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String robot = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 工作组客服对话中，存储工作组信息
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String workgroup = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 工作流对话中，存储工作流信息
@@ -183,7 +185,7 @@ public abstract class AbstractThreadEntity extends BaseEntity {
     // @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     // private List<String> transfers = new ArrayList<>();
     @Builder.Default
-    @Column(length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String transfer = BytedeskConsts.EMPTY_JSON_STRING;
 
     // 邀请多个客服参与会话，存放多个 UserProtobuf 实体转换成的 JSON

@@ -213,8 +213,23 @@ Other Software START -->
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="/pages/termshell.html" class="stretched-link"><@t key="page.download.termshell">Termshell - SSH终端</@t></a></h5>
-					<p class="mb-1 small text-muted"><@t key="page.download.termshell.desc">随身SSH终端，手机管理服务器</@t></p>
+					<p class="mb-1 small text-body"><@t key="page.download.termshell.desc">随身SSH终端，手机管理服务器</@t></p>
 					<a href="https://www.weiyuai.cn/download/termshell-android.apk" target="_blank" class="btn btn-sm btn-outline-primary mt-2 position-relative" style="z-index:2;"><@t key="page.download.termshell.apk">Android APK 下载</@t></a>
+				</div>
+			</div>
+
+			<!-- Item: notebase Chrome Extension -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/idea.svg" alt="<@t key='alt.download.notebaseExtIcon'>知识库浏览器插件下载图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="/pages/clipper.html" class="stretched-link"><@t key="page.download.notebaseExt">知识库浏览器插件</@t></a></h5>
+					<p class="mb-1 small text-body"><@t key="page.download.notebaseExt.desc">微语剪藏插件，选中内容或右键菜单，一键保存同步到知识库</@t></p>
+					<p class="mb-1 small text-body"><@t key="page.download.notebaseExt.install">Chrome 浏览器：下载 zip 解压后，在 chrome://extensions/ 开启开发者模式，加载已解压的扩展程序</@t></p>
+					<a href="https://www.weiyuai.cn/download/notebase_chrome_extension_latest.zip" target="_blank" class="btn btn-sm btn-outline-primary mt-2 position-relative" style="z-index:2;"><@t key="page.download.notebaseExt.zip">下载 zip 安装包</@t></a>
 				</div>
 			</div>
 

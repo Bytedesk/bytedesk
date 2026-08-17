@@ -417,7 +417,7 @@ public class AdviserTestController {
 	 *   GET .../tool-search?message=今天星期几       → toolSearchTool → DateTimeTools
 	 * </pre>
 	 *
-	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/tool-search?message=帮我算 3+5
+	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/tool-search?message=帮我算%203%2B5
 	 */
 	@GetMapping("/tool-search")
 	public ResponseEntity<JsonResult<?>> toolSearch(
@@ -451,7 +451,7 @@ public class AdviserTestController {
 	 *   GET .../vector-memory-compare?message=我刚才说叫什么名字？&amp;conversationId=cmp1
 	 * </pre>
 	 *
-	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/vector-memory-compare?message=你好&conversationId=compare-demo
+	 * GET http://127.0.0.1:9003/spring/ai/api/v1/adviser/vector-memory-compare?message=你好&conversationId=comp1
 	 */
 	@GetMapping("/vector-memory-compare")
 	public ResponseEntity<JsonResult<?>> vectorMemoryCompare(

@@ -7,6 +7,8 @@ package com.bytedesk.ai.chat_memory;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +32,8 @@ public class ChatMemoryRecord {
     /** 消息类型：USER / ASSISTANT / SYSTEM / TOOL */
     private String type;
 
-    /** 时间戳（PostgreSQL 中为保留字，查询时需引为 "timestamp"） */
+    /** 时间戳（北京时间；PostgreSQL 中为保留字，查询时需引为 "timestamp"） */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
     /** 序列号（同一会话内递增） */

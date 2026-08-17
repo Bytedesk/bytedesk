@@ -2357,7 +2357,7 @@ public class TicketService {
                 .orderByHistoricActivityInstanceStartTime().asc()
                 .list()
                 .stream()
-                .filter(activity -> !"sequenceFlow".equals(activity.getActivityType()))
+            .filter(this::shouldDisplayTicketActivity)
                 .collect(Collectors.toList());
 
         // 获取任务评论
@@ -2398,6 +2398,28 @@ public class TicketService {
         return responses.stream()
                 .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
                 .collect(Collectors.toList());
+    }
+
+    private boolean shouldDisplayTicketActivity(HistoricActivityInstance activity) {
+        if (activity == null) {
+            return false;
+        }
+        if ("sequenceFlow".equals(activity.getActivityType())) {
+            return false;
+        }
+        // 边界定时器（如认领/处理 SLA 超时）不作为流转步骤展示：
+        // - 未触发（endTime=null）与被取消（任务先完成时 endTime 被回填）都不代表真实超时；
+        // - 真实超时会执行紧随其后的 serviceTask（如“记录认领 SLA 超时”），该节点会单独出现在历史中。
+        if ("boundaryEvent".equals(activity.getActivityType())) {
+            return false;
+        }
+        if (!StringUtils.hasText(activity.getActivityName())) {
+            return false;
+        }
+        if (activity.getStartTime() == null) {
+            return false;
+        }
+        return true;
     }
 
     private Map<String, String> buildTicketAssigneeNameMap(TicketEntity ticket,

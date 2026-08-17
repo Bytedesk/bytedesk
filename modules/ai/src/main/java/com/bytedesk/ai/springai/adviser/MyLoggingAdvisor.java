@@ -11,6 +11,9 @@ import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.util.JsonHelper;
 import org.springframework.util.StringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MyLoggingAdvisor implements BaseAdvisor {
 
 	private final int order;
@@ -65,7 +68,7 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 			}
 		}
 
-		System.out.println(sb.toString());
+		log.info(sb.toString());
 
 		return chatClientRequest;
 	}
@@ -76,7 +79,7 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 
 		if (chatClientResponse.chatResponse() == null || chatClientResponse.chatResponse().getResults() == null) {
 			sb.append(" No chat response ");
-			System.out.println(sb.toString());
+			log.info(sb.toString());
 			return chatClientResponse;
 		}
 
@@ -99,7 +102,7 @@ public class MyLoggingAdvisor implements BaseAdvisor {
 			}
 		}
 
-		System.out.println(sb.toString());
+		log.info(sb.toString());
 
 		return chatClientResponse;
 	}

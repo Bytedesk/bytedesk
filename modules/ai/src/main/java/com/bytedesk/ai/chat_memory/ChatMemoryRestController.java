@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,7 +45,8 @@ public class ChatMemoryRestController {
             m.put("conversationId", r.getConversationId());
             m.put("content", r.getContent());
             m.put("type", r.getType());
-            m.put("timestamp", r.getTimestamp() != null ? r.getTimestamp().toString() : null);
+            // 格式化为 yyyy-MM-dd HH:mm:ss（RowMapper 已转为北京时间，此处仅格式化，避免 LocalDateTime.toString() 输出 ISO 带 T 格式）
+            m.put("timestamp", r.getTimestamp() != null ? r.getTimestamp().format(BdDateUtils.getDateTimeFormatter()) : null);
             m.put("sequenceId", r.getSequenceId());
             return m;
         }).toList();

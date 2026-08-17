@@ -296,18 +296,27 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
         WorkgroupEntity workgroup = workgroupRestService.findByUid(workgroupUid)
                 .orElseThrow(() -> new IllegalArgumentException("Workgroup uid " + workgroupUid + " not found"));
 
+        ThreadEntity latestThread = getThreadByUid(thread.getUid());
+        if (hasAssignedAgent(latestThread)) {
+            return latestThread;
+        }
+
+        AgentEntity assignedAgent = resolveAssignedAgentFromTicket(ticket, workgroup);
+        if (assignedAgent != null) {
+            return applyAgentToThread(latestThread, workgroup, assignedAgent);
+        }
+        if (hasTicketAssignee(ticket)) {
+            log.warn("Ticket {} already has assignee {}, but no matching workgroup agent found, skip rerouting",
+                    ticket.getUid(), ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null);
+            return latestThread;
+        }
+
         // 按 TicketBasicSettingsEntity.assignmentMode 选择客服（MANUAL 时返回 null 即不分配）
         String assignmentMode = getTicketAssignmentMode(ticket);
-        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, thread, assignmentMode);
+        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, latestThread, assignmentMode);
         if (selectedAgent == null) {
             log.info("No available agent for ticket {}, workgroup {}, assignmentMode={}",
                     ticket.getUid(), workgroupUid, assignmentMode);
-            return thread;
-        }
-
-        // 读取最新线程再写入，避免并发覆盖
-        ThreadEntity latestThread = getThreadByUid(thread.getUid());
-        if (hasAssignedAgent(latestThread)) {
             return latestThread;
         }
 
@@ -358,29 +367,61 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             log.warn("Failed to sync ticket assignee/status for ticket {}: {}", ticket.getUid(), e.getMessage());
         }
 
-        // 按 workgroup 路由策略写入 agent，并同步设置 userUid
-        latestThread.setAgent(agentProtobuf.toJson());
-        // owner: best-effort（避免 agent.member 缺失导致抛错）
+        ThreadEntity savedThread = applyAgentToThread(latestThread, workgroup, selectedAgent);
+        log.info("Assigned ticket thread {} to agent {} for ticket {}", savedThread.getUid(),
+                selectedAgent.getUid(), ticket.getUid());
+        return savedThread;
+    }
+
+    private boolean hasTicketAssignee(TicketEntity ticket) {
+        if (ticket == null) {
+            return false;
+        }
         try {
-            if (selectedAgent.getMember() != null && selectedAgent.getMember().getUser() != null) {
-                latestThread.setOwner(selectedAgent.getMember().getUser());
-                latestThread.setUserUid(selectedAgent.getMember().getUser().getUid());
+            UserProtobuf assignee = ticket.getAssignee();
+            return assignee != null && StringUtils.hasText(assignee.getUid());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    private AgentEntity resolveAssignedAgentFromTicket(TicketEntity ticket, WorkgroupEntity workgroup) {
+        if (!hasTicketAssignee(ticket) || workgroup == null || workgroup.getAgents() == null) {
+            return null;
+        }
+        String assigneeUid = ticket.getAssignee().getUid();
+        return workgroup.getAgents().stream()
+                .filter(agent -> agent != null
+                        && agent.getMember() != null
+                        && StringUtils.hasText(agent.getMember().getUid())
+                        && assigneeUid.equals(agent.getMember().getUid()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private ThreadEntity applyAgentToThread(ThreadEntity thread, WorkgroupEntity workgroup, AgentEntity agent) {
+        UserProtobuf agentProtobuf = agent.toUserProtobuf();
+        thread.setAgent(agentProtobuf.toJson());
+
+        try {
+            if (agent.getMember() != null && agent.getMember().getUser() != null) {
+                thread.setOwner(agent.getMember().getUser());
+                thread.setUserUid(agent.getMember().getUser().getUid());
             }
         } catch (Exception e) {
-            log.debug("Failed to set thread owner for ticket {}: {}", ticket.getUid(), e.getMessage());
+            log.debug("Failed to set thread owner for thread {}: {}", thread.getUid(), e.getMessage());
         }
 
-        // workgroup 信息补写
         try {
-            UserProtobuf wg = latestThread.getWorkgroupProtobuf();
+            UserProtobuf wg = thread.getWorkgroupProtobuf();
             if (wg == null || !StringUtils.hasText(wg.getUid())) {
-                latestThread.setWorkgroup(ServiceConvertUtils.convertToUserProtobufJSONString(workgroup));
+                thread.setWorkgroup(ServiceConvertUtils.convertToUserProtobufJSONString(workgroup));
             }
         } catch (Exception e) {
-            latestThread.setWorkgroup(ServiceConvertUtils.convertToUserProtobufJSONString(workgroup));
+            thread.setWorkgroup(ServiceConvertUtils.convertToUserProtobufJSONString(workgroup));
         }
 
-        return saveThread(latestThread);
+        return saveThread(thread);
     }
 
     private boolean hasAssignedAgent(ThreadEntity thread) {

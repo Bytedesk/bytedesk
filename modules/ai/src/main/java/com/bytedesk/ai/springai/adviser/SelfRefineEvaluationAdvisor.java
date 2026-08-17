@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -34,6 +32,8 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.util.Assert;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Self-Refine Evaluation Advisor (LLM-as-a-Judge)
@@ -69,9 +69,8 @@ import org.springframework.util.Assert;
  * @author jackning 270580156@qq.com
  * @see <a href="https://docs.spring.io/spring-ai/reference/api/advisors.html">Spring AI Advisors</a>
  */
+@Slf4j
 public final class SelfRefineEvaluationAdvisor implements CallAdvisor, StreamAdvisor {
-
-	private static final Logger logger = LoggerFactory.getLogger(SelfRefineEvaluationAdvisor.class);
 
 	private static final PromptTemplate DEFAULT_EVALUATION_PROMPT_TEMPLATE = new PromptTemplate(
 			"""
@@ -158,7 +157,7 @@ public final class SelfRefineEvaluationAdvisor implements CallAdvisor, StreamAdv
 
 			// Early exit - skip evaluation (e.g., tool call response)
 			if (this.skipEvaluationPredicate.test(chatClientRequest, response)) {
-				logger.debug("[{}] Skipping evaluation (tool call / empty response)", getName());
+				log.debug("[{}] Skipping evaluation (tool call / empty response)", getName());
 				return response;
 			}
 
@@ -166,18 +165,18 @@ public final class SelfRefineEvaluationAdvisor implements CallAdvisor, StreamAdv
 			EvaluationResponse evaluation = this.evaluate(chatClientRequest, response);
 
 			if (evaluation.rating() >= this.successRating) {
-				logger.info("[{}] ✅ Passed on attempt {}/{}, rating={}: {}",
+				log.info("[{}] ✅ Passed on attempt {}/{}, rating={}: {}",
 						getName(), attempt, maxRepeatAttempts, evaluation.rating(), evaluation.evaluation());
 				return response;
 			}
 
 			if (attempt > maxRepeatAttempts) {
-				logger.warn("[{}] ❌ Max attempts ({}) reached. Last rating={}, feedback: {}",
+				log.warn("[{}] ❌ Max attempts ({}) reached. Last rating={}, feedback: {}",
 						getName(), maxRepeatAttempts, evaluation.rating(), evaluation.feedback());
 				return response;
 			}
 
-			logger.warn("[{}] 🔄 Retry attempt {}/{}, rating={}: {} | feedback: {}",
+			log.warn("[{}] 🔄 Retry attempt {}/{}, rating={}: {} | feedback: {}",
 					getName(), attempt, maxRepeatAttempts, evaluation.rating(), evaluation.evaluation(),
 					evaluation.feedback());
 
