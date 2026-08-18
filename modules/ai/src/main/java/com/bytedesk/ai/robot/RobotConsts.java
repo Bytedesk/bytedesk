@@ -64,6 +64,7 @@ public class RobotConsts {
     public static final String ROBOT_NAME_LANGUAGE_TRANSLATION = "language_translation"; // 语言翻译
     public static final String ROBOT_NAME_KB_TRANSLATION = "kbase_translation"; // 知识库内容翻译
     public static final String ROBOT_MODEL_KB_TRANSLATION = "qwen-mt-flash";
+    public static final String ROBOT_NAME_KB_WRITING = "kbase_writing"; // 知识库写作助手
 //     public static final String ROBOT_NAME_LANGUAGE_RECOGNITION = "language_recognition"; // 语言识别
 //     public static final String ROBOT_NAME_SEMANTIC_ANALYSIS = "semantic_analysis"; // 语义分析
 //     public static final String ROBOT_NAME_ENTITY_RECOGNITION = "entity_recognition"; // 实体识别

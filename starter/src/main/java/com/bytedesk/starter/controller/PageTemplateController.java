@@ -55,6 +55,7 @@ public class PageTemplateController {
         pageTemplateService.toHtml("pages/terms");
         pageTemplateService.toHtml("pages/termshell");
         pageTemplateService.toHtml("pages/clipper");
+        pageTemplateService.toHtml("pages/liangshibao");
         // features
         pageTemplateService.toHtml("features/office");
         pageTemplateService.toHtml("features/scrm");
@@ -83,6 +84,7 @@ public class PageTemplateController {
         pageTemplateService.toHtmlMulti("pages/terms");
         pageTemplateService.toHtmlMulti("pages/termshell");
         pageTemplateService.toHtmlMulti("pages/clipper");
+        pageTemplateService.toHtmlMulti("pages/liangshibao");
         // features
         pageTemplateService.toHtmlMulti("features/office");
         pageTemplateService.toHtmlMulti("features/scrm");

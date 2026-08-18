@@ -616,7 +616,8 @@ public class TicketService {
                 task.getTaskDefinitionKey(), null, transfer ? "MANUAL_TRANSFER" : "MANUAL_ASSIGN",
                 (transfer ? "转派给 " : "指派给 ") + targetMember.getUid());
         if (transfer) {
-            log.info("[NOTICE-DIAG] assignWorkflowTask transfer: calling notifyTicketTransferred for ticketUid={} assigneeUid={}",
+            log.info(
+                    "[NOTICE-DIAG] assignWorkflowTask transfer: calling notifyTicketTransferred for ticketUid={} assigneeUid={}",
                     ticket.getUid(), targetMember.getUid());
             ticketNotificationService.notifyTicketTransferred(ticket);
         }
@@ -1042,7 +1043,8 @@ public class TicketService {
     private void persistAndNotifyStatusChange(TicketEntity ticket, String previousStatus) {
         ticketRestService.save(ticket);
         if (!Objects.equals(previousStatus, ticket.getStatus())) {
-            log.info("[NOTICE-DIAG] persistAndNotifyStatusChange: previous={} current={} assigneeUid={} assigneeType={}",
+            log.info(
+                    "[NOTICE-DIAG] persistAndNotifyStatusChange: previous={} current={} assigneeUid={} assigneeType={}",
                     previousStatus, ticket.getStatus(),
                     ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null,
                     ticket.getAssignee() != null ? ticket.getAssignee().getType() : null);
@@ -1201,8 +1203,8 @@ public class TicketService {
         persistAndNotifyStatusChange(ticket, previousStatus);
         ticketSLAService.completeClaim(ticket, assigneeUid);
         ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
-            task.getTaskDefinitionKey(), null, "MANUAL_CLAIM",
-            "成员 " + assigneeUid + " 认领工单");
+                task.getTaskDefinitionKey(), null, "MANUAL_CLAIM",
+                "成员 " + assigneeUid + " 认领工单");
 
         // 7. 返回工单响应
         return TicketConvertUtils.convertToResponse(ticket);
@@ -1355,8 +1357,8 @@ public class TicketService {
         comment.setUserId(assigneeUid); // 设置评论的userId为当前认领人
         taskService.saveComment(comment);
         ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
-            task.getTaskDefinitionKey(), previousAssigneeJson, "MANUAL_UNCLAIM",
-            "成员 " + assigneeUid + " 退回工单到工作组");
+                task.getTaskDefinitionKey(), previousAssigneeJson, "MANUAL_UNCLAIM",
+                "成员 " + assigneeUid + " 退回工单到工作组");
 
         // 更新工单状态
         ticket.setAssignee(null);
@@ -1402,13 +1404,13 @@ public class TicketService {
         }
 
         MemberEntity targetMember = memberRestService.findByUid(request.getTargetAssigneeUid())
-            .orElseThrow(() -> new RuntimeException("目标处理人不存在: " + request.getTargetAssigneeUid()));
+                .orElseThrow(() -> new RuntimeException("目标处理人不存在: " + request.getTargetAssigneeUid()));
         UserProtobuf targetAssignee = UserProtobuf.builder()
-            .uid(targetMember.getUid())
-            .nickname(targetMember.getNickname())
-            .avatar(targetMember.getAvatar())
-            .type(UserTypeEnum.MEMBER.name())
-            .build();
+                .uid(targetMember.getUid())
+                .nickname(targetMember.getNickname())
+                .avatar(targetMember.getAvatar())
+                .type(UserTypeEnum.MEMBER.name())
+                .build();
 
         // 3. 查询任务
         Task task = taskService.createTaskQuery()
@@ -1435,7 +1437,8 @@ public class TicketService {
         // comment
         Comment comment = taskService.addComment(task.getId(), ticket.getProcessInstanceId(),
                 TicketStatusEnum.TRANSFERRED.name(),
-                "工单被转派给 " + (StringUtils.hasText(targetMember.getNickname()) ? targetMember.getNickname() : targetMember.getUid()));
+                "工单被转派给 " + (StringUtils.hasText(targetMember.getNickname()) ? targetMember.getNickname()
+                        : targetMember.getUid()));
         comment.setUserId(operatorUid);
         taskService.saveComment(comment);
         ticketAssignmentService.writeManualAssignmentLog(ticket, ticket.getProcessInstanceId(),
@@ -2351,18 +2354,26 @@ public class TicketService {
             ticket = ticketRestService.findByUid(request.getUid()).orElse(null);
         }
 
+        // 防御：工单未关联流程实例（历史数据/流程启动失败）时 processInstanceId 为空，
+        // Flowable 历史查询会退化为无过滤的全库扫描，把其他工单（甚至其他租户）的活动全部返回。
+        if (!StringUtils.hasText(request.getProcessInstanceId())) {
+            log.warn("queryTicketActivityHistory: processInstanceId is blank, skip history query, ticketUid={}",
+                    request.getUid());
+            return new ArrayList<>();
+        }
+
         // 获取活动历史，过滤掉 sequenceFlow
         List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery()
                 .processInstanceId(request.getProcessInstanceId())
                 .orderByHistoricActivityInstanceStartTime().asc()
                 .list()
                 .stream()
-            .filter(this::shouldDisplayTicketActivity)
+                .filter(this::shouldDisplayTicketActivity)
                 .collect(Collectors.toList());
 
         // 获取任务评论
         List<Comment> comments = taskService.getProcessInstanceComments(request.getProcessInstanceId());
-    Map<String, String> assigneeNameMap = buildTicketAssigneeNameMap(ticket, activities, comments);
+        Map<String, String> assigneeNameMap = buildTicketAssigneeNameMap(ticket, activities, comments);
 
         // 合并活动和评论信息
         List<TicketHistoryActivityResponse> responses = new ArrayList<>();
@@ -2374,7 +2385,7 @@ public class TicketService {
                         .activityName(activity.getActivityName())
                         .activityType(activity.getActivityType())
                         .assignee(activity.getAssignee())
-                    .assigneeName(assigneeNameMap.get(activity.getAssignee()))
+                        .assigneeName(assigneeNameMap.get(activity.getAssignee()))
                         .startTime(activity.getStartTime())
                         .endTime(activity.getEndTime())
                         .durationInMillis(activity.getDurationInMillis())
@@ -2390,7 +2401,7 @@ public class TicketService {
                         .description(comment.getFullMessage())
                         .startTime(comment.getTime())
                         .assignee(comment.getUserId())
-                    .assigneeName(assigneeNameMap.get(comment.getUserId()))
+                        .assigneeName(assigneeNameMap.get(comment.getUserId()))
                         .build())
                 .collect(Collectors.toList()));
 

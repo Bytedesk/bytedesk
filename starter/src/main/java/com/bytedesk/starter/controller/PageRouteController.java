@@ -90,7 +90,7 @@ public class PageRouteController {
 	@GetMapping({
 		"/{lang:zh-CN|zh-TW|en}/index.html",
 		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
-		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms|termshell|clipper}.html"
+		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}.html"
 	})
 	public String multiLanguageStaticPages(
 			@PathVariable String lang,
@@ -138,7 +138,7 @@ public class PageRouteController {
 	@GetMapping({
 		"/index.html",
 		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
-		"/pages/{page:download|contact|about|privacy|terms|termshell|clipper}.html"
+		"/pages/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}.html"
 	})
 	public String rootStaticPages(
 			@PathVariable(required = false) String feature,
@@ -563,8 +563,8 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/pages/download
 	 */
 	@GetMapping({ 
-		"/{page:download|contact|about|privacy|terms|termshell|clipper}", 
-		"/pages/{page:download|contact|about|privacy|terms|termshell|clipper}"
+		"/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}", 
+		"/pages/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}"
 	})
 	public String handlePageRoutes(@PathVariable String page, Model model) {
 		// if (!showDemo) {

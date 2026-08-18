@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.ThreadContent;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -248,6 +249,14 @@ public class MessagePersistService {
         log.info("dealWithMessageReceipt: {}, content: {}", type, message.getContent());
         String receiptContent = message.getContent();
         String receiptDedupKey = type.name() + ":" + receiptContent;
+        // 系统通知消息不会写入 message 表（仅存于 notification 表），
+        // 客户端对 system/ 主题通知回发的回执永远找不到目标消息，
+        // 直接按已处理跳过，避免重试 12 次后打出 orphan receipt 噪音日志
+        if (isSystemNoticeReceipt(message)) {
+            redisService.tryMarkMessageReceiptProcessed(receiptDedupKey, RECEIPT_DEDUP_TTL_SECONDS);
+            log.debug("skip receipt for system notice: type {}, targetUid {}", type, receiptContent);
+            return;
+        }
         // 回执消息内容存储被回执消息的uid
         // 当status已经为read时，不处理。防止delivered在后面更新read消息
         Optional<MessageEntity> messageOpt = messageRestService.findByUid(receiptContent);
@@ -294,6 +303,20 @@ public class MessagePersistService {
             message.setExtra(buildReceiptRetryExtra(retryCount + 1));
             messagePersistCache.pushForPersist(message.toJson());
         }
+    }
+
+    /**
+     * 判断回执是否针对系统通知消息（system/ 主题）。
+     * 通知消息不落 message 表，其回执无需也无法更新目标消息状态。
+     */
+    private boolean isSystemNoticeReceipt(MessageProtobuf message) {
+        if (message == null || message.getThread() == null) {
+            return false;
+        }
+        String threadUid = message.getThread().getUid();
+        String threadTopic = message.getThread().getTopic();
+        return (threadUid != null && threadUid.startsWith(TopicUtils.TOPIC_SYSTEM_PREFIX))
+                || (threadTopic != null && threadTopic.startsWith(TopicUtils.TOPIC_SYSTEM_PREFIX));
     }
 
     // 消息撤回，从数据库中删除消息

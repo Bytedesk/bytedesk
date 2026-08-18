@@ -68,6 +68,8 @@ public abstract class AbstractRobotService {
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
                 orgUid);
         if (robotOptional.isPresent()) {
+            // 惰性回填 textProviderUid：系统机器人可能在配置服务商之前创建
+            getRobotRestService().backfillTextProviderUid(robotOptional.get());
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
                 provider = robotOptional.get().getLlm().getTextProvider();
@@ -110,6 +112,8 @@ public abstract class AbstractRobotService {
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
                 orgUid);
         if (robotOptional.isPresent()) {
+            // 惰性回填 textProviderUid：系统机器人可能在配置服务商之前创建
+            getRobotRestService().backfillTextProviderUid(robotOptional.get());
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
                 provider = robotOptional.get().getLlm().getTextProvider();
@@ -143,6 +147,8 @@ public abstract class AbstractRobotService {
         Optional<RobotEntity> robotOptional = getRobotRestService().findByNameAndOrgUidAndDeletedFalse(robotName,
                 orgUid);
         if (robotOptional.isPresent()) {
+            // 惰性回填 textProviderUid：系统机器人可能在配置服务商之前创建
+            getRobotRestService().backfillTextProviderUid(robotOptional.get());
             String provider;
             if (robotOptional.get().getSettings() != null && robotOptional.get().getLlm() != null) {
                 provider = robotOptional.get().getLlm().getTextProvider();

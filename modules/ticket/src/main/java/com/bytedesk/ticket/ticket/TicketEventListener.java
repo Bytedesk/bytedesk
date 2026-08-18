@@ -164,6 +164,9 @@ public class TicketEventListener {
 
             ticketNotificationService.notifyNewTicket(ticketEntity);
         } else {
+            // 事件已改为事务提交后发布，正常不应出现读不到工单行的情况；保留兜底并告警，避免静默丢失流程实例关联
+            log.warn("handleTicketCreateEvent: ticket row not found after commit, ticketUid={}, processInstanceId={} not linked",
+                    ticket.getUid(), processInstance.getId());
             ticketNotificationService.notifyNewTicket(ticket);
         }
     }

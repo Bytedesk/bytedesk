@@ -233,6 +233,20 @@ Other Software START -->
 				</div>
 			</div>
 
+			<!-- Item: Liangshibao -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/artist.svg" alt="<@t key='alt.download.liangshibaoIcon'>良师宝K12学习助手下载图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="/pages/liangshibao.html" class="stretched-link"><@t key="page.download.liangshibao">良师宝 - K12学习助手</@t></a></h5>
+					<p class="mb-1 small text-muted"><@t key="page.download.liangshibao.desc">英语点读、古诗词朗诵、高考题库刷题</@t></p>
+					<a href="https://www.weiyuai.cn/download/liangshibao-android.apk" target="_blank" class="btn btn-sm btn-outline-primary mt-2 position-relative" style="z-index:2;"><@t key="page.download.liangshibao.apk">Android APK 下载</@t></a>
+				</div>
+			</div>
+
 		</div>
 	</div>
 </section>

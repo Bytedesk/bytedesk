@@ -982,6 +982,34 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
     }
 
     /**
+     * 惰性回填 textProviderUid（组织级优先，平台级兜底），成功后持久化。
+     * <p>robots.json 创建的系统机器人通常早于服务商配置创建，textProviderUid 可能为空，
+     * 导致 DashscopeService.resolveProvider 抛出 "RobotLlm or textProviderUid is null"。
+     * 此处在使用侧（如 AbstractRobotService.processSyncRequest）调用，配置好服务商后即可自愈。
+     *
+     * @return true 表示发生了回填并已保存
+     */
+    public boolean backfillTextProviderUid(RobotEntity robot) {
+        if (robot == null || robot.getLlm() == null
+                || StringUtils.hasText(robot.getLlm().getTextProviderUid())) {
+            return false;
+        }
+        resolveTextProviderUid(robot.getLlm(), robot.getOrgUid());
+        if (!StringUtils.hasText(robot.getLlm().getTextProviderUid())) {
+            return false;
+        }
+        try {
+            save(robot);
+            log.info("backfillTextProviderUid: robot={} orgUid={} providerUid={}",
+                    robot.getUid(), robot.getOrgUid(), robot.getLlm().getTextProviderUid());
+            return true;
+        } catch (Exception ex) {
+            log.warn("backfillTextProviderUid save failed, robot={}, err={}", robot.getUid(), ex.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * 解析并回填 textProviderUid。
      * <p>当 textProviderUid 为空但 textProvider（type）有值时，按 type 从「组织级 → 平台级」provider
      * 中查找并回填 UID。这样无论是通过 RobotModal 快速新建（不传 llm）还是通过抽屉编辑保存，

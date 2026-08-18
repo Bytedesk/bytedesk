@@ -188,7 +188,7 @@ public class KbaseStaticService {
             InputStream inputStream = IOUtils.toInputStream(content, "UTF-8");
             //
             String saveHtmlPathWithKbUid = resolveArticleHtmlDirectory(kbase.getUid(), languageDirectory);
-            log.info("toHtmlArticle saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
+            // log.info("toHtmlArticle saveHtmlPathWithKbUid {}", saveHtmlPathWithKbUid);
             File file = new File(saveHtmlPathWithKbUid);
             if (!file.exists()) {
                 file.mkdirs();
