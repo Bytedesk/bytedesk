@@ -197,6 +197,7 @@ public enum MessageTypeEnum {
     GROUP_CREATE,
     GROUP_INVITE,
     GROUP_DISMISS,
+    // 
     NOTIFICATION_AGENT_REPLY_TIMEOUT, // 客服回复超时提醒
     NOTIFICATION_RATE_SUBMITTED, // 访客评价提交提醒
     ERROR,

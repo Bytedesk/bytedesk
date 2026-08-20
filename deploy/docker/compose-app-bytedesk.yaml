@@ -36,7 +36,7 @@ services:
       BYTEDESK_CUSTOM_PRIVACY_POLICY_URL: https://www.weiyuai.cn/privacy.html
       BYTEDESK_CUSTOM_TERMS_OF_SERVICE_URL: https://www.weiyuai.cn/terms.html
       # Public MQTT WebSocket URL, typically used behind nginx or another reverse proxy. 外网可访问的 MQTT WebSocket 完整地址。
-      BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL:
+      BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL: ${BYTEDESK_CUSTOM_MQTT_WEBSOCKET_URL:-}
       # Public upload API base URL without the upload path, useful for multi-node or reverse-proxy upload setups. 外网上传 API 基础地址，不带上传路径。
       # BYTEDESK_CUSTOM_UPLOAD_API_URL: https://upload.example.com
       # Public visitor ticket HTML base URL without trailing slash, used in ticket notification emails. 访客工单页面基础地址，不带末尾斜杠。
@@ -121,7 +121,7 @@ services:
       BYTEDESK_FEATURES_JAVA_AI: "true"
       BYTEDESK_FEATURES_EMAIL_TYPE: javamail
       # Base URL for avatar access; change this to a publicly reachable address in real deployments. 头像访问基础地址，请改成对外可访问地址。
-      BYTEDESK_FEATURES_AVATAR_BASE_URL: http://127.0.0.1:9003
+      BYTEDESK_FEATURES_AVATAR_BASE_URL: ${BYTEDESK_FEATURES_AVATAR_BASE_URL:-http://127.0.0.1:9003}
       BYTEDESK_JWT_SECRET_KEY: ${BYTEDESK_JWT_SECRET_KEY}
       # 30 days in milliseconds. 30 天，单位毫秒。
       BYTEDESK_JWT_EXPIRATION: 2592000000
@@ -157,7 +157,7 @@ services:
       # ===============================
       BYTEDESK_UPLOAD_TYPE: local
       BYTEDESK_UPLOAD_DIR: /app/uploads
-      BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
+      BYTEDESK_UPLOAD_URL: ${BYTEDESK_UPLOAD_URL:-http://127.0.0.1:9003}
       # Maximum file size in bytes; default is 10MB. 最大文件大小，单位字节。
       BYTEDESK_UPLOAD_SECURITY_MAX_FILE_SIZE: 10485760
       BYTEDESK_UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION: "true"
@@ -183,10 +183,10 @@ services:
       # ===============================
       BYTEDESK_KBASE_HELPCENTER_THEME: default
       BYTEDESK_KBASE_HTML_PATH: /app/helpcenter
-      BYTEDESK_KBASE_HELPCENTER_API_URL: http://127.0.0.1:9003
+      BYTEDESK_KBASE_HELPCENTER_API_URL: ${BYTEDESK_KBASE_HELPCENTER_API_URL:-http://127.0.0.1:9003}
       BYTEDESK_KBASE_BLOG_THEME: default
       BYTEDESK_KBASE_BLOG_HTML_PATH: /app/blog
-      BYTEDESK_KBASE_BLOG_API_URL: http://127.0.0.1:9003
+      BYTEDESK_KBASE_BLOG_API_URL: ${BYTEDESK_KBASE_BLOG_API_URL:-http://127.0.0.1:9003}
       # ===============================
       # Socket config
       # WebSocket service for realtime messaging. 实时消息 WebSocket 服务配置。
@@ -299,13 +299,13 @@ services:
       # AI provider and model selection
       # Select default providers first, then configure API keys and model options for the providers you actually use. 先选择默认 provider，再为实际使用的 provider 配置密钥和模型参数。
       # ===============================
-      SPRING_AI_MODEL_CHAT: zhipuai
-      SPRING_AI_MODEL_EMBEDDING: zhipuai
-      SPRING_AI_MODEL_VISION: zhipuai
-      SPRING_AI_MODEL_AUDIO: zhipuai
+      SPRING_AI_MODEL_CHAT: none
+      SPRING_AI_MODEL_EMBEDDING: none
+      SPRING_AI_MODEL_VISION: none
+      SPRING_AI_MODEL_AUDIO: none
       SPRING_AI_MODEL_AUDIO_SPEECH: none
       SPRING_AI_MODEL_AUDIO_TRANSCRIPTION: none
-      SPRING_AI_MODEL_RERANK: zhipuai
+      SPRING_AI_MODEL_RERANK: none
       # 
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: "false"
@@ -317,7 +317,7 @@ services:
       SPRING_AI_OLLAMA_EMBEDDING_OPTIONS_MODEL_RERANK: bge-reranker-v2-m3:latest
       # 
       SPRING_AI_ZHIPUAI_API_KEY: ${SPRING_AI_ZHIPUAI_API_KEY:-}
-      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "true"
+      SPRING_AI_ZHIPUAI_CHAT_ENABLED: "false"
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_MODEL: glm-4.5-flash
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TEMPERATURE: 0.7
       SPRING_AI_ZHIPUAI_CHAT_OPTIONS_TOP_P: 0.9
@@ -328,7 +328,7 @@ services:
       SPRING_AI_ZHIPUAI_PING_INTERVAL: 10
       SPRING_AI_ZHIPUAI_MAX_IDLE_CONNECTIONS: 8
       SPRING_AI_ZHIPUAI_KEEP_ALIVE_DURATION: 1
-      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "true"
+      SPRING_AI_ZHIPUAI_EMBEDDING_ENABLED: "false"
       SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_MODEL: embedding-2
       SPRING_AI_ZHIPUAI_EMBEDDING_OPTIONS_DIMENSIONS: 1024
       # 

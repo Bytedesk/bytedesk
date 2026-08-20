@@ -185,21 +185,21 @@ public class MessageUtils {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.NOTIFICATION_AGENT_REPLY_TIMEOUT,
-                content);
+                buildSystemContent(MessageTypeEnum.NOTIFICATION_AGENT_REPLY_TIMEOUT, content));
     }
 
     public static MessageProtobuf createRateSubmittedMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.NOTIFICATION_RATE_SUBMITTED,
-                content);
+                buildSystemContent(MessageTypeEnum.NOTIFICATION_RATE_SUBMITTED, content));
     }
 
     public static MessageProtobuf createRateInviteMessage(ThreadEntity thread, String content) {
         return MessageUtils.createThreadMessage(UidUtils.getInstance().getUid(),
                 thread,
                 MessageTypeEnum.RATE_INVITE,
-                content);
+                buildSystemContent(MessageTypeEnum.RATE_INVITE, content));
     }
 
     public static MessageProtobuf createSystemMessage(ThreadEntity thread, String content) {
@@ -210,7 +210,6 @@ public class MessageUtils {
     }
 
     public static void notifyUser(MessageProtobuf messageProtobuf) {
-        // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
         bytedeskEventPublisher.publishMessageJsonEvent(messageProtobuf.toJson());
     }

@@ -369,8 +369,7 @@ public final class LicenseValidator {
             log.error("========================================");
             log.error("  ❌ 许可证验签失败：签名无效或格式错误");
             log.error("  ❌ License validation FAILED: invalid signature or format");
-            log.error("  请使用 generate_license.sh 生成有效的 RSA 签名许可证");
-            log.error("  Please use generate_license.sh to generate a valid license");
+            log.error("  Please get a valid license from https://www.weiyuai.cn/docs/zh-CN/docs/development/license");
             log.error("========================================");
         }
         return info;

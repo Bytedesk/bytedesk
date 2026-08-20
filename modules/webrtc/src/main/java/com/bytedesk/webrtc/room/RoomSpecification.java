@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,18 @@ public class RoomSpecification extends BaseSpecification<RoomEntity, RoomRequest
             predicates.add(criteriaBuilder.equal(root.get("inviteUid"), request.getInviteUid()));
         }
         if (StringUtils.hasText(request.getType())) {
-            predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            String[] typeValues = request.getType().split(",");
+            if (typeValues.length > 1) {
+                CriteriaBuilder.In<Object> typeIn = criteriaBuilder.in(root.get("type"));
+                for (String typeValue : typeValues) {
+                    if (StringUtils.hasText(typeValue)) {
+                        typeIn.value(typeValue.trim());
+                    }
+                }
+                predicates.add(typeIn);
+            } else {
+                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType().trim()));
+            }
         }
         if (StringUtils.hasText(request.getLevel())) {
             predicates.add(criteriaBuilder.equal(root.get("level"), request.getLevel()));

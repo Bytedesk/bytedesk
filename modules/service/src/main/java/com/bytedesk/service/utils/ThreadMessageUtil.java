@@ -227,7 +227,8 @@ public class ThreadMessageUtil {
     /**
      * 构造发送给客服通知线程的 ROUTING_POOL 消息（手动接入）。
      */
-    public static MessageProtobuf getAgentRoutingPoolNoticeMessage(RoutingPoolNotification payload, ThreadEntity thread) {
+    public static MessageProtobuf getAgentRoutingPoolNoticeMessage(RoutingPoolNotification payload,
+            ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
 
@@ -361,7 +362,7 @@ public class ThreadMessageUtil {
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-            .content(payload)
+                .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -383,7 +384,7 @@ public class ThreadMessageUtil {
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-            .content(payload)
+                .content(payload)
                 .type(MessageTypeEnum.LEAVE_MSG.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -405,7 +406,7 @@ public class ThreadMessageUtil {
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())
-            .content(payload)
+                .content(payload)
                 .type(MessageTypeEnum.SYSTEM.name())
                 .status(MessageStatusEnum.READ.name())
                 .channel(ChannelEnum.SYSTEM.name())
@@ -448,18 +449,20 @@ public class ThreadMessageUtil {
         // }
 
         // ServiceTrigger trigger = JSON.parseObject(
-        //         settings.getTriggerConditions(),
-        //         ServiceTrigger.class);
+        // settings.getTriggerConditions(),
+        // ServiceTrigger.class);
 
         // 检查无响应触发
         // trigger.getConditions().stream()
-        //         .filter(c -> c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
-        //         .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 > c.getTimeout())
-        //         .findFirst()
-        //         .ifPresent(condition -> {
-        //             // TODO: 发送主动推送消息
-        //             // sendProactiveMessage(userId, condition.getMessage());
-        //         });
+        // .filter(c ->
+        // c.getType().equals(ServiceTrigger.TriggerCondition.TYPE_NO_RESPONSE))
+        // .filter(c -> (System.currentTimeMillis() - lastActiveTime) / 1000 >
+        // c.getTimeout())
+        // .findFirst()
+        // .ifPresent(condition -> {
+        // // TODO: 发送主动推送消息
+        // // sendProactiveMessage(userId, condition.getMessage());
+        // });
     }
 
 }

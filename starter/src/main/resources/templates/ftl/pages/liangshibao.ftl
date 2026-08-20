@@ -37,6 +37,7 @@ Hero Banner START -->
 				<p class="mb-4">面向 K12 学生的开源学习助手，英语听力点读、必背古诗词朗诵、高考题库刷题，支持多宝宝档案、家庭共享学习记录、跨设备云同步，随时随地陪孩子学习成长。</p>
 				<div class="d-flex gap-3 align-items-center flex-wrap">
 					<a href="https://www.weiyuai.cn/download/liangshibao-android.apk" class="btn btn-primary" target="_blank">📱 立即下载 Android 版</a>
+					<a href="https://apps.apple.com/cn/app/%E8%89%AF%E5%B8%88%E5%AE%9D/id1515007448" class="btn btn-primary" target="_blank">🍎 App Store 下载</a>
 					<a href="https://liangshibao.com/" class="btn btn-outline-primary" target="_blank">🌐 访问官网</a>
 				</div>
 			</div>
@@ -163,10 +164,13 @@ Download Section START -->
 		<div class="row g-4 align-items-center">
 			<div class="col-md-5 position-relative z-index-9">
 				<h2>下载良师宝</h2>
-				<p>当前提供 Android 版本。iOS 版本开发中，敬请期待。</p>
+				<p>支持 Android 与 iOS 双端下载，随时随地开启学习。</p>
 				<div class="d-flex gap-3 align-items-center mt-3 flex-wrap">
 					<a href="https://www.weiyuai.cn/download/liangshibao-android.apk" class="btn btn-lg btn-primary" target="_blank">
 						📱 下载 Android APK
+					</a>
+					<a href="https://apps.apple.com/hk/app/%E8%89%AF%E5%B8%88%E5%AE%9D/id1515007448" class="btn btn-lg btn-primary" target="_blank">
+						🍎 下载 iOS 版
 					</a>
 					<a href="https://liangshibao.com/" class="btn btn-lg btn-outline-primary" target="_blank">
 						🌐 访问官网
