@@ -51,6 +51,7 @@ cp .env.example .env
 # 重要：密码/API Key/JWT 等敏感信息已统一迁移到 .env
 # start.sh/stop.sh 会通过 --env-file 自动加载 deploy/docker/.env
 # 如需调整本地 ASR 模型或设备，可在 .env 中修改 FUNASR_DEVICE、FUNASR_MODEL、FUNASR_VAD_MODEL。
+# 注意：.env 务必使用 UTF-8 编码保存（推荐无 BOM），且值中不要包含中文全角引号或首尾空格，否则可能导致环境变量解析异常。
 
 # 脚本方式（推荐）
 # 参数格式：

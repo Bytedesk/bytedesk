@@ -27,6 +27,11 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Boolean debug;
     private String version; 
     private String licenseKey; // 注意：这是前端专用的加密许可证摘要，不再暴露原始 licenseKey
+    /**
+     * 明文许可证摘要（服务端验签后的结论），供前端门控直接读取，无需解密。
+     * 字段缺失/valid=false 时前端应回退为社区版展示。
+     */
+    private License license;
 
     // 
     private Custom custom;
@@ -36,6 +41,27 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Service service;
     private Ai ai;
     private Call call;
+
+    @Getter
+    @Setter
+    public static class License {
+        /** COMMUNITY / ENTERPRISE / PLATFORM */
+        private String edition;
+        /** 到期日期 yyyy-MM-dd，空表示未解析到 */
+        private String expiryDate;
+        /** 服务端验签结论：签名有效且未过期 */
+        private Boolean valid = false;
+        /** free / paid */
+        private String userType;
+        /** 被授权人 */
+        private String name = "";
+        /** 授权描述 */
+        private String description = "";
+        /** 授权服务器 IP 列表 */
+        private java.util.List<String> serverIps = new java.util.ArrayList<>();
+        /** 授权域名列表 */
+        private java.util.List<String> serverDomains = new java.util.ArrayList<>();
+    }
 
     @Getter
     @Setter

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
     </parent>
 
     <groupId>com.bytedesk</groupId>
@@ -43,7 +43,7 @@
         <jspecify.version>1.0.0</jspecify.version>
         <!-- <agentscope.version>2.0.0</agentscope.version> -->
         <fastjson2.version>2.0.61</fastjson2.version>
-        <revision>4.1.0</revision>
+        <revision>4.2.0</revision>
     </properties>
 
     <dependencies>

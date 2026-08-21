@@ -110,6 +110,101 @@ public class BytedeskProperties implements EnvironmentAware {
     }
 
     /**
+     * 当前许可证的 edition（COMMUNITY / ENTERPRISE / PLATFORM），无效时返回 null。
+     */
+    public String getLicenseEdition() {
+        LicenseValidator.LicenseInfo info = validateLicense();
+        return info == null ? null : info.getEdition();
+    }
+
+    /**
+     * 是否为企业版或平台版（仅校验 edition，不校验过期）。
+     */
+    public boolean isEnterpriseOrPlatformEdition() {
+        LicenseValidator.LicenseInfo info = validateLicense();
+        if (info == null || !info.isValid()) {
+            return false;
+        }
+        String edition = info.getEdition();
+        return "ENTERPRISE".equalsIgnoreCase(edition) || "PLATFORM".equalsIgnoreCase(edition);
+    }
+
+    /**
+     * 许可证是否已过期（无效或过期均返回 true，fail-closed）。
+     */
+    public boolean isLicenseExpired() {
+        LicenseValidator.LicenseInfo info = validateLicense();
+        return info == null || !info.isValid() || info.isExpired();
+    }
+
+    /**
+     * IP/域名绑定校验（仅企业版/平台版需要；与前端 validateServerIpOrDomain 逻辑对齐）。
+     * 本地地址、无绑定限制时放行；否则当前 hostname 必须命中 serverIps 或 serverDomains 之一。
+     */
+    public boolean validateServerIpOrDomain(String hostname) {
+        LicenseValidator.LicenseInfo info = validateLicense();
+        if (info == null || !info.isValid()) {
+            return false;
+        }
+        String edition = info.getEdition();
+        if (!("ENTERPRISE".equalsIgnoreCase(edition) || "PLATFORM".equalsIgnoreCase(edition))) {
+            return true;
+        }
+        if (hostname == null || hostname.isBlank()) {
+            return false;
+        }
+        if (isLocalAddress(hostname)) {
+            return true;
+        }
+        java.util.List<String> ips = splitCsv(info.getServerIps());
+        java.util.List<String> domains = splitCsv(info.getServerDomains());
+        if (ips.isEmpty() && domains.isEmpty()) {
+            return true;
+        }
+        if (ips.contains(hostname)) {
+            return true;
+        }
+        for (String domain : domains) {
+            if (domain.equals(hostname)) {
+                return true;
+            }
+            if (domain.startsWith("*.")) {
+                String base = domain.substring(2);
+                if (hostname.equals(base) || hostname.endsWith("." + base)) {
+                    return true;
+                }
+            }
+            if (hostname.endsWith("." + domain)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isLocalAddress(String hostname) {
+        return "localhost".equalsIgnoreCase(hostname)
+                || hostname.startsWith("127.")
+                || hostname.startsWith("192.168.")
+                || hostname.startsWith("10.")
+                || hostname.startsWith("172.")
+                || "[::1]".equals(hostname);
+    }
+
+    private static java.util.List<String> splitCsv(String csv) {
+        if (csv == null || csv.isBlank()) {
+            return java.util.List.of();
+        }
+        java.util.List<String> result = new java.util.ArrayList<>();
+        for (String item : csv.split(",")) {
+            String value = item == null ? "" : item.trim();
+            if (!value.isEmpty()) {
+                result.add(value);
+            }
+        }
+        return result;
+    }
+
+    /**
      * 处理可能包含中文的文本
      * 
      * @param text 原始文本

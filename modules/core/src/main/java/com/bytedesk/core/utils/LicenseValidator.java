@@ -17,19 +17,10 @@ import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Signature;
-import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
-
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.OAEPParameterSpec;
-import javax.crypto.spec.PSource;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.exception.LicenseException;
@@ -63,28 +54,7 @@ public final class LicenseValidator {
         "2d1jnVa9SeGn1VM9RdMZsicCAwEAAQ==\n" +
         "-----END PUBLIC KEY-----";
 
-    private static final String FRONTEND_TRANSPORT_PUBLIC_KEY_PEM =
-        "-----BEGIN PUBLIC KEY-----\n" +
-        "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAtjEgf11ZbAyIBU3HZVjB\n" +
-        "XjeUxGCA4vcKUSly78TfUc9/8FHROnDDCV9y2sFZTSd+diNehdfIrpAH1rRG/pFr\n" +
-        "3V15Hq0f+d/+e/D6ETnrjvbE5iwE1pFta/m8niG1xnH70uzARVsMX7edgeBc38OZ\n" +
-        "IPPdS1PYV1do69JUQkpyWPO904bO2hhgGAwwZfWkl+KRoJmOZZfoPmUVnYgWulDJ\n" +
-        "G+1HurJmIHqenBLT3Mt/LRluEcBfpL9r4GWNhfUnw8YZiq8ykywAct6JxYh+h6jh\n" +
-        "w/+hCh0goM22lQJ9fY4YC0WRM+LC+JnN+6uHtDo499T9FcKyfSpykWbIbZxeTCq8\n" +
-        "FcIugg+rLDsv1JGNxAghpWgGmDyykBUQxtLIPRMB9/nEoeNJdmplvxDW5v4Ef8aM\n" +
-        "Sw3MEoFK0PZpEzZNwit//K0xOG48qwRHDjtKdiXYRGe/oYsy/zFlS1hV5AEZFBjy\n" +
-        "NSUAdirnoqUU7+gWrtSFrD/lth+M1HGs2G8AeoSRGFLRPbEZFpJDHXPTSx+5OA+J\n" +
-        "4vn/nCAhACe/MyPyVc5Pf6Y+LmBvHS2j4hVltGqHLOuadGsiwdSXqtk27XailRMS\n" +
-        "2xqYcRgbuG4k8GyA6pC3nHi2Dp8lXfp4v29n6zCU7aa+tGIUFahSvnI4ZddmOMfZ\n" +
-        "OU3w0VdN1ImMoE07XHm73X8CAwEAAQ==\n" +
-        "-----END PUBLIC KEY-----";
-
-    private static final String FRONTEND_TRANSPORT_PREFIX = "BDTK2";
-    private static final int GCM_IV_LENGTH = 12;
-    private static final int GCM_TAG_LENGTH = 128;
-
     private static volatile PublicKey cachedPublicKey;
-    private static volatile PublicKey cachedFrontendTransportPublicKey;
 
     /**
      * 加载 RSA 公钥 (懒加载 + 缓存)
@@ -112,31 +82,6 @@ public final class LicenseValidator {
                 throw new RuntimeException("License public key initialization failed", e);
             }
             return cachedPublicKey;
-        }
-    }
-
-    private static PublicKey getFrontendTransportPublicKey() {
-        if (cachedFrontendTransportPublicKey != null) {
-            return cachedFrontendTransportPublicKey;
-        }
-        synchronized (LicenseValidator.class) {
-            if (cachedFrontendTransportPublicKey != null) {
-                return cachedFrontendTransportPublicKey;
-            }
-            try {
-                String keyContent = FRONTEND_TRANSPORT_PUBLIC_KEY_PEM
-                    .replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\\s", "");
-                byte[] keyBytes = Base64.getDecoder().decode(keyContent);
-                X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-                KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-                cachedFrontendTransportPublicKey = keyFactory.generatePublic(spec);
-            } catch (Exception e) {
-                log.error("Failed to load frontend transport RSA public key", e);
-                throw new RuntimeException("Frontend transport public key initialization failed", e);
-            }
-            return cachedFrontendTransportPublicKey;
         }
     }
 
@@ -259,88 +204,6 @@ public final class LicenseValidator {
         return payloadB64 + ":" + signatureB64;
     }
 
-    public static String encryptForFrontend(LicenseInfo info) {
-        if (info == null || !info.isValid()) {
-            return null;
-        }
-
-        try {
-            byte[] iv = new byte[GCM_IV_LENGTH];
-            SecureRandom secureRandom = new SecureRandom();
-            secureRandom.nextBytes(iv);
-
-            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-            keyGenerator.init(256);
-            SecretKey aesKey = keyGenerator.generateKey();
-
-            Cipher aesCipher = Cipher.getInstance("AES/GCM/NoPadding");
-            aesCipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(GCM_TAG_LENGTH, iv));
-            byte[] cipherBytes = aesCipher.doFinal(toFrontendPayload(info).getBytes(StandardCharsets.UTF_8));
-
-            Cipher rsaCipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
-            rsaCipher.init(Cipher.ENCRYPT_MODE, getFrontendTransportPublicKey(),
-                    new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT));
-            byte[] encryptedKey = rsaCipher.doFinal(aesKey.getEncoded());
-
-            Base64.Encoder encoder = Base64.getEncoder();
-            return FRONTEND_TRANSPORT_PREFIX + ":"
-                    + encoder.encodeToString(encryptedKey) + ":"
-                    + encoder.encodeToString(iv) + ":"
-                    + encoder.encodeToString(cipherBytes);
-        } catch (Exception e) {
-            log.error("Failed to encrypt frontend license payload", e);
-            throw new RuntimeException("Frontend license payload encryption failed", e);
-        }
-    }
-
-    private static String toFrontendPayload(LicenseInfo info) {
-        return "{"
-                + "\"userType\":\"" + escapeJson(info.getUserType()) + "\"," 
-                + "\"expiryDate\":\"" + escapeJson(info.getExpiryDate()) + "\"," 
-                + "\"isValid\":" + info.isValid() + ","
-                + "\"edition\":\"" + escapeJson(info.getEdition()) + "\"," 
-                + "\"serverIps\":" + toJsonArray(info.getServerIps()) + ","
-                + "\"serverDomains\":" + toJsonArray(info.getServerDomains()) + ","
-                + "\"name\":\"" + escapeJson(info.getName()) + "\"," 
-                + "\"description\":\"" + escapeJson(info.getDescription()) + "\"," 
-                + "\"format\":\"FRONTEND_ENCRYPTED\""
-                + "}";
-    }
-
-    private static String toJsonArray(String csv) {
-        if (csv == null || csv.isBlank()) {
-            return "[]";
-        }
-        String[] items = csv.split(",");
-        StringBuilder builder = new StringBuilder("[");
-        boolean first = true;
-        for (String item : items) {
-            String value = item == null ? "" : item.trim();
-            if (value.isEmpty()) {
-                continue;
-            }
-            if (!first) {
-                builder.append(',');
-            }
-            builder.append('"').append(escapeJson(value)).append('"');
-            first = false;
-        }
-        builder.append(']');
-        return builder.toString();
-    }
-
-    private static String escapeJson(String value) {
-        if (value == null) {
-            return "";
-        }
-        return value
-                .replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
-    }
-
     // ============================================================
     // 启动时本地验签（替代远程在线验证）
     // ============================================================
@@ -458,7 +321,23 @@ public final class LicenseValidator {
         private String serverDomains;   // comma-separated
         private String name;           // 被授权人
         private String description;    // 描述
-        private String format;         // "RSA_SIGNED" | "FRONTEND_ENCRYPTED"
+        private String format;         // "RSA_SIGNED"
         private boolean valid;
+
+        /**
+         * 许可证是否已过期（按天粒度，过期日当天仍视为有效，与前端 isValidationExpired 对齐）。
+         * expiryDate 为空或格式非法时视为已过期（fail-closed）。
+         */
+        public boolean isExpired() {
+            if (expiryDate == null || expiryDate.isBlank()) {
+                return true;
+            }
+            try {
+                java.time.LocalDate expiry = java.time.LocalDate.parse(expiryDate);
+                return java.time.LocalDate.now().isAfter(expiry);
+            } catch (Exception e) {
+                return true;
+            }
+        }
     }
 }

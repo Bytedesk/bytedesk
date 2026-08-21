@@ -637,6 +637,7 @@ public class I18Consts {
     // public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
     public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled"; // 用户已被禁用
     public static final String I18N_FORBIDDEN_ACCESS = I18N_PREFIX + "forbidden.access"; // 禁止访问
+    public static final String I18N_ENTERPRISE_EDITION_REQUIRED = I18N_PREFIX + "enterprise.edition.required"; // 该功能仅企业版/平台版可用
     public static final String I18N_USER_BLOCKED = I18N_PREFIX + "user.blocked"; // 用户已被封禁
     public static final String I18N_SENSITIVE_CONTENT = I18N_PREFIX + "sensitive.content"; // 包含敏感内容
     public static final String I18N_MESSAGE_PROCESSING_FAILED = I18N_PREFIX + "message.processing.failed"; // 消息处理失败
