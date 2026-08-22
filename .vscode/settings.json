@@ -36,5 +36,6 @@
   },
   "CodeGPT.apiKey": "CodeGPT Plus Beta",
   "java.jdt.ls.vmargs": "-noverify -Xmx16G -XX:+UseG1GC -XX:+UseStringDeduplication",
-  "git.ignoreLimitWarning": true
+  "git.ignoreLimitWarning": true,
+  "java.debug.settings.onBuildFailureProceed": true
 }
