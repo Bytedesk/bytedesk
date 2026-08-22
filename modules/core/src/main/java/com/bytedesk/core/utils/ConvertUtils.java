@@ -41,8 +41,7 @@ public class ConvertUtils {
         // return modelMapper.map(bytedeskProperties, BytedeskPropertiesResponse.class);
         BytedeskPropertiesResponse response = getModelMapper().map(bytedeskProperties, BytedeskPropertiesResponse.class);
         
-        // 先带出配置中的许可证值，控制器会在返回前替换为前端专用加密摘要。
-        response.setLicenseKey(bytedeskProperties.getLicenseKey());
+        // 注意：licenseKey 不复制到响应，避免泄露给前端（控制器仅下发验签后的明文摘要）
         
         // 明确设置Custom所有字段的值，确保从配置中获取
         if (bytedeskProperties.getCustom() != null) {

@@ -171,6 +171,39 @@ public class LicenseValidatorTest {
     }
 
     @Test
+    void testParsePayloadUidBackwardCompatible() {
+        // 旧格式（7 段，无 uid）：uid 解析为空字符串
+        LicenseInfo info = LicenseValidator.parsePayload("p:2026-08-21:PLATFORM:1.2.3.4:example.com:name:desc");
+        assertNotNull(info);
+        assertEquals("", info.getUid());
+
+        // 旧格式（8 段含签发时间戳，无 uid）：uid 解析为空字符串
+        info = LicenseValidator.parsePayload("p:2026-08-21:PLATFORM:1.2.3.4:example.com:name:desc:1760000000");
+        assertNotNull(info);
+        assertEquals("", info.getUid());
+
+        // 新格式（9 段，末尾携带 uid）：uid 解析正确，且不影响其他字段
+        info = LicenseValidator.parsePayload("p:2026-08-21:PLATFORM:1.2.3.4:example.com:name:desc:1760000000:lic_1974747327902711");
+        assertNotNull(info);
+        assertEquals("lic_1974747327902711", info.getUid());
+        assertEquals("name", info.getName());
+        assertEquals("desc", info.getDescription());
+        assertEquals("PLATFORM", info.getEdition());
+    }
+
+    @Test
+    void testSignAndValidateWithUidRoundTrip() {
+        Assumptions.assumeTrue(hasPrivateKey(), "私钥缺失，跳过 uid 签发/验签回环测试");
+
+        String license = LicenseValidator.signLicense("p:2126-01-01:ENTERPRISE:::test:desc:1760000000:lic_uid_123");
+        LicenseInfo info = LicenseValidator.validate(license);
+        assertNotNull(info);
+        assertTrue(info.isValid());
+        assertEquals("lic_uid_123", info.getUid());
+        assertEquals("ENTERPRISE", info.getEdition());
+    }
+
+    @Test
     void testParsePayloadTooShortReturnsNull() {
         assertNull(LicenseValidator.parsePayload("only-one-part"));
         assertNull(LicenseValidator.parsePayload(""));

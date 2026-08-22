@@ -11,9 +11,11 @@ public interface CallIpBlacklistRepository extends JpaRepository<CallIpBlacklist
 
     Optional<CallIpBlacklistEntity> findByUid(String uid);
 
-    Optional<CallIpBlacklistEntity> findByOrgUidAndIpAddressAndDeletedFalse(String orgUid, String ipAddress);
+    // 使用 List + 按 id 升序:同一 IP 可能被并发自动拉黑或被多个 org 分别拉黑而产生多行,
+    // 单结果查询会抛 NonUniqueResultException,取最早一条即可
+    List<CallIpBlacklistEntity> findAllByOrgUidAndIpAddressAndDeletedFalseOrderByIdAsc(String orgUid, String ipAddress);
 
-    Optional<CallIpBlacklistEntity> findByIpAddressAndDeletedFalse(String ipAddress);
+    List<CallIpBlacklistEntity> findAllByIpAddressAndDeletedFalseOrderByIdAsc(String ipAddress);
 
     List<CallIpBlacklistEntity> findAllByOrgUidInAndDeletedFalse(Collection<String> orgUids);
 }

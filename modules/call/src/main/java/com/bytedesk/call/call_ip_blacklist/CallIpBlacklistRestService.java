@@ -210,10 +210,14 @@ public class CallIpBlacklistRestService extends BaseRestServiceWithExport<CallIp
         }
 
         if (StringUtils.hasText(orgUid)) {
-            return callIpBlacklistRepository.findByOrgUidAndIpAddressAndDeletedFalse(orgUid, normalizedIp);
+            return callIpBlacklistRepository.findAllByOrgUidAndIpAddressAndDeletedFalseOrderByIdAsc(orgUid, normalizedIp)
+                    .stream()
+                    .findFirst();
         }
 
-        return callIpBlacklistRepository.findByIpAddressAndDeletedFalse(normalizedIp);
+        return callIpBlacklistRepository.findAllByIpAddressAndDeletedFalseOrderByIdAsc(normalizedIp)
+                .stream()
+                .findFirst();
     }
 
     private String requireNormalizedIp(String ipAddress) {

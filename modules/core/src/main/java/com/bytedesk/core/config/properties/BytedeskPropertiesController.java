@@ -49,8 +49,6 @@ public class BytedeskPropertiesController {
     private static final long FALLBACK_ASR_TIMEOUT_MS = 180_000L;
     private static final long FALLBACK_ASR_POLL_INTERVAL_MS = 1_500L;
 
-    private static final String LICENSE_INVALID_MESSAGE = "LICENSE_INVALID";
-
     private final Environment environment;
     private final StringRedisTemplate stringRedisTemplate;
 
@@ -78,10 +76,8 @@ public class BytedeskPropertiesController {
         bytedeskPropertiesResponse.getService().setAgentSeatEnabled(
             environment.getProperty("bytedesk.service.agent-seat-enabled", Boolean.class, false));
 
-        // 服务端验签通过后，licenseKey 按原始 RSA 签名格式下发（Base64(payload):Base64(signature)），
-        // 载荷内容与明文摘要一致，无秘密可言；前端仅用内嵌公钥验签，不需要任何私钥。
-        // 同时下发明文 license 摘要（edition/expiryDate/valid/userType 等），供前端门控直接读取，无需验签/解密。
-        String licenseKey = bytedeskPropertiesResponse.getLicenseKey();
+        // 仅下发服务端验签后的明文 license 摘要（edition/expiryDate/valid/userType 等），供前端门控直接读取，无需验签/解密。
+        String licenseKey = BytedeskProperties.getInstance().getLicenseKey();
         if (StringUtils.hasText(licenseKey)) {
             String cacheKey = BytedeskConsts.LICENSE_VALID_CACHE_PREFIX + BytedeskProperties.getInstance().getOriginalAppkey();
             String cachedResult = stringRedisTemplate.opsForValue().get(cacheKey);
@@ -103,8 +99,6 @@ public class BytedeskPropertiesController {
                     log.info("License re-validated successfully, stale cache cleared: edition={}, expiry={}",
                             licenseInfo.getEdition(), licenseInfo.getExpiryDate());
                 }
-                // 原始签名 licenseKey 直接下发：前端门控走明文摘要，旧版前端可用公钥验签本格式。
-                // （历史上的 BDTK2 二次加密包装已废弃移除：前端不再持有传输私钥，解不出也无法利用）
 
                 // 明文摘要：签名有效；valid 需叠加过期判断（与后端拦截器语义一致）
                 plainLicense.setEdition(licenseInfo.getEdition());
@@ -112,6 +106,8 @@ public class BytedeskPropertiesController {
                 plainLicense.setUserType(licenseInfo.getUserType());
                 plainLicense.setValid(!licenseInfo.isExpired());
                 // 展示字段：被授权人/描述/授权IP/授权域名（许可证载荷中已存在，随明文摘要同步下发）
+                // uid：新格式 licenseKey 载荷末尾携带，旧格式许可证为空字符串（前端据此判定兼容）
+                plainLicense.setUid(licenseInfo.getUid() != null ? licenseInfo.getUid() : "");
                 plainLicense.setName(licenseInfo.getName() != null ? licenseInfo.getName() : "");
                 plainLicense.setDescription(licenseInfo.getDescription() != null ? licenseInfo.getDescription() : "");
                 plainLicense.setServerIps(splitCsvToList(licenseInfo.getServerIps()));
@@ -120,7 +116,7 @@ public class BytedeskPropertiesController {
                 stringRedisTemplate.opsForValue().set(cacheKey, "false",
                         java.time.Duration.ofMinutes(30));
                 log.warn("License validation FAILED, marking as invalid");
-                bytedeskPropertiesResponse.setLicenseKey(LICENSE_INVALID_MESSAGE);
+                // 不下发 licenseKey（包括哨兵值），前端依据明文摘要 valid=false 回退社区版
                 plainLicense.setValid(false);
             }
             bytedeskPropertiesResponse.setLicense(plainLicense);

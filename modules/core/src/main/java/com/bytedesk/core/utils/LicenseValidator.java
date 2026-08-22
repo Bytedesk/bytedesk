@@ -282,7 +282,8 @@ public final class LicenseValidator {
 
     /**
      * 解析载荷内容
-     * 格式: type:date:edition:ips:domains:name:description[:timestamp]
+     * 格式: type:date:edition:ips:domains:name:description[:timestamp[:uid]]
+     * uid 为许可证记录标识（追加在载荷末尾），旧格式许可证不含该字段，解析为空字符串。
      */
     static LicenseInfo parsePayload(String payload) {
         if (payload == null || payload.isBlank()) {
@@ -304,6 +305,8 @@ public final class LicenseValidator {
         info.setServerDomains(parts.length > 4 ? parts[4] : "");
         info.setName(parts.length > 5 ? parts[5] : "");
         info.setDescription(parts.length > 6 ? parts[6] : "");
+        // 新格式末尾第 9 段为 uid；旧格式许可证（段数 <= 8）uid 保持为空，兼容历史 licenseKey
+        info.setUid(parts.length > 8 ? parts[8] : "");
 
         return info;
     }
@@ -321,6 +324,7 @@ public final class LicenseValidator {
         private String serverDomains;   // comma-separated
         private String name;           // 被授权人
         private String description;    // 描述
+        private String uid;            // 许可证记录 uid（新格式载荷末尾携带，旧格式为空字符串）
         private String format;         // "RSA_SIGNED"
         private boolean valid;
 

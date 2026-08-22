@@ -887,5 +887,6 @@ public class I18Consts {
     public static final String I18N_MESSAGE_TYPE_EMAIL_ADDRESS = I18N_PREFIX + "message.type.email.address";
     public static final String I18N_MESSAGE_TYPE_WECHAT_NUMBER = I18N_PREFIX + "message.type.wechat.number";
     public static final String I18N_MESSAGE_TYPE_BLOG = I18N_PREFIX + "message.type.blog";
+    
 
 }

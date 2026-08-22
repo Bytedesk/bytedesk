@@ -62,10 +62,10 @@ public class CallIpBlacklistService {
             return false;
         }
         if (StringUtils.hasText(normalizedOrgUid)
-                && callIpBlacklistRepository.findByOrgUidAndIpAddressAndDeletedFalse(normalizedOrgUid, normalizedIp).isPresent()) {
+                && !callIpBlacklistRepository.findAllByOrgUidAndIpAddressAndDeletedFalseOrderByIdAsc(normalizedOrgUid, normalizedIp).isEmpty()) {
             return true;
         }
-        return callIpBlacklistRepository.findByIpAddressAndDeletedFalse(normalizedIp).isPresent();
+        return !callIpBlacklistRepository.findAllByIpAddressAndDeletedFalseOrderByIdAsc(normalizedIp).isEmpty();
     }
 
     public List<String> findBlacklistedIps(Collection<String> orgUids) {
@@ -88,9 +88,13 @@ public class CallIpBlacklistService {
 
     private Optional<CallIpBlacklistEntity> findExisting(String orgUid, String sourceIp) {
         if (StringUtils.hasText(orgUid)) {
-            return callIpBlacklistRepository.findByOrgUidAndIpAddressAndDeletedFalse(orgUid, sourceIp);
+            return callIpBlacklistRepository.findAllByOrgUidAndIpAddressAndDeletedFalseOrderByIdAsc(orgUid, sourceIp)
+                    .stream()
+                    .findFirst();
         }
-        return callIpBlacklistRepository.findByIpAddressAndDeletedFalse(sourceIp);
+        return callIpBlacklistRepository.findAllByIpAddressAndDeletedFalseOrderByIdAsc(sourceIp)
+                .stream()
+                .findFirst();
     }
 
     private CallIpBlacklistEntity saveNew(EslEventEntity eslEvent, String sourceIp, String orgUid) {

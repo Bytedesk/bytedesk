@@ -26,7 +26,6 @@ public class BytedeskPropertiesResponse implements Serializable {
 
     private Boolean debug;
     private String version; 
-    private String licenseKey; // 注意：这是前端专用的加密许可证摘要，不再暴露原始 licenseKey
     /**
      * 明文许可证摘要（服务端验签后的结论），供前端门控直接读取，无需解密。
      * 字段缺失/valid=false 时前端应回退为社区版展示。
@@ -45,6 +44,8 @@ public class BytedeskPropertiesResponse implements Serializable {
     @Getter
     @Setter
     public static class License {
+        /** 许可证记录 uid（新格式 licenseKey 载荷末尾携带；旧格式许可证为空字符串） */
+        private String uid = "";
         /** COMMUNITY / ENTERPRISE / PLATFORM */
         private String edition;
         /** 到期日期 yyyy-MM-dd，空表示未解析到 */
