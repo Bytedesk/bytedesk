@@ -247,31 +247,45 @@ public class CallEventListener implements IEslEventListener {
                     "Caller-Caller-ID-Number");
                 String orgUid = resolveOrgUid(headers, callerNumber);
                 if (StringUtils.hasText(sourceIp)) {
-                try {
-                    var blacklistEntity = callIpBlacklistService.blacklistSourceIp(
-                        orgUid,
-                        sourceIp,
-                        eslEvent.getEventName(),
-                        callerNumber,
-                        null,
-                        "Auto-blocked from CUSTOM sofia::wrong_call_state");
-                    log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp={} sourcePort={} orgUid={} blacklistUid={} function={} file={} line={}",
-                        eventSubclass,
-                        callerNumber,
-                        sourceIp,
-                        sourcePort,
-                        blacklistEntity.getOrgUid(),
-                        blacklistEntity.getUid(),
-                        headers.get("Event-Calling-Function"),
-                        headers.get("Event-Calling-File"),
-                        headers.get("Event-Calling-Line-Number"));
-                } catch (Exception ex) {
-                    log.warn("自定义事件(异常状态)自动拉黑失败: subclass={} fromUser={} sourceIp={} reason={}",
-                        eventSubclass,
-                        callerNumber,
-                        sourceIp,
-                        ex.getMessage());
-                }
+                    // 同一扫描器会持续探测已拉黑 IP（每条 INVITE/CANCEL 都产生一条 wrong_call_state），
+                    // 重复事件降级为 DEBUG，避免线上日志刷屏；仅首次拉黑/拉黑失败保留 WARN，便于监控新增攻击源。
+                    if (callIpBlacklistService.isBlacklisted(orgUid, sourceIp)) {
+                        log.debug("自定义事件(异常状态)重复扫描(已拉黑): subclass={} fromUser={} sourceIp={} sourcePort={} orgUid={} function={} file={} line={}",
+                                eventSubclass,
+                                callerNumber,
+                                sourceIp,
+                                sourcePort,
+                                orgUid,
+                                headers.get("Event-Calling-Function"),
+                                headers.get("Event-Calling-File"),
+                                headers.get("Event-Calling-Line-Number"));
+                        return;
+                    }
+                    try {
+                        var blacklistEntity = callIpBlacklistService.blacklistSourceIp(
+                            orgUid,
+                            sourceIp,
+                            eslEvent.getEventName(),
+                            callerNumber,
+                            null,
+                            "Auto-blocked from CUSTOM sofia::wrong_call_state");
+                        log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp={} sourcePort={} orgUid={} blacklistUid={} function={} file={} line={}",
+                            eventSubclass,
+                            callerNumber,
+                            sourceIp,
+                            sourcePort,
+                            blacklistEntity.getOrgUid(),
+                            blacklistEntity.getUid(),
+                            headers.get("Event-Calling-Function"),
+                            headers.get("Event-Calling-File"),
+                            headers.get("Event-Calling-Line-Number"));
+                    } catch (Exception ex) {
+                        log.warn("自定义事件(异常状态)自动拉黑失败: subclass={} fromUser={} sourceIp={} reason={}",
+                            eventSubclass,
+                            callerNumber,
+                            sourceIp,
+                            ex.getMessage());
+                    }
                 } else {
                 log.warn("自定义事件(异常状态): subclass={} fromUser={} sourceIp=<empty> sourcePort={} function={} file={} line={}",
                     eventSubclass,

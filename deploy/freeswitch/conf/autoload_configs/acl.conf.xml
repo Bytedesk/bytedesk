@@ -38,7 +38,7 @@
       <node type="allow" cidr="111.181.0.0/16" />
       <node type="allow" cidr="111.183.0.0/16" />
       <node type="allow" cidr="183.92.15.0/24" />
-      <node type="allow" cidr="122.191.157.0/24" />
+      <node type="allow" cidr="138.68.11.125/32" />
       <node type="allow" cidr="185.199.109.133/32" />
       <node type="allow" cidr="178.128.69.202/32" />
       <node type="allow" cidr="172.66.152.246/32"/>
