@@ -38,12 +38,12 @@
         <!-- <redisson.version>4.1.0</redisson.version> -->
         <springdoc.version>3.0.3</springdoc.version>
         <spring-retry.version>2.0.13</spring-retry.version>
-        <spring-ai.version>2.0.0</spring-ai.version>
+        <spring-ai.version>2.0.1</spring-ai.version>
         <dashscope-sdk-java.version>2.22.28</dashscope-sdk-java.version>
         <jspecify.version>1.0.0</jspecify.version>
         <!-- <agentscope.version>2.0.0</agentscope.version> -->
         <fastjson2.version>2.0.61</fastjson2.version>
-        <revision>4.2.0</revision>
+        <revision>4.3.0</revision>
     </properties>
 
     <dependencies>
