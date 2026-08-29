@@ -51,7 +51,8 @@ public class TicketRestControllerVisitor {
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TicketRequest request) {
 
-        TicketResponse response = ticketRestService.queryByUid(request);
+        // 匿名访客与列表接口同等安全级别；已认证访客仍走报告人可见性校验
+        TicketResponse response = ticketRestService.queryByUidForVisitor(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

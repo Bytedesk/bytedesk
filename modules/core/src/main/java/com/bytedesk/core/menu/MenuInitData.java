@@ -149,6 +149,8 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/sms", "sms", "message", "/super", "menu.super.sms"));
                 seeds.add(MenuSeed.child("/super/recycle", "recycle", "delete", "/super", "menu.super.recycle"));
                 seeds.add(MenuSeed.child("/super/server", "server", "cloudServer", "/super", "menu.super.server"));
+                // 渠道管理：单页（Splitter + 左列表 + 右Tab），无子菜单
+                seeds.add(MenuSeed.child("/super/channel", "channel", "apartment", "/super", "menu.super.channel"));
 
                 return seeds;
         }

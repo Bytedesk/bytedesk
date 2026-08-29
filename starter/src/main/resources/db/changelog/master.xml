@@ -40,4 +40,8 @@
 
     <include file="db/changelog/migration/260817_widen_core_thread_json_columns.xml" />
 
+    <include file="db/changelog/migration/260823_add_wechat_work_contact_tables.xml" />
+
+    <include file="db/changelog/migration/260829_widen_core_notification_content.xml" />
+
 </databaseChangeLog>

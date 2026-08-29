@@ -25,11 +25,13 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class ExcelExportUtils {
 
@@ -68,7 +70,21 @@ public final class ExcelExportUtils {
                                         List<List<String>> head,
                                         List<List<Object>> rows,
                                         int[] columnWidths) throws Exception {
-        prepareExcelResponse(response, filePrefix);
+        writeCustomExcel(response, null, sheetName, filePrefix, head, rows, columnWidths);
+    }
+
+    /**
+     * 自定义表头导出，支持从 request 解析 exportFileName/exportSheetName 覆盖默认值
+     */
+    public static void writeCustomExcel(HttpServletResponse response,
+                                        Object request,
+                                        String sheetName,
+                                        String filePrefix,
+                                        List<List<String>> head,
+                                        List<List<Object>> rows,
+                                        int[] columnWidths) throws Exception {
+        prepareExcelResponse(response, request, filePrefix);
+        String resolvedSheetName = resolveSheetName(request, sheetName, filePrefix);
 
         var writer = EasyExcel.write(response.getOutputStream())
                 .autoCloseStream(Boolean.FALSE)
@@ -79,7 +95,7 @@ public final class ExcelExportUtils {
             writer.registerWriteHandler(widthHandler);
         }
 
-        writer.sheet(sheetName)
+        writer.sheet(resolvedSheetName)
                 .doWrite(rows);
     }
 
@@ -168,6 +184,16 @@ public final class ExcelExportUtils {
         if (!value.startsWith(I18Consts.I18N_PREFIX) && !value.startsWith("ROLE_")) {
             return value;
         }
+        // 逗号分隔的多个值（如角色列表 "ROLE_ADMIN, ROLE_USER"）逐个翻译后再拼接
+        if (value.contains(", ")) {
+            return Arrays.stream(value.split(", "))
+                    .map(part -> localizeSingleValue(part, lang))
+                    .collect(Collectors.joining(", "));
+        }
+        return localizeSingleValue(value, lang);
+    }
+
+    private static String localizeSingleValue(String value, String lang) {
         if (!ApplicationContextHolder.isInitialized()) {
             return value;
         }
@@ -356,6 +382,21 @@ public final class ExcelExportUtils {
                 case "ja" -> "座席番号";
                 case "zh" -> locale.getCountry().equalsIgnoreCase("TW") ? "座席號" : "座位号";
                 default -> "Seat Number";
+            };
+            case "roles" -> switch (language) {
+                case "ja" -> "ロール";
+                case "zh" -> "角色";
+                default -> "Roles";
+            };
+            case "allowedLoginPlatforms" -> switch (language) {
+                case "ja" -> "ログイン可能プラットフォーム";
+                case "zh" -> locale.getCountry().equalsIgnoreCase("TW") ? "可登入平台" : "可登录平台";
+                default -> "Allowed Login Platforms";
+            };
+            case "orgUid" -> switch (language) {
+                case "ja" -> "所属組織";
+                case "zh" -> locale.getCountry().equalsIgnoreCase("TW") ? "所屬組織" : "所属组织";
+                default -> "Organization";
             };
             case "title" -> switch (language) {
                 case "ja" -> "タイトル";

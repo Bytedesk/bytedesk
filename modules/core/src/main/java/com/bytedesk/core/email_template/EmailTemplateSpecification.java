@@ -34,6 +34,18 @@ public class EmailTemplateSpecification extends BaseSpecification<EmailTemplateE
 			if (StringUtils.hasText(request.getName())) {
 				predicates.add(cb.like(root.get("name"), "%" + request.getName() + "%"));
 			}
+			// subject 邮件主题
+			if (StringUtils.hasText(request.getSubject())) {
+				predicates.add(cb.like(root.get("subject"), "%" + request.getSubject() + "%"));
+			}
+			// templateType 模板类型
+			if (StringUtils.hasText(request.getTemplateType())) {
+				predicates.add(cb.equal(root.get("templateType"), request.getTemplateType()));
+			}
+			// status 状态
+			if (StringUtils.hasText(request.getStatus())) {
+				predicates.add(cb.equal(root.get("status"), request.getStatus()));
+			}
 			// searchText across name/content
 			if (StringUtils.hasText(request.getSearchText())) {
 				String kw = request.getSearchText();

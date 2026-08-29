@@ -121,6 +121,8 @@ public class I18Consts {
     public static final String I18N_TASK_COMMENT = I18N_PREFIX + "task.comment";
     public static final String I18N_GROUP = I18N_PREFIX + "group";
     public static final String I18N_MESSAGE = I18N_PREFIX + "message";
+    public static final String I18N_NOTIFICATION = I18N_PREFIX + "notification";
+    public static final String I18N_SETTINGS = I18N_PREFIX + "settings";
     public static final String I18N_MESSAGE_NOT_FOUND = I18N_PREFIX + "message.not.found"; // 消息未找到
     public static final String I18N_TRANSLATE_BAIDU_CONFIGURED = I18N_PREFIX + "translate.baidu.configured";
     public static final String I18N_TRANSLATE_BAIDU_NOT_CONFIGURED = I18N_PREFIX + "translate.baidu.not.configured";
@@ -230,6 +232,9 @@ public class I18Consts {
     public static final String I18N_ACTION_UPDATE = I18N_PREFIX + "action.update";
     public static final String I18N_ACTION_DELETE = I18N_PREFIX + "action.delete";
     public static final String I18N_ACTION_EXPORT = I18N_PREFIX + "action.export";
+    public static final String I18N_ACTION_SEND = I18N_PREFIX + "action.send";
+    public static final String I18N_ACTION_QUERY_UNREAD_COUNT = I18N_PREFIX + "action.query.unread.count";
+    public static final String I18N_ACTION_MARK_ALL_AS_READ = I18N_PREFIX + "action.mark.all.as.read";
     public static final String I18N_ACTION_REFRESH_TOKEN = I18N_PREFIX + "action.refresh.token";
     public static final String I18N_ACTION_CHECK_SERVICE_REACHABLE = I18N_PREFIX + "action.check.service.reachable";
     public static final String I18N_ACTION_START_BOT = I18N_PREFIX + "action.start.bot";
@@ -416,6 +421,7 @@ public class I18Consts {
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect"; // 用户名或密码不正确
     public static final String I18N_MOBILE_ALREADY_EXISTS = I18N_PREFIX + "mobile.already.exists"; // 手机号已存在
     public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists"; // 邮箱已存在
+    public static final String I18N_USERNAME_ALREADY_EXISTS = I18N_PREFIX + "username.already.exists"; // 用户名已存在
     public static final String I18N_MEMBER_RESTRICTED_ROLE_UPDATE_NOT_SUPPORTED = I18N_PREFIX
             + "member.restricted.role.update.not.supported"; // 不支持在成员入口修改管理员/超管角色
     public static final String I18N_PERMISSION_CREATE_DENIED = I18N_PREFIX + "permission.create.denied"; // 无权限创建当前层级数据

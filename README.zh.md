@@ -94,6 +94,25 @@
 
 ## 快速开始
 
+### 方式一：仅下载 Docker 部署配置（推荐快速体验）
+
+如果只想通过 Docker 快速启动并验证本项目，无需 clone 整个仓库，只需单独下载部署配置仓库 [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose)：
+
+```bash
+git clone https://github.com/Bytedesk/bytedesk-docker-compose.git
+cd bytedesk-docker-compose
+# 创建 .env
+cp .env.example .env
+# 默认启动（MySQL + Artemis，中间件 + bytedesk 应用镜像）
+./start.sh
+```
+
+> 注意：`all`（默认）会启动中间件 **以及** bytedesk 应用镜像，即 `redis + elasticsearch + MySQL + Artemis + bytedesk`，适合快速启动验证。`middleware` 仅启动中间件（`redis + elasticsearch + 所选数据库 + 所选 MQ`，不含 bytedesk 镜像），主要供本地源码开发调试使用。完整关键字说明见 [deploy/docker/readme.zh.md](deploy/docker/readme.zh.md)。
+
+> [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose) 仓库中存放的内容与本项目 [`deploy/docker`](deploy/docker) 目录完全相同并保持同步更新，方便用户只下载 Docker 镜像配置文件即可快速启动验证项目，而无需下载完整源码。
+
+### 方式二：完整仓库
+
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
@@ -103,7 +122,7 @@ cp .env.example .env
 ./start.sh mysql artemis standard middleware
 ```
 
-更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、webrtc、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)。
+更多启动/停止组合（PostgreSQL、Oracle、RabbitMQ、noai、webrtc、call、全量启动）请参考 [docker readme](deploy/docker/readme.zh.md)（该说明同样位于 [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose) 仓库中）。
 
 - [Docker部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/docker)
 - [宝塔面板部署](https://www.weiyuai.cn/docs/zh-CN/docs/deploy/baota)
@@ -180,6 +199,7 @@ bytedesk/
 
 - [下载](https://www.weiyuai.cn/download.html)
 - [文档](https://www.weiyuai.cn/docs/zh-CN/)
+- [Docker部署配置仓库](https://github.com/Bytedesk/bytedesk-docker-compose)
 
 ## 技术栈
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->

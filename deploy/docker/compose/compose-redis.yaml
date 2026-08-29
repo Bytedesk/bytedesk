@@ -1,0 +1,26 @@
+# Redis 缓存（核心中间件，start.sh 默认自动包含）
+# 单独启动（在 deploy/docker 目录）：docker compose --env-file .env -f compose/compose-redis.yaml up -d
+services:
+  bytedesk-redis:
+    image: redis:latest
+    container_name: redis-bytedesk
+    ports:
+      - "16379:6379"
+    command: sh -c "chown -R redis:redis /data && exec redis-server --requirepass ${REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bytedesk-network
+    # healthcheck:
+    #   test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+
+volumes:
+  redis_data:
+    name: bytedesk_redis_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

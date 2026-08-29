@@ -1,0 +1,31 @@
+# RabbitMQ 消息队列（二选一：artemis / rabbitmq）
+# 启动方式：./start.sh rabbitmq ... 或 docker compose --env-file .env -f compose/compose-rabbitmq.yaml up -d（在 deploy/docker 目录执行）
+# 管理后台 http://localhost:15673
+services:
+  bytedesk-rabbitmq:
+    image: rabbitmq:4.2.3-management
+    container_name: rabbitmq-bytedesk
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+      - TZ=Asia/Shanghai
+    ports:
+      - "5673:5672"     # AMQP
+      - "15673:15672"   # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+    name: bytedesk_rabbitmq_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

@@ -12,13 +12,3 @@
  * Copyright (c) 2024 by bytedesk.com, All Rights Reserved. 
 -->
 # ai module
-
-## docs
-
-- [spring-ai-getting-started](https://docs.spring.io/spring-ai/reference/getting-started.html)
-- [spring-ai-agentic-patterns](https://spring.io/blog/2025/01/21/spring-ai-agentic-patterns)
-- [spring-ai-examples](https://github.com/spring-projects/spring-ai-examples)
-
-```bash
-ollama --help
-```

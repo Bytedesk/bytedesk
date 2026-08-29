@@ -333,7 +333,8 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
                     : (StringUtils.hasText(userEntity.getPlatform()) ? userEntity.getPlatform() : PlatformEnum.BYTEDESK.name());
 
             if (Boolean.TRUE.equals(userRepository.existsByUsernameAndPlatformAndDeletedFalse(request.getUsername(), platformToCheck))) {
-                throw new UsernameExistsException("Username " + request.getUsername() + " already exists..!!");
+                throw new UsernameExistsException(
+                        I18Consts.withArgs(I18Consts.I18N_USERNAME_ALREADY_EXISTS, request.getUsername()));
             }
         }
 

@@ -1,0 +1,44 @@
+# 用法：./start.sh logstash ... 或 docker compose --env-file .env -f compose/compose-logstash.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware logstash
+# 说明：Logstash 日志采集中转（独立组件，默认不启用）
+# - 采集 Docker 应用容器写入共享卷 log_data（/app/logs/bytedeskim.log）的日志
+# - 采集本地源码运行写入 starter/logs 的 bytedeskim.log
+# - 写入 Elasticsearch（bytedesk-elasticsearch，需先启动：./start.sh middleware 或 elasticsearch 关键字）
+# 端口：19600（Logstash 监控 API）
+# 详细说明见 readme/readme.logstash.md
+services:
+  # https://www.elastic.co/guide/en/logstash/9.4/docker.html
+  # Logstash 日志采集中转
+  bytedesk-logstash:
+    # image: docker.elastic.co/logstash/logstash:9.4.2
+    # image: dockerproxy.net/library/logstash:9.4.2
+    image: logstash:9.4.2
+    container_name: logstash-bytedesk
+    restart: always
+    environment:
+      - "LS_JAVA_OPTS=-Xms256m -Xmx256m"
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-bytedesk:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTIC_PASSWORD}
+      - XPACK_MONITORING_ENABLED=false
+    volumes:
+      - ./logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      # 与 compose-bytedesk.yaml 共用同一卷（app 写入，logstash 只读采集）
+      - log_data:/var/log/bytedesk:ro
+      - ../../../starter/logs:/var/log/bytedesk-source:ro
+      - logstash_data:/usr/share/logstash/data
+    ports:
+      - "19600:9600"
+    networks:
+      - bytedesk-network
+
+volumes:
+  # 显式命名，确保与 compose-bytedesk.yaml 中的 log_data 指向同一个卷
+  log_data:
+    name: bytedesk_log_data
+  logstash_data:
+    name: bytedesk_logstash_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

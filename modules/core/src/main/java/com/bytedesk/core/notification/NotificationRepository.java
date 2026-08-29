@@ -23,6 +23,8 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
     
     Optional<NotificationEntity> findByUid(String uid);
 
+    Optional<NotificationEntity> findByUidAndDeletedFalse(String uid);
+
     // find by extra contains messageUid: ''
     Optional<NotificationEntity> findByExtraContains(String messageUid);
 

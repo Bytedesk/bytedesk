@@ -5,173 +5,207 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_NAME="${PROJECT_NAME:-bytedesk}"
 
-DB="${1:-mysql}"
-MQ="${2:-artemis}"
-SCENARIO="${3:-standard}"
-MODE="${4:-stop}"
-TARGET="${5:-all}"
-OBSERVABILITY="${6:-}"
+# ============================================================
+# 微语 Docker Compose 组合停止脚本（纯关键字驱动）
+#
+# 用法：./stop.sh [stop|down] [关键字...]
+# 动作 stop/down 可在任意位置（stop = 停止容器；down = 删除容器保留数据卷；默认 stop）
+# 其余关键字与 start.sh 完全一致，需与启动时传入的关键字相同。
+#
+# 示例：
+#   ./stop.sh                      # 停止默认栈（等价 ./stop.sh stop all）
+#   ./stop.sh down                 # 删除默认栈容器（保留数据卷）
+#   ./stop.sh middleware down      # 仅删除中间件容器
+#   ./stop.sh call webrtc down     # 删除呼叫中心 + WebRTC 栈
+#   ./stop.sh all obs logstash kibana down
+# ============================================================
 
-case "${DB}" in
-  mysql|postgresql|oracle|kingbase9) ;;
-  pg) DB="postgresql" ;;
-  kingbase) DB="kingbase9" ;;
-  *)
-    echo "[ERROR] Unsupported db: ${DB}. Allowed: mysql|postgresql|oracle|kingbase9|kingbase|pg"
+# compose 文件统一位于 ./compose/ 目录（一镜像一文件），与 start.sh 保持一致
+COMPOSE_DIR="${SCRIPT_DIR}/compose"
+
+MODE=""
+
+set_mode() {
+  if [[ -n "${MODE}" ]]; then
+    echo "[ERROR] Conflicting actions: '${MODE}' and '$1'."
     exit 1
-    ;;
-esac
+  fi
+  MODE="$1"
+}
 
-case "${SCENARIO}" in
-  standard|noai|call|webrtc|call-webrtc) ;;
-  webrtc-call) SCENARIO="call-webrtc" ;;
-  *)
-    echo "[ERROR] Unsupported scenario: ${SCENARIO}. Allowed: standard|noai|call|webrtc|call-webrtc|webrtc-call"
+DB=""
+MQ=""
+ENABLE_FREESWITCH=false
+ENABLE_MRCP=false
+ENABLE_COTURN=false
+ENABLE_JANUS=false
+ENABLE_SEARXNG=false
+ENABLE_NEO4J=false
+ENABLE_LOGSTASH=false
+ENABLE_KIBANA=false
+ENABLE_MINIO=false
+ENABLE_PROMETHEUS=false
+ENABLE_GRAFANA=false
+ENABLE_ZIPKIN=false
+TARGET=""
+
+set_db() {
+  if [[ -n "${DB}" ]]; then
+    echo "[ERROR] Duplicate db keyword: '${DB}' and '$1'. Pick exactly one."
     exit 1
-    ;;
-esac
+  fi
+  DB="$1"
+}
 
-case "${MQ}" in
-  artemis|rabbitmq) ;;
-  *)
-    echo "[ERROR] Unsupported mq: ${MQ}. Allowed: artemis|rabbitmq"
+set_mq() {
+  if [[ -n "${MQ}" ]]; then
+    echo "[ERROR] Duplicate mq keyword: '${MQ}' and '$1'. Pick exactly one."
     exit 1
-    ;;
-esac
+  fi
+  MQ="$1"
+}
 
-case "${MODE}" in
-  stop|down) ;;
-  *)
-    echo "[ERROR] Unsupported mode: ${MODE}. Allowed: stop|down"
+set_target() {
+  if [[ -n "${TARGET}" ]]; then
+    echo "[ERROR] Conflicting target keywords: '${TARGET}' and '$1'."
     exit 1
-    ;;
-esac
+  fi
+  TARGET="$1"
+}
 
-case "${TARGET}" in
-  all|middleware) ;;
-  *)
-    echo "[ERROR] Unsupported target: ${TARGET}. Allowed: all|middleware"
-    exit 1
-    ;;
-esac
-
-case "${OBSERVABILITY}" in
-  ""|false|no) OBSERVABILITY="" ;;
-  obs|observability|true|yes) OBSERVABILITY="obs" ;;
-  *)
-    echo "[ERROR] Unsupported observability: ${OBSERVABILITY}. Allowed: obs|observability|true|yes"
-    exit 1
-    ;;
-esac
-
-BASE_FILE="${SCRIPT_DIR}/compose-base.yaml"
-DB_FILE="${SCRIPT_DIR}/compose-db-${DB}.yaml"
-MQ_FILE="${SCRIPT_DIR}/compose-mq-${MQ}.yaml"
-SCENARIO_FILE="${SCRIPT_DIR}/compose-scenario-${SCENARIO}.yaml"
-SCENARIO_FILES=()
-APP_FILE="${SCRIPT_DIR}/compose-app-bytedesk.yaml"
-APP_MQ_FILE="${SCRIPT_DIR}/compose-app-mq-${MQ}.yaml"
-OBS_FILE="${SCRIPT_DIR}/compose-observability.yaml"
-
-case "${SCENARIO}" in
-  call-webrtc)
-    SCENARIO_FILES+=(
-      "${SCRIPT_DIR}/compose-scenario-call.yaml"
-      "${SCRIPT_DIR}/compose-scenario-webrtc.yaml"
-    )
-    ;;
-  *)
-    SCENARIO_FILES+=("${SCENARIO_FILE}")
-    ;;
-esac
-
-if [[ "${SCENARIO}" == "call" || "${SCENARIO}" == "call-webrtc" ]]; then
-  case "${DB}" in
-    mysql|postgresql) ;;
-    oracle|kingbase9)
-      echo "[ERROR] call scenario does not support ${DB}. Allowed db for call: mysql|postgresql"
+for arg in "$@"; do
+  case "${arg}" in
+    stop|down) set_mode "${arg}" ;;
+    mysql) set_db mysql ;;
+    postgresql|pg) set_db postgresql ;;
+    oracle) set_db oracle ;;
+    kingbase|kingbase9) set_db kingbase ;;
+    artemis) set_mq artemis ;;
+    rabbitmq) set_mq rabbitmq ;;
+    freeswitch) ENABLE_FREESWITCH=true ;;
+    mrcp) ENABLE_MRCP=true ;;
+    coturn) ENABLE_COTURN=true ;;
+    janus) ENABLE_JANUS=true ;;
+    searxng|search) ENABLE_SEARXNG=true ;;
+    neo4j) ENABLE_NEO4J=true ;;
+    logstash) ENABLE_LOGSTASH=true ;;
+    kibana) ENABLE_KIBANA=true ;;
+    minio) ENABLE_MINIO=true ;;
+    prometheus) ENABLE_PROMETHEUS=true ;;
+    grafana) ENABLE_GRAFANA=true ;;
+    zipkin) ENABLE_ZIPKIN=true ;;
+    call)
+      ENABLE_FREESWITCH=true
+      ENABLE_MRCP=true
+      ;;
+    webrtc)
+      ENABLE_COTURN=true
+      ENABLE_JANUS=true
+      ;;
+    obs|observability)
+      ENABLE_PROMETHEUS=true
+      ENABLE_GRAFANA=true
+      ENABLE_ZIPKIN=true
+      ;;
+    middleware) set_target middleware ;;
+    all|bytedesk|app) set_target all ;;
+    -h|--help|help)
+      sed -n '10,22p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *)
+      echo "[ERROR] Unknown keyword: '${arg}'"
+      echo "Allowed: stop|down mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq"
+      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin"
+      echo "        call webrtc obs middleware all"
       exit 1
       ;;
   esac
-fi
+done
 
-for file in "${BASE_FILE}" "${DB_FILE}" "${MQ_FILE}" "${SCENARIO_FILES[@]}"; do
+# 默认值与归一化（与 start.sh 一致）
+MODE="${MODE:-stop}"
+DB="${DB:-mysql}"
+MQ="${MQ:-artemis}"
+TARGET="${TARGET:-all}"
+
+# ============================================================
+# 组装 compose 文件列表（与 start.sh 相同规则）
+# ============================================================
+compose_files=()
+
+add_file() {
+  local file="${COMPOSE_DIR}/$1"
   if [[ ! -f "${file}" ]]; then
     echo "[ERROR] Missing compose file: ${file}"
     exit 1
   fi
-done
-
-for file in "${APP_FILE}" "${APP_MQ_FILE}"; do
-  if [[ ! -f "${file}" ]]; then
-    echo "[ERROR] Missing compose file: ${file}"
-    exit 1
-  fi
-done
-
-if [[ -n "${OBSERVABILITY}" ]]; then
-  if [[ ! -f "${OBS_FILE}" ]]; then
-    echo "[ERROR] Missing compose file: ${OBS_FILE}"
-    exit 1
-  fi
-fi
-
-compose_files=(
-  -f "${BASE_FILE}"
-  -f "${DB_FILE}"
-  -f "${MQ_FILE}"
-)
-
-for file in "${SCENARIO_FILES[@]}"; do
   compose_files+=( -f "${file}" )
-done
+}
 
-compose_files+=(
-  -f "${APP_FILE}"
-  -f "${APP_MQ_FILE}"
-)
+add_file compose-redis.yaml
+add_file compose-elasticsearch.yaml
+add_file "compose-${DB}.yaml"
+add_file "compose-${MQ}.yaml"
+[[ "${ENABLE_FREESWITCH}" == true ]] && add_file compose-freeswitch.yaml
+[[ "${ENABLE_MRCP}" == true ]] && add_file compose-mrcp.yaml
+[[ "${ENABLE_COTURN}" == true ]] && add_file compose-coturn.yaml
+[[ "${ENABLE_JANUS}" == true ]] && add_file compose-janus.yaml
+[[ "${ENABLE_SEARXNG}" == true ]] && add_file compose-searxng.yaml
+[[ "${ENABLE_NEO4J}" == true ]] && add_file compose-neo4j.yaml
+[[ "${ENABLE_LOGSTASH}" == true ]] && add_file compose-logstash.yaml
+[[ "${ENABLE_KIBANA}" == true ]] && add_file compose-kibana.yaml
+[[ "${ENABLE_MINIO}" == true ]] && add_file compose-minio.yaml
+[[ "${ENABLE_PROMETHEUS}" == true ]] && add_file compose-prometheus.yaml
+[[ "${ENABLE_GRAFANA}" == true ]] && add_file compose-grafana.yaml
+[[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
 
-if [[ -n "${OBSERVABILITY}" ]]; then
-  compose_files+=( -f "${OBS_FILE}" )
+# TARGET=all（默认）时包含应用文件，保证 down 能一并删除应用容器
+APP_FILE="${COMPOSE_DIR}/compose-bytedesk.yaml"
+if [[ "${TARGET}" == "all" ]]; then
+  if [[ ! -f "${APP_FILE}" ]]; then
+    echo "[ERROR] Missing compose file: ${APP_FILE}"
+    exit 1
+  fi
+  compose_files+=( -f "${APP_FILE}" )
 fi
 
-echo "[INFO] ${MODE} stack: db=${DB}, mq=${MQ}, scenario=${SCENARIO}, target=${TARGET}, project=${PROJECT_NAME}, observability=${OBSERVABILITY:-false}"
+ENV_FILE_ARGS=()
+if [[ -f "${SCRIPT_DIR}/.env" ]]; then
+  ENV_FILE_ARGS+=( --env-file "${SCRIPT_DIR}/.env" )
+fi
+if [[ -f "${SCRIPT_DIR}/.env.app" ]]; then
+  ENV_FILE_ARGS+=( --env-file "${SCRIPT_DIR}/.env.app" )
+fi
 
-if [[ "${TARGET}" == "all" ]]; then
+components_summary=""
+[[ "${ENABLE_FREESWITCH}" == true ]] && components_summary="${components_summary} freeswitch"
+[[ "${ENABLE_MRCP}" == true ]] && components_summary="${components_summary} mrcp"
+[[ "${ENABLE_COTURN}" == true ]] && components_summary="${components_summary} coturn"
+[[ "${ENABLE_JANUS}" == true ]] && components_summary="${components_summary} janus"
+[[ "${ENABLE_SEARXNG}" == true ]] && components_summary="${components_summary} searxng"
+[[ "${ENABLE_NEO4J}" == true ]] && components_summary="${components_summary} neo4j"
+[[ "${ENABLE_LOGSTASH}" == true ]] && components_summary="${components_summary} logstash"
+[[ "${ENABLE_KIBANA}" == true ]] && components_summary="${components_summary} kibana"
+[[ "${ENABLE_MINIO}" == true ]] && components_summary="${components_summary} minio"
+[[ "${ENABLE_PROMETHEUS}" == true ]] && components_summary="${components_summary} prometheus"
+[[ "${ENABLE_GRAFANA}" == true ]] && components_summary="${components_summary} grafana"
+[[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
+
+echo "[INFO] ${MODE} stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"
+
+if [[ "${MODE}" == "stop" ]]; then
   docker compose \
-    --env-file "${SCRIPT_DIR}/.env" \
+    "${ENV_FILE_ARGS[@]}" \
     -p "${PROJECT_NAME}" \
     "${compose_files[@]}" \
-    "${MODE}"
+    stop
 else
-  middleware_services=()
-  while IFS= read -r service; do
-    middleware_services+=("${service}")
-  done < <(
-    docker compose \
-      --env-file "${SCRIPT_DIR}/.env" \
-      -p "${PROJECT_NAME}" \
-      "${compose_files[@]}" \
-      config --services | grep -v '^bytedesk$'
-  )
-
-  if [[ ${#middleware_services[@]} -eq 0 ]]; then
-    echo "[ERROR] No middleware services resolved"
-    exit 1
-  fi
-
-  compose_cmd=(
-    docker compose
-    --env-file "${SCRIPT_DIR}/.env"
-    -p "${PROJECT_NAME}"
-    "${compose_files[@]}"
-  )
-
-  if [[ "${MODE}" == "stop" ]]; then
-    "${compose_cmd[@]}" stop "${middleware_services[@]}"
-  else
-    "${compose_cmd[@]}" rm -f -s "${middleware_services[@]}"
-  fi
+  docker compose \
+    "${ENV_FILE_ARGS[@]}" \
+    -p "${PROJECT_NAME}" \
+    "${compose_files[@]}" \
+    down
 fi
 
 echo "[INFO] Done."

@@ -18,9 +18,9 @@ import io.netty.handler.codec.mqtt.*;
 
 import java.nio.charset.StandardCharsets;
 
+import com.bytedesk.core.connection.ConnectionRestService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.utils.MessageConvertUtils;
-import com.bytedesk.core.socket.connection.ConnectionRestService;
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.protobuf.model.MessageProto;
 

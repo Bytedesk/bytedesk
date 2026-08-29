@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        企业微信通讯录（部门 + 成员）同步表结构迁移。
+
+        背景：channels/wechat 下 work/department 与 work/user 包原为 tag 模板 CRUD，
+        Entity 已重定义为企微通讯录语义（见 2026-08-23-wechat-work-contact-sync-plan.md）。
+        旧模板表 bytedesk_wechat_work_department / bytedesk_wechat_work_user 由 ddl-auto 创建，
+        含模板列 name/description/user_type|department_type。
+
+        策略（双保护）：
+        1. 全新环境（表不存在）：createTable 建完整新结构。
+        2. 已有模板表（缺新列）：以「关键新列 corp_dept_id / corp_user_id 不存在」为标志，
+           addColumn 批量补齐新列；ddl-auto 已加过的环境则 MARK_RAN 跳过。
+        3. dropColumn 幂等删除旧模板列 user_type / department_type。
+        4. createIndex 幂等建唯一索引与常用查询索引。
+    -->
+
+    <!-- ============ 部门表 ============ -->
+    <changeSet id="260823-create-wechat-work-department-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_wechat_work_department"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_wechat_work_department">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_wechat_work_department" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_wechat_work_department_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="corp_dept_id" type="BIGINT"/>
+            <column name="name" type="VARCHAR(128)"/>
+            <column name="name_en" type="VARCHAR(128)"/>
+            <column name="corp_parent_id" type="BIGINT"/>
+            <column name="sort_order" type="BIGINT"/>
+            <column name="leader_user_ids" type="TEXT"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="last_synced_at" type="TIMESTAMP"/>
+            <column name="description" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 已有模板表：补齐部门新列 -->
+    <changeSet id="260823-add-wechat-work-department-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_wechat_work_department"/>
+            <not>
+                <columnExists tableName="bytedesk_wechat_work_department" columnName="corp_dept_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_wechat_work_department">
+            <column name="corp_dept_id" type="BIGINT"/>
+            <column name="name_en" type="VARCHAR(128)"/>
+            <column name="corp_parent_id" type="BIGINT"/>
+            <column name="sort_order" type="BIGINT"/>
+            <column name="leader_user_ids" type="TEXT"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="last_synced_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- ============ 成员表 ============ -->
+    <changeSet id="260823-create-wechat-work-user-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_wechat_work_user"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_wechat_work_user">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_wechat_work_user" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_wechat_work_user_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="corp_user_id" type="VARCHAR(64)"/>
+            <column name="name" type="VARCHAR(128)"/>
+            <column name="english_name" type="VARCHAR(128)"/>
+            <column name="alias" type="VARCHAR(64)"/>
+            <column name="position" type="VARCHAR(128)"/>
+            <column name="mobile" type="VARCHAR(32)"/>
+            <column name="gender" type="VARCHAR(8)"/>
+            <column name="email" type="VARCHAR(128)"/>
+            <column name="biz_mail" type="VARCHAR(128)"/>
+            <column name="telephone" type="VARCHAR(32)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="avatar" type="VARCHAR(512)"/>
+            <column name="thumb_avatar" type="VARCHAR(512)"/>
+            <column name="qr_code" type="VARCHAR(512)"/>
+            <column name="status" type="VARCHAR(16)"/>
+            <column name="corp_dept_ids" type="TEXT"/>
+            <column name="dept_orders" type="TEXT"/>
+            <column name="is_leader_in_depts" type="TEXT"/>
+            <column name="main_dept_id" type="BIGINT"/>
+            <column name="direct_leaders" type="TEXT"/>
+            <column name="open_user_id" type="VARCHAR(64)"/>
+            <column name="external_position" type="VARCHAR(128)"/>
+            <column name="extattr" type="TEXT"/>
+            <column name="external_profile" type="TEXT"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="last_synced_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 已有模板表：补齐成员新列 -->
+    <changeSet id="260823-add-wechat-work-user-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_wechat_work_user"/>
+            <not>
+                <columnExists tableName="bytedesk_wechat_work_user" columnName="corp_user_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_wechat_work_user">
+            <column name="corp_user_id" type="VARCHAR(64)"/>
+            <column name="english_name" type="VARCHAR(128)"/>
+            <column name="alias" type="VARCHAR(64)"/>
+            <column name="position" type="VARCHAR(128)"/>
+            <column name="mobile" type="VARCHAR(32)"/>
+            <column name="gender" type="VARCHAR(8)"/>
+            <column name="email" type="VARCHAR(128)"/>
+            <column name="biz_mail" type="VARCHAR(128)"/>
+            <column name="telephone" type="VARCHAR(32)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="avatar" type="VARCHAR(512)"/>
+            <column name="thumb_avatar" type="VARCHAR(512)"/>
+            <column name="qr_code" type="VARCHAR(512)"/>
+            <column name="status" type="VARCHAR(16)"/>
+            <column name="corp_dept_ids" type="TEXT"/>
+            <column name="dept_orders" type="TEXT"/>
+            <column name="is_leader_in_depts" type="TEXT"/>
+            <column name="main_dept_id" type="BIGINT"/>
+            <column name="direct_leaders" type="TEXT"/>
+            <column name="open_user_id" type="VARCHAR(64)"/>
+            <column name="external_position" type="VARCHAR(128)"/>
+            <column name="extattr" type="TEXT"/>
+            <column name="external_profile" type="TEXT"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="last_synced_at" type="TIMESTAMP"/>
+        </addColumn>
+    </changeSet>
+
+    <!-- ============ 删除旧模板列 ============ -->
+    <changeSet id="260823-drop-wechat-work-user-type-column" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_wechat_work_user" columnName="user_type"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_wechat_work_user" columnName="user_type"/>
+    </changeSet>
+
+    <changeSet id="260823-drop-wechat-work-department-type-column" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="bytedesk_wechat_work_department" columnName="department_type"/>
+        </preConditions>
+        <dropColumn tableName="bytedesk_wechat_work_department" columnName="department_type"/>
+    </changeSet>
+
+    <!-- ============ 索引 ============ -->
+    <changeSet id="260823-create-wechat-work-department-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_wechat_work_department"/>
+        </preConditions>
+        <createIndex tableName="bytedesk_wechat_work_department" indexName="uk_work_dept_app_corpid" unique="true">
+            <column name="app_uid"/>
+            <column name="corp_dept_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_wechat_work_department" indexName="idx_work_dept_app">
+            <column name="app_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_wechat_work_department" indexName="idx_work_dept_app_parent">
+            <column name="app_uid"/>
+            <column name="corp_parent_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260823-create-wechat-work-user-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_wechat_work_user"/>
+        </preConditions>
+        <createIndex tableName="bytedesk_wechat_work_user" indexName="uk_work_user_app_corpid" unique="true">
+            <column name="app_uid"/>
+            <column name="corp_user_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_wechat_work_user" indexName="idx_work_user_app">
+            <column name="app_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_wechat_work_user" indexName="idx_work_user_app_status">
+            <column name="app_uid"/>
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 通讯录标签表（第二部分，企微 /cgi-bin/tag/*） ============ -->
+    <changeSet id="260823-create-wechat-work-contact-tag-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_wechat_work_contact_tag"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_wechat_work_contact_tag">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_wechat_work_contact_tag" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_wechat_work_contact_tag_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="corp_tag_id" type="BIGINT"/>
+            <column name="tag_name" type="VARCHAR(64)"/>
+            <column name="user_ids" type="TEXT"/>
+            <column name="party_ids" type="TEXT"/>
+            <column name="app_uid" type="VARCHAR(64)"/>
+            <column name="last_synced_at" type="TIMESTAMP"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="260823-create-wechat-work-contact-tag-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_wechat_work_contact_tag"/>
+        </preConditions>
+        <createIndex tableName="bytedesk_wechat_work_contact_tag" indexName="uk_work_tag_app_corpid" unique="true">
+            <column name="app_uid"/>
+            <column name="corp_tag_id"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_wechat_work_contact_tag" indexName="idx_work_tag_app">
+            <column name="app_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

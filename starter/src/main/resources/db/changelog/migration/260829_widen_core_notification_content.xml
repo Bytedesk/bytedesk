@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        加宽 bytedesk_core_notification.content 列为大字段类型。
+
+        背景：
+        - admin 管理后台"发送通知"输入框允许最长 1000 字，但该列历史为
+          varchar(255)（实体未指定长度，ddl-auto 默认建列），输入约 256 字以上
+          即触发 MySQL 1406 "Data too long for column 'content'"，
+          被 GlobalExceptionHandler 兜底返回 400 + "i18n.input.too.long"，
+          用户在 920 字时点确定即报错；
+        - 实体侧已同步改为 columnDefinition=TEXT（新库由 ddl-auto 直接创建 TEXT 列），
+          本迁移负责将存量库中的旧 varchar(255) 列加宽。
+
+        说明：
+        - newDataType=clob 由 Liquibase 按数据库自动映射方言类型：
+          MySQL/MariaDB -> LONGTEXT，PostgreSQL/Kingbase -> TEXT，H2/Oracle -> CLOB；
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体定义直接创建 TEXT 列，无需本迁移；
+        - 仅加宽类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="260829-1-widen-core-notification-content-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_notification" />
+            <columnExists tableName="bytedesk_core_notification" columnName="content" />
+        </preConditions>
+        <comment>将 bytedesk_core_notification.content 由 varchar(255) 加宽为大字段类型，修复发送通知内容超过 255 字时报 Data too long 的问题。</comment>
+        <modifyDataType tableName="bytedesk_core_notification" columnName="content" newDataType="clob" />
+    </changeSet>
+
+</databaseChangeLog>

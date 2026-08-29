@@ -119,17 +119,32 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameExistsException.class)
     public ResponseEntity<?> handleUsernameExistsException(UsernameExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        // 用户名重复属于客户端输入冲突：返回 400 + 本地化文案，而非默认 500 英文提示
+        log.debug("Username exists: {}", e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(EmailExistsException.class)
     public ResponseEntity<?> handleEmailExistsException(EmailExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        // 邮箱重复属于客户端输入冲突：返回 400 + 本地化文案，而非默认 500 英文提示
+        log.debug("Email exists: {}", e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(MobileExistsException.class)
     public ResponseEntity<?> handleMobileExistsException(MobileExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        // 手机号重复属于客户端输入冲突：返回 400 + 本地化文案，而非默认 500 英文提示
+        log.debug("Mobile exists: {}", e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
@@ -204,7 +219,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ExistsException.class)
     public ResponseEntity<?> handleExistsException(ExistsException e) {
-        return ResponseEntity.ok().body(JsonResult.error(e.getMessage()));
+        // 资源重复冲突：解析 i18n 文案并返回 409，而非默认 500
+        log.debug("Resource exists: {}", e.getMessage());
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
     }
 
     @ExceptionHandler(OrgMaxMembersExceededException.class)

@@ -125,9 +125,14 @@ public class ActionRestService extends BaseRestServiceWithExport<ActionEntity, A
 
     @Override
     public ActionExcel convertToExcel(ActionEntity entity) {
-        return modelMapper.map(entity, ActionExcel.class);
+        ActionExcel excel = modelMapper.map(entity, ActionExcel.class);
+        // 与前端 ActionTable 第一列保持一致：显示用户昵称
+        if (entity.getUser() != null) {
+            excel.setNickname(entity.getUser().getNickname());
+        }
+        // 与前端保持一致：创建时间格式化为 yyyy-MM-dd HH:mm:ss
+        excel.setCreatedAt(entity.getCreatedAtString());
+        return excel;
     }
-
-    
 
 }

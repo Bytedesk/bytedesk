@@ -23,8 +23,7 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-// import com.bytedesk.core.event.BytedeskEventPublisher;
-import com.bytedesk.core.socket.connection.ConnectionRestService;
+import com.bytedesk.core.connection.ConnectionRestService;
 
 /**
  * published when a STOMP session ends.

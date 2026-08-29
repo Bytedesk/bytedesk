@@ -37,10 +37,10 @@ public class VerifyValidationStrategy implements AuthValidationStrategy {
     public void validateUserStatus(AuthRequest authRequest, String receiver, String platform) {
         // 验证时，如果账号不存在，则直接抛出异常
         if (authRequest.isMobile() && !userService.existsByMobileAndPlatform(receiver, CountryCodeUtils.normalize(authRequest.getCountry()), platform)) {
-            throw new MobileExistsException(I18Consts.I18N_MOBILE_NOT_EXISTS);
+            throw new MobileExistsException(I18Consts.withArgs(I18Consts.I18N_MOBILE_NOT_EXISTS, receiver));
         }
         if (authRequest.isEmail() && !userService.existsByEmailAndPlatform(receiver, platform)) {
-            throw new EmailExistsException(I18Consts.I18N_EMAIL_NOT_EXISTS);
+            throw new EmailExistsException(I18Consts.withArgs(I18Consts.I18N_EMAIL_NOT_EXISTS, receiver));
         }
     }
 

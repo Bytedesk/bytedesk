@@ -35,12 +35,12 @@ import org.springframework.util.StringUtils;
 
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 
-import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingModel;
-import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingOptions;
-import com.bytedesk.ai.providers.openai.OpenAiCompatibleModelFactory;
-import com.bytedesk.ai.providers.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
+import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.provider.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRestService;

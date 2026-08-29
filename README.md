@@ -106,6 +106,25 @@ AI powered Omnichannel customer service With Team Cooperation
 
 ## Quick Start
 
+### Option 1: Docker Compose Only (Quick Verification)
+
+If you only want to quickly start and verify the project with Docker, without downloading the full source code, just clone the standalone deployment repository [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose):
+
+```bash
+git clone https://github.com/Bytedesk/bytedesk-docker-compose.git
+cd bytedesk-docker-compose
+# create .env
+cp .env.example .env
+# default startup (MySQL + Artemis, middleware + bytedesk app image)
+./start.sh
+```
+
+> Note: `all` (the default) starts the middleware **plus** the bytedesk app image — i.e. `redis + elasticsearch + MySQL + Artemis + bytedesk` — which is what you want for quick verification. `middleware` only starts the middleware (`redis + elasticsearch + the selected DB + MQ`, no bytedesk image) and is intended for local development running bytedesk from source code. See [deploy/docker/readme.md](deploy/docker/readme.md) for the full keyword reference.
+
+> The [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose) repository contains exactly the same content as the [`deploy/docker`](deploy/docker) folder of this repository and is kept in sync. It lets you start and verify the project by downloading only the Docker image configuration files, without cloning the entire monorepo.
+
+### Option 2: Full Repository
+
 ```bash
 git clone https://github.com/Bytedesk/bytedesk.git
 cd bytedesk/deploy/docker
@@ -115,7 +134,7 @@ cp .env.example .env
 ./start.sh mysql artemis standard middleware
 ```
 
-For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, webrtc, call, full stack), see [docker readme](deploy/docker/readme.md).
+For more startup/stop combinations (PostgreSQL, Oracle, RabbitMQ, noai, webrtc, call, full stack), see [docker readme](deploy/docker/readme.md) (also available in the [bytedesk-docker-compose](https://github.com/Bytedesk/bytedesk-docker-compose) repository).
 
 ```bash
 # Please replace 127.0.0.1 with your server IP
@@ -187,6 +206,7 @@ bytedesk/
 
 - [Download](https://www.weiyuai.cn/download.html)
 - [Docs](https://www.weiyuai.cn/docs/)
+- [Docker Compose Deployment Repo](https://github.com/Bytedesk/bytedesk-docker-compose)
 
 <!-- ## Dev Stack -->
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server -->

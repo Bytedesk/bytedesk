@@ -1,0 +1,37 @@
+# KingbaseES V9 数据库（四选一：mysql / postgresql / oracle / kingbase）
+# 启动方式：./start.sh kingbase ... 或 docker compose --env-file .env -f compose/compose-kingbase.yaml up -d（在 deploy/docker 目录执行）
+# 应用侧 DSN 由 start.sh 按所选数据库自动注入（或通过 .env 中 SPRING_DATASOURCE_* 显式配置）
+# 需要 license 文件：.env 中 KINGBASE_LICENSE_FILE 指向 ../../kingbase/（即 deploy/kingbase/）下的 license.dat
+services:
+  bytedesk-kingbase:
+    image: ${KINGBASE_IMAGE:-kingbase_v009r001c010b0004_single_arm:v1}
+    container_name: kingbase9-bytedesk
+    environment:
+      SYSTEM_PWD: ${KINGBASE_SYSTEM_PWD:-SYSTEM}
+      # 可选值：mysql | postgresql | oracle | sqlserver（默认 mysql）
+      DB_MODE: ${KINGBASE_DB_MODE:-mysql}
+      ENABLE_CI: ${KINGBASE_ENABLE_CI:-yes}
+      NEED_START: ${KINGBASE_NEED_START:-yes}
+      DB_USER: ${KINGBASE_DB_USER:-root}
+      DB_PASSWORD: ${KINGBASE_DB_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${KINGBASE_HOST_PORT:-54321}:${KINGBASE_PORT:-54321}"
+    volumes:
+      - kingbase_data:/opt/kingbase/data
+      - ${KINGBASE_LICENSE_FILE:-../../kingbase/license_V009R001C-专业版.dat}:/opt/kingbase/Server/bin/license.dat:ro
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "printf \"%s\\n\" \"${KINGBASE_DB_PASSWORD}\" | /home/kingbase/install/kingbase/bin/ksql -h 127.0.0.1 -p ${KINGBASE_PORT:-54321} -U ${KINGBASE_DB_USER:-root} -d kingbase -W -c 'select 1' >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+volumes:
+  kingbase_data:
+    name: bytedesk_kingbase_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

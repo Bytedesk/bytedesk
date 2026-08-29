@@ -13,8 +13,17 @@
  */
 package com.bytedesk.core.member;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestControllerOverride;
+import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -46,7 +56,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Tag(name = "Member Management", description = "Member management APIs")
 public class MemberRestController extends BaseRestControllerOverride<MemberRequest> {
 
+    private static final DateTimeFormatter EXPORT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    // 昵称、用户名、手机、邮箱、工号、职位、座位号、分机号、部门、角色、可登录平台、创建时间、更新时间
+    private static final int[] EXPORT_COLUMN_WIDTHS = {20, 20, 20, 25, 20, 20, 20, 20, 20, 25, 30, 20, 20};
+
+    private static final String PLATFORM_I18N_PREFIX = "member.platform.option.";
+
     private final MemberRestService memberRestService;
+
+    private final MessageSource messageSource;
 
     @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query member by org")
     @Operation(summary = "Query Members by Organization", description = "Retrieve member list by organization ID")
@@ -156,14 +175,129 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
     @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_EXPORT, description = "export member")
     @GetMapping("/export")
     public Object export(MemberRequest request, HttpServletResponse response) {
-        return exportTemplate(
-            request,
-            response,
-            memberRestService,
-            MemberExcelExport.class,
-            "成员",
-            "member"
-        );
+        try {
+            Locale locale = ExcelExportUtils.resolveLocale(request);
+            String sheetName = localize("export.member.sheet", "Member", locale);
+            String filePrefix = localize("export.member.file.prefix", "Member", locale);
+
+            Page<MemberEntity> memberPage = memberRestService.queryByOrgEntity(request);
+            List<List<Object>> rows = memberPage.getContent().stream()
+                    .map(entity -> buildExportRow(memberRestService.convertToExcel(entity), locale))
+                    .collect(Collectors.toList());
+
+            ExcelExportUtils.writeCustomExcel(
+                response,
+                request,
+                sheetName,
+                filePrefix,
+                buildExportHead(locale),
+                rows,
+                EXPORT_COLUMN_WIDTHS);
+        } catch (Exception e) {
+            return exportError(response, e);
+        }
+        return "";
+    }
+
+    private Object exportError(HttpServletResponse response, Exception e) {
+        response.reset();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+        String message = e.getMessage() != null ? e.getMessage() : e.toString();
+        return JsonResult.error(message);
+    }
+
+    private List<List<String>> buildExportHead(Locale locale) {
+        return List.of(
+                List.of(localize("export.member.column.nickname", "Nickname", locale)),
+                List.of(localize("export.member.column.username", "Username", locale)),
+                List.of(localize("export.member.column.mobile", "Mobile", locale)),
+                List.of(localize("export.member.column.email", "Email", locale)),
+                List.of(localize("export.member.column.jobNo", "Job Number", locale)),
+                List.of(localize("export.member.column.jobTitle", "Job Title", locale)),
+                List.of(localize("export.member.column.seatNo", "Seat Number", locale)),
+                List.of(localize("export.member.column.telephone", "Telephone", locale)),
+                List.of(localize("export.member.column.department", "Department", locale)),
+                List.of(localize("export.member.column.roles", "Roles", locale)),
+                List.of(localize("export.member.column.allowedLoginPlatforms", "Allowed Login Platforms", locale)),
+                List.of(localize("export.member.column.createdAt", "Created At", locale)),
+                List.of(localize("export.member.column.updatedAt", "Updated At", locale)));
+    }
+
+    private List<Object> buildExportRow(MemberExcelExport excel, Locale locale) {
+        return List.of(
+                nullableToEmpty(excel.getNickname()),
+                nullableToEmpty(excel.getUsername()),
+                nullableToEmpty(excel.getMobile()),
+                nullableToEmpty(excel.getEmail()),
+                nullableToEmpty(excel.getJobNo()),
+                // 职位可能为 i18n key（如 i18n.admin），按请求语言翻译
+                localizeI18nKey(excel.getJobTitle(), locale),
+                nullableToEmpty(excel.getSeatNo()),
+                nullableToEmpty(excel.getTelephone()),
+                // 部门名称可能为 i18n key，与前端 translateString 对齐
+                localizeI18nKey(excel.getDepartmentName(), locale),
+                // 角色名称（ROLE_* / i18n.* / 自定义），逐个翻译后拼接
+                localizeJoinedValues(excel.getRoles(), locale),
+                // 可登录平台编码 -> 与前端一致的平台名称（如 admin -> 管理后台 admin）
+                localizePlatformCodes(excel.getAllowedLoginPlatforms(), locale),
+                formatExportDateTime(excel.getCreatedAt()),
+                formatExportDateTime(excel.getUpdatedAt()));
+    }
+
+    /**
+     * 翻译 i18n.* 前缀的国际化 key，非 key 内容原样返回（与前端 translateString 行为对齐）
+     */
+    private String localizeI18nKey(String value, Locale locale) {
+        if (!StringUtils.hasText(value)) {
+            return "";
+        }
+        if (!value.startsWith(I18Consts.I18N_PREFIX)) {
+            return value;
+        }
+        return messageSource.getMessage(value, null, value, locale);
+    }
+
+    /**
+     * 逗号分隔的多个值逐个翻译（如 "ROLE_ADMIN, ROLE_USER" -> "组织管理员, 用户"），
+     * 支持 ROLE_* 与 i18n.* 前缀，自定义角色名原样保留
+     */
+    private String localizeJoinedValues(String joined, Locale locale) {
+        if (!StringUtils.hasText(joined)) {
+            return "";
+        }
+        return Arrays.stream(joined.split(", "))
+                .map(value -> {
+                    if (value.startsWith(I18Consts.I18N_PREFIX) || value.startsWith("ROLE_")) {
+                        return messageSource.getMessage(value, null, value, locale);
+                    }
+                    return value;
+                })
+                .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * 平台编码翻译为与前端一致的平台名称，词条缺失时回退显示原始编码
+     */
+    private String localizePlatformCodes(String joined, Locale locale) {
+        if (!StringUtils.hasText(joined)) {
+            return "";
+        }
+        return Arrays.stream(joined.split(", "))
+                .map(code -> messageSource.getMessage(PLATFORM_I18N_PREFIX + code, null, code, locale))
+                .collect(Collectors.joining(", "));
+    }
+
+    private String localize(String key, String defaultMessage, Locale locale) {
+        return messageSource.getMessage(key, null, defaultMessage, locale);
+    }
+
+    private String formatExportDateTime(ZonedDateTime dateTime) {
+        return dateTime != null ? EXPORT_DATETIME_FORMATTER.format(dateTime) : "";
+    }
+
+    private String nullableToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     @Operation(summary = "Activate Member", description = "Activate the specified member")

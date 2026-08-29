@@ -15,10 +15,22 @@ package com.bytedesk.core.action;
 
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ActionRepository extends JpaRepository<ActionEntity, Long>, JpaSpecificationExecutor<ActionEntity> {
 
     Optional<ActionEntity> findByUid(String uid);
+
+    /**
+     * 分页查询时联动抓取 user，保证会话关闭后仍可读取用户昵称，
+     * 与前端 ActionTable 用户列及导出内容保持一致
+     */
+    @Override
+    @EntityGraph(attributePaths = "user")
+    Page<ActionEntity> findAll(Specification<ActionEntity> spec, Pageable pageable);
 }

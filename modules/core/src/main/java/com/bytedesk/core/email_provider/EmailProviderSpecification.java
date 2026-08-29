@@ -37,6 +37,14 @@ public class EmailProviderSpecification extends BaseSpecification<EmailProviderE
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
+            // provider 邮件服务提供商
+            if (StringUtils.hasText(request.getProvider())) {
+                predicates.add(criteriaBuilder.equal(root.get("provider"), request.getProvider()));
+            }
+            // emailAddress 邮箱地址
+            if (StringUtils.hasText(request.getEmailAddress())) {
+                predicates.add(criteriaBuilder.like(root.get("emailAddress"), "%" + request.getEmailAddress() + "%"));
+            }
             // description
             // if (StringUtils.hasText(request.getDescription())) {
             //     predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));

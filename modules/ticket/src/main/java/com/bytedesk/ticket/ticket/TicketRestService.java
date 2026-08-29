@@ -165,6 +165,25 @@ public class TicketRestService
     }
 
     /**
+     * 访客端按 uid 查询工单：
+     * 已认证访客仍走报告人可见性校验；匿名访客与列表接口（/visitor/api/v1/ticket/query，
+     * 匿名可按 reporterUid 查询完整工单数据）保持同等安全级别，直接返回。
+     * 否则访客端工单会话页（iframe 聊天页/宿主预取）均会收到 resource not found。
+     */
+    public TicketResponse queryByUidForVisitor(TicketRequest request) {
+        Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        UserEntity currentUser = authService.getUser();
+        if (currentUser != null && StringUtils.hasText(currentUser.getUid())) {
+            assertTicketVisible(ticket);
+        }
+        return convertToResponse(ticket);
+    }
+
+    /**
      * 按工单会话 uid 查询工单（threadUid 与 ticket 一对一）。
      */
     public TicketResponse queryByThreadUid(TicketRequest request) {
@@ -603,7 +622,24 @@ public class TicketRestService
 
     @Override
     public TicketExcel convertToExcel(TicketEntity entity) {
-        return modelMapper.map(entity, TicketExcel.class);
+        TicketExcel excel = modelMapper.map(entity, TicketExcel.class);
+        // 处理人/报告人显示昵称，与前端 TicketTable 列显示保持一致
+        excel.setAssignee(resolveUserNickname(entity.getAssignee()));
+        excel.setReporter(resolveUserNickname(entity.getReporter()));
+        // 格式化时间戳为 yyyy-MM-dd HH:mm:ss，与前端 TicketTable 列显示保持一致
+        excel.setCreatedAt(entity.getCreatedAtString());
+        excel.setUpdatedAt(entity.getUpdatedAtString());
+        return excel;
+    }
+
+    /**
+     * 从工单关联的用户信息中提取昵称，无昵称时返回空字符串
+     */
+    private String resolveUserNickname(UserProtobuf userProtobuf) {
+        if (userProtobuf == null || !StringUtils.hasText(userProtobuf.getNickname())) {
+            return "";
+        }
+        return userProtobuf.getNickname();
     }
 
     @Override
@@ -724,8 +760,12 @@ public class TicketRestService
             return;
         }
 
-        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
-        request.setType(ticketType.name());
+        // 仅规范化客户端已传入的 type（如 internal -> INTERNAL），
+        // 不再为未传 type 的查询强制默认 EXTERNAL，否则会被 createSpecification
+        // 过滤为仅外部工单，导致内部 INTERNAL 工单无法出现在列表中
+        if (StringUtils.hasText(request.getType())) {
+            request.setType(TicketTypeEnum.fromValue(request.getType()).name());
+        }
 
         if (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser)) {
             request.setVisibilityOrgAdmin(true);

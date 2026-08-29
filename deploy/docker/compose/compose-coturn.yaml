@@ -1,0 +1,47 @@
+# Coturn TURN/STUN 服务（WebRTC 音视频客服组件，关键字：coturn 或组合关键字 webrtc）
+# 启动方式：./start.sh webrtc ... 或 docker compose --env-file .env -f compose/compose-coturn.yaml up -d（在 deploy/docker 目录执行）
+# https://hub.docker.com/r/coturn/coturn
+# 参考：https://github.com/coturn/coturn/blob/master/docker/coturn/README.md
+# 说明：TURN 需要开放一段 UDP 中继端口范围（RFC 5766）。Docker 对超大端口段映射性能较差，
+# 这里按官方示例收敛到 49160-49200（可按需调整）。
+services:
+  bytedesk-coturn:
+    image: coturn/coturn:4.6.3
+    container_name: coturn-bytedesk
+    restart: always
+    ports:
+      - "13478:3478"
+      - "13478:3478/udp"
+      - "15349:5349"
+      - "15349:5349/udp"
+      - "49160-49200:49160-49200/udp"
+    command:
+      - -n
+      - --log-file=stdout
+      - --min-port=49160
+      - --max-port=49200
+      - --lt-cred-mech
+      - --fingerprint
+      - --no-multicast-peers
+      - --no-cli
+      - --no-tlsv1
+      - --realm=${COTURN_REALM:-bytedesk.local}
+      - --user=${COTURN_USER}:${COTURN_PASS}
+    volumes:
+      - coturn_data:/var/lib/coturn
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD-SHELL", "turnutils_stunclient -p 3478 127.0.0.1 >/dev/null 2>&1 || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 6
+      start_period: 15s
+
+volumes:
+  coturn_data:
+    name: bytedesk_coturn_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

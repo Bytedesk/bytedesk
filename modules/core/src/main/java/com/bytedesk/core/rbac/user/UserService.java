@@ -125,12 +125,14 @@ public class UserService {
 
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndPlatform(request.getEmail(), platform)) {
-            throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
+            throw new EmailExistsException(
+                    I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, request.getEmail()));
         }
 
         if (StringUtils.hasText(request.getMobile())
                 && existsByMobileAndPlatform(request.getMobile(), normalizedCountry, platform)) {
-            throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+            throw new MobileExistsException(
+                    I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, request.getMobile()));
         }
         //
         UserEntity user = modelMapper.map(request, UserEntity.class);
@@ -225,7 +227,7 @@ public class UserService {
                     if (existsByUsernameAndPlatform(request.getUsername(),
                             request.getPlatform())) {
                         throw new UsernameExistsException(
-                                "Username " + request.getUsername() + " already exists..!!");
+                                I18Consts.withArgs(I18Consts.I18N_USERNAME_ALREADY_EXISTS, request.getUsername()));
                     }
                 }
                 user.setUsername(request.getUsername());
@@ -244,7 +246,8 @@ public class UserService {
                 if (!request.getEmail().equals(user.getEmail())) {
                     if (existsByEmailAndPlatform(request.getEmail(),
                             request.getPlatform())) {
-                        throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
+                        throw new EmailExistsException(
+                                I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, request.getEmail()));
                     }
                 }
                 user.setEmail(request.getEmail());
@@ -259,7 +262,8 @@ public class UserService {
                     if (existsByMobileAndPlatform(request.getMobile(),
                             normalizedCountry,
                             request.getPlatform())) {
-                        throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+                        throw new MobileExistsException(
+                                I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, request.getMobile()));
                     }
                 }
                 user.setMobile(request.getMobile());
@@ -269,7 +273,8 @@ public class UserService {
                 boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
                 if (countryChanged
                         && existsByMobileAndPlatform(user.getMobile(), normalizedCountry, request.getPlatform())) {
-                    throw new MobileExistsException("Mobile " + user.getMobile() + " already exists..!!");
+                    throw new MobileExistsException(
+                            I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, user.getMobile()));
                 }
                 user.setCountry(normalizedCountry);
             }
@@ -352,7 +357,8 @@ public class UserService {
                 if (!request.getEmail().equals(user.getEmail())) {
                     if (existsByEmailAndPlatform(request.getEmail(),
                             request.getPlatform())) {
-                        throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
+                        throw new EmailExistsException(
+                                I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, request.getEmail()));
                     }
                 }
                 user.setEmail(request.getEmail());
@@ -385,7 +391,8 @@ public class UserService {
                     if (existsByMobileAndPlatform(request.getMobile(),
                             normalizedCountry,
                             request.getPlatform())) {
-                        throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+                        throw new MobileExistsException(
+                                I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, request.getMobile()));
                     }
                 }
                 user.setMobile(request.getMobile());

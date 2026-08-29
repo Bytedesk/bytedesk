@@ -196,13 +196,24 @@ public class NotificationRestService extends BaseRestService<NotificationEntity,
         return unreadNotifications.size();
     }
 
-    public NotificationResponse queryCurrentUserNotification(String uid) {
+    /**
+     * 按UID查询通知详情（与 BaseRestService/Thread 等模块范式统一）
+     * - 非超级管理员仅可查询本组织内的通知，超级管理员可查询全部
+     * - 当前用户自己的通知必然属于本组织，用户侧收件箱场景同样适用
+     */
+    @Override
+    public NotificationResponse queryByUid(NotificationRequest request) {
         UserEntity user = authService.getUser();
         if (user == null || !StringUtils.hasText(user.getUid())) {
             throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
-        NotificationEntity entity = notificationRepository.findByUidAndUserUidAndDeletedFalse(uid, user.getUid())
+        NotificationEntity entity = notificationRepository.findByUidAndDeletedFalse(request.getUid())
                 .orElseThrow(() -> new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND));
+        if (!user.isSuperUser()
+                && StringUtils.hasText(entity.getOrgUid())
+                && !entity.getOrgUid().equals(user.getOrgUid())) {
+            throw new RuntimeException(I18Consts.I18N_ORGANIZATION_ACCESS_DENIED);
+        }
         return convertToResponse(entity);
     }
 

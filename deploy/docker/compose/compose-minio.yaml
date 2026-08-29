@@ -1,0 +1,40 @@
+# 用法：./start.sh minio ... 或 docker compose --env-file .env -f compose/compose-minio.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware minio
+# 说明：MinIO 对象存储（独立组件，默认不启用）
+# - MinIO Console: http://127.0.0.1:19001（使用 .env 中的 MINIO_ROOT_USER/MINIO_ROOT_PASSWORD 登录）
+# - MinIO API: http://127.0.0.1:19000
+# - 应用侧需同时开启 BYTEDESK_MINIO_ENABLED=true（对应 bytedesk.minio.enabled）
+# 详细说明见 readme/readme.minio.md
+services:
+  # MinIO 对象存储服务
+  # http://localhost:19000 - MinIO API
+  # http://localhost:19001 - MinIO Console
+  bytedesk-minio:
+    image: minio/minio:latest
+    container_name: minio-bytedesk
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # API
+      - "19001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    command: minio server /data --console-address ":9001"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  minio_data:
+    name: bytedesk_minio_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

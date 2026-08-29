@@ -118,6 +118,8 @@ public class ServiceSettingsResponse implements Serializable {
 
     private String agentCloseTip;
 
+    private String visitorCloseTip;
+
     // 桌面版聊天窗口右侧iframe
     private Boolean showRightIframe;
 
@@ -220,6 +222,7 @@ public class ServiceSettingsResponse implements Serializable {
                 .autoCloseMin(settings.getAutoCloseMin())
                 .autoCloseTip(settings.getAutoCloseTip())
                 .agentCloseTip(settings.getAgentCloseTip())
+                .visitorCloseTip(settings.getVisitorCloseTip())
                 .showRightIframe(settings.getShowRightIframe())
                 .rightIframeUrl(settings.getRightIframeUrl())
                 .inputAssociationEnabled(settings.getInputAssociationEnabled())

@@ -19,10 +19,10 @@ import java.util.Map;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.stereotype.Component;
 
+import com.bytedesk.ai.llm_model.LlmModelJsonLoader;
+import com.bytedesk.ai.llm_model.LlmModelRestService;
+import com.bytedesk.ai.llm_model.LlmModelJsonLoader.ModelJson;
 import com.bytedesk.ai.llm_provider.LlmProviderJsonLoader.ProviderJson;
-import com.bytedesk.ai.model.LlmModelJsonLoader;
-import com.bytedesk.ai.model.LlmModelJsonLoader.ModelJson;
-import com.bytedesk.ai.model.LlmModelRestService;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;

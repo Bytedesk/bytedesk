@@ -1,0 +1,28 @@
+# Oracle 数据库（四选一：mysql / postgresql / oracle / kingbase）
+# 启动方式：./start.sh oracle ... 或 docker compose --env-file .env -f compose/compose-oracle.yaml up -d（在 deploy/docker 目录执行）
+# 应用侧 DSN 由 start.sh 按所选数据库自动注入（或通过 .env 中 SPRING_DATASOURCE_* 显式配置）
+services:
+  bytedesk-oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: oracle-bytedesk
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      APP_USER: ${ORACLE_APP_USER}
+      APP_USER_PASSWORD: ${ORACLE_APP_USER_PASSWORD}
+      ORACLE_DATABASE: ${ORACLE_DATABASE}
+      TZ: Asia/Shanghai
+    ports:
+      - "11521:1521"
+      - "15500:5500"
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+    networks:
+      - bytedesk-network
+
+volumes:
+  oracle_data:
+    name: bytedesk_oracle_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

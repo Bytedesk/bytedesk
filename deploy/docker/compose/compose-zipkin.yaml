@@ -1,0 +1,25 @@
+# Zipkin 分布式追踪（可观测性组件，关键字：zipkin 或组合关键字 obs）
+# 启动方式：./start.sh obs ... 或 docker compose --env-file .env -f compose/compose-zipkin.yaml up -d（在 deploy/docker 目录执行）
+# 访问 http://localhost:19411
+# 启用后需设置 MANAGEMENT_TRACING_ENABLED=true 让应用向 Zipkin 上报 span
+services:
+  bytedesk-zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin-bytedesk
+    ports:
+      - '19411:9411'
+    environment:
+      - JAVA_OPTS=-Xms256m -Xmx512m
+      - STORAGE_TYPE=mem
+      - ZIPKIN_UI_QUERY_LIMIT=100
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9411/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  bytedesk-network:
+    driver: bridge

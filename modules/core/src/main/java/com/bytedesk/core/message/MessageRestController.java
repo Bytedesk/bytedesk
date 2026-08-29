@@ -57,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MessageRestController extends BaseRestController<MessageRequest, MessageRestService> {
 
     private static final DateTimeFormatter EXPORT_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
     private static final int[] EXPORT_COLUMN_WIDTHS = {60, 20, 30, 30};
 
     private final MessageRestService messageRestService;

@@ -36,10 +36,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingModel;
-import com.bytedesk.ai.providers.dashscope.embedding.DashScopeEmbeddingOptions;
-import com.bytedesk.ai.providers.openai.OpenAiCompatibleModelFactory;
-import com.bytedesk.ai.providers.zhipuai.embedding.ZhipuaiEmbeddingModel;
+import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.provider.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;

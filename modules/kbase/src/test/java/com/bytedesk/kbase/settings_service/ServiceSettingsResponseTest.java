@@ -29,4 +29,20 @@ class ServiceSettingsResponseTest {
         assertEquals(Boolean.FALSE, response.getToolbar().getTicket());
         assertEquals(List.of("smile", "goods", "ticket"), response.getToolbar().getOrder());
     }
+
+    @Test
+    void shouldMapCloseTipsWhenBuildingResponseFromEntity() {
+        ServiceSettingsEntity entity = ServiceSettingsEntity.builder()
+                .agentCloseTip("<p>agent close</p>")
+                .visitorCloseTip("<p>visitor close</p>")
+                .autoCloseTip("<p>auto close</p>")
+                .build();
+
+        ServiceSettingsResponse response = ServiceSettingsResponse.fromEntity(entity);
+
+        assertNotNull(response);
+        assertEquals("<p>agent close</p>", response.getAgentCloseTip());
+        assertEquals("<p>visitor close</p>", response.getVisitorCloseTip());
+        assertEquals("<p>auto close</p>", response.getAutoCloseTip());
+    }
 }

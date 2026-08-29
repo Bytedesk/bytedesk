@@ -1,0 +1,37 @@
+# 用法：./start.sh kibana ... 或 docker compose --env-file .env -f compose/compose-kibana.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware kibana
+# 说明：Kibana 日志查询界面（独立组件，默认不启用）
+# - 访问地址: http://127.0.0.1:15601（登录 elastic / .env 中的 ELASTIC_PASSWORD）
+# - 依赖 Elasticsearch（bytedesk-elasticsearch，需先启动：./start.sh middleware 或 elasticsearch 关键字）
+# - Kibana 自身通过 .env 中的 KIBANA_SERVICE_ACCOUNT_TOKEN 连接 Elasticsearch
+# 详细说明见 readme/readme.kibana.md
+services:
+  # Kibana 日志查询界面
+  bytedesk-kibana:
+    # image: docker.elastic.co/kibana/kibana:9.4.2
+    # image: dockerproxy.net/library/kibana:9.4.2
+    image: kibana:9.4.2
+    container_name: kibana-bytedesk
+    restart: always
+    environment:
+      - SERVER_NAME=bytedesk-kibana
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-bytedesk:9200
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN=${KIBANA_SERVICE_ACCOUNT_TOKEN}
+      - I18N_LOCALE=zh-CN
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=bytedesk-kibana-encrypted-saved-objects-key-2026
+      - XPACK_REPORTING_ENCRYPTIONKEY=bytedesk-kibana-reporting-encryption-key-2026
+      - XPACK_SECURITY_ENCRYPTIONKEY=bytedesk-kibana-security-encryption-key-2026
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+    ports:
+      - "15601:5601"
+    networks:
+      - bytedesk-network
+
+volumes:
+  kibana_data:
+    name: bytedesk_kibana_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

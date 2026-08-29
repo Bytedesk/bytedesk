@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.assignment.TicketAssignmentLogEntity;
@@ -31,6 +33,8 @@ import com.bytedesk.ticket.ticket.dto.TicketStatusCountResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -43,6 +47,8 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     private final TicketRestService ticketRestService;
 
     private final TicketAssignmentLogRepository assignmentLogRepository;
+
+    private final MessageSource messageSource;
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org")
@@ -167,14 +173,49 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXPORT, description = "export ticket")
     @GetMapping("/export")
     public Object export(TicketRequest request, HttpServletResponse response) {
-        return exportTemplate(
-            request,
-            response,
-            ticketRestService,
-            TicketExcel.class,
-            "Ticket",
-            "Ticket"
-        );
+        try {
+            Locale locale = ExcelExportUtils.resolveLocale(request);
+            Page<TicketEntity> ticketPage = ticketRestService.queryByOrgEntity(request);
+            List<TicketExcel> excelList = ticketPage.getContent().stream()
+                    .map(entity -> localizeExcel(ticketRestService.convertToExcel(entity), locale))
+                    .collect(Collectors.toList());
+            ExcelExportUtils.writeExcel(response, request, excelList, TicketExcel.class, "Ticket", "Ticket");
+        } catch (Exception e) {
+            log.error("export ticket failed: request={}", request, e);
+            // 发生异常时重置响应
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            String message = e.getMessage() != null ? e.getMessage() : e.toString();
+            return JsonResult.error(message);
+        }
+        return "";
+    }
+
+    /**
+     * 将工单Excel中的状态/优先级/类型等枚举值转换为国际化文案
+     * 与前端 TicketTable 列显示保持一致
+     */
+    private TicketExcel localizeExcel(TicketExcel excel, Locale locale) {
+        if (excel == null) {
+            return null;
+        }
+        excel.setStatus(localizeEnumText(excel.getStatus(), "ticket.status", locale));
+        excel.setPriority(localizeEnumText(excel.getPriority(), "ticket.priority", locale));
+        excel.setType(localizeEnumText(excel.getType(), "ticket.type", locale));
+        return excel;
+    }
+
+    /**
+     * 枚举值转国际化文案，未配置国际化key时回退为原始枚举值
+     * 例如: PROCESSING -> i18n.ticket.status.processing -> 处理中
+     */
+    private String localizeEnumText(String enumValue, String keyPrefix, Locale locale) {
+        if (enumValue == null || enumValue.isBlank()) {
+            return enumValue;
+        }
+        String key = I18Consts.I18N_PREFIX + keyPrefix + "." + enumValue.toLowerCase();
+        return messageSource.getMessage(key, null, enumValue, locale);
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)

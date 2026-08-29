@@ -1,0 +1,28 @@
+# Baidu MRCP Server（ASR/TTS，呼叫中心组件，关键字：mrcp 或组合关键字 call）
+# 启动方式：./start.sh mrcp ... 或 ./start.sh call ... 或 docker compose --env-file .env -f compose/compose-mrcp.yaml up -d（在 deploy/docker 目录执行）
+# 镜像来源：/Users/ningjinpeng/Desktop/Git/Github/open/bytedesk-mrcp
+# Apple Silicon 本地运行时使用 amd64 镜像，由 Docker Desktop 负责模拟运行。
+services:
+  bytedesk-mrcp:
+    image: registry.cn-hangzhou.aliyuncs.com/bytedesk/mrcp:latest
+    platform: ${MRCP_PLATFORM:-linux/amd64}
+    # pull_policy: always
+    container_name: ${MRCP_CONTAINER_NAME:-mrcp-server-bytedesk}
+    # restart: unless-stopped
+    # restart: always
+    ports:
+      - "${MRCP_HOST_PORT:-11544}:1544"
+      - "${MRCP_RTSP_HOST_PORT:-11554}:1554"
+      - "${MRCP_SIP_HOST_PORT:-25060}:5060/udp"
+      - "${MRCP_SIP_HOST_PORT:-25060}:5060/tcp"
+      - "${MRCP_RTP_HOST_PORT_RANGE:-14000-15000}:5000-6000/udp"
+    volumes:
+      - ${MRCP_CONF_DIR:-../../freeswitch/mrcp/MRCPServer/mrcp-server/conf}:/opt/mrcp-server/conf:ro
+      - ${MRCP_LOG_DIR:-../../freeswitch/mrcp/log}:/opt/mrcp-server/log
+      - ${MRCP_AUDIO_DIR:-../../freeswitch/mrcp/audio}:/opt/mrcp-server/audio
+    networks:
+      - bytedesk-network
+
+networks:
+  bytedesk-network:
+    driver: bridge

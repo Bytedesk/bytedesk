@@ -25,10 +25,10 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.ai.providers.dashscope.tool.DashScopeToolCallingResult;
-import com.bytedesk.ai.providers.dashscope.tool.DashScopeToolService;
 import com.bytedesk.ai.robot_settings.tools.ResolvedRobotToolIntent;
-import com.bytedesk.ai.providers.zhipuai.tool.ZhipuaiToolService;
+import com.bytedesk.ai.provider.dashscope.tool.DashScopeToolCallingResult;
+import com.bytedesk.ai.provider.dashscope.tool.DashScopeToolService;
+import com.bytedesk.ai.provider.zhipuai.tool.ZhipuaiToolService;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
 import com.bytedesk.ai.tool.ToolEntity;

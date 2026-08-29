@@ -20,11 +20,11 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.core.connection.ConnectionEntity;
+import com.bytedesk.core.connection.event.ConnectionCreateEvent;
+import com.bytedesk.core.connection.event.ConnectionDeleteEvent;
+import com.bytedesk.core.connection.event.ConnectionUpdateEvent;
 import com.bytedesk.core.quartz.event.QuartzFiveMinEvent;
-import com.bytedesk.core.socket.connection.ConnectionEntity;
-import com.bytedesk.core.socket.connection.event.ConnectionCreateEvent;
-import com.bytedesk.core.socket.connection.event.ConnectionDeleteEvent;
-import com.bytedesk.core.socket.connection.event.ConnectionUpdateEvent;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.service.agent.event.AgentUpdateStatusEvent;
 import com.bytedesk.service.workgroup.WorkgroupEntity;

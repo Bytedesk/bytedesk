@@ -27,7 +27,7 @@
   <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_server_host=192.168.0.102" />
   <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_server_port=1544" />
   <X-PRE-PROCESS cmd="set" data="ai_bot_mrcp_rtp_ip=192.168.0.102" />
-  <X-PRE-PROCESS cmd="set" data="baidu_mrcp_server_host=bytedesk-mrcp-server" />
+  <X-PRE-PROCESS cmd="set" data="baidu_mrcp_server_host=bytedesk-mrcp" />
   <X-PRE-PROCESS cmd="set" data="baidu_mrcp_sip_port=5060" />
   <!-- 录音公开访问 URL；生产部署时通过 .env 中 FREESWITCH_RECORDINGS_PUBLIC_BASE 覆盖 -->
   <X-PRE-PROCESS cmd="set"

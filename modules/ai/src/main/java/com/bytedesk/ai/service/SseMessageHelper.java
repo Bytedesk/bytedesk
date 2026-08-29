@@ -13,7 +13,6 @@ import com.bytedesk.ai.service.agent.AgentResponseTimingContext;
 
 import org.springframework.ai.chat.messages.Message;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.utils.I18nTextResolver;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -246,7 +245,7 @@ public class SseMessageHelper {
             MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, SseEmitter emitter) {
         // 将 i18n key（如 "i18n.robot.noreply"）解析为本地化文本，避免 key 直接泄漏给前端
-        answer = I18nTextResolver.resolveIfKey(answer);
+        // answer = I18nTextResolver.resolveIfKey(answer);
         String robotStreamContent = promptHelper.createRobotStreamContentAnswer(query, answer, new ArrayList<>(),
                 robot);
         sendStreamMessage(

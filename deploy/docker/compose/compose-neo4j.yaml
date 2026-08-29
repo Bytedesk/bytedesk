@@ -1,0 +1,48 @@
+# 用法：./start.sh neo4j ... 或 docker compose --env-file .env -f compose/compose-neo4j.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware neo4j / ./start.sh all neo4j
+# 说明：Neo4j 图数据库（社区版，用于知识图谱 / GraphRAG 能力验证）
+# 官方文档: https://neo4j.com/docs/operations-manual/current/docker/introduction/
+# 镜像: https://hub.docker.com/_/neo4j
+# github: https://github.com/neo4j/neo4j
+# 启动后：
+# - Neo4j Browser: http://127.0.0.1:17474
+# - Bolt 连接: bolt://127.0.0.1:17687（docker 内应用容器地址 bolt://neo4j-bytedesk:7687）
+# - 默认账号 neo4j / ${NEO4J_PASSWORD}（仅空数据卷首次启动生效；复用旧卷时以旧密码为准）
+# 应用侧需在 properties 或环境变量中开启: bytedesk.ai.neo4j.enabled=true（BYTEDESK_AI_NEO4J_ENABLED=true）
+# 注意：healthcheck 密码通过容器内环境变量插值，不在本文件写死
+services:
+  bytedesk-neo4j:
+    image: neo4j:5.26.30
+    container_name: neo4j-bytedesk
+    restart: always
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    environment:
+      # 初始密码仅对空 /data 卷首次启动生效；复用已有数据卷时修改本值不会覆盖旧密码
+      # 使用 ":-" 兜底，避免 .env 中留空值导致 NEO4J_AUTH=neo4j/ 启动失败
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-bytedesk-neo4j}
+    ports:
+      - "17474:7474"
+      - "17687:7687"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      # 通过 CMD-SHELL 插值引用容器内 NEO4J_PASSWORD，验证 Bolt 链路与认证真正可用
+      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u neo4j -p \"$${NEO4J_PASSWORD:-bytedesk-neo4j}\" 'RETURN 1' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+
+networks:
+  bytedesk-network:
+    driver: bridge

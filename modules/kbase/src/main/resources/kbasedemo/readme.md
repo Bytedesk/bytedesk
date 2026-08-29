@@ -301,13 +301,13 @@ WebSocket长连接
 ### 克隆项目并启动docker compose容器
 
 ```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && ./start.sh mysql artemis standard all
+git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && ./start.sh all
 ```
 
 ### 或者 仅启动中间件（源码启动推荐）
 
 ```bash
-git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && ./start.sh mysql artemis standard middleware
+git clone https://github.com/Bytedesk/bytedesk.git && cd bytedesk/deploy/docker && ./start.sh middleware
 # 运行模型
 # docker exec ollama-bytedesk ollama pull deepseek-r1
 docker exec ollama-bytedesk ollama pull qwen3:0.6b
@@ -323,12 +323,12 @@ ollama pull qwen3:0.6b
 ### 停止容器
 
 ```bash
-./stop.sh mysql artemis standard stop all
+./stop.sh stop all
 ```
 
 ### 修改配置，否则上传图片、文件和知识库无法正常显示
 
-- 修改 `deploy/docker/compose-app-bytedesk.yaml` 文件
+- 修改 `deploy/docker/compose/compose-bytedesk.yaml` 文件
 
 ```bash
 # 请将服务器127.0.0.1替换为你的服务器ip

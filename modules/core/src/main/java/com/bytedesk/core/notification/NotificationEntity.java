@@ -51,7 +51,10 @@ public class NotificationEntity extends BaseEntity {
 
     /**
      * Main content of the notification.
+     * 前端发送通知内容允许最长 1000 字，varchar(255) 会触发
+     * "Data too long for column 'content'"，故使用 TEXT 类型。
      */
+    @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String content;
 
     /**

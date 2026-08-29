@@ -9,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.connection.ConnectionEntity;
+import com.bytedesk.core.connection.ConnectionRepository;
+import com.bytedesk.core.connection.ConnectionRestService;
+import com.bytedesk.core.connection.PresenceResponse;
+
 @SpringBootTest
 @Transactional
 class ConnectionPresenceTests {

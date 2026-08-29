@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
@@ -174,13 +175,15 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         if (StringUtils.hasText(request.getEmail())
                 && existsByEmailAndOrgUid(request.getEmail(), request.getOrgUid())) {
-            throw new EmailExistsException("Email " + request.getEmail() + " already exists..!!");
+            throw new EmailExistsException(
+                    I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, request.getEmail()));
         }
         String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
         request.setCountry(normalizedCountry);
         if (StringUtils.hasText(request.getMobile())
             && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, request.getOrgUid())) {
-            throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+            throw new MobileExistsException(
+                    I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, request.getMobile()));
         }
         assertMemberCapacityAvailable(request.getOrgUid());
         //
@@ -257,7 +260,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(member.getCountry()));
             if ((mobileChanged || countryChanged)
                     && existsByMobileAndOrgUid(request.getMobile(), normalizedCountry, member.getOrgUid())) {
-                throw new MobileExistsException("Mobile " + request.getMobile() + " already exists..!!");
+                throw new MobileExistsException(
+                        I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, request.getMobile()));
             }
         }
 
@@ -891,6 +895,17 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     @Override
     public MemberExcelExport convertToExcel(MemberEntity entity) {
         MemberExcelExport excel = modelMapper.map(entity, MemberExcelExport.class);
+        // createdAt/updatedAt 由 modelMapper 从 BaseEntity 自动映射
+        // 登录用户名：MemberEntity 本身无 username 字段，从关联 UserEntity 获取
+        if (entity.getUser() != null) {
+            excel.setUsername(entity.getUser().getUsername());
+            // 角色与成员列表接口保持一致（含强制 ROLE_USER），导出时按语言统一翻译
+            excel.setRoles(joinRoleNames(getRolesForOrg(entity.getUser(), entity.getOrgUid())));
+        }
+        // 可登录平台：Set -> 按枚举声明顺序（与前端选项一致）逗号分隔，保证导出顺序稳定
+        if (entity.getAllowedLoginPlatforms() != null && !entity.getAllowedLoginPlatforms().isEmpty()) {
+            excel.setAllowedLoginPlatforms(joinPlatformCodes(entity.getAllowedLoginPlatforms()));
+        }
         // 设置部门名称
         if (entity.getDeptUid() != null) {
             Optional<DepartmentEntity> departmentOptional = departmentRestService.findByUid(entity.getDeptUid());
@@ -899,6 +914,31 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             }
         }
         return excel;
+    }
+
+    /**
+     * 平台编码按 MemberLoginPlatformEnum 声明顺序拼接（admin, desktop, notebase, workflow, call, callAdmin），
+     * 未知编码追加在末尾并排序，保证导出顺序与前端展示一致
+     */
+    private String joinPlatformCodes(Set<String> platforms) {
+        LinkedHashSet<String> ordered = new LinkedHashSet<>(MemberLoginPlatformEnum.allCodes());
+        ordered.retainAll(platforms);
+        // 不在枚举中的历史/自定义编码，按字典序追加在末尾
+        Set<String> unknownCodes = new TreeSet<>(platforms);
+        unknownCodes.removeAll(MemberLoginPlatformEnum.allCodes());
+        ordered.addAll(unknownCodes);
+        return ordered.stream().collect(Collectors.joining(", "));
+    }
+
+    private String joinRoleNames(Set<RoleResponseSimple> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return "";
+        }
+        return roles.stream()
+                .map(RoleResponseSimple::getName)
+                .filter(StringUtils::hasText)
+                .sorted()
+                .collect(Collectors.joining(", "));
     }
 
     @Override

@@ -23,9 +23,12 @@ import lombok.Data;
 @Data
 public class ActionExcel {
 
-    @ExcelProperty("用户")
+    /**
+     * 与前端 ActionTable 第一列保持一致：显示用户昵称
+     */
+    @ExcelProperty("昵称")
     @ColumnWidth(20)
-    private String user;
+    private String nickname;
 
     @ExcelProperty("标题")
     @ColumnWidth(20)

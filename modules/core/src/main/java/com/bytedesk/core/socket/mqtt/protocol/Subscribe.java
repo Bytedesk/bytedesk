@@ -16,10 +16,10 @@ package com.bytedesk.core.socket.mqtt.protocol;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
+import com.bytedesk.core.connection.ConnectionRestService;
 import com.bytedesk.core.socket.mqtt.MqttChannelUtils;
 import com.bytedesk.core.socket.mqtt.MqttUtils;
 import com.bytedesk.core.socket.mqtt.event.MqttEventPublisher;
-import com.bytedesk.core.socket.connection.ConnectionRestService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

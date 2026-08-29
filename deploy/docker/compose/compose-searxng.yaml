@@ -1,0 +1,41 @@
+# 用法：./start.sh searxng ... 或 docker compose --env-file .env -f compose/compose-searxng.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware searxng
+# 说明：SearXNG 联网搜索引擎（开源元搜索引擎，聚合 Google/Bing/DuckDuckGo 等搜索结果）
+# 官方文档: https://docs.searxng.org/admin/installation-docker.html
+# 镜像: https://hub.docker.com/r/searxng/searxng
+# github: https://github.com/searxng/searxng
+# 启动后：
+# - 搜索页面: http://127.0.0.1:18888
+# - JSON API: http://127.0.0.1:18888/search?q=bytedesk&format=json
+# - 健康检查: http://127.0.0.1:18888/healthz
+# 应用侧需在 properties 或环境变量中开启: bytedesk.ai.searxng.enabled=true（BYTEDESK_AI_SEARXNG_ENABLED=true）
+services:
+  bytedesk-searxng:
+    image: searxng/searxng:latest
+    container_name: searxng-bytedesk
+    restart: always
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+    environment:
+      # 对外基础地址（浏览器可访问的地址），按需替换为服务器 IP 或域名
+      - SEARXNG_BASE_URL=http://localhost:18888/
+      # 实例密钥，由 docker entrypoint 注入 settings.yml，生产环境务必修改
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-bytedesk-searxng-secret}
+    ports:
+      - "18888:8080"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  bytedesk-network:
+    driver: bridge

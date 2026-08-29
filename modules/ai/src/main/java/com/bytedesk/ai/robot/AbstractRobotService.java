@@ -163,8 +163,8 @@ public abstract class AbstractRobotService {
                 RobotProtobuf robot = ConvertAiUtils.convertToRobotProtobuf(robotOptional.get());
 
                 // 如果服务支持多模态处理（如ZhipuMultiModelService），使用多模态方法
-                if (service instanceof com.bytedesk.ai.providers.zhipuai.ZhipuaiService) {
-                    com.bytedesk.ai.providers.zhipuai.ZhipuaiService multiModelService = (com.bytedesk.ai.providers.zhipuai.ZhipuaiService) service;
+                if (service instanceof com.bytedesk.ai.provider.zhipuai.ZhipuaiService) {
+                    com.bytedesk.ai.provider.zhipuai.ZhipuaiService multiModelService = (com.bytedesk.ai.provider.zhipuai.ZhipuaiService) service;
 
                     // 创建包含图片的MessageProtobuf
                     MessageProtobuf imageMessage = createImageMessage(imageUrl, textQuery);

@@ -1,0 +1,35 @@
+# SearXNG 配置（微语定制）
+# 官方文档: https://docs.searxng.org/admin/settings/settings.html
+# 注意: secret_key 由 docker 环境变量 SEARXNG_SECRET 注入，无需在此填写
+use_default_settings: true
+
+server:
+  # 私有实例可关闭限流，否则 /search?format=json 的 API 调用会被 botdetection 拦截
+  limiter: false
+  # 图片结果通过 searxng 代理加载
+  image_proxy: true
+  # docker 镜像内默认监听 8080
+  port: 8080
+  bind_address: "0.0.0.0"
+
+search:
+  # 安全搜索级别: 0=关闭, 1=中等, 2=严格
+  safe_search: 1
+  # 关闭搜索框自动补全，减少对外部搜索引擎的请求
+  autocomplete: ""
+  # 必须显式开启 json 输出，否则 /search?format=json 会返回 403
+  # https://docs.searxng.org/admin/engines/settings.html#formats
+  formats:
+    - html
+    - json
+
+# 引擎覆盖（与默认设置按 name 合并）
+# 默认 general 引擎为 google/duckduckgo/startpage/brave/wikipedia，
+# 大陆网络环境下这些引擎全部超时导致搜索结果为空；
+# bing/baidu 在国内外均可直达，显式启用以保证大陆服务器也能返回结果，
+# 海外部署时默认引擎不受影响，仍会聚合返回。
+engines:
+  - name: bing
+    disabled: false
+  - name: baidu
+    disabled: false

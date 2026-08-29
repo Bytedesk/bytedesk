@@ -23,7 +23,7 @@ import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 
-import com.bytedesk.core.socket.connection.ConnectionRestService;
+import com.bytedesk.core.connection.ConnectionRestService;
 
 // import com.bytedesk.core.event.BytedeskEventPublisher;
 

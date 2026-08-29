@@ -98,6 +98,16 @@ public class UrlPreviewRestControllerAgent {
                 .fetchedAt(ZonedDateTime.now().toString())
                 .build();
 
+        // 抓取不到任何有效预览信息（如纯文件链接）时不写回消息内容，
+        // 避免前端把只含 url 的预览渲染成重复的链接行
+        boolean meaningful = StringUtils.hasText(urlPreview.getTitle())
+                || StringUtils.hasText(urlPreview.getDescription())
+                || StringUtils.hasText(urlPreview.getImageUrl())
+                || StringUtils.hasText(urlPreview.getSiteName());
+        if (!meaningful) {
+            return ResponseEntity.ok(JsonResult.success(textContent));
+        }
+
         previews.add(urlPreview);
         textContent.setUrlPreviews(previews);
         message.setContent(textContent.toJson());

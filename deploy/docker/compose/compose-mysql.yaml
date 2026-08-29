@@ -1,0 +1,31 @@
+# MySQL 数据库（四选一：mysql / postgresql / oracle / kingbase）
+# 启动方式：./start.sh mysql ... 或 docker compose --env-file .env -f compose/compose-mysql.yaml up -d（在 deploy/docker 目录执行）
+# 应用侧 DSN 由 start.sh 按所选数据库自动注入（或通过 .env 中 SPRING_DATASOURCE_* 显式配置）
+services:
+  bytedesk-mysql:
+    image: mysql:latest
+    container_name: mysql-bytedesk
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-bytedesk}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_HOST_PORT:-13306}:${MYSQL_PORT:-3306}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    networks:
+      - bytedesk-network
+
+volumes:
+  mysql_data:
+    name: bytedesk_mysql_data
+
+networks:
+  bytedesk-network:
+    driver: bridge

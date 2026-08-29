@@ -16,6 +16,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.ai.mcp.client.common.autoconfigure.NamedClientMcpTransport;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -43,6 +45,12 @@ public class McpClientManager {
 
     private static final String LEGACY_SSE_TRANSPORT_CLASS = "io.modelcontextprotocol.client.transport.HttpClientSseClientTransport";
 
+    /**
+     * Minimum interval between on-demand init retries for the same connection,
+     * to avoid hammering unreachable servers on every request.
+     */
+    private static final long INIT_RETRY_INTERVAL_MS = 30_000L;
+
     private static final List<String> CLIENT_DIRECTIONS = List.of(
             McpServerDirectionEnum.CLIENT.name(),
             McpServerDirectionEnum.DUAL.name());
@@ -55,9 +63,39 @@ public class McpClientManager {
 
     private final Map<String, McpClientRuntime> clientRuntimes = new ConcurrentHashMap<>();
 
+    /**
+     * Timestamp (System.currentTimeMillis) of the last consumed init retry attempt
+     * per connection uid, used to throttle on-demand recovery.
+     */
+    private final Map<String, Long> lastInitRetryAttempts = new ConcurrentHashMap<>();
+
     @PostConstruct
     public void initialize() {
         refreshConnectionConfigs();
+    }
+
+    /**
+     * Re-initialize external MCP clients once the application is fully started.
+     * <p>
+     * Loopback connections (an MCP client connecting to this app's own MCP server,
+     * e.g. {@code http://127.0.0.1:9003/mcp}) cannot be established in
+     * {@link #initialize()} because the web server is not listening yet at
+     * {@code @PostConstruct} time. Refreshing here retries those failed
+     * initializations after Jetty is up.
+     * </p>
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        try {
+            int before = clientRuntimes.size();
+            refreshConnectionConfigs();
+            int after = clientRuntimes.size();
+            if (after > before) {
+                log.info("Recovered external MCP runtime clients after startup: {} -> {}", before, after);
+            }
+        } catch (Exception ex) {
+            log.warn("Failed to re-initialize external MCP clients after startup: {}", ex.getMessage());
+        }
     }
 
     @PreDestroy
@@ -91,7 +129,41 @@ public class McpClientManager {
     }
 
     public Optional<McpSyncClient> findSyncClient(String uid) {
-        return Optional.ofNullable(clientRuntimes.get(uid)).map(McpClientRuntime::syncClient);
+        McpClientRuntime runtime = clientRuntimes.get(uid);
+        if (runtime != null) {
+            return Optional.of(runtime.syncClient());
+        }
+        // Retry on demand: initial creation may have failed at startup (e.g. loopback
+        // connection before the web server was listening). Throttled per uid.
+        McpClientConnectionConfig config = connectionConfigs.get(uid);
+        if (config == null || !shouldRetryInit(uid)) {
+            return Optional.empty();
+        }
+        return createRuntime(config).map(created -> {
+            McpClientRuntime existing = clientRuntimes.putIfAbsent(uid, created);
+            if (existing != null) {
+                closeRuntimes(List.of(created));
+                return existing;
+            }
+            lastInitRetryAttempts.remove(uid);
+            log.info("Recovered external MCP runtime client {} ({}) on demand", created.name(), uid);
+            return created;
+        }).map(McpClientRuntime::syncClient);
+    }
+
+    /**
+     * Whether an on-demand init retry is due for the given connection uid.
+     * Marks the attempt time even before knowing the outcome, so failed and
+     * successful attempts are both throttled by {@link #INIT_RETRY_INTERVAL_MS}.
+     */
+    private boolean shouldRetryInit(String uid) {
+        long now = System.currentTimeMillis();
+        Long last = lastInitRetryAttempts.get(uid);
+        if (last != null && now - last < INIT_RETRY_INTERVAL_MS) {
+            return false;
+        }
+        lastInitRetryAttempts.put(uid, now);
+        return true;
     }
 
     public synchronized void refreshConnectionConfigs() {
@@ -141,9 +213,31 @@ public class McpClientManager {
             syncClient.initialize();
             return Optional.of(new McpClientRuntime(config.uid(), config.name(), namedTransport, syncClient));
         } catch (Exception ex) {
-            log.warn("Failed to initialize external MCP client {} ({})", config.name(), config.uid(), ex);
+            // Expected for loopback connections during @PostConstruct: the web server is not
+            // listening yet, so initialize() gets ConnectException. Recovery is automatic via
+            // onApplicationReady() and the throttled retry in findSyncClient(). Log one concise
+            // line at WARN with the root cause only; never print the full stack trace so the
+            // startup output stays clean even with DEBUG logging enabled.
+            log.warn("Failed to initialize external MCP client {} ({}): {} - will retry after startup or on first use",
+                    config.name(), config.uid(), rootCauseMessage(ex));
             return Optional.empty();
         }
+    }
+
+    /**
+     * Extract the most informative (root cause) message from an exception chain,
+     * e.g. {@code ConnectException: Connection refused} instead of a generic
+     * "Client failed to initialize by explicit API call" wrapper message.
+     */
+    private String rootCauseMessage(Throwable ex) {
+        Throwable cause = ex;
+        while (cause.getCause() != null && cause.getCause() != cause) {
+            cause = cause.getCause();
+        }
+        String message = cause.getMessage();
+        return message != null
+                ? cause.getClass().getSimpleName() + ": " + message
+                : cause.getClass().getSimpleName();
     }
 
     private io.modelcontextprotocol.spec.McpClientTransport createTransport(McpClientConnectionConfig config) {
