@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -41,6 +42,7 @@ import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 
@@ -500,9 +502,28 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
     public UserExcel convertToExcel(UserEntity entity) {
         UserExcel excel = new UserExcel();
         excel.setNickname(entity.getNickname());
-        excel.setEmail(entity.getEmail());
+        excel.setUsername(entity.getUsername());
         excel.setMobile(entity.getMobile());
+        excel.setEmail(entity.getEmail());
+        // 当前组织名称
+        if (entity.getCurrentOrganization() != null) {
+            excel.setCurrentOrganizationName(entity.getCurrentOrganization().getName());
+        }
+        // 当前角色名称，逗号分隔（导出时按语言逐个翻译）
+        if (entity.getCurrentRoles() != null && !entity.getCurrentRoles().isEmpty()) {
+            excel.setCurrentRoles(entity.getCurrentRoles().stream()
+                    .map(RoleEntity::getName)
+                    .filter(StringUtils::hasText)
+                    .sorted()
+                    .collect(Collectors.joining(", ")));
+        }
         excel.setDescription(entity.getDescription());
+        excel.setEnabled(entity.isEnabled());
+        excel.setSuperUser(entity.isSuperUser());
+        excel.setSex(entity.getSex());
+        excel.setRegisterSource(entity.getRegisterSource());
+        excel.setCreatedAt(entity.getCreatedAt());
+        excel.setUpdatedAt(entity.getUpdatedAt());
         return excel;
     }
 

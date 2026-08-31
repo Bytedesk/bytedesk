@@ -242,7 +242,8 @@ public class PushSendService {
         return AuthTypeEnum.EMAIL_REGISTER.name().equals(type) ||
                AuthTypeEnum.EMAIL_LOGIN.name().equals(type) ||
                AuthTypeEnum.EMAIL_RESET.name().equals(type) ||
-               AuthTypeEnum.EMAIL_VERIFY.name().equals(type);
+               AuthTypeEnum.EMAIL_VERIFY.name().equals(type) ||
+               AuthTypeEnum.EMAIL_PASSWORD_RESET.name().equals(type);
     }
 
     /**
@@ -252,6 +253,7 @@ public class PushSendService {
         return AuthTypeEnum.MOBILE_REGISTER.name().equals(type) ||
                AuthTypeEnum.MOBILE_LOGIN.name().equals(type) ||
                AuthTypeEnum.MOBILE_RESET.name().equals(type) ||
-               AuthTypeEnum.MOBILE_VERIFY.name().equals(type);
+               AuthTypeEnum.MOBILE_VERIFY.name().equals(type) ||
+               AuthTypeEnum.MOBILE_PASSWORD_RESET.name().equals(type);
     }
 }

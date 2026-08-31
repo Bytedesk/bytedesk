@@ -202,6 +202,36 @@ services:
       BYTEDESK_MINIO_REGION: us-east-1
       BYTEDESK_MINIO_SECURE: false
       # ===============================
+      # File preview config（Office 转 PDF，企业版功能，社区版镜像不含此功能）
+      # 官方镜像已精简（不含 LibreOffice）。Docker 部署开启预览：./start.sh gotenberg 启动转换 sidecar，
+      # 并在 .env 设置 BYTEDESK_PREVIEW_CONVERT_ENABLED=true + BYTEDESK_PREVIEW_CONVERT_MODE=remote
+      # 自建全量镜像（INSTALL_LIBREOFFICE=true）保持 MODE=local 即可；直跑 jar 在宿主机安装 LibreOffice（docs: development/filepreview）
+      # ===============================
+      # 是否启用 Office 转 PDF 预览（默认关闭，未启用时前端降级提示下载）
+      BYTEDESK_PREVIEW_CONVERT_ENABLED: ${BYTEDESK_PREVIEW_CONVERT_ENABLED:-false}
+      # 转换模式：local（默认，镜像内/宿主机 LibreOffice）/ remote（gotenberg sidecar，精简镜像推荐）
+      BYTEDESK_PREVIEW_CONVERT_MODE: ${BYTEDESK_PREVIEW_CONVERT_MODE:-local}
+      # remote 模式：gotenberg 服务地址（仅 MODE=remote 时生效，compose 内网默认 http://bytedesk-gotenberg:3000）
+      BYTEDESK_PREVIEW_CONVERT_REMOTE_URL: ${BYTEDESK_PREVIEW_CONVERT_REMOTE_URL:-http://bytedesk-gotenberg:3000}
+      # remote 模式：单次转换 HTTP 超时（毫秒），默认对齐 task-execution-timeout 3 分钟
+      BYTEDESK_PREVIEW_CONVERT_REMOTE_TIMEOUT: "180000"
+      # LibreOffice 安装目录，容器内留空自动探测（仅 local 模式）
+      # BYTEDESK_PREVIEW_CONVERT_OFFICE_HOME: /usr/lib/libreoffice
+      # LibreOffice 进程端口，多个逗号分隔（仅 local 模式）
+      BYTEDESK_PREVIEW_CONVERT_PORTS: "2001"
+      # 单次转换任务超时（毫秒），默认 3 分钟（仅 local 模式）
+      BYTEDESK_PREVIEW_CONVERT_TASK_EXECUTION_TIMEOUT: "180000"
+      # LibreOffice 进程存活超时（毫秒），默认 5 分钟（仅 local 模式）
+      BYTEDESK_PREVIEW_CONVERT_PROCESS_TIMEOUT: "300000"
+      # 每个 LibreOffice 进程最大任务数，超过后重启进程（仅 local 模式）
+      BYTEDESK_PREVIEW_CONVERT_MAX_TASKS_PER_PROCESS: "20"
+      # 待转换文件大小上限（MB），超过则拒绝转换
+      BYTEDESK_PREVIEW_CONVERT_MAX_FILE_SIZE_MB: "100"
+      # 是否允许从对象存储 URL（MinIO 公读直链）下载源文件用于转换，默认 true
+      BYTEDESK_PREVIEW_CONVERT_REMOTE_SOURCE_ENABLED: "true"
+      # 远程源文件主机白名单（host 或 host:port，多个逗号分隔），默认仅允许 MinIO endpoint；如需转换 OSS/COS 直链可在此追加
+      # BYTEDESK_PREVIEW_CONVERT_ALLOWED_REMOTE_HOSTS: oss.example.com,cos.example.com
+      # ===============================
       # Knowledge base config
       # Helpcenter and blog can be configured independently with their own theme, static output path, and public API URL. helpcenter 和 blog 可分别配置主题、目录和 API 地址。
       # ===============================

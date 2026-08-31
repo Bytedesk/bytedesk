@@ -40,7 +40,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
 
     private final McpClientRestService mcpClientRestService;
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query mcp_client by org")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query mcp_client by org")
     @Operation(summary = "Query McpClients by Organization", description = "Retrieve mcp_clients for the current organization")
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_READ)
     @Override
@@ -51,7 +51,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success(mcp_clients));
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_QUERY_USER, description = "query mcp_client by user")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query mcp_client by user")
     @Operation(summary = "Query McpClients by User", description = "Retrieve mcp_clients for the current user")
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_READ)
     @Override
@@ -62,7 +62,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success(mcp_clients));
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query mcp_client by uid")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query mcp_client by uid")
     @Operation(summary = "Query McpClient by UID", description = "Retrieve a specific mcp_client by its unique identifier")
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_READ)
     @Override
@@ -73,7 +73,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success(mcp_client));
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_CREATE, description = "create mcp_client")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_CREATE, description = "create mcp_client")
     @Operation(summary = "Create McpClient", description = "Create a new mcp_client")
     @Override
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_CREATE)
@@ -84,7 +84,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success(mcp_client));
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_UPDATE, description = "update mcp_client")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update mcp_client")
     @Operation(summary = "Update McpClient", description = "Update an existing mcp_client")
     @Override
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_UPDATE)
@@ -95,7 +95,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success(mcp_client));
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_DELETE, description = "delete mcp_client")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete mcp_client")
     @Operation(summary = "Delete McpClient", description = "Delete a mcp_client")
     @Override
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_DELETE)
@@ -106,7 +106,7 @@ public class McpClientRestController extends BaseRestController<McpClientRequest
         return ResponseEntity.ok(JsonResult.success());
     }
 
-    @ActionAnnotation(title = "McpClient", action = I18Consts.I18N_ACTION_EXPORT, description = "export mcp_client")
+    @ActionAnnotation(title = I18Consts.I18N_MCP_CLIENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export mcp_client")
     @Operation(summary = "Export McpClients", description = "Export mcp_clients to Excel format")
     @Override
     // @PreAuthorize(McpClientPermissions.HAS_MCPCLIENT_EXPORT)

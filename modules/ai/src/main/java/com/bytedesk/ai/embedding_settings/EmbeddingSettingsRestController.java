@@ -40,7 +40,7 @@ import lombok.AllArgsConstructor;
 @Description("EmbeddingSettings Management Controller - Content embedding_settingsging and categorization APIs")
 public class EmbeddingSettingsRestController extends BaseRestController<EmbeddingSettingsRequest, EmbeddingSettingsRestService> {
 
-    private final EmbeddingSettingsRestService embedding_settingsRestService;
+    private final EmbeddingSettingsRestService embeddingSettingsRestService;
 
     @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query embedding_settings by org")
     @Operation(summary = "Query EmbeddingSettingss by Organization", description = "Retrieve embedding_settingss for the current organization")
@@ -49,7 +49,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(EmbeddingSettingsRequest request) {
         
-        Page<EmbeddingSettingsResponse> embedding_settingss = embedding_settingsRestService.queryByOrg(request);
+        Page<EmbeddingSettingsResponse> embedding_settingss = embeddingSettingsRestService.queryByOrg(request);
 
         return ResponseEntity.ok(JsonResult.success(embedding_settingss));
     }
@@ -61,7 +61,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(EmbeddingSettingsRequest request) {
         
-        Page<EmbeddingSettingsResponse> embedding_settingss = embedding_settingsRestService.queryByUser(request);
+        Page<EmbeddingSettingsResponse> embedding_settingss = embeddingSettingsRestService.queryByUser(request);
 
         return ResponseEntity.ok(JsonResult.success(embedding_settingss));
     }
@@ -73,7 +73,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(EmbeddingSettingsRequest request) {
         
-        EmbeddingSettingsResponse embedding_settings = embedding_settingsRestService.queryByUid(request);
+        EmbeddingSettingsResponse embedding_settings = embeddingSettingsRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(embedding_settings));
     }
@@ -85,7 +85,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody EmbeddingSettingsRequest request) {
         
-        EmbeddingSettingsResponse embedding_settings = embedding_settingsRestService.create(request);
+        EmbeddingSettingsResponse embedding_settings = embeddingSettingsRestService.create(request);
 
         return ResponseEntity.ok(JsonResult.success(embedding_settings));
     }
@@ -97,7 +97,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody EmbeddingSettingsRequest request) {
         
-        EmbeddingSettingsResponse embedding_settings = embedding_settingsRestService.update(request);
+        EmbeddingSettingsResponse embedding_settings = embeddingSettingsRestService.update(request);
 
         return ResponseEntity.ok(JsonResult.success(embedding_settings));
     }
@@ -109,7 +109,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody EmbeddingSettingsRequest request) {
         
-        embedding_settingsRestService.delete(request);
+        embeddingSettingsRestService.delete(request);
 
         return ResponseEntity.ok(JsonResult.success());
     }
@@ -123,7 +123,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
         return exportTemplate(
             request,
             response,
-            embedding_settingsRestService,
+            embeddingSettingsRestService,
             EmbeddingSettingsExcel.class,
             "EmbeddingSettings",
             "embedding_settings"
@@ -135,7 +135,7 @@ public class EmbeddingSettingsRestController extends BaseRestController<Embeddin
     @PreAuthorize(EmbeddingSettingsPermissions.HAS_EMBEDDING_SETTINGS_READ)
     @PostMapping("/test")
     public ResponseEntity<?> testVectorization(@RequestBody EmbeddingSettingsRequest request) {
-        EmbeddingSettingsTestResponse result = embedding_settingsRestService.testVectorization(request);
+        EmbeddingSettingsTestResponse result = embeddingSettingsRestService.testVectorization(request);
         if (Boolean.TRUE.equals(result.getSuccess())) {
             return ResponseEntity.ok(JsonResult.success(result));
         }

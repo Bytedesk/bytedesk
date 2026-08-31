@@ -28,15 +28,21 @@ import lombok.extern.slf4j.Slf4j;
  * 合并了原 ZhipuaiChatConfig（z-ai-sdk ZhipuAiClient Bean）与 Spring AI 适配 Bean。
  * 参考 z-ai-sdk-java: https://github.com/zai-org/z-ai-sdk-java
  *
- * <p>Bean 层次：</p>
+ * <p>
+ * Bean 层次：
+ * </p>
  * <ol>
- *   <li><b>zhipuAiClient</b> — 原生 z-ai-sdk {@link ZhipuAiClient}，所有上层能力的基础</li>
- *   <li><b>zhiPuAiEmbeddingModel</b> — 基于 z-ai-sdk 的 Spring AI {@code EmbeddingModel} 适配</li>
+ * <li><b>zhipuAiClient</b> — 原生 z-ai-sdk {@link ZhipuAiClient}，所有上层能力的基础</li>
+ * <li><b>zhiPuAiEmbeddingModel</b> — 基于 z-ai-sdk 的 Spring AI
+ * {@code EmbeddingModel} 适配</li>
  * </ol>
- * <p>以下 Spring AI ChatModel/ChatClient 适配 Bean 已注释，Chat 走 {@code ZhipuaiService} 直调 z-ai-sdk：</p>
+ * <p>
+ * 以下 Spring AI ChatModel/ChatClient 适配 Bean 已注释，Chat 走 {@code ZhipuaiService}
+ * 直调 z-ai-sdk：
+ * </p>
  * <ul>
- *   <li><del>{@code bytedeskZhipuaiChatModel}</del></li>
- *   <li><del>{@code bytedeskZhipuaiChatClient}</del></li>
+ * <li><del>{@code bytedeskZhipuaiChatModel}</del></li>
+ * <li><del>{@code bytedeskZhipuaiChatClient}</del></li>
  * </ul>
  */
 @Slf4j
@@ -79,16 +85,17 @@ public class ZhipuaiConfig {
     @Value("${spring.ai.zhipuai.keep-alive-duration:1}")
     private int keepAliveDuration;
 
-    // ──────────────────────── z-ai-sdk ZhipuAiClient Bean ──────────────────────────
+    // ──────────────────────── z-ai-sdk ZhipuAiClient Bean
+    // ──────────────────────────
 
     /**
      * 原生 z-ai-sdk 客户端 Bean。
      * 参考 SDK 源码 {@code ZhipuAiClient.Builder} / {@code AbstractBuilder}：
      * <ul>
-     *   <li>{@code .ofZHIPU()} — 使用智谱官方端点</li>
-     *   <li>{@code .enableTokenCache()} — 启用 JWT 令牌缓存</li>
-     *   <li>{@code .networkConfig(request, connect, read, write, unit)} — 超时配置</li>
-     *   <li>{@code .connectionPool(maxIdle, keepAlive, unit)} — 连接池配置</li>
+     * <li>{@code .ofZHIPU()} — 使用智谱官方端点</li>
+     * <li>{@code .enableTokenCache()} — 启用 JWT 令牌缓存</li>
+     * <li>{@code .networkConfig(request, connect, read, write, unit)} — 超时配置</li>
+     * <li>{@code .connectionPool(maxIdle, keepAlive, unit)} — 连接池配置</li>
      * </ul>
      */
     @Bean("zhipuAiClient")
@@ -104,31 +111,31 @@ public class ZhipuaiConfig {
         try {
             int minimumRequestTimeout = connectionTimeout + readTimeout + writeTimeout + 5;
             int effectiveRequestTimeout = requestTimeout > 0
-                ? Math.max(requestTimeout, minimumRequestTimeout)
-                : minimumRequestTimeout;
+                    ? Math.max(requestTimeout, minimumRequestTimeout)
+                    : minimumRequestTimeout;
 
             if (requestTimeout > 0 && requestTimeout < minimumRequestTimeout) {
                 log.warn(
-                    "Configured spring.ai.zhipuai.request-timeout={}s is lower than the minimum safe timeout {}s; using {}s instead",
-                    requestTimeout,
-                    minimumRequestTimeout,
-                    effectiveRequestTimeout);
+                        "Configured spring.ai.zhipuai.request-timeout={}s is lower than the minimum safe timeout {}s; using {}s instead",
+                        requestTimeout,
+                        minimumRequestTimeout,
+                        effectiveRequestTimeout);
             }
 
             return ZhipuAiClient.builder()
-                .ofZHIPU()
+                    .ofZHIPU()
                     .apiKey(apiKey)
-                .enableTokenCache()
-                .networkConfig(
-                    effectiveRequestTimeout,
-                    connectionTimeout,
-                    readTimeout,
-                    writeTimeout,
-                    TimeUnit.SECONDS)
-                .connectionPool(
-                    maxIdleConnections,
-                    keepAliveDuration,
-                    TimeUnit.SECONDS)
+                    .enableTokenCache()
+                    .networkConfig(
+                            effectiveRequestTimeout,
+                            connectionTimeout,
+                            readTimeout,
+                            writeTimeout,
+                            TimeUnit.SECONDS)
+                    .connectionPool(
+                            maxIdleConnections,
+                            keepAliveDuration,
+                            TimeUnit.SECONDS)
                     .build();
         } catch (Exception e) {
             // zai-sdk 会在 setApiKey 时做格式校验；无效 key 不应阻塞应用启动
@@ -176,7 +183,8 @@ public class ZhipuaiConfig {
         return chatClientBuilderFactory.builder(chatModel).build();
     }
 
-    // ─────────────────── Spring AI EmbeddingModel 适配 Bean ─────────────────────────
+    // ─────────────────── Spring AI EmbeddingModel 适配 Bean
+    // ─────────────────────────
 
     @Bean("zhiPuAiEmbeddingModel")
     @ConditionalOnProperty(name = "spring.ai.model.embedding", havingValue = LlmProviderConstants.ZHIPUAI, matchIfMissing = false)

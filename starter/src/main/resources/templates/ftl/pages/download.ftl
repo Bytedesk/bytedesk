@@ -129,8 +129,7 @@ Listed course START -->
 						<img src="/assets/images/element/coding.svg" alt="<@t key='alt.download.serverIcon'>服务器端下载图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-server.zip" class="stretched-link" target="_blank"><@t key="page.download.server">服务器端</@t></a></h5>
-					<#--  <span class="mb-0">即将开放下载</span>  -->
+						<h5 class="mb-1"><a href="https://github.com/Bytedesk/bytedesk/releases" class="stretched-link" target="_blank"><@t key="page.download.server">服务器端</@t></a></h5>
 				</div>
 			</div>
 

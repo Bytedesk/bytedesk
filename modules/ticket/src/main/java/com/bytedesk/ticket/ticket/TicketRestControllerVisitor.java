@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -89,6 +90,11 @@ public class TicketRestControllerVisitor {
     @GetMapping("/workflow/actions")
     public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
 
+        // 安全约束：仅工单报告人可查询验证动作，防止 customerVerify 任务未分配时被其他访客冒领
+        if (!isReporterOperator(request)) {
+            return ResponseEntity.ok(JsonResult.success(List.of()));
+        }
+
         List<TicketWorkflowTaskResponse> actions = ticketService.queryWorkflowActions(request);
 
         return ResponseEntity.ok(JsonResult.success(actions));
@@ -101,9 +107,31 @@ public class TicketRestControllerVisitor {
     @PostMapping("/workflow/action")
     public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
 
+        // 安全约束：仅工单报告人可执行验证操作
+        if (!isReporterOperator(request)) {
+            return ResponseEntity.ok(JsonResult.error("仅工单报告人可执行该操作"));
+        }
+
         TicketResponse response = ticketService.executeWorkflowAction(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 校验请求操作人是否为工单报告人（operatorUid 取 assignee.uid 或 assigneeUid）
+     */
+    private boolean isReporterOperator(TicketRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            return false;
+        }
+        String operatorUid = request.getAssignee() != null ? request.getAssignee().getUid() : request.getAssigneeUid();
+        if (!StringUtils.hasText(operatorUid)) {
+            return false;
+        }
+        return ticketRestService.findByUid(request.getUid())
+                .map(ticket -> ticket.getReporter() != null
+                        && operatorUid.equals(ticket.getReporter().getUid()))
+                .orElse(false);
     }
 
     

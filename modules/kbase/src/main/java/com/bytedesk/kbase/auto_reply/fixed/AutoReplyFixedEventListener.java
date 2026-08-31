@@ -25,6 +25,7 @@ import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
 import com.bytedesk.core.upload.UploadTypeEnum;
 import com.bytedesk.core.upload.event.UploadCreateEvent;
+import com.bytedesk.core.utils.BdUploadUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,14 +50,22 @@ public class AutoReplyFixedEventListener {
     @EventListener
     public void onUploadCreateEvent(UploadCreateEvent event) {
         UploadEntity upload = event.getUpload();
-        log.info("AutoReplyFixedEventListener UploadEventListener create: {}", upload.toString());
 
-        try {
-            Resource resource = uploadRestService.loadAsResource(upload);
-            if (resource.exists()) {
-                String filePath = resource.getFile().getAbsolutePath();
-                log.info("UploadEventListener loadAsResource: {}", filePath);
-                if (UploadTypeEnum.AUTOREPLY_FIXED.name().equalsIgnoreCase(upload.getType())) {
+        // 先判断类型，仅处理固定自动回复导入上传，避免头像等其他类型上传触发无效的文件解析
+        if (UploadTypeEnum.AUTOREPLY_FIXED.name().equalsIgnoreCase(upload.getType())) {
+            // 检查文件类型是否为Excel
+            String fileName = upload.getFileName();
+            if (!BdUploadUtils.isExcelFile(fileName)) {
+                log.warn("不是Excel文件，无法导入固定自动回复: {}", fileName);
+                return;
+            }
+            log.info("AutoReplyFixedEventListener UploadEventListener create: {}", upload.toString());
+
+            try {
+                Resource resource = uploadRestService.loadAsResource(upload);
+                if (resource.exists()) {
+                    String filePath = resource.getFile().getAbsolutePath();
+                    log.info("UploadEventListener loadAsResource: {}", filePath);
                     // 导入自动回复
                     // 这里 需要指定读用哪个class去读，然后读取第一个sheet 文件流会自动关闭
                     // https://easyexcel.opensource.alibaba.com/docs/current/quickstart/read
@@ -67,9 +76,9 @@ public class AutoReplyFixedEventListener {
                                     upload.getOrgUid()))
                             .sheet().doRead();
                 }
+            } catch (Exception e) {
+                log.error("AutoReplyFixedEventListener UploadEventListener create error: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("AutoReplyFixedEventListener UploadEventListener create error: {}", e.getMessage());
         }
     }
 

@@ -257,6 +257,21 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(resolvedMessage, HttpStatus.CONFLICT.value()));
     }
 
+    /**
+     * 业务校验异常（专门拦截）：旧密码错误、参数不合法等可预期业务错误，
+     * message 为 i18n key。仅以 WARN 记录摘要，不打印堆栈，返回本地化文案。
+     * 注意：HTTP 200 + 业务码放 body，与前端 response.code !== 200 的约定保持一致。
+     */
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<?> handleBusinessException(BusinessException e) {
+        String resolvedMessage = resolveRuntimeMessage(e.getMessage());
+        log.warn("Business error: {} -> {}", e.getMessage(), resolvedMessage);
+        int code = e.getCode() > 0 ? e.getCode() : HttpStatus.BAD_REQUEST.value();
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(resolvedMessage, code));
+    }
+
     @ExceptionHandler(IpInWhitelistException.class)
     public ResponseEntity<?> handleIpInWhitelistException(IpInWhitelistException e) {
         // IP 在白名单中，不能加入黑名单：属于可预期的业务冲突，warn 级别不打印堆栈
@@ -296,6 +311,18 @@ public class GlobalExceptionHandler {
 
         String rawMessage = e.getMessage();
         String resolvedMessage = resolveRuntimeMessage(rawMessage);
+
+        // i18n key 类业务异常（如 throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG)）：
+        // 属于可预期业务错误，专门拦截，仅 WARN 摘要不打印堆栈，返回翻译后的文案
+        // HTTP 200 + 业务码放 body，与前端 response.code !== 200 的约定保持一致
+        if (rawMessage != null && rawMessage.startsWith(I18Consts.I18N_PREFIX)) {
+            log.warn("Business i18n error: {} -> {}", rawMessage, resolvedMessage);
+            Integer businessStatus = resolveBusinessStatusCode(rawMessage);
+            int code = businessStatus != null ? businessStatus : HttpStatus.BAD_REQUEST.value();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(JsonResult.error(resolvedMessage, code));
+        }
 
         // 统一 not found：避免刷 error 堆栈，返回明确 404 code
         if (rawMessage != null && rawMessage.startsWith("Entity not found for UID:")) {
@@ -425,7 +452,16 @@ public class GlobalExceptionHandler {
                 String rawArgs = key.substring(separatorIndex + I18Consts.I18N_ARG_SEPARATOR.length());
                 args = rawArgs.isEmpty() ? new Object[0] : rawArgs.split("\\|", -1);
             }
-            MessageSource messageSource = ApplicationContextHolder.getBean(MessageSource.class);
+            // 注意：容器中可能存在多个 MessageSource 实现（messageSource bean + ApplicationContext 自身），
+            // 按类型 getBean(MessageSource.class) 会抛 NoUniqueBeanDefinitionException，
+            // 必须按名获取；失败时回退到 ApplicationContext 自身（其 getMessage 委托容器内 messageSource）
+            MessageSource messageSource;
+            try {
+                messageSource = ApplicationContextHolder.getApplicationContext()
+                        .getBean("messageSource", MessageSource.class);
+            } catch (Exception nameLookupEx) {
+                messageSource = ApplicationContextHolder.getApplicationContext();
+            }
             return messageSource.getMessage(messageKey, args, key, LocaleContextHolder.getLocale());
         } catch (Exception ex) {
             log.debug("Failed to translate i18n key: {}", key);

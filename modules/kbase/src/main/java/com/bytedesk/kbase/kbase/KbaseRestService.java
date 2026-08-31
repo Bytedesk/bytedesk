@@ -116,6 +116,12 @@ public class KbaseRestService extends BaseRestService<KbaseEntity, KbaseRequest,
         entity.setHeadline(request.getHeadline());
         entity.setDescriptionHtml(request.getDescriptionHtml());
         entity.setFooterHtml(request.getFooterHtml());
+        entity.setLogoUrl(request.getLogoUrl());
+        entity.setFaviconUrl(request.getFaviconUrl());
+        entity.setCoverImageUrl(request.getCoverImageUrl());
+        entity.setBackgroundImageUrl(request.getBackgroundImageUrl());
+        entity.setPrimaryColor(request.getPrimaryColor());
+        entity.setTheme(request.getTheme());
         entity.setLanguage(request.getLanguage());
         entity.setSourceLanguage(StringUtils.hasText(request.getSourceLanguage())
             ? request.getSourceLanguage()

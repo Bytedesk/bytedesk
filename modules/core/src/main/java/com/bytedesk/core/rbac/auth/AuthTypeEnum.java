@@ -19,11 +19,15 @@ public enum AuthTypeEnum {
     MOBILE_LOGIN, // 手机号登录
     MOBILE_RESET, // 手机号重置
     MOBILE_VERIFY, // 手机号验证
+    //
+    MOBILE_PASSWORD_RESET, // 手机号验证码重置密码（已登录用户，忘记旧密码场景）
     // 
     EMAIL_REGISTER, // 邮箱注册
     EMAIL_LOGIN, // 邮箱登录
     EMAIL_RESET, // 邮箱重置
     EMAIL_VERIFY, // 邮箱验证
+    // 
+    EMAIL_PASSWORD_RESET, // 邮箱验证码重置密码（已登录用户，忘记旧密码场景）
     // 
     USERNAME_REGISTER, // 用户名注册
     USERNAME_LOGIN, // 用户名登录

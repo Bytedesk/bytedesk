@@ -58,6 +58,12 @@ public class AuthValidationStrategyFactory {
             strategyMap.put(AuthTypeEnum.EMAIL_VERIFY.name(), verifyStrategy);
             strategyMap.put(AuthTypeEnum.MOBILE_VERIFY.name(), verifyStrategy);
         }
+        
+        // 验证码重置密码（已登录用户，忘记旧密码场景）：接收方必须存在，复用验证策略
+        if (verifyStrategy != null) {
+            strategyMap.put(AuthTypeEnum.EMAIL_PASSWORD_RESET.name(), verifyStrategy);
+            strategyMap.put(AuthTypeEnum.MOBILE_PASSWORD_RESET.name(), verifyStrategy);
+        }
     }
 
     private AuthValidationStrategy getResetStrategy() {

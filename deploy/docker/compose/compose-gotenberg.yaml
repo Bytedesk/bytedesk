@@ -1,0 +1,46 @@
+# 用法：./start.sh gotenberg ... 或 docker compose --env-file .env -f compose/compose-gotenberg.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware gotenberg
+# 说明：Gotenberg 文档转换服务（Office 转 PDF），Bytedesk 文件预览（企业版功能）的转换 sidecar
+# 官方文档: https://gotenberg.dev
+# 镜像: https://hub.docker.com/r/gotenberg/gotenberg
+# github: https://github.com/gotenberg/gotenberg
+# 官方镜像 8.30.0+ 自带 CJK 字体（fonts-noto-cjk），中文文档转换不乱码
+# 启动后：
+# - 仅 compose 内网可访问（bytedesk-gotenberg:3000），不映射宿主端口
+# - 健康检查: 容器内 http://localhost:3000/health
+# 应用侧需在 .env 中开启（bytedesk 容器环境变量）:
+#   BYTEDESK_PREVIEW_CONVERT_ENABLED=true
+#   BYTEDESK_PREVIEW_CONVERT_MODE=remote
+#   BYTEDESK_PREVIEW_CONVERT_REMOTE_URL=http://bytedesk-gotenberg:3000（默认值，可不填）
+services:
+  bytedesk-gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg-bytedesk
+    restart: always
+    command:
+      - "gotenberg"
+      # 单次转换超时，对齐 bytedesk 侧 BYTEDESK_PREVIEW_CONVERT_REMOTE_TIMEOUT / task-execution-timeout（3 分钟）
+      - "--api-timeout=180s"
+      # 每个 LibreOffice 进程处理 20 个任务后重启，对齐 bytedesk 侧 max-tasks-per-process，防内存缓慢泄漏
+      - "--libreoffice-restart-after=20"
+    # 不映射宿主端口（默认，推荐）：仅 compose 内网（bytedesk-network）供主应用访问，避免无鉴权的转换接口暴露宿主/公网
+    # 可选（仅调试场景）：宿主机直跑 jar 想连容器内 gotenberg 时，取消注释并配
+    #   BYTEDESK_PREVIEW_CONVERT_REMOTE_URL=http://127.0.0.1:13030（生产勿开）
+    # ports:
+    #   - "13030:3000"
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  bytedesk-network:
+    driver: bridge

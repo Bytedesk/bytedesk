@@ -1,0 +1,7 @@
+# 最小化 Docker 构建上下文：仅保留 Dockerfile 与最终 jar
+# GitHub runner 磁盘有限，starter/ 目录下 target 其他产物（classes/*.jar.original 等）无需进入上下文，
+# 且上下文会被 build-push 传输两次（阿里云 + Docker Hub），过大会拖慢构建并占用磁盘
+*
+!Dockerfile
+!target
+!target/bytedesk-starter.jar

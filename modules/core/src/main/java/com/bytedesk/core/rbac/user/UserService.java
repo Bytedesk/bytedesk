@@ -36,6 +36,7 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.PlatformEnum;
+import com.bytedesk.core.exception.BusinessException;
 import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
@@ -316,11 +317,11 @@ public class UserService {
                 //
                 return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
             } else {
-                // 旧密码验证失败，抛出异常或返回错误信息
-                throw new RuntimeException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
+                // 旧密码验证失败，抛出业务校验异常（GlobalExceptionHandler 专门拦截，warn 级别不打印堆栈）
+                throw new BusinessException(I18Consts.I18N_USER_OLD_PASSWORD_WRONG);
             }
         } else {
-            throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
+            throw new BusinessException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 
@@ -341,6 +342,28 @@ public class UserService {
             return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
         } else {
             throw new RuntimeException(I18Consts.I18N_USER_NOT_FOUND);
+        }
+    }
+
+    // 已登录用户通过手机号/邮箱验证码重置自己的密码（忘记旧密码场景）
+    // 绑定校验与验证码校验已在 UserRestController 完成，此处仅更新当前用户密码
+    @Transactional
+    public UserResponse resetPassword(UserRequest request) {
+        UserEntity currentUser = authService.getUser();
+        Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            String newRawPassword = request.getNewPassword(); // 用户输入的新密码
+            // 设置新密码
+            String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
+            user.setPassword(newEncryptedPassword); // 更新用户密码
+            // 更新密码修改时间
+            user.setPasswordModifiedAt(BdDateUtils.now());
+            user = save(user); // 保存用户信息到数据库
+            //
+            return UserConvertUtils.convertToUserResponse(user); // 返回更新后的用户信息
+        } else {
+            throw new BusinessException(I18Consts.I18N_USER_NOT_FOUND);
         }
     }
 

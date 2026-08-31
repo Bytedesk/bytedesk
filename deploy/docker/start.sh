@@ -20,7 +20,7 @@ PROJECT_NAME="${PROJECT_NAME:-bytedesk}"
 # 组件（任意组合）：
 #   freeswitch | mrcp | coturn | janus
 #   searxng(别名 search) | neo4j | logstash | kibana | minio
-#   prometheus | grafana | zipkin
+#   prometheus | grafana | zipkin | gotenberg(文件预览转换)
 # 组合关键字：
 #   call   = freeswitch + mrcp
 #   webrtc = coturn + janus
@@ -61,6 +61,7 @@ ENABLE_MINIO=false
 ENABLE_PROMETHEUS=false
 ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
+ENABLE_GOTENBERG=false
 TARGET=""
 
 usage() {
@@ -112,6 +113,7 @@ for arg in "$@"; do
     prometheus) ENABLE_PROMETHEUS=true ;;
     grafana) ENABLE_GRAFANA=true ;;
     zipkin) ENABLE_ZIPKIN=true ;;
+    gotenberg) ENABLE_GOTENBERG=true ;;
     call)
       ENABLE_FREESWITCH=true
       ENABLE_MRCP=true
@@ -131,7 +133,7 @@ for arg in "$@"; do
     *)
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq redis|elasticsearch|es"
-      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin"
+      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin gotenberg"
       echo "        call webrtc obs middleware all"
       exit 1
       ;;
@@ -188,6 +190,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_PROMETHEUS}" == true ]] && add_file compose-prometheus.yaml
 [[ "${ENABLE_GRAFANA}" == true ]] && add_file compose-grafana.yaml
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
+[[ "${ENABLE_GOTENBERG}" == true ]] && add_file compose-gotenberg.yaml
 
 APP_FILE="${COMPOSE_DIR}/compose-bytedesk.yaml"
 if [[ "${TARGET}" == "all" && ! -f "${APP_FILE}" ]]; then
@@ -552,6 +555,7 @@ components_summary=""
 [[ "${ENABLE_PROMETHEUS}" == true ]] && components_summary="${components_summary} prometheus"
 [[ "${ENABLE_GRAFANA}" == true ]] && components_summary="${components_summary} grafana"
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
+[[ "${ENABLE_GOTENBERG}" == true ]] && components_summary="${components_summary} gotenberg"
 
 echo "[INFO] Starting stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"
 

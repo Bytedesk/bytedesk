@@ -46,6 +46,14 @@ public class ThreadMessageUtil {
         return SystemContent.of(type, content).toJson();
     }
 
+    private static String buildSystemContent(MessageTypeEnum type, String content, String systemExtra) {
+        SystemContent systemContent = SystemContent.of(type, content);
+        if (systemExtra != null && !systemExtra.isEmpty()) {
+            systemContent.setExtra(systemExtra);
+        }
+        return systemContent.toJson();
+    }
+
     /**
      * 结构化 WelcomeContent 的机器人欢迎消息
      */
@@ -400,9 +408,16 @@ public class ThreadMessageUtil {
     }
 
     public static MessageEntity getThreadSystemMessage(String content, ThreadEntity thread) {
+        return getThreadSystemMessage(content, null, thread);
+    }
+
+    /**
+     * 携带 SystemContent.extra 的系统消息（用于消息内嵌交互 payload，如工单验证按钮）
+     */
+    public static MessageEntity getThreadSystemMessage(String content, String systemExtra, ThreadEntity thread) {
         UserProtobuf system = UserProtobuf.getSystemUser();
         MessageExtra extra = MessageExtra.fromOrgUid(thread.getOrgUid());
-        String payload = buildSystemContent(MessageTypeEnum.SYSTEM, content);
+        String payload = buildSystemContent(MessageTypeEnum.SYSTEM, content, systemExtra);
 
         MessageEntity message = MessageEntity.builder()
                 .uid(UidUtils.getInstance().getUid())

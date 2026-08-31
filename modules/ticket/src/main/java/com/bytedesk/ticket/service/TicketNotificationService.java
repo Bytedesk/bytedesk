@@ -81,6 +81,16 @@ public class TicketNotificationService {
 
     public static final String EVENT_TYPE_TICKET_SLA_BREACH = "TICKET_SLA_BREACH";
 
+    /**
+     * 外部工单状态变更时允许向访客会话投递系统消息的状态白名单。
+     * 仅 RESOLVED 附带验证按钮，其余状态为纯文案回执（形成验证闭环）。
+     */
+    private static final Set<String> VISITOR_NOTIFIABLE_STATUSES = Set.of(
+            TicketStatusEnum.RESOLVED.name(),
+            TicketStatusEnum.REOPENED.name(),
+            TicketStatusEnum.VERIFIED_OK.name(),
+            TicketStatusEnum.CLOSED.name());
+
     private final NotificationService notificationService;
 
     private final MemberRestService memberRestService;
@@ -176,7 +186,10 @@ public class TicketNotificationService {
         String content = buildContent(ticket, previousStatus, currentStatus, eventType);
         String extra = buildExtra(ticket, previousStatus, currentStatus, eventType);
 
-        emitTicketThreadStatusMessage(ticket, previousStatus, currentStatus, eventType, content);
+        // 外部工单白名单状态：由增强版投递接管（带验证按钮 payload），避免同会话重复两条系统消息
+        if (!emitVisitorTicketStatusMessage(ticket, previousStatus, currentStatus, eventType, content)) {
+            emitTicketThreadStatusMessage(ticket, previousStatus, currentStatus, eventType, content);
+        }
 
         Set<String> recipients = resolveRecipientUids(ticket, EVENT_TYPE_TICKET_CREATED.equals(eventType));
         log.info("[NOTICE-DIAG] notifyTicketStatusChanged recipients: size={} uids={}",
@@ -237,6 +250,83 @@ public class TicketNotificationService {
             log.warn("ticket thread system message failed: ticketUid={}, threadUid={}, error={}",
                     ticket.getUid(), ticket.getThreadUid(), ex.getMessage());
         }
+    }
+
+    /**
+     * 外部工单状态变更时，向访客可感知的会话投递系统消息（增强版，携带验证按钮 payload）：
+     * - 工单自有会话(threadUid)：投递增强版，供访客在工单会话内直接验证（替代原纯文案版）；
+     * - 访客原会话(visitorThreadUid)：与工单会话不同时补发，访客在聊天界面即可看到状态更新并验证。
+     *
+     * @return true 表示本方法已接管投递，调用方无需再调用 {@link #emitTicketThreadStatusMessage}
+     */
+    private boolean emitVisitorTicketStatusMessage(TicketEntity ticket, String previousStatus, String currentStatus,
+            String eventType, String content) {
+        if (!EVENT_TYPE_TICKET_STATUS_CHANGED.equals(eventType)
+                || !TicketTypeEnum.EXTERNAL.name().equals(ticket.getType())
+                || !VISITOR_NOTIFIABLE_STATUSES.contains(currentStatus)
+                || Objects.equals(previousStatus, currentStatus)
+                || !StringUtils.hasText(content)) {
+            return false;
+        }
+        String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
+        String systemExtra = buildTicketVerifyExtra(ticket, previousStatus, currentStatus, reporterUid);
+        if (StringUtils.hasText(ticket.getThreadUid())) {
+            sendTicketSystemMessage(ticket, ticket.getThreadUid(), content, systemExtra);
+        }
+        if (StringUtils.hasText(ticket.getVisitorThreadUid())
+                && !Objects.equals(ticket.getVisitorThreadUid(), ticket.getThreadUid())) {
+            sendTicketSystemMessage(ticket, ticket.getVisitorThreadUid(), content, systemExtra);
+        }
+        return true;
+    }
+
+    private void sendTicketSystemMessage(TicketEntity ticket, String threadUid, String content, String systemExtra) {
+        try {
+            Optional<ThreadEntity> threadOptional = threadRestService.findByUid(threadUid);
+            if (threadOptional.isEmpty()) {
+                log.debug("ticket visitor system message skipped: thread not found, ticketUid={}, threadUid={}",
+                        ticket.getUid(), threadUid);
+                return;
+            }
+            ThreadEntity thread = threadOptional.get();
+            MessageEntity message = ThreadMessageUtil.getThreadSystemMessage(content, systemExtra, thread);
+            messageRestService.save(message);
+            MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
+            messageSendService.sendProtobufMessage(messageProtobuf);
+        } catch (Exception ex) {
+            log.warn("ticket visitor system message failed: ticketUid={}, threadUid={}, error={}",
+                    ticket.getUid(), threadUid, ex.getMessage());
+        }
+    }
+
+    /**
+     * 构造 SystemContent.extra：ticketStatusNotice 供前端 i18n 组装正文（P1），
+     * ticketVerify 驱动消息内验证按钮（仅 RESOLVED 且报告人存在时 show=true）
+     */
+    private String buildTicketVerifyExtra(TicketEntity ticket, String previousStatus, String currentStatus,
+            String reporterUid) {
+        JSONObject ticketStatusNotice = new JSONObject();
+        ticketStatusNotice.put("ticketUid", ticket.getUid());
+        ticketStatusNotice.put("ticketNumber", ticket.getTicketNumber());
+        ticketStatusNotice.put("orgUid", ticket.getOrgUid());
+        ticketStatusNotice.put("previousStatus", previousStatus);
+        ticketStatusNotice.put("currentStatus", currentStatus);
+        ticketStatusNotice.put("title", ticket.getTitle());
+
+        boolean showVerify = TicketStatusEnum.RESOLVED.name().equals(currentStatus)
+                && StringUtils.hasText(reporterUid);
+        JSONObject ticketVerify = new JSONObject();
+        ticketVerify.put("show", showVerify);
+        ticketVerify.put("ticketUid", ticket.getUid());
+        ticketVerify.put("ticketNumber", ticket.getTicketNumber());
+        ticketVerify.put("orgUid", ticket.getOrgUid());
+        ticketVerify.put("operatorUid", reporterUid);
+        ticketVerify.put("submitted", false);
+
+        JSONObject extra = new JSONObject();
+        extra.put("ticketStatusNotice", ticketStatusNotice);
+        extra.put("ticketVerify", ticketVerify);
+        return JSON.toJSONString(extra);
     }
 
     /**

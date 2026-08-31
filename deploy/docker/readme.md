@@ -67,6 +67,7 @@ cp .env.example .env
 | Call center | `freeswitch` `mrcp`, combo `call` | call supports mysql/postgresql only |
 | WebRTC | `coturn` `janus`, combo `webrtc` | |
 | Search/storage | `searxng`(search) `minio` `neo4j` | enterprise feature |
+| File preview | `gotenberg` | Office→PDF conversion sidecar, enterprise feature; enable via `BYTEDESK_PREVIEW_CONVERT_ENABLED=true` + `BYTEDESK_PREVIEW_CONVERT_MODE=remote` |
 | Logging | `logstash` `kibana` | depends on elasticsearch |
 | Observability | `prometheus` `grafana` `zipkin`, combo `obs` | |
 | Target | `middleware` / `all`(bytedesk), default all | expansion see below |
@@ -109,6 +110,7 @@ All compose files and their per-component configs (`searxng/`, `grafana/`, `logs
 | compose/compose-prometheus.yaml | prometheus | 19090 | [Observability](./readme/readme.observability.md) |
 | compose/compose-grafana.yaml | grafana | 13000 | [Observability](./readme/readme.observability.md) |
 | compose/compose-zipkin.yaml | zipkin | 19411 | [Observability](./readme/readme.observability.md) |
+| compose/compose-gotenberg.yaml | gotenberg/gotenberg:8 | internal only (no host port) | File preview conversion sidecar; see [File Preview docs](../../../docs/docs/development/filepreview.md) |
 
 Other files: `start.sh`/`stop.sh` (compose launcher), `watchdog.sh` (app watchdog, see [watchdog guide](./readme/readme.watchdog.md)), `.env` (secrets), `one/` (all-in-one deployment).
 

@@ -313,6 +313,12 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
                 predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getUserNickname() + "%"));
             }
 
+            // 访客过滤：按 visitorUid 查询该访客的全部历史会话（user JSON 中包含其 uid），
+            // 与 searchForVisitor 的实现方式保持一致；同时作用于 /query/org 与 /export
+            if (StringUtils.hasText(request.getVisitorUid())) {
+                predicates.add(criteriaBuilder.like(root.get("user"), "%" + request.getVisitorUid() + "%"));
+            }
+
             // agentNickname
             if (StringUtils.hasText(request.getAgentNickname())) {
                 predicates.add(criteriaBuilder.like(root.get("agent"), "%" + request.getAgentNickname() + "%"));

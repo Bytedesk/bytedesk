@@ -47,8 +47,8 @@ cp .env.example .env
 
 # WebRTC 音视频（webrtc = coturn + janus）
 ./start.sh call webrtc all
-./start.sh call webrtc middleware obs minio mrcp searxng  # 任意组合
-./stop.sh call webrtc middleware obs minio mrcp searxng down
+./start.sh call webrtc middleware obs minio mrcp searxng neo4j  # 任意组合
+./stop.sh call webrtc middleware obs minio mrcp searxng neo4j down
 
 # 可选组件（任意组合）
 ./start.sh all minio searxng
