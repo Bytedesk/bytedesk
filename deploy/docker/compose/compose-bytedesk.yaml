@@ -340,6 +340,11 @@ services:
       MANAGEMENT_ZIPKIN_TRACING_ENABLED: "false"
       MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://127.0.0.1:19411/api/v2/spans
       MANAGEMENT_TRACING_SAMPLING_PROBABILITY: 0.0
+      # OpenTelemetry / OTLP 默认关闭：starter-opentelemetry 附带的 OtlpMeterRegistry 默认向
+      # http://localhost:4318/v1/metrics 推指标，未部署 OTLP 后端时会刷连接拒绝告警；
+      # 需要时设为 "true" 开启（OTel 模式还需 SPRING_AUTOCONFIGURE_EXCLUDE 排除 Brave，见 docs）
+      MANAGEMENT_OPENTELEMETRY_ENABLED: "false"
+      MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "false"
       # ===============================
       # Spring Boot Admin Client (bytedesk-monitor)
       # Uncomment to register this instance with a monitor server. 取消注释以注册到监控服务端。
