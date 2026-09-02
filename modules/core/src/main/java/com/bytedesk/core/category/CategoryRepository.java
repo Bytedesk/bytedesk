@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.category;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>, JpaSpecificationExecutor<CategoryEntity> {
     Optional<CategoryEntity> findByUid(String uid);
+
+    List<CategoryEntity> findByUidInAndDeletedFalse(Collection<String> uids);
     // 
     List<CategoryEntity> findByParentAndPlatformAndDeletedOrderByOrderAsc(CategoryEntity parent, String platform,
                     Boolean deleted);

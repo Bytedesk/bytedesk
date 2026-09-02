@@ -14,8 +14,13 @@
 package com.bytedesk.ticket.ticket_settings;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -27,10 +32,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRequest;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -112,6 +128,13 @@ public class TicketSettingsRestService extends
 
     private final SmsPushSendService smsPushSendService;
 
+    private final CategoryRestService categoryRestService;
+
+    private final PlatformTransactionManager transactionManager;
+
+    /** 分类自愈写库去重：同一 settingsUid 同时仅一个线程执行修复，避免并发读触发乐观锁冲突 */
+    private final Set<String> categoryHealInFlight = ConcurrentHashMap.newKeySet();
+
     @Override
     protected Specification<TicketSettingsEntity> createSpecification(TicketSettingsRequest request) {
         return TicketSettingsSpecification.search(request, authService);
@@ -178,10 +201,12 @@ public class TicketSettingsRestService extends
                 entity.getOrgUid());
         entity.setDraftBasicSettings(draftBasic);
 
-        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings(), entity.getOrgUid()));
+        entity.setCategorySettings(createCategorySettingsEntity(request.getCategorySettings(), entity.getOrgUid(),
+                resolveCategoryTypeName(normalizedType)));
 
         entity.setDraftCategorySettings(
-                createCategorySettingsEntity(resolveDraftCategoryRequest(request), entity.getOrgUid()));
+                createCategorySettingsEntity(resolveDraftCategoryRequest(request), entity.getOrgUid(),
+                        resolveCategoryTypeName(normalizedType)));
 
         // 通知设置
         entity.setNotificationSettings(
@@ -539,9 +564,11 @@ public class TicketSettingsRestService extends
                 .customFormEnabled(false)
                 .build();
 
-        settings.setCategorySettings(createCategorySettingsEntity(null, orgUid));
+        settings.setCategorySettings(
+                createCategorySettingsEntity(null, orgUid, resolveCategoryTypeName(normalizedType)));
 
-        settings.setDraftCategorySettings(createCategorySettingsEntity(null, orgUid));
+        settings.setDraftCategorySettings(
+                createCategorySettingsEntity(null, orgUid, resolveCategoryTypeName(normalizedType)));
 
         // 通知设置
         settings.setNotificationSettings(createNotificationSettingsEntity(null, orgUid));
@@ -1020,22 +1047,77 @@ public class TicketSettingsRestService extends
         }
 
     private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request,
-            String orgUid) {
+            String orgUid, String categoryTypeName) {
         TicketCategorySettingsEntity category = TicketCategorySettingsEntity.fromRequest(request, uidUtils::getUid);
         category.setUid(uidUtils.getUid());
         category.setOrgUid(orgUid);
         if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
-            category.setContent(buildDefaultCategorySettingsData());
+            category.setContent(buildDefaultCategorySettingsData(orgUid, categoryTypeName));
         }
         return category;
     }
 
-    private TicketCategorySettingsData buildDefaultCategorySettingsData() {
+    /**
+     * 工单设置类型（INTERNAL/EXTERNAL）对应的分类类型（TICKET_INTERNAL/TICKET_EXTERNAL）
+     */
+    private String resolveCategoryTypeName(String settingsType) {
+        TicketTypeEnum ticketType = TicketTypeEnum.fromValue(settingsType);
+        if (TicketTypeEnum.INTERNAL.equals(ticketType)) {
+            return CategoryTypeEnum.TICKET_INTERNAL.name();
+        }
+        return CategoryTypeEnum.TICKET_EXTERNAL.name();
+    }
+
+    /**
+     * 与 TicketRestService#initTicketCategory 的分类 uid 规则保持一致：orgUid + "_" + type + "_" + name。
+     * 默认分类项必须引用真实的组织级 CategoryEntity，否则 admin 端按分类过滤工单失效、
+     * 工单分类列会显示“未知分类”。
+     */
+    private String defaultTicketCategoryUid(String orgUid, String categoryTypeName, String categoryName) {
+        return Utils.formatUid(orgUid, categoryTypeName + "_" + categoryName);
+    }
+
+    /**
+     * 幂等确保组织级工单分类存在（兜底：老组织可能缺失分类数据），与 initTicketCategory 保持一致。
+     */
+    private void ensureOrganizationTicketCategory(String orgUid, String categoryTypeName, String categoryUid,
+            String categoryName) {
+        if (categoryRestService.existsByUid(categoryUid)) {
+            return;
+        }
+        try {
+            categoryRestService.create(CategoryRequest.builder()
+                    .uid(categoryUid)
+                    .name(categoryName)
+                    .order(0)
+                    .type(categoryTypeName)
+                    .level(LevelEnum.ORGANIZATION.name())
+                    .platform(BytedeskConsts.PLATFORM_BYTEDESK)
+                    .orgUid(orgUid)
+                    .build());
+        } catch (Exception e) {
+            log.warn("ensure ticket category failed: {}", categoryUid, e);
+        }
+    }
+
+    private TicketCategorySettingsData buildDefaultCategorySettingsData(String orgUid, String categoryTypeName) {
+        return buildDefaultCategorySettingsData(orgUid, categoryTypeName, true);
+    }
+
+    /**
+     * @param ensureCategories 是否兜底创建缺失的组织级分类（仅写路径传 true；读路径计算展示数据时传 false，避免副作用）
+     */
+    private TicketCategorySettingsData buildDefaultCategorySettingsData(String orgUid, String categoryTypeName,
+            boolean ensureCategories) {
         List<TicketCategoryItemData> items = new ArrayList<>();
         String[] defaultCategories = TicketCategories.getAllCategories();
         for (int index = 0; index < defaultCategories.length; index++) {
+            String categoryUid = defaultTicketCategoryUid(orgUid, categoryTypeName, defaultCategories[index]);
+            if (ensureCategories) {
+                ensureOrganizationTicketCategory(orgUid, categoryTypeName, categoryUid, defaultCategories[index]);
+            }
             items.add(TicketCategoryItemData.builder()
-                    .uid(uidUtils.getUid())
+                    .uid(categoryUid)
                     .name(defaultCategories[index])
                     .enabled(Boolean.TRUE)
                     .defaultCategory(index == 0)
@@ -1322,11 +1404,194 @@ public class TicketSettingsRestService extends
         return copy;
     }
 
-    private TicketCategorySettingsResponse mapCategorySettings(TicketCategorySettingsEntity entity) {
-        if (entity == null || entity.getContent() == null) {
+    /**
+     * 自愈历史分类设置数据：分类项 uid 必须指向本组织 level=ORGANIZATION 的工单分类。
+     * <p>
+     * 历史默认配置使用随机 uid（不引用真实 CategoryEntity），导致访客端创建的工单在
+     * admin 端按分类过滤时无法显示、分类列显示"未知分类"。修正规则：
+     * <ul>
+     * <li>uid 有效（本组织、组织级、类型匹配）→ 保留</li>
+     * <li>uid 无效但能按默认命名规则重连到真实分类 → 重写 uid</li>
+     * <li>无法重连（分类已删除/跨组织/平台级）→ 丢弃该项；全部丢弃则重建默认配置</li>
+     * </ul>
+     * <p>
+     * 注意：本方法只计算修正后的数据（返回深拷贝），不修改传入实体、不直接写库。
+     * 写库修复由 {@link #scheduleCategoryHealPersist(String)} 在独立事务中完成，
+     * 避免 convertToResponse（读路径）并发触发乐观锁冲突导致请求失败。
+     *
+     * @return 修正后的分类数据；null 表示无需修正
+     */
+    private TicketCategorySettingsData healCategoryData(TicketCategorySettingsEntity categoryEntity, String orgUid,
+            String categoryTypeName, boolean ensureCategories) {
+        if (categoryEntity == null) {
             return null;
         }
-        TicketCategorySettingsData content = entity.getContent();
+        TicketCategorySettingsData content = categoryEntity.getContent();
+        if (content == null || content.getItems() == null || content.getItems().isEmpty()) {
+            return buildDefaultCategorySettingsData(orgUid, categoryTypeName, ensureCategories);
+        }
+        // 收集现有 uid 与候选 uid，一次批量查询校验，避免逐项查库
+        Set<String> uidsToCheck = new HashSet<>();
+        for (TicketCategoryItemData item : content.getItems()) {
+            if (StringUtils.hasText(item.getUid())) {
+                uidsToCheck.add(item.getUid());
+            }
+            if (StringUtils.hasText(item.getName())) {
+                uidsToCheck.add(defaultTicketCategoryUid(orgUid, categoryTypeName, item.getName()));
+            }
+        }
+        Map<String, CategoryEntity> categoryByUid = new HashMap<>();
+        for (CategoryEntity category : categoryRestService.findByUidInAndDeletedFalse(uidsToCheck)) {
+            if (StringUtils.hasText(category.getUid())) {
+                categoryByUid.put(category.getUid(), category);
+            }
+        }
+        List<TicketCategoryItemData> healedItems = new ArrayList<>();
+        boolean changed = false;
+        for (TicketCategoryItemData item : content.getItems()) {
+            if (isUsableTicketCategory(categoryByUid.get(item.getUid()), orgUid, categoryTypeName)) {
+                healedItems.add(copyCategoryItem(item));
+                continue;
+            }
+            String relinkUid = StringUtils.hasText(item.getName())
+                    ? defaultTicketCategoryUid(orgUid, categoryTypeName, item.getName())
+                    : null;
+            if (isUsableTicketCategory(categoryByUid.get(relinkUid), orgUid, categoryTypeName)) {
+                log.info("ticket settings category relinked: name={}, uid={} -> {}",
+                        item.getName(), item.getUid(), relinkUid);
+                TicketCategoryItemData healed = copyCategoryItem(item);
+                healed.setUid(relinkUid);
+                healedItems.add(healed);
+                changed = true;
+                continue;
+            }
+            log.warn("ticket settings category dropped (no org-level category found): name={}, uid={}",
+                    item.getName(), item.getUid());
+            changed = true;
+        }
+        if (healedItems.isEmpty()) {
+            return buildDefaultCategorySettingsData(orgUid, categoryTypeName, ensureCategories);
+        }
+        if (!changed) {
+            return null;
+        }
+        TicketCategorySettingsData healed = TicketCategorySettingsData.builder()
+                .items(healedItems)
+                .build();
+        healed.normalize();
+        return healed;
+    }
+
+    private TicketCategoryItemData copyCategoryItem(TicketCategoryItemData item) {
+        return TicketCategoryItemData.builder()
+                .uid(item.getUid())
+                .name(item.getName())
+                .description(item.getDescription())
+                .enabled(item.getEnabled())
+                .defaultCategory(item.getDefaultCategory())
+                .orderIndex(item.getOrderIndex())
+                .build();
+    }
+
+    /**
+     * 在独立新事务中对最新数据执行分类自愈（结构缺失补建 + uid 重连/丢弃）。
+     * 实体在该事务内为托管状态，saveAndFlush 立即提交，乐观锁冲突可被捕获且视为良性竞争。
+     */
+    private void healCategorySettingsInTx(TicketSettingsEntity entity) {
+        if (entity == null || !StringUtils.hasText(entity.getOrgUid())) {
+            return;
+        }
+        String categoryTypeName = resolveCategoryTypeName(entity.getType());
+        boolean changed = false;
+        if (entity.getCategorySettings() == null) {
+            entity.setCategorySettings(createCategorySettingsEntity(null, entity.getOrgUid(), categoryTypeName));
+            changed = true;
+        } else {
+            TicketCategorySettingsData healed = healCategoryData(entity.getCategorySettings(), entity.getOrgUid(),
+                    categoryTypeName, true);
+            if (healed != null) {
+                entity.getCategorySettings().setContent(healed);
+                changed = true;
+            }
+        }
+        if (entity.getDraftCategorySettings() == null) {
+            entity.setDraftCategorySettings(
+                    createCategorySettingsEntity(null, entity.getOrgUid(), categoryTypeName));
+            changed = true;
+        } else {
+            TicketCategorySettingsData healedDraft = healCategoryData(entity.getDraftCategorySettings(),
+                    entity.getOrgUid(), categoryTypeName, true);
+            if (healedDraft != null) {
+                entity.getDraftCategorySettings().setContent(healedDraft);
+                changed = true;
+            }
+        }
+        if (changed) {
+            ticketSettingsRepository.saveAndFlush(entity);
+        }
+    }
+
+    /**
+     * 调度分类自愈的写库修复：
+     * <ul>
+     * <li>当前存在事务（create/update/getOrDefaultByWorkgroup 等读转响应路径）→ 注册 afterCommit
+     * 再执行，避免与外层事务持有的行锁互等（findDefaultForUpdate 为悲观锁）</li>
+     * <li>无事务（纯查询路径）→ 立即执行</li>
+     * </ul>
+     * 修复在 REQUIRES_NEW 独立事务中对最新数据重算（幂等），同一 settingsUid 同时仅一个线程执行。
+     */
+    private void scheduleCategoryHealPersist(String settingsUid) {
+        if (!StringUtils.hasText(settingsUid)) {
+            return;
+        }
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    runCategoryHealPersist(settingsUid);
+                }
+            });
+            return;
+        }
+        runCategoryHealPersist(settingsUid);
+    }
+
+    private void runCategoryHealPersist(String settingsUid) {
+        if (!categoryHealInFlight.add(settingsUid)) {
+            return;
+        }
+        try {
+            TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
+            txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+            txTemplate.executeWithoutResult(status -> {
+                TicketSettingsEntity fresh = ticketSettingsRepository.findByUid(settingsUid).orElse(null);
+                healCategorySettingsInTx(fresh);
+            });
+        } catch (ObjectOptimisticLockingFailureException e) {
+            // 并发修复竞争：另一请求已完成写入，本次跳过即可
+            log.debug("ticket settings category heal skipped (concurrently updated): {}", settingsUid);
+        } catch (Exception e) {
+            log.warn("heal ticket settings category failed: {}", settingsUid, e);
+        } finally {
+            categoryHealInFlight.remove(settingsUid);
+        }
+    }
+
+    private boolean isUsableTicketCategory(CategoryEntity category, String orgUid, String categoryTypeName) {
+        return category != null
+                && !category.isDeleted()
+                && orgUid.equals(category.getOrgUid())
+                && LevelEnum.ORGANIZATION.name().equals(category.getLevel())
+                && categoryTypeName.equals(category.getType());
+    }
+
+    private TicketCategorySettingsResponse mapCategorySettings(TicketCategorySettingsEntity entity,
+            TicketCategorySettingsData override) {
+        TicketCategorySettingsData content = override != null ? override
+                : (entity != null ? entity.getContent() : null);
+        if (content == null) {
+            return null;
+        }
         List<TicketCategoryItemResponse> items = content.getItems() == null
                 ? new ArrayList<>()
                 : content.getItems().stream()
@@ -1344,7 +1609,7 @@ public class TicketSettingsRestService extends
                 .defaultCategoryUid(content.resolveDefaultUid())
                 .enabledCount(content.countEnabled())
                 .disabledCount(content.countDisabled())
-                .updatedAt(entity.getUpdatedAt())
+                .updatedAt(entity != null ? entity.getUpdatedAt() : null)
                 .build();
     }
 
@@ -1626,13 +1891,36 @@ public class TicketSettingsRestService extends
 
     @Override
     public TicketSettingsResponse convertToResponse(TicketSettingsEntity entity) {
+        // 自愈历史数据：分类项 uid 必须指向本组织 level=ORGANIZATION 的工单分类。
+        // 读路径只计算修正后的展示数据（不修改实体、不写库），写库修复在独立事务中执行，
+        // 避免并发读同时触发 heal 写入导致乐观锁冲突（请求 500 + Optimistic locking failure）
+        TicketCategorySettingsData healedCategory = null;
+        TicketCategorySettingsData healedDraftCategory = null;
+        if (entity != null && StringUtils.hasText(entity.getOrgUid())) {
+            String categoryTypeName = resolveCategoryTypeName(entity.getType());
+            if (entity.getCategorySettings() == null) {
+                healedCategory = buildDefaultCategorySettingsData(entity.getOrgUid(), categoryTypeName, false);
+            } else {
+                healedCategory = healCategoryData(entity.getCategorySettings(), entity.getOrgUid(), categoryTypeName,
+                        false);
+            }
+            if (entity.getDraftCategorySettings() == null) {
+                healedDraftCategory = buildDefaultCategorySettingsData(entity.getOrgUid(), categoryTypeName, false);
+            } else {
+                healedDraftCategory = healCategoryData(entity.getDraftCategorySettings(), entity.getOrgUid(),
+                        categoryTypeName, false);
+            }
+            if (healedCategory != null || healedDraftCategory != null) {
+                scheduleCategoryHealPersist(entity.getUid());
+            }
+        }
         TicketSettingsResponse resp = modelMapper.map(entity, TicketSettingsResponse.class);
         // 基础设置
         resp.setBasicSettings(mapBasicSettings(entity.getBasicSettings()));
         resp.setDraftBasicSettings(mapBasicSettings(entity.getDraftBasicSettings()));
         // 分类设置
-        resp.setCategorySettings(mapCategorySettings(entity.getCategorySettings()));
-        resp.setDraftCategorySettings(mapCategorySettings(entity.getDraftCategorySettings()));
+        resp.setCategorySettings(mapCategorySettings(entity.getCategorySettings(), healedCategory));
+        resp.setDraftCategorySettings(mapCategorySettings(entity.getDraftCategorySettings(), healedDraftCategory));
         // 流程与表单
         resp.setProcess(mapProcess(entity.getProcess()));
         resp.setDraftProcess(mapProcess(entity.getDraftProcess()));

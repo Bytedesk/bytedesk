@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.mcp_client;
 
+import com.bytedesk.ai.mcp_client.enums.McpClientTypeEnum;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import jakarta.persistence.Column;

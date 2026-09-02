@@ -291,7 +291,7 @@
           "refId": "A"
         },
         {
-          "expr": "rate(gen_ai_client_operation_seconds_sum{gen_ai_operation_name=\"embed\"}[1m])",
+          "expr": "rate(gen_ai_client_operation_seconds_sum{gen_ai_operation_name=\"embedding\"}[1m])",
           "legendFormat": "Embedding (sum/s)",
           "refId": "B"
         }

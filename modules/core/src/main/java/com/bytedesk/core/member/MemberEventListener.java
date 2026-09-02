@@ -82,6 +82,11 @@ public class MemberEventListener {
         String orgUid = organization.getUid();
         Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
         log.info("organization created: {}", organization.getName());
+        // 超级管理员可以创建不指定管理员的组织（userUid 为空），此时没有关联用户，无法创建成员，直接跳过
+        if (user == null) {
+            log.info("organization {} created without admin user, skip member creation", orgUid);
+            return;
+        }
         var existingMemberOptional = memberRestService.findByUserAndOrgUid(user, orgUid);
         if (existingMemberOptional.isPresent()) {
             MemberEntity existingMember = existingMemberOptional.get();

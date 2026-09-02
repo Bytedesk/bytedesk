@@ -20,11 +20,11 @@ PROJECT_NAME="${PROJECT_NAME:-bytedesk}"
 # 组件（任意组合）：
 #   freeswitch | mrcp | coturn | janus
 #   searxng(别名 search) | neo4j | logstash | kibana | minio
-#   prometheus | grafana | zipkin | gotenberg(文件预览转换)
+#   prometheus | grafana | zipkin | otelcol(别名 opentelemetry) | gotenberg(文件预览转换)
 # 组合关键字：
 #   call   = freeswitch + mrcp
 #   webrtc = coturn + janus
-#   obs(别名 observability) = prometheus + grafana + zipkin
+#   obs(别名 observability) = prometheus + grafana + zipkin + otelcol
 # 目标：
 #   middleware = redis + elasticsearch + 所选db + 所选mq（不含 bytedesk 应用，源码本地开发）
 #   all / bytedesk = middleware 全部 + bytedesk 应用（默认）
@@ -61,6 +61,7 @@ ENABLE_MINIO=false
 ENABLE_PROMETHEUS=false
 ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
+ENABLE_OTELCOL=false
 ENABLE_GOTENBERG=false
 TARGET=""
 
@@ -113,6 +114,7 @@ for arg in "$@"; do
     prometheus) ENABLE_PROMETHEUS=true ;;
     grafana) ENABLE_GRAFANA=true ;;
     zipkin) ENABLE_ZIPKIN=true ;;
+    otelcol|opentelemetry) ENABLE_OTELCOL=true ;;
     gotenberg) ENABLE_GOTENBERG=true ;;
     call)
       ENABLE_FREESWITCH=true
@@ -126,6 +128,7 @@ for arg in "$@"; do
       ENABLE_PROMETHEUS=true
       ENABLE_GRAFANA=true
       ENABLE_ZIPKIN=true
+      ENABLE_OTELCOL=true
       ;;
     middleware) set_target middleware ;;
     all|bytedesk|app) set_target all ;;
@@ -133,7 +136,7 @@ for arg in "$@"; do
     *)
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq redis|elasticsearch|es"
-      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin gotenberg"
+      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin otelcol gotenberg"
       echo "        call webrtc obs middleware all"
       exit 1
       ;;
@@ -190,6 +193,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_PROMETHEUS}" == true ]] && add_file compose-prometheus.yaml
 [[ "${ENABLE_GRAFANA}" == true ]] && add_file compose-grafana.yaml
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
+[[ "${ENABLE_OTELCOL}" == true ]] && add_file compose-otelcol.yaml
 [[ "${ENABLE_GOTENBERG}" == true ]] && add_file compose-gotenberg.yaml
 
 APP_FILE="${COMPOSE_DIR}/compose-bytedesk.yaml"
@@ -555,6 +559,7 @@ components_summary=""
 [[ "${ENABLE_PROMETHEUS}" == true ]] && components_summary="${components_summary} prometheus"
 [[ "${ENABLE_GRAFANA}" == true ]] && components_summary="${components_summary} grafana"
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
+[[ "${ENABLE_OTELCOL}" == true ]] && components_summary="${components_summary} otelcol"
 [[ "${ENABLE_GOTENBERG}" == true ]] && components_summary="${components_summary} gotenberg"
 
 echo "[INFO] Starting stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"

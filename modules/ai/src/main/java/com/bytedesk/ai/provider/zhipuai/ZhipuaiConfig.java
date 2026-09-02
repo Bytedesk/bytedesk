@@ -157,7 +157,8 @@ public class ZhipuaiConfig {
     @Bean("bytedeskZhipuaiChatModel")
     @ConditionalOnProperty(prefix = "spring.ai.zhipuai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
     ZhipuaiChatModel bytedeskZhipuaiChatModel(
-            ObjectProvider<ZhipuAiClient> clientProvider) {
+            ObjectProvider<ZhipuAiClient> clientProvider,
+            ObjectProvider<io.micrometer.observation.ObservationRegistry> observationRegistryProvider) {
         ZhipuAiClient client = clientProvider.getIfAvailable();
         if (client == null) {
             return null;
@@ -168,6 +169,11 @@ public class ZhipuaiConfig {
                 .topP(topP)
                 .maxTokens(maxTokens)
                 .build();
+        // 注入统一 ObservationRegistry，产生 gen_ai_client_operation_seconds 等指标
+        io.micrometer.observation.ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+        if (observationRegistry != null) {
+            return new ZhipuaiChatModel(client, options, observationRegistry);
+        }
         return new ZhipuaiChatModel(client, options);
     }
 

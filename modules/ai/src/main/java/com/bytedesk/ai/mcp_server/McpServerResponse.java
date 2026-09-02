@@ -33,14 +33,13 @@ public class McpServerResponse extends BaseResponse {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
     private String type;
 
-    private McpServerStatusEnum status;
+    private String status;
 
     private Boolean enabled;
 

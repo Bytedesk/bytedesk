@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.bytedesk.ai.mcp_client.enums.McpTransportTypeEnum;
 import com.bytedesk.ai.mcp_server.McpServerEntity;
 
 import lombok.Builder;

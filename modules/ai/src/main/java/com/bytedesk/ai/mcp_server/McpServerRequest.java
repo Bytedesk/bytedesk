@@ -31,14 +31,13 @@ public class McpServerRequest extends BaseRequest {
 
     private static final long serialVersionUID = 1L;
 
-
     private String name;
 
     private String description;
 
     private String serverType;
 
-    private McpServerStatusEnum status;
+    private String status;
 
     private Boolean enabled;
 

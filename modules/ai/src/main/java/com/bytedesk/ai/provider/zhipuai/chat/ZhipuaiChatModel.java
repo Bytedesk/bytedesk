@@ -11,8 +11,13 @@ import org.springframework.ai.chat.metadata.DefaultUsage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.observation.ChatModelObservationContext;
+import org.springframework.ai.chat.observation.ChatModelObservationConvention;
+import org.springframework.ai.chat.observation.ChatModelObservationDocumentation;
+import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import ai.z.openapi.ZhipuAiClient;
@@ -25,39 +30,102 @@ import ai.z.openapi.service.model.ModelData;
 import ai.z.openapi.service.model.Usage;
 import reactor.core.publisher.Flux;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
+
+/**
+ * 智谱 AI ChatModel 适配层。
+ *
+ * <p>内置手动观测（{@link ChatModelObservationDocumentation#CHAT_MODEL_OPERATION}），
+ * 使 zhipuai 调用产生 {@code gen_ai_client_operation_seconds} 与
+ * {@code gen_ai_client_token_usage_total} 指标，模式与 {@code MoonshotChatModel}、
+ * {@code DashScopeEmbeddingModel} 保持一致。</p>
+ */
 public class ZhipuaiChatModel implements ChatModel {
 
     private static final String DEFAULT_MODEL = "glm-4.5-flash";
+
+    private static final String PROVIDER = "zhipuai";
+
+    private static final ChatModelObservationConvention DEFAULT_OBSERVATION_CONVENTION =
+            new DefaultChatModelObservationConvention();
 
     private final ZhipuAiClient client;
 
     private final ChatOptions defaultOptions;
 
+    private final ObservationRegistry observationRegistry;
+
+    private ChatModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
+
     public ZhipuaiChatModel(ZhipuAiClient client, ChatOptions defaultOptions) {
+        this(client, defaultOptions, ObservationRegistry.NOOP);
+    }
+
+    public ZhipuaiChatModel(ZhipuAiClient client, ChatOptions defaultOptions,
+            ObservationRegistry observationRegistry) {
+        Assert.notNull(observationRegistry, "observationRegistry cannot be null");
         this.client = client;
         this.defaultOptions = defaultOptions;
+        this.observationRegistry = observationRegistry;
+    }
+
+    public void setObservationConvention(ChatModelObservationConvention observationConvention) {
+        this.observationConvention = observationConvention;
     }
 
     @Override
     public ChatResponse call(Prompt prompt) {
-        try {
-            ChatCompletionResponse response = client.chat().createChatCompletion(createRequest(prompt, false));
-            return toChatResponse(response != null ? response.getData() : null);
-        } catch (Exception e) {
-            throw new IllegalStateException("ZhipuAI chat call failed", e);
-        }
+        ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
+                .prompt(prompt)
+                .provider(PROVIDER)
+                .build();
+
+        return ChatModelObservationDocumentation.CHAT_MODEL_OPERATION
+                .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION,
+                        () -> observationContext, this.observationRegistry)
+                .observe(() -> {
+                    try {
+                        ChatCompletionResponse response = client.chat().createChatCompletion(createRequest(prompt, false));
+                        ChatResponse chatResponse = toChatResponse(response != null ? response.getData() : null);
+                        observationContext.setResponse(chatResponse);
+                        return chatResponse;
+                    } catch (Exception e) {
+                        observationContext.setError(e);
+                        throw new IllegalStateException("ZhipuAI chat call failed", e);
+                    }
+                });
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
-        return Flux.defer(() -> {
+        return Flux.deferContextual(contextView -> {
+            ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
+                    .prompt(prompt)
+                    .provider(PROVIDER)
+                    .build();
+
+            Observation observation = ChatModelObservationDocumentation.CHAT_MODEL_OPERATION
+                    .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION,
+                            () -> observationContext, this.observationRegistry)
+                    .parentObservation(contextView.getOrDefault(ObservationThreadLocalAccessor.KEY, null))
+                    .start();
+
             try {
                 ChatCompletionResponse response = client.chat().createChatCompletion(createRequest(prompt, true));
                 if (response == null || response.getFlowable() == null) {
+                    observation.stop();
                     return Flux.empty();
                 }
-                return Flux.from(response.getFlowable()).map(this::toChatResponse);
+                return Flux.from(response.getFlowable())
+                        .map(this::toChatResponse)
+                        .doOnNext(observationContext::setResponse)
+                        .doOnError(observation::error)
+                        .doFinally(signal -> observation.stop());
             } catch (Exception e) {
+                observation.error(e);
+                observation.stop();
                 return Flux.error(new IllegalStateException("ZhipuAI chat stream failed", e));
             }
         });

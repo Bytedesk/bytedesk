@@ -1,0 +1,28 @@
+# OTel Collector（OpenTelemetry 可观测性组件，关键字：otelcol 或组合关键字 obs）
+# 启动方式：./start.sh otelcol ... 或 docker compose --env-file .env -f compose/compose-otelcol.yaml up -d（在 deploy/docker 目录执行）
+# 接收应用 OTLP 上报（HTTP 14318 / gRPC 14317，映射容器标准 4318/4317），并转发到 Zipkin（/api/v2/spans）
+# 应用侧开启方式见 starter/src/main/resources/properties/local/actuator.properties 的 OpenTelemetry 配置段：
+#   SPRING_AUTOCONFIGURE_EXCLUDE=org.springframework.boot.micrometer.tracing.brave.autoconfigure.BraveAutoConfiguration
+#   MANAGEMENT_TRACING_ENABLED=true MANAGEMENT_OPENTELEMETRY_ENABLED=true
+#   MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT=http://127.0.0.1:14318/v1/traces
+services:
+  bytedesk-otelcol:
+    image: otel/opentelemetry-collector-contrib:latest
+    container_name: otelcol-bytedesk
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otelcol/otelcol-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - '14317:4317' # OTLP gRPC
+      - '14318:4318' # OTLP HTTP
+    networks:
+      - bytedesk-network
+    healthcheck:
+      test: ["CMD", "/otelcol-contrib", "--config=/etc/otelcol/config.yaml", "--dry-run"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+networks:
+  bytedesk-network:
+    driver: bridge

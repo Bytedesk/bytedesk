@@ -1,0 +1,35 @@
+# OTel Collector 配置：接收 OTLP（traces/metrics），traces 转发 Zipkin
+# Zipkin 地址使用 compose 网络内的服务名（zipkin-bytedesk:9411）；
+# 若未启动 Zipkin（./start.sh zipkin），转发失败仅记录日志，不影响接收。
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 5s
+    send_batch_size: 512
+
+exporters:
+  # 转发到 compose 网络内的 Zipkin 容器（需 ./start.sh zipkin 一并启动）
+  zipkin:
+    endpoint: http://zipkin-bytedesk:9411/api/v2/spans
+  # 调试用：把收到的 spans 打到控制台（默认注释，需要时取消注释）
+  # debug:
+  #   verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [zipkin]
+    # metrics 如需转发，可加 metrics pipeline（exporters 用 otlp/zipkin 不适用，需 prometheus 或 debug）
+    # metrics:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [debug]

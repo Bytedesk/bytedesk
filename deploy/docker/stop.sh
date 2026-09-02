@@ -47,6 +47,7 @@ ENABLE_MINIO=false
 ENABLE_PROMETHEUS=false
 ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
+ENABLE_OTELCOL=false
 ENABLE_GOTENBERG=false
 TARGET=""
 
@@ -95,6 +96,7 @@ for arg in "$@"; do
     prometheus) ENABLE_PROMETHEUS=true ;;
     grafana) ENABLE_GRAFANA=true ;;
     zipkin) ENABLE_ZIPKIN=true ;;
+    otelcol|opentelemetry) ENABLE_OTELCOL=true ;;
     gotenberg) ENABLE_GOTENBERG=true ;;
     call)
       ENABLE_FREESWITCH=true
@@ -108,6 +110,7 @@ for arg in "$@"; do
       ENABLE_PROMETHEUS=true
       ENABLE_GRAFANA=true
       ENABLE_ZIPKIN=true
+      ENABLE_OTELCOL=true
       ;;
     middleware) set_target middleware ;;
     all|bytedesk|app) set_target all ;;
@@ -118,7 +121,7 @@ for arg in "$@"; do
     *)
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: stop|down mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq"
-      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin gotenberg"
+      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin otelcol gotenberg"
       echo "        call webrtc obs middleware all"
       exit 1
       ;;
@@ -161,6 +164,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_PROMETHEUS}" == true ]] && add_file compose-prometheus.yaml
 [[ "${ENABLE_GRAFANA}" == true ]] && add_file compose-grafana.yaml
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
+[[ "${ENABLE_OTELCOL}" == true ]] && add_file compose-otelcol.yaml
 [[ "${ENABLE_GOTENBERG}" == true ]] && add_file compose-gotenberg.yaml
 
 # TARGET=all（默认）时包含应用文件，保证 down 能一并删除应用容器
@@ -194,6 +198,7 @@ components_summary=""
 [[ "${ENABLE_PROMETHEUS}" == true ]] && components_summary="${components_summary} prometheus"
 [[ "${ENABLE_GRAFANA}" == true ]] && components_summary="${components_summary} grafana"
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
+[[ "${ENABLE_OTELCOL}" == true ]] && components_summary="${components_summary} otelcol"
 [[ "${ENABLE_GOTENBERG}" == true ]] && components_summary="${components_summary} gotenberg"
 
 echo "[INFO] ${MODE} stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"

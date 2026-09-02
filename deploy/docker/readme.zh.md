@@ -52,7 +52,7 @@ cp .env.example .env
 
 # 可选组件（任意组合）
 ./start.sh all minio searxng
-./start.sh middleware obs        # obs = prometheus + grafana + zipkin
+./start.sh middleware obs        # obs = prometheus + grafana + zipkin + otelcol
 ./start.sh middleware logstash kibana
 ./stop.sh middleware logstash kibana down
 ```
@@ -68,7 +68,7 @@ cp .env.example .env
 | WebRTC | `coturn` `janus`，组合 `webrtc` | |
 | 搜索/存储 | `searxng`(search) `minio` `neo4j` | 企业版功能 |
 | 日志 | `logstash` `kibana` | 依赖 elasticsearch |
-| 可观测 | `prometheus` `grafana` `zipkin`，组合 `obs` | |
+| 可观测 | `prometheus` `grafana` `zipkin` `otelcol`(opentelemetry)，组合 `obs` | 追踪后端二选一：zipkin（Brave）或 otelcol（OTLP），详见 [可观测性文档](./readme/readme.observability.md) |
 | 目标 | `middleware` / `all`(bytedesk)，默认 all | 展开见下表 |
 
 ### all / middleware 对应镜像
@@ -109,6 +109,7 @@ cp .env.example .env
 | compose/compose-prometheus.yaml | prometheus | 19090 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-grafana.yaml | grafana | 13000 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-zipkin.yaml | zipkin | 19411 | [可观测性](./readme/readme.observability.md) |
+| compose/compose-otelcol.yaml | otel/opentelemetry-collector-contrib | 14317/14318 | [可观测性](./readme/readme.observability.md)——OTLP 接收，trace 转发 Zipkin |
 
 其他文件：`start.sh`/`stop.sh`（组合启停）、`watchdog.sh`（应用看门狗，详见 [watchdog 使用说明](./readme/readme.watchdog.md)）、`.env`（敏感配置）、`one/`（all-in-one 单文件部署）。
 
@@ -138,7 +139,7 @@ docker compose --env-file .env -p bytedesk \
 - [Neo4j 知识图谱](./readme/readme.neo4j.md)（企业版）
 - [Logstash 日志采集](./readme/readme.logstash.md) / [Kibana 日志查询](./readme/readme.kibana.md)
 - [MinIO 对象存储](./readme/readme.minio.md)
-- [可观测性（Prometheus + Grafana + Zipkin）](./readme/readme.observability.md)
+- [可观测性（Prometheus + Grafana + Zipkin + OTel Collector）](./readme/readme.observability.md)
 - [watchdog.sh 应用看门狗](./readme/readme.watchdog.md)
 - [环境变量说明](./readme/readme.env.md)
 - [旧版本迁移指南](./readme/readme.migration.md)

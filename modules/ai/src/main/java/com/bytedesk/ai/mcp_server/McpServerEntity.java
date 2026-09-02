@@ -13,6 +13,9 @@
  */
 package com.bytedesk.ai.mcp_server;
 
+import com.bytedesk.ai.mcp_server.enums.McpServerDirectionEnum;
+import com.bytedesk.ai.mcp_server.enums.McpServerStatusEnum;
+import com.bytedesk.ai.mcp_server.enums.McpServerTypeEnum;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;

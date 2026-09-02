@@ -57,6 +57,9 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
 
     private static final Duration ONLINE_HEARTBEAT_UPDATE_INTERVAL = Duration.ofSeconds(60);
 
+    // 访客状态更新（心跳上线/定时离线）并发冲突时的最大尝试次数
+    private static final int STATUS_UPDATE_MAX_ATTEMPTS = 3;
+
     private final VisitorRepository visitorRepository;
 
     private final ModelMapper modelMapper;
@@ -279,36 +282,53 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         return visitorRepository.findByStatusAndDeleted(status, false);
     }
 
-    @Transactional
+    // 注意：不能加 @Transactional。读-改-写放在同一事务时，UPDATE 会延迟到外层事务提交才执行，
+    // 乐观锁冲突在提交期抛出，BaseRestService.save 的 @Retryable 捕获不到，导致请求直接报
+    // "Optimistic locking failure"（如访客心跳与定时离线任务并发更新同一访客）。
+    // 这里改为每次尝试读取最新数据，并在独立短事务内 saveAndFlush 立即暴露冲突后重试。
     public int updateStatus(String uid, String newStatus) {
         if (!StringUtils.hasText(uid) || !StringUtils.hasText(newStatus)) {
             log.warn("skip visitor status update because uid or status is blank, uid: {}, status: {}", uid, newStatus);
             return 0;
         }
 
-        Optional<VisitorEntity> visitorOptional = visitorRepository.findByUidAndDeleted(uid, false);
-        if (visitorOptional.isEmpty()) {
-            log.warn("skip visitor status update because visitor not found, uid: {}", uid);
-            return 0;
-        }
-
-        VisitorEntity visitor = visitorOptional.get();
-
-        // epoch-millis heartbeat 节流，跨数据库、零时区歧义
-        if (VisitorStatusEnum.ONLINE.name().equals(newStatus)) {
-            long nowMs = System.currentTimeMillis();
-            Long lastHbMs = visitor.getHeartbeatAtMillis();
-            if (VisitorStatusEnum.ONLINE.name().equals(visitor.getStatus())
-                    && lastHbMs != null
-                    && (nowMs - lastHbMs) < ONLINE_HEARTBEAT_UPDATE_INTERVAL.toMillis()) {
+        for (int attempt = 1; attempt <= STATUS_UPDATE_MAX_ATTEMPTS; attempt++) {
+            Optional<VisitorEntity> visitorOptional = visitorRepository.findByUidAndDeleted(uid, false);
+            if (visitorOptional.isEmpty()) {
+                log.warn("skip visitor status update because visitor not found, uid: {}", uid);
                 return 0;
             }
-            visitor.setHeartbeatAtMillis(nowMs);
-        }
 
-        visitor.setStatus(newStatus);
-        save(visitor);
-        return 1;
+            VisitorEntity visitor = visitorOptional.get();
+
+            // epoch-millis heartbeat 节流，跨数据库、零时区歧义
+            if (VisitorStatusEnum.ONLINE.name().equals(newStatus)) {
+                long nowMs = System.currentTimeMillis();
+                Long lastHbMs = visitor.getHeartbeatAtMillis();
+                if (VisitorStatusEnum.ONLINE.name().equals(visitor.getStatus())
+                        && lastHbMs != null
+                        && (nowMs - lastHbMs) < ONLINE_HEARTBEAT_UPDATE_INTERVAL.toMillis()) {
+                    return 0;
+                }
+                visitor.setHeartbeatAtMillis(nowMs);
+            }
+
+            visitor.setStatus(newStatus);
+            try {
+                // 独立短事务内 saveAndFlush，乐观锁冲突在此立即抛出，便于用最新数据重试
+                VisitorEntity savedVisitor = executeInNewTransaction(() -> visitorRepository.saveAndFlush(visitor));
+                return savedVisitor != null ? 1 : 0;
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (attempt == STATUS_UPDATE_MAX_ATTEMPTS) {
+                    // 多次冲突则放弃本次更新，状态由下一次心跳/定时任务自然纠正
+                    log.warn("visitor status update conflict after {} attempts, uid: {}, status: {}",
+                            attempt, uid, newStatus);
+                    return 0;
+                }
+                log.debug("visitor status optimistic lock conflict, retrying, uid: {}, attempt: {}", uid, attempt);
+            }
+        }
+        return 0;
     }
 
     @Caching(put = {

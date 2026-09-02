@@ -16,6 +16,7 @@ package com.bytedesk.ai.provider.dashscope.chat;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -53,13 +54,20 @@ public class DashscopeChatConfig {
     }
 
     @Bean("bytedeskDashscopeChatModel")
-    ChatModel bytedeskDashscopeChatModel() {
+    ChatModel bytedeskDashscopeChatModel(
+            ObjectProvider<io.micrometer.observation.ObservationRegistry> observationRegistryProvider) {
+        // 注入统一 ObservationRegistry，产生 gen_ai_client_operation_seconds 等指标
+        io.micrometer.observation.ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+        if (observationRegistry != null) {
+            return new DashScopeChatModel(baseUrl, apiKey, bytedeskDashscopeChatOptions(), observationRegistry);
+        }
         return new DashScopeChatModel(baseUrl, apiKey, bytedeskDashscopeChatOptions());
     }
 
     @Bean("bytedeskDashscopeChatClient")
-    ChatClient bytedeskDashscopeChatClient(ChatClientBuilderFactory chatClientBuilderFactory) {
-        return chatClientBuilderFactory.builder(bytedeskDashscopeChatModel())
+    ChatClient bytedeskDashscopeChatClient(ChatClientBuilderFactory chatClientBuilderFactory,
+            ObjectProvider<io.micrometer.observation.ObservationRegistry> observationRegistryProvider) {
+        return chatClientBuilderFactory.builder(bytedeskDashscopeChatModel(observationRegistryProvider))
                 .defaultOptions(bytedeskDashscopeChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();

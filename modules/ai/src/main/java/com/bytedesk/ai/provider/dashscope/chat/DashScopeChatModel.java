@@ -12,8 +12,13 @@ import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.observation.ChatModelObservationContext;
+import org.springframework.ai.chat.observation.ChatModelObservationConvention;
+import org.springframework.ai.chat.observation.ChatModelObservationDocumentation;
+import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.dashscope.aigc.generation.GenerationOutput;
@@ -22,11 +27,27 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.GenerationUsage;
 import com.bytedesk.ai.provider.dashscope.DashScopeBaseUrlSupport;
 
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
 import reactor.core.publisher.Flux;
 
+/**
+ * DashScope ChatModel 适配层。
+ *
+ * <p>内置手动观测（{@link ChatModelObservationDocumentation#CHAT_MODEL_OPERATION}），
+ * 使 dashscope 调用产生 {@code gen_ai_client_operation_seconds} 与
+ * {@code gen_ai_client_token_usage_total} 指标，模式与 {@code MoonshotChatModel}、
+ * {@code DashScopeEmbeddingModel} 保持一致。</p>
+ */
 public class DashScopeChatModel implements ChatModel {
 
     private static final String DEFAULT_MODEL = "qwen-max";
+
+    private static final String PROVIDER = "dashscope";
+
+    private static final ChatModelObservationConvention DEFAULT_OBSERVATION_CONVENTION =
+            new DefaultChatModelObservationConvention();
 
     private final String baseUrl;
 
@@ -34,28 +55,73 @@ public class DashScopeChatModel implements ChatModel {
 
     private final DashScopeChatOptions defaultOptions;
 
+    private final ObservationRegistry observationRegistry;
+
+    private ChatModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
+
     public DashScopeChatModel(String baseUrl, String apiKey, DashScopeChatOptions defaultOptions) {
+        this(baseUrl, apiKey, defaultOptions, ObservationRegistry.NOOP);
+    }
+
+    public DashScopeChatModel(String baseUrl, String apiKey, DashScopeChatOptions defaultOptions,
+            ObservationRegistry observationRegistry) {
+        Assert.notNull(observationRegistry, "observationRegistry cannot be null");
         this.baseUrl = DashScopeBaseUrlSupport.normalize(baseUrl);
         this.apiKey = apiKey;
         this.defaultOptions = defaultOptions != null ? defaultOptions : DashScopeChatOptions.builder().model(DEFAULT_MODEL).build();
+        this.observationRegistry = observationRegistry;
+    }
+
+    public void setObservationConvention(ChatModelObservationConvention observationConvention) {
+        this.observationConvention = observationConvention;
     }
 
     @Override
     public ChatResponse call(Prompt prompt) {
-        try {
-            GenerationResult result = createGeneration().call(createParam(prompt, false));
-            return toChatResponse(result);
-        } catch (Exception e) {
-            throw new IllegalStateException("DashScope chat call failed", e);
-        }
+        ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
+                .prompt(prompt)
+                .provider(PROVIDER)
+                .build();
+
+        return ChatModelObservationDocumentation.CHAT_MODEL_OPERATION
+                .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION,
+                        () -> observationContext, this.observationRegistry)
+                .observe(() -> {
+                    try {
+                        GenerationResult result = createGeneration().call(createParam(prompt, false));
+                        ChatResponse chatResponse = toChatResponse(result);
+                        observationContext.setResponse(chatResponse);
+                        return chatResponse;
+                    } catch (Exception e) {
+                        observationContext.setError(e);
+                        throw new IllegalStateException("DashScope chat call failed", e);
+                    }
+                });
     }
 
     @Override
     public Flux<ChatResponse> stream(Prompt prompt) {
-        return Flux.defer(() -> {
+        return Flux.deferContextual(contextView -> {
+            ChatModelObservationContext observationContext = ChatModelObservationContext.builder()
+                    .prompt(prompt)
+                    .provider(PROVIDER)
+                    .build();
+
+            Observation observation = ChatModelObservationDocumentation.CHAT_MODEL_OPERATION
+                    .observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION,
+                            () -> observationContext, this.observationRegistry)
+                    .parentObservation(contextView.getOrDefault(ObservationThreadLocalAccessor.KEY, null))
+                    .start();
+
             try {
-                return Flux.from(createGeneration().streamCall(createParam(prompt, true))).map(this::toChatResponse);
+                return Flux.from(createGeneration().streamCall(createParam(prompt, true)))
+                        .map(this::toChatResponse)
+                        .doOnNext(observationContext::setResponse)
+                        .doOnError(observation::error)
+                        .doFinally(signal -> observation.stop());
             } catch (Exception e) {
+                observation.error(e);
+                observation.stop();
                 return Flux.error(new IllegalStateException("DashScope chat stream failed", e));
             }
         });

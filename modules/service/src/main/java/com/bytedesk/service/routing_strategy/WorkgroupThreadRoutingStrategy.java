@@ -39,6 +39,7 @@ import com.bytedesk.core.message.content.QueueContent;
 import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.RoutingPoolContent;
 import com.bytedesk.core.message.content.RoutingPoolNotification;
+import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
@@ -1083,8 +1084,7 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         Optional<MessageEntity> latestMessageOptional = messageRestService.findLatestByThreadUid(thread.getUid());
         if (latestMessageOptional.isPresent()) {
             MessageEntity latestMessage = latestMessageOptional.get();
-            if (MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(latestMessage.getType())
-                    && I18Consts.I18N_ROBOT_TO_AGENT_TIP.equals(latestMessage.getContent())) {
+            if (isRobotToAgentTipMessage(latestMessage)) {
                 return;
             }
         }
@@ -1093,6 +1093,32 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         messageRestService.save(message);
         MessageProtobuf messageProtobuf = ServiceConvertUtils.convertToMessageProtobuf(message, thread);
         messageSendService.sendProtobufMessage(messageProtobuf);
+    }
+
+    /**
+     * 判断消息是否已是"机器人转人工"系统提示。
+     *
+     * <p>
+     * content 历史上直接存储 i18n key，现在存储 SystemContent JSON
+     * （{"content":"i18n.robot.to.agent.tip","title":"...","type":"SYSTEM"}），
+     * 需同时兼容两种格式，否则同一次转人工流程中 routeToAgent 与 handleForceAgentTransfer
+     * 各发送一次，去重判断永远不命中，导致重复落库两条相同提示。
+     */
+    private boolean isRobotToAgentTipMessage(MessageEntity message) {
+        if (message == null || !MessageTypeEnum.SYSTEM.name().equalsIgnoreCase(message.getType())) {
+            return false;
+        }
+        String content = message.getContent();
+        if (!StringUtils.hasText(content)) {
+            return false;
+        }
+        if (I18Consts.I18N_ROBOT_TO_AGENT_TIP.equals(content)) {
+            return true;
+        }
+        // SystemContent.fromJson 对非 JSON 字符串有兜底（原串作为 content），且不会抛异常
+        SystemContent systemContent = SystemContent.fromJson(content);
+        return systemContent != null
+                && I18Consts.I18N_ROBOT_TO_AGENT_TIP.equals(systemContent.getContent());
     }
 
     /**

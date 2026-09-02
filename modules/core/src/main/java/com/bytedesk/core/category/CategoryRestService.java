@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.category;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -143,6 +144,16 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
             String orgUid, String level, String platform) {
         return categoryRepository.findByNameAndTypeAndOrgUidAndLevelAndPlatformAndDeletedFalse(name, type, orgUid,
                 level, platform);
+    }
+
+    /**
+     * 按 uid 集合批量查询未删除分类，用于一次性校验工单分类设置等场景。
+     */
+    public List<CategoryEntity> findByUidInAndDeletedFalse(Collection<String> uids) {
+        if (uids == null || uids.isEmpty()) {
+            return List.of();
+        }
+        return categoryRepository.findByUidInAndDeletedFalse(uids);
     }
 
     public Optional<CategoryEntity> findByNameAndKbUid(String name, String kbUid) {

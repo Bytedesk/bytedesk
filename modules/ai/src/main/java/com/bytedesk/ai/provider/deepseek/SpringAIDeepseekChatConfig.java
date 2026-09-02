@@ -25,6 +25,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
 
+import io.micrometer.observation.ObservationRegistry;
+
 /**
  * Deepseek 聊天配置
  */
@@ -60,17 +62,24 @@ public class SpringAIDeepseekChatConfig {
                 .build();
     }
 
+    /**
+     * 注入 Boot 自动配置的 ObservationRegistry，使 deepseek 调用产生
+     * gen_ai_client_operation_seconds / gen_ai_client_token_usage_total 指标。
+     * 否则 ChatModel 层观测缺失，Grafana Provider 分布 / Token 用量面板无数据。
+     */
     @Bean("deepseekChatModel")
-    DeepSeekChatModel deepseekChatModel() {
+    DeepSeekChatModel deepseekChatModel(ObservationRegistry observationRegistry) {
         return DeepSeekChatModel.builder()
                 .deepSeekApi(deepseekApi())
                 .options(deepseekChatOptions())
+                .observationRegistry(observationRegistry)
                 .build();
     }
 
     @Bean("deepseekChatClient")
-    ChatClient deepseekChatClient(ChatClientBuilderFactory chatClientBuilderFactory) {
-        return  chatClientBuilderFactory.builder(deepseekChatModel())
+    ChatClient deepseekChatClient(ChatClientBuilderFactory chatClientBuilderFactory,
+            ObservationRegistry observationRegistry) {
+        return  chatClientBuilderFactory.builder(deepseekChatModel(observationRegistry))
                 .defaultOptions(deepseekChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();

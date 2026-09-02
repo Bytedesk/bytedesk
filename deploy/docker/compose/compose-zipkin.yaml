@@ -1,5 +1,6 @@
 # Zipkin 分布式追踪（可观测性组件，关键字：zipkin 或组合关键字 obs）
 # 启动方式：./start.sh obs ... 或 docker compose --env-file .env -f compose/compose-zipkin.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware zipkin
 # 访问 http://localhost:19411
 # 启用后需设置 MANAGEMENT_TRACING_ENABLED=true 让应用向 Zipkin 上报 span
 services:

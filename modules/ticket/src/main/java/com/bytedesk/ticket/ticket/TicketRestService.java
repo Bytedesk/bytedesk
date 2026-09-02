@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
@@ -293,6 +294,9 @@ public class TicketRestService
                 ticket.setUserUid(reporterUid);
             }
         }
+        // 校验工单分类：必须属于当前组织的组织级（level=ORGANIZATION）工单分类，
+        // 防止使用平台级/其他组织/已删除分类，导致 admin 端分类过滤失效与“未知分类”
+        sanitizeCategoryUid(ticket);
         // 应用工单设置
         TicketSettingsEntity settings = applyTicketSettings(ticket, request);
         ensureTicketNumber(ticket, request, settings);
@@ -962,6 +966,40 @@ public class TicketRestService
         }
 
         throw new IllegalStateException("Unable to allocate unique ticket number for org " + scopedOrgUid);
+    }
+
+    /**
+     * 工单分类校验：categoryUid 必须指向本组织 level=ORGANIZATION 且类型匹配的工单分类，
+     * 否则置空（不阻断工单创建），避免脏分类引用流入列表/过滤。
+     */
+    private void sanitizeCategoryUid(TicketEntity ticket) {
+        if (!StringUtils.hasText(ticket.getCategoryUid())) {
+            return;
+        }
+        String categoryUid = ticket.getCategoryUid();
+        String expectedType = resolveTicketCategoryTypeName(ticket.getType());
+        Optional<CategoryEntity> categoryOpt = categoryRestService.findByUid(categoryUid);
+        boolean valid = false;
+        if (categoryOpt.isPresent()) {
+            CategoryEntity category = categoryOpt.get();
+            valid = !category.isDeleted()
+                    && LevelEnum.ORGANIZATION.name().equals(category.getLevel())
+                    && ticket.getOrgUid().equals(category.getOrgUid())
+                    && expectedType.equals(category.getType());
+        }
+        if (!valid) {
+            log.warn("invalid ticket categoryUid ignored: categoryUid={}, orgUid={}, ticketType={}",
+                    categoryUid, ticket.getOrgUid(), ticket.getType());
+            ticket.setCategoryUid(null);
+        }
+    }
+
+    private String resolveTicketCategoryTypeName(String ticketType) {
+        TicketTypeEnum type = TicketTypeEnum.fromValue(ticketType);
+        if (TicketTypeEnum.INTERNAL.equals(type)) {
+            return CategoryTypeEnum.TICKET_INTERNAL.name();
+        }
+        return CategoryTypeEnum.TICKET_EXTERNAL.name();
     }
 
     private TicketSettingsEntity applyTicketSettings(TicketEntity ticket, TicketRequest request) {

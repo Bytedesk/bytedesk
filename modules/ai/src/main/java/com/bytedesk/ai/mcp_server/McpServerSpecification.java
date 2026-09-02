@@ -52,7 +52,7 @@ public class McpServerSpecification extends BaseSpecification<McpServerEntity, M
             
             // status
             if (request.getStatus() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus().name()));
+                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
             }
             
             // enabled

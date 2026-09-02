@@ -48,14 +48,23 @@ public class CustomChatClientObservationConvention implements ChatClientObservat
     /** 历史保留：输出格式上下文键，向后兼容旧版本 ChatClientAttributes.OUTPUT_FORMAT. */
     private static final String OUTPUT_FORMAT_KEY = "spring.ai.chat.client.output.format";
 
+    /**
+     * 观测名对齐 Grafana 仪表板 / 文档 / histogram 配置中约定的
+     * {@code gen_ai.chat.client.operation}（Prometheus 指标名为
+     * {@code gen_ai_chat_client_operation_seconds}）。
+     *
+     * <p>历史问题：此前返回 {@code bytedesk.ai.chat.client}，导致实际指标名为
+     * {@code bytedesk_ai_chat_client_seconds}，与仪表板查询的
+     * {@code gen_ai_chat_client_operation_seconds_*} 不匹配，Grafana 面板全部 No Data。</p>
+     */
     @Override
     public String getName() {
-        return "bytedesk.ai.chat.client";
+        return "gen_ai.chat.client.operation";
     }
 
     @Override
     public String getContextualName(ChatClientObservationContext context) {
-        return "bytedesk.ai.chat.client." + resolveModel(context);
+        return "gen_ai.chat.client.operation." + resolveModel(context);
     }
 
     @Override

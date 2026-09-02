@@ -21,9 +21,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.mcp_server.McpServerDirectionEnum;
 import com.bytedesk.ai.mcp_server.McpServerEntity;
 import com.bytedesk.ai.mcp_server.McpServerRepository;
+import com.bytedesk.ai.mcp_server.enums.McpServerDirectionEnum;
 
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
