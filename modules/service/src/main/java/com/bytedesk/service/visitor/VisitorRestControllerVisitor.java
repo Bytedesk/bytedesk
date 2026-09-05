@@ -442,7 +442,23 @@ public class VisitorRestControllerVisitor {
     @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
     @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessage")
     @GetMapping(value = "/member/message/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter sendSseMemberMessage(@RequestParam(value = "message") String message) {
+    public SseEmitter sendSseMemberMessageGet(@RequestParam(value = "message") String message) {
+
+        return sendSseMemberMessageInternal(message);
+    }
+
+    // POST 变体：长 prompt 超出 URI 上限时使用（对齐 /message/sse 的 GET/POST 双端点模式）
+    // @ @BlackIpFilter(title = "black", action = "sendSseMemberMessage")
+    // @BlackUserFilter(title = "black", action = "sendSseMemberMessage")
+    @TabooJsonFilter(title = "敏感词", action = "sendSseMemberMessage")
+    @VisitorAnnotation(title = "visitor", action = "sendSseMemberMessage", description = "sendSseMemberMessagePost")
+    @PostMapping(value = "/member/message/sse", consumes = MediaType.TEXT_PLAIN_VALUE, produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter sendSseMemberMessagePost(@RequestBody String message) {
+
+        return sendSseMemberMessageInternal(message);
+    }
+
+    private SseEmitter sendSseMemberMessageInternal(String message) {
 
         // 延长超时时间至10分钟
         SseEmitter emitter = new SseEmitter(600_000L);

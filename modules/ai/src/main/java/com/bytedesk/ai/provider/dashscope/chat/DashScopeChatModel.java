@@ -1,10 +1,15 @@
 package com.bytedesk.ai.provider.dashscope.chat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.metadata.ChatGenerationMetadata;
 import org.springframework.ai.chat.metadata.ChatResponseMetadata;
 import org.springframework.ai.chat.metadata.DefaultUsage;
@@ -18,14 +23,26 @@ import org.springframework.ai.chat.observation.ChatModelObservationDocumentation
 import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
+import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.alibaba.dashscope.aigc.generation.GenerationOutput;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.GenerationUsage;
+import com.alibaba.dashscope.tools.FunctionDefinition;
+import com.alibaba.dashscope.tools.ToolBase;
+import com.alibaba.dashscope.tools.ToolCallBase;
+import com.alibaba.dashscope.tools.ToolCallFunction;
+import com.alibaba.dashscope.tools.ToolFunction;
 import com.bytedesk.ai.provider.dashscope.DashScopeBaseUrlSupport;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
@@ -49,6 +66,9 @@ public class DashScopeChatModel implements ChatModel {
     private static final ChatModelObservationConvention DEFAULT_OBSERVATION_CONVENTION =
             new DefaultChatModelObservationConvention();
 
+    /** 工具调用管理器缺省值（同 MoonshotChatModel，仅用于解析工具定义，执行由框架 ToolCallingAdvisor 外部化）。 */
+    private static final ToolCallingManager DEFAULT_TOOL_CALLING_MANAGER = ToolCallingManager.builder().build();
+
     private final String baseUrl;
 
     private final String apiKey;
@@ -56,6 +76,8 @@ public class DashScopeChatModel implements ChatModel {
     private final DashScopeChatOptions defaultOptions;
 
     private final ObservationRegistry observationRegistry;
+
+    private final ToolCallingManager toolCallingManager;
 
     private ChatModelObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
 
@@ -65,11 +87,19 @@ public class DashScopeChatModel implements ChatModel {
 
     public DashScopeChatModel(String baseUrl, String apiKey, DashScopeChatOptions defaultOptions,
             ObservationRegistry observationRegistry) {
+        this(baseUrl, apiKey, defaultOptions, observationRegistry, DEFAULT_TOOL_CALLING_MANAGER);
+    }
+
+    public DashScopeChatModel(String baseUrl, String apiKey, DashScopeChatOptions defaultOptions,
+            ObservationRegistry observationRegistry, ToolCallingManager toolCallingManager) {
         Assert.notNull(observationRegistry, "observationRegistry cannot be null");
+        Assert.notNull(toolCallingManager, "toolCallingManager cannot be null");
         this.baseUrl = DashScopeBaseUrlSupport.normalize(baseUrl);
         this.apiKey = apiKey;
-        this.defaultOptions = defaultOptions != null ? defaultOptions : DashScopeChatOptions.builder().model(DEFAULT_MODEL).build();
+        this.defaultOptions = defaultOptions != null ? defaultOptions
+                : DashScopeChatOptions.builder().model(DEFAULT_MODEL).build();
         this.observationRegistry = observationRegistry;
+        this.toolCallingManager = toolCallingManager;
     }
 
     public void setObservationConvention(ChatModelObservationConvention observationConvention) {
@@ -158,33 +188,102 @@ public class DashScopeChatModel implements ChatModel {
         if (options.getStopSequences() != null && !options.getStopSequences().isEmpty()) {
             builder.stopStrings(options.getStopSequences());
         }
+        // 思考模型参数：仅显式设置时透传（默认不设置，遵守「思考模式由模型名决定」约束，
+        // 对非思考模型设置 enableThinking=true 会导致 400 Bad Request）
+        if (options.getEnableThinking() != null) {
+            builder.enableThinking(options.getEnableThinking());
+        }
+        if (options.getThinkingBudget() != null) {
+            builder.thinkingBudget(options.getThinkingBudget());
+        }
+        // 工具定义：toolCallbacks/toolNames → ToolDefinition → dashscope ToolFunction
+        List<ToolDefinition> toolDefinitions = this.toolCallingManager.resolveToolDefinitions(options);
+        if (!CollectionUtils.isEmpty(toolDefinitions)) {
+            builder.tools(toDashScopeTools(toolDefinitions));
+            // 工具选择模式（规划 G8）：auto/none/required 透传 GenerationParam.toolChoice
+            if (StringUtils.hasText(options.getToolChoice())) {
+                builder.toolChoice(options.getToolChoice());
+            }
+        }
         return builder.build();
     }
 
+    /**
+     * Spring AI {@link ToolDefinition} → dashscope-sdk-java {@link ToolBase}。
+     * 映射对齐 {@code EnterpriseDashScopeToolService#buildXxxToolFunction()} 已验证模式。
+     */
+    private List<ToolBase> toDashScopeTools(List<ToolDefinition> toolDefinitions) {
+        List<ToolBase> tools = new ArrayList<>();
+        for (ToolDefinition toolDefinition : toolDefinitions) {
+            JsonObject parameters = StringUtils.hasText(toolDefinition.inputSchema())
+                    ? JsonParser.parseString(toolDefinition.inputSchema()).getAsJsonObject()
+                    : null;
+            FunctionDefinition function = FunctionDefinition.builder()
+                    .name(toolDefinition.name())
+                    .description(toolDefinition.description())
+                    .parameters(parameters)
+                    .build();
+            tools.add(ToolFunction.builder().function(function).build());
+        }
+        return tools;
+    }
+
+    /**
+     * 合并运行时 options 与默认 options。
+     *
+     * <p>2026-09-04 Phase 2：新增工具字段合并（{@code mergeToolCallbacks/mergeToolContext}，
+     * 修复 {@code applyRobotToolCallbacks} 注入的工具回调被静默丢弃的问题——2026-08-10 Skills
+     * 调试发现的同款根因）与思考参数合并。工具执行不在此处（同 MoonshotChatModel，
+     * 由框架自动注册的 ToolCallingAdvisor 外部执行）。</p>
+     */
     private DashScopeChatOptions mergeOptions(ChatOptions runtimeOptions) {
-        DashScopeChatOptions.Builder builder = this.defaultOptions.mutate();
+        DashScopeChatOptions merged = DashScopeChatOptions.fromOptions(this.defaultOptions);
         if (runtimeOptions == null) {
-            return builder.build();
+            ToolCallingChatOptions.validateToolCallbacks(merged.getToolCallbacks());
+            return merged;
         }
         if (StringUtils.hasText(runtimeOptions.getModel())) {
-            builder.model(runtimeOptions.getModel());
+            merged.setModel(runtimeOptions.getModel());
         }
         if (runtimeOptions.getTemperature() != null) {
-            builder.temperature(runtimeOptions.getTemperature());
+            merged.setTemperature(runtimeOptions.getTemperature());
         }
         if (runtimeOptions.getMaxTokens() != null) {
-            builder.maxTokens(runtimeOptions.getMaxTokens());
+            merged.setMaxTokens(runtimeOptions.getMaxTokens());
         }
         if (runtimeOptions.getTopP() != null) {
-            builder.topP(runtimeOptions.getTopP());
+            merged.setTopP(runtimeOptions.getTopP());
         }
         if (runtimeOptions.getTopK() != null) {
-            builder.topK(runtimeOptions.getTopK());
+            merged.setTopK(runtimeOptions.getTopK());
         }
         if (runtimeOptions.getStopSequences() != null) {
-            builder.stopSequences(runtimeOptions.getStopSequences());
+            merged.setStopSequences(runtimeOptions.getStopSequences());
         }
-        return builder.build();
+        // 思考参数与 toolNames：仅 DashScopeChatOptions 透传
+        if (runtimeOptions instanceof DashScopeChatOptions runtimeDashscope) {
+            if (runtimeDashscope.getEnableThinking() != null) {
+                merged.setEnableThinking(runtimeDashscope.getEnableThinking());
+            }
+            if (runtimeDashscope.getThinkingBudget() != null) {
+                merged.setThinkingBudget(runtimeDashscope.getThinkingBudget());
+            }
+            if (StringUtils.hasText(runtimeDashscope.getToolChoice())) {
+                merged.setToolChoice(runtimeDashscope.getToolChoice());
+            }
+            if (!CollectionUtils.isEmpty(runtimeDashscope.getToolNames())) {
+                merged.setToolNames(new HashSet<>(runtimeDashscope.getToolNames()));
+            }
+        }
+        // 工具回调/上下文：runtime 与 default 合并（忽略 runtime 会丢 applyRobotToolCallbacks 注入）
+        if (runtimeOptions instanceof ToolCallingChatOptions runtimeToolOptions) {
+            merged.setToolCallbacks(ToolCallingChatOptions.mergeToolCallbacks(
+                    runtimeToolOptions.getToolCallbacks(), merged.getToolCallbacks()));
+            merged.setToolContext(ToolCallingChatOptions.mergeToolContext(
+                    runtimeToolOptions.getToolContext(), merged.getToolContext()));
+        }
+        ToolCallingChatOptions.validateToolCallbacks(merged.getToolCallbacks());
+        return merged;
     }
 
     private String resolveModel(DashScopeChatOptions options) {
@@ -194,10 +293,49 @@ public class DashScopeChatModel implements ChatModel {
     private List<com.alibaba.dashscope.common.Message> toDashScopeMessages(List<Message> messages) {
         List<com.alibaba.dashscope.common.Message> result = new ArrayList<>();
         for (Message message : messages) {
-            result.add(com.alibaba.dashscope.common.Message.builder()
+            // 工具结果消息：每个 ToolResponse 一条 role=tool 消息（带 toolCallId/name）
+            if (message.getMessageType() == MessageType.TOOL
+                    && message instanceof ToolResponseMessage toolResponseMessage) {
+                for (ToolResponseMessage.ToolResponse toolResponse : toolResponseMessage.getResponses()) {
+                    result.add(com.alibaba.dashscope.common.Message.builder()
+                            .role("tool")
+                            .toolCallId(toolResponse.id() != null ? toolResponse.id() : "")
+                            .name(toolResponse.name() != null ? toolResponse.name() : "")
+                            .content(toolResponse.responseData() != null
+                                    ? String.valueOf(toolResponse.responseData()) : "")
+                            .build());
+                }
+                continue;
+            }
+            com.alibaba.dashscope.common.Message.MessageBuilder<?, ?> builder = com.alibaba.dashscope.common.Message
+                    .builder()
                     .role(message.getMessageType().getValue())
-                    .content(message.getText())
-                    .build());
+                    .content(message.getText());
+            // assistant 工具调用消息：回传 toolCalls 供模型续轮
+            if (message instanceof AssistantMessage assistantMessage
+                    && !CollectionUtils.isEmpty(assistantMessage.getToolCalls())) {
+                builder.toolCalls(toDashScopeToolCalls(assistantMessage.getToolCalls()));
+            }
+            result.add(builder.build());
+        }
+        return result;
+    }
+
+    /**
+     * Spring AI {@link AssistantMessage.ToolCall} → dashscope-sdk-java {@link ToolCallFunction}。
+     * SDK 该类无 builder，使用 setter + 内部类 CallFunction（已 javap 核实 2.22.28）。
+     */
+    private List<ToolCallBase> toDashScopeToolCalls(List<AssistantMessage.ToolCall> toolCalls) {
+        List<ToolCallBase> result = new ArrayList<>();
+        for (AssistantMessage.ToolCall toolCall : toolCalls) {
+            ToolCallFunction callFunction = new ToolCallFunction();
+            callFunction.setId(toolCall.id() != null ? toolCall.id() : "");
+            callFunction.setType(toolCall.type() != null ? toolCall.type() : "function");
+            ToolCallFunction.CallFunction function = callFunction.new CallFunction();
+            function.setName(toolCall.name());
+            function.setArguments(toolCall.arguments() != null ? toolCall.arguments() : "{}");
+            callFunction.setFunction(function);
+            result.add(callFunction);
         }
         return result;
     }
@@ -210,9 +348,16 @@ public class DashScopeChatModel implements ChatModel {
         List<Generation> generations = new ArrayList<>();
         if (output.getChoices() != null && !output.getChoices().isEmpty()) {
             for (GenerationOutput.Choice choice : output.getChoices()) {
-                String text = choice.getMessage() != null ? choice.getMessage().getContent() : "";
-                String finishReason = choice.getFinishReason() != null ? choice.getFinishReason() : output.getFinishReason();
-                generations.add(new Generation(new AssistantMessage(text),
+                com.alibaba.dashscope.common.Message choiceMessage = choice.getMessage();
+                String text = choiceMessage != null && choiceMessage.getContent() != null
+                        ? choiceMessage.getContent() : "";
+                String finishReason = choice.getFinishReason() != null ? choice.getFinishReason()
+                        : output.getFinishReason();
+                List<AssistantMessage.ToolCall> toolCalls = toSpringAiToolCalls(choiceMessage);
+                if (!toolCalls.isEmpty() && !StringUtils.hasText(finishReason)) {
+                    finishReason = "tool_calls";
+                }
+                generations.add(new Generation(toAssistantMessage(choiceMessage, text, toolCalls),
                         ChatGenerationMetadata.builder().finishReason(finishReason).build()));
             }
         } else {
@@ -221,6 +366,49 @@ public class DashScopeChatModel implements ChatModel {
                     ChatGenerationMetadata.builder().finishReason(output.getFinishReason()).build()));
         }
         return new ChatResponse(generations, toChatResponseMetadata(result));
+    }
+
+    /**
+     * 构造 Spring AI {@link AssistantMessage}：透传 reasoning_content（metadata key
+     * {@code reasoningContent}，契约见 {@code ReasoningContentHelper}，helper 零改动）与 toolCalls。
+     */
+    private AssistantMessage toAssistantMessage(com.alibaba.dashscope.common.Message choiceMessage,
+            String text, List<AssistantMessage.ToolCall> toolCalls) {
+        AssistantMessage.Builder<?> builder = AssistantMessage.builder()
+                .content(text)
+                .toolCalls(toolCalls)
+                .media(List.of());
+        if (choiceMessage != null && StringUtils.hasText(choiceMessage.getReasoningContent())) {
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("reasoningContent", choiceMessage.getReasoningContent());
+            builder.properties(metadata);
+        }
+        return builder.build();
+    }
+
+    /**
+     * dashscope-sdk-java {@link ToolCallBase}（实际为 {@link ToolCallFunction}）→
+     * Spring AI {@link AssistantMessage.ToolCall}。name/arguments 经 getFunction() 取。
+     */
+    private List<AssistantMessage.ToolCall> toSpringAiToolCalls(
+            com.alibaba.dashscope.common.Message choiceMessage) {
+        if (choiceMessage == null || CollectionUtils.isEmpty(choiceMessage.getToolCalls())) {
+            return List.of();
+        }
+        List<AssistantMessage.ToolCall> toolCalls = new ArrayList<>();
+        for (ToolCallBase toolCallBase : choiceMessage.getToolCalls()) {
+            if (toolCallBase instanceof ToolCallFunction toolCallFunction
+                    && toolCallFunction.getFunction() != null) {
+                String name = toolCallFunction.getFunction().getName();
+                String arguments = toolCallFunction.getFunction().getArguments();
+                toolCalls.add(new AssistantMessage.ToolCall(
+                        toolCallFunction.getId() != null ? toolCallFunction.getId() : "",
+                        toolCallFunction.getType() != null ? toolCallFunction.getType() : "function",
+                        name != null ? name : "",
+                        arguments != null ? arguments : "{}"));
+            }
+        }
+        return toolCalls;
     }
 
     private ChatResponseMetadata toChatResponseMetadata(GenerationResult result) {

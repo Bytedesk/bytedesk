@@ -37,11 +37,11 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.root("/team", "team", "team", "menu.team"));
                 seeds.add(MenuSeed.child("/team/member", "member", "user", "/team", "menu.team.member"));
                 seeds.add(MenuSeed.child("/team/role", "role", "safety", "/team", "menu.team.role"));
+                seeds.add(MenuSeed.child("/team/task", "task", "calendar", "/team", "menu.team.task"));
+                seeds.add(MenuSeed.child("/team/notification", "notification", "notification", "/team", "menu.team.notification"));
                 seeds.add(MenuSeed.child("/team/email", "email", "mail", "/team", "menu.team.email"));
                 seeds.add(MenuSeed.child("/team/sms", "sms", "message", "/team", "menu.team.sms"));
                 seeds.add(MenuSeed.child("/team/action", "action", "lock", "/team", "menu.team.action"));
-                seeds.add(MenuSeed.child("/team/task", "task", "calendar", "/team", "menu.team.task"));
-                seeds.add(MenuSeed.child("/team/notification", "notification", "notification", "/team", "menu.team.notification"));
                 seeds.add(MenuSeed.child("/team/org", "company", "bank", "/team", "menu.team.company"));
 
                 seeds.add(MenuSeed.root("/service", "service", "customerService", "menu.service"));
@@ -72,14 +72,13 @@ public final class MenuInitData {
 
                 seeds.add(MenuSeed.root("/ai", "robot", "robot", "menu.robot"));
                 seeds.add(MenuSeed.child("/ai/robot", "robot", "robot", "/ai", "menu.robot.robot"));
-                seeds.add(MenuSeed.child("/ai/assistant", "assistant", "message", "/ai", "menu.robot.assistant"));
                 seeds.add(MenuSeed.child("/ai/agent", "agent", "user", "/ai", "menu.robot.agent"));
                 seeds.add(MenuSeed.child("/ai/prompt", "prompt", "message", "/ai", "menu.robot.prompt"));
                 seeds.add(MenuSeed.child("/ai/model", "model", "bulb", "/ai", "menu.robot.model"));
+                seeds.add(MenuSeed.child("/ai/message", "message", "mail", "/ai", "menu.robot.message"));
                 seeds.add(MenuSeed.child("/ai/tools", "tools", "tool", "/ai", "menu.robot.tools"));
                 seeds.add(MenuSeed.child("/ai/mcp", "mcp", "api", "/ai", "menu.robot.mcp"));
                 seeds.add(MenuSeed.child("/ai/skill", "skill", "rocket", "/ai", "menu.robot.skill"));
-                seeds.add(MenuSeed.child("/ai/message", "message", "mail", "/ai", "menu.robot.message"));
 
                 seeds.add(MenuSeed.root("/kb", "kbase", "book", "menu.kbase"));
                 seeds.add(MenuSeed.child("/kb/article", "helpcenter", "fileText", "/kb", "menu.kbase.helpcenter"));
@@ -131,10 +130,11 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/workgroup", "workgroup", "apartment", "/super", "menu.super.workgroup"));
                 seeds.add(MenuSeed.child("/super/audio", "audio", "audio", "/super", "menu.super.audio"));
                 seeds.add(MenuSeed.child("/super/video", "video", "videoCamera", "/super", "menu.super.video"));
-                seeds.add(MenuSeed.child("/super/robot", "robot", "robot", "/super", "menu.super.robot"));
-                seeds.add(MenuSeed.child("/super/robotagent", "robotagent", "user", "/super", "menu.super.robotagent"));
-                seeds.add(MenuSeed.child("/super/skills", "skills", "rocket", "/super", "menu.super.skills"));
-                seeds.add(MenuSeed.child("/super/prompt", "prompt", "message", "/super", "menu.super.prompt"));
+                // 以下四项前端路由 hideInMenu，后端种子同步标记 enabled=false
+                seeds.add(MenuSeed.child("/super/robot", "robot", "robot", "/super", "menu.super.robot", Boolean.FALSE));
+                seeds.add(MenuSeed.child("/super/robotagent", "robotagent", "user", "/super", "menu.super.robotagent", Boolean.FALSE));
+                seeds.add(MenuSeed.child("/super/skills", "skills", "rocket", "/super", "menu.super.skills", Boolean.FALSE));
+                seeds.add(MenuSeed.child("/super/prompt", "prompt", "message", "/super", "menu.super.prompt", Boolean.FALSE));
                 seeds.add(MenuSeed.child("/super/ticket", "ticket", "profile", "/super", "menu.super.ticket"));
                 seeds.add(MenuSeed.child("/super/menu", "menu", "menu", "/super", "menu.super.menu"));
                 seeds.add(MenuSeed.child("/super/kbase", "kbase", "book", "/super", "menu.super.kbase"));
@@ -149,6 +149,8 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/sms", "sms", "message", "/super", "menu.super.sms"));
                 seeds.add(MenuSeed.child("/super/recycle", "recycle", "delete", "/super", "menu.super.recycle"));
                 seeds.add(MenuSeed.child("/super/server", "server", "cloudServer", "/super", "menu.super.server"));
+                // 系统全局配置：品牌外观（logo/标题/favicon）+ 协议链接等，运行时 DB 覆盖，无需重启
+                seeds.add(MenuSeed.child("/super/system-config", "systemConfig", "setting", "/super", "menu.super.systemConfig"));
                 // 渠道管理：单页（Splitter + 左列表 + 右Tab），无子菜单
                 seeds.add(MenuSeed.child("/super/channel", "channel", "apartment", "/super", "menu.super.channel"));
 

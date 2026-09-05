@@ -86,6 +86,8 @@ public class RedisCacheConfig implements CachingConfigurer {
         cacheConfigurations.put("activeConnections", defaultCacheConfiguration().entryTtl(Duration.ofSeconds(5)));
         // 平台设置缓存 - 30分钟过期（用于邮件、短信、工单中心等平台级配置）
         cacheConfigurations.put("platformSettings", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
+        // 系统全局配置缓存 - 30分钟过期（品牌/协议等 KV 覆盖值，保存后逐次失效）
+        cacheConfigurations.put("system_config", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
         // 会话缓存 - 4小时过期
         // cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         // 

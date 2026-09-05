@@ -165,7 +165,7 @@ public class PasswordCryptoUtils {
             return hexString.toString().substring(0, 16);
             
         } catch (Exception e) {
-            throw new RuntimeException("生成密钥失败: " + e.getMessage());
+            throw new RuntimeException(I18Consts.I18N_PASSWORD_KEY_GENERATE_FAILED);
         }
     }
 

@@ -51,6 +51,8 @@ public class I18Consts {
     public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
     public static final String I18N_EMAIL_PUSH = I18N_PREFIX + "email.push";
     public static final String I18N_PUSH_SETTINGS = I18N_PREFIX + "push.settings";
+    public static final String I18N_SYSTEM_CONFIG = I18N_PREFIX + "system.config";
+    public static final String I18N_ACTION_SAVE_SYSTEM_CONFIG = I18N_PREFIX + "action.save.system.config";
     public static final String I18N_DATA_SOURCE = I18N_PREFIX + "data.source";
     public static final String I18N_TOOL = I18N_PREFIX + "tool";
     public static final String I18N_TOOL_APPROVAL = I18N_PREFIX + "tool.approval";
@@ -495,11 +497,33 @@ public class I18Consts {
     public static final String I18N_SYSTEM_NOTIFICATION_NAME = I18N_PREFIX + "system.notification"; // 系统通知
     public static final String I18N_REENTER_TIP = I18N_PREFIX + "reenter.tip"; // 重新进入提示
     public static final String I18N_LOGIN_REQUIRED = I18N_PREFIX + "login.required"; // 请先登录
-    public static final String I18N_FORCE_LOGOUT_REASON = I18N_PREFIX + "force.logout.reason"; // 账号已被管理员强制下线，请联系管理员恢复后再登录。
+    public static final String I18N_FORCE_LOGOUT_REASON = I18N_PREFIX + "force.logout.reason"; // 账号已被管理员禁用，请联系管理员启用后再登录。
     public static final String I18N_SUPER_ADMIN_REQUIRED = I18N_PREFIX + "super.admin.required"; // 仅超级管理员可操作
+    // 成员/客服禁用（forceLogout）相关提示
+    public static final String I18N_MEMBER_UID_REQUIRED = I18N_PREFIX + "member.uid.required"; // 成员 UID 不能为空
+    public static final String I18N_MEMBER_SAVE_FAILED = I18N_PREFIX + "member.save.failed"; // 成员保存失败，请稍后重试
+    public static final String I18N_MEMBER_SUPER_ADMIN_DISABLE_FORBIDDEN = I18N_PREFIX
+            + "member.super.admin.disable.forbidden"; // 超级管理员成员禁止禁用
+    public static final String I18N_MEMBER_UPDATE_ADMIN_OR_SELF_ONLY = I18N_PREFIX
+            + "member.update.admin.or.self.only"; // 仅组织管理员或超级管理员可编辑其他成员，普通成员仅能编辑自己的成员资料
+    public static final String I18N_MEMBER_DISABLE_ADMIN_ONLY = I18N_PREFIX
+            + "member.disable.admin.only"; // 仅组织管理员或超级管理员可禁用或启用成员
+    public static final String I18N_AGENT_UID_REQUIRED = I18N_PREFIX + "agent.uid.required"; // 客服 UID 不能为空
+    public static final String I18N_AGENT_SAVE_FAILED = I18N_PREFIX + "agent.save.failed"; // 客服保存失败，请稍后重试
+    public static final String I18N_AGENT_NOT_FOUND = I18N_PREFIX + "agent.not.found"; // 客服未找到
 
     // 账号相关
     public static final String I18N_USERNAME_OR_PASSWORD_INCORRECT = I18N_PREFIX + "username.or.password.incorrect"; // 用户名或密码不正确
+    // 登录链路提示（AuthController/AuthLoginRetryHelper，前端通过 translateString 翻译，带 {0} 占位的用 I18Consts.withArgs 传参）
+    public static final String I18N_AUTH_USERNAME_MOBILE_MISMATCH = I18N_PREFIX + "auth.username.mobile.mismatch"; // 用户名和手机号不匹配，请检查后重新输入
+    public static final String I18N_AUTH_PASSWORD_REQUIRED = I18N_PREFIX + "auth.password.required"; // 请输入密码
+    public static final String I18N_AUTH_PASSWORD_DECRYPT_FAILED = I18N_PREFIX + "auth.password.decrypt.failed"; // 密码解密失败，请检查密码格式
+    public static final String I18N_AUTH_USER_NOT_REGISTERED = I18N_PREFIX + "auth.user.not.registered"; // 用户未注册，请先通过店铺对接接口创建账号
+    public static final String I18N_AUTH_ACCESS_TOKEN_INVALID = I18N_PREFIX + "auth.access.token.invalid"; // accessToken 无效
+    public static final String I18N_AUTH_ACCOUNT_LOCKED_RETRY_AFTER = I18N_PREFIX + "auth.account.locked.retry.after"; // 账户已被锁定，请{0}后重试
+    public static final String I18N_AUTH_ACCOUNT_LOCKED_MINUTES = I18N_PREFIX + "auth.account.locked.minutes"; // 密码错误次数过多，账户已被锁定{0}分钟
+    public static final String I18N_AUTH_PASSWORD_ATTEMPTS_REMAINING = I18N_PREFIX + "auth.password.attempts.remaining"; // 用户名或密码错误，还可尝试{0}次
+    public static final String I18N_PASSWORD_KEY_GENERATE_FAILED = I18N_PREFIX + "password.key.generate.failed"; // 生成密钥失败
     public static final String I18N_MOBILE_ALREADY_EXISTS = I18N_PREFIX + "mobile.already.exists"; // 手机号已存在
     public static final String I18N_EMAIL_ALREADY_EXISTS = I18N_PREFIX + "email.already.exists"; // 邮箱已存在
     public static final String I18N_USERNAME_ALREADY_EXISTS = I18N_PREFIX + "username.already.exists"; // 用户名已存在

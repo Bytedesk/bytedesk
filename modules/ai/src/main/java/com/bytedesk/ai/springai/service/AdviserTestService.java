@@ -797,7 +797,7 @@ public class AdviserTestService {
 		private final java.util.Random random = new java.util.Random();
 		private final int[] temperatures = { -125, 25, -255, 18, 72, 30 };
 
-		@Tool(description = "Get the current weather for a given location")
+		@Tool(name = "get_weather", description = "Get the current weather for a given location")
 		public String getWeather(String location) {
 			int temperature = temperatures[random.nextInt(temperatures.length)];
 			log.info("[UnstableWeatherTools] getWeather({}) → {}°C", location, temperature);

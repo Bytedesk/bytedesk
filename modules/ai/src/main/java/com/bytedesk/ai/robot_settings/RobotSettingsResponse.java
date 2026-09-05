@@ -13,7 +13,7 @@
  */
 package com.bytedesk.ai.robot_settings;
 
-import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsResponse;
+import com.bytedesk.ai.robot_tool.RobotToolsSettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsResponse;
 

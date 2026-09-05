@@ -14,34 +14,34 @@ public class AgentSeatTools extends BaseTools<AgentSeatRequest, AgentSeatRespons
         super("agent_seat", AgentSeatRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query agent_seat by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_query_by_uid", description = "Query agent_seat by uid. This tool returns structured data for AI tool invocation.")
     public Object agent_seatQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query agent_seat by org with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_query_by_org", description = "Query agent_seat by org with request json. This tool returns structured data for AI tool invocation.")
     public Object agent_seatQueryByOrg(@ToolParam(description = "AgentSeatRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query agent_seat by user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_query_by_user", description = "Query agent_seat by user with request json. This tool returns structured data for AI tool invocation.")
     public Object agent_seatQueryByUser(@ToolParam(description = "AgentSeatRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create agent_seat with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_create", description = "Create agent_seat with request json. This tool returns structured data for AI tool invocation.")
     public Object agent_seatCreate(@ToolParam(description = "AgentSeatRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update agent_seat with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_update", description = "Update agent_seat with request json. This tool returns structured data for AI tool invocation.")
     public Object agent_seatUpdate(@ToolParam(description = "AgentSeatRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete agent_seat by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "agent_seat_delete_by_uid", description = "Delete agent_seat by uid. This tool returns structured data for AI tool invocation.")
     public Object agent_seatDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

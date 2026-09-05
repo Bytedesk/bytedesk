@@ -39,6 +39,10 @@ public class RobotMessageExcel {
     @ColumnWidth(20)
     private String robot;
 
+    @ExcelProperty(value = "评价标签")
+    @ColumnWidth(30)
+    private String rateDownTags;
+
     @ExcelProperty(value = "时间")
     @ColumnWidth(20)
     private String createdAt;

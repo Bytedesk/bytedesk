@@ -230,7 +230,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         // 保存Agent并检查返回值
         AgentEntity savedAgent = save(agent);
         if (savedAgent == null) {
-            throw new RuntimeException("Failed to save agent.");
+            throw new RuntimeException(I18Consts.I18N_AGENT_SAVE_FAILED);
         }
         // 返回保存后的Agent
         return convertToResponse(savedAgent);
@@ -431,7 +431,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         //
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
-            throw new RuntimeException("Failed to save agent.");
+            throw new RuntimeException(I18Consts.I18N_AGENT_SAVE_FAILED);
         }
         //
         bytedeskEventPublisher.publishEvent(new AgentUpdateStatusEvent(this, updatedAgent));
@@ -442,11 +442,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Transactional
     public AgentResponse forceLogout(AgentRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new RuntimeException("agent uid is required");
+            throw new RuntimeException(I18Consts.I18N_AGENT_UID_REQUIRED);
         }
 
         AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent not found for uid: " + request.getUid()));
+                .orElseThrow(() -> new RuntimeException(I18Consts.I18N_AGENT_NOT_FOUND));
         agent.setForceLogout(true);
         agent.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
         agent.setForceLogoutAt(java.time.ZonedDateTime.now());
@@ -455,7 +455,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
-            throw new RuntimeException("Failed to save agent.");
+            throw new RuntimeException(I18Consts.I18N_AGENT_SAVE_FAILED);
         }
 
         if (updatedAgent.getMember() != null && updatedAgent.getMember().getUser() != null) {
@@ -474,11 +474,11 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
     @Transactional
     public AgentResponse restoreLogin(AgentRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new RuntimeException("agent uid is required");
+            throw new RuntimeException(I18Consts.I18N_AGENT_UID_REQUIRED);
         }
 
         AgentEntity agent = findByUid(request.getUid())
-                .orElseThrow(() -> new RuntimeException("agent not found for uid: " + request.getUid()));
+                .orElseThrow(() -> new RuntimeException(I18Consts.I18N_AGENT_NOT_FOUND));
         agent.setForceLogout(false);
         agent.setForceLogoutReason(null);
         agent.setForceLogoutAt(null);
@@ -486,7 +486,7 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
         AgentEntity updatedAgent = save(agent);
         if (updatedAgent == null) {
-            throw new RuntimeException("Failed to save agent.");
+            throw new RuntimeException(I18Consts.I18N_AGENT_SAVE_FAILED);
         }
         return convertToResponse(updatedAgent);
     }

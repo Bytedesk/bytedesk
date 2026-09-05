@@ -11,37 +11,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WorkflowEdgeTools extends BaseTools<WorkflowEdgeRequest, WorkflowEdgeResponse> {
 
     public WorkflowEdgeTools(WorkflowEdgeRestService restService, ObjectMapper objectMapper) {
-        super("workflowEdge", WorkflowEdgeRequest.class, restService, objectMapper);
+        super("workflow_edge", WorkflowEdgeRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query workflowEdge by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_query_by_uid", description = "Query workflow_edge by uid. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query workflowEdge by org with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_query_by_org", description = "Query workflow_edge by org with request json. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeQueryByOrg(@ToolParam(description = "WorkflowEdgeRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query workflowEdge by user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_query_by_user", description = "Query workflow_edge by user with request json. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeQueryByUser(@ToolParam(description = "WorkflowEdgeRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create workflowEdge with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_create", description = "Create workflow_edge with request json. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeCreate(@ToolParam(description = "WorkflowEdgeRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update workflowEdge with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_update", description = "Update workflow_edge with request json. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeUpdate(@ToolParam(description = "WorkflowEdgeRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete workflowEdge by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "workflow_edge_delete_by_uid", description = "Delete workflow_edge by uid. This tool returns structured data for AI tool invocation.")
     public Object workflowEdgeDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

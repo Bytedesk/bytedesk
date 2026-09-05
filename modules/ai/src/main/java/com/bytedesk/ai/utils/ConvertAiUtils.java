@@ -36,11 +36,11 @@ import com.bytedesk.ai.robot_message.RobotMessageResponse;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotProtobufBasic;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
-import com.bytedesk.ai.robot_settings.tools.RobotToolConfig;
-import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
-import com.bytedesk.ai.robot_settings.tools.RobotToolIntentResolver;
-import com.bytedesk.ai.robot_settings.tools.ToolChoice;
-import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
+import com.bytedesk.ai.robot_tool.RobotToolConfig;
+import com.bytedesk.ai.robot_tool.RobotToolIntentContext;
+import com.bytedesk.ai.robot_tool.RobotToolIntentResolver;
+import com.bytedesk.ai.robot_tool.RobotToolsSettingsEntity;
+import com.bytedesk.ai.robot_tool.ToolChoice;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
@@ -104,6 +104,10 @@ public class ConvertAiUtils {
         if (StringUtils.hasText(toolsSettings.getToolChoice())) {
             llm.setToolChoice(normalizeToolChoice(toolsSettings.getToolChoice()));
         }
+        // 单轮工具调用次数上限（规划 G9）：@Transient 运行时字段，不落库
+        if (toolsSettings.getMaxToolInvocations() != null) {
+            llm.setMaxToolInvocations(toolsSettings.getMaxToolInvocations());
+        }
     }
 
     private static RobotToolIntentContext resolveToolIntentContext(RobotEntity entity,
@@ -112,8 +116,13 @@ public class ConvertAiUtils {
             return RobotToolIntentContext.empty();
         }
 
-        RobotToolIntentResolver resolver = ApplicationContextHolder.getBean(RobotToolIntentResolver.class);
-        return resolver.resolve(entity != null ? entity.getOrgUid() : null, toolsSettings);
+        // 工具意图解析实现位于 enterprise/ai（企业版/平台版）；社区版无实现 bean 时降级为空上下文
+        try {
+            RobotToolIntentResolver resolver = ApplicationContextHolder.getBean(RobotToolIntentResolver.class);
+            return resolver.resolve(entity != null ? entity.getOrgUid() : null, toolsSettings);
+        } catch (Exception e) {
+            return RobotToolIntentContext.empty();
+        }
     }
 
     private static List<RobotToolConfig> safeToolConfigs(RobotToolsSettingsEntity toolsSettings) {

@@ -52,6 +52,7 @@ import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
+import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.role.RoleResponseSimple;
 import com.bytedesk.core.rbac.role.RoleRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -87,6 +88,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final TokenRestService tokenRestService;
 
     private final RoleRestService roleRestService;
 
@@ -233,7 +236,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         //
         MemberEntity saveMember = save(member);
         if (saveMember == null) {
-            throw new RuntimeException("Failed to save member.");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
         // 
         return convertToResponse(saveMember);
@@ -248,6 +251,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         //
         MemberEntity member = memberOptional.get();
+        // 权限收敛：编辑其他成员仅限组织管理员/超级管理员；普通成员仅能编辑自己的成员资料
+        enforceUpdatePermission(member, request);
         String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
         request.setCountry(normalizedCountry);
 
@@ -293,10 +298,47 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         //
         MemberEntity savedMember = save(member);
         if (savedMember == null) {
-            throw new RuntimeException("Failed to save member.");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
  
         return convertToResponse(savedMember);
+    }
+
+    /**
+     * 成员编辑权限收敛（与前端 MemberTable 按钮隐藏双层防护）：
+     * - 组织管理员/超级管理员可编辑任意成员；
+     * - 普通成员仅能编辑自己对应的成员资料，且角色/可登录平台/部门保持不变（防提权）。
+     */
+    private void enforceUpdatePermission(MemberEntity member, MemberRequest request) {
+        if (authService.isOrgAdminOrSuperUser()) {
+            return;
+        }
+        UserEntity currentUser = authService.getUser();
+        String targetUserUid = member.getUser() != null ? member.getUser().getUid() : null;
+        boolean isSelf = currentUser != null && StringUtils.hasText(targetUserUid)
+                && targetUserUid.equals(currentUser.getUid());
+        if (!isSelf) {
+            log.warn("Member update denied: only org admin can edit other members, currentUser={}, targetMemberUid={}",
+                    currentUser != null ? currentUser.getUid() : null, member.getUid());
+            throw new RuntimeException(I18Consts.I18N_MEMBER_UPDATE_ADMIN_OR_SELF_ONLY);
+        }
+        // 普通成员自编辑：忽略角色/可登录平台/部门变更，保持现有值（防提权）
+        request.setRoleUids(null);
+        request.setAllowedLoginPlatforms(null);
+        request.setDeptUid(member.getDeptUid());
+    }
+
+    /**
+     * 禁用/启用成员仅组织管理员/超级管理员可操作，普通成员不可禁用/启用任何人（包括自己）。
+     */
+    private void enforceOrgAdminOnly(String action) {
+        if (authService.isOrgAdminOrSuperUser()) {
+            return;
+        }
+        UserEntity currentUser = authService.getUser();
+        log.warn("Member {} denied: only org admin can perform this action, currentUser={}",
+                action, currentUser != null ? currentUser.getUid() : null);
+        throw new RuntimeException(I18Consts.I18N_MEMBER_DISABLE_ADMIN_ONLY);
     }
 
     private Set<String> normalizeRoleUids(Set<String> roleUids) {
@@ -386,7 +428,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         // 
         MemberEntity savedEntity = save(member);
         if (savedEntity == null) {
-            throw new RuntimeException("Failed to save member.");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -394,18 +436,24 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     @Transactional
     public MemberResponse forceLogout(MemberRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new RuntimeException("member uid is required");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_UID_REQUIRED);
         }
+        // 禁用成员仅组织管理员/超级管理员可操作
+        enforceOrgAdminOnly("forceLogout");
 
         MemberEntity member = findByUid(request.getUid())
             .orElseThrow(ResourceI18nExceptions::memberNotFound);
+        // 防止把超级管理员禁用后无法登录任何前端解禁，后端双层防护（前端已隐藏入口）
+        if (member.getUser() != null && Boolean.TRUE.equals(member.getUser().isSuperUser())) {
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SUPER_ADMIN_DISABLE_FORBIDDEN);
+        }
         member.setForceLogout(true);
         member.setForceLogoutReason(I18Consts.I18N_FORCE_LOGOUT_REASON);
         member.setForceLogoutAt(java.time.ZonedDateTime.now());
 
         MemberEntity savedEntity = save(member);
         if (savedEntity == null) {
-            throw new RuntimeException("Failed to save member.");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
 
         if (savedEntity.getUser() != null) {
@@ -415,6 +463,13 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
                     "MEMBER",
                     savedEntity.getUid(),
                     savedEntity.getForceLogoutReason());
+            // 撤销该用户在本组织下的所有 token：使 admin 等无实时消息通道的前端
+            // 也立即被踢出（REST 鉴权 401 + MQTT 重连被拒），登录入口由
+            // AuthService.formatResponse 的禁用拦截兜底
+            tokenRestService.revokeAllByUserUidAndOrgUid(
+                    savedEntity.getUser().getUid(),
+                    savedEntity.getOrgUid(),
+                    TokenRestService.REVOKE_REASON_MEMBER_FORCE_LOGOUT);
         }
 
         return convertToResponse(savedEntity);
@@ -423,8 +478,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     @Transactional
     public MemberResponse restoreLogin(MemberRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new RuntimeException("member uid is required");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_UID_REQUIRED);
         }
+        // 启用成员仅组织管理员/超级管理员可操作
+        enforceOrgAdminOnly("restoreLogin");
 
         MemberEntity member = findByUid(request.getUid())
             .orElseThrow(ResourceI18nExceptions::memberNotFound);
@@ -434,7 +491,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         MemberEntity savedEntity = save(member);
         if (savedEntity == null) {
-            throw new RuntimeException("Failed to save member.");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
         return convertToResponse(savedEntity);
     }
@@ -720,7 +777,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             // 保存成员
             MemberEntity saveMember = save(member);
             if (saveMember == null) {
-                throw new RuntimeException("Failed to save member.");
+                throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
             }
             
             return saveMember;
@@ -808,7 +865,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     @Transactional
     public void removeUserFromOrg(MemberRequest request) {
         if (request == null || !StringUtils.hasText(request.getUid())) {
-            throw new RuntimeException("member uid is required");
+            throw new RuntimeException(I18Consts.I18N_MEMBER_UID_REQUIRED);
         }
 
         Optional<MemberEntity> memberOptional = findByUid(request.getUid());

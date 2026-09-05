@@ -40,6 +40,7 @@ import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingModel;
 import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
+import com.bytedesk.ai.provider.zhipuai.ZhipuaiUrlUtils;
 import com.bytedesk.ai.provider.zhipuai.embedding.ZhipuaiEmbeddingModel;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.kbase.kbase.KbaseEntity;
@@ -196,8 +197,12 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
     }
 
     private EmbeddingModel buildZhipuaiEmbeddingModel(EmbeddingSettingsEntity settings) {
+        // z-ai-sdk 内部基于 Retrofit：baseUrl 必须以 "/" 结尾且包含 "/v4/" 版本段，
+        // 否则抛 "baseUrl must end in /" 或请求 404，这里统一规范化（自动补齐 /v4/）
+        String normalizedBaseUrl = ZhipuaiUrlUtils.normalizeBaseUrl(
+                resolveBaseUrl(settings, ZhipuaiUrlUtils.DEFAULT_ZHIPUAI_BASE_URL));
         return new ZhipuaiEmbeddingModel(
-            new ai.z.openapi.ZhipuAiClient.Builder(resolveBaseUrl(settings, "https://open.bigmodel.cn/api/paas"), resolveApiKey(settings)).build(),
+            new ai.z.openapi.ZhipuAiClient.Builder(normalizedBaseUrl, resolveApiKey(settings)).build(),
             resolveModel(settings, "embedding-2"),
             resolveModelDimensions(settings));
     }

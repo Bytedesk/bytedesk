@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        系统全局配置表（KV）：存储平台级运行时配置覆盖值（品牌外观 logo/标题/favicon、
+        隐私协议/用户协议链接等），优先级高于 bytedesk.custom.* 静态配置。
+
+        策略（双保护，参照 260823_add_wechat_work_contact_tables.xml）：
+        1. 全新环境（表不存在）：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+        3. 唯一索引 (config_key, org_uid) 幂等创建。
+
+        见 docs/plans/2026-09-04-system-global-config-plan.md
+    -->
+
+    <changeSet id="260904-create-system-config-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_system_config"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_core_system_config">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_system_config" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_system_config_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="config_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_value" type="TEXT"/>
+            <column name="value_type" type="VARCHAR(16)" defaultValue="STRING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_group" type="VARCHAR(32)"/>
+            <column name="display_name" type="VARCHAR(128)"/>
+            <column name="description" type="VARCHAR(512)"/>
+            <column name="visible" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- 唯一索引：config_key + org_uid（幂等） -->
+    <changeSet id="260904-add-system-config-unique-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_system_config"/>
+            <not>
+                <indexExists tableName="bytedesk_core_system_config" indexName="uk_system_config_key_org"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_system_config_key_org" tableName="bytedesk_core_system_config" unique="true">
+            <column name="config_key"/>
+            <column name="org_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

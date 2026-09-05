@@ -44,6 +44,7 @@ import org.springframework.core.retry.RetryTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.provider.moonshot.api.MoonshotApi.*;
 import com.bytedesk.ai.provider.moonshot.api.MoonshotApi.ChatCompletion.Choice;
@@ -55,6 +56,7 @@ import reactor.core.publisher.Mono;
 
 import static com.bytedesk.ai.provider.moonshot.api.MoonshotConstants.MOONSHOT_PROVIDER_NAME;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -123,9 +125,17 @@ public class MoonshotChatModel implements ChatModel {
 							toolCall.function().name(), toolCall.function().arguments()))
 					.toList();
 
+		// Kimi thinking models (e.g. kimi-k2) return "reasoning_content" in the
+		// message/delta. Expose it via AssistantMessage metadata so downstream
+		// ReasoningContentHelper can pick it up (same contract as ZhipuaiChatModel).
+		Map<String, Object> messageProperties = new HashMap<>(metadata);
+		if (StringUtils.hasText(choice.message().reasoningContent())) {
+			messageProperties.put("reasoningContent", choice.message().reasoningContent());
+		}
+
 		var assistantMessage = AssistantMessage.builder()
 			.content(choice.message().content())
-			.properties(metadata)
+			.properties(messageProperties)
 			.toolCalls(toolCalls)
 			.media(List.<Media>of())
 			.build();
@@ -385,7 +395,7 @@ public class MoonshotChatModel implements ChatModel {
 					}).toList();
 				}
 				return List.of(new ChatCompletionMessage(assistantMessage.getText(),
-						ChatCompletionMessage.Role.ASSISTANT, null, null, toolCalls));
+						ChatCompletionMessage.Role.ASSISTANT, null, null, toolCalls, null));
 			}
 			else if (message.getMessageType() == MessageType.TOOL) {
 				ToolResponseMessage toolMessage = (ToolResponseMessage) message;
@@ -395,7 +405,7 @@ public class MoonshotChatModel implements ChatModel {
 				return toolMessage.getResponses()
 					.stream()
 					.map(tr -> new ChatCompletionMessage(tr.responseData(), ChatCompletionMessage.Role.TOOL, tr.name(),
-							tr.id(), null))
+							tr.id(), null, null))
 					.toList();
 			}
 			else {

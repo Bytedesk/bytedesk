@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CustomerTools {
 
-    @Tool(description = "Update customer information. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "update_customer_info", description = "Update customer information. This tool returns structured data for AI tool invocation.")
     public String updateCustomerInfo(
             @ToolParam(description = "Customer id") Long id,
             @ToolParam(description = "Customer name") String name,

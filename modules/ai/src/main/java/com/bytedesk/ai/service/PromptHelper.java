@@ -67,8 +67,12 @@ public class PromptHelper {
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
+        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
+        // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
         Integer contextMsgCount = robot.getLlm().getContextMsgCount();
+        boolean memoryAdvisorEnabled = !Boolean.FALSE.equals(robot.getLlm().getMemoryEnabled());
         if (contextMsgCount != null && contextMsgCount > 0
+                && !memoryAdvisorEnabled
                 && messageProtobufQuery != null
                 && messageProtobufQuery.getThread() != null) {
             String threadTopic = messageProtobufQuery.getThread().getTopic();
@@ -115,8 +119,12 @@ public class PromptHelper {
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
+        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
+        // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
         Integer contextMsgCount = robot.getLlm().getContextMsgCount();
+        boolean memoryAdvisorEnabled = !Boolean.FALSE.equals(robot.getLlm().getMemoryEnabled());
         if (contextMsgCount != null && contextMsgCount > 0
+                && !memoryAdvisorEnabled
                 && messageProtobufQuery != null
                 && messageProtobufQuery.getThread() != null) {
             String threadTopic = messageProtobufQuery.getThread().getTopic();

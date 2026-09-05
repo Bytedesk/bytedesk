@@ -24,6 +24,7 @@ import com.bytedesk.core.action.ActionTypeEnum;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
+import com.bytedesk.core.exception.MemberForceLogoutException;
 import com.bytedesk.core.kaptcha.KaptchaRedisService;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.push.service.PushSendResult;
@@ -120,7 +121,7 @@ public class AuthController {
                     authRequest.getCountry(),
                         authRequest.getPlatform());
                 if (!userMatch) {
-                    return ResponseEntity.ok().body(JsonResult.error("用户名和手机号不匹配，请检查后重新输入", -3, false));
+                    return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_USERNAME_MOBILE_MISMATCH, -3, false));
                 }
             }
         }
@@ -138,7 +139,7 @@ public class AuthController {
                 log.debug("Using plain password authentication");
                 authentication = authService.authenticateWithPlainPassword(authRequest);
                 if (authentication == null) {
-                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT);
                 }
             } else if (StringUtils.hasText(authRequest.getPasswordHash())
                     && StringUtils.hasText(authRequest.getPasswordSalt())) {
@@ -146,10 +147,10 @@ public class AuthController {
                 log.debug("Using password hash authentication with AES decryption for user: {}", authRequest.getUsername());
                 authentication = authService.authenticateWithPasswordHash(authRequest);
                 if (authentication == null) {
-                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+                    return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT);
                 }
             } else {
-                return ResponseEntity.ok().body(JsonResult.error("Password or password hash is required", -1, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_PASSWORD_REQUIRED, -1, false));
             }
          
             // 登录成功，重置失败次数（性能测试模式跳过）
@@ -165,6 +166,10 @@ public class AuthController {
                 log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+            } catch (MemberForceLogoutException e) {
+                log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
+                // HTTP 200 + code 403：与登录错误约定一致，前端登录页内联展示并翻译 i18n key
+                return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
             
         } catch (Exception e) {
             // Always log stacktrace for troubleshooting; do not include raw credential fields
@@ -181,17 +186,20 @@ public class AuthController {
                                     || msg.contains("IllegalBlockSize")
                                     || msg.contains("Base64")
                                     || msg.contains("生成密钥失败")
+                                    || msg.contains(I18Consts.I18N_PASSWORD_DECRYPT_FAILED)
+                                    || msg.contains(I18Consts.I18N_PASSWORD_DECRYPT_KEY_INVALID)
+                                    || msg.contains(I18Consts.I18N_PASSWORD_KEY_GENERATE_FAILED)
                                     || msg.contains("解密失败")));
             if (looksLikeDecryptError) {
                 log.warn("Password decrypt failed: username={}, platform={}, channel={} (passwordHash present)",
                         authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel());
-                return ResponseEntity.ok().body(JsonResult.error("密码解密失败，请检查密码格式", -1, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_PASSWORD_DECRYPT_FAILED, -1, false));
             }
             // 性能测试模式下，避免额外的失败次数写入/锁定逻辑
             if (performanceTestingEnabled) {
-                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT, -1, false));
             }
-            return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), "用户名或密码错误");
+            return authLoginRetryHelper.handleLoginFailure(authRequest.getUsername(), I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT);
         }
     }
 
@@ -234,7 +242,7 @@ public class AuthController {
         // 手机号是否已经注册，如果没有，则自动注册
         if (!userService.existsByMobileAndPlatform(authRequest.getMobile(), authRequest.getCountry(), authRequest.getPlatform())) {
             if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
-                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -3, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_USER_NOT_REGISTERED, -3, false));
             }
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(CountryCodeUtils.buildMobileUsername(authRequest.getCountry(), authRequest.getMobile()));
@@ -274,6 +282,10 @@ public class AuthController {
             log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        } catch (MemberForceLogoutException e) {
+            log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
+            // HTTP 200 + code 403：与登录错误约定一致，前端登录页内联展示并翻译 i18n key
+            return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
         }
     }
 
@@ -309,7 +321,7 @@ public class AuthController {
         if (!userService.existsByEmailAndPlatform(authRequest.getEmail(),
                 authRequest.getPlatform())) {
             if (!Boolean.TRUE.equals(bytedeskProperties.getCustom().getAutoRegisterOnLogin())) {
-                return ResponseEntity.ok().body(JsonResult.error("用户未注册，请先通过店铺对接接口创建账号", -2, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_USER_NOT_REGISTERED, -2, false));
             }
             UserRequest userRequest = new UserRequest();
             userRequest.setUsername(authRequest.getEmail());
@@ -346,6 +358,10 @@ public class AuthController {
             log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        } catch (MemberForceLogoutException e) {
+            log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
+            // HTTP 200 + code 403：与登录错误约定一致，前端登录页内联展示并翻译 i18n key
+            return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
         }
     }
 
@@ -356,7 +372,7 @@ public class AuthController {
 
         boolean isValid = tokenRestService.validateAccessToken(authRequest.getAccessToken());
         if (!isValid) {
-            return ResponseEntity.ok(JsonResult.error("accessToken is invalid", -1, false));
+            return ResponseEntity.ok(JsonResult.error(I18Consts.I18N_AUTH_ACCESS_TOKEN_INVALID, -1, false));
         }
 
         // Extract subject (username) from the access token
@@ -373,6 +389,10 @@ public class AuthController {
             log.info("Login blocked by org maxMembers: orgUid={}, maxMembers={}, currentDistinctUsers={}", e.getOrgUid(), e.getMaxMembers(), e.getCurrentDistinctUsers());
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
+        } catch (MemberForceLogoutException e) {
+            log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
+            // HTTP 200 + code 403：与登录错误约定一致，前端登录页内联展示并翻译 i18n key
+            return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
         }
     }
 

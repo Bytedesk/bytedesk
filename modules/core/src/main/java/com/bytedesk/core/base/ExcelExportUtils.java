@@ -181,16 +181,44 @@ public final class ExcelExportUtils {
         if (!StringUtils.hasText(value)) {
             return value;
         }
-        if (!value.startsWith(I18Consts.I18N_PREFIX) && !value.startsWith("ROLE_")) {
-            return value;
-        }
-        // 逗号分隔的多个值（如角色列表 "ROLE_ADMIN, ROLE_USER"）逐个翻译后再拼接
+        // 逗号分隔的多个值（如角色列表 "ROLE_ADMIN, ROLE_USER"、反馈标签 "bubbles.x, bubbles.y"）
+        // 逐个翻译后再拼接，全部为不可翻译片段时保持原值
         if (value.contains(", ")) {
-            return Arrays.stream(value.split(", "))
+            String[] parts = value.split(", ");
+            boolean anyLocalizable = Arrays.stream(parts).anyMatch(ExcelExportUtils::isLocalizablePart);
+            if (!anyLocalizable) {
+                return value;
+            }
+            return Arrays.stream(parts)
                     .map(part -> localizeSingleValue(part, lang))
                     .collect(Collectors.joining(", "));
         }
-        return localizeSingleValue(value, lang);
+        if (isLocalizablePart(value)) {
+            return localizeSingleValue(value, lang);
+        }
+        return value;
+    }
+
+    /**
+     * 判断单个片段是否需要翻译：i18n./ROLE_ 前缀，或 i18n key 形态
+     * （前端提交的评价标签等直接存储 key，如 bubbles.robot.feedback.option.irrelevant）
+     */
+    private static boolean isLocalizablePart(String value) {
+        if (!StringUtils.hasText(value)) {
+            return false;
+        }
+        return value.startsWith(I18Consts.I18N_PREFIX) || value.startsWith("ROLE_") || isI18nKeyLike(value);
+    }
+
+    /**
+     * 判断是否为 i18n key 形态：小写字母开头的多段以点分隔（如 bubbles.robot.feedback.option.irrelevant）。
+     * 普通文本（含空格、中文、@ 等）不会匹配；误判的片段经 MessageSource 兜底也会原样返回
+     */
+    private static boolean isI18nKeyLike(String value) {
+        if (value == null || value.length() < 3) {
+            return false;
+        }
+        return value.matches("[a-z][a-z0-9]*(\\.[a-z0-9_-]+)+");
     }
 
     private static String localizeSingleValue(String value, String lang) {

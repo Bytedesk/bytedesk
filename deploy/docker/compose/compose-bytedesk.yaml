@@ -78,11 +78,14 @@ services:
       BYTEDESK_CUSTOM_LOGIN_GITHUB_ENABLE: "false"
       BYTEDESK_CUSTOM_DOC_URL_SHOW: "true"
       BYTEDESK_CUSTOM_DOC_URL: https://www.weiyuai.cn/docs/zh-CN/
+      # Show HelpDocButton in admin console; hidden unless explicitly enabled. 是否显示 admin 帮助文档按钮，默认不显示，明确开启才显示。
+      BYTEDESK_CUSTOM_HELP_DOC_BUTTON_ENABLED: "false"
       # Login page language: zh-CN / en-US / zh-TW. 登录页语言。
       BYTEDESK_CUSTOM_LANG: zh-CN
       # Custom default LLM prompt; leave empty to fall back to the built-in RobotConsts default. 自定义默认 LLM Prompt，留空时回退到内置默认值。
       BYTEDESK_CUSTOM_DEFAULT_LLM_PROMPT:
-      BYTEDESK_CUSTOM_ALLOW_REGISTER: "true"
+      # Show register button on login page; display-only toggle, does not block the register API. 是否显示登录页注册按钮，仅控制显隐。
+      BYTEDESK_CUSTOM_SHOW_REGISTER_BUTTON: "false"
       # Auto-register users when they log in with mobile/email and no account exists yet. 手机号或邮箱登录时若用户不存在则自动注册。
       BYTEDESK_CUSTOM_AUTO_REGISTER_ON_LOGIN: "true"
       BYTEDESK_CUSTOM_FORCE_VALIDATE_MOBILE: "true"
@@ -106,10 +109,12 @@ services:
       BYTEDESK_MEMBER_PASSWORD: ${BYTEDESK_MEMBER_PASSWORD}
       # ===============================
       # Performance Testing config
+      # 生产/客户部署必须保持 false：testing.enabled + disable-captcha 同为 true 时后端会跳过验证码校验（登录页输错验证码也能通过）
+      # 仅在使用 jmeter 压测时可临时改为 true
       # ===============================
-      BYTEDESK_TESTING_ENABLED: "true"
-      BYTEDESK_TESTING_DISABLE_CAPTCHA: "true"
-      BYTEDESK_TESTING_DISABLE_IP_FILTER: "true"
+      BYTEDESK_TESTING_ENABLED: "false"
+      BYTEDESK_TESTING_DISABLE_CAPTCHA: "false"
+      BYTEDESK_TESTING_DISABLE_IP_FILTER: "false"
       # IP whitelist for performance testing, comma-separated. 性能测试白名单 IP，逗号分隔。
       BYTEDESK_TESTING_IP_WHITELIST: 127.0.0.1,127.0.0.2
       # ===============================

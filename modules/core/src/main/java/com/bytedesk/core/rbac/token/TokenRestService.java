@@ -47,6 +47,13 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest, TokenResponse> {
 
+    /**
+     * 成员被禁用（forceLogout）时撤销 token 统一使用的撤销原因。
+     * AuthEntryPoint 依据该原因向前端返回明确的"账号已被管理员禁用"提示，
+     * 避免前端只能展示 "Full authentication is required..." 这类技术性报错。
+     */
+    public static final String REVOKE_REASON_MEMBER_FORCE_LOGOUT = "Member disabled (forceLogout)";
+
     private final TokenRepository tokenRepository;
 
     private final ModelMapper modelMapper;
@@ -343,6 +350,24 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
             entity.revoke(reason);
             save(entity);
         }
+    }
+
+    /**
+     * 批量撤销指定用户在指定组织下的所有有效 token。
+     * 成员被管理员禁用（forceLogout）时调用：使其在所有前端（admin/desktop/notebase/workflow 等）
+     * 的现有会话立即失效——REST 鉴权失败返回 401、MQTT 重连被拒。
+     */
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    @Transactional
+    public int revokeAllByUserUidAndOrgUid(String userUid, String orgUid, String reason) {
+        if (!StringUtils.hasText(userUid) || !StringUtils.hasText(orgUid)) {
+            return 0;
+        }
+        int revoked = tokenRepository.revokeAllByUserUidAndOrgUid(userUid, orgUid, reason);
+        if (revoked > 0) {
+            log.info("Revoked {} tokens for user {} in org {} (reason: {})", revoked, userUid, orgUid, reason);
+        }
+        return revoked;
     }
 
     /**

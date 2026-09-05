@@ -1,105 +1,56 @@
+/*
+ * @Author: jackning 270580156@qq.com
+ * @Date: 2026-09-03 12:00:00
+ * @LastEditors: jackning 270580156@qq.com
+ * @LastEditTime: 2026-09-03 12:00:00
+ * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
+ *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
+ *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
+ *  Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE 
+ *  contact: 270580156@qq.com 
+ * 
+ * Copyright (c) 2026 by bytedesk.com, All Rights Reserved. 
+ * 
+ */
 package com.bytedesk.ai.tool.utils;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.tool.ToolInvocationAuditService;
-import com.bytedesk.ai.tool.ToolRestService;
+/**
+ * 机器人工具回调解析 SPI（社区版接口 / 企业版实现）。
+ *
+ * <p>工具注册表（ToolEntity 治理）、本地 @Tool 回调、MCP 外部工具等能力已迁移至
+ * enterprise/ai 模块（企业版/平台版功能）。本接口保留在 modules/ai 中，
+ * 供 {@code BaseSpringAIService#applyRobotToolCallbacks} 在社区版下编译与运行：
+ * 社区版无实现 bean 时，机器人 LLM 对话不挂载工具回调，其余链路不受影响。</p>
+ *
+ * <p>企业版实现：{@code com.bytedesk.ai.tool.utils.RobotToolCallbackResolverImpl}
+ * （enterprise/ai 模块，bytedesk-enterprise-ai）。</p>
+ */
+public interface RobotToolCallbackResolver {
 
-import lombok.extern.slf4j.Slf4j;
+	/**
+	 * 根据机器人配置的工具名列表解析可用的 ToolCallback。
+	 *
+	 * @param requestedToolNames 机器人配置的工具名（可能包含未注册/已禁用的工具）
+	 * @return 解析出的工具回调列表；无可用工具时返回空列表
+	 */
+	List<ToolCallback> resolveToolCallbacks(List<String> requestedToolNames);
 
-@Slf4j
-@Service
-public class RobotToolCallbackResolver {
-
-    private final ToolRestService toolRestService;
-
-    private final ToolInvocationAuditService toolInvocationAuditService;
-
-    private final BytedeskLocalToolCallbackProvider localToolCallbackProvider;
-
-    private final ToolCallbackProvider builtinRobotToolCallbackProvider;
-
-    private final ToolCallbackProvider externalMcpToolCallbackProvider;
-
-    public RobotToolCallbackResolver(
-            ToolRestService toolRestService,
-            ToolInvocationAuditService toolInvocationAuditService,
-            BytedeskLocalToolCallbackProvider localToolCallbackProvider,
-            @Qualifier("builtinRobotToolCallbackProvider") ObjectProvider<ToolCallbackProvider> builtinRobotToolCallbackProvider,
-            @Qualifier("externalMcpToolCallbackProvider") ObjectProvider<ToolCallbackProvider> externalMcpToolCallbackProvider) {
-        this.toolRestService = toolRestService;
-        this.toolInvocationAuditService = toolInvocationAuditService;
-        this.localToolCallbackProvider = localToolCallbackProvider;
-        this.builtinRobotToolCallbackProvider = builtinRobotToolCallbackProvider.getIfAvailable();
-        this.externalMcpToolCallbackProvider = externalMcpToolCallbackProvider.getIfAvailable();
-    }
-
-    public List<ToolCallback> resolveToolCallbacks(List<String> requestedToolNames) {
-        if (requestedToolNames == null || requestedToolNames.isEmpty()) {
-            return List.of();
-        }
-
-        Map<String, ToolCallback> availableCallbacks = new LinkedHashMap<>();
-        addProviderCallbacks(builtinRobotToolCallbackProvider, availableCallbacks);
-        addCallbacks(localToolCallbackProvider.getToolCallbacks(), availableCallbacks);
-        addProviderCallbacks(externalMcpToolCallbackProvider, availableCallbacks);
-
-        List<ToolCallback> resolvedCallbacks = new ArrayList<>();
-        List<String> missingToolNames = new ArrayList<>();
-
-        for (String requestedToolName : requestedToolNames) {
-            if (!StringUtils.hasText(requestedToolName)) {
-                continue;
-            }
-
-            String normalizedToolName = requestedToolName.trim();
-            ToolCallback callback = availableCallbacks.get(normalizedToolName);
-            if (callback != null) {
-                if (!toolRestService.isRuntimeToolEnabled(normalizedToolName)) {
-                    log.info("Requested robot tool is disabled by registry: {}", normalizedToolName);
-                    missingToolNames.add(normalizedToolName);
-                    continue;
-                }
-                resolvedCallbacks.add(toolInvocationAuditService.wrap(callback));
-            } else {
-                missingToolNames.add(normalizedToolName);
-            }
-        }
-
-        if (!missingToolNames.isEmpty()) {
-            log.warn("Requested robot tools are not available: {}", missingToolNames);
-        }
-        return resolvedCallbacks;
-    }
-
-    private void addProviderCallbacks(ToolCallbackProvider provider, Map<String, ToolCallback> callbacks) {
-        if (provider == null) {
-            return;
-        }
-
-        addCallbacks(provider.getToolCallbacks(), callbacks);
-    }
-
-    private void addCallbacks(ToolCallback[] toolCallbacks, Map<String, ToolCallback> callbacks) {
-        if (toolCallbacks == null || toolCallbacks.length == 0) {
-            return;
-        }
-
-        for (ToolCallback callback : toolCallbacks) {
-            if (callback == null || callback.getToolDefinition() == null || !StringUtils.hasText(callback.getToolDefinition().name())) {
-                continue;
-            }
-            callbacks.putIfAbsent(callback.getToolDefinition().name(), callback);
-        }
-    }
+	/**
+	 * 解析工具回调并应用单轮请求工具调用次数上限（规划 G9）。
+	 *
+	 * <p>企业版实现会在同一请求的全部回调间共享一个计数器，超出上限的调用
+	 * 不再执行并返回终止提示；社区版/默认实现忽略上限，行为与
+	 * {@link #resolveToolCallbacks(List)} 一致。</p>
+	 *
+	 * @param requestedToolNames 机器人配置的工具名
+	 * @param maxToolInvocations 单轮请求内工具调用总次数上限；null 或 <=0 表示不限制
+	 * @return 解析出的工具回调列表；无可用工具时返回空列表
+	 */
+	default List<ToolCallback> resolveToolCallbacks(List<String> requestedToolNames, Integer maxToolInvocations) {
+		return resolveToolCallbacks(requestedToolNames);
+	}
 }

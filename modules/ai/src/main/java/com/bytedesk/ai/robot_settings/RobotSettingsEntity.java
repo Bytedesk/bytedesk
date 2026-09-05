@@ -5,7 +5,7 @@
  */
 package com.bytedesk.ai.robot_settings;
 
-import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
+import com.bytedesk.ai.robot_tool.RobotToolsSettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.kbase.settings_ratedown.RatedownSettingsEntity;
 

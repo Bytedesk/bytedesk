@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        加宽 bytedesk_ticket.description 列为大字段类型。
+
+        背景：
+        - 会话关闭自动建单（TicketAutoCreateService）生成的默认描述模板
+          （触发原因 + 会话信息 + 会话摘要）以及 AI 生成的工单描述均可能远超 255 字；
+        - 该列历史为 varchar(255)（实体未指定长度，ddl-auto 默认建列），
+          超长即触发 MySQL 1406 "Data too long for column 'description'"，
+          导致自动建单整个事务失败（供销云线上已复现）；
+        - 实体侧已同步改为 columnDefinition=TEXT（新库由 ddl-auto 直接创建 TEXT 列），
+          本迁移负责将存量库中的旧 varchar(255) 列加宽。
+
+        说明：
+        - newDataType=clob 由 Liquibase 按数据库自动映射方言类型：
+          MySQL/MariaDB -> LONGTEXT，PostgreSQL/Kingbase -> TEXT，H2/Oracle -> CLOB；
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体定义直接创建 TEXT 列，无需本迁移；
+        - 仅加宽类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="260905-1-widen-ticket-description-to-clob" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket" />
+            <columnExists tableName="bytedesk_ticket" columnName="description" />
+        </preConditions>
+        <comment>将 bytedesk_ticket.description 由 varchar(255) 加宽为大字段类型，修复自动建单描述超过 255 字时报 Data too long 导致建单失败的问题。</comment>
+        <modifyDataType tableName="bytedesk_ticket" columnName="description" newDataType="clob" />
+    </changeSet>
+
+</databaseChangeLog>

@@ -56,7 +56,6 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 import com.bytedesk.ai.robot.RobotLlm;
-import com.bytedesk.ai.tool_call.ToolCallRestService;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -103,8 +102,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected DashScopeToolService dashScopeToolService;
 
     protected ZhipuaiToolService zhipuaiToolService;
-
-    protected ToolCallRestService toolCallRestService;
 
     protected LlmProviderRestService llmProviderRestService;
 
@@ -158,7 +155,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
             ObjectProvider<RobotToolCallbackResolver> robotToolCallbackResolverProvider,
             ObjectProvider<DashScopeToolService> dashScopeToolServiceProvider,
             ObjectProvider<ZhipuaiToolService> zhipuaiToolServiceProvider,
-            ObjectProvider<ToolCallRestService> toolCallRestServiceProvider,
             ObjectProvider<LlmProviderRestService> llmProviderRestServiceProvider,
             ObjectProvider<ProviderToolServiceDispatcher> providerToolServiceDispatcherProvider,
             ObjectProvider<ReasoningContentHelper> reasoningContentHelperProvider,
@@ -185,7 +181,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         this.robotToolCallbackResolver = robotToolCallbackResolverProvider.getIfAvailable();
         this.dashScopeToolService = dashScopeToolServiceProvider.getIfAvailable();
         this.zhipuaiToolService = zhipuaiToolServiceProvider.getIfAvailable();
-        this.toolCallRestService = toolCallRestServiceProvider.getIfAvailable();
         this.llmProviderRestService = llmProviderRestServiceProvider.getIfAvailable();
         this.providerToolServiceDispatcher = providerToolServiceDispatcherProvider.getIfAvailable();
         this.reasoningContentHelper = reasoningContentHelperProvider.getIfAvailable();
@@ -255,7 +250,8 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return options;
         }
 
-        List<ToolCallback> toolCallbacks = robotToolCallbackResolver.resolveToolCallbacks(llm.getTools());
+        List<ToolCallback> toolCallbacks = robotToolCallbackResolver.resolveToolCallbacks(
+                llm.getTools(), llm.getMaxToolInvocations());
         if (toolCallbacks.isEmpty()) {
             return options;
         }
@@ -269,9 +265,46 @@ public abstract class BaseSpringAIService implements SpringAIService {
             builder.toolContext("model", llm.getTextModel());
         }
         if (StringUtils.hasText(llm.getToolChoice())) {
+            // 兼容保留：toolContext 供既有工具/审计读取
             builder.toolContext("toolChoice", llm.getToolChoice());
         }
-        return (T) builder.build();
+        if (llm.getMaxToolInvocations() != null && llm.getMaxToolInvocations() > 0) {
+            // 便于审计记录追溯本次请求的上限配置（实际拦截在 AuditedToolCallback 内）
+            builder.toolContext("maxToolInvocations", llm.getMaxToolInvocations());
+        }
+        T built = (T) builder.build();
+        applyProviderToolChoice(built, llm.getToolChoice());
+        return built;
+    }
+
+    /**
+     * 工具选择模式写入 provider 请求参数（规划 G8 修复）。
+     *
+     * <p>此前 toolChoice 只写入 toolContext（执行时传给工具的元数据），对模型请求无效；
+     * 现补充写入各 provider ChatOptions 的 toolChoice 字段，由 ChatModel 透传至 API
+     * （DashScope GenerationParam.toolChoice / zai toolChoice，取值 auto/none/required）。</p>
+     *
+     * <p>DeepSeekChatOptions（Spring AI 官方）暂无 toolChoice 字段，保持默认 auto 行为。</p>
+     */
+    private void applyProviderToolChoice(ToolCallingChatOptions options, String toolChoice) {
+        if (options == null || !StringUtils.hasText(toolChoice)) {
+            return;
+        }
+        String providerToolChoice = toProviderToolChoice(toolChoice);
+        if (options instanceof com.bytedesk.ai.provider.dashscope.chat.DashScopeChatOptions dashScopeOptions) {
+            dashScopeOptions.setToolChoice(providerToolChoice);
+        } else if (options instanceof com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiChatOptions zhipuaiOptions) {
+            zhipuaiOptions.setToolChoice(providerToolChoice);
+        }
+    }
+
+    /** AUTO/NONE/REQUIRED（ToolChoice 枚举名）→ provider 取值 auto/none/required。 */
+    private String toProviderToolChoice(String toolChoice) {
+        return switch (toolChoice.trim().toUpperCase()) {
+            case "NONE" -> "none";
+            case "REQUIRED" -> "required";
+            default -> "auto";
+        };
     }
 
     protected String extractReasoningContent(Generation generation, AssistantMessage assistantMessage) {

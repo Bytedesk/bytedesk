@@ -1,7 +1,0 @@
-package com.bytedesk.ai.mcp_client.enums;
-
-public enum McpTransportTypeEnum {
-    SSE,
-    STDIO,
-    STREAMABLE_HTTP
-}

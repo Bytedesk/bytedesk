@@ -14,34 +14,34 @@ public class UserTools extends BaseTools<UserRequest, UserResponse> {
         super("user", UserRequest.class, restService, objectMapper);
     }
 
-    @Tool(description = "Query user by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_query_by_uid", description = "Query user by uid. This tool returns structured data for AI tool invocation.")
     public Object userQueryByUid(
             @ToolParam(description = "uid") String uid,
             @ToolParam(description = "orgUid", required = false) String orgUid) {
         return doQueryByUid(uid, orgUid);
     }
 
-    @Tool(description = "Query user by org with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_query_by_org", description = "Query user by org with request json. This tool returns structured data for AI tool invocation.")
     public Object userQueryByOrg(@ToolParam(description = "UserRequest json") String requestJson) {
         return doQueryByOrg(requestJson);
     }
 
-    @Tool(description = "Query user by user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_query_by_user", description = "Query user by user with request json. This tool returns structured data for AI tool invocation.")
     public Object userQueryByUser(@ToolParam(description = "UserRequest json") String requestJson) {
         return doQueryByUser(requestJson);
     }
 
-    @Tool(description = "Create user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_create", description = "Create user with request json. This tool returns structured data for AI tool invocation.")
     public Object userCreate(@ToolParam(description = "UserRequest json") String requestJson) {
         return doCreate(requestJson);
     }
 
-    @Tool(description = "Update user with request json. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_update", description = "Update user with request json. This tool returns structured data for AI tool invocation.")
     public Object userUpdate(@ToolParam(description = "UserRequest json") String requestJson) {
         return doUpdate(requestJson);
     }
 
-    @Tool(description = "Delete user by uid. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "user_delete_by_uid", description = "Delete user by uid. This tool returns structured data for AI tool invocation.")
     public Object userDeleteByUid(@ToolParam(description = "uid") String uid) {
         return doDeleteByUid(uid);
     }

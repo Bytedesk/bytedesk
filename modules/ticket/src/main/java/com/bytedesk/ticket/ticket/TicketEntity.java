@@ -78,7 +78,11 @@ public class TicketEntity extends BaseEntity {
     /**
      * Detailed description of the ticket issue (optional)
      */
-    private String description;     // 工单描述(选填)
+    // 工单描述(选填)。使用 TEXT 类型：
+    // 自动建单的默认描述模板 + 会话摘要、AI 生成的描述均可能远超 255 字，
+    // varchar(255) 会触发 MySQL 1406 "Data too long for column 'description'" 导致建单失败
+    @Column(name = "description", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
+    private String description;
 
     // 联系称呼
     private String contactName;     // 联系称呼

@@ -26,7 +26,7 @@ Listed course START -->
 		<div class="row mb-4">
 			<div class="col-lg-8 mx-auto text-center">
 				<#include "./common/macro/i18n.ftl" />
-				<h2><@t key="section.suite.title">微语开源套件：N合一</@t></h2>
+				<h2><@t key="section.suite.title">做智能客服界的"张雪机车"</@t></h2>
 				<p class="mb-0"><@t key="section.suite.desc">开源、免费，私有部署，所有数据存储在您自己的服务器上</@t></p>
 			</div>
 		</div>

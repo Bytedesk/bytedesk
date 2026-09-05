@@ -16,7 +16,7 @@ package com.bytedesk.ai.robot;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
+import com.bytedesk.ai.robot_tool.RobotToolIntentContext;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.converter.StringListConverter;
@@ -256,6 +256,13 @@ public class RobotLlm {
 
     @Transient
     private RobotToolIntentContext toolIntentContext;
+
+    /**
+     * 单轮请求内工具调用总次数上限（规划 G9，非持久化，运行时由已发布 toolsSettings 填充）。
+     * null 或 <=0 表示不限制。
+     */
+    @Transient
+    private Integer maxToolInvocations;
 
     // ===== Spring AI Advisor 控制字段 =====
     // 注：敏感词不再按 robot 存储，统一复用 TabooService 数据库源（按 orgUid 隔离），

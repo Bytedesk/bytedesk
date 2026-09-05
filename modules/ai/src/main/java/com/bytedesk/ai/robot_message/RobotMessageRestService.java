@@ -288,6 +288,10 @@ public class RobotMessageRestService extends
         excel.setContent(entity.getContent());
         excel.setUser(entity.getUserProtobuf().getNickname());
         excel.setRobot(entity.getRobotProtobuf().getNickname());
+        // rateDownTagList(List) 与 rateDownTags(String) 名称不匹配，手动拼接
+        if (entity.getRateDownTagList() != null && !entity.getRateDownTagList().isEmpty()) {
+            excel.setRateDownTags(String.join(", ", entity.getRateDownTagList()));
+        }
         excel.setCreatedAt(BdDateUtils.formatDatetimeToString(entity.getCreatedAt()));
         return excel;
     }

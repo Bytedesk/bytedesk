@@ -111,4 +111,24 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
             """)
     int updateLastActiveAtIfDue(@Param("id") Long id, @Param("now") ZonedDateTime now,
             @Param("threshold") ZonedDateTime threshold);
+
+    /**
+     * 批量撤销指定用户在指定组织下所有未撤销的 token（成员被禁用时调用，
+     * 使其所有前端会话立即失效：REST 鉴权 401、MQTT 重连失败）。
+     * JPQL bulk update 绕过 @Version，这里为刻意为之。
+     */
+    @Transactional
+    @Modifying
+    @Query("""
+            update TokenEntity t
+                 set t.revoked = true,
+                     t.revokeReason = :reason
+             where t.userUid = :userUid
+                 and t.orgUid = :orgUid
+                 and t.revoked = false
+                 and t.deleted = false
+            """)
+    int revokeAllByUserUidAndOrgUid(@Param("userUid") String userUid,
+            @Param("orgUid") String orgUid,
+            @Param("reason") String reason);
 }

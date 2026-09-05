@@ -325,9 +325,13 @@ public class UserService {
         }
     }
 
-    // 管理员修改子成员用户密码, 无需验证旧密码
+    // 管理员修改子成员用户密码, 无需验证旧密码；普通成员仅能修改自己的密码
     @Transactional
     public UserResponse adminChangePassword(UserRequest request) {
+        // 收缩权限：非管理员仅能修改自己的密码（与 UserRestController @PreAuthorize 双层防护）
+        if (!authService.isOrgAdminOrSuperUser() && !authService.isSelfUserUid(request.getUid())) {
+            throw new RuntimeException(I18Consts.I18N_PERMISSION_UPDATE_DENIED);
+        }
         Optional<UserEntity> userOptional = findByUid(request.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();

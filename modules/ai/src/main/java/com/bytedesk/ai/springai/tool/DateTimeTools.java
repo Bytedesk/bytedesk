@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DateTimeTools {
 
-    @Tool(description = "Get the current date and time in the user's timezone")
+    @Tool(name = "get_current_date_time", description = "Get the current date and time in the user's timezone")
     public String getCurrentDateTime() {
         // 获取当前时区
         TimeZone timeZone = LocaleContextHolder.getTimeZone();
@@ -43,7 +43,7 @@ public class DateTimeTools {
         // return LocalDateTime.now().atZone(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }
 
-    @Tool(description = "Set a user alarm for the given time. This tool returns structured data for AI tool invocation.")
+    @Tool(name = "set_alarm", description = "Set a user alarm for the given time. This tool returns structured data for AI tool invocation.")
     public void setAlarm(@ToolParam(description = "Time in ISO-8601 format") String time) {
         if (time == null || time.isBlank()) {
             log.warn("setAlarm called with null or blank time, ignoring");
@@ -54,7 +54,7 @@ public class DateTimeTools {
     }
 
     // MethodToolCallback
-    @Tool(description = "Get the current date and time using MethodToolCallback")
+    @Tool(name = "get_current_date_time_method_tool_callback", description = "Get the current date and time using MethodToolCallback")
     public String getCurrentDateTimeMethodToolCallback() {
         return BdDateUtils.now().withZoneSameInstant(LocaleContextHolder.getTimeZone().toZoneId()).toString();
     }

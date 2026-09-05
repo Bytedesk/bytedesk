@@ -78,6 +78,12 @@ public class MoonshotStreamFunctionCallingHelper {
 		role = (role != null ? role : Role.ASSISTANT); // default to ASSISTANT (if null
 		String name = (current.name() != null ? current.name() : previous.name());
 		String toolCallId = (current.toolCallId() != null ? current.toolCallId() : previous.toolCallId());
+		// Concatenate streamed reasoning content fragments (Kimi thinking models).
+		String reasoningContent = null;
+		if (previous.reasoningContent() != null || current.reasoningContent() != null) {
+			reasoningContent = (previous.reasoningContent() != null ? previous.reasoningContent() : "")
+					+ (current.reasoningContent() != null ? current.reasoningContent() : "");
+		}
 
 		List<ToolCall> toolCalls = new ArrayList<>();
 		ToolCall lastPreviousTooCall = null;
@@ -107,7 +113,7 @@ public class MoonshotStreamFunctionCallingHelper {
 				toolCalls.add(lastPreviousTooCall);
 			}
 		}
-		return new ChatCompletionMessage(content, role, name, toolCallId, toolCalls);
+		return new ChatCompletionMessage(content, role, name, toolCallId, toolCalls, reasoningContent);
 	}
 
 	private ToolCall merge(ToolCall previous, ToolCall current) {

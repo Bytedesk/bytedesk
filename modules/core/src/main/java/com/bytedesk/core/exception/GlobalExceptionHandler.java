@@ -239,6 +239,15 @@ public class GlobalExceptionHandler {
                 .body(JsonResult.error(e.getMessage(), HttpStatus.CONFLICT.value()));
     }
 
+    @ExceptionHandler(MemberForceLogoutException.class)
+    public ResponseEntity<?> handleMemberForceLogoutException(MemberForceLogoutException e) {
+        // 成员被管理员禁用后尝试登录：返回 403，message 为 i18n key（前端翻译为“账号已被管理员禁用...”）
+        log.info("Member force logout login blocked: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value()));
+    }
+
     @ExceptionHandler(AgentCapacityExceededException.class)
     public ResponseEntity<?> handleAgentCapacityExceededException(AgentCapacityExceededException e) {
         String resolvedMessage = resolveRuntimeMessage(e.getMessage());

@@ -44,4 +44,8 @@
 
     <include file="db/changelog/migration/260829_widen_core_notification_content.xml" />
 
+    <include file="db/changelog/migration/260904_add_system_config_table.xml" />
+
+    <include file="db/changelog/migration/260905_widen_ticket_description.xml" />
+
 </databaseChangeLog>

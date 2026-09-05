@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.redis.RedisLoginRetryService;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -82,7 +83,7 @@ public class AuthLoginRetryHelper {
                 long minutes = remainingTime / 60;
                 long seconds = remainingTime % 60;
                 String timeStr = minutes > 0 ? minutes + "分" + seconds + "秒" : seconds + "秒";
-                return ResponseEntity.ok().body(JsonResult.error("账户已被锁定，请" + timeStr + "后重试", -1, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_RETRY_AFTER, timeStr), -1, false));
             } else {
                 // 锁定时间已过，解锁用户
                 redisLoginRetryService.unlockUser(username);
@@ -105,7 +106,7 @@ public class AuthLoginRetryHelper {
                 // 达到最大重试次数，锁定用户
                 if (config.lockTimeMinutes > 0) {
                     redisLoginRetryService.lockUser(username, config.lockTimeMinutes * 60L);
-                    return ResponseEntity.ok().body(JsonResult.error("密码错误次数过多，账户已被锁定" + config.lockTimeMinutes + "分钟", -1, false));
+                    return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_MINUTES, config.lockTimeMinutes), -1, false));
                 }
             }
         }
@@ -125,18 +126,18 @@ public class AuthLoginRetryHelper {
             int remainingAttempts = config.maxRetryCount - newFailedCount;
             
             if (remainingAttempts > 0) {
-                return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误，还可尝试" + remainingAttempts + "次", -1, false));
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_PASSWORD_ATTEMPTS_REMAINING, remainingAttempts), -1, false));
             } else {
                 // 达到最大重试次数，锁定用户
                 if (config.lockTimeMinutes > 0) {
                     redisLoginRetryService.lockUser(username, config.lockTimeMinutes * 60L);
-                    return ResponseEntity.ok().body(JsonResult.error("密码错误次数过多，账户已被锁定" + config.lockTimeMinutes + "分钟", -1, false));
+                    return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_MINUTES, config.lockTimeMinutes), -1, false));
                 } else {
-                    return ResponseEntity.ok().body(JsonResult.error("用户名或密码错误", -1, false));
+                    return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT, -1, false));
                 }
             }
         } else {
-            return ResponseEntity.ok().body(JsonResult.error(errorMessage != null ? errorMessage : "用户名或密码错误", -1, false));
+            return ResponseEntity.ok().body(JsonResult.error(errorMessage != null ? errorMessage : I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT, -1, false));
         }
     }
 

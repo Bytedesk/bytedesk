@@ -15,6 +15,7 @@ package com.bytedesk.core.rbac.auth;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.ChannelEnum;
+import com.bytedesk.core.exception.MemberForceLogoutException;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.token.TokenRequest;
 import com.bytedesk.core.rbac.token.TokenTypeEnum;
 import com.bytedesk.core.rbac.token.TokenEntity;
@@ -41,6 +44,7 @@ import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.PasswordCryptoUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +66,8 @@ public class AuthService {
     private final TokenRepository tokenRepository;
 
     private final OrganizationRepository organizationRepository;
+
+    private final MemberRepository memberRepository;
 
     private final UidUtils uidUtils;
 
@@ -103,6 +109,50 @@ public class AuthService {
         return getUser();
     }
 
+    /**
+     * 当前登录用户是否为组织管理员（ROLE_ADMIN）或超级管理员（superUser / ROLE_SUPER）。
+     * 用于成员管理等"仅管理员可操作他人"接口的收缩判断，与前端 access.canAdmin() 逻辑对齐。
+     * 注意：角色别名机制（UserConvertUtils.addRoleAliasAuthorities）会同时授予
+     * ROLE_ADMIN/ADMIN（以及 ROLE_SUPER/SUPER）两种形式，这里两种都识别。
+     */
+    public boolean isOrgAdminOrSuperUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return false;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetailsImpl userDetails
+                && Boolean.TRUE.equals(userDetails.getSuperUser())) {
+            return true;
+        }
+        for (GrantedAuthority authority : authentication.getAuthorities()) {
+            if (authority == null || !StringUtils.hasText(authority.getAuthority())) {
+                continue;
+            }
+            switch (authority.getAuthority()) {
+                case "ROLE_ADMIN":
+                case "ADMIN":
+                case "ROLE_SUPER":
+                case "SUPER":
+                    return true;
+                default:
+                    break;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断给定 userUid 是否为当前登录用户本人
+     */
+    public boolean isSelfUserUid(String userUid) {
+        if (!StringUtils.hasText(userUid)) {
+            return false;
+        }
+        UserEntity currentUser = getUser();
+        return currentUser != null && userUid.equals(currentUser.getUid());
+    }
+
     public UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request, String subject) {
 
         UserDetails userDetails = userDetailsService.loadUserByUsernameAndPlatform(subject);
@@ -135,6 +185,9 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        // 成员被管理员禁用后，拒绝登录（覆盖所有登录入口），确保禁用后无法登录任何前端
+        enforceMemberNotForceLogoutIfNeeded(userDetails);
 
         UserResponse userResponse = UserConvertUtils.convertToUserResponse(userDetails);
 
@@ -200,6 +253,39 @@ public class AuthService {
                 .accessToken(accessToken)
                 .user(userResponse)
                 .build();
+    }
+
+    /**
+     * 成员被管理员禁用（forceLogout）后禁止登录。
+     * - 超级管理员不受限制；
+     * - 仅检查当前组织的成员记录（禁用是组织级语义，不影响用户在其他组织的登录）；
+     * - 找不到成员记录时不拦截（如平台级用户未加入组织成员表）。
+     */
+    private void enforceMemberNotForceLogoutIfNeeded(UserDetailsImpl userDetails) {
+        if (userDetails == null) {
+            return;
+        }
+
+        // Super user should always be allowed to log in.
+        if (Boolean.TRUE.equals(userDetails.getSuperUser())) {
+            return;
+        }
+
+        final String orgUid = userDetails.getOrgUid();
+        final String userUid = userDetails.getUid();
+        if (!StringUtils.hasText(orgUid) || !StringUtils.hasText(userUid)) {
+            return;
+        }
+
+        memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(userUid, orgUid)
+                .filter(member -> Boolean.TRUE.equals(member.getForceLogout()))
+                .ifPresent(member -> {
+                    String reason = StringUtils.hasText(member.getForceLogoutReason())
+                            ? member.getForceLogoutReason()
+                            : I18Consts.I18N_FORCE_LOGOUT_REASON;
+                    log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", userUid, orgUid);
+                    throw new MemberForceLogoutException(userUid, orgUid, reason);
+                });
     }
 
     private void enforceOrganizationMaxMembersIfNeeded(UserDetailsImpl userDetails) {

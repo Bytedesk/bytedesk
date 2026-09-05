@@ -15,12 +15,13 @@ package com.bytedesk.ai.provider.zhipuai;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.bytedesk.ai.utils.AIFileUtils;
 
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -28,9 +29,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.llm_provider.LlmProviderEntity;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
+import com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiChatModel;
+import com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiChatOptions;
+import com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiContentParser;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.constant.I18Consts;
@@ -42,20 +47,12 @@ import ai.z.openapi.service.model.ChatCompletionResponse;
 import ai.z.openapi.service.model.ChatMessage;
 import ai.z.openapi.service.model.ChatMessageRole;
 import ai.z.openapi.service.model.ChatThinking;
-import ai.z.openapi.service.model.Delta;
-import ai.z.openapi.service.model.FileUrl;
-import ai.z.openapi.service.model.ImageUrl;
 import ai.z.openapi.service.model.MessageContent;
-import ai.z.openapi.service.model.ResponseFormat;
-import ai.z.openapi.service.model.VideoUrl;
 
+import io.micrometer.observation.ObservationRegistry;
 import lombok.extern.slf4j.Slf4j;
-import com.bytedesk.core.message.content.ImageContent;
 import com.bytedesk.core.message.content.RobotContent;
-import com.bytedesk.core.message.content.VideoContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
-import com.bytedesk.core.message.content.FileContent;
-import com.bytedesk.core.message.content.AudioContent;
 
 @Slf4j
 @Service
@@ -63,11 +60,15 @@ public class ZhipuaiService extends BaseSpringAIService {
 
     public ZhipuaiService(
             @Qualifier("zhipuAiClient") ObjectProvider<ZhipuAiClient> defaultClientProvider,
+            @Qualifier("bytedeskZhipuaiChatModel") ObjectProvider<ZhipuaiChatModel> defaultChatModelProvider,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider,
             LlmProviderRestService llmProviderRestService,
             TokenUsageHelper tokenUsageHelper) {
         this.llmProviderRestService = llmProviderRestService;
         this.tokenUsageHelper = tokenUsageHelper;
         this.defaultClient = defaultClientProvider.getIfAvailable();
+        this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
+        this.observationRegistryProvider = observationRegistryProvider;
     }
 
     private final LlmProviderRestService llmProviderRestService;
@@ -76,9 +77,14 @@ public class ZhipuaiService extends BaseSpringAIService {
 
     private final TokenUsageHelper tokenUsageHelper;
 
+    /** 全局回退 ChatModel Bean（ZhipuaiConfig#bytedeskZhipuaiChatModel），动态创建失败时回退。 */
+    private final ZhipuaiChatModel defaultChatModel;
+
+    /** 动态建 model 时传入的 ObservationRegistry（可选，产生 gen_ai_* 指标）。 */
+    private final ObjectProvider<ObservationRegistry> observationRegistryProvider;
+
     private static final String DEFAULT_MULTI_MODEL = "glm-4.1v-thinking-flash";
-    // zai-sdk 角色/思维模式常量
-    private static final String ZAI_ROLE_SYSTEM = "system";
+    // zai-sdk 思维模式常量（多模态同步直调路径使用）
     private static final String ZAI_THINKING_ENABLED = "enabled";
     private static final String ZAI_THINKING_DISABLED = "disabled";
 
@@ -124,231 +130,106 @@ public class ZhipuaiService extends BaseSpringAIService {
         }
     }
 
-    private List<ChatMessage> buildZaiMessagesFromPrompt(Prompt prompt) {
-        List<ChatMessage> messages = new ArrayList<>();
-        if (prompt == null || prompt.getInstructions() == null) {
-            return messages;
+    /**
+     * 根据机器人配置创建 Zhipuai chat options（含工具回调与思考模式）。
+     * 对齐 DashscopeService.createDashscopeOptions 模式；enableThinking 恒非 null
+     * （按 llm.thinking 显式 enabled/disabled，与旧直调路径行为一致）。
+     */
+    private ZhipuaiChatOptions createZhipuaiOptions(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
         }
-        // 通过 Spring AI Message 接口的 getMessageType() 统一分发，避免直接依赖 SystemMessage/UserMessage/AssistantMessage 子类
-        for (Message m : prompt.getInstructions()) {
-            MessageType type = m.getMessageType();
-            String text = m.getText();
-            if (type == MessageType.SYSTEM) {
-                messages.add(ChatMessage.builder()
-                        .role(ZAI_ROLE_SYSTEM)
-                        .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
-                        .build());
-            } else if (type == MessageType.USER) {
-                messages.add(ChatMessage.builder()
-                        .role(ChatMessageRole.USER.value())
-                        .content(buildUserContents(text))
-                        .build());
-            } else if (type == MessageType.ASSISTANT) {
-                // 将历史助手消息也带上，利于多轮
-                messages.add(ChatMessage.builder()
-                        .role(ChatMessageRole.ASSISTANT.value())
-                        .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
-                        .build());
-            } else {
-                // 兜底按系统文本处理（含 TOOL 等其它类型）
-                messages.add(ChatMessage.builder()
-                        .role(ZAI_ROLE_SYSTEM)
-                        .content(List.of(
-                                MessageContent.builder().type(ZAI_TEXT).text(text).build()))
-                        .build());
+        try {
+            return applyRobotToolCallbacks(ZhipuaiChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .maxTokens(llm.getMaxTokens())
+                    .topP(llm.getTopP())
+                    .enableThinking(Boolean.TRUE.equals(llm.getThinking()))
+                    .build(), llm);
+        } catch (Exception e) {
+            log.error("Error creating Zhipuai options for model {}", llm.getTextModel(), e);
+            return null;
+        }
+    }
+
+    /**
+     * 根据机器人配置动态创建 ZhipuaiChatModel（对齐 DashscopeService.createDashscopeChatModel 模式）。
+     * provider 缺失 / apiKey 缺失 / options 构建失败时回退 bytedeskZhipuaiChatModel Bean（全局配置）。
+     */
+    private ChatModel createZhipuaiChatModel(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getTextProviderUid())) {
+            log.warn("RobotLlm or textProviderUid is null, using default chat model");
+            return defaultChatModel;
+        }
+        var opt = llmProviderRestService.findByUid(llm.getTextProviderUid());
+        if (opt.isEmpty()) {
+            log.warn("LlmProvider with uid {} not found, using default chat model", llm.getTextProviderUid());
+            return defaultChatModel;
+        }
+        LlmProviderEntity provider = opt.get();
+        String apiKey = provider.getApiKey();
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            log.warn("API key is not configured for provider {}, using default chat model", provider.getUid());
+            return defaultChatModel;
+        }
+        try {
+            ZhipuaiChatOptions options = createZhipuaiOptions(llm);
+            if (options == null) {
+                log.warn("Failed to create Zhipuai options, using default chat model");
+                return defaultChatModel;
             }
+            log.info("Creating dynamic ZhipuaiChatModel with provider: {} ({})", provider.getType(), provider.getUid());
+            ZhipuAiClient client = ZhipuAiClient.builder().apiKey(apiKey).build();
+            ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+            if (observationRegistry != null) {
+                return new ZhipuaiChatModel(client, options, observationRegistry);
+            }
+            return new ZhipuaiChatModel(client, options);
+        } catch (Exception e) {
+            log.error("Failed to create dynamic ZhipuaiChatModel for provider {}, using default", provider.getUid(), e);
+            return defaultChatModel;
         }
-        return messages;
+    }
+
+    /**
+     * 多模态 enrich：媒体类型消息（IMAGE/VIDEO/FILE/AUDIO）时，将 Prompt 中最后一条用户消息文本
+     * 替换为原始内容 JSON，由 ZhipuaiChatModel.toMessages → ZhipuaiContentParser 解析多模态内容
+     * （等价旧 SSE 直调路径的「覆盖最新用户消息」逻辑）。非媒体消息原样返回。
+     */
+    private Prompt enrichPromptMedia(Prompt prompt, MessageProtobuf messageProtobufQuery) {
+        try {
+            if (prompt == null || messageProtobufQuery == null
+                    || !StringUtils.hasText(messageProtobufQuery.getContent())) {
+                return prompt;
+            }
+            MessageTypeEnum type = messageProtobufQuery.getType();
+            if (type != MessageTypeEnum.IMAGE && type != MessageTypeEnum.VIDEO
+                    && type != MessageTypeEnum.FILE && type != MessageTypeEnum.AUDIO) {
+                return prompt;
+            }
+            List<org.springframework.ai.chat.messages.Message> instructions = new ArrayList<>(
+                    prompt.getInstructions());
+            for (int i = instructions.size() - 1; i >= 0; i--) {
+                if (instructions.get(i) instanceof UserMessage) {
+                    instructions.set(i, new UserMessage(messageProtobufQuery.getContent()));
+                    return new Prompt(instructions, prompt.getOptions());
+                }
+            }
+        } catch (Exception e) {
+            log.debug("enrichPromptMedia failed, fallback to original prompt: {}", e.getMessage());
+        }
+        return prompt;
     }
 
     // 直接根据原始 MessageProtobuf（而不是通过 BD_MEDIA 标记）构建用户多模态内容
+    // 2026-09-04 Phase 5：委托 ZhipuaiContentParser（仅多模态同步直调路径使用）
     private List<MessageContent> buildUserContentsFromMessage(MessageProtobuf messageProtobufQuery) {
-        List<MessageContent> contents = new ArrayList<>();
-        if (messageProtobufQuery == null) {
-            return contents;
-        }
-        MessageTypeEnum type = messageProtobufQuery.getType();
-        String raw = messageProtobufQuery.getContent();
-        try {
-            if (type == MessageTypeEnum.IMAGE) {
-                ImageContent ic = ImageContent.fromJson(raw);
-                String url = ic != null ? ic.getUrl() : null;
-                if (url != null && !url.isEmpty()) {
-                    String toSend = url;
-                    if (AIFileUtils.isLocalLoopbackHttpUrl(url)) {
-                        try {
-                            String b64 = AIFileUtils.fetchHttpAsBase64(url, 8 * 1024 * 1024);
-                            if (b64 != null && !b64.isEmpty()) {
-                                toSend = b64;
-                                log.debug(
-                                        "Converted local image url to base64 (MessageProtobuf) for zai image_url: {} -> (base64)",
-                                        url);
-                            }
-                        } catch (Exception ce) {
-                            log.warn("Convert local image to base64 error (MessageProtobuf), fallback to url: {} - {}",
-                                    url, ce.getMessage());
-                        }
-                    }
-                    contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
-                            .imageUrl(ImageUrl.builder().url(toSend).build()).build());
-                    // 若有图片说明（label），追加一条文本消息
-                    if (ic != null && ic.getLabel() != null && !ic.getLabel().isEmpty()) {
-                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(ic.getLabel()).build());
-                    }
-                }
-            } else if (type == MessageTypeEnum.ROBOT_STREAM) {
-                // 仅提取历史机器人流式消息中的 answer 文本，避免把整段 JSON 作为文本传给模型
-                try {
-                    RobotContent rc = RobotContent.fromJson(raw, RobotContent.class);
-                    String answer = rc != null ? rc.getAnswer() : null;
-                    if (answer != null && !answer.isEmpty()) {
-                        contents.add(MessageContent.builder()
-                                .type(ZAI_TEXT)
-                                .text(stripThinkTags(answer))
-                                .build());
-                    }
-                } catch (Exception ignore) {
-                    // 忽略解析失败，保持不追加，避免发送原始 JSON
-                }
-            } else if (type == MessageTypeEnum.VIDEO) {
-                VideoContent vc = VideoContent.fromJson(raw);
-                String url = vc != null ? vc.getUrl() : null;
-                if (url != null && !url.isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
-                            .videoUrl(VideoUrl.builder().url(url).build()).build());
-                    // 若有视频说明（label），追加一条文本消息
-                    if (vc != null && vc.getLabel() != null && !vc.getLabel().isEmpty()) {
-                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(vc.getLabel()).build());
-                    }
-                }
-            } else if (type == MessageTypeEnum.FILE || type == MessageTypeEnum.AUDIO) {
-                // AUDIO 暂按 file_url 处理
-                String url = null;
-                FileContent fc = null;
-                AudioContent ac = null;
-                if (type == MessageTypeEnum.FILE) {
-                    fc = FileContent.fromJson(raw);
-                    url = fc != null ? fc.getUrl() : null;
-                } else {
-                    ac = AudioContent.fromJson(raw);
-                    url = ac != null ? ac.getUrl() : null;
-                }
-                if (url != null && !url.isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_FILE_URL)
-                            .fileUrl(FileUrl.builder().url(url).build()).build());
-                    // 若有文件/音频说明（label），追加一条文本消息
-                    if (fc != null && fc.getLabel() != null && !fc.getLabel().isEmpty()) {
-                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(fc.getLabel()).build());
-                    }
-                    if (ac != null && ac.getLabel() != null && !ac.getLabel().isEmpty()) {
-                        contents.add(MessageContent.builder().type(ZAI_TEXT).text(ac.getLabel()).build());
-                    }
-                }
-            } else {
-                // 其他类型按文本
-                contents.add(MessageContent.builder().type(ZAI_TEXT).text(raw != null ? raw : "").build());
-            }
-        } catch (Exception e) {
-            log.warn("buildUserContentsFromMessage parse failed, fallback to text: {}", e.getMessage());
-            contents.add(MessageContent.builder().type(ZAI_TEXT).text(raw != null ? raw : "").build());
-        }
-        return contents;
+        return ZhipuaiContentParser.contentsFromMessage(messageProtobufQuery);
     }
 
-    // 直接根据文本尝试解析媒体
-    // JSON（ImageContent/VideoContent/FileContent/AudioContent），否则退化为纯文本。
-    private List<MessageContent> buildUserContents(String text) {
-        List<MessageContent> contents = new ArrayList<>();
-        if (text == null) {
-            contents.add(MessageContent.builder().type(ZAI_TEXT).text("").build());
-            return contents;
-        }
-        String trimmed = text.trim();
-        // 尝试逐类解析标准 JSON
-        try {
-            ImageContent ic = ImageContent.fromJson(trimmed);
-            if (ic != null && ic.getUrl() != null && !ic.getUrl().isEmpty()) {
-                String url = ic.getUrl();
-                String toSend = url;
-                if (AIFileUtils.isLocalLoopbackHttpUrl(url)) {
-                    try {
-                        String b64 = AIFileUtils.fetchHttpAsBase64(url, 8 * 1024 * 1024);
-                        if (b64 != null && !b64.isEmpty()) {
-                            toSend = b64;
-                            log.debug("Converted local image url to base64 for zai image_url: {} -> (base64)", url);
-                        }
-                    } catch (Exception ce) {
-                        log.warn("Convert local image to base64 error, fallback to original url: {} - {}", url,
-                                ce.getMessage());
-                    }
-                }
-                contents.add(MessageContent.builder().type(ZAI_IMAGE_URL)
-                        .imageUrl(ImageUrl.builder().url(toSend).build()).build());
-                // 若有图片说明（label），追加一条文本消息
-                if (ic.getLabel() != null && !ic.getLabel().isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(ic.getLabel()).build());
-                }
-                return contents;
-            }
-        } catch (Exception ignore) {
-        }
-
-        try {
-            VideoContent vc = VideoContent.fromJson(trimmed);
-            if (vc != null && vc.getUrl() != null && !vc.getUrl().isEmpty()) {
-                contents.add(MessageContent.builder().type(ZAI_VIDEO_URL)
-                        .videoUrl(VideoUrl.builder().url(vc.getUrl()).build()).build());
-                // 若有视频说明（label），追加一条文本消息
-                if (vc.getLabel() != null && !vc.getLabel().isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(vc.getLabel()).build());
-                }
-                return contents;
-            }
-        } catch (Exception ignore) {
-        }
-
-        try {
-            FileContent fc = FileContent.fromJson(trimmed);
-            if (fc != null && fc.getUrl() != null && !fc.getUrl().isEmpty()) {
-                contents.add(MessageContent.builder().type(ZAI_FILE_URL)
-                        .fileUrl(FileUrl.builder().url(fc.getUrl()).build()).build());
-                // 若有文件说明（label），追加一条文本消息
-                if (fc.getLabel() != null && !fc.getLabel().isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(fc.getLabel()).build());
-                }
-                return contents;
-            }
-        } catch (Exception ignore) {
-        }
-
-        try {
-            AudioContent ac = AudioContent.fromJson(trimmed);
-            if (ac != null && ac.getUrl() != null && !ac.getUrl().isEmpty()) {
-                contents.add(MessageContent.builder().type(ZAI_FILE_URL)
-                        .fileUrl(FileUrl.builder().url(ac.getUrl()).build()).build());
-                // 若有音频说明（label），追加一条文本消息
-                if (ac.getLabel() != null && !ac.getLabel().isEmpty()) {
-                    contents.add(MessageContent.builder().type(ZAI_TEXT).text(ac.getLabel()).build());
-                }
-                return contents;
-            }
-        } catch (Exception ignore) {
-        }
-
-        // 以上均无法解析为媒体 JSON，则按纯文本
-        contents.add(MessageContent.builder().type(ZAI_TEXT).text(text).build());
-        return contents;
-    }
-
-    // zai-sdk 消息内容类型常量
-    private static final String ZAI_TEXT = "text";
-    private static final String ZAI_IMAGE_URL = "image_url";
-    private static final String ZAI_VIDEO_URL = "video_url";
-    private static final String ZAI_FILE_URL = "file_url";
-
-    // 保留：如需自定义解析辅助，可在此处添加
+        // 保留：如需自定义解析辅助，可在此处添加
+    // 2026-09-04 Phase 5：文本提取委托 ZhipuaiContentParser（仅多模态同步直调路径使用）
     private String extractFinalTextFromResponse(ChatCompletionResponse response) {
         try {
             if (response == null || response.getData() == null || response.getData().getChoices() == null
@@ -357,26 +238,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             }
             Object msgObj = response.getData().getChoices().get(0).getMessage();
             if (msgObj instanceof ChatMessage cm) {
-                Object contentObj = cm.getContent();
-                if (contentObj instanceof List<?>) {
-                    StringBuilder sb = new StringBuilder();
-                    for (Object o : (List<?>) contentObj) {
-                        if (o instanceof MessageContent mc) {
-                            if (ZAI_TEXT.equalsIgnoreCase(mc.getType()) && mc.getText() != null) {
-                                sb.append(mc.getText());
-                            }
-                        } else if (o != null) {
-                            sb.append(o.toString());
-                        }
-                    }
-                    String text = sb.toString();
-                    text = stripThinkTags(text);
-                    return text;
-                } else if (contentObj instanceof String s) {
-                    return stripThinkTags(s);
-                }
-                // 兜底
-                return cm.toString();
+                return stripThinkTags(ZhipuaiContentParser.extractTextFromContent(cm.getContent()));
             }
             return String.valueOf(msgObj);
         } catch (Exception e) {
@@ -385,42 +247,7 @@ public class ZhipuaiService extends BaseSpringAIService {
         }
     }
 
-    private String extractDeltaText(Delta delta) {
-        if (delta == null)
-            return null;
-        // 直接使用 zai-sdk Delta.getContent()（Lombok @Data 生成）。
-        // 过滤掉字符串 "null"（部分模型会在 reasoning-only chunk 下发字面量 null）。
-        String s = delta.getContent();
-        if (s == null || s.isEmpty()) {
-            return null;
-        }
-        String trimmed = s.trim();
-        if ("null".equalsIgnoreCase(trimmed)) {
-            log.debug("extractDeltaText: ignoring literal 'null' from getContent(), delta={}", delta);
-            return null;
-        }
-        return trimmed;
-    }
-
-    /**
-     * 直接使用 zai-sdk Delta.getReasoningContent()（Lombok @Data 生成，映射 reasoning_content 字段）。
-     * 返回非空的 reasoning 文本，否则返回 null。
-     */
-    private String extractDeltaReasoning(Delta delta) {
-        if (delta == null)
-            return null;
-        String r = delta.getReasoningContent();
-        if (r == null || r.isEmpty()) {
-            return null;
-        }
-        String trimmed = r.trim();
-        if ("null".equalsIgnoreCase(trimmed)) {
-            return null;
-        }
-        return trimmed;
-    }
-
-    // 统一移除 <think>...</think>
+    // 统一移除 <think>...</think>（委托 ZhipuaiContentParser，多模态同步路径与估算兑底使用）
     private String stripThinkTags(String text) {
         if (text == null)
             return null;
@@ -446,51 +273,60 @@ public class ZhipuaiService extends BaseSpringAIService {
 
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
+        // provider tool service 优先（意图识别 / 外部工具），命中则直接返回
         String toolServiceResponse = tryProcessPromptSyncWithProviderToolService(message, robot);
         if (StringUtils.hasText(toolServiceResponse)) {
             return toolServiceResponse;
         }
+        // 2026-09-04 Phase 5：回接 ChatClient 链路（多轮记忆/工具/Advisor）。
+        // 注意：旧实现此处硬编码 responseFormat=json_object，为意图识别残留，普通对话会被强制 JSON 输出，
+        // 与 DashScope 路径对齐后不再设置（意图识别 JSON 依赖提示词约束，与 DashScope 行为一致）。
+        ZhipuaiChatOptions customOptions = robot != null && robot.getLlm() != null
+                ? createZhipuaiOptions(robot.getLlm())
+                : null;
+        return processPromptSync(buildUserOnlyPrompt(message, customOptions), robot);
+    }
+
+    @Override
+    protected String processPromptSync(Prompt prompt, RobotProtobuf robot) {
+        long startTime = System.currentTimeMillis();
+        boolean success = false;
+        ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
+
+        RobotLlm llm = robot != null ? robot.getLlm() : null;
+        if (llm == null) {
+            log.info("Zhipuai API not available: robot.llm is null");
+            return "Zhipuai service is not available";
+        }
+        String modelType = getModel(robot);
 
         try {
-            String model = getModel(robot);
-            // 将文本包装为 Prompt -> zai 消息
-            List<ChatMessage> msgs = new ArrayList<>();
-            msgs.add(ChatMessage.builder()
-                    .role(ChatMessageRole.USER.value())
-                    .content(buildUserContents(message))
-                    .build());
-            ZhipuAiClient client = createDynamicClient(robot != null ? robot.getLlm() : null);
-            if (client == null) {
-                log.error("No available ZhipuAiClient for sync");
+            ChatModel chatModel = createZhipuaiChatModel(llm);
+            if (chatModel == null) {
+                log.error("Failed to create Zhipuai chat model and no default chat model available");
                 return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
             }
-            boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getThinking());
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    // https://docs.bigmodel.cn/cn/guide/capabilities/struct-output
-                    .responseFormat(ResponseFormat.builder().type("json_object").build())
-                    .messages(msgs)
-                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
-                            .build())
-                    .build();
-            long start = System.currentTimeMillis();
-            ChatCompletionResponse resp = client.chat().createChatCompletion(req);
-            boolean success = resp != null && resp.isSuccess();
-            String text = success ? extractFinalTextFromResponse(resp) : null;
-            if (text == null)
-                text = "";
-            text = stripThinkTags(text);
-            // 记录用量事件（粗略估算）
-            long promptTokens = estimateTokens(message);
-            long completionTokens = estimateTokens(text);
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model, promptTokens,
-                    completionTokens, success,
-                    System.currentTimeMillis() - start);
-            return text;
+            Prompt requestPrompt = prompt;
+            ZhipuaiChatOptions customOptions = createZhipuaiOptions(llm);
+            if (customOptions != null) {
+                requestPrompt = processPromptWithOptions(prompt, customOptions);
+            }
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
+            var response = invokePromptSync(chatClient, requestPrompt);
+            tokenUsage = tokenUsageHelper.extractTokenUsage(response);
+            success = true;
+            return stripThinkTags(promptHelper.extractTextFromResponse(response));
         } catch (Exception e) {
-            log.error("processPromptSync failed", e);
+            log.error("Zhipuai API sync error", e);
             return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+        } finally {
+            long responseTime = System.currentTimeMillis() - startTime;
+            // API 未返回 usage 时退回估算（保持旧路径行为）
+            long promptTokens = tokenUsage.getPromptTokens() > 0 ? tokenUsage.getPromptTokens()
+                    : estimateTokens(prompt != null ? prompt.getContents() : null);
+            long completionTokens = tokenUsage.getCompletionTokens();
+            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, modelType,
+                    promptTokens, completionTokens, success, responseTime);
         }
     }
 
@@ -568,141 +404,87 @@ public class ZhipuaiService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences,
             SseEmitter emitter) {
+        // provider tool service 优先
         if (tryProcessPromptSseWithProviderToolService(prompt, robot, messageProtobufQuery, messageProtobufReply,
                 sourceReferences, emitter)) {
             return;
         }
 
-        if (robot == null || robot.getLlm() == null) {
+        RobotLlm llm = robot != null ? robot.getLlm() : null;
+        if (llm == null) {
             sseMessageHelper.handleSseError(new IllegalArgumentException("robot or llm is null"), messageProtobufQuery,
                     messageProtobufReply, emitter);
             return;
         }
         String model = getModel(robot);
+
+        ChatModel chatModel = createZhipuaiChatModel(llm);
+        if (chatModel == null) {
+            sseMessageHelper.handleSseError(new IllegalStateException("No available Zhipuai chat model"),
+                    messageProtobufQuery, messageProtobufReply, emitter);
+            return;
+        }
+
         // 起始提示
         sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
                 I18Consts.I18N_THINKING);
         long start = System.currentTimeMillis();
         final StringBuilder finalAnswer = new StringBuilder();
-        // 如果模型在流式输出的是 RobotContent JSON，而不是纯文本，这里做缓冲，避免被二次包裹导致嵌套
-        // 仅按纯文本分片进行推送，RobotContent 的包装统一由 SseMessageHelper 负责
+        final boolean[] success = { false };
+        final ChatTokenUsage[] tokenUsage = { new ChatTokenUsage(0, 0, 0) };
+
         try {
-            List<ChatMessage> zaiMessages = buildZaiMessagesFromPrompt(prompt);
-            // 覆盖最新的用户消息为基于 MessageProtobuf 直接解析的多模态内容，避免 BD_MEDIA 标记往返
-            try {
-                List<MessageContent> directUserContents = buildUserContentsFromMessage(messageProtobufQuery);
-                if (directUserContents != null && !directUserContents.isEmpty()) {
-                    for (int i = zaiMessages.size() - 1; i >= 0; i--) {
-                        ChatMessage m = zaiMessages.get(i);
-                        if (ChatMessageRole.USER.value().equals(m.getRole())) {
-                            ChatMessage replaced = ChatMessage.builder()
-                                    .role(m.getRole())
-                                    .content(directUserContents)
-                                    .build();
-                            zaiMessages.set(i, replaced);
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception ig) {
-                log.debug("sse override user content failed: {}", ig.getMessage());
-            }
-            ZhipuAiClient client = createDynamicClient(robot.getLlm());
-            if (client == null) {
-                sseMessageHelper.handleSseError(new IllegalStateException("No available ZhipuAiClient"),
-                        messageProtobufQuery,
-                        messageProtobufReply, emitter);
-                return;
-            }
-            boolean enableThinking = robot != null && robot.getLlm() != null
-                    && Boolean.TRUE.equals(robot.getLlm().getThinking());
-            ChatCompletionCreateParams req = ChatCompletionCreateParams.builder()
-                    .model(model)
-                    .messages(zaiMessages)
-                    .stream(true)
-                    .thinking(ChatThinking.builder().type(enableThinking ? ZAI_THINKING_ENABLED : ZAI_THINKING_DISABLED)
-                            .build())
-                    .build();
-            log.info("zai stream request: model={}, enableThinking={}, messages={} ", model, enableThinking,
-                    zaiMessages.size());
-            ChatCompletionResponse response = client.chat().createChatCompletion(req);
-            if (response != null && response.isSuccess() && response.getFlowable() != null) {
-                response.getFlowable().subscribe(
-                        data -> {
-                            try {
-                                if (data.getChoices() != null && !data.getChoices().isEmpty()) {
-                                    Delta delta = data.getChoices().get(0).getDelta();
-                                    String piece = extractDeltaText(delta);
-                                    // 提取模型推理内容（reasoningContent），直接调用 SDK getter，不再反射
-                                    String reasoning = extractDeltaReasoning(delta);
-                                    if (piece != null) {
-                                        String pieceTrim = piece.trim();
-                                        if (pieceTrim.equalsIgnoreCase("null")) {
-                                            log.warn("SSE piece is literal 'null', delta={}, data={}", delta, data);
-                                            return;
-                                        }
-                                        if (!pieceTrim.isEmpty()) {
-                                            // 正常边流边发，由 SseMessageHelper 统一封装为 RobotContent
-                                            finalAnswer.append(pieceTrim);
-                                            sseMessageHelper.sendStreamMessage(
-                                                    messageProtobufQuery,
-                                                    messageProtobufReply,
-                                                    emitter,
-                                                    pieceTrim,
-                                                    reasoning,
-                                                    sourceReferences);
-                                        } else if (reasoning != null && !reasoning.isEmpty()) {
-                                            // 某些 thinking 模型会先只返回推理内容，此时也要把 reasonContent 推到前端。
-                                            sseMessageHelper.sendStreamMessage(
-                                                    messageProtobufQuery,
-                                                    messageProtobufReply,
-                                                    emitter,
-                                                    "",
-                                                    reasoning,
-                                                    sourceReferences);
-                                        } else {
-                                            log.debug("SSE piece is empty after trim, delta={}", delta);
-                                        }
-                                    } else if (reasoning != null && !reasoning.isEmpty()) {
-                                        sseMessageHelper.sendStreamMessage(
-                                                messageProtobufQuery,
-                                                messageProtobufReply,
-                                                emitter,
-                                                "",
-                                                reasoning,
+            // 多模态 enrich：媒体消息时替换最后一条用户消息为原始内容 JSON，
+            // 由 ZhipuaiChatModel.toMessages → ZhipuaiContentParser 解析（等价旧「覆盖用户消息」逻辑）
+            Prompt effectivePrompt = enrichPromptMedia(prompt, messageProtobufQuery);
+
+            var chatClient = createChatClient(chatModel, effectivePrompt, robot);
+            // SSE 异步跨线程，conversationId 显式传递（不走 ThreadLocal）
+            String conversationId = extractConversationId(messageProtobufQuery);
+            invokePromptStream(chatClient, effectivePrompt, conversationId).subscribe(
+                    response -> {
+                        try {
+                            if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {
+                                List<Generation> generations = response.getResults();
+                                for (Generation generation : generations) {
+                                    AssistantMessage assistantMessage = generation.getOutput();
+                                    String textContent = assistantMessage.getText();
+                                    // "null" 字面量守卫已下沉到 ChatModel.toGeneration（filterLiteralNull）
+                                    String reasonContent = extractReasoningContent(generation, assistantMessage);
+                                    if (StringUtils.hasText(textContent) || StringUtils.hasText(reasonContent)) {
+                                        finalAnswer.append(textContent != null ? textContent : "");
+                                        sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply,
+                                                emitter, textContent != null ? textContent : "", reasonContent,
                                                 sourceReferences);
-                                    } else {
-                                        log.debug("SSE piece is null, delta={}", delta);
                                     }
                                 }
-                            } catch (Exception ex) {
-                                log.error("SSE send piece error", ex);
+                                tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
+                                success[0] = true;
                             }
-                        },
-                        err -> {
-                            log.error("zai stream error", err);
-                            sseMessageHelper.handleSseError(err, messageProtobufQuery, messageProtobufReply, emitter);
-                        },
-                        () -> {
-                            // 结束时将累计文本移除 <think> 标签作为最终答案，用于用量估算
-                            String answer = stripThinkTags(finalAnswer.toString());
-                            long promptTokens = estimateTokens(prompt.getContents());
-                            long completionTokens = estimateTokens(answer);
-                            // 结束并持久化
-                            sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
-                                    promptTokens,
-                                    completionTokens, promptTokens + completionTokens, prompt,
-                                    LlmProviderConstants.ZHIPUAI, model);
-                            // 发布用量事件
-                            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model,
-                                    promptTokens,
-                                    completionTokens, true, System.currentTimeMillis() - start);
-                        });
-            } else {
-                sseMessageHelper.handleSseError(
-                        new RuntimeException(response != null ? response.getMsg() : "null response"),
-                        messageProtobufQuery, messageProtobufReply, emitter);
-            }
+                        } catch (Exception ex) {
+                            log.error("Zhipuai API SSE error 1: ", ex);
+                            sseMessageHelper.handleSseError(ex, messageProtobufQuery, messageProtobufReply, emitter);
+                            success[0] = false;
+                        }
+                    },
+                    err -> {
+                        log.error("Zhipuai API SSE error 2: ", err);
+                        sseMessageHelper.handleSseError(err, messageProtobufQuery, messageProtobufReply, emitter);
+                        success[0] = false;
+                    },
+                    () -> {
+                        // 流式 chunk 通常不带 usage：为 0 时按累计文本估算兜底（保持旧路径行为）
+                        long promptTokens = tokenUsage[0].getPromptTokens() > 0 ? tokenUsage[0].getPromptTokens()
+                                : estimateTokens(prompt != null ? prompt.getContents() : null);
+                        long completionTokens = tokenUsage[0].getCompletionTokens() > 0
+                                ? tokenUsage[0].getCompletionTokens()
+                                : estimateTokens(stripThinkTags(finalAnswer.toString()));
+                        sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
+                                promptTokens, completionTokens, promptTokens + completionTokens, prompt,
+                                LlmProviderConstants.ZHIPUAI, model);
+                        tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.ZHIPUAI, model,
+                                promptTokens, completionTokens, success[0], System.currentTimeMillis() - start);
+                    });
         } catch (Exception e) {
             log.error("processPromptSse failed", e);
             sseMessageHelper.handleSseError(e, messageProtobufQuery, messageProtobufReply, emitter);

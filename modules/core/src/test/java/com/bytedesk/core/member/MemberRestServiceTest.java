@@ -2,6 +2,9 @@ package com.bytedesk.core.member;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,7 +24,9 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRestService;
 import com.bytedesk.core.rbac.role.RoleRestService;
+import com.bytedesk.core.rbac.token.TokenRestService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserResponseSimple;
 import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
@@ -44,6 +49,9 @@ class MemberRestServiceTest {
 
     @Mock
     private AuthService authService;
+
+    @Mock
+    private TokenRestService tokenRestService;
 
     @Mock
     private RoleRestService roleRestService;
@@ -70,6 +78,7 @@ class MemberRestServiceTest {
                 modelMapper,
                 uidUtils,
                 authService,
+                tokenRestService,
                 roleRestService,
                 threadRestService,
                 departmentRestService,
@@ -187,5 +196,57 @@ class MemberRestServiceTest {
                 memberRestService.queryByUserUid(request);
 
                 verify(memberRepository).findByUser_UidAndOrgUidAndDeletedFalse("user-2", "org-current");
+        }
+
+        @Test
+        void forceLogoutRejectsSuperAdminMember() {
+                UserEntity superUser = new UserEntity();
+                superUser.setSuperUser(true);
+                MemberEntity member = MemberEntity.builder()
+                                .uid("member-super")
+                                .orgUid("org-1")
+                                .user(superUser)
+                                .build();
+
+                when(memberRepository.findByUid("member-super")).thenReturn(Optional.of(member));
+
+                RuntimeException exception = assertThrows(
+                                RuntimeException.class,
+                                () -> memberRestService.forceLogout(MemberRequest.builder().uid("member-super").build()));
+
+                assertThat(exception.getMessage()).isEqualTo("i18n.member.super.admin.disable.forbidden");
+        }
+
+        @Test
+        void forceLogoutRevokesAllTokensOfMemberUser() {
+                UserEntity memberUser = new UserEntity();
+                memberUser.setUid("user-1");
+                MemberEntity member = MemberEntity.builder()
+                                .uid("member-1")
+                                .orgUid("org-1")
+                                .user(memberUser)
+                                .build();
+
+                when(memberRepository.findByUid("member-1")).thenReturn(Optional.of(member));
+                // save 直接返回同一实体，模拟禁用落库成功
+                when(memberRepository.save(any(MemberEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+                // convertToResponse 依赖的两个映射
+                when(modelMapper.map(any(MemberEntity.class), eq(MemberResponse.class))).thenReturn(new MemberResponse());
+                when(modelMapper.map(any(UserEntity.class), eq(UserResponseSimple.class))).thenReturn(new UserResponseSimple());
+
+                memberRestService.forceLogout(MemberRequest.builder().uid("member-1").build());
+
+                verify(tokenRestService).revokeAllByUserUidAndOrgUid("user-1", "org-1", "Member disabled (forceLogout)");
+                verify(messageService).sendForceLogoutMessage(
+                                eq(memberUser), eq("org-1"), eq("MEMBER"), eq("member-1"), anyString());
+        }
+
+        @Test
+        void forceLogoutRequiresUid() {
+                RuntimeException exception = assertThrows(
+                                RuntimeException.class,
+                                () -> memberRestService.forceLogout(MemberRequest.builder().build()));
+
+                assertThat(exception.getMessage()).isEqualTo("i18n.member.uid.required");
         }
 }

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.bytedesk.ai.robot_settings.tools.RobotToolsSettingsEntity;
+import com.bytedesk.ai.robot_tool.RobotToolsSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.uid.UidUtils;

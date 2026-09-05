@@ -28,9 +28,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.robot_settings.tools.ResolvedRobotToolIntent;
-import com.bytedesk.ai.robot_settings.tools.RobotToolIntentContext;
-import com.bytedesk.ai.robot_settings.tools.ToolIntentMatchMode;
+import com.bytedesk.ai.robot_tool.ResolvedRobotToolIntent;
+import com.bytedesk.ai.robot_tool.RobotToolIntentContext;
+import com.bytedesk.ai.robot_tool.ToolIntentMatchMode;
 import com.bytedesk.ai.springai.service.ChatClientInfoService;
 
 import lombok.RequiredArgsConstructor;
@@ -463,9 +463,15 @@ public class IntentRecognitionHelper {
     }
 
     private static boolean isMathTool(String toolName) {
-        return StringUtils.hasText(toolName)
-                && List.of("add", "subtract", "multiply", "divide").stream()
-                        .anyMatch(expected -> expected.equalsIgnoreCase(toolName.trim()));
+        if (!StringUtils.hasText(toolName)) {
+            return false;
+        }
+        // 分隔符不敏感：兼容旧驼峰命名（add）与 snake_case（calculator_add）
+        String normalized = normalizeToolToken(toolName);
+        return List.of("add", "subtract", "multiply", "divide",
+                "calculatoradd", "calculatorsubtract", "calculatormultiply", "calculatordivide")
+                .stream()
+                .anyMatch(expected -> expected.equals(normalized));
     }
 
     static List<String> fallbackKeywords(String toolName) {
@@ -473,7 +479,9 @@ public class IntentRecognitionHelper {
             return List.of();
         }
 
-        String normalizedToolName = toolName.trim().toLowerCase(Locale.ROOT);
+        // 去除分隔符后小写，同时兼容 camelCase（getCurrentDateTime）与
+        // snake_case（get_current_date_time）两种命名风格
+        String normalizedToolName = normalizeToolToken(toolName);
         if (List.of("getcurrentdatetime", "getcurrentdatetimemethodtoolcallback")
                 .contains(normalizedToolName)) {
             return List.of("现在时间", "当前时间", "几点", "几号", "日期", "今天", "明天", "后天", "北京时间",
@@ -482,7 +490,8 @@ public class IntentRecognitionHelper {
         if ("setalarm".equals(normalizedToolName)) {
             return List.of("闹钟", "提醒", "定时", "alarm", "remind", "reminder", "wake me");
         }
-        if ("currentweather".equals(normalizedToolName)) {
+        if ("currentweather".equals(normalizedToolName)
+                || "getweather".equals(normalizedToolName)) {
             return List.of("天气", "温度", "下雨", "下雪", "晴", "阴", "多云", "weather", "forecast", "temperature",
                     "hot", "cold");
         }
@@ -495,5 +504,16 @@ public class IntentRecognitionHelper {
 
     private static boolean equalsIgnoreCase(String left, String right) {
         return left != null && left.equalsIgnoreCase(right);
+    }
+
+    /**
+     * 将工具名归一化为小写并去除分隔符，
+     * 兼容 camelCase / snake_case / 蛇形驼峰混合命名。
+     */
+    private static String normalizeToolToken(String value) {
+        if (!StringUtils.hasText(value)) {
+            return "";
+        }
+        return value.trim().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "");
     }
 }

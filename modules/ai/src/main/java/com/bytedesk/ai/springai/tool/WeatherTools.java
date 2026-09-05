@@ -37,7 +37,7 @@ public class WeatherTools {
 		this.weatherService = weatherService;
 	}
 
-	@Tool(description = "查询指定城市的当前天气情况。输入参数 city 为城市名称（中文或英文），"
+	@Tool(name = "get_weather", description = "查询指定城市的当前天气情况。输入参数 city 为城市名称（中文或英文），"
 			+ "返回该城市当前天气的一句话描述，包含天气状况和气温信息。")
 	public String getWeather(String city) {
 		log.info("[tool] getWeather called: city={}", city);

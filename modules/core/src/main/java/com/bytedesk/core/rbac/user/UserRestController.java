@@ -345,8 +345,8 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
-    // 管理员修改子成员用户密码
-    @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    // 管理员修改子成员用户密码；普通成员仅能修改自己的密码（均无需旧密码）
+    @PreAuthorize(RolePermissions.ROLE_ADMIN + " or @authService.isSelfUserUid(#userRequest.uid)")
     @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_CHANGE_PASSWORD, description = "changePassword")
     @PostMapping("/admin/change/password")
     public ResponseEntity<?> adminChangePassword(@RequestBody UserRequest userRequest) {
