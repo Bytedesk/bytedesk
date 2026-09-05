@@ -40,6 +40,8 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Service service;
     private Ai ai;
     private Call call;
+    /** 文件预览（Office 转 PDF）能力配置，供前端门控预览按钮显隐 */
+    private Preview preview;
 
     @Getter
     @Setter
@@ -99,10 +101,12 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean loginGoogleEnable = false;
         private Boolean docUrlShow = true;
         private String docUrl;
+        /** 是否显示 admin 管理后台帮助文档按钮（HelpDocButton），默认不显示，明确开启才显示 */
+        private Boolean helpDocButtonEnabled = false;
         // default lang: en-US, zh-CN, zh-TW
         private String lang = "zh-CN";
-        // 
-        private Boolean allowRegister;
+        /** 是否显示注册按钮（仅控制登录页注册入口显隐，不拦截注册接口） */
+        private Boolean showRegisterButton;
         private Boolean autoRegisterOnLogin;
         private Boolean forceValidateMobile;
         private Boolean forceValidateEmail;
@@ -110,6 +114,15 @@ public class BytedeskPropertiesResponse implements Serializable {
         private Boolean wechatMpSubscribePromptEnabled = false;
         private String wechatMpSubscribePromptAppId;
         private String defaultLlmPrompt;
+
+        /**
+         * 兼容旧前端构建产物读取 custom.allowRegister 字段（与 showRegisterButton 同值下发）。
+         * @deprecated 请使用 showRegisterButton
+         */
+        @Deprecated
+        public Boolean getAllowRegister() {
+            return showRegisterButton;
+        }
     }
 
     @Getter
@@ -148,6 +161,26 @@ public class BytedeskPropertiesResponse implements Serializable {
     @Setter
     public static class Service {
         private Boolean agentSeatEnabled = false;
+    }
+
+    /**
+     * 文件预览（Office 转 PDF）配置。
+     * 前端门控公式：license（企业/平台且有效） && preview.enabled && preview.available。
+     * fail-closed：字段缺失时前端应视为 false（不显示预览按钮）。
+     */
+    @Getter
+    @Setter
+    public static class Preview {
+        /** 是否启用 Office 转 PDF（bytedesk.preview.convert.enabled，默认 false） */
+        private Boolean enabled = false;
+        /** 转换模式 local / remote（bytedesk.preview.convert.mode，默认 local） */
+        private String mode = "local";
+        /**
+         * 转换能力是否可用：
+         * local 模式 → 探测到 LibreOffice 安装目录；
+         * remote 模式 → gotenberg remote-url 已配置
+         */
+        private Boolean available = false;
     }
 
     @Getter

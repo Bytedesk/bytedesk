@@ -17,7 +17,9 @@ import org.springframework.ai.chat.client.observation.ChatClientObservationConve
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.bytedesk.ai.springai.observability.BytedeskAiMetricsObservationHandler;
 import com.bytedesk.ai.springai.observability.CustomChatClientObservationConvention;
+import com.bytedesk.core.config.metrics.BytedeskMetrics;
 
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.aop.ObservedAspect;
@@ -47,5 +49,22 @@ public class ObservationConfig {
     @Bean
     public ChatClientObservationConvention chatClientObservationConvention() {
         return new CustomChatClientObservationConvention();
+    }
+
+    /**
+     * 将 ChatClient 观测事件桥接到 {@code bytedesk.ai.*} 业务指标
+     * （requests / errors / response time），否则这些计数器永远为 0，
+     * Grafana「AI 错误率」面板 No Data。
+     *
+     * <p><b>注意</b>：此处绝不能注入 {@link ObservationRegistry} 并手动调用
+     * {@code observationConfig().observationHandler(...)}——Boot 的
+     * {@code ObservationRegistryPostProcessor} 在创建 observationRegistry 时会收集
+     * 所有 {@code ObservationHandler} bean，若本 bean 又依赖 observationRegistry
+     * 会形成循环依赖导致启动失败。只需声明为 Bean，Boot 会自动注册到统一 Registry。</p>
+     */
+    @Bean
+    public BytedeskAiMetricsObservationHandler bytedeskAiMetricsObservationHandler(
+            BytedeskMetrics bytedeskMetrics) {
+        return new BytedeskAiMetricsObservationHandler(bytedeskMetrics);
     }
 }

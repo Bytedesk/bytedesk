@@ -76,6 +76,10 @@ public class BytedeskPropertiesController {
         bytedeskPropertiesResponse.getService().setAgentSeatEnabled(
             environment.getProperty("bytedesk.service.agent-seat-enabled", Boolean.class, false));
 
+        // 文件预览（Office 转 PDF）能力下发：enabled/mode/available，供三端前端门控预览按钮显隐。
+        // PreviewConvertProperties 位于 enterprise/core，modules/core 不依赖，故按 bndEnabled 同款 Environment 读取。
+        bytedeskPropertiesResponse.setPreview(buildPreviewConfig());
+
         // 仅下发服务端验签后的明文 license 摘要（edition/expiryDate/valid/userType 等），供前端门控直接读取，无需验签/解密。
         String licenseKey = BytedeskProperties.getInstance().getLicenseKey();
         if (StringUtils.hasText(licenseKey)) {
@@ -162,6 +166,57 @@ public class BytedeskPropertiesController {
             }
         }
         return result;
+    }
+
+    /**
+     * 组装文件预览（Office 转 PDF）能力配置。
+     * available 为静态探测，不做健康检查（运行期故障由转换失败降级兜底）：
+     * local 模式 → 常见 LibreOffice 安装目录存在即 true（不启动进程）；
+     * remote 模式 → remote-url 非空即 true。
+     */
+    private BytedeskPropertiesResponse.Preview buildPreviewConfig() {
+        BytedeskPropertiesResponse.Preview preview = new BytedeskPropertiesResponse.Preview();
+        preview.setEnabled(environment.getProperty("bytedesk.preview.convert.enabled", Boolean.class, false));
+        String mode = environment.getProperty("bytedesk.preview.convert.mode", String.class, "local");
+        preview.setMode(mode);
+        if ("remote".equalsIgnoreCase(mode)) {
+            String remoteUrl = environment.getProperty("bytedesk.preview.convert.remote-url", String.class, "");
+            preview.setAvailable(remoteUrl != null && !remoteUrl.isBlank());
+        } else {
+            preview.setAvailable(isLibreOfficeInstalled());
+        }
+        return preview;
+    }
+
+    /**
+     * 轻量探测 LibreOffice 是否安装（仅文件存在检查，不启动进程）。
+     * 探测顺序：bytedesk.preview.convert.office-home 显式配置 → 各平台常见安装路径。
+     */
+    private boolean isLibreOfficeInstalled() {
+        String officeHome = environment.getProperty("bytedesk.preview.convert.office-home", String.class, "");
+        if (officeHome != null && !officeHome.isBlank()) {
+            return java.nio.file.Files.exists(java.nio.file.Path.of(officeHome));
+        }
+        String os = System.getProperty("os.name", "").toLowerCase();
+        java.util.List<String> candidates = new java.util.ArrayList<>();
+        if (os.contains("mac") || os.contains("darwin")) {
+            candidates.add("/Applications/LibreOffice.app/Contents");
+        } else if (os.contains("win")) {
+            candidates.add("C:\\Program Files\\LibreOffice");
+            candidates.add("C:\\Program Files (x86)\\LibreOffice");
+        } else {
+            // Linux/容器
+            candidates.add("/usr/lib/libreoffice");
+            candidates.add("/opt/libreoffice");
+            candidates.add("/opt/libreoffice7.6");
+            candidates.add("/opt/libreoffice24.8");
+        }
+        for (String candidate : candidates) {
+            if (java.nio.file.Files.exists(java.nio.file.Path.of(candidate))) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

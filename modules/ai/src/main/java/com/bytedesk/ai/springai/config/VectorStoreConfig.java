@@ -7,6 +7,7 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStoreOptions;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -66,7 +67,8 @@ public class VectorStoreConfig {
     @Bean("elasticsearchVectorStore")
     @ConditionalOnProperty(prefix = "spring.ai.vectorstore.elasticsearch", name = "enabled", havingValue = "true", matchIfMissing = false)
     @ConditionalOnBean(EmbeddingModel.class)
-    public ElasticsearchVectorStore elasticsearchVectorStore(EmbeddingModel embeddingModel) {
+    public ElasticsearchVectorStore elasticsearchVectorStore(EmbeddingModel embeddingModel,
+            ObjectProvider<io.micrometer.observation.ObservationRegistry> observationRegistryProvider) {
         
         log.info("Configuring ElasticsearchVectorStore with index: {} and dimensions: {}", 
                 elasticsearchIndexName, elasticsearchDimensions);
@@ -88,13 +90,18 @@ public class VectorStoreConfig {
         
         Rest5Client rest5Client = createRest5Client();
 
-        ElasticsearchVectorStore vectorStore = ElasticsearchVectorStore.builder(rest5Client, embeddingModel)
+        var builder = ElasticsearchVectorStore.builder(rest5Client, embeddingModel)
                 .options(options)
                 // .metadataFields(kbUid, fileUid, enabled, startDate, endDate)
-                .initializeSchema(true)
-                .build();
-        
-        return vectorStore;
+                .initializeSchema(true);
+
+        // 注入统一 ObservationRegistry，产生 db_vector_client_operation_seconds 指标
+        io.micrometer.observation.ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+        if (observationRegistry != null) {
+            builder.observationRegistry(observationRegistry);
+        }
+
+        return builder.build();
     }
 
     private Rest5Client createRest5Client() {

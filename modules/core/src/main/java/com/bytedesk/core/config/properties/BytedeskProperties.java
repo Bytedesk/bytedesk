@@ -369,10 +369,12 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean loginGoogleEnable = false;
         private Boolean docUrlShow = true;
         private String docUrl;
+        // 是否显示 admin 管理后台帮助文档按钮（HelpDocButton），默认不显示，明确开启才显示
+        private Boolean helpDocButtonEnabled = false;
         // default lang: en-US, zh-CN, zh-TW
         private String lang = "zh-CN";
-        // 
-        private Boolean allowRegister = false;
+        // 是否显示注册按钮（仅控制登录页注册入口显隐，不拦截注册接口）
+        private Boolean showRegisterButton = false;
         // 手机/邮箱验证码登录时，未注册用户是否允许自动创建账号
         private Boolean autoRegisterOnLogin = true;
         private Boolean forceValidateMobile = false;
@@ -385,6 +387,16 @@ public class BytedeskProperties implements EnvironmentAware {
          * 自定义默认 LLM Prompt；为空时回退到代码内置默认值。
          */
         private String defaultLlmPrompt;
+
+        /**
+         * 兼容旧配置名 bytedesk.custom.allow-register（环境变量 BYTEDESK_CUSTOM_ALLOW_REGISTER），
+         * 绑定时映射到 showRegisterButton，避免升级后旧配置失效。
+         * @deprecated 请使用 bytedesk.custom.show-register-button
+         */
+        @Deprecated
+        public void setAllowRegister(Boolean allowRegister) {
+            this.showRegisterButton = allowRegister;
+        }
     }
 
     @Getter
