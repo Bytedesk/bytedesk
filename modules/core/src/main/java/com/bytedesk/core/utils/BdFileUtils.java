@@ -114,8 +114,8 @@ public class BdFileUtils {
 
         Files.walk(deletingPath)
                 .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+                .map(path -> path.toFile())
+                .forEach(file -> file.delete());
 
         log.debug("Deleted [{}] successfully", deletingPath);
     }

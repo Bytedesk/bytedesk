@@ -91,7 +91,7 @@ public class EmbeddingSettingsKbaseVectorStoreResolver implements KbaseVectorSto
             throw new IllegalStateException("spring.elasticsearch.uris is not configured");
         }
         var builder = Rest5Client.builder(Arrays.stream(StringUtils.commaDelimitedListToStringArray(uris))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(StringUtils::hasText)
                 .map(URI::create)
                 .toArray(URI[]::new));

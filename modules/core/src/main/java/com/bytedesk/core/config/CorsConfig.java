@@ -68,7 +68,7 @@ public class CorsConfig {
         }
 
         List<String> originPatterns = Arrays.stream(StringUtils.commaDelimitedListToStringArray(configuredOrigins))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(StringUtils::hasText)
                 .toList();
 

@@ -17,7 +17,7 @@ public enum ToolIntentMatchMode {
         return Arrays.stream(values())
                 .filter(mode -> mode.name().equalsIgnoreCase(normalized))
                 .findFirst()
-                .map(Enum::name)
+                .map(mode -> mode.name())
                 .orElse(KEYWORD.name());
     }
 }

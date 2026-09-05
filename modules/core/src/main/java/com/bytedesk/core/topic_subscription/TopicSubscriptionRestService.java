@@ -109,7 +109,7 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
             return Set.of();
         }
         return topic_subscriptionRepository.findByTopicAndDeletedFalse(topic).stream()
-                .map(TopicSubscriptionEntity::getUserUid)
+                .map(subscription -> subscription.getUserUid())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toSet());
     }
@@ -121,7 +121,7 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         }
         return topic_subscriptionRepository.findByUserUidAndDeletedFalse(userUid).stream()
                 .filter(this::isChatSubscription)
-                .map(TopicSubscriptionEntity::getTopic)
+                .map(subscription -> subscription.getTopic())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
@@ -451,7 +451,7 @@ public class TopicSubscriptionRestService extends BaseRestServiceWithExport<Topi
         List<TopicSubscriptionEntity> subscriptions = topic_subscriptionRepository.findByUserUidAndTopic(userUid, topic);
         return subscriptions.stream()
                 .filter(item -> isCompatibleType(item, type))
-                .sorted(Comparator.comparing(TopicSubscriptionEntity::isDeleted))
+                .sorted(Comparator.comparing(item -> item.isDeleted()))
                 .findFirst();
     }
 

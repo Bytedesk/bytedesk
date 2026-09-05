@@ -525,7 +525,7 @@ public class ButtonContent extends BaseContent {
         }
         
         return buttons.stream()
-            .map(ButtonContent::toMap)
+            .map(button -> button.toMap())
             .collect(Collectors.toList());
     }
     

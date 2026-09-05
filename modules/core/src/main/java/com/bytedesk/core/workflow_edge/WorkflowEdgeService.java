@@ -242,10 +242,10 @@ public class WorkflowEdgeService {
         List<WorkflowEdgeEntity> allEdges = findByWorkflow(workflow);
         
         long totalEdges = allEdges.size();
-        long enabledEdges = allEdges.stream().filter(WorkflowEdgeEntity::getEnabled).count();
-        long conditionalEdges = allEdges.stream().filter(WorkflowEdgeEntity::isConditionalEdge).count();
-        long controlEdges = allEdges.stream().filter(WorkflowEdgeEntity::isControlEdge).count();
-        long dataEdges = allEdges.stream().filter(WorkflowEdgeEntity::isDataEdge).count();
+        long enabledEdges = allEdges.stream().filter(edge -> Boolean.TRUE.equals(edge.getEnabled())).count();
+        long conditionalEdges = allEdges.stream().filter(edge -> edge.isConditionalEdge()).count();
+        long controlEdges = allEdges.stream().filter(edge -> edge.isControlEdge()).count();
+        long dataEdges = allEdges.stream().filter(edge -> edge.isDataEdge()).count();
         
         return WorkflowEdgeStats.builder()
                 .totalEdges(totalEdges)

@@ -57,7 +57,6 @@ import com.bytedesk.ticket.ticket_sla.TicketSlaStatusEnum;
 import com.bytedesk.ticket.ticket_sla.TicketSlaTypeEnum;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordEntity;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
-import com.bytedesk.ticket.ticket_sla_rule.TicketSlaRuleEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -692,7 +691,7 @@ public class TicketSLAService {
                     .active()
                     .list()
                     .stream()
-                    .map(Task::getId)
+                    .map(task -> task.getId())
                     .filter(StringUtils::hasText)
                     .collect(Collectors.toCollection(HashSet::new));
         } catch (Exception exception) {
@@ -748,7 +747,7 @@ public class TicketSLAService {
                             .filter(rule -> !StringUtils.hasText(rule.getPriority()) || rule.getPriority().equalsIgnoreCase(record.getPriority()))
                             .filter(rule -> !StringUtils.hasText(rule.getCategoryUid()) || rule.getCategoryUid().equals(record.getCategoryUid()))
                             .sorted(Comparator.comparing(rule -> rule.getOrderIndex() == null ? 0 : rule.getOrderIndex()))
-                            .map(TicketSlaRuleEntity::getWarningMinutes)
+                            .map(rule -> rule.getWarningMinutes())
                             .filter(minutes -> minutes != null && minutes > 0)
                             .findFirst();
                     if (ruleWarning.isPresent()) {
@@ -921,7 +920,7 @@ public class TicketSLAService {
                 .filter(rule -> !StringUtils.hasText(rule.getPriority()) || rule.getPriority().equalsIgnoreCase(ticket.getPriority()))
                 .filter(rule -> !StringUtils.hasText(rule.getCategoryUid()) || rule.getCategoryUid().equals(ticket.getCategoryUid()))
                 .sorted(Comparator.comparing(rule -> rule.getOrderIndex() == null ? 0 : rule.getOrderIndex()))
-                .map(TicketSlaRuleEntity::getDurationMinutes)
+                .map(rule -> rule.getDurationMinutes())
                 .filter(minutes -> minutes != null && minutes > 0)
                 .findFirst()
                 .orElse(resolveFallbackMinutes(slaType, ticket.getPriority()));
@@ -937,7 +936,7 @@ public class TicketSLAService {
         List<TicketSettingsEntity> defaults = ticketSettingsRepository
                 .findByOrgUidAndTypeAndIsDefaultTrue(ticket.getOrgUid(), ticket.getType());
         return defaults.stream()
-                .map(TicketSettingsEntity::getSlaSettings)
+                .map(settings -> settings.getSlaSettings())
                 .filter(java.util.Objects::nonNull)
                 .findFirst();
     }
@@ -996,7 +995,7 @@ public class TicketSLAService {
             }
         }
         return points.values().stream()
-                .sorted(Comparator.comparing(TicketSlaTypePoint::getSlaType))
+                .sorted(Comparator.comparing(point -> point.getSlaType()))
                 .collect(Collectors.toList());
     }
 

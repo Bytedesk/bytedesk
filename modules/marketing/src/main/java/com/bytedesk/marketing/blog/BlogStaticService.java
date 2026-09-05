@@ -126,7 +126,7 @@ public class BlogStaticService {
             boolean ok = file.delete();
             log.info("deleteBlogPostStatic {} => {}", file.getAbsolutePath(), ok);
         }
-        File[] languageDirectories = new File(root).listFiles(File::isDirectory);
+        File[] languageDirectories = new File(root).listFiles(dir -> dir.isDirectory());
         if (languageDirectories != null) {
             for (File languageDir : languageDirectories) {
                 File translatedFile = new File(languageDir, "post/" + blogUid + ".html");

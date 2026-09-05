@@ -162,7 +162,7 @@ public class SystemConfigRestService {
         }
 
         log.info("System config saved, keys: {}",
-                items.stream().map(SystemConfigRequest.SystemConfigItem::getKey)
+                items.stream().map(item -> item.getKey())
                         .collect(Collectors.joining(",")));
 
         return queryAll();

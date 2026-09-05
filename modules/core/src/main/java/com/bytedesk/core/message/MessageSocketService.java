@@ -129,7 +129,7 @@ public class MessageSocketService {
         Map<String, Set<String>> clientIdsByUserUid = connectionRestService.listActiveClientIdsByUserUid(subscriberUserUids);
 
         String subscriberDetails = subscriberUserUids.stream()
-                .sorted(Comparator.nullsLast(String::compareTo))
+                .sorted(Comparator.nullsLast((a, b) -> a.compareTo(b)))
                 .map(userUid -> {
                     Set<String> clientIds = clientIdsByUserUid.get(userUid);
                     String clientIdsStr = clientIds == null
@@ -139,7 +139,7 @@ public class MessageSocketService {
                 })
                 .collect(Collectors.joining(";"));
 
-        int activeClientCount = clientIdsByUserUid.values().stream().mapToInt(Set::size).sum();
+        int activeClientCount = clientIdsByUserUid.values().stream().mapToInt(clientIds -> clientIds.size()).sum();
         log.info("topicList size {} topic {} subscribers {} activeClients {}", subscriberUserUids.size(), topic, subscriberDetails,
                 activeClientCount);
 

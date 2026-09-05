@@ -24,10 +24,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
@@ -147,7 +145,7 @@ public class NotificationService {
             return false;
         }
         return user.getCurrentRoles().stream()
-                .map(RoleEntity::getName)
+                .map(role -> role.getName())
                 .anyMatch(ROLE_ADMIN::equals);
     }
 
@@ -174,7 +172,7 @@ public class NotificationService {
         return new LinkedHashSet<>(memberRepository.findAll().stream()
                 .filter(member -> !member.isDeleted())
                 .filter(member -> orgUid.equals(member.getOrgUid()))
-                .map(MemberEntity::getUser)
+                .map(member -> member.getUser())
                 .filter(java.util.Objects::nonNull)
                 .toList());
     }
@@ -182,7 +180,7 @@ public class NotificationService {
     private Set<UserEntity> resolveDepartmentRecipients(String deptUid) {
         Assert.hasText(deptUid, "Department UID cannot be empty when sending department notification");
         return new LinkedHashSet<>(memberRepository.findByDeptUidAndDeletedFalse(deptUid).stream()
-                .map(MemberEntity::getUser)
+                .map(member -> member.getUser())
                 .filter(java.util.Objects::nonNull)
                 .toList());
     }

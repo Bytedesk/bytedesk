@@ -148,7 +148,7 @@ public class HttapiController {
             if (welcomeResult != null && hasText(welcomeResult.welcomeAudioUrl())) {
                 x.execute("playback", normalizePlaybackUrl(welcomeResult.welcomeAudioUrl(), request));
             } else {
-                String resolvedGreetText = hasText(welcomeResult != null ? welcomeResult.welcomeText() : null)
+                String resolvedGreetText = welcomeResult != null && hasText(welcomeResult.welcomeText())
                         ? welcomeResult.welcomeText()
                         : greetText;
                 VoiceAgentHttpClient.VoiceAgentSpeakResult speakResult = voiceAgentHttpClient

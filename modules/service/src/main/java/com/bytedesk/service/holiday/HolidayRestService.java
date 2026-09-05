@@ -73,7 +73,7 @@ public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRe
         String resolvedCountryCode = StringUtils.hasText(countryCode) ? countryCode : "CN";
         return holidayRepository
             .findFirstByCountryCodeAndHolidayDateAndOffDayTrueAndDeletedFalse(resolvedCountryCode, holidayDate)
-            .map(HolidayEntity::getOfficial)
+            .map(holiday -> holiday.getOfficial())
             .orElse(false);
     }
 

@@ -133,7 +133,7 @@ public class ServiceTrigger {
             return false;
         }
         
-        return conditions.stream().allMatch(TriggerCondition::isValid);
+        return conditions.stream().allMatch(condition -> condition.isValid());
     }
 
     /**

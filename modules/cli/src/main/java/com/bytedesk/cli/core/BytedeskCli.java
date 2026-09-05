@@ -146,7 +146,7 @@ public class BytedeskCli {
 	}
 
 	private List<String> commandNames() {
-		return registry.all().stream().map(CliCommand::name).toList();
+		return registry.all().stream().map(command -> command.name()).toList();
 	}
 
 	private record ParsedInput(

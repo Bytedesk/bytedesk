@@ -88,10 +88,10 @@ class NotificationServiceTest {
         verify(notificationRepository, times(2)).save(notificationCaptor.capture());
         assertThat(response.getSentCount()).isEqualTo(2);
         assertThat(notificationCaptor.getAllValues())
-                .extracting(NotificationEntity::getUserUid)
+                .extracting(n -> n.getUserUid())
                 .containsExactlyInAnyOrder("user-a", "user-b");
         assertThat(notificationCaptor.getAllValues())
-                .extracting(NotificationEntity::getStatus)
+                .extracting(n -> n.getStatus())
                 .containsOnly(NotificationStatusEnum.UNREAD.name());
     }
 

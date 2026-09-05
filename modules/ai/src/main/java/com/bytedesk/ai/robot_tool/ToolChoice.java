@@ -27,7 +27,7 @@ public enum ToolChoice {
         return Arrays.stream(values())
                 .filter(choice -> choice.name().equalsIgnoreCase(normalized))
                 .findFirst()
-                .map(ToolChoice::providerValue)
+                .map(choice -> choice.providerValue())
                 .orElse(normalized);
     }
 }

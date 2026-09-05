@@ -116,21 +116,21 @@ public class MessageLeaveRestService extends
         
         // Extract thread UIDs from message leave entities
         List<String> threadUids = messageLeaveEntities.getContent().stream()
-                .map(MessageLeaveEntity::getThreadUid)
+                .map(e -> e.getThreadUid())
                 .filter(threadUid -> threadUid != null && !threadUid.isEmpty())
                 .collect(Collectors.toList());
         
         // Query threads by UIDs
         List<ThreadResponse> threadResponses = threadUids.stream()
                 .map(threadUid -> threadRestService.findByUid(threadUid))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .filter(opt -> opt.isPresent())
+                .map(opt -> opt.get())
                 .map(threadRestService::convertToResponse)
                 .collect(Collectors.toList());
         
         // Group by topic and keep only the latest one by createdAt
         List<ThreadResponse> mergedThreadResponses = threadResponses.stream()
-                .collect(Collectors.groupingBy(ThreadResponse::getTopic))
+                .collect(Collectors.groupingBy(thread -> thread.getTopic()))
                 .values()
                 .stream()
                 .map(threadList -> threadList.stream()

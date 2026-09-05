@@ -72,8 +72,11 @@ public class ChatMemoryJdbcDao {
         String productName = "";
         if (dataSource != null) {
             try {
+                // 显式 lambda 代替方法引用：方法引用的接收者 this 经方法描述符传入时
+                // 无法保证符合 @Nonnull DatabaseMetaData，触发空类型安全告警；
+                // lambda 参数则按接口声明按 @Nonnull 处理，无此问题
                 productName = org.springframework.jdbc.support.JdbcUtils
-                    .extractDatabaseMetaData(dataSource, java.sql.DatabaseMetaData::getDatabaseProductName);
+                    .extractDatabaseMetaData(dataSource, dbmd -> dbmd.getDatabaseProductName());
             } catch (Exception ex) {
                 log.warn("Failed to detect database product name, defaulting to double-quote for timestamp column", ex);
             }

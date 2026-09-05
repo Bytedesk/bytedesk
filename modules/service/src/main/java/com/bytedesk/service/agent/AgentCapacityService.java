@@ -84,7 +84,7 @@ public class AgentCapacityService {
         String today = LocalDate.now().format(ISO_DATE);
         String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
         Optional<QueueEntity> queueEntityOpt = queueService.findByTopicAndDay(queueTopic, today);
-        int currentChattingCount = queueEntityOpt.map(QueueEntity::getChattingCount).orElse(0);
+        int currentChattingCount = queueEntityOpt.map(q -> q.getChattingCount()).orElse(0);
         int maxThreadCount = agent.getMaxThreadCount();
         boolean hasCapacity = currentChattingCount < maxThreadCount;
         log.debug("Agent capacity check - agentUid: {}, current: {}, max: {}, hasCapacity: {}",

@@ -13,8 +13,6 @@
  */
 package com.bytedesk.core.converter;
 
-import com.google.common.base.Strings;
-
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
@@ -31,7 +29,7 @@ public class StringSetConverter implements AttributeConverter<Set<String>, Strin
         Iterator<String> iterator = set.iterator();  
         while(iterator.hasNext()){  
             String str = iterator.next();  
-            if(Strings.isNullOrEmpty(str)){  
+            if (str == null || str.isEmpty()) {  
                 iterator.remove();  // 正确
             }  
         }

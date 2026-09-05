@@ -79,7 +79,7 @@ class UserServiceTest {
                 .extracting(uor -> uor.getOrganization().getUid())
                 .containsExactly("org-b");
         assertThat(updated.getCurrentRoles())
-                .extracting(RoleEntity::getUid)
+                .extracting(r -> r.getUid())
                 .contains("role-b");
     }
 
@@ -131,7 +131,7 @@ class UserServiceTest {
                 .extracting(uor -> uor.getOrganization().getUid())
                 .containsExactly("org-b");
         assertThat(updated.getCurrentRoles())
-                .extracting(RoleEntity::getUid)
+                .extracting(r -> r.getUid())
                 .contains("role-user");
     }
 

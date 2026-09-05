@@ -62,9 +62,9 @@ public class GrayReleaseMetricsService {
             .findByFeatureAndTimestampBetween(feature.getCode(), start, end);
         
         long totalUsage = metrics.size();
-        long successCount = metrics.stream().filter(GrayReleaseMetrics::getSuccess).count();
+        long successCount = metrics.stream().filter(m -> Boolean.TRUE.equals(m.getSuccess())).count();
         long uniqueUsers = metrics.stream()
-            .map(GrayReleaseMetrics::getUserUid)
+            .map(m -> m.getUserUid())
             .distinct()
             .count();
         

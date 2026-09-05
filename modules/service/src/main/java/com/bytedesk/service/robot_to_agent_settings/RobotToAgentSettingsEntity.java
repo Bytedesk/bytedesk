@@ -145,7 +145,7 @@ public class RobotToAgentSettingsEntity extends BaseEntity {
         }
         List<String> sanitized = keywords.stream()
                 .filter(StringUtils::hasText)
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(s -> !s.isEmpty())
                 .distinct()
                 .collect(Collectors.toList());

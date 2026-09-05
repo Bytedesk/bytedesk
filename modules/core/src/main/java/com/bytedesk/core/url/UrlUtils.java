@@ -14,8 +14,11 @@
 package com.bytedesk.core.url;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnel;
 import com.google.common.hash.Funnels;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
@@ -25,14 +28,17 @@ public class UrlUtils {
 
     // 将长url转换为短url
     public static String to62url(String longUrl) {
+        Objects.requireNonNull(longUrl, "longUrl is required");
         //
         int size = 1000000;// 预计要插入多少数据
         double fpp = 0.001;// 期望的误判率
-        BloomFilter<Integer> bloomFilter = BloomFilter.create(Funnels.integerFunnel(), size, fpp);
+        Funnel<Integer> integerFunnel = Objects.requireNonNull(Funnels.integerFunnel(), "integerFunnel is required");
+        BloomFilter<Integer> bloomFilter = BloomFilter.create(integerFunnel, size, fpp);
         //
         // MurmurHash算法
         HashFunction function = Hashing.murmur3_32_fixed();
-        HashCode hashCode = function.hashString(longUrl, Charset.forName("utf-8"));
+        Charset utf8 = Objects.requireNonNull(StandardCharsets.UTF_8, "UTF-8 charset is required");
+        HashCode hashCode = function.hashString(longUrl, utf8);
         // i为长url的murmur值
         int i = Math.abs(hashCode.asInt());
         // 准备一个url在生成的murmur值重复时拼接字符串用
@@ -41,7 +47,7 @@ public class UrlUtils {
         boolean bo = bloomFilter.mightContain(i);
         while (bo) {
             newUrl += "ALREADY";
-            hashCode = function.hashString(newUrl, Charset.forName("utf-8"));
+            hashCode = function.hashString(newUrl, utf8);
             // 使用拼接过字符串的url重新生成murmur值
             i = Math.abs(hashCode.asInt());
             bo = bloomFilter.mightContain(i);

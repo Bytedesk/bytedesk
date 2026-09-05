@@ -652,7 +652,7 @@ public class TextVectorService {
 
     private VectorStore resolveStoreByUid(String uid) {
         return textRestService.findByUidNoCache(uid)
-                .map(TextEntity::getKbase)
+                .map(e -> e.getKbase())
                 .map(vectorStoreResolver::resolveByKbase)
                 .orElseGet(vectorStoreResolver::resolveDefault);
     }
@@ -740,7 +740,7 @@ public class TextVectorService {
         }
 
         List<String> docIds = existingDocs.stream()
-                .map(Document::getId)
+                .map(doc -> doc.getId())
                 .filter(StringUtils::hasText)
                 .toList();
         if (!docIds.isEmpty()) {

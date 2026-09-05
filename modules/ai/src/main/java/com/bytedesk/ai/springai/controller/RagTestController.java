@@ -644,7 +644,7 @@ public class RagTestController {
         List<Document> joinedDocuments = documentJoiner.join(documentsForQuery);
 
         return ResponseEntity.ok(JsonResult.success(Map.of(
-                "queries", queries.stream().map(Query::text).toList(),
+                "queries", queries.stream().map(query -> query.text()).toList(),
                 "queryCount", queries.size(),
                 "joinedDocuments", joinedDocuments,
                 "joinedDocumentCount", joinedDocuments.size())));

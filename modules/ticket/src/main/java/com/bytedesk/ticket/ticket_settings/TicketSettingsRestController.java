@@ -249,8 +249,8 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
                     (TicketCategoryItemResponse item) -> 
                         item.getOrderIndex() != null ? item.getOrderIndex() : Integer.MAX_VALUE)
                     .thenComparing(
-                        TicketCategoryItemResponse::getName, 
-                        java.util.Comparator.nullsLast(String::compareToIgnoreCase)))
+                        item -> item.getName(), 
+                        java.util.Comparator.nullsLast((a, b) -> a.compareToIgnoreCase(b))))
                 .map(item -> TicketCategoryVisitorItemResponse.builder()
                         .uid(item.getUid())
                         .name(item.getName())
@@ -264,7 +264,7 @@ public class TicketSettingsRestController extends BaseRestController<TicketSetti
         String effectiveDefaultUid = defaultAvailable
             ? configuredDefaultUid
             : items.stream().findFirst()
-                .map(TicketCategoryVisitorItemResponse::getUid)
+                .map(item -> item.getUid())
                 .orElse(null);
 
         return TicketCategoryVisitorResponse.builder()

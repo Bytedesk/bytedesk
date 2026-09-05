@@ -679,7 +679,7 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
 
         List<String> normalizedUids = relatedFaqUids.stream()
                 .filter(Objects::nonNull)
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(StringUtils::hasText)
                 .filter(uid -> !uid.equals(selfUid))
                 .distinct()

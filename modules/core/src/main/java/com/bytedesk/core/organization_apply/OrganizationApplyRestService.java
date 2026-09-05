@@ -280,7 +280,8 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
         }
 
         // 若申请人已有当前组织且与新组织不同，确保审批后不切换当前组织
-        if (StringUtils.hasText(originalCurrentOrgUid) && !originalCurrentOrgUid.equals(org.getUid())) {
+        if (originalCurrentOrgUid != null && StringUtils.hasText(originalCurrentOrgUid)
+                && !originalCurrentOrgUid.equals(org.getUid())) {
             UserEntity refreshedApplicant = userRepository.findByUid(applicant.getUid())
                     .orElseThrow(() -> new NotFoundException("User not found"));
             if (refreshedApplicant.getCurrentOrganization() == null
@@ -387,7 +388,7 @@ public class OrganizationApplyRestService extends BaseRestServiceWithExport<Orga
                 .filter(org -> org.getUser() != null
                         && StringUtils.hasText(org.getUser().getUid())
                         && org.getUser().getUid().equals(user.getUid()))
-                .map(OrganizationEntity::getUid)
+                .map(org -> org.getUid())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toList());
 

@@ -366,7 +366,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
 
             log.info("Before remove - group members size: {}, members: {}", 
                 group.getMembers().size(), 
-                group.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                group.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
 
             for (String memberUid : request.getMemberUids()) {
                 Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
@@ -390,7 +390,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
 
             log.info("After remove - group members size: {}, remaining members: {}", 
                 group.getMembers().size(),
-                group.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                group.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
             
             //
             GroupEntity saved = save(group);
@@ -399,7 +399,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
             }
             log.info("After save - group members size: {}, saved members: {}", 
                 saved.getMembers().size(),
-                saved.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                saved.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
             //
             return convertToResponse(saved);
         }
@@ -420,7 +420,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
 
             log.info("Before leave - group members size: {}, members: {}", 
                 group.getMembers().size(), 
-                group.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                group.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
 
             for (String memberUid : request.getMemberUids()) {
                 Optional<MemberEntity> memberOptional = memberRestService.findByUid(memberUid);
@@ -444,7 +444,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
 
             log.info("After leave - group members size: {}, remaining members: {}", 
                 group.getMembers().size(),
-                group.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                group.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
             
             //
             GroupEntity saved = save(group);
@@ -453,7 +453,7 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
             }
             log.info("After save - group members size: {}, saved members: {}", 
                 saved.getMembers().size(),
-                saved.getMembers().stream().map(MemberEntity::getUid).collect(Collectors.toList()));
+                saved.getMembers().stream().map(member -> member.getUid()).collect(Collectors.toList()));
             //
             return convertToResponse(saved);
         }

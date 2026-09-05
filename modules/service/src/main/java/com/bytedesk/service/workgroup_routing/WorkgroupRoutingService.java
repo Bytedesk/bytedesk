@@ -169,7 +169,7 @@ public class WorkgroupRoutingService {
                 .routingMode(routingMode)
                 .nextAgentUid(next == null ? state.getNextAgentUid() : next.getUid())
                 .nextAgent(next == null ? null : next.toUserProtobuf())
-                .availableAgents(availableAgents == null ? List.of() : availableAgents.stream().map(AgentEntity::toUserProtobuf).toList())
+                .availableAgents(availableAgents == null ? List.of() : availableAgents.stream().map(agent -> agent.toUserProtobuf()).toList())
                 .build();
     }
 
@@ -483,8 +483,8 @@ public class WorkgroupRoutingService {
                     Optional<QueueEntity> queueEntity1 = queueRestService.findByTopicAndDay(queueTopic1, today);
                     Optional<QueueEntity> queueEntity2 = queueRestService.findByTopicAndDay(queueTopic2, today);
 
-                    int count1 = queueEntity1.map(QueueEntity::getChattingCount).orElse(0);
-                    int count2 = queueEntity2.map(QueueEntity::getChattingCount).orElse(0);
+                    int count1 = queueEntity1.map(q -> q.getChattingCount()).orElse(0);
+                    int count2 = queueEntity2.map(q -> q.getChattingCount()).orElse(0);
 
                     return Integer.compare(count1, count2);
                 })
@@ -575,7 +575,7 @@ public class WorkgroupRoutingService {
         // 3. 工作负载权重
         String queueTopic = TopicUtils.getQueueTopicFromUid(agent.getUid());
         Optional<QueueEntity> queueEntity = queueRestService.findByTopicAndDay(queueTopic, today);
-        int currentLoad = queueEntity.map(QueueEntity::getChattingCount).orElse(0);
+        int currentLoad = queueEntity.map(q -> q.getChattingCount()).orElse(0);
         weight *= (1.0 / (currentLoad + 1));
 
         return weight;

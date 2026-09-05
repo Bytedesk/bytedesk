@@ -278,7 +278,7 @@ public class ProcessRestService
         if (!existingDeployments.isEmpty()) {
             // Deployment 已存在，仅更新 ProcessEntity 状态
             existingDeployments.sort(Comparator
-                    .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .comparing((Deployment deployment) -> deployment.getDeploymentTime(), Comparator.nullsLast(Comparator.naturalOrder()))
                     .reversed());
             Deployment latestDeployment = existingDeployments.get(0);
             markProcessAsDeployed(processUid, latestDeployment.getId());
@@ -443,7 +443,7 @@ public class ProcessRestService
 
             if (!existingDeployments.isEmpty()) {
                 existingDeployments.sort(Comparator
-                        .comparing(Deployment::getDeploymentTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .comparing((Deployment deployment) -> deployment.getDeploymentTime(), Comparator.nullsLast(Comparator.naturalOrder()))
                         .reversed());
                 Deployment latestDeployment = existingDeployments.get(0);
                 markProcessAsDeployed(processUid, latestDeployment.getId());
@@ -510,7 +510,7 @@ public class ProcessRestService
 
         // 收集所有部署ID
         Set<String> deploymentIds = deployedProcesses.stream()
-                .map(ProcessEntity::getDeploymentId)
+                .map(process -> process.getDeploymentId())
                 .filter(id -> id != null)
                 .collect(Collectors.toSet());
 
@@ -615,13 +615,13 @@ public class ProcessRestService
         String processUid = StringUtils.hasText(request.getUid()) ? request.getUid() : null;
         String type = StringUtils.hasText(request.getType())
                 ? request.getType()
-                : optional.map(ProcessEntity::getType).orElse(ProcessTypeEnum.TICKET_INTERNAL.name());
+                : optional.map(process -> process.getType()).orElse(ProcessTypeEnum.TICKET_INTERNAL.name());
         String bpmnXml = StringUtils.hasText(request.getSchema())
                 ? request.getSchema()
-                : optional.map(ProcessEntity::getSchema).orElse(null);
+                : optional.map(process -> process.getSchema()).orElse(null);
         String flowgramSchema = StringUtils.hasText(request.getFlowgramSchema())
                 ? request.getFlowgramSchema()
-                : optional.map(ProcessEntity::getFlowgramSchema).orElse(null);
+                : optional.map(process -> process.getFlowgramSchema()).orElse(null);
 
         List<ProcessValidationIssueResponse> errors = new ArrayList<>();
         List<ProcessValidationIssueResponse> warnings = new ArrayList<>();
@@ -677,7 +677,7 @@ public class ProcessRestService
                 .build());
         if (validation.getErrors() != null && !validation.getErrors().isEmpty()) {
             String message = validation.getErrors().stream()
-                    .map(ProcessValidationIssueResponse::getMessage)
+                    .map(issue -> issue.getMessage())
                     .collect(Collectors.joining("; "));
             throw new RuntimeException("流程校验失败: " + message);
         }

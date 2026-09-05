@@ -132,7 +132,7 @@ public class RagQueryRewriteHelper {
             Query transformed = buildRewriteTransformer().transform(new Query(query));
             String rewritten = transformed != null ? transformed.text() : null;
             long latency = System.currentTimeMillis() - start;
-            if (StringUtils.hasText(rewritten) && !rewritten.equals(query)) {
+            if (rewritten != null && StringUtils.hasText(rewritten) && !rewritten.equals(query)) {
                 log.info("RAG rewrite query: '{}' -> '{}'", query, rewritten);
                 RagRewriteService.record(robot, threadTopic, messageUid,
                         query, RagRewriteTypeEnum.REWRITE, RagRewriteStatusEnum.SUCCESS,

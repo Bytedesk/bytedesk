@@ -515,7 +515,8 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
         for (String configuredReason : statusSettings.getRestReasons()) {
             String normalizedReason = configuredReason == null ? null : configuredReason.strip();
-            if (StringUtils.hasText(normalizedReason) && normalizedReason.equals(requestedReason)) {
+            if (normalizedReason != null && StringUtils.hasText(normalizedReason)
+                    && normalizedReason.equals(requestedReason)) {
                 return normalizedReason;
             }
         }

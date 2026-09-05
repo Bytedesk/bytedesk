@@ -267,7 +267,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         }
         try {
             String resolved = userRepository.findByUidWithOrganizations(userUid)
-                    .map(UserEntity::getCurrentOrganization)
+                    .map(user -> user.getCurrentOrganization())
                     .map(o -> o.getUid())
                     .orElse(null);
             if (StringUtils.hasText(resolved) && cache != null) {

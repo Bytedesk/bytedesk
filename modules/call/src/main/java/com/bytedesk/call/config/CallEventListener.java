@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.call.call_settings.CallSettingsEntity;
 import com.bytedesk.call.call_settings.CallSettingsRepository;
 import com.bytedesk.call.esl.EslEventNames;
 import com.bytedesk.call.esl.client.inbound.IEslEventListener;
@@ -338,9 +337,9 @@ public class CallEventListener implements IEslEventListener {
         candidates.add("sip:" + normalizedCallerNumber + "@" + CallConstants.DIRECTORY_DOMAIN_DEFAULT);
 
         return callSettingsRepository.findAllByTargetInAndEnabledTrueAndDeletedFalse(candidates).stream()
-                .map(CallSettingsEntity::getOrgUid)
+                .map(e -> e.getOrgUid())
                 .filter(StringUtils::hasText)
-                .map(String::trim)
+                .map(s -> s.trim())
                 .findFirst()
                 .orElse(null);
     }

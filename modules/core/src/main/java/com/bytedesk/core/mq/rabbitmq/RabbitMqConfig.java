@@ -106,7 +106,7 @@ public class RabbitMqConfig {
         List<String> normalizedNodes = rabbitMqClusterProperties.getNodes()
                 .stream()
                 .filter(StringUtils::hasText)
-                .map(String::trim)
+                .map(s -> s.trim())
                 .map(node -> node.startsWith("amqp://") ? node.substring("amqp://".length()) : node)
                 .collect(Collectors.toList());
 

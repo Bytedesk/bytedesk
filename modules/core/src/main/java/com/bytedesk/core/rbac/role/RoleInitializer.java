@@ -29,7 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.bytedesk.core.rbac.authority.AuthorityEntity;
 
 @Slf4j
 @Component
@@ -153,7 +152,7 @@ public class RoleInitializer {
     private void initRoleAgentDefaultAuthorities() {
         Set<String> authorityUids = authorityRestService.findAllActive().stream()
             .filter(a -> RoleAuthorityRules.isKbaseReadPermission(a.getValue()))
-                .map(AuthorityEntity::getUid)
+                .map(a -> a.getUid())
                 .collect(Collectors.toSet());
 
         // 追加 ROLE_AGENT 额外默认权限
@@ -178,7 +177,7 @@ public class RoleInitializer {
     private void initRoleAdminDefaultAuthorities() {
         Set<String> authorityUids = authorityRestService.findAllActive().stream()
             .filter(a -> a != null && !RoleAuthorityRules.isAdminExcludedPermission(a.getValue()))
-                .map(AuthorityEntity::getUid)
+                .map(a -> a.getUid())
                 .collect(Collectors.toSet());
 
         if (authorityUids.isEmpty()) {
@@ -197,7 +196,7 @@ public class RoleInitializer {
      */
     private void initRoleSuperDefaultAuthorities() {
         Set<String> authorityUids = authorityRestService.findAllActive().stream()
-                .map(AuthorityEntity::getUid)
+                .map(a -> a.getUid())
                 .collect(Collectors.toSet());
 
         if (authorityUids.isEmpty()) {
@@ -232,7 +231,7 @@ public class RoleInitializer {
 
     private void addAuthorityUidIfExists(Set<String> authorityUids, String authorityValue) {
         authorityRestService.findByValue(authorityValue)
-                .map(AuthorityEntity::getUid)
+                .map(a -> a.getUid())
                 .ifPresent(authorityUids::add);
     }
     

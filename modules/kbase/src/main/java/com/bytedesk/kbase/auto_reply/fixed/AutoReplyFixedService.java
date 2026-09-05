@@ -27,7 +27,7 @@ public class AutoReplyFixedService {
 		}
 
 		List<String> candidates = fixedList.stream()
-				.map(AutoReplyFixedEntity::getContent)
+				.map(e -> e.getContent())
 				.filter(content -> content != null && !content.isBlank())
 				.toList();
 		if (candidates.isEmpty()) {

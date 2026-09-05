@@ -117,7 +117,7 @@ public class VectorStoreConfig {
 
     private URI[] parseUris(String uris) {
         return Arrays.stream(StringUtils.commaDelimitedListToStringArray(uris))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(StringUtils::hasText)
                 .map(URI::create)
                 .toArray(URI[]::new);

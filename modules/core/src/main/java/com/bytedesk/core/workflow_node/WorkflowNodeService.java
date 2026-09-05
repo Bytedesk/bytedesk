@@ -245,7 +245,7 @@ public class WorkflowNodeService {
         List<WorkflowNodeEntity> allNodes = findByWorkflow(workflow);
         
         long totalNodes = allNodes.size();
-        long enabledNodes = allNodes.stream().filter(WorkflowNodeEntity::getEnabled).count();
+        long enabledNodes = allNodes.stream().filter(node -> Boolean.TRUE.equals(node.getEnabled())).count();
         long startNodes = allNodes.stream().filter(node -> 
                 node.getNodeTypeEnum() == WorkflowNodeTypeEnum.START).count();
         long endNodes = allNodes.stream().filter(node -> 

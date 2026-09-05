@@ -47,8 +47,8 @@ public class ZhipuaiEmbeddingModel implements EmbeddingModel {
             }
 
             List<Embedding> embeddings = result.getData().stream()
-                    .sorted(Comparator.comparing(ai.z.openapi.service.embedding.Embedding::getIndex,
-                            Comparator.nullsLast(Integer::compareTo)))
+                    .sorted(Comparator.comparing((ai.z.openapi.service.embedding.Embedding e) -> e.getIndex(),
+                            Comparator.nullsLast((a, b) -> a.compareTo(b))))
                     .map(item -> new Embedding(toFloatArray(item.getEmbedding()), item.getIndex() != null ? item.getIndex() : 0))
                     .toList();
             return new EmbeddingResponse(embeddings);
@@ -65,7 +65,7 @@ public class ZhipuaiEmbeddingModel implements EmbeddingModel {
     @Override
     public List<float[]> embed(List<String> texts) {
         return call(new EmbeddingRequest(texts, null)).getResults().stream()
-                .map(Embedding::getOutput)
+                .map(e -> e.getOutput())
                 .toList();
     }
 

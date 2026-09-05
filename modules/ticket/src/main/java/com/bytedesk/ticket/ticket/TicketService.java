@@ -695,7 +695,7 @@ public class TicketService {
         for (Task activeTask : activeTasks) {
             JSONObject node = findFlowgramNode(flowgramSchema, activeTask.getTaskDefinitionKey());
             JSONObject data = node != null ? node.getJSONObject("data") : null;
-            if (data != null && expectedStage.equals(data.getString("ticketStage"))) {
+            if (data != null && Objects.equals(expectedStage, data.getString("ticketStage"))) {
                 return activeTask;
             }
         }
@@ -2407,7 +2407,7 @@ public class TicketService {
 
         // 按时间排序
         return responses.stream()
-                .sorted(Comparator.comparing(TicketHistoryActivityResponse::getStartTime))
+                .sorted(Comparator.comparing(response -> response.getStartTime()))
                 .collect(Collectors.toList());
     }
 
@@ -2438,11 +2438,11 @@ public class TicketService {
             List<Comment> comments) {
         Map<String, String> assigneeNameMap = new HashMap<>();
         Set<String> assigneeUids = activities.stream()
-                .map(HistoricActivityInstance::getAssignee)
+                .map(activity -> activity.getAssignee())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toSet());
         assigneeUids.addAll(comments.stream()
-                .map(Comment::getUserId)
+                .map(comment -> comment.getUserId())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toSet()));
 

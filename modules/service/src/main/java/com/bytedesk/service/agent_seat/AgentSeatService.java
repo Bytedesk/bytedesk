@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.member.MemberRestService;
-import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.agent.AgentRepository;
 import com.bytedesk.service.agent_seat.enums.AgentSeatStatusEnum;
 
@@ -284,8 +283,8 @@ public class AgentSeatService {
                 .map(this::refreshSeatStatus)
                 .filter(this::isAllocatable)
                 .sorted(Comparator
-                        .comparing(AgentSeatEntity::getBaseSeat, Comparator.nullsLast(Comparator.reverseOrder()))
-                        .thenComparing(AgentSeatEntity::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .comparing((AgentSeatEntity seat) -> seat.getBaseSeat(), Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(seat -> seat.getCreatedAt(), Comparator.nullsLast(Comparator.naturalOrder())))
                 .findFirst();
     }
 
@@ -337,7 +336,7 @@ public class AgentSeatService {
         }
 
         agentRepository.findByUid(seat.getAssignedAgentUid())
-            .map(AgentEntity::getMember)
+            .map(agent -> agent.getMember())
             .filter(member -> member != null && StringUtils.hasText(member.getUid()))
             .flatMap(member -> memberRestService.findByUid(member.getUid()))
                 .filter(member -> !member.isDeleted())

@@ -59,17 +59,15 @@ public class MessageLeaveSpecification extends BaseSpecification<MessageLeaveEnt
                 predicates.add(criteriaBuilder.or(contactPredicate, contentPredicate));
             }
             // 时间范围过滤（统一使用 BaseRequest.startAt/endAt，按留言 createdAt 过滤）
-            if (request != null) {
-                ZonedDateTime startAt = request.getStartAt();
-                ZonedDateTime endAt = request.getEndAt();
+            ZonedDateTime startAt = request.getStartAt();
+            ZonedDateTime endAt = request.getEndAt();
 
-                if (startAt != null) {
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
-                }
+            if (startAt != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
+            }
 
-                if (endAt != null) {
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
-                }
+            if (endAt != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
             }
             //
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

@@ -55,7 +55,7 @@ public class DefaultKbaseVectorStoreResolver implements KbaseVectorStoreResolver
         VectorStore dbStore = embeddingConfigProvider
                 .stream()
                 .findFirst()
-                .flatMap(EmbeddingConfigProvider::getDefaultVectorStore)
+                .flatMap(provider -> provider.getDefaultVectorStore())
                 .orElse(null);
         if (dbStore != null) {
             log.info("DefaultKbaseVectorStoreResolver: using DB-configured VectorStore");

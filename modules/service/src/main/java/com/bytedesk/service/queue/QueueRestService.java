@@ -171,7 +171,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
         Page<ThreadResponse> page = threadRestService.queryByOrg(request);
 
         List<String> threadUids = page.getContent().stream()
-                .map(ThreadResponse::getUid)
+                .map(e -> e.getUid())
                 .filter(StringUtils::hasText)
                 .toList();
 
@@ -275,7 +275,7 @@ public class QueueRestService extends BaseRestServiceWithExport<QueueEntity, Que
             Map<String, ThreadEntity> threadByUid = threadRepository.findByUidInAndDeletedFalse(threadUids)
                     .stream()
                     .filter(thread -> thread != null && StringUtils.hasText(thread.getUid()))
-                    .collect(Collectors.toMap(ThreadEntity::getUid, thread -> thread, (a, b) -> a));
+                    .collect(Collectors.toMap(thread -> thread.getUid(), thread -> thread, (a, b) -> a));
 
             int batchUpdated = 0;
             ZonedDateTime repliedAt = ZonedDateTime.now();

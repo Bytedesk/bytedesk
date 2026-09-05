@@ -64,7 +64,7 @@ class WorkflowRestServiceTest {
 
                 List<WorkflowEntity> savedEntities = entityCaptor.getAllValues();
                 Map<String, WorkflowEntity> workflowByUid = savedEntities.stream()
-                                .collect(java.util.stream.Collectors.toMap(WorkflowEntity::getUid, Function.identity(),
+                                .collect(java.util.stream.Collectors.toMap(w -> w.getUid(), Function.identity(),
                                                 (left, right) -> right));
 
                 WorkflowEntity ivrEntity = workflowByUid.get(BytedeskConsts.DEFAULT_IVR_WORKFLOW_UID);
@@ -285,7 +285,7 @@ class WorkflowRestServiceTest {
                 List<WorkflowTemplateOptionResponse> options = workflowRestService.queryIvrDemoTemplateOptions();
 
                 assertThat(options).hasSize(4);
-                assertThat(options).extracting(WorkflowTemplateOptionResponse::getValue)
+                assertThat(options).extracting(option -> option.getValue())
                                 .containsExactly(
                                                 "demo-default",
                                                 "demo-satisfaction",

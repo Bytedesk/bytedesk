@@ -106,15 +106,13 @@ public class MessageSpecification extends BaseSpecification<MessageEntity, Messa
             predicates.addAll(getBasicPredicates(root, criteriaBuilder, request, authService));
 
             // 时间范围过滤（按消息 createdAt）
-            if (request != null) {
-                ZonedDateTime startAt = request.getStartAt();
-                ZonedDateTime endAt = request.getEndAt();
-                if (startAt != null) {
-                    predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
-                }
-                if (endAt != null) {
-                    predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
-                }
+            ZonedDateTime startAt = request.getStartAt();
+            ZonedDateTime endAt = request.getEndAt();
+            if (startAt != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
+            }
+            if (endAt != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
             }
 
             // 使用基类方法处理超级管理员权限和组织过滤

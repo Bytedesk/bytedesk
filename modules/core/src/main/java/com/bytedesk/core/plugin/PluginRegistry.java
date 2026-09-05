@@ -47,7 +47,7 @@ public class PluginRegistry {
         
         // 按优先级排序
         List<BytedeskPlugin> sortedPlugins = pluginList.stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .collect(Collectors.toList());
 
         // 依赖感知注册：优先级仅作为同层排序依据，依赖未满足的插件会在后续轮次重试
@@ -144,8 +144,8 @@ public class PluginRegistry {
      */
     public List<BytedeskPlugin> getEnabledPlugins() {
         return plugins.values().stream()
-            .filter(BytedeskPlugin::isEnabled)
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .filter(plugin -> plugin.isEnabled())
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .collect(Collectors.toList());
     }
     
@@ -161,7 +161,7 @@ public class PluginRegistry {
      */
     public int getEnabledPluginCount() {
         return (int) plugins.values().stream()
-            .filter(BytedeskPlugin::isEnabled)
+            .filter(plugin -> plugin.isEnabled())
             .count();
     }
     
@@ -177,7 +177,7 @@ public class PluginRegistry {
      */
     public boolean isPluginEnabled(String pluginId) {
         return getPlugin(pluginId)
-            .map(BytedeskPlugin::isEnabled)
+            .map(plugin -> plugin.isEnabled())
             .orElse(false);
     }
     
@@ -188,7 +188,7 @@ public class PluginRegistry {
         Map<String, Map<String, Object>> healthStatus = new LinkedHashMap<>();
         
         plugins.values().stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .forEach(plugin -> {
                 try {
                     healthStatus.put(plugin.getPluginId(), plugin.getHealthStatus());
@@ -211,7 +211,7 @@ public class PluginRegistry {
         Map<String, Map<String, Object>> statistics = new LinkedHashMap<>();
         
         plugins.values().stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .forEach(plugin -> {
                 try {
                     statistics.put(plugin.getPluginId(), plugin.getStatistics());
@@ -274,7 +274,7 @@ public class PluginRegistry {
         log.info("==================================================");
         
         plugins.values().stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .forEach(plugin -> {
                 log.info("  - {} ({}) v{} [{}] Priority: {}", 
                     plugin.getPluginName(),
@@ -301,7 +301,7 @@ public class PluginRegistry {
         
         // 按优先级逆序销毁
         List<BytedeskPlugin> sortedPlugins = new ArrayList<>(plugins.values());
-        sortedPlugins.sort(Comparator.comparingInt(BytedeskPlugin::getPriority).reversed());
+        sortedPlugins.sort(Comparator.comparingInt((BytedeskPlugin plugin) -> plugin.getPriority()).reversed());
         
         for (BytedeskPlugin plugin : sortedPlugins) {
             try {

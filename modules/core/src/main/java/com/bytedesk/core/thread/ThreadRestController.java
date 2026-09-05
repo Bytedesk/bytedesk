@@ -404,7 +404,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         boolean alreadyClosed = false;
         if (StringUtils.hasText(request.getUid())) {
             alreadyClosed = threadRestService.findByUid(request.getUid())
-                    .map(ThreadEntity::isClosed)
+                    .map(thread -> thread.isClosed())
                     .orElse(false);
         }
         request.setCloseType(ThreadCloseTypeEnum.AGENT.name());
@@ -425,7 +425,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
             List<ThreadEntity> threads = threadRestService.findListByTopic(request.getTopic());
             alreadyClosed = threads != null
                     && !threads.isEmpty()
-                    && threads.stream().filter(java.util.Objects::nonNull).allMatch(ThreadEntity::isClosed);
+                    && threads.stream().filter(java.util.Objects::nonNull).allMatch(thread -> thread.isClosed());
         }
 
         request.setCloseType(ThreadCloseTypeEnum.AGENT.name());

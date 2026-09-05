@@ -33,7 +33,6 @@ import com.eatthepath.pushy.apns.util.SimpleApnsPayloadBuilder;
 import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import com.eatthepath.pushy.apns.util.TokenUtil;
 import com.eatthepath.pushy.apns.util.concurrent.PushNotificationFuture;
-import com.google.common.base.Strings;
 
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.MultiThreadIoEventLoopGroup;
@@ -207,7 +206,7 @@ public class ApnsPushService {
      */
     public ApnsPushEntity push(String deviceToken, String nickname, String content, int badgeNumber, ApnsP12Entity apnsP12,
             ApnsPushEntity record) {
-        if (Strings.isNullOrEmpty(deviceToken)) {
+        if (!StringUtils.hasText(deviceToken)) {
             return markPushResult(record, false, PushStatusEnum.ERROR.name(), "device token is empty");
         }
 

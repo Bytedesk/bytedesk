@@ -706,7 +706,7 @@ public class FaqVectorService {
 
     private VectorStore resolveStoreByUid(String uid) {
         return faqRestService.findByUidNoCache(uid)
-                .map(FaqEntity::getKbase)
+                .map(e -> e.getKbase())
                 .map(vectorStoreResolver::resolveByKbase)
                 .orElseGet(vectorStoreResolver::resolveDefault);
     }
@@ -843,7 +843,7 @@ public class FaqVectorService {
         }
 
         List<String> docIds = existingDocs.stream()
-                .map(Document::getId)
+                .map(doc -> doc.getId())
                 .filter(StringUtils::hasText)
                 .toList();
         if (!docIds.isEmpty()) {

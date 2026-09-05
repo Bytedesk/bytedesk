@@ -754,7 +754,7 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
 
         boolean changed = false;
         String prompt = localeData != null ? localeData.getPrompt() : null;
-        if (StringUtils.hasText(prompt) && !prompt.equals(robotEntity.getLlm().getPrompt())) {
+        if (prompt != null && StringUtils.hasText(prompt) && !prompt.equals(robotEntity.getLlm().getPrompt())) {
             robotEntity.getLlm().setPrompt(prompt);
             changed = true;
         }

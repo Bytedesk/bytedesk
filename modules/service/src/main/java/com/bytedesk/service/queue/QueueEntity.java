@@ -213,7 +213,7 @@ public class QueueEntity extends BaseEntity {
         }
 
         long totalWaitTime = servedMembers.stream()
-                .mapToLong(QueueMemberEntity::getWaitLength)
+                .mapToLong(qm -> qm.getWaitLength())
                 .sum();
 
         return (int) (totalWaitTime / servedMembers.size());

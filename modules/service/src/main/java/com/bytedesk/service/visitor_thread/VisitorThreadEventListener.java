@@ -278,7 +278,7 @@ public class VisitorThreadEventListener {
             return null;
         }
         Optional<QueueMemberEntity> queueMemberOptional = queueMemberRestService.findByThreadUid(thread.getUid());
-        Boolean resolved = queueMemberOptional.map(QueueMemberEntity::getResolved).orElse(null);
+        Boolean resolved = queueMemberOptional.map(qm -> qm.getResolved()).orElse(null);
         boolean submitted = Boolean.TRUE.equals(resolved);
         return MessageUtils.buildResolvedPromptExtra(thread.getUid(), thread.getOrgUid(), submitted, resolved);
     }

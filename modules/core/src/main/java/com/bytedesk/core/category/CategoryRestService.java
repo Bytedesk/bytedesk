@@ -89,7 +89,7 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         List<String> uniqueUids = allRootEntities.stream()
                 .filter(Objects::nonNull)
                 .filter(entity -> StringUtils.hasText(entity.getUid()))
-                .map(CategoryEntity::getUid)
+                .map(entity -> entity.getUid())
                 .distinct()
                 .collect(Collectors.toList());
         // log.debug("Step 2: Unique UIDs after deduplication: {}", uniqueUids);
@@ -112,8 +112,8 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
             
             List<CategoryEntity> entities = pagedUids.stream()
                     .map(this::findByUid)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .filter(opt -> opt.isPresent())
+                    .map(opt -> opt.get())
                     .filter(entity -> entity.getParent() == null) // 再次确保只处理根分类
                     .collect(Collectors.toList());
             // log.debug("Step 3: Found {} root entities after filtering", entities.size());

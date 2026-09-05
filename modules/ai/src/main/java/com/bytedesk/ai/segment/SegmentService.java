@@ -154,7 +154,7 @@ public class SegmentService {
                     response.setDetails(details)
                             .setTotalWords(details.size())
                             .setUniqueWords((int) details.stream()
-                                    .map(SegmentWordDetail::getWord)
+                                    .map(detail -> detail.getWord())
                                     .distinct().count());
                     break;
                     
@@ -163,15 +163,15 @@ public class SegmentService {
                     if (request.getFilterPunctuation() != null && request.getFilterPunctuation()) {
                         wordCountMap = wordCountMap.entrySet().stream()
                                 .filter(entry -> !PUNCTUATION_PATTERN.matcher(entry.getKey()).matches())
-                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
                     }
                     if (request.getMinWordLength() != null && request.getMinWordLength() > 1) {
                         wordCountMap = wordCountMap.entrySet().stream()
                                 .filter(entry -> entry.getKey().length() >= request.getMinWordLength())
-                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                                .collect(Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue()));
                     }
                     response.setWordCount(wordCountMap)
-                            .setTotalWords(wordCountMap.values().stream().mapToInt(Integer::intValue).sum())
+                            .setTotalWords(wordCountMap.values().stream().mapToInt(value -> value.intValue()).sum())
                             .setUniqueWords(wordCountMap.size());
                     break;
                     

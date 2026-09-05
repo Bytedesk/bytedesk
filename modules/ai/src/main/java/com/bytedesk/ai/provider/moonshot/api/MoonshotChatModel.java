@@ -411,7 +411,7 @@ public class MoonshotChatModel implements ChatModel {
 			else {
 				throw new IllegalArgumentException("Unsupported message type: " + message.getMessageType());
 			}
-		}).flatMap(List::stream).toList();
+		}).flatMap(list -> list.stream()).toList();
 
 		MoonshotChatOptions requestOptions = (MoonshotChatOptions) prompt.getOptions();
 		ChatCompletionRequest request = new ChatCompletionRequest(chatCompletionMessages, requestOptions.getModel(),

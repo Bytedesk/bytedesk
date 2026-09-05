@@ -47,7 +47,7 @@ public class PluginController {
         List<BytedeskPlugin> plugins = pluginRegistry.getAllPlugins();
         
         List<Map<String, Object>> pluginList = plugins.stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .map(this::convertPluginToMap)
             .collect(Collectors.toList());
         
@@ -175,7 +175,7 @@ public class PluginController {
         
         // 插件列表（简化信息）
         List<Map<String, Object>> pluginSummary = pluginRegistry.getAllPlugins().stream()
-            .sorted(Comparator.comparingInt(BytedeskPlugin::getPriority))
+            .sorted(Comparator.comparingInt(plugin -> plugin.getPriority()))
             .map(plugin -> {
                 Map<String, Object> summary = new LinkedHashMap<>();
                 summary.put("id", plugin.getPluginId());

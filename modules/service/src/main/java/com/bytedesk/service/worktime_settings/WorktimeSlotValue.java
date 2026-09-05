@@ -64,7 +64,7 @@ public class WorktimeSlotValue implements Serializable {
         }
         final int dayValue = date.getDayOfWeek().getValue();
         return Arrays.stream(workDays.split(","))
-                .map(String::trim)
+                .map(s -> s.trim())
                 .filter(StringUtils::hasText)
                 .anyMatch(token -> token.equals(String.valueOf(dayValue)));
     }

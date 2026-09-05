@@ -44,8 +44,8 @@ public class TicketCategorySettingsData implements Serializable {
             }
             index++;
         }
-        items.sort(Comparator.comparing(TicketCategoryItemData::getOrderIndex, Comparator.nullsLast(Integer::compareTo))
-                .thenComparing(TicketCategoryItemData::getName, Comparator.nullsLast(String::compareToIgnoreCase)));
+        items.sort(Comparator.comparing((TicketCategoryItemData item) -> item.getOrderIndex(), Comparator.nullsLast((a, b) -> a.compareTo(b)))
+                .thenComparing(item -> item.getName(), Comparator.nullsLast((a, b) -> a.compareToIgnoreCase(b))));
 
         // 确保最多一个默认分类；若没有但存在启用项，则选第一个启用项
         boolean hasDefault = false;
@@ -86,7 +86,7 @@ public class TicketCategorySettingsData implements Serializable {
         }
         return items.stream()
                 .filter(i -> Boolean.TRUE.equals(i.getDefaultCategory()) && Boolean.TRUE.equals(i.getEnabled()))
-                .map(TicketCategoryItemData::getUid)
+                .map(i -> i.getUid())
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);

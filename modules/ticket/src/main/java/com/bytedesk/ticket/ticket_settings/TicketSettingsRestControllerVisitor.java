@@ -92,7 +92,7 @@ public class TicketSettingsRestControllerVisitor {
         List<TicketCategoryVisitorItemResponse> items = categorySettings.getItems().stream()
                 .filter(item -> Boolean.TRUE.equals(item.getEnabled()))
                 .sorted(Comparator.comparing(this::orderIndexOrDefault)
-                        .thenComparing(TicketCategoryItemResponse::getName, Comparator.nullsLast(String::compareToIgnoreCase)))
+                        .thenComparing(item -> item.getName(), Comparator.nullsLast((a, b) -> a.compareToIgnoreCase(b))))
                 .map(this::toVisitorItem)
                 .collect(Collectors.toList());
 
@@ -101,7 +101,7 @@ public class TicketSettingsRestControllerVisitor {
             .anyMatch(item -> Objects.equals(item.getUid(), configuredDefaultUid));
         String effectiveDefaultUid = defaultAvailable
             ? configuredDefaultUid
-            : items.stream().findFirst().map(TicketCategoryVisitorItemResponse::getUid).orElse(null);
+            : items.stream().findFirst().map(item -> item.getUid()).orElse(null);
 
         return TicketCategoryVisitorResponse.builder()
             .defaultCategoryUid(effectiveDefaultUid)

@@ -804,7 +804,7 @@ public class WebpageVectorService {
         }
 
         List<String> docIds = existingDocs.stream()
-                .map(Document::getId)
+                .map(doc -> doc.getId())
                 .filter(StringUtils::hasText)
                 .toList();
         if (!docIds.isEmpty()) {

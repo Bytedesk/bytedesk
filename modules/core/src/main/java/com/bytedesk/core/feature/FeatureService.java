@@ -103,7 +103,7 @@ public class FeatureService {
         List<FeatureEntity> features = featureRepository.findByEnabledTrue();
         return features.stream()
             .collect(Collectors.groupingBy(
-                FeatureEntity::getModuleName,
+                feature -> feature.getModuleName(),
                 Collectors.counting()
             ));
     }

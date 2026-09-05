@@ -39,7 +39,6 @@ import com.bytedesk.core.category.CategoryEntity;
 import com.bytedesk.core.category.CategoryRequest;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.category.CategoryTypeEnum;
-import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
@@ -598,7 +597,7 @@ public class TicketRestService
                 .findByTicketUidAndDeletedFalse(entity.getUid())
                 .stream()
                 .map(TicketSlaRecordResponse::fromEntity)
-                .sorted(Comparator.comparing(TicketSlaRecordResponse::getDueAt, Comparator.nullsLast(Comparator.naturalOrder())))
+                .sorted(Comparator.comparing(record -> record.getDueAt(), Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
         response.setSlaRecords(slaRecords);
         return response;
@@ -780,7 +779,7 @@ public class TicketRestService
 
         request.setVisibilityOrgAdmin(false);
         memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), request.getOrgUid())
-                .map(MemberEntity::getDeptUid)
+                .map(member -> member.getDeptUid())
                 .ifPresent(request::setVisibilityCurrentUserDepartmentUid);
 
         TicketVisibilitySettingsData visibilityData = resolveVisibilitySettingsData(request);
@@ -797,14 +796,14 @@ public class TicketRestService
         TicketVisibilitySettingsEntity visibilitySettings = null;
         if (StringUtils.hasText(request.getTicketSettingsUid())) {
             visibilitySettings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .map(settings -> settings.getVisibilitySettings())
                     .orElse(null);
         }
         if (visibilitySettings == null) {
             TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
             visibilitySettings = ticketSettingsRestService
                 .findDefaultByOrgUidAndType(request.getOrgUid(), ticketType.name())
-                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .map(settings -> settings.getVisibilitySettings())
                     .orElse(null);
         }
 
@@ -855,7 +854,7 @@ public class TicketRestService
         }
 
         String currentDeptUid = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), ticket.getOrgUid())
-                .map(MemberEntity::getDeptUid)
+                .map(member -> member.getDeptUid())
                 .orElse(null);
         TicketRequest visibilityRequest = TicketRequest.builder()
             .ticketSettingsUid(ticket.getTicketSettingsUid())

@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
-import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.message.content.NoticeContent;
 import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
@@ -243,7 +242,7 @@ public class MessageService {
         return new LinkedHashSet<>(memberRepository.findAll().stream()
                 .filter(member -> !member.isDeleted())
                 .filter(member -> orgUid.equals(member.getOrgUid()))
-                .map(MemberEntity::getUser)
+                .map(member -> member.getUser())
                 .filter(java.util.Objects::nonNull)
                 .toList());
     }
@@ -251,7 +250,7 @@ public class MessageService {
     private Set<UserEntity> resolveDepartmentRecipients(String deptUid) {
         Assert.hasText(deptUid, "Department UID cannot be empty when sending department notice");
         return new LinkedHashSet<>(memberRepository.findByDeptUidAndDeletedFalse(deptUid).stream()
-                .map(MemberEntity::getUser)
+                .map(member -> member.getUser())
                 .filter(java.util.Objects::nonNull)
                 .toList());
     }

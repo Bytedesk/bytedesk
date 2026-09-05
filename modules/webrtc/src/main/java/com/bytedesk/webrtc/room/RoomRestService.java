@@ -93,17 +93,17 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
 
     Set<String> getVisibleRoomUidsForUser(String userUid) {
         LinkedHashSet<String> visibleRoomUids = roomRepository.findByUserUidAndDeletedFalse(userUid).stream()
-                .map(RoomEntity::getUid)
+                .map(room -> room.getUid())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         relationRepository.findBySubjectUserUidAndTypeAndDeletedFalse(userUid, RelationTypeEnum.ROOM.name()).stream()
-                .map(RelationEntity::getObjectContentUid)
+                .map(relation -> relation.getObjectContentUid())
                 .filter(StringUtils::hasText)
                 .forEach(visibleRoomUids::add);
 
         relationRepository.findByObjectUserUidAndTypeAndDeletedFalse(userUid, RelationTypeEnum.ROOM.name()).stream()
-            .map(RelationEntity::getObjectContentUid)
+            .map(relation -> relation.getObjectContentUid())
             .filter(StringUtils::hasText)
             .forEach(visibleRoomUids::add);
 

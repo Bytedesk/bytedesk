@@ -160,7 +160,7 @@ public class ThreadProcessService {
 
         // 按时间排序
         return responses.stream()
-                .sorted(Comparator.comparing(ThreadHistoryActivityResponse::getStartTime))
+                .sorted(Comparator.comparing(response -> response.getStartTime()))
                 .collect(Collectors.toList());
     }
 

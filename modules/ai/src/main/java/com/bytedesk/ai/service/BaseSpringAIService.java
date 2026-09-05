@@ -568,7 +568,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
                         return answer;
                     }
                 } else {
-                    String context = String.join("\n", kbResults.stream().map(FaqProtobuf::toJson).toList());
+                    String context = String.join("\n", kbResults.stream().map(faq -> faq.toJson()).toList());
                     List<Message> messages = promptHelper.buildMessagesForSync(query, context, robot,
                             messageProtobufQuery);
                     Prompt aiPrompt = promptHelper.toPrompt(messages);
@@ -718,7 +718,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 构建提示词
         String context = "";
         if (!searchResultList.isEmpty()) {
-            context = String.join("\n", searchResultList.stream().map(FaqProtobuf::toJson).toList());
+            context = String.join("\n", searchResultList.stream().map(faq -> faq.toJson()).toList());
             log.info("processDirectLlmRequest context {}", context);
         }
 

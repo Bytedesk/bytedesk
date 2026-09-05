@@ -78,7 +78,7 @@ class UserRestServiceTest {
 
         assertThat(targetUser.getCurrentOrganization()).isNotNull();
         assertThat(targetUser.getCurrentOrganization().getUid()).isEqualTo("org-b");
-        assertThat(targetUser.getCurrentRoles()).extracting(RoleEntity::getUid).contains("role-b");
+        assertThat(targetUser.getCurrentRoles()).extracting(r -> r.getUid()).contains("role-b");
         assertThat(response.getCurrentOrganization()).isNotNull();
         assertThat(response.getCurrentOrganization().getUid()).isEqualTo("org-b");
     }

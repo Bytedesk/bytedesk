@@ -206,8 +206,8 @@ public class ConferenceRoomRegistry {
 
     private ConferenceRoomSnapshot snapshotOf(RoomState state) {
         List<ConferenceParticipant> participants = new ArrayList<>(state.participants.values());
-        participants.sort(Comparator.comparing(ConferenceParticipant::joinedAt)
-                .thenComparing(ConferenceParticipant::participantId));
+        participants.sort(Comparator.comparing((ConferenceParticipant p) -> p.joinedAt())
+                .thenComparing(p -> p.participantId()));
         return new ConferenceRoomSnapshot(
                 state.roomId,
                 participants,

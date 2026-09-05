@@ -83,7 +83,7 @@ public class EslService {
         boolean ok = false;
         if (reply != null && reply.trim().startsWith("+OK")) {
             ok = true;
-        } else if (bodyLines.stream().filter(Objects::nonNull).map(String::trim).anyMatch(line -> line.startsWith("+OK"))) {
+        } else if (bodyLines.stream().filter(Objects::nonNull).map(s -> s.trim()).anyMatch(line -> line.startsWith("+OK"))) {
             ok = true;
         }
 

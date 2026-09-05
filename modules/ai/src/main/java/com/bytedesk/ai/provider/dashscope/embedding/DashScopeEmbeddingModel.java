@@ -19,7 +19,6 @@ import org.springframework.util.StringUtils;
 import com.alibaba.dashscope.embeddings.TextEmbedding;
 import com.alibaba.dashscope.embeddings.TextEmbeddingParam;
 import com.alibaba.dashscope.embeddings.TextEmbeddingResult;
-import com.alibaba.dashscope.embeddings.TextEmbeddingResultItem;
 import com.bytedesk.ai.provider.dashscope.DashScopeBaseUrlSupport;
 
 import io.micrometer.observation.Observation;
@@ -86,7 +85,7 @@ public class DashScopeEmbeddingModel implements EmbeddingModel {
         try (Observation.Scope scope = observation.openScope()) {
             TextEmbeddingResult result = new TextEmbedding(this.baseUrl).call(createParam(request, merged));
             List<Embedding> embeddings = result.getOutput().getEmbeddings().stream()
-                    .sorted(Comparator.comparing(TextEmbeddingResultItem::getTextIndex))
+                    .sorted(Comparator.comparing(item -> item.getTextIndex()))
                     .map(item -> new Embedding(toFloatArray(item.getEmbedding()), item.getTextIndex()))
                     .toList();
             EmbeddingResponse response = new EmbeddingResponse(embeddings);
@@ -108,7 +107,7 @@ public class DashScopeEmbeddingModel implements EmbeddingModel {
     @Override
     public List<float[]> embed(List<String> texts) {
         return call(new EmbeddingRequest(texts, this.defaultOptions)).getResults().stream()
-                .map(Embedding::getOutput)
+                .map(e -> e.getOutput())
                 .toList();
     }
 

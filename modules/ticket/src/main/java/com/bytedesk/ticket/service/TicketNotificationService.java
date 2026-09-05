@@ -41,11 +41,9 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
-import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
-import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.utils.ThreadMessageUtil;
 import com.bytedesk.service.visitor.VisitorEntity;
@@ -201,7 +199,8 @@ public class TicketNotificationService {
 
         for (String recipientUid : recipients) {
             try {
-                boolean isReporter = StringUtils.hasText(reporterUid) && reporterUid.equals(recipientUid);
+                boolean isReporter = reporterUid != null && StringUtils.hasText(reporterUid)
+                        && reporterUid.equals(recipientUid);
                 String recipientTitle = isReporter ? buildReporterTitle(ticket, eventType) : title;
                 String recipientContent = isReporter ? buildReporterContent(ticket, eventType) : content;
                 NotificationRequest request = NotificationRequest.builder()
@@ -564,9 +563,9 @@ public class TicketNotificationService {
                     .filter(workgroup -> !workgroup.isDeleted())
                     .ifPresent(workgroup -> workgroup.getAgents().stream()
                             .filter(agent -> agent != null && !agent.isDeleted())
-                            .map(AgentEntity::getMember)
+                            .map(agent -> agent.getMember())
                             .filter(member -> member != null && !member.isDeleted())
-                            .map(MemberEntity::getUser)
+                            .map(member -> member.getUser())
                             .filter(user -> user != null && !user.isDeleted())
                             .map(user -> user.getUid())
                             .filter(StringUtils::hasText)
@@ -583,7 +582,7 @@ public class TicketNotificationService {
 
         if (UserTypeEnum.MEMBER.name().equals(user.getType())) {
             return memberRestService.findByUid(user.getUid())
-                    .map(MemberEntity::getUser)
+                    .map(member -> member.getUser())
                     .filter(Objects::nonNull)
                     .map(userEntity -> userEntity.getUid())
                     .filter(StringUtils::hasText)

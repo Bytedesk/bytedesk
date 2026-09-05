@@ -26,7 +26,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
-import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -268,7 +267,7 @@ public abstract class BaseSpecification<T, TRequest> {
         }
 
         List<String> matchedOrgUids = organizationRepository.searchByKeyword(keyword).stream()
-                .map(OrganizationEntity::getUid)
+                .map(org -> org.getUid())
                 .filter(StringUtils::hasText)
                 .distinct()
                 .collect(Collectors.toList());

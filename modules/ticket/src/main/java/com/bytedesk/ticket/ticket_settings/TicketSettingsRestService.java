@@ -919,7 +919,7 @@ public class TicketSettingsRestService extends
                 .findByTicketSettingsUidAndDeletedFalse(uid);
         if (!activeBindings.isEmpty()) {
             String boundWorkgroups = activeBindings.stream()
-                    .map(TicketSettingsBindingEntity::getWorkgroupUid)
+                    .map(binding -> binding.getWorkgroupUid())
                     .filter(StringUtils::hasText)
                     .distinct()
                     .collect(Collectors.joining(","));
@@ -1167,7 +1167,7 @@ public class TicketSettingsRestService extends
                 : Utils.formatUid(orgUid, TicketConsts.TICKET_PROCESS_KEY);
         return ticketProcessRepository
                 .findByUidAndOrgUidAndType(defaultProcessUid, orgUid, processType.name())
-                .map(ProcessEntity::getUid)
+                .map(process -> process.getUid())
                 .orElse(null);
     }
 
@@ -1181,7 +1181,7 @@ public class TicketSettingsRestService extends
         }
         return formRepository
                 .findFirstByOrgUidAndTypeAndDeletedFalseOrderByCreatedAtAsc(orgUid, formType.name())
-                .map(FormEntity::getUid)
+                .map(form -> form.getUid())
                 .orElse(null);
     }
 
@@ -1891,12 +1891,15 @@ public class TicketSettingsRestService extends
 
     @Override
     public TicketSettingsResponse convertToResponse(TicketSettingsEntity entity) {
+        if (entity == null) {
+            throw new IllegalArgumentException("TicketSettingsEntity is required");
+        }
         // 自愈历史数据：分类项 uid 必须指向本组织 level=ORGANIZATION 的工单分类。
         // 读路径只计算修正后的展示数据（不修改实体、不写库），写库修复在独立事务中执行，
         // 避免并发读同时触发 heal 写入导致乐观锁冲突（请求 500 + Optimistic locking failure）
         TicketCategorySettingsData healedCategory = null;
         TicketCategorySettingsData healedDraftCategory = null;
-        if (entity != null && StringUtils.hasText(entity.getOrgUid())) {
+        if (StringUtils.hasText(entity.getOrgUid())) {
             String categoryTypeName = resolveCategoryTypeName(entity.getType());
             if (entity.getCategorySettings() == null) {
                 healedCategory = buildDefaultCategorySettingsData(entity.getOrgUid(), categoryTypeName, false);

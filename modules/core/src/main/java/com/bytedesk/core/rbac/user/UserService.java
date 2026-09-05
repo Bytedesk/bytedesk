@@ -815,6 +815,7 @@ public class UserService {
         }
 
         if (preserveCurrentOrganization
+                && originalCurrentOrgUid != null
                 && StringUtils.hasText(originalCurrentOrgUid)
                 && StringUtils.hasText(orgUid)
                 && !originalCurrentOrgUid.equals(orgUid)) {

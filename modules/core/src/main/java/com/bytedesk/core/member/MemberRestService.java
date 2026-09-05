@@ -315,7 +315,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         UserEntity currentUser = authService.getUser();
         String targetUserUid = member.getUser() != null ? member.getUser().getUid() : null;
-        boolean isSelf = currentUser != null && StringUtils.hasText(targetUserUid)
+        boolean isSelf = currentUser != null && targetUserUid != null
+                && StringUtils.hasText(targetUserUid)
                 && targetUserUid.equals(currentUser.getUid());
         if (!isSelf) {
             log.warn("Member update denied: only org admin can edit other members, currentUser={}, targetMemberUid={}",
@@ -992,7 +993,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             return "";
         }
         return roles.stream()
-                .map(RoleResponseSimple::getName)
+                .map(r -> r.getName())
                 .filter(StringUtils::hasText)
                 .sorted()
                 .collect(Collectors.joining(", "));

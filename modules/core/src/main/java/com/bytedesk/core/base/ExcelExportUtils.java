@@ -343,9 +343,9 @@ public final class ExcelExportUtils {
         }
 
         fields.sort(Comparator
-                .comparingInt(ExcelFieldMeta::index)
-                .thenComparingInt(ExcelFieldMeta::order)
-                .thenComparingInt(ExcelFieldMeta::declarationOrder));
+                .comparingInt((ExcelFieldMeta meta) -> meta.index())
+                .thenComparingInt(meta -> meta.order())
+                .thenComparingInt(meta -> meta.declarationOrder()));
         return fields;
     }
 

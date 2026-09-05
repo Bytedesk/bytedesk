@@ -73,7 +73,7 @@ public class CallIpBlacklistService {
             return Collections.emptyList();
         }
         return callIpBlacklistRepository.findAllByOrgUidInAndDeletedFalse(orgUids).stream()
-            .map(CallIpBlacklistEntity::getIpAddress)
+            .map(e -> e.getIpAddress())
             .filter(StringUtils::hasText)
             .map(this::normalizeIp)
             .filter(StringUtils::hasText)

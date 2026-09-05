@@ -26,7 +26,7 @@ public class CustomerCustomFieldSettingsRestService {
             return List.of();
         }
         return repository.findByOrgUidAndDeleted(orgUid, false)
-                .map(CustomerCustomFieldSettingsEntity::getCustomFieldList)
+                .map(e -> e.getCustomFieldList())
                 .orElse(List.of());
     }
 

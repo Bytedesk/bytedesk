@@ -42,7 +42,6 @@ import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
-import com.bytedesk.core.rbac.role.RoleEntity;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 
@@ -512,7 +511,7 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         // 当前角色名称，逗号分隔（导出时按语言逐个翻译）
         if (entity.getCurrentRoles() != null && !entity.getCurrentRoles().isEmpty()) {
             excel.setCurrentRoles(entity.getCurrentRoles().stream()
-                    .map(RoleEntity::getName)
+                    .map(role -> role.getName())
                     .filter(StringUtils::hasText)
                     .sorted()
                     .collect(Collectors.joining(", ")));

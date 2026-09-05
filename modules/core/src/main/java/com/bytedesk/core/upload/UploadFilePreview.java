@@ -130,7 +130,7 @@ public class UploadFilePreview {
 
 	private String resolveContentType(File file, HttpServletRequest request) {
 		return Optional.ofNullable(request.getServletContext().getMimeType(file.getName()))
-			.or(() -> MediaTypeFactory.getMediaType(file.getName()).map(MediaType::toString))
+			.or(() -> MediaTypeFactory.getMediaType(file.getName()).map(mediaType -> mediaType.toString()))
 			.orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 	}
 

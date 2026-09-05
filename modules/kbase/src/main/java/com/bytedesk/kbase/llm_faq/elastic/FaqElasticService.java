@@ -705,8 +705,8 @@ public class FaqElasticService {
                     BoolQuery.Builder languageQuery = new BoolQuery.Builder();
                     preferredLanguages.stream()
                             .filter(StringUtils::hasText)
-                            .map(String::trim)
-                            .map(String::toUpperCase)
+                            .map(s -> s.trim())
+                            .map(s -> s.toUpperCase())
                             .forEach(language -> languageQuery.should(
                                     QueryBuilders.term().field("language").value(language).build()._toQuery()));
                     languageQuery.minimumShouldMatch("1");

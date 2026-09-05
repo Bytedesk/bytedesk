@@ -1144,7 +1144,7 @@ public class WorkflowChatService {
         }
 
         String segment = rawSegment;
-        while (StringUtils.hasText(segment)) {
+        while (segment != null && StringUtils.hasText(segment)) {
             int bracketIndex = segment.indexOf('[');
             String property = bracketIndex >= 0 ? segment.substring(0, bracketIndex) : segment;
             if (StringUtils.hasText(property)) {
