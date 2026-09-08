@@ -22,6 +22,7 @@ public enum ChannelEnum {
     WEB_VISITOR, // 访客端
     WEB_FLOAT, // 悬浮窗
     WEB_ADMIN, // 管理端
+    WEB_OFFICE, // 微语文档桌面端
     // 
     IOS,
     ANDROID,
@@ -157,6 +158,8 @@ public enum ChannelEnum {
                 return "网页访客端";
             case WEB_ADMIN:
                 return "网页管理端";
+            case WEB_OFFICE:
+                return "微语文档";
             case IOS:
                 return "iOS";
             case ANDROID:

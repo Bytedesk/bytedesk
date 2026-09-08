@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketResponse;
@@ -58,6 +59,17 @@ public class TicketConvertUtils {
         if (StringUtils.hasText(entity.getReporterString())) {
             UserProtobuf reporter = entity.getReporter();
             ticketResponse.setReporter(reporter);
+        }
+        //
+        // 加载组织级分类名称，便于前端直接显示（可能为 i18n key，由前端翻译），失败不影响工单主流程
+        if (StringUtils.hasText(entity.getCategoryUid())) {
+            try {
+                ApplicationContextHolder.getBean(CategoryRestService.class)
+                        .findByUid(entity.getCategoryUid())
+                        .ifPresent(category -> ticketResponse.setCategoryName(category.getName()));
+            } catch (Exception e) {
+                log.warn("Failed to load ticket category name for ticket {}: {}", entity.getUid(), e.getMessage());
+            }
         }
         // 
         // 加载关联的流程实体

@@ -38,6 +38,11 @@ public class SystemConfigConsts {
     public static final String KEY_CUSTOM_PRIVACY_POLICY_URL = "custom.privacyPolicyUrl";
     public static final String KEY_CUSTOM_TERMS_OF_SERVICE_URL = "custom.termsOfServiceUrl";
 
+    // ============ 平台客服（PLATFORM_SERVICE） ============
+    public static final String KEY_PLATFORM_SERVICE_ENABLED = "platform_service.enabled";
+    public static final String KEY_PLATFORM_SERVICE_ORG_UID = "platform_service.orgUid";
+    public static final String KEY_PLATFORM_SERVICE_WORKGROUP_UID = "platform_service.workgroupUid";
+
     private SystemConfigConsts() {
     }
 }

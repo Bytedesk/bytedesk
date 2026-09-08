@@ -37,6 +37,8 @@ import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 import com.bytedesk.kbase.translation.KbaseTranslationRepository;
 import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
 import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.utils.KbaseValidityFilterUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
@@ -279,6 +281,23 @@ public class FaqElasticService {
         log.info("索引FAQ: uid={}, question={}", faq.getUid(), faq.getQuestion());
 
         try {
+            // 写入守卫：已过期内容不写入全文索引，删除可能存在的旧文档（幂等，含翻译文档），状态置 EXPIRED，静默返回
+            // 不抛异常，保证批量重建（updateAllIndex 等）不被单条过期内容中断；复活靠 UpdateDocEvent 自动重建
+            if (faq.isExpired()) {
+                log.info("FAQ已过期，跳过全文索引并删除旧文档: uid={}, endDate={}", faq.getUid(), faq.getEndDate());
+                try {
+                    deleteFaq(faq.getUid());
+                    deleteTranslatedFaqDocuments(faq.getUid());
+                } catch (Exception delEx) {
+                    log.warn("删除过期FAQ全文文档失败（将继续置EXPIRED）: uid={}, error={}", faq.getUid(),
+                            delEx.getMessage());
+                }
+                faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.EXPIRED.name());
+                faqRestService.evictFaqCacheAllEntries();
+                return;
+            }
+            // 未生效（startDate > now）：照常写入索引，检索期过滤会排除
+
             // kbUid 必填：避免写入 Elasticsearch 文档时 kbUid 为空
             if (faq.getKbase() == null || !StringUtils.hasText(faq.getKbase().getUid())) {
                 faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
@@ -306,6 +325,17 @@ public class FaqElasticService {
                     faqRestService.updateElasticStatusOnly(faq.getUid(), FaqStatusEnum.ERROR.name());
                     faqRestService.evictFaqCacheAllEntries();
                     throw new RuntimeException("索引创建失败，无法继续索引文档: " + faq.getUid());
+                }
+            } else {
+                // 存量索引可能缺少 startDate/endDate 等 keyword 字段映射：
+                // 若不补映射，新字段会走动态映射（text 分词），导致有效期 range 词法比较失配。
+                // putMapping 对已有相同字段是幂等 no-op，仅新增字段；遇到历史类型冲突（如 date→keyword）会抛错，
+                // 此时需要删除整个索引后重建（deleteAllIndexByKbUid + updateAllIndex 或手动删索引）。
+                try {
+                    elasticsearchOperations.indexOps(FaqElastic.class).putMapping();
+                } catch (Exception mapEx) {
+                    log.warn("补齐FAQ索引映射失败（可能存在历史 date 类型冲突，请删除索引后全量重建）: {}, error={}",
+                            faq.getUid(), mapEx.getMessage());
                 }
             }
 
@@ -404,7 +434,8 @@ public class FaqElasticService {
             .forEach(translation -> elasticsearchOperations.save(FaqElastic.fromTranslation(faq, translation)));
         }
 
-        private void deleteTranslatedFaqDocuments(String sourceUid) {
+        // public 供过期清理任务（KbaseExpiryTask）按 sourceUid 联动删除翻译文档
+        public void deleteTranslatedFaqDocuments(String sourceUid) {
         if (!StringUtils.hasText(sourceUid)) {
             return;
         }
@@ -712,6 +743,11 @@ public class FaqElasticService {
                     languageQuery.minimumShouldMatch("1");
                     boolQueryBuilder.filter(languageQuery.build()._toQuery());
                 }
+
+                // 有效期过滤（null 容忍：字段缺失视为无边界，兼容存量未重建文档）
+                // 有效 = (startDate 缺失 或 startDate <= now) AND (endDate 缺失 或 endDate >= now)
+                String nowStr = BdDateUtils.formatDatetimeToString(BdDateUtils.now());
+                boolQueryBuilder.filter(KbaseValidityFilterUtils.validityFilterQuery(nowStr));
             } catch (Exception e) {
                 log.warn("添加过滤条件时出错: {}", e.getMessage());
             }

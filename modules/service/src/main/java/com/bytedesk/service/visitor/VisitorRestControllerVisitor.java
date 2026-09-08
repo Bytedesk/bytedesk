@@ -33,6 +33,7 @@ import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.annotation.BlackIpFilter;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.annotation.TabooJsonFilter;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 import com.bytedesk.core.message.IMessageSendService;
@@ -167,7 +168,10 @@ public class VisitorRestControllerVisitor {
         if (!StringUtils.hasText(request.getVisitorUid()) && !StringUtils.hasText(request.getUid())) {
             return ResponseEntity.ok(JsonResult.error("visitorUid or uid required"));
         }
-
+        // 访客端匿名接口：服务端强制按访客视角过滤消息（NOTICE/TRANSFER*/INVITE*/
+        // NOTIFICATION_AGENT_REPLY_TIMEOUT/NOTIFICATION_RATE_SUBMITTED/QUEUE_NOTICE/QUEUE_ACCEPT 等），
+        // 与 chatbox 主聊天列表的过滤口径完全一致，前后端同步升级无需考虑旧版兼容
+        request.setComponentType(TypeConsts.COMPONENT_TYPE_VISITOR);
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));
@@ -184,7 +188,8 @@ public class VisitorRestControllerVisitor {
         if (!StringUtils.hasText(request.getOrgUid())) {
             return ResponseEntity.ok(JsonResult.error("orgUid required"));
         }
-
+        // 访客端匿名接口：服务端强制按访客视角过滤消息，与 chatbox 主聊天列表口径一致
+        request.setComponentType(TypeConsts.COMPONENT_TYPE_VISITOR);
         Page<MessageResponse> response = messageRestService.queryByOrg(request);
         //
         return ResponseEntity.ok(JsonResult.success(response));

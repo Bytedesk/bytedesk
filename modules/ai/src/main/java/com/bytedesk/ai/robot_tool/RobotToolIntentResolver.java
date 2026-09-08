@@ -23,7 +23,7 @@ package com.bytedesk.ai.robot_tool;
  * 社区版无实现 bean 时返回 {@link RobotToolIntentContext#empty()}，
  * 机器人 LLM 对话不启用工具意图识别，其余链路不受影响。</p>
  *
- * <p>企业版实现：{@code com.bytedesk.ai.tool.RobotToolIntentResolverImpl}
+ * <p>企业版实现：{@code com.bytedesk.enterprise.ai.tool.RobotToolIntentResolverImpl}
  * （enterprise/ai 模块，bytedesk-enterprise-ai）。</p>
  */
 public interface RobotToolIntentResolver {

@@ -85,8 +85,15 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             }
 
             // ticket number
+            // 容错匹配：通知/移动端展示为 "#TKxxxx"，允许用户带 '#' 或仅输入部分编号；
+            // 统一 trim + 去前导 '#'，转义后按小写模糊匹配（兼容大小写敏感数据库）
             if (StringUtils.hasText(request.getTicketNumber())) {
-                predicates.add(criteriaBuilder.equal(root.get("ticketNumber"), request.getTicketNumber()));
+                String ticketNumber = request.getTicketNumber().trim().replaceFirst("^#+", "");
+                if (!ticketNumber.isEmpty()) {
+                    String ticketNumberPattern = "%" + escapeLike(ticketNumber.toLowerCase()) + "%";
+                    predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("ticketNumber")),
+                            ticketNumberPattern, LIKE_ESCAPE_CHAR));
+                }
             }
             // type
             if (StringUtils.hasText(request.getType())) {

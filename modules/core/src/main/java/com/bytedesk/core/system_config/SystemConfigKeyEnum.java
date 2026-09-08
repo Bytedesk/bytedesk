@@ -76,6 +76,29 @@ public enum SystemConfigKeyEnum {
             "用户协议链接",
             "登录页面《用户服务协议》跳转地址（完整 URL）",
             2),
+
+    // ============ 平台客服（PLATFORM_SERVICE） ============
+    PLATFORM_SERVICE_ENABLED(
+            SystemConfigConsts.KEY_PLATFORM_SERVICE_ENABLED,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.PLATFORM_SERVICE,
+            "启用平台客服入口",
+            "开启后访客聊天页工具栏显示「平台客服」按钮，用于用户-商户纠纷时联系平台介入",
+            1),
+    PLATFORM_SERVICE_ORG_UID(
+            SystemConfigConsts.KEY_PLATFORM_SERVICE_ORG_UID,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PLATFORM_SERVICE,
+            "平台客服组织 UID",
+            "平台客服所属组织，默认 df_org_uid",
+            2),
+    PLATFORM_SERVICE_WORKGROUP_UID(
+            SystemConfigConsts.KEY_PLATFORM_SERVICE_WORKGROUP_UID,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PLATFORM_SERVICE,
+            "平台客服工作组 UID",
+            "访客联系的工作组，须属于上述组织，默认 df_wg_uid",
+            3),
     ;
 
     private final String key;

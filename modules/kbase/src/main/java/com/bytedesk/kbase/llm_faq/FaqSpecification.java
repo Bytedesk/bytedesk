@@ -57,10 +57,16 @@ public class FaqSpecification extends BaseSpecification<FaqEntity, FaqRequest> {
             // onlyLoadValid
             if (request.getOnlyLoadValid() != null && request.getOnlyLoadValid()) {
                 predicates.add(criteriaBuilder.equal(root.get("enabled"), true));
-                // 当前时间 > startDate && 当前时间 < endDate
+                // 当前时间在有效期内：startDate <= now <= endDate（null 视为无边界）
                 ZonedDateTime now = BdDateUtils.now();
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("startDate"), now));
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("endDate"), now));
+                // startDate 为 null 或 startDate <= now
+                Predicate startDateNull = criteriaBuilder.isNull(root.get("startDate"));
+                Predicate started = criteriaBuilder.lessThanOrEqualTo(root.get("startDate"), now);
+                predicates.add(criteriaBuilder.or(startDateNull, started));
+                // endDate 为 null 或 endDate >= now
+                Predicate endDateNull = criteriaBuilder.isNull(root.get("endDate"));
+                Predicate notEnded = criteriaBuilder.greaterThanOrEqualTo(root.get("endDate"), now);
+                predicates.add(criteriaBuilder.or(endDateNull, notEnded));
             }
             // searchText
             if (StringUtils.hasText(request.getSearchText())) {

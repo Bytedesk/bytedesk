@@ -16,11 +16,15 @@ package com.bytedesk.kbase.llm_faq;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.ZonedDateTime;
 
 public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecificationExecutor<FaqEntity> {
 
@@ -61,4 +65,14 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update FaqEntity f set f.kbase = :kbase where f.uid = :uid")
     int updateKbaseByUid(@Param("uid") String uid, @Param("kbase") com.bytedesk.kbase.kbase.KbaseEntity kbase);
+
+    /**
+     * 查询已过期但仍残留在索引中的 FAQ（endDate < now 且 elastic/vector 状态为 SUCCESS）
+     * 供过期清理定时任务分页使用
+     */
+    @Query(value = "select f from FaqEntity f where f.deleted = false and f.endDate < :now "
+            + "and (f.elasticStatus = 'SUCCESS' or f.vectorStatus = 'SUCCESS')",
+           countQuery = "select count(f) from FaqEntity f where f.deleted = false and f.endDate < :now "
+            + "and (f.elasticStatus = 'SUCCESS' or f.vectorStatus = 'SUCCESS')")
+    Page<FaqEntity> findExpiredIndexed(@Param("now") ZonedDateTime now, Pageable pageable);
 }

@@ -24,6 +24,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.llm_text.TextEntity;
 import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
@@ -60,11 +61,12 @@ public class TextElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime startDate;
+    // 有效期（定宽字符串 yyyy-MM-dd HH:mm:ss，词法序=时间序，null/缺失视为无边界）
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
 
     @Field(type = FieldType.Keyword)
     private String categoryUid;
@@ -115,8 +117,8 @@ public class TextElastic {
                 .status(entity.getElasticStatus())
                 .tagList(entity.getTagList())
                 .enabled(entity.getEnabled())
-                // .startDate(entity.getStartDate())
-                // .endDate(entity.getEndDate())
+                .startDate(BdDateUtils.formatDatetimeToString(entity.getStartDate()))
+                .endDate(BdDateUtils.formatDatetimeToString(entity.getEndDate()))
                 .categoryUid(entity.getCategoryUid())
                 .kbUid(kbUid)
                 .language(sourceLanguage)
@@ -150,6 +152,8 @@ public class TextElastic {
                 .status(entity.getElasticStatus())
                 .tagList(translation.getTagList() == null || translation.getTagList().isEmpty() ? entity.getTagList() : translation.getTagList())
                 .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(entity.getEnabled()))
+                .startDate(BdDateUtils.formatDatetimeToString(entity.getStartDate()))
+                .endDate(BdDateUtils.formatDatetimeToString(entity.getEndDate()))
                 .categoryUid(entity.getCategoryUid())
                 .kbUid(kbUid)
                 .language(targetLanguage)

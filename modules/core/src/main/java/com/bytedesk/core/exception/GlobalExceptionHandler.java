@@ -367,7 +367,7 @@ public class GlobalExceptionHandler {
 
         // 无可用测试分机号，属于已知业务异常
         // 类在 enterprise/call 模块，此处通过类名匹配避免跨模块依赖
-        if ("com.bytedesk.call.extension.exception.NoAvailableExtensionException"
+        if ("com.bytedesk.enterprise.call.extension.exception.NoAvailableExtensionException"
                 .equals(e.getClass().getName())) {
             log.warn("No available extension: {}", rawMessage);
             return ResponseEntity.ok().body(JsonResult.error(resolvedMessage));
@@ -516,29 +516,31 @@ public class GlobalExceptionHandler {
         Throwable root = e.getMostSpecificCause();
         String rootMsg = root != null ? root.getMessage() : e.getMessage();
         log.warn("DataIntegrityViolation: {}", rootMsg);
+        // 注意：以下 message 均为 i18n key，若直接返回前端会显示原始 key（如 i18n.input.too.long），
+        // 统一经 resolveRuntimeMessage 按请求语言（Accept-Language）解析后返回
         if (rootMsg != null) {
             // 字段超长：Data truncation: Data too long for column 'xxx'
             if (rootMsg.contains("Data too long for column")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error(I18Consts.I18N_INPUT_TOO_LONG, HttpStatus.BAD_REQUEST.value()));
+                .body(JsonResult.error(resolveRuntimeMessage(I18Consts.I18N_INPUT_TOO_LONG), HttpStatus.BAD_REQUEST.value()));
             }
             // 唯一键冲突：Duplicate entry 'xxx' for key 'yyy'
             if (rootMsg.contains("Duplicate entry")) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error(I18Consts.I18N_DATA_ALREADY_EXISTS, HttpStatus.CONFLICT.value()));
+                .body(JsonResult.error(resolveRuntimeMessage(I18Consts.I18N_DATA_ALREADY_EXISTS), HttpStatus.CONFLICT.value()));
             }
             // 外键约束：Cannot add or update a child row / Cannot delete or update a parent row
             if (rootMsg.contains("foreign key constraint") || rootMsg.contains("a foreign key constraint")) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
-                .body(JsonResult.error(I18Consts.I18N_DATA_RELATION_CONSTRAINT_VIOLATED, HttpStatus.BAD_REQUEST.value()));
+                .body(JsonResult.error(resolveRuntimeMessage(I18Consts.I18N_DATA_RELATION_CONSTRAINT_VIOLATED), HttpStatus.BAD_REQUEST.value()));
             }
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
-            .body(JsonResult.error(I18Consts.I18N_DATA_SAVE_FAILED, HttpStatus.BAD_REQUEST.value()));
+            .body(JsonResult.error(resolveRuntimeMessage(I18Consts.I18N_DATA_SAVE_FAILED), HttpStatus.BAD_REQUEST.value()));
     }
 
     @ExceptionHandler(InvalidDataAccessApiUsageException.class)

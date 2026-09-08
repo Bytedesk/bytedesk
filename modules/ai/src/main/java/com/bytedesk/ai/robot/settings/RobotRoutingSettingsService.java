@@ -4,6 +4,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,8 @@ public class RobotRoutingSettingsService {
     }
 
     private final JdbcTemplate jdbcTemplate;
+
+    private final RobotRoutingSettingsRepository robotRoutingSettingsRepository;
 
     @Cacheable(cacheNames = "workgroupAutoReplyConfig", key = "#workgroupUid", unless = "#result == null")
     public WorkgroupAutoReplyConfig findByWorkgroupUid(String workgroupUid) {
@@ -52,5 +55,20 @@ public class RobotRoutingSettingsService {
     @CacheEvict(cacheNames = "workgroupAutoReplyConfig", key = "#workgroupUid")
     public void evictByWorkgroupUid(String workgroupUid) {
         // cache eviction is handled by annotation
+    }
+
+    /**
+     * 全量关闭机器人路由开关（defaultRobot/offlineRobot/nonWorktimeRobot 全部置为 false）。
+     * 用于 "/ai" 菜单隐藏后，停用所有工作组/技能组的机器人接待策略。
+     *
+     * @return 实际更新的行数
+     */
+    @Transactional
+    public int disableAllRobotRouting() {
+        int updated = robotRoutingSettingsRepository.disableAllRobotRouting();
+        if (updated > 0) {
+            log.info("disableAllRobotRouting: {} robot routing settings reset to false", updated);
+        }
+        return updated;
     }
 }

@@ -520,20 +520,26 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     /**
      * 预初始化 MemberEntity.user 的代理及其懒加载集合 (currentRoles/userOrganizationRoles)，
      * 避免实体序列化进 Redis 后反序列化时 "Cannot lazily initialize collection (no session)"。
-     * 必须在事务内/持久化上下文存活时调用。
+     * 必须在事务内/持久化上下文存活时调用；会话已关闭时（如调度线程无事务上下文）直接跳过，
+     * 由 RedisCacheConfig 中注册的 Hibernate7Module 将未初始化的懒加载属性序列化为 null。
      */
     private void initializeUserRelations(MemberEntity member) {
         if (member == null || member.getUser() == null) {
             return;
         }
-        // 初始化 user 代理本身
-        Hibernate.initialize(member.getUser());
-        // 初始化 user 的懒加载集合
-        if (member.getUser().getCurrentRoles() != null) {
-            Hibernate.initialize(member.getUser().getCurrentRoles());
-        }
-        if (member.getUser().getUserOrganizationRoles() != null) {
-            Hibernate.initialize(member.getUser().getUserOrganizationRoles());
+        try {
+            // 初始化 user 代理本身
+            Hibernate.initialize(member.getUser());
+            // 初始化 user 的懒加载集合
+            if (member.getUser().getCurrentRoles() != null) {
+                Hibernate.initialize(member.getUser().getCurrentRoles());
+            }
+            if (member.getUser().getUserOrganizationRoles() != null) {
+                Hibernate.initialize(member.getUser().getUserOrganizationRoles());
+            }
+        } catch (Exception e) {
+            // 持久化上下文可能已关闭（LazyInitializationException），跳过预加载不影响主流程
+            log.debug("skip initialize member user relations: uid={}, msg={}", member.getUid(), e.getMessage());
         }
     }
 

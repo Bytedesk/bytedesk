@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.article.elastic;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -21,6 +20,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.article.ArticleEntity;
 
 import lombok.AllArgsConstructor;
@@ -77,9 +77,10 @@ public class ArticleElastic {
     @Field(type = FieldType.Keyword)
     private String categoryUid;
     
+    // 有效期（定宽字符串 yyyy-MM-dd HH:mm:ss，词法序=时间序，null/缺失视为无边界）
     @Field(type = FieldType.Keyword)
     private String startDate;
-    
+
     @Field(type = FieldType.Keyword)
     private String endDate;
     
@@ -108,8 +109,8 @@ public class ArticleElastic {
             .orgUid(article.getOrgUid())
             .kbUid(kbUid)
             .categoryUid(article.getCategoryUid())
-            .startDate(article.getStartDate() != null ? article.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-            .endDate(article.getEndDate() != null ? article.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .startDate(BdDateUtils.formatDatetimeToString(article.getStartDate()))
+            .endDate(BdDateUtils.formatDatetimeToString(article.getEndDate()))
             .readCount(article.getReadCount())
             .likeCount(article.getLikeCount())
             .build();

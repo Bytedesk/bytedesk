@@ -208,6 +208,30 @@ public class FaqEntity extends BaseEntity {
         return this.transferCount;
     }
 
+    // 有效期判定：null 视为无边界（startDate==null 早已生效，endDate==null 永不过期）
+
+    /** 当前处于有效期内: startDate <= now <= endDate */
+    public boolean isValidNow() {
+        return isValidAt(BdDateUtils.now());
+    }
+
+    /** 指定时刻处于有效期内 */
+    public boolean isValidAt(ZonedDateTime at) {
+        boolean started = startDate == null || !startDate.isAfter(at);
+        boolean notEnded = endDate == null || !endDate.isBefore(at);
+        return started && notEnded;
+    }
+
+    /** 已过期（仅 endDate < now；null 视为永不过期） */
+    public boolean isExpired() {
+        return endDate != null && endDate.isBefore(BdDateUtils.now());
+    }
+
+    /** 未生效（startDate > now；null 视为早已生效） */
+    public boolean isNotStarted() {
+        return startDate != null && startDate.isAfter(BdDateUtils.now());
+    }
+
     // set Success
     public FaqEntity setElasticSuccess() {
         this.setElasticStatus(FaqStatusEnum.SUCCESS.name());

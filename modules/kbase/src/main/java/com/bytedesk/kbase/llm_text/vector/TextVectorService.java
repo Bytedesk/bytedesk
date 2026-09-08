@@ -120,6 +120,20 @@ public class TextVectorService {
         long startMs = System.currentTimeMillis();
         
         try {
+            // 写入守卫：已过期内容不写入向量索引，删除可能存在的旧文档（幂等），状态置 EXPIRED，静默返回
+            // 不抛异常，保证批量重建不被单条过期内容中断；复活靠 UpdateDocEvent 自动重建
+            if (text.isExpired()) {
+                log.info("Text已过期，跳过向量索引并删除旧文档: uid={}, endDate={}", text.getUid(), text.getEndDate());
+                try {
+                    deleteTextVector(text);
+                } catch (Exception delEx) {
+                    log.warn("删除过期Text向量文档失败（将继续置EXPIRED）: uid={}, error={}", text.getUid(), delEx.getMessage());
+                }
+                textRestService.updateVectorStatusOnly(text.getUid(), ChunkStatusEnum.EXPIRED.name());
+                return;
+            }
+            // 未生效（startDate > now）：照常写入索引，检索期过滤会排除
+
             // 1. 为标题和内容创建文档（带有元数据）
             String id = "text_" + text.getUid();
             // 将标题和内容合并，以便一起索引，确保标题具有更大的权重
@@ -143,6 +157,13 @@ public class TextVectorService {
             metadata.put("sourceLanguage", text.getKbase() != null && StringUtils.hasText(text.getKbase().getSourceLanguage()) ? text.getKbase().getSourceLanguage().trim().toUpperCase() : "");
             metadata.put("translated", Boolean.FALSE.toString());
             metadata.put("sourceType", "TEXT");
+            // 有效期（epoch 毫秒），为二期 metadata 范围过滤铺路；null 不写入
+            if (text.getStartDate() != null) {
+                metadata.put("startDateMillis", text.getStartDate().toInstant().toEpochMilli());
+            }
+            if (text.getEndDate() != null) {
+                metadata.put("endDateMillis", text.getEndDate().toInstant().toEpochMilli());
+            }
             
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -576,6 +597,20 @@ public class TextVectorService {
                     metadata.getOrDefault(KbaseConst.KBASE_KB_UID_LEGACY, ""));
             String docCategoryUid = (String) metadata.getOrDefault("categoryUid", "");
             String docOrgUid = (String) metadata.getOrDefault("orgUid", "");
+
+            // 有效期后过滤：按 sourceUid（翻译文档回查源实体）回查数据库实体，
+            // 过期/未生效/已删除/查不到实体一律跳过，宁可漏召回也不召回过期内容
+            String validityUid = (String) metadata.getOrDefault("sourceUid", docUid);
+            if (!StringUtils.hasText(validityUid)) {
+                validityUid = docUid;
+            }
+            Optional<TextEntity> validityOpt = StringUtils.hasText(validityUid)
+                    ? textRestService.findByUid(validityUid)
+                    : Optional.empty();
+            if (validityOpt.isEmpty() || validityOpt.get().isDeleted() || !validityOpt.get().isValidNow()) {
+                log.debug("Text已过期/未生效/实体不存在，跳过向量召回: uid={}, sourceUid={}", docUid, validityUid);
+                continue;
+            }
             
             // 从标签字符串还原为列表
             String tagsStr = (String) metadata.getOrDefault("tags", "");
@@ -716,7 +751,8 @@ public class TextVectorService {
         }
     }
 
-    private void deleteTranslatedTextVectors(TextEntity text) {
+    // public 供过期清理任务（KbaseExpiryTask）按 sourceUid 联动删除翻译向量文档
+    public void deleteTranslatedTextVectors(TextEntity text) {
         if (text.getKbase() == null || !StringUtils.hasText(text.getUid())) {
             return;
         }

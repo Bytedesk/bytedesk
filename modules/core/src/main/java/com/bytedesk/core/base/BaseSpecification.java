@@ -88,7 +88,8 @@ public abstract class BaseSpecification<T, TRequest> {
             if (user != null
                     && !Boolean.TRUE.equals(request.getSuperUser())
                     && !platformDefaultOrgRequest
-                    && !platformLevelRequest) {
+                    && !platformLevelRequest
+                    && !isPlatformOrgMember(user)) {
                 String userOrgUid = user.getOrgUid();
                 if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(request.getOrgUid())) {
                     throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_ACCESS_DENIED);
@@ -254,6 +255,19 @@ public abstract class BaseSpecification<T, TRequest> {
         boolean isDefaultOrg = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(request.getOrgUid());
         boolean isPlatformLevel = LevelEnum.PLATFORM.name().equalsIgnoreCase(request.getLevel());
         return isDefaultOrg && isPlatformLevel;
+    }
+
+    /**
+     * 平台默认组织（df_org_uid）成员判定：平台客服跨组织只读查询放行入口。
+     *
+     * 语义（仅影响读查询的 spec 闸门，写路径不经此处）：
+     * - 平台成员显式传入任意 orgUid 时不再拒绝，进入下方 orgUid 精确过滤（equal，不做关键字模糊匹配）；
+     * - 未传 orgUid 仍自动补 df_org_uid，既有默认行为零变化；
+     * - 租户成员传他人 orgUid 仍拒绝。
+     */
+    private static boolean isPlatformOrgMember(UserEntity user) {
+        return user != null
+                && BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(user.getOrgUid());
     }
 
     protected static List<String> resolveOrganizationUidsForKeyword(String keyword) {

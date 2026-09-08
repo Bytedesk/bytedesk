@@ -36,6 +36,9 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long>,
 
     List<CategoryEntity> findByKbUidAndDeletedFalse(String kbUid);
 
+    // 查询组织级分类（按 order 升序），visitor 端工单创建下拉等场景使用
+    List<CategoryEntity> findByOrgUidAndTypeAndLevelAndDeletedFalseOrderByOrderAsc(String orgUid, String type, String level);
+
     Boolean existsByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
 
     Boolean existsByUid(String uid);

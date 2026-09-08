@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        机器人 Tools/MCP 调用改为默认关闭（opt-in）：清理存量数据。
+
+        背景：
+        - RobotToolConfig.enabled 历史默认 true，RobotToolsSettingsEntity.toolConfigs
+          历史默认预置 5 个演示工具（spring.datetime / spring.math / spring.datetime.alarm
+          默认开启），导致存量机器人未显式配置即参与大模型对话的工具解析链路；
+        - 实体侧已改为：单工具 enabled 默认 false、toolConfigs 默认空列表；
+        - 本迁移将存量数据按最新默认配置对齐：全部关闭，需管理员在
+          管理后台（TabTools）显式开启并发布后才恢复调用。
+
+        覆盖的数据面：
+        1. bytedesk_ai_robot_tools_settings（发布 toolsSettings + 草稿 draftToolsSettings
+           为同表两行，全表更新一并覆盖）：
+           - is_tools_enabled 主开关统一置为 false；
+           - tool_configs JSON 数组内每个条目的 "enabled":true 改为 "enabled":false
+             （序列化统一走 Jackson RobotToolConfigListConverter，紧凑格式无空格，
+             另叠加带空格变体兜底；保留条目本身便于管理员重新开启，不做清空删除）；
+        2. bytedesk_ai_robot.llm_tools（RobotLlm @Embedded 实例级工具名列表，
+           StringListConverter 逗号拼接存储）：清空为 ''，与最新默认空列表一致。
+           注意：该列独立于 toolsSettings 主开关，若不清空，存量机器人仍会
+           直接参与工具回调解析。
+
+        说明：
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体新默认值直接建行，无需本迁移；
+        - 所有语句幂等，重复执行无副作用；
+        - Oracle 下空字符串即 NULL，单独处理 WHERE 条件。
+    -->
+
+    <changeSet id="260908-disable-robot-tools-settings-default" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot_tools_settings" />
+        </preConditions>
+
+        <!-- 1a. 主开关统一关闭（含 NULL 行） -->
+        <sql dbms="mysql,mariadb">
+            UPDATE bytedesk_ai_robot_tools_settings
+            SET is_tools_enabled = b'0'
+            WHERE is_tools_enabled IS NULL OR is_tools_enabled = b'1';
+        </sql>
+        <sql dbms="postgresql,h2,oracle,kingbase">
+            UPDATE bytedesk_ai_robot_tools_settings
+            SET is_tools_enabled = FALSE
+            WHERE is_tools_enabled IS NULL OR is_tools_enabled = TRUE;
+        </sql>
+
+        <!-- 1b. tool_configs 内每个工具条目置为 enabled=false（保留条目，便于手动重新开启） -->
+        <sql dbms="mysql,mariadb,postgresql,h2,oracle,kingbase">
+            UPDATE bytedesk_ai_robot_tools_settings
+            SET tool_configs = REPLACE(tool_configs, '"enabled":true', '"enabled":false')
+            WHERE tool_configs IS NOT NULL
+              AND tool_configs LIKE '%"enabled":true%';
+
+            UPDATE bytedesk_ai_robot_tools_settings
+            SET tool_configs = REPLACE(REPLACE(tool_configs, '"enabled": true', '"enabled": false'), '"enabled": true', '"enabled":false')
+            WHERE tool_configs IS NOT NULL
+              AND tool_configs LIKE '%"enabled": true%';
+        </sql>
+    </changeSet>
+
+    <changeSet id="260908-clear-robot-llm-tools" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+            <columnExists tableName="bytedesk_ai_robot" columnName="llm_tools" />
+        </preConditions>
+
+        <!-- 2. 实例级 llm_tools（逗号拼接）清空，与默认空列表一致；Oracle 空串即 NULL -->
+        <sql dbms="mysql,mariadb,postgresql,h2,kingbase">
+            UPDATE bytedesk_ai_robot
+            SET llm_tools = ''
+            WHERE llm_tools IS NOT NULL
+              AND TRIM(llm_tools) &lt;&gt; '';
+        </sql>
+        <sql dbms="oracle">
+            UPDATE bytedesk_ai_robot
+            SET llm_tools = NULL
+            WHERE llm_tools IS NOT NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -48,4 +48,9 @@
 
     <include file="db/changelog/migration/260905_widen_ticket_description.xml" />
 
+    <include file="db/changelog/migration/260906_add_office_document_table.xml" />
+    <include file="db/changelog/migration/260906_add_office_project_table.xml" />
+
+    <include file="db/changelog/migration/260908_disable_robot_tools_by_default.xml" />
+
 </databaseChangeLog>

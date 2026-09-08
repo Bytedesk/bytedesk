@@ -33,7 +33,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.menu.event.MenuUpdateEvent;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -53,6 +55,8 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
     private final UidUtils uidUtils;
 
     private final AuthService authService;
+
+    private final BytedeskEventPublisher bytedeskEventPublisher;
 
     @Override
     protected Specification<MenuEntity> createSpecification(MenuRequest request) {
@@ -256,6 +260,8 @@ public class MenuRestService extends BaseRestServiceWithExport<MenuEntity, MenuR
             if (savedEntity == null) {
                 throw new RuntimeException(I18Consts.I18N_UPDATE_FAILED);
             }
+            // 发布菜单更新事件，供其他模块联动处理，如："/ai" 菜单隐藏时联动关闭机器人路由
+            bytedeskEventPublisher.publishEvent(new MenuUpdateEvent(savedEntity));
             return convertToResponse(savedEntity);
         }
         else {

@@ -26,7 +26,7 @@ import org.springframework.ai.tool.ToolCallback;
  * 供 {@code BaseSpringAIService#applyRobotToolCallbacks} 在社区版下编译与运行：
  * 社区版无实现 bean 时，机器人 LLM 对话不挂载工具回调，其余链路不受影响。</p>
  *
- * <p>企业版实现：{@code com.bytedesk.ai.tool.utils.RobotToolCallbackResolverImpl}
+ * <p>企业版实现：{@code com.bytedesk.enterprise.ai.tool.utils.RobotToolCallbackResolverImpl}
  * （enterprise/ai 模块，bytedesk-enterprise-ai）。</p>
  */
 public interface RobotToolCallbackResolver {

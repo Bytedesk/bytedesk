@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.article.vector;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -21,6 +20,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.article.ArticleEntity;
 
 import lombok.AllArgsConstructor;
@@ -79,7 +79,7 @@ public class ArticleVector {
     @Field(type = FieldType.Dense_Vector, dims = 1536)
     private float[] contentEmbedding;
     
-    // 有效日期范围
+    // 有效日期范围（定宽字符串 yyyy-MM-dd HH:mm:ss，词法序=时间序，null/缺失视为无边界）
     @Field(type = FieldType.Keyword)
     private String startDate;
 
@@ -112,8 +112,8 @@ public class ArticleVector {
             .categoryUid(article.getCategoryUid())
             .enabled(article.getPublished()) // 使用published字段作为enabled
             .top(article.getTop())
-            .startDate(article.getStartDate() != null ? article.getStartDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
-            .endDate(article.getEndDate() != null ? article.getEndDate().format(DateTimeFormatter.ISO_DATE_TIME) : null)
+            .startDate(BdDateUtils.formatDatetimeToString(article.getStartDate()))
+            .endDate(BdDateUtils.formatDatetimeToString(article.getEndDate()))
             .readCount(article.getReadCount())
             .likeCount(article.getLikeCount())
             // .docIdList(article.getDocIdList())

@@ -200,6 +200,29 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return page.map(entity -> modelMapper.map(entity, OrganizationResponseSimple.class));
     }
 
+    /**
+     * 平台查询组织列表（desktop「平台查询」组织选择器数据源）。
+     *
+     * 鉴权：仅超级管理员或平台默认组织（df_org_uid）成员可用；
+     * 返回 OrganizationResponseSimple 简版字段，不包含联系人等敏感信息（R11）；
+     * 审计：Controller 层 @ActionAnnotation 留痕。
+     */
+    public Page<OrganizationResponseSimple> queryByPlatform(OrganizationRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        boolean platformMember = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(user.getOrgUid());
+        if (!user.isSuperUser() && !platformMember) {
+            throw OrganizationI18nExceptions.organizationAccessDenied();
+        }
+
+        Pageable pageable = request.getPageable();
+        Specification<OrganizationEntity> spec = OrganizationSpecification.search(request, authService);
+        Page<OrganizationEntity> page = organizationRepository.findAll(spec, pageable);
+        return page.map(entity -> modelMapper.map(entity, OrganizationResponseSimple.class));
+    }
+
     @Transactional
     @Override
     public OrganizationResponse create(OrganizationRequest request) {

@@ -18,7 +18,8 @@ public enum ChunkStatusEnum {
     PROCESSING, // 处理中
     WAITING, // 等待中
     SUCCESS,  // 成功
-    ERROR;  // 失败
+    ERROR,  // 失败
+    EXPIRED;  // 内容已过期，已从索引移除
 
     // 根据字符串查找对应的枚举常量
     public static ChunkStatusEnum fromValue(String value) {
@@ -60,6 +61,8 @@ public enum ChunkStatusEnum {
                 return "成功";
             case ERROR:
                 return "失败";
+            case EXPIRED:
+                return "已过期";
             default:
                 return this.name();
         }

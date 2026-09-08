@@ -382,6 +382,23 @@ public class FaqVectorService {
         FaqEntity currentFaq = currentFaqOpt.get();
         log.info("获取到最新FAQ实体，当前向量状态: {}, ID: {}", currentFaq.getVectorStatus(), currentFaq.getUid());
 
+        // 写入守卫：已过期内容不写入向量索引，删除可能存在的旧文档（幂等），状态置 EXPIRED，静默返回
+        // 不抛异常，保证批量重建（updateAllVectorIndex 等）不被单条过期内容中断；复活靠 UpdateDocEvent 自动重建
+        if (currentFaq.isExpired()) {
+            log.info("FAQ已过期，跳过向量索引并删除旧文档: uid={}, endDate={}", currentFaq.getUid(),
+                    currentFaq.getEndDate());
+            try {
+                deleteFaqVector(currentFaq);
+            } catch (Exception delEx) {
+                log.warn("删除过期FAQ向量文档失败（将继续置EXPIRED）: uid={}, error={}", currentFaq.getUid(),
+                        delEx.getMessage());
+            }
+            faqRestService.updateVectorStatusOnly(currentFaq.getUid(), FaqStatusEnum.EXPIRED.name());
+            faqRestService.evictFaqCacheAllEntries();
+            return;
+        }
+        // 未生效（startDate > now）：照常写入索引，检索期过滤会排除
+
         // kbUid 必填：避免写入向量存储时 kb_uid 为空
         String kbUid = (currentFaq.getKbase() != null) ? currentFaq.getKbase().getUid() : null;
         if (!StringUtils.hasText(kbUid) && StringUtils.hasText(kbUidHint)) {
@@ -434,6 +451,13 @@ public class FaqVectorService {
                 metadata.put("sourceLanguage", currentFaq.getKbase() != null && StringUtils.hasText(currentFaq.getKbase().getSourceLanguage()) ? currentFaq.getKbase().getSourceLanguage().trim().toUpperCase() : "");
                 metadata.put("translated", Boolean.FALSE.toString());
                 metadata.put("sourceType", "FAQ");
+                // 有效期（epoch 毫秒），为二期 metadata 范围过滤铺路；null 不写入
+                if (currentFaq.getStartDate() != null) {
+                    metadata.put("startDateMillis", currentFaq.getStartDate().toInstant().toEpochMilli());
+                }
+                if (currentFaq.getEndDate() != null) {
+                    metadata.put("endDateMillis", currentFaq.getEndDate().toInstant().toEpochMilli());
+                }
 
             // 创建文档
             Document document = new Document(id, content, metadata);
@@ -660,11 +684,19 @@ public class FaqVectorService {
             // 从文档中提取元数据
             Map<String, Object> metadata = doc.getMetadata();
             String uid = (String) metadata.getOrDefault("uid", "");
+            // 翻译文档的 uid 是 translation.uid（直接查不到源实体），优先用 sourceUid 回查源实体
+            String sourceUid = (String) metadata.getOrDefault("sourceUid", "");
+            String entityUid = StringUtils.hasText(sourceUid) ? sourceUid : uid;
 
-            // 1. 通过UID查找对应的FAQ实体，以便获取完整信息
-            Optional<FaqEntity> faqEntityOpt = faqRestService.findByUid(uid);
+            // 1. 通过UID查找对应的FAQ实体，并校验有效期（过期/未生效/已删除一律跳过，宁可漏召回也不召回过期内容）
+            Optional<FaqEntity> faqEntityOpt = faqRestService.findByUid(entityUid);
             if (faqEntityOpt.isPresent()) {
                 FaqEntity faqEntity = faqEntityOpt.get();
+                if (faqEntity.isDeleted() || !faqEntity.isValidNow()) {
+                    log.debug("FAQ已过期或未生效，跳过向量召回: uid={}, startDate={}, endDate={}",
+                            entityUid, faqEntity.getStartDate(), faqEntity.getEndDate());
+                    continue;
+                }
 
                 // 2. 将FaqEntity转换为FaqVector
                 FaqVector faqVector;
@@ -687,17 +719,9 @@ public class FaqVectorService {
 
                 resultList.add(result);
             } else {
-                // 如果找不到对应的FAQ实体，尝试从文档元数据构建一个简化的FaqVector
-                FaqVector simpleFaqVector = createSimpleFaqVectorFromDocument(doc);
-
-                FaqVectorSearchResult result = FaqVectorSearchResult.builder()
-                        .faqVector(simpleFaqVector)
-                        .score(doc.getScore().floatValue())
-                        .highlightedQuestion((String) metadata.getOrDefault("question", ""))
-                        .distance((float) (1.0 - doc.getScore().doubleValue())) // 同上
-                        .build();
-
-                resultList.add(result);
+                // 查不到实体（已删除/翻译文档源已删除等）：metadata 无日期无法判断有效期，一律跳过，
+                // 宁可漏召回也不召回过期内容
+                log.debug("向量召回文档查不到有效源实体，跳过: uid={}, sourceUid={}", uid, sourceUid);
             }
         }
 
@@ -819,7 +843,8 @@ public class FaqVectorService {
         }
     }
 
-    private void deleteTranslatedFaqVectors(FaqEntity faq) {
+    // public 供过期清理任务（KbaseExpiryTask）按 sourceUid 联动删除翻译向量文档
+    public void deleteTranslatedFaqVectors(FaqEntity faq) {
         if (faq.getKbase() == null || !StringUtils.hasText(faq.getUid())) {
             return;
         }

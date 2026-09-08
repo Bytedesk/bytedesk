@@ -17,7 +17,9 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
@@ -314,7 +316,52 @@ class TicketSLAServiceTest {
 
         assertEquals(1, closed);
         assertEquals(TicketStatusEnum.CLOSED.name(), ticket.getStatus());
+        // SLA 记录应推进到终态，避免监控任务每分钟重复关单/评论/通知
+        assertEquals(TicketSlaStatusEnum.COMPLETED.name(), record.getStatus());
+        assertEquals("system", record.getCompletedBy());
+        assertTrue(record.getCompletedAt() != null);
+        // 保留 breached 标记，统计口径不变
+        assertTrue(Boolean.TRUE.equals(record.getBreached()));
+        verify(fixture.slaRecordRepository).save(record);
         verify(fixture.ticketRepository).save(ticket);
+        verify(fixture.notificationService).sendSLABreachNotification(
+                eq(ticket.getUid()), eq(TicketSlaTypeEnum.CUSTOMER_VERIFY.name()), any());
+    }
+
+    @Test
+    void autoCloseShouldFinalizeRecordOnlyWhenTicketAlreadyClosed() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        fixture.enableAutoClose(ticket, 1);
+        when(fixture.ticketRepository.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
+        TicketSlaRecordEntity record = TicketSlaRecordEntity.builder()
+                .uid("sla-record-5")
+                .ticketUid("ticket-1")
+                .processInstanceId("process-5")
+                .slaType(TicketSlaTypeEnum.CUSTOMER_VERIFY.name())
+                .status(TicketSlaStatusEnum.BREACHED.name())
+                .startedAt(BdDateUtils.now().minusMinutes(180))
+                .dueAt(BdDateUtils.now().minusMinutes(120))
+                .breachedAt(BdDateUtils.now().minusMinutes(90))
+                .durationMinutes(60L)
+                .breached(Boolean.TRUE)
+                .build();
+        when(fixture.slaRecordRepository.findTop200BySlaTypeAndStatusAndDeletedFalseOrderByBreachedAtAsc(
+                TicketSlaTypeEnum.CUSTOMER_VERIFY.name(), TicketSlaStatusEnum.BREACHED.name()))
+                .thenReturn(List.of(record));
+
+        int closed = fixture.service.autoCloseBreachedCustomerVerifyRecords();
+
+        assertEquals(1, closed);
+        assertEquals(TicketStatusEnum.CLOSED.name(), ticket.getStatus());
+        // 工单已关闭：仅终结 SLA 记录，不重复保存工单/评论/通知
+        assertEquals(TicketSlaStatusEnum.COMPLETED.name(), record.getStatus());
+        assertEquals("system", record.getCompletedBy());
+        assertTrue(Boolean.TRUE.equals(record.getBreached()));
+        verify(fixture.ticketRepository, never()).save(any(TicketEntity.class));
+        verify(fixture.notificationService, never()).sendSLABreachNotification(any(), any(), any());
+        verify(fixture.slaRecordRepository).save(record);
     }
 
     @Test
@@ -399,13 +446,18 @@ class TicketSLAServiceTest {
         private final UidUtils uidUtils = mock(UidUtils.class);
         private final TaskService taskService = mock(TaskService.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
                 private final TaskQuery taskQuery = mock(TaskQuery.class, org.mockito.Mockito.RETURNS_SELF);
+        private final RuntimeService runtimeService = mock(RuntimeService.class);
+        private final ProcessInstanceQuery processInstanceQuery = mock(ProcessInstanceQuery.class,
+                org.mockito.Mockito.RETURNS_SELF);
         private final HolidayRestService holidayRestService = mock(HolidayRestService.class);
         private final TicketSLAService service = new TicketSLAService(notificationService, ticketSettingsRepository,
-                slaRecordRepository, ticketRepository, processRepository, uidUtils, taskService, holidayRestService);
+                slaRecordRepository, ticketRepository, processRepository, uidUtils, taskService, runtimeService,
+                holidayRestService);
 
                 private Fixture() {
                         when(taskService.createTaskQuery()).thenReturn(taskQuery);
                         when(taskQuery.active()).thenReturn(taskQuery);
+                        when(runtimeService.createProcessInstanceQuery()).thenReturn(processInstanceQuery);
                 }
 
                 private void mockActiveTasks(String processInstanceId, List<Task> tasks) {

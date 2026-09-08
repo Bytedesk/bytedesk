@@ -156,6 +156,14 @@ public class CategoryRestService extends BaseRestService<CategoryEntity, Categor
         return categoryRepository.findByUidInAndDeletedFalse(uids);
     }
 
+    /**
+     * 查询组织级未删除分类（按 order 升序），visitor 端工单创建下拉等场景使用。
+     */
+    public List<CategoryEntity> findByOrgUidAndTypeAndLevelAndDeletedFalseOrderByOrderAsc(String orgUid, String type,
+            String level) {
+        return categoryRepository.findByOrgUidAndTypeAndLevelAndDeletedFalseOrderByOrderAsc(orgUid, type, level);
+    }
+
     public Optional<CategoryEntity> findByNameAndKbUid(String name, String kbUid) {
         return categoryRepository.findByNameAndKbUidAndDeletedFalse(name, kbUid);
     }

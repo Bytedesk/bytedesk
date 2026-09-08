@@ -57,9 +57,10 @@ public class RobotToolConfig implements Serializable {
 
         /**
          * Whether this tool is enabled for the current robot template.
+         * 默认关闭：工具/ MCP 调用一律 opt-in，必须在管理后台显式开启后才会参与大模型对话。
          */
         @Builder.Default
-        private Boolean enabled = true;
+        private Boolean enabled = false;
 
         /**
          * Binding type: CLASS, SPRING_BEAN, FUNCTION_BEAN, HTTP_ENDPOINT, CUSTOM,
@@ -141,8 +142,11 @@ public class RobotToolConfig implements Serializable {
         private Map<String, Object> metadata = new HashMap<>();
 
         /**
-         * Provide a curated set of builtin Spring AI demo tools so that a brand-new
-         * robot template always contains meaningful defaults.
+         * 平台内置 Spring AI 演示工具目录（catalog）。
+         *
+         * <p>仅作为可选目录来源（企业版 ToolRestService#initTools 注册表种子），
+         * 全部条目默认 {@code enabled=false}：机器人模板不会自动绑定任何工具，
+         * 需在管理后台手动添加并显式开启后才会参与大模型对话。</p>
          */
         public static List<RobotToolConfig> defaultSpringAiTools() {
                 List<RobotToolConfig> defaults = new ArrayList<>();

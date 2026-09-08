@@ -44,7 +44,6 @@ public enum ThreadTypeEnum {
     CALLCENTER(19), // 呼叫中心会话-用于呼叫中心场景
     TICKET_EXTERNAL(20) // 外部工单会话
     ;
-
     private final int value;
 
     // 枚举构造器，每个枚举常量都有一个与之关联的整型值

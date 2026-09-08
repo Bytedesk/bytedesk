@@ -74,10 +74,14 @@ public class RobotToolsSettingsEntity extends BaseEntity {
     @Column(name = "intent_timeout_ms")
     private Integer intentTimeoutMs = 1500;
 
+    /**
+     * 工具绑定列表默认为空：大模型对话中的 Tools/MCP 调用默认全部关闭，
+     * 仅在管理后台（TabTools）手动添加并显式开启、发布后才会生效。
+     */
     @Builder.Default
     @Convert(converter = RobotToolConfigListConverter.class)
     @Column(name = "tool_configs", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
-    private List<RobotToolConfig> toolConfigs = RobotToolConfig.defaultSpringAiTools();
+    private List<RobotToolConfig> toolConfigs = new ArrayList<>();
 
     public static RobotToolsSettingsEntity fromRequest(RobotToolsSettingsRequest request, ModelMapper modelMapper) {
         if (modelMapper == null) {

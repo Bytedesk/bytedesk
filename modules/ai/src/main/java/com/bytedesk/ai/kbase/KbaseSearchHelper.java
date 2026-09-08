@@ -1,5 +1,6 @@
 package com.bytedesk.ai.kbase;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -13,12 +14,15 @@ import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.service.SearchResultWithSources;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.kbase.article.ArticleRestService;
 import com.bytedesk.kbase.article.elastic.ArticleElastic;
 import com.bytedesk.kbase.article.elastic.ArticleElasticSearchResult;
 import com.bytedesk.kbase.article.elastic.ArticleElasticService;
 import com.bytedesk.kbase.article.vector.ArticleVector;
 import com.bytedesk.kbase.article.vector.ArticleVectorSearchResult;
 import com.bytedesk.kbase.article.vector.ArticleVectorService;
+import com.bytedesk.kbase.llm_chunk.ChunkRestService;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElastic;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticSearchResult;
 import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
@@ -26,18 +30,21 @@ import com.bytedesk.kbase.llm_chunk.vector.ChunkVector;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorSearchResult;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
+import com.bytedesk.kbase.llm_faq.FaqRestService;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElastic;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticSearchResult;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
 import com.bytedesk.kbase.llm_faq.vector.FaqVector;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorSearchResult;
 import com.bytedesk.kbase.llm_faq.vector.FaqVectorService;
+import com.bytedesk.kbase.llm_text.TextRestService;
 import com.bytedesk.kbase.llm_text.elastic.TextElastic;
 import com.bytedesk.kbase.llm_text.elastic.TextElasticSearchResult;
 import com.bytedesk.kbase.llm_text.elastic.TextElasticService;
 import com.bytedesk.kbase.llm_text.vector.TextVector;
 import com.bytedesk.kbase.llm_text.vector.TextVectorSearchResult;
 import com.bytedesk.kbase.llm_text.vector.TextVectorService;
+import com.bytedesk.kbase.llm_webpage.WebpageRestService;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElastic;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticSearchResult;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
@@ -66,7 +73,12 @@ public class KbaseSearchHelper {
             TextElasticService textElasticService,
             ChunkElasticService chunkElasticService,
             WebpageElasticService webpageElasticService,
-            ArticleElasticService articleElasticService) {
+            ArticleElasticService articleElasticService,
+            FaqRestService faqRestService,
+            TextRestService textRestService,
+            ChunkRestService chunkRestService,
+            WebpageRestService webpageRestService,
+            ArticleRestService articleRestService) {
         this.faqElasticService = faqElasticService;
         this.textElasticService = textElasticService;
         this.chunkElasticService = chunkElasticService;
@@ -77,6 +89,11 @@ public class KbaseSearchHelper {
         this.chunkVectorService = chunkVectorServiceProvider.getIfAvailable();
         this.webpageVectorService = webpageVectorServiceProvider.getIfAvailable();
         this.articleVectorService = articleVectorServiceProvider.getIfAvailable();
+        this.faqRestService = faqRestService;
+        this.textRestService = textRestService;
+        this.chunkRestService = chunkRestService;
+        this.webpageRestService = webpageRestService;
+        this.articleRestService = articleRestService;
     }
 
     private static final int DEFAULT_VECTOR_RECALL_LIMIT = 5;
@@ -96,6 +113,13 @@ public class KbaseSearchHelper {
     private final ChunkVectorService chunkVectorService;
     private final WebpageVectorService webpageVectorService;
     private final ArticleVectorService articleVectorService;
+
+    // 兜底有效期过滤用（第 3 层防线）：按来源类型回查实体校验有效期
+    private final FaqRestService faqRestService;
+    private final TextRestService textRestService;
+    private final ChunkRestService chunkRestService;
+    private final WebpageRestService webpageRestService;
+    private final ArticleRestService articleRestService;
 
     // 2. 知识库搜索相关方法
     public List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
@@ -119,17 +143,17 @@ public class KbaseSearchHelper {
     /**
      * 搜索知识库并收集源引用信息（支持按数据源类型过滤）
      * 
-     * @param query 查询内容
-     * @param robot 机器人配置
+     * @param query            查询内容
+     * @param robot            机器人配置
      * @param sourceTypeFilter 数据源类型过滤（ALL/FAQ/TEXT/CHUNK/WEBPAGE）
      * @return 包含源引用信息的搜索结果
      */
     public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
             String sourceTypeFilter) {
         return searchKnowledgeBaseWithSources(query, robot, sourceTypeFilter, null);
-        }
+    }
 
-        public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
+    public SearchResultWithSources searchKnowledgeBaseWithSources(String query, RobotProtobuf robot,
             String sourceTypeFilter, List<String> preferredLanguages) {
         // 如果知识库未启用，直接返回空结果
         if (!StringUtils.hasText(robot.getKbUid()) || !robot.getKbEnabled()) {
@@ -151,21 +175,21 @@ public class KbaseSearchHelper {
         switch (RobotSearchTypeEnum.valueOf(searchType)) {
             case VECTOR:
                 log.info("使用向量搜索");
-                    executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                            sourceReferences, sourceTypeFilter, preferredLanguages);
+                executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                        sourceReferences, sourceTypeFilter, preferredLanguages);
                 break;
             case MIXED:
                 log.info("使用混合搜索");
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                    sourceReferences, preferredLanguages, sourceTypeFilter);
-                    executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                            sourceReferences, sourceTypeFilter, preferredLanguages);
+                        sourceReferences, preferredLanguages, sourceTypeFilter);
+                executeVectorSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
+                        sourceReferences, sourceTypeFilter, preferredLanguages);
                 break;
             case FULLTEXT:
             default:
                 log.info("使用全文搜索");
                 executeFulltextSearchWithSources(query, robot, robot.getKbUid(), searchResultList,
-                    sourceReferences, preferredLanguages, sourceTypeFilter);
+                        sourceReferences, preferredLanguages, sourceTypeFilter);
                 break;
         }
 
@@ -250,6 +274,11 @@ public class KbaseSearchHelper {
             filteredSources = filteredSources.subList(0, useTopK);
         }
 
+        // 4.5) 第 3 层兜底：按来源类型回查实体，剔除过期/未生效/已删除/查不到实体的来源
+        // 覆盖"存量 ES 文档未重建（无日期字段 → null 容忍放行）且物理清理尚未跑到"的过渡期窗口，
+        // 确保返回给大模型的内容绝对不含过期项；数量已被 topK 约束，回查成本可控（走缓存）
+        filteredSources = filterSourcesByValidity(filteredSources);
+
         // 5) 构建 uid->Faq 的映射（保留首次出现）
         Map<String, FaqProtobuf> faqByUidFirst = new LinkedHashMap<>();
         for (FaqProtobuf faq : searchResultList) {
@@ -273,6 +302,78 @@ public class KbaseSearchHelper {
         }
 
         return new SearchResultWithSources(filteredFaqs, filteredSources);
+    }
+
+    /**
+     * 第 3 层兜底：按来源类型回查实体校验有效期，剔除过期/未生效/已删除/查不到实体的来源。
+     *
+     * - FAQ/TEXT/ARTICLE 使用实体的 isValidNow（统一 null=无边界语义）；
+     * - CHUNK/WEBPAGE 实体同样具有 startDate/endDate，用同一语义内联判定；
+     * - 查询失败不阻断主链路（fail-open，保留该来源，由第 1/2 层防线负责物理清理与检索过滤）。
+     */
+    private List<RobotContent.SourceReference> filterSourcesByValidity(
+            List<RobotContent.SourceReference> filteredSources) {
+        List<RobotContent.SourceReference> validSources = new ArrayList<>(filteredSources.size());
+        for (RobotContent.SourceReference src : filteredSources) {
+            if (src == null || !StringUtils.hasText(src.getSourceUid())) {
+                continue;
+            }
+            try {
+                if (isSourceValidNow(src)) {
+                    validSources.add(src);
+                } else {
+                    log.info("KB兜底过滤：来源已过期/未生效/实体不存在，剔除: type={}, uid={}, name={}",
+                            src.getSourceType(), src.getSourceUid(), src.getSourceName());
+                }
+            } catch (Exception ex) {
+                // 兜底过滤自身异常不应阻断问答主链路
+                log.warn("KB兜底有效期校验失败（保留该来源）: type={}, uid={}, error={}",
+                        src.getSourceType(), src.getSourceUid(), ex.getMessage());
+                validSources.add(src);
+            }
+        }
+        return validSources;
+    }
+
+    /** 按来源类型回查实体并校验有效期；查不到实体（已删除/翻译源已删除）返回 false */
+    private boolean isSourceValidNow(RobotContent.SourceReference src) {
+        String uid = src.getSourceUid();
+        if (src.getSourceType() == null) {
+            // 类型未知，无法回查，不拦截（fail-open）
+            return true;
+        }
+        switch (src.getSourceType()) {
+            case FAQ:
+                return faqRestService.findByUid(uid)
+                        .map(e -> !e.isDeleted() && e.isValidNow())
+                        .orElse(false);
+            case TEXT:
+                return textRestService.findByUid(uid)
+                        .map(e -> !e.isDeleted() && e.isValidNow())
+                        .orElse(false);
+            case ARTICLE:
+                return articleRestService.findByUid(uid)
+                        .map(e -> !e.isDeleted() && e.isValidNow())
+                        .orElse(false);
+            case CHUNK:
+                return chunkRestService.findByUid(uid)
+                        .map(e -> !e.isDeleted() && isValidRange(e.getStartDate(), e.getEndDate()))
+                        .orElse(false);
+            case WEBPAGE:
+                return webpageRestService.findByUid(uid)
+                        .map(e -> !e.isDeleted() && isValidRange(e.getStartDate(), e.getEndDate()))
+                        .orElse(false);
+            default:
+                return true;
+        }
+    }
+
+    /** 与实体 isValidNow 同语义：null 视为无边界，startDate <= now <= endDate */
+    private static boolean isValidRange(ZonedDateTime startDate, ZonedDateTime endDate) {
+        ZonedDateTime now = BdDateUtils.now();
+        boolean started = startDate == null || !startDate.isAfter(now);
+        boolean notEnded = endDate == null || !endDate.isBefore(now);
+        return started && notEnded;
     }
 
     /**
@@ -362,7 +463,8 @@ public class KbaseSearchHelper {
 
                     RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                             .sourceType(RobotContent.SourceTypeEnum.CHUNK)
-                            .sourceUid(StringUtils.hasText(chunk.getSourceUid()) ? chunk.getSourceUid() : chunk.getUid())
+                            .sourceUid(
+                                    StringUtils.hasText(chunk.getSourceUid()) ? chunk.getSourceUid() : chunk.getUid())
                             .sourceName(chunk.getName())
                             .fileName(chunk.getFileName())
                             .fileUrl(chunk.getFileUrl())
@@ -378,7 +480,8 @@ public class KbaseSearchHelper {
             }
 
             if (allowWebpage) {
-                List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid, null,
+                List<WebpageElasticSearchResult> webpageResults = webpageElasticService.searchWebpage(query, kbUid,
+                        null,
                         null, recallLimit, language == null ? null : List.of(language));
                 for (WebpageElasticSearchResult withScore : webpageResults) {
                     WebpageElastic webpage = withScore.getWebpageElastic();
@@ -387,7 +490,8 @@ public class KbaseSearchHelper {
 
                     RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                             .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
-                            .sourceUid(StringUtils.hasText(webpage.getSourceUid()) ? webpage.getSourceUid() : webpage.getUid())
+                            .sourceUid(StringUtils.hasText(webpage.getSourceUid()) ? webpage.getSourceUid()
+                                    : webpage.getUid())
                             .sourceName(webpage.getTitle())
                             .contentSummary(getContentSummary(webpage.getContent(), 200))
                             .language(webpage.getLanguage())
@@ -482,7 +586,8 @@ public class KbaseSearchHelper {
 
             if (allowFaq && faqVectorService != null) {
                 try {
-                    List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null, null,
+                    List<FaqVectorSearchResult> searchResults = faqVectorService.searchFaqVector(query, kbUid, null,
+                            null,
                             recallLimit, language);
                     for (FaqVectorSearchResult withScore : searchResults) {
                         FaqVector faqVector = withScore.getFaqVector();
@@ -491,7 +596,8 @@ public class KbaseSearchHelper {
 
                         RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                                 .sourceType(RobotContent.SourceTypeEnum.FAQ)
-                            .sourceUid(StringUtils.hasText(faqVector.getSourceUid()) ? faqVector.getSourceUid() : faqVector.getUid())
+                                .sourceUid(StringUtils.hasText(faqVector.getSourceUid()) ? faqVector.getSourceUid()
+                                        : faqVector.getUid())
                                 .sourceName(faqVector.getQuestion())
                                 .contentSummary(getContentSummary(faqVector.getAnswer(), 200))
                                 .language(faqVector.getLanguage())
@@ -508,7 +614,8 @@ public class KbaseSearchHelper {
 
             if (allowText && textVectorService != null) {
                 try {
-                    List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null, null,
+                    List<TextVectorSearchResult> textResults = textVectorService.searchTextVector(query, kbUid, null,
+                            null,
                             recallLimit, language);
                     for (TextVectorSearchResult withScore : textResults) {
                         TextVector textVector = withScore.getTextVector();
@@ -517,7 +624,8 @@ public class KbaseSearchHelper {
 
                         RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                                 .sourceType(RobotContent.SourceTypeEnum.TEXT)
-                            .sourceUid(StringUtils.hasText(textVector.getSourceUid()) ? textVector.getSourceUid() : textVector.getUid())
+                                .sourceUid(StringUtils.hasText(textVector.getSourceUid()) ? textVector.getSourceUid()
+                                        : textVector.getUid())
                                 .sourceName(textVector.getTitle())
                                 .contentSummary(getContentSummary(textVector.getContent(), 200))
                                 .language(textVector.getLanguage())
@@ -534,7 +642,8 @@ public class KbaseSearchHelper {
 
             if (allowChunk && chunkVectorService != null) {
                 try {
-                    List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid, null,
+                    List<ChunkVectorSearchResult> chunkResults = chunkVectorService.searchChunkVector(query, kbUid,
+                            null,
                             null, recallLimit, 0.0, language);
                     for (ChunkVectorSearchResult withScore : chunkResults) {
                         ChunkVector chunkVector = withScore.getChunkVector();
@@ -543,7 +652,8 @@ public class KbaseSearchHelper {
 
                         RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                                 .sourceType(RobotContent.SourceTypeEnum.CHUNK)
-                            .sourceUid(StringUtils.hasText(chunkVector.getSourceUid()) ? chunkVector.getSourceUid() : chunkVector.getUid())
+                                .sourceUid(StringUtils.hasText(chunkVector.getSourceUid()) ? chunkVector.getSourceUid()
+                                        : chunkVector.getUid())
                                 .sourceName(chunkVector.getName())
                                 .fileName(chunkVector.getFileName())
                                 .fileUrl(chunkVector.getFileUrl())
@@ -563,7 +673,8 @@ public class KbaseSearchHelper {
 
             if (allowWebpage && webpageVectorService != null) {
                 try {
-                    List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query, kbUid,
+                    List<WebpageVectorSearchResult> webpageResults = webpageVectorService.searchWebpageVector(query,
+                            kbUid,
                             null, null, recallLimit, language);
                     for (WebpageVectorSearchResult withScore : webpageResults) {
                         WebpageVector webpageVector = withScore.getWebpageVector();
@@ -572,7 +683,9 @@ public class KbaseSearchHelper {
 
                         RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                                 .sourceType(RobotContent.SourceTypeEnum.WEBPAGE)
-                            .sourceUid(StringUtils.hasText(webpageVector.getSourceUid()) ? webpageVector.getSourceUid() : webpageVector.getUid())
+                                .sourceUid(
+                                        StringUtils.hasText(webpageVector.getSourceUid()) ? webpageVector.getSourceUid()
+                                                : webpageVector.getUid())
                                 .sourceName(webpageVector.getTitle())
                                 .contentSummary(getContentSummary(webpageVector.getContent(), 200))
                                 .language(webpageVector.getLanguage())
@@ -599,7 +712,8 @@ public class KbaseSearchHelper {
 
                         RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
                                 .sourceType(RobotContent.SourceTypeEnum.ARTICLE)
-                                .sourceUid(StringUtils.hasText(articleVector.getUid()) ? articleVector.getUid() : articleVector.getUid())
+                                .sourceUid(StringUtils.hasText(articleVector.getUid()) ? articleVector.getUid()
+                                        : articleVector.getUid())
                                 .sourceName(articleVector.getTitle())
                                 .contentSummary(getContentSummary(
                                         articleVector.getContentMarkdown() != null ? articleVector.getContentMarkdown()

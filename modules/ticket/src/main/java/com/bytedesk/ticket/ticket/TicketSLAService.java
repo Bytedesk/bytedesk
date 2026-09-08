@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.delegate.DelegateTask;
@@ -81,8 +82,8 @@ public class TicketSLAService {
     private final ProcessRepository processRepository;
     private final UidUtils uidUtils;
     private final TaskService taskService;
+    private final RuntimeService runtimeService;
     private final HolidayRestService holidayRestService;
-    // private final RuntimeService runtimeService;
 
     private static final String SLA_SOURCE_GLOBAL = "GLOBAL";
     private static final String SLA_SOURCE_NODE = "NODE";
@@ -210,7 +211,7 @@ public class TicketSLAService {
             record.setPausedAt(now);
             slaRecordRepository.save(record);
             addSlaComment(record, "SLA_PAUSED", operatorUid,
-                    "SLA 已暂停: " + record.getSlaType() + ", 暂停时间: " + now);
+                    "SLA 已暂停: " + record.getSlaType() + ", 暂停时间: " + BdDateUtils.formatDatetimeToString(now));
         }
     }
 
@@ -237,7 +238,7 @@ public class TicketSLAService {
             slaRecordRepository.save(record);
             addSlaComment(record, "SLA_RESUMED", operatorUid,
                     "SLA 已恢复: " + record.getSlaType() + ", 本次暂停秒数: " + pausedSeconds
-                            + ", 新截止时间: " + record.getDueAt());
+                            + ", 新截止时间: " + BdDateUtils.formatDatetimeToString(record.getDueAt()));
         }
     }
 
@@ -313,9 +314,10 @@ public class TicketSLAService {
                 record.setStatus(TicketSlaStatusEnum.WARNED.name());
                 slaRecordRepository.save(record);
                 addSlaComment(record, "SLA_WARNED", "system",
-                    "SLA 即将超时: " + record.getSlaType() + ", 截止时间: " + record.getDueAt());
+                    "SLA 即将超时: " + record.getSlaType() + ", 截止时间: "
+                            + BdDateUtils.formatDatetimeToString(record.getDueAt()));
                 notificationService.sendSLAWarningNotification(record.getTicketUid(), record.getSlaType(),
-                        "SLA 即将超时，截止时间: " + record.getDueAt());
+                        "SLA 即将超时，截止时间: " + BdDateUtils.formatDatetimeToString(record.getDueAt()));
                 updated++;
             }
         }
@@ -556,6 +558,14 @@ public class TicketSLAService {
                     : record.getUpdatedAt();
             if (breachedAt == null || now.isBefore(breachedAt.plusHours(autoCloseHours))) continue;
             try {
+                boolean alreadyClosed = TicketStatusEnum.CLOSED.name().equals(ticket.getStatus());
+                if (alreadyClosed) {
+                    // 工单已处于关闭状态（此前已自动关单或被人工关闭）：
+                    // 仅将 SLA 记录置为终态，避免监控任务每分钟重复评论/重复通知/重复保存工单
+                    completeAutoClosedRecord(record, now);
+                    closed++;
+                    continue;
+                }
                 ticket.setStatus(TicketStatusEnum.CLOSED.name());
                 ticket.setClosedTime(now);
                 ticketRepository.save(ticket);
@@ -563,6 +573,9 @@ public class TicketSLAService {
                         "客户验证超时 " + autoCloseHours + " 小时，工单自动关闭");
                 notificationService.sendSLABreachNotification(record.getTicketUid(), record.getSlaType(),
                         "客户验证超时，工单已自动关闭");
+                // 关键：将 SLA 记录置为终态(COMPLETED)，否则监控任务每分钟都会重新捞出该
+                // BREACHED 记录，重复关单/评论/通知
+                completeAutoClosedRecord(record, now);
                 closed++;
             } catch (Exception e) {
                 log.warn("autoClose breached customer verify failed: ticketUid={}, error={}",
@@ -572,11 +585,34 @@ public class TicketSLAService {
         return closed;
     }
 
+    /**
+     * 客户验证超时自动关单后，将 SLA 记录置为终态。
+     * 保留 breached=true 标记（该记录确实超时过，统计仍按 breached 口径计算），
+     * 仅将生命周期推进到 COMPLETED，避免被定时任务反复处理。
+     */
+    private void completeAutoClosedRecord(TicketSlaRecordEntity record, ZonedDateTime now) {
+        record.setStatus(TicketSlaStatusEnum.COMPLETED.name());
+        record.setCompletedAt(now);
+        record.setCompletedBy("system");
+        slaRecordRepository.save(record);
+    }
+
     private void addSlaComment(TicketSlaRecordEntity record, String type, String userId, String message) {
         if (record == null || !StringUtils.hasText(record.getProcessInstanceId())) {
             return;
         }
         try {
+            // 工单流程实例可能已经结束（进入历史表），运行时 execution 不存在时
+            // taskService.addComment 会抛 FlowableObjectNotFoundException("execution ... doesn't exist")，
+            // 先检查流程实例是否仍在运行，已结束的直接跳过，避免每分钟堆栈噪音
+            long runningCount = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(record.getProcessInstanceId())
+                    .count();
+            if (runningCount == 0) {
+                log.info("skip SLA comment for ended process instance: ticketUid={}, slaType={}, type={}",
+                        record.getTicketUid(), record.getSlaType(), type);
+                return;
+            }
             Task task = taskService.createTaskQuery()
                     .processInstanceId(record.getProcessInstanceId())
                     .orderByTaskCreateTime()
@@ -595,8 +631,8 @@ public class TicketSLAService {
                 taskService.saveComment(comment);
             }
         } catch (Exception e) {
-            log.warn("failed to add SLA process comment, ticketUid={}, slaType={}, type={}",
-                    record.getTicketUid(), record.getSlaType(), type, e);
+            log.warn("failed to add SLA process comment, ticketUid={}, slaType={}, type={}, error={}",
+                    record.getTicketUid(), record.getSlaType(), type, e.getMessage());
         }
     }
 
@@ -654,7 +690,8 @@ public class TicketSLAService {
                 .findTop200ByStatusAndDueAtLessThanEqualAndDeletedFalseOrderByDueAtAsc(status.name(), now);
         int updated = 0;
         for (TicketSlaRecordEntity record : records) {
-            if (markBreached(record, "SLA 截止时间已到: " + record.getDueAt())) {
+            if (markBreached(record,
+                    "SLA 截止时间已到: " + BdDateUtils.formatDatetimeToString(record.getDueAt()))) {
                 updated++;
             }
         }

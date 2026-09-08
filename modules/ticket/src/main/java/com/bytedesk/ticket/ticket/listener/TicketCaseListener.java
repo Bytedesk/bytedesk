@@ -86,7 +86,7 @@ public class TicketCaseListener implements CaseInstanceLifecycleListener {
             // 
             notificationService.notifyManager(
                 assigneeUid,
-                String.format("工单 #%d 已被终止", ticket.getId())
+                String.format("工单 %d 已被终止", ticket.getId())
             );
         });
     }

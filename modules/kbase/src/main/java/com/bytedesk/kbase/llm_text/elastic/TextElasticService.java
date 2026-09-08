@@ -36,6 +36,8 @@ import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 import com.bytedesk.kbase.translation.KbaseTranslationRepository;
 import com.bytedesk.kbase.translation.KbaseTranslationSourceTypeEnum;
 import com.bytedesk.kbase.translation.KbaseTranslationStatusEnum;
+import com.bytedesk.kbase.utils.KbaseValidityFilterUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
@@ -252,6 +254,21 @@ public class TextElasticService {
                 return;
             }
 
+            // 写入守卫：已过期内容不写入全文索引，删除可能存在的旧文档（幂等，含翻译文档），状态置 EXPIRED，静默返回
+            // 不抛异常，保证批量重建不被单条过期内容中断；复活靠 UpdateDocEvent 自动重建
+            if (text.isExpired()) {
+                log.info("Text已过期，跳过全文索引并删除旧文档: uid={}, endDate={}", textUid, text.getEndDate());
+                try {
+                    deleteText(textUid);
+                    deleteTranslatedTextDocuments(textUid);
+                } catch (Exception delEx) {
+                    log.warn("删除过期Text全文文档失败（将继续置EXPIRED）: uid={}, error={}", textUid, delEx.getMessage());
+                }
+                textRestService.updateElasticStatusOnly(textUid, ChunkStatusEnum.EXPIRED.name());
+                return;
+            }
+            // 未生效（startDate > now）：照常写入索引，检索期过滤会排除
+
             // 若事件/缓存传入的实体缺少 kbase 关联，则回源数据库（join fetch）补齐
             if (text.getKbase() == null) {
                 textRestService.findByUidWithKbaseNoCache(textUid).ifPresent(textFromDb -> {
@@ -275,6 +292,17 @@ public class TextElasticService {
                 if (!(created && mapped)) {
                     log.error("索引创建失败，无法继续索引文档: {}", textUid);
                     return;
+                }
+            } else {
+                // 存量索引可能缺少 startDate/endDate 等 keyword 字段映射：
+                // 若不补映射，新字段会走动态映射（text 分词），导致有效期 range 词法比较失配。
+                // putMapping 幂等（已有相同字段 no-op，仅新增字段）；历史类型冲突（如 date→keyword）会抛错，
+                // 此时需要删除整个索引后重建。
+                try {
+                    elasticsearchOperations.indexOps(TextElastic.class).putMapping();
+                } catch (Exception mapEx) {
+                    log.warn("补齐Text索引映射失败（可能存在历史类型冲突，请删除索引后全量重建）: {}, error={}",
+                            textUid, mapEx.getMessage());
                 }
             }
             
@@ -364,7 +392,8 @@ public class TextElasticService {
             .forEach(translation -> elasticsearchOperations.save(TextElastic.fromTranslation(text, translation)));
         }
 
-        private void deleteTranslatedTextDocuments(String sourceUid) {
+        // public 供过期清理任务（KbaseExpiryTask）按 sourceUid 联动删除翻译文档
+        public void deleteTranslatedTextDocuments(String sourceUid) {
         if (!StringUtils.hasText(sourceUid)) {
             return;
         }
@@ -531,24 +560,10 @@ public class TextElasticService {
             // 添加过滤条件：启用状态
             boolQueryBuilder.filter(QueryBuilders.term().field("enabled").value(true).build()._toQuery());
             
-            // 添加时间过滤
-            // ZonedDateTime now = BdDateUtils.now();
-            // DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-            // String nowStr = now.format(formatter);
-            
-            // // 有效期过滤 - 开始日期
-            // DateRangeQuery startDateQuery = new DateRangeQuery.Builder()
-            //     .field("startDate")
-            //     .lte(nowStr)
-            //     .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(startDateQuery).build()._toQuery());
-            
-            // // 有效期过滤 - 结束日期
-            // DateRangeQuery endDateQuery = new DateRangeQuery.Builder()
-            //     .field("endDate")
-            //     .gte(nowStr)
-            //     .build();
-            // boolQueryBuilder.filter(QueryBuilders.range().date(endDateQuery).build()._toQuery());
+            // 有效期过滤（null 容忍：字段缺失视为无边界，兼容存量未重建文档）
+            // 有效 = (startDate 缺失 或 startDate <= now) AND (endDate 缺失 或 endDate >= now)
+            String nowStr = BdDateUtils.formatDatetimeToString(BdDateUtils.now());
+            boolQueryBuilder.filter(KbaseValidityFilterUtils.validityFilterQuery(nowStr));
             
             // 添加可选的过滤条件：知识库、分类、组织
             if (kbUid != null && !kbUid.isEmpty()) {

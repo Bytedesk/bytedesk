@@ -16,11 +16,15 @@ package com.bytedesk.kbase.llm_text;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.time.ZonedDateTime;
 
 public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpecificationExecutor<TextEntity> {
 
@@ -56,4 +60,14 @@ public interface TextRepository extends JpaRepository<TextEntity, Long>, JpaSpec
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update TextEntity t set t.docIdList = :docIdList where t.uid = :uid")
     int updateDocIdListByUid(@Param("uid") String uid, @Param("docIdList") List<String> docIdList);
+
+    /**
+     * 查询已过期但仍残留在索引中的 Text（endDate < now 且 elastic/vector 状态为 SUCCESS）
+     * 供过期清理定时任务分页使用
+     */
+    @Query(value = "select t from TextEntity t where t.deleted = false and t.endDate < :now "
+            + "and (t.elasticStatus = 'SUCCESS' or t.vectorStatus = 'SUCCESS')",
+           countQuery = "select count(t) from TextEntity t where t.deleted = false and t.endDate < :now "
+            + "and (t.elasticStatus = 'SUCCESS' or t.vectorStatus = 'SUCCESS')")
+    Page<TextEntity> findExpiredIndexed(@Param("now") ZonedDateTime now, Pageable pageable);
 }

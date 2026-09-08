@@ -1,6 +1,7 @@
 package com.bytedesk.service.visitor;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -11,12 +12,15 @@ import java.util.concurrent.ExecutorService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 
 import com.bytedesk.ai.robot.RobotService;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageRequest;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.constant.TypeConsts;
 import com.bytedesk.core.message_unread.MessageUnreadRestService;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.utils.JsonResult;
@@ -83,6 +87,39 @@ class VisitorRestControllerVisitorTest {
         assertThat(body.getCode()).isEqualTo(500);
         assertThat(body.getMessage()).isEqualTo("orgUid required");
         verifyNoInteractions(messageRestService);
+    }
+
+    @Test
+    void queryByThreadTopicShouldForceVisitorComponentType() {
+        MessageRequest request = MessageRequest.builder()
+                .orgUid("org-1")
+                .visitorUid("visitor-1")
+                .build();
+        when(messageRestService.queryByOrg(any(MessageRequest.class))).thenReturn(Page.empty());
+
+        ResponseEntity<?> response = controller.queryByThreadTopic(request);
+
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+        verify(messageRestService).queryByOrg(captor.capture());
+        // 服务端强制访客视角过滤，与 chatbox 主聊天列表口径一致（前后端同步升级，无需旧版兼容）
+        assertThat(captor.getValue().getComponentType()).isEqualTo(TypeConsts.COMPONENT_TYPE_VISITOR);
+    }
+
+    @Test
+    void queryByThreadUidShouldForceVisitorComponentType() {
+        MessageRequest request = MessageRequest.builder()
+                .orgUid("org-1")
+                .threadUid("thread-1")
+                .build();
+        when(messageRestService.queryByOrg(any(MessageRequest.class))).thenReturn(Page.empty());
+
+        ResponseEntity<?> response = controller.queryByThreadUid(request);
+
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        ArgumentCaptor<MessageRequest> captor = ArgumentCaptor.forClass(MessageRequest.class);
+        verify(messageRestService).queryByOrg(captor.capture());
+        assertThat(captor.getValue().getComponentType()).isEqualTo(TypeConsts.COMPONENT_TYPE_VISITOR);
     }
 
     @Test

@@ -154,6 +154,33 @@ public class VisitorRequest extends BaseRequest {
 	@Builder.Default
 	private Boolean forceNewThread = false;
 
+    /**
+     * 发起平台客服会话时携带的来源会话 uid（用户-商户纠纷溯源），可选。
+     * 格式：长度<=64，仅允许 [a-zA-Z0-9_-]，非法值将被忽略。
+     */
+    private String originThreadUid;
+
+    /**
+     * 来源会话所属组织 uid（访客从租户会话发起平台客服时，父页面传入的当前组织），可选。
+     * 格式：长度<=64，仅允许 [a-zA-Z0-9_-]，非法值将被忽略。
+     */
+    private String originOrgUid;
+
+    /**
+     * originThreadUid/originOrgUid 格式校验：非空时长度<=64且仅 [a-zA-Z0-9_-]
+     */
+    private boolean isValidOriginUid(String uid) {
+        return uid != null && uid.length() <= 64 && uid.matches("[a-zA-Z0-9_-]+");
+    }
+
+    public String getSanitizedOriginThreadUid() {
+        return isValidOriginUid(originThreadUid) ? originThreadUid : null;
+    }
+
+    public String getSanitizedOriginOrgUid() {
+        return isValidOriginUid(originOrgUid) ? originOrgUid : null;
+    }
+
 	/**
 	 * 判断是否为社交渠道（微信、Meta、Telegram、WhatsApp）
 	 * @return true 如果为社交渠道，否则为 false

@@ -16,7 +16,8 @@ public enum MemberLoginPlatformEnum {
     NOTEBASE("notebase"),
     WORKFLOW("workflow"),
     CALL("call"),
-    CALL_ADMIN("callAdmin");
+    CALL_ADMIN("callAdmin"),
+    OFFICE("office");
 
         private static final Set<String> IMPORT_ALL_ALIASES = Set.of(
             "all",
@@ -105,6 +106,7 @@ public enum MemberLoginPlatformEnum {
         addImportAliases(aliases, WORKFLOW, "工作流后台", "工作流", "workflow后台");
         addImportAliases(aliases, CALL, "呼叫中心工作台", "呼叫中心", "call工作台");
         addImportAliases(aliases, CALL_ADMIN, "呼叫中心后台", "calladmin后台", "calladmin");
+        addImportAliases(aliases, OFFICE, "微语文档", "文档", "office文档");
         return aliases;
     }
 

@@ -45,6 +45,7 @@ import com.bytedesk.ticket.ticket.event.TicketCreateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
+import com.bytedesk.ticket.ticket.assignment.AssignmentResolutionResult;
 import com.bytedesk.ticket.ticket.assignment.TicketAssignmentService;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.service.TicketNotificationService;
@@ -160,9 +161,22 @@ public class TicketEventListener {
             ticketSLAService.initializeSlaRecords(ticketEntity);
 
             // 7. 自动分配处理人
-            ticketAssignmentService.autoAssign(ticketEntity, processInstance.getId());
+            AssignmentResolutionResult assignmentResult =
+                    ticketAssignmentService.autoAssign(ticketEntity, processInstance.getId());
 
-            ticketNotificationService.notifyNewTicket(ticketEntity);
+            // 8. 发送新工单通知。
+            // 注意：autoAssign 成功分配时，applyAssignment 内部已通过 notifyTicketAssigned 发送过
+            // TICKET_CREATED 通知（收件人同样覆盖 报告人/处理人/工作组成员），若此处再调用
+            // notifyNewTicket 会导致 desktop 客服端右上角弹出两条内容相同的重复通知。
+            // 因此仅在"本次未自动分配"时补发新工单通知；创建时已显式指定处理人的场景
+            // autoAssign 会直接跳过（返回 unresolved），仍会走到这里发送通知。
+            boolean autoAssignedAndNotified = assignmentResult != null
+                    && assignmentResult.isResolved()
+                    && ticketEntity.getAssignee() != null
+                    && StringUtils.hasText(ticketEntity.getAssignee().getUid());
+            if (!autoAssignedAndNotified) {
+                ticketNotificationService.notifyNewTicket(ticketEntity);
+            }
         } else {
             // 事件已改为事务提交后发布，正常不应出现读不到工单行的情况；保留兜底并告警，避免静默丢失流程实例关联
             log.warn("handleTicketCreateEvent: ticket row not found after commit, ticketUid={}, processInstanceId={} not linked",

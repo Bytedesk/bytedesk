@@ -69,6 +69,8 @@ public class TicketResponse extends BaseResponse {
     private String visitorThreadTopic;
     // 
     private String categoryUid;
+    // 工单分类名称（组织级分类名称，可能为 i18n key，由前端翻译显示）
+    private String categoryName;
     private String workgroupUid;
     private String departmentUid;
     // 

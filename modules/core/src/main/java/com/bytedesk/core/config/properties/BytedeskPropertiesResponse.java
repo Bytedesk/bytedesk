@@ -15,6 +15,8 @@ package com.bytedesk.core.config.properties;
 
 import java.io.Serializable;
 
+import com.bytedesk.core.constant.BytedeskConsts;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,6 +44,8 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Call call;
     /** 文件预览（Office 转 PDF）能力配置，供前端门控预览按钮显隐 */
     private Preview preview;
+    /** 平台客服（访客端纠纷介入通道）配置，供 visitor 工具栏按钮显隐与路由 */
+    private PlatformService platformService;
 
     @Getter
     @Setter
@@ -161,6 +165,22 @@ public class BytedeskPropertiesResponse implements Serializable {
     @Setter
     public static class Service {
         private Boolean agentSeatEnabled = false;
+    }
+
+    /**
+     * 平台客服配置（访客端纠纷介入通道）。
+     * 默认值为代码常量（不新增 properties 键）；DB 覆盖值经 SystemConfig 下发链路合并。
+     * 仅 enabled=true 时访客端显示「平台客服」按钮。
+     */
+    @Getter
+    @Setter
+    public static class PlatformService {
+        /** 是否启用平台客服入口（platform_service.enabled，默认 false） */
+        private Boolean enabled = false;
+        /** 平台客服组织 UID（platform_service.orgUid，默认 df_org_uid） */
+        private String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+        /** 平台客服工作组 UID（platform_service.workgroupUid，默认 df_wg_uid） */
+        private String workgroupUid = BytedeskConsts.DEFAULT_WORKGROUP_UID;
     }
 
     /**

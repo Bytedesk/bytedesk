@@ -34,6 +34,8 @@ import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializ
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import tools.jackson.datatype.hibernate7.Hibernate7Module;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -103,8 +105,16 @@ public class RedisCacheConfig implements CachingConfigurer {
      * 使用Jackson作为JSON序列化器，需要包含类型信息以便正确反序列化
      */
     private RedisCacheConfiguration defaultCacheConfiguration() {
+        // 注册 Hibernate7 模块，解决缓存 JPA 实体时懒加载代理/集合无法反序列化的问题：
+        // - 未初始化的懒加载代理/集合序列化为 null（无需数据库会话）
+        // - PersistentSet/PersistentBag 等 Hibernate 集合替换为标准 JDK 集合，
+        //   避免 JSON 中写入 org.hibernate.collection.spi.* 类型，
+        //   反序列化时触发 "Cannot lazily initialize collection (no session)"
+        Hibernate7Module hibernate7Module = new Hibernate7Module()
+                .enable(Hibernate7Module.Feature.REPLACE_PERSISTENT_COLLECTIONS);
         GenericJacksonJsonRedisSerializer serializer = GenericJacksonJsonRedisSerializer.builder()
                 .enableUnsafeDefaultTyping()
+                .customize(mapperBuilder -> mapperBuilder.addModule(hibernate7Module))
                 .build();
 
         return RedisCacheConfiguration.defaultCacheConfig()

@@ -21,5 +21,7 @@ public enum SystemConfigGroupEnum {
     /** 品牌外观：名称/logo/favicon/描述 */
     BRAND,
     /** 协议与合规：隐私协议/用户协议 */
-    AGREEMENT
+    AGREEMENT,
+    /** 平台客服：访客端纠纷介入通道 */
+    PLATFORM_SERVICE
 }

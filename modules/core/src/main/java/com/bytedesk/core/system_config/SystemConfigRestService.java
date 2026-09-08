@@ -126,6 +126,8 @@ public class SystemConfigRestService {
             if (StringUtils.hasText(value)) {
                 // 校验值类型合法性（BOOLEAN/INTEGER 非法值直接拒绝，避免脏数据进入下发链路）
                 validateValueType(keyEnum, value);
+                // 平台客服 org/workgroup uid：基础格式校验（长度<=64，字符集 [a-zA-Z0-9_-]），防注入
+                validatePlatformServiceUid(keyEnum, value);
 
                 if (existing.isPresent()) {
                     SystemConfigEntity entity = existing.get();
@@ -203,9 +205,20 @@ public class SystemConfigRestService {
     }
 
     /**
-     * 读取单个 key 的静态默认值（来自 BytedeskProperties.Custom）
+     * 读取单个 key 的静态默认值（来自 BytedeskProperties.Custom 或代码常量）
      */
     private String getDefaultValue(SystemConfigKeyEnum keyEnum) {
+        // 平台客服：静态默认值为代码常量，不新增 properties 键
+        switch (keyEnum) {
+            case PLATFORM_SERVICE_ENABLED:
+                return "false";
+            case PLATFORM_SERVICE_ORG_UID:
+                return com.bytedesk.core.constant.BytedeskConsts.DEFAULT_ORGANIZATION_UID;
+            case PLATFORM_SERVICE_WORKGROUP_UID:
+                return com.bytedesk.core.constant.BytedeskConsts.DEFAULT_WORKGROUP_UID;
+            default:
+                break;
+        }
         if (bytedeskProperties == null || bytedeskProperties.getCustom() == null) {
             return null;
         }
@@ -251,6 +264,20 @@ public class SystemConfigRestService {
                 break;
             default:
                 break;
+        }
+    }
+
+    /**
+     * 平台客服 org/workgroup uid 格式校验：长度<=64，仅允许 [a-zA-Z0-9_-]，防止注入
+     */
+    private void validatePlatformServiceUid(SystemConfigKeyEnum keyEnum, String value) {
+        if (!SystemConfigKeyEnum.PLATFORM_SERVICE_ORG_UID.equals(keyEnum)
+                && !SystemConfigKeyEnum.PLATFORM_SERVICE_WORKGROUP_UID.equals(keyEnum)) {
+            return;
+        }
+        if (value == null || value.length() > 64 || !value.matches("[a-zA-Z0-9_-]+")) {
+            throw new IllegalArgumentException(
+                    "invalid uid value for key " + keyEnum.getKey() + ": only [a-zA-Z0-9_-] up to 64 chars allowed");
         }
     }
 

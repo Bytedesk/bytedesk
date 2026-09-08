@@ -13,7 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.category.CategoryEntity;
+import com.bytedesk.core.category.CategoryRestService;
+import com.bytedesk.core.category.CategoryTypeEnum;
+import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategoryItemResponse;
 import com.bytedesk.ticket.ticket_settings_category.TicketCategorySettingsResponse;
@@ -34,6 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TicketSettingsRestControllerVisitor {
 
     private final TicketSettingsRestService ticketSettingsRestService;
+
+    private final CategoryRestService categoryRestService;
 
     /**
      * 与管理端对齐：按 orgUid + workgroupUid 获取 TicketSettings（不存在则返回默认模板）。
@@ -62,6 +69,48 @@ public class TicketSettingsRestControllerVisitor {
         TicketCategoryVisitorResponse response = toVisitorResponse(settings != null ? settings.getCategorySettings() : null);
 
         return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 查询当前组织级工单分类（level=ORGANIZATION、未删除、按 order 升序）。
+     * visitor 端创建工单的分类下拉使用，与管理后台组织分类保持同源。
+     * http://127.0.0.1:9003/visitor/api/v1/ticket/settings/orgs/{orgUid}/categories?type=TICKET_EXTERNAL
+     */
+    @GetMapping("/orgs/{orgUid}/categories")
+    public ResponseEntity<?> getCategoriesByOrg(
+            @PathVariable("orgUid") String orgUid,
+            @RequestParam(value = "type", required = false) String type) {
+
+        String categoryType = resolveCategoryType(type);
+        List<CategoryEntity> categories = categoryRestService.findByOrgUidAndTypeAndLevelAndDeletedFalseOrderByOrderAsc(
+                orgUid, categoryType, LevelEnum.ORGANIZATION.name());
+
+        List<TicketCategoryVisitorItemResponse> items = categories.stream()
+                .filter(category -> StringUtils.hasText(category.getUid()))
+                .map(category -> TicketCategoryVisitorItemResponse.builder()
+                        .uid(category.getUid())
+                        .name(category.getName())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(JsonResult.success(TicketCategoryVisitorResponse.builder()
+                .categories(items)
+                .build()));
+    }
+
+    /**
+     * 兼容 TICKET_EXTERNAL / EXTERNAL 等写法，统一解析为组织级工单分类类型，默认外部工单分类
+     */
+    private String resolveCategoryType(String rawType) {
+        if (!StringUtils.hasText(rawType)) {
+            return CategoryTypeEnum.TICKET_EXTERNAL.name();
+        }
+        String normalized = rawType.trim().toUpperCase();
+        if (TicketTypeEnum.INTERNAL.name().equals(normalized)
+                || CategoryTypeEnum.TICKET_INTERNAL.name().equals(normalized)) {
+            return CategoryTypeEnum.TICKET_INTERNAL.name();
+        }
+        return CategoryTypeEnum.TICKET_EXTERNAL.name();
     }
 
     @GetMapping("/orgs/{orgUid}/workgroups/{workgroupUid}/basic")

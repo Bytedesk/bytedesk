@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        微语文档（Bytedesk Docs）同步项目表：office 桌面端本地项目（project-store）
+        在创建/重命名/删除时同步到服务端存储。client_uid 保存本地项目 id，
+        (client_uid, user_uid, org_uid) 作为客户端幂等同步锚点。企业版功能。
+
+        策略（双保护，参照 260906_add_office_document_table.xml）：
+        1. 全新环境（表不存在）：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+
+        见 docs/plans/2026-09-06-weiyu-office-rebrand-ai-sync-plan.md（P2/P2-2）
+    -->
+
+    <changeSet id="260906-create-office-project-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_office_project"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_office_project">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_office_project" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_office_project_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="project_name" type="VARCHAR(255)"/>
+            <column name="project_description" type="VARCHAR(1024)"/>
+            <column name="client_uid" type="VARCHAR(128)"/>
+            <column name="project_extra" type="TEXT"/>
+        </createTable>
+        <createIndex tableName="bytedesk_office_project" indexName="idx_office_project_org_uid">
+            <column name="org_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_office_project" indexName="idx_office_project_user_uid">
+            <column name="user_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_office_project" indexName="idx_office_project_client_uid">
+            <column name="client_uid"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

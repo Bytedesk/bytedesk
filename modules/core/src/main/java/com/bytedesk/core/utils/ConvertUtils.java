@@ -83,10 +83,12 @@ public class ConvertUtils {
                 response.getCustom().setDefaultLlmPrompt(
                     bytedeskProperties.getCustom().getDefaultLlmPrompt());
 
-            // 合并系统全局配置 DB 覆盖值（/super/system-config 后台保存的运行时配置）：
-            // DB 值非空才覆盖静态默认值；service 缺失/异常时静默回退静态值，不影响下发链路。
-            applySystemConfigOverrides(response);
         }
+
+        // 合并系统全局配置 DB 覆盖值（/super/system-config 后台保存的运行时配置）：
+        // DB 值非空才覆盖静态默认值；service 缺失/异常时静默回退静态值，不影响下发链路。
+        // 注意：在 custom 判空外调用——platformService 节与 custom 无关，始终需要合成。
+        applySystemConfigOverrides(response);
 
         // 明确设置Organization部分字段，确保从配置中获取
         if (bytedeskProperties.getOrganization() != null) {
@@ -128,14 +130,18 @@ public class ConvertUtils {
      */
     private static void applySystemConfigOverrides(BytedeskPropertiesResponse response) {
         try {
-            if (!ApplicationContextHolder.isInitialized() || response.getCustom() == null) {
+            if (!ApplicationContextHolder.isInitialized()) {
                 return;
             }
             com.bytedesk.core.system_config.SystemConfigRestService systemConfigRestService =
                     ApplicationContextHolder.getBean(com.bytedesk.core.system_config.SystemConfigRestService.class);
             Map<String, String> overrides = systemConfigRestService
                     .getOverrideValues(com.bytedesk.core.system_config.SystemConfigConsts.PLATFORM_CONFIG_ORG_UID);
-            if (overrides == null || overrides.isEmpty()) {
+
+            // 平台客服配置：无论 custom 是否存在都需要合成（默认值为代码常量）
+            applyPlatformServiceOverrides(response, overrides);
+
+            if (overrides == null || overrides.isEmpty() || response.getCustom() == null) {
                 return;
             }
             BytedeskPropertiesResponse.Custom custom = response.getCustom();
@@ -176,6 +182,54 @@ public class ConvertUtils {
             // 静默降级：使用静态默认值，不打断下发链路
             log.warn("Apply system config overrides failed, fallback to static defaults: {}", e.getMessage());
         }
+    }
+
+    /**
+     * 合并平台客服（platform_service.*）DB 覆盖值到 platformService 节。
+     * 默认值为代码常量（enabled=false / df_org_uid / df_wg_uid）；
+     * 仅 enabled=true 时对 orgUid/workgroupUid 做非空兜底（无效回退默认并告警）。
+     */
+    private static void applyPlatformServiceOverrides(BytedeskPropertiesResponse response,
+            Map<String, String> overrides) {
+        BytedeskPropertiesResponse.PlatformService platformService = response.getPlatformService();
+        if (platformService == null) {
+            platformService = new BytedeskPropertiesResponse.PlatformService();
+            response.setPlatformService(platformService);
+        }
+        if (overrides == null || overrides.isEmpty()) {
+            return;
+        }
+        String enabled = overrides.get(com.bytedesk.core.system_config.SystemConfigConsts.KEY_PLATFORM_SERVICE_ENABLED);
+        if (StringUtils.hasText(enabled)) {
+            platformService.setEnabled(Boolean.parseBoolean(enabled));
+        }
+        String orgUid = overrides.get(com.bytedesk.core.system_config.SystemConfigConsts.KEY_PLATFORM_SERVICE_ORG_UID);
+        if (StringUtils.hasText(orgUid)) {
+            platformService.setOrgUid(orgUid);
+        }
+        String workgroupUid = overrides
+                .get(com.bytedesk.core.system_config.SystemConfigConsts.KEY_PLATFORM_SERVICE_WORKGROUP_UID);
+        if (StringUtils.hasText(workgroupUid)) {
+            platformService.setWorkgroupUid(workgroupUid);
+        }
+        // enabled=true 时兜底：orgUid/workgroupUid 缺失或非法格式则回退默认，避免访客端打不开
+        if (Boolean.TRUE.equals(platformService.getEnabled())) {
+            if (!isValidUid(platformService.getOrgUid())) {
+                log.warn("platform_service.orgUid invalid ({}), fallback to default",
+                        platformService.getOrgUid());
+                platformService.setOrgUid(BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+            }
+            if (!isValidUid(platformService.getWorkgroupUid())) {
+                log.warn("platform_service.workgroupUid invalid ({}), fallback to default",
+                        platformService.getWorkgroupUid());
+                platformService.setWorkgroupUid(BytedeskConsts.DEFAULT_WORKGROUP_UID);
+            }
+        }
+    }
+
+    /** uid 格式校验：非空、长度<=64、仅 [a-zA-Z0-9_-] */
+    private static boolean isValidUid(String uid) {
+        return StringUtils.hasText(uid) && uid.length() <= 64 && uid.matches("[a-zA-Z0-9_-]+");
     }
 
     public static UploadResponse convertToUploadResponse(UploadEntity entity) {

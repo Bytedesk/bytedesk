@@ -213,4 +213,14 @@ public class ServiceSettingsResponseVisitor implements Serializable {
      * 自动回复设置 UID（AutoReplySettingsEntity.uid）
      */
     private String autoReplySettingsUid;
+
+    /**
+     * 来源会话 uid：本会话由访客从另一商户会话发起平台客服介入时记录（用户-商户纠纷溯源）
+     */
+    private String originThreadUid;
+
+    /**
+     * 来源会话所属组织 uid（平台客服可据此跨组织只读回查原会话）
+     */
+    private String originOrgUid;
 }

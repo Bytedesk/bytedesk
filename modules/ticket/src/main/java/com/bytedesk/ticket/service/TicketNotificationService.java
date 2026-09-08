@@ -442,14 +442,14 @@ public class TicketNotificationService {
     private String buildSlaTitle(TicketEntity ticket, String slaType, boolean breached) {
         String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
                 : ticket.getUid();
-        return (breached ? "SLA已超时：#" : "SLA即将超时：#") + ticketNumber + " " + toSlaTypeLabel(slaType);
+        return (breached ? "SLA已超时：" : "SLA即将超时：") + ticketNumber + " " + toSlaTypeLabel(slaType);
     }
 
     private String buildSlaContent(TicketEntity ticket, String slaType, String details, boolean breached) {
         String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
                 : ticket.getUid();
         StringBuilder builder = new StringBuilder();
-        builder.append("工单 #").append(ticketNumber).append(" 的 ").append(toSlaTypeLabel(slaType));
+        builder.append("工单 ").append(ticketNumber).append(" 的 ").append(toSlaTypeLabel(slaType));
         builder.append(breached ? " SLA 已超时" : " SLA 即将超时");
         if (StringUtils.hasText(details)) {
             builder.append("，").append(details);
@@ -652,40 +652,40 @@ public class TicketNotificationService {
         String summary = StringUtils.hasText(ticket.getTitle()) ? ticket.getTitle() : "";
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return StringUtils.hasText(summary)
-                    ? "#" + ticketNumber + " " + summary
-                    : "收到新工单 #" + ticketNumber;
+                    ? ticketNumber + " " + summary
+                    : "收到新工单 " + ticketNumber;
         }
         if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
             return StringUtils.hasText(summary)
-                ? "工单 #" + ticketNumber + " 已转派给您。内容：" + summary
-                : "工单 #" + ticketNumber + " 已转派给您";
+                ? "工单 " + ticketNumber + " 已转派给您。内容：" + summary
+                : "工单 " + ticketNumber + " 已转派给您";
         }
         if (EVENT_TYPE_TICKET_SLA_WARNING.equals(eventType)) {
             return StringUtils.hasText(summary)
-                    ? "#" + ticketNumber + " 即将超时 " + summary
-                    : "工单 #" + ticketNumber + " SLA 即将超时";
+                    ? ticketNumber + " 即将超时 " + summary
+                    : "工单 " + ticketNumber + " SLA 即将超时";
         }
         if (EVENT_TYPE_TICKET_SLA_BREACH.equals(eventType)) {
             return StringUtils.hasText(summary)
-                    ? "#" + ticketNumber + " 已超时 " + summary
-                    : "工单 #" + ticketNumber + " SLA 已超时";
+                    ? ticketNumber + " 已超时 " + summary
+                    : "工单 " + ticketNumber + " SLA 已超时";
         }
         String statusLabel = toStatusLabel(ticket.getStatus());
         return StringUtils.hasText(summary)
-                ? "#" + ticketNumber + " " + statusLabel + " " + summary
-                : "工单 #" + ticketNumber + " 状态：" + statusLabel;
+                ? ticketNumber + " " + statusLabel + " " + summary
+                : "工单 " + ticketNumber + " 状态：" + statusLabel;
     }
 
     private String buildTitle(TicketEntity ticket, String eventType) {
         String ticketNumber = StringUtils.hasText(ticket.getTicketNumber()) ? ticket.getTicketNumber()
                 : ticket.getUid();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
-            return "新工单：#" + ticketNumber;
+            return "新工单：" + ticketNumber;
         }
         if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
-            return "工单转派：#" + ticketNumber;
+            return "工单转派：" + ticketNumber;
         }
-        return "工单状态更新：#" + ticketNumber;
+        return "工单状态更新：" + ticketNumber;
     }
 
     private String buildReporterTitle(TicketEntity ticket, String eventType) {
@@ -694,7 +694,7 @@ public class TicketNotificationService {
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
             return "工单创建成功";
         }
-        return "工单状态更新：#" + ticketNumber;
+        return "工单状态更新：" + ticketNumber;
     }
 
     private String buildContent(TicketEntity ticket, String previousStatus, String currentStatus, String eventType) {
@@ -703,11 +703,11 @@ public class TicketNotificationService {
         String summary = StringUtils.hasText(ticket.getTitle()) ? ticket.getTitle() : ticket.getDescription();
         StringBuilder builder = new StringBuilder();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
-            builder.append("收到新工单 #").append(ticketNumber);
+            builder.append("收到新工单 ").append(ticketNumber);
         } else if (EVENT_TYPE_TICKET_TRANSFERRED.equals(eventType)) {
-            builder.append("工单 #").append(ticketNumber).append(" 已转派给您");
+            builder.append("工单 ").append(ticketNumber).append(" 已转派给您");
         } else {
-            builder.append("工单 #").append(ticketNumber).append(" 状态更新为 ").append(toStatusLabel(currentStatus));
+            builder.append("工单 ").append(ticketNumber).append(" 状态更新为 ").append(toStatusLabel(currentStatus));
         }
         if (StringUtils.hasText(previousStatus)) {
             builder.append("，原状态为 ").append(toStatusLabel(previousStatus));
@@ -723,9 +723,9 @@ public class TicketNotificationService {
                 : ticket.getUid();
         StringBuilder builder = new StringBuilder();
         if (EVENT_TYPE_TICKET_CREATED.equals(eventType)) {
-            builder.append("您的工单 #").append(ticketNumber).append(" 已创建成功，请耐心等待客服处理");
+            builder.append("您的工单 ").append(ticketNumber).append(" 已创建成功，请耐心等待客服处理");
         } else {
-            builder.append("工单 #").append(ticketNumber).append(" 状态已更新");
+            builder.append("工单 ").append(ticketNumber).append(" 状态已更新");
         }
         return builder.toString();
     }

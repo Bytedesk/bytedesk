@@ -33,7 +33,7 @@ Main Banner START -->
 		<div class="row align-items-center">
 			<div class="col-md-5">
 				<!-- Title -->
-				<h1 class="mb-3">开源企业协作与管理平台</h1>
+				<h1 class="mb-3">开源智能客服系统</h1>
 				<h4 class="mb-3"><@t key="banner.subtitle">基于AI全新打造</@t></h4>
 				<!-- <h6 class="mb-3">1000+ chatbot have been built with Bytedesk.</h6> -->
 				<!-- Button -->

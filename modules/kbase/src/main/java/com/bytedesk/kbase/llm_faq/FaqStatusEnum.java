@@ -17,5 +17,7 @@ public enum FaqStatusEnum {
     NEW,
     PROCESSING,
     SUCCESS,
-    ERROR
+    ERROR,
+    // 内容已过期，已从索引移除
+    EXPIRED
 }

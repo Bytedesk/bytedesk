@@ -447,6 +447,9 @@ public class VisitorThreadService
             }
         }
 
+        // 平台客服溯源：合并 originThreadUid/originOrgUid 到 extra（非法值已被 sanitize 为 null）
+        applyOriginThreadInfo(extra, visitorRequest);
+
         return JSON.toJSONString(extra);
     }
 
@@ -468,8 +471,30 @@ public class VisitorThreadService
         }
         boolean preview = Boolean.TRUE.equals(visitorRequest.getDebug())
                 || Boolean.TRUE.equals(visitorRequest.getDraft());
-        return ServiceConvertUtils.convertToServiceSettingsResponseVisitorJSONString(
-                settings, preview);
+        ServiceSettingsResponseVisitor extra = ServiceConvertUtils.buildServiceSettingsResponseVisitor(settings,
+                preview);
+        // 平台客服溯源：与 workgroup 路由对称支持
+        applyOriginThreadInfo(extra, visitorRequest);
+        return JSON.toJSONString(extra);
+    }
+
+    /**
+     * 合并平台客服溯源信息到 thread.extra：
+     * originThreadUid 非空（且格式合法）时记录 originThreadUid 与 originOrgUid（均可选）。
+     * 非法格式值在 getSanitizedOrigin* 中被归一为 null，不会写入 extra。
+     */
+    private void applyOriginThreadInfo(ServiceSettingsResponseVisitor extra, VisitorRequest visitorRequest) {
+        String originThreadUid = visitorRequest.getSanitizedOriginThreadUid();
+        if (!StringUtils.hasText(originThreadUid)) {
+            return;
+        }
+        extra.setOriginThreadUid(originThreadUid);
+        String originOrgUid = visitorRequest.getSanitizedOriginOrgUid();
+        if (StringUtils.hasText(originOrgUid)) {
+            extra.setOriginOrgUid(originOrgUid);
+        } else {
+            extra.setOriginOrgUid(null);
+        }
     }
 
     /**

@@ -56,7 +56,7 @@ public class StarterApplication {
 			return invokeCli("com.bytedesk.cli.core.BytedeskCli", cliArgs, "OSS CLI");
 		}
 		if ("enterprise-cli".equals(launcher)) {
-			return invokeCli("com.bytedesk.cli.EnterpriseCli", cliArgs, "enterprise CLI");
+			return invokeCli("com.bytedesk.enterprise.cli.EnterpriseCli", cliArgs, "enterprise CLI");
 		}
 		return -1;
 	}

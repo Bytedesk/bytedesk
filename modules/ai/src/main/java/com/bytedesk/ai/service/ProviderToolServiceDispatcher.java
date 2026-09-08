@@ -31,7 +31,7 @@ import com.bytedesk.ai.robot.RobotProtobuf;
  * 社区版无实现 bean 时（ObjectProvider 优雅降级），机器人对话不走 provider-native 工具链路，
  * 其余 LLM 问答链路不受影响。</p>
  *
- * <p>企业版实现：{@code com.bytedesk.ai.tool.ProviderToolServiceDispatcherImpl}
+ * <p>企业版实现：{@code com.bytedesk.enterprise.ai.tool.ProviderToolServiceDispatcherImpl}
  * （enterprise/ai 模块，bytedesk-enterprise-ai）。</p>
  */
 public interface ProviderToolServiceDispatcher {

@@ -24,6 +24,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.LanguageEnum;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
 import com.bytedesk.kbase.translation.KbaseTranslationEntity;
 
@@ -81,11 +82,12 @@ public class FaqElastic {
     @Field(type = FieldType.Boolean)
     private Boolean enabled;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime startDate;
+    // 有效期（定宽字符串 yyyy-MM-dd HH:mm:ss，词法序=时间序，null/缺失视为无边界）
+    @Field(type = FieldType.Keyword)
+    private String startDate;
 
-    // @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second_millis)
-    // private ZonedDateTime endDate;
+    @Field(type = FieldType.Keyword)
+    private String endDate;
     
     @Field(type = FieldType.Integer)
     private Integer viewCount;
@@ -122,8 +124,8 @@ public class FaqElastic {
             .translated(false)
             .categoryUid(faq.getCategoryUid())
             .enabled(faq.getEnabled())
-            // .startDate(faq.getStartDate())
-            // .endDate(faq.getEndDate())
+            .startDate(BdDateUtils.formatDatetimeToString(faq.getStartDate()))
+            .endDate(BdDateUtils.formatDatetimeToString(faq.getEndDate()))
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())
@@ -160,6 +162,8 @@ public class FaqElastic {
             .translated(true)
             .categoryUid(faq.getCategoryUid())
             .enabled(Boolean.TRUE.equals(translation.getEnabled()) && Boolean.TRUE.equals(faq.getEnabled()))
+            .startDate(BdDateUtils.formatDatetimeToString(faq.getStartDate()))
+            .endDate(BdDateUtils.formatDatetimeToString(faq.getEndDate()))
             .viewCount(faq.getViewCount())
             .clickCount(faq.getClickCount())
             .upCount(faq.getUpCount())

@@ -155,4 +155,16 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    /**
+     * 平台查询组织列表（desktop「平台查询」组织选择器数据源）。
+     * 仅超级管理员/平台默认组织成员可用（服务层校验），返回简版字段。
+     */
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query organization for platform cross-org query")
+    @GetMapping("/query/platform")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> queryByPlatform(OrganizationRequest request) {
+        Page<OrganizationResponseSimple> page = organizationRestService.queryByPlatform(request);
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
 }
