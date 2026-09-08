@@ -34,14 +34,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.security/spring-security-messaging -->
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-messaging</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- spring statemachine - 迁移到 cola statemachine -->
 		<!-- https://github.com/spring-projects/spring-statemachine -->
 		<!--
@@ -178,11 +170,21 @@
 			<version>0.4.0</version>
 		</dependency>
 
-		<!-- Required for Hibernate5Module to work with JPA annotations -->
+		<!-- Required for Hibernate7Module to work with JPA annotations -->
 		<dependency>
 			<groupId>jakarta.persistence</groupId>
 			<artifactId>jakarta.persistence-api</artifactId>
 			<version>3.2.0</version>
+		</dependency>
+
+		<!-- Redis 缓存序列化 JPA 实体时处理 Hibernate 懒加载代理/集合：
+		     未初始化的懒加载属性序列化为 null，PersistentSet/Bag 替换为标准 JDK 集合，
+		     避免 "Cannot lazily initialize collection (no session)"。
+		     版本由 spring-boot-starter-parent 4.1.x 导入的 tools.jackson:jackson-bom 管理 -->
+		<!-- https://github.com/FasterXML/jackson-datatype-hibernate -->
+		<dependency>
+			<groupId>tools.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate7</artifactId>
 		</dependency>
 
 		<!-- ////////////////////// 推送 /////////////////////////////////// -->
@@ -342,12 +344,12 @@
 
 		<!-- for workflow execution -->
 		<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
-        <!-- <dependency>
+		<!-- <dependency>
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-core</artifactId>
 			<version>1.5.2</version>
         </dependency> -->
-		
+
 
 	</dependencies>
 

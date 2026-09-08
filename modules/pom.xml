@@ -22,11 +22,13 @@
         <module>core</module>
         <module>crm</module>
         <module>disk</module>
+        <module>erp</module>
         <module>forum</module>
         <module>kbase</module>
         <module>mall</module>
         <module>marketing</module>
         <module>meet</module>
+        <module>office</module>
         <module>opinion</module>
         <module>service</module>
         <module>remote</module>

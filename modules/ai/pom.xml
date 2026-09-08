@@ -167,21 +167,9 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-server-webmvc -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
-
-		<!-- https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-mcp-client -->
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-mcp-client</artifactId>
-			<version>${spring-ai.version}</version>
-		</dependency>
+		<!-- MCP server/client 与 mcp/mcp_client/mcp_server/skill/tool/tool_audit/tool_call 等包 -->
+		<!-- 已迁移至 enterprise/ai（企业版/平台版功能），对应依赖 spring-ai-starter-mcp-server-webmvc -->
+		<!-- 与 spring-ai-starter-mcp-client 已同步迁移到 enterprise/ai/pom.xml -->
 
 		<!-- https://github.com/spring-ai-community/spring-ai-agent-utils -->
 		<!-- Source: https://mvnrepository.com/artifact/org.springaicommunity/spring-ai-agent-utils -->
@@ -301,16 +289,8 @@
 			<artifactId>micrometer-observation</artifactId>
 		</dependency> -->
 
-		<!-- Observability -->
-		<dependency>
-			<groupId>io.micrometer</groupId>
-			<artifactId>micrometer-tracing-bridge-brave</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.zipkin.reporter2</groupId>
-			<artifactId>zipkin-reporter-brave</artifactId>
-		</dependency>
+		<!-- Observability：micrometer-tracing-bridge-brave / zipkin-reporter-brave
+			已上移至 starter 的 spring-boot-starter-zipkin（Boot 4.1 专用 starter，含自动配置模块） -->
 
 		<!-- 分词、词频分析  -->
 		<!-- https://mvnrepository.com/artifact/org.ansj/ansj_seg -->
