@@ -12,6 +12,9 @@
         字段挂在 WorkgroupSettingsEntity 顶层（与 RobotSettingsEntity 对称），不放入共享的 ServiceSettingsEntity。
     -->
     <changeSet id="260812-4-add-workgroup-settings-hide-ai-disclaimer" author="copilot">
+        <!-- type 改用 Liquibase 抽象类型 BOOLEAN: MySQL 上映射为 BIT(1) (行为不变), PostgreSQL 映射为 BOOLEAN,
+             写死 BIT(1) 会导致 PG 上 "column is of type bit but default expression is of type boolean" 启动失败 -->
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="bytedesk_service_workgroup_settings"/>
             <not>
@@ -19,7 +22,7 @@
             </not>
         </preConditions>
         <addColumn tableName="bytedesk_service_workgroup_settings">
-            <column name="hide_ai_disclaimer" type="BIT(1)" defaultValueBoolean="false">
+            <column name="hide_ai_disclaimer" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

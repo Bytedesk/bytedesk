@@ -11,6 +11,9 @@
         背景：RobotBubble 原本无条件显示免责声明，现支持在 RobotSettings 中控制开关和自定义文案。
     -->
     <changeSet id="260812-1-add-robot-settings-hide-ai-disclaimer" author="copilot">
+        <!-- type 改用 Liquibase 抽象类型 BOOLEAN: MySQL 上映射为 BIT(1) (行为不变), PostgreSQL 映射为 BOOLEAN,
+             写死 BIT(1) 会导致 PG 上 "column is of type bit but default expression is of type boolean" 启动失败 -->
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="bytedesk_ai_robot_settings"/>
             <not>
@@ -18,7 +21,7 @@
             </not>
         </preConditions>
         <addColumn tableName="bytedesk_ai_robot_settings">
-            <column name="hide_ai_disclaimer" type="BIT(1)" defaultValueBoolean="false">
+            <column name="hide_ai_disclaimer" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

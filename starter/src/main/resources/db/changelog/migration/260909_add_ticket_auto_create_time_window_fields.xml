@@ -14,6 +14,10 @@
         时间段外的关闭事件直接跳过、不补建。
     -->
     <changeSet id="260909-1-add-ticket-auto-create-time-window-enabled" author="copilot">
+        <!-- type 改用 Liquibase 抽象类型 BOOLEAN: MySQL 上映射为 BIT(1) (行为不变), PostgreSQL 映射为 BOOLEAN。
+             原写死的 BIT(1) 在 PostgreSQL 上生成 "ADD COLUMN ... BIT(1) DEFAULT FALSE NOT NULL",
+             报错 "column is of type bit but default expression is of type boolean", 导致 4.4.5 在 PG 上启动失败。 -->
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
             <not>
@@ -21,7 +25,7 @@
             </not>
         </preConditions>
         <addColumn tableName="bytedesk_ticket_auto_create_settings">
-            <column name="time_window_enabled" type="BIT(1)" defaultValueBoolean="false">
+            <column name="time_window_enabled" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
