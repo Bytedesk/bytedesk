@@ -1010,7 +1010,7 @@ public class TicketSettingsRestService extends
         return entity;
     }
 
-        private TicketVisibilitySettingsRequest sanitizeVisibilitySettingsRequest(TicketVisibilitySettingsRequest request,
+    private TicketVisibilitySettingsRequest sanitizeVisibilitySettingsRequest(TicketVisibilitySettingsRequest request,
             String rawType) {
         if (request == null) {
             return null;
@@ -1035,8 +1035,6 @@ public class TicketSettingsRestService extends
             }
             categoryRules = categoryRules.stream()
                 .filter(rule -> !TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name()
-                    .equalsIgnoreCase(rule.getVisibility())
-                    && !TicketVisibilityModeEnum.DEPARTMENT_BASED.name()
                     .equalsIgnoreCase(rule.getVisibility()))
                 .collect(Collectors.toList());
         }
@@ -1048,7 +1046,7 @@ public class TicketSettingsRestService extends
             .mode(mode)
             .categoryRules(categoryRules)
             .build();
-        }
+    }
 
     private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request,
             String orgUid, String categoryTypeName) {

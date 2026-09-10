@@ -87,13 +87,6 @@ public class TicketAssignmentService {
      * @return resolution result for audit/logging
      */
     public AssignmentResolutionResult autoAssign(TicketEntity ticket, String processInstanceId) {
-        // Only auto-assign if ticket doesn't already have an assignee
-        if (StringUtils.hasText(ticket.getAssigneeString()) && ticket.getAssignee() != null
-                && StringUtils.hasText(ticket.getAssignee().getUid())) {
-            log.debug("autoAssign: ticket {} already has assignee, skipping", ticket.getUid());
-            return AssignmentResolutionResult.unresolved(AssignmentSource.AUTOMATIC, "already assigned");
-        }
-
         // 1. Query the active task
         List<Task> activeTasks = taskService.createTaskQuery()
                 .processInstanceId(processInstanceId)
@@ -108,6 +101,21 @@ public class TicketAssignmentService {
 
         Task activeTask = activeTasks.get(0);
         ensureWaitClaimCandidateUsers(ticket, activeTask);
+
+        if (StringUtils.hasText(ticket.getAssigneeString()) && ticket.getAssignee() != null
+                && StringUtils.hasText(ticket.getAssignee().getUid())) {
+            String explicitAssigneeUid = ticket.getAssignee().getUid();
+            AssignmentResolutionResult result = AssignmentResolutionResult.resolved(
+                    explicitAssigneeUid,
+                    AssignmentSource.AUTOMATIC,
+                    "EXPLICIT_ASSIGNEE",
+                    "ticket already created with explicit assignee",
+                    "single explicit assignee from ticket request");
+            applyAssignment(ticket, activeTask, explicitAssigneeUid);
+            writeAssignmentLog(ticket, processInstanceId, activeTask.getTaskDefinitionKey(),
+                    null, result);
+            return result;
+        }
 
         // 2. Try explicit assignment from workflow node configuration
         AssignmentResolutionResult result = resolveFromWorkflowNode(ticket, activeTask.getTaskDefinitionKey());

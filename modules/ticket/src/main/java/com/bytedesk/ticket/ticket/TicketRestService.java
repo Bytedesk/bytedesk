@@ -841,10 +841,18 @@ public class TicketRestService
                         || RoleConsts.ROLE_SUPER.equals(role.getValue()));
     }
 
-    private void assertTicketVisible(TicketEntity ticket) {
+    public void assertTicketVisible(TicketEntity ticket) {
         if (!canViewTicket(ticket)) {
             throw new NotFoundException("ticket not found");
         }
+    }
+
+    public void assertTicketVisibleIfAuthenticated(TicketEntity ticket) {
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            return;
+        }
+        assertTicketVisible(ticket);
     }
 
     private boolean canViewTicket(TicketEntity ticket) {

@@ -98,7 +98,9 @@ public class TicketService {
         if (!ticketOptional.isPresent()) {
             throw new RuntimeException("工单不存在: " + ticketUid);
         }
-        return ticketOptional.get();
+        TicketEntity ticket = ticketOptional.get();
+        ticketRestService.assertTicketVisibleIfAuthenticated(ticket);
+        return ticket;
     }
 
     private Task getActiveTaskOrThrow(TicketEntity ticket, TicketRequest request) {
@@ -212,9 +214,11 @@ public class TicketService {
         String nodeTitle = data != null && StringUtils.hasText(data.getString("title"))
                 ? data.getString("title")
                 : task.getName();
-        boolean assignedToOperator = StringUtils.hasText(task.getAssignee())
-                && Objects.equals(task.getAssignee(), operatorUid);
-        boolean unassigned = !StringUtils.hasText(task.getAssignee());
+        String ticketAssigneeUid = ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null;
+        String effectiveAssignee = StringUtils.hasText(task.getAssignee()) ? task.getAssignee() : ticketAssigneeUid;
+        boolean assignedToOperator = StringUtils.hasText(effectiveAssignee)
+                && Objects.equals(effectiveAssignee, operatorUid);
+        boolean unassigned = !StringUtils.hasText(effectiveAssignee);
         boolean actionable = assignedToOperator || unassigned;
 
         return TicketWorkflowTaskResponse.builder()
@@ -224,7 +228,7 @@ public class TicketService {
                 .taskId(task.getId())
                 .taskName(task.getName())
                 .taskDefinitionKey(task.getTaskDefinitionKey())
-                .assignee(task.getAssignee())
+                .assignee(effectiveAssignee)
                 .nodeType(nodeType)
                 .nodeTitle(nodeTitle)
                 .actionable(actionable)
@@ -2338,21 +2342,12 @@ public class TicketService {
      * 查询工单的完整活动历史
      */
     public List<TicketHistoryActivityResponse> queryTicketActivityHistory(TicketRequest request) {
-        // processInstanceId不能为空
-        TicketEntity ticket = null;
-        if (request.getProcessInstanceId() == null) {
-            if (StringUtils.hasText(request.getUid())) {
-                Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
-                if (ticketOptional.isPresent()) {
-                    ticket = ticketOptional.get();
-                    request.setProcessInstanceId(ticket.getProcessInstanceId());
-                }
-            } else {
-                throw new RuntimeException("processInstanceId不能为空");
-            }
-        }
-        if (ticket == null && StringUtils.hasText(request.getUid())) {
-            ticket = ticketRestService.findByUid(request.getUid()).orElse(null);
+        Assert.notNull(request, "ticket request required");
+        Assert.hasText(request.getUid(), "ticket uid required");
+
+        TicketEntity ticket = getTicketOrThrow(request.getUid());
+        if (!StringUtils.hasText(request.getProcessInstanceId())) {
+            request.setProcessInstanceId(ticket.getProcessInstanceId());
         }
 
         // 防御：工单未关联流程实例（历史数据/流程启动失败）时 processInstanceId 为空，

@@ -262,8 +262,11 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                             continue;
                         }
                         Predicate categoryMatched = criteriaBuilder.equal(root.get("categoryUid"), categoryUid);
+                        Predicate departmentRestrictedInvisible = criteriaBuilder.and(
+                                criteriaBuilder.not(noDepartmentAssigned),
+                                criteriaBuilder.not(sameDepartment));
                         restrictedAndInvisible.add(criteriaBuilder.and(categoryMatched,
-                                criteriaBuilder.not(sameDepartment)));
+                                departmentRestrictedInvisible));
                     }
                 }
                 if (deptBasedCategories != null && !deptBasedCategories.isEmpty()) {
@@ -285,7 +288,7 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 if (!restrictedAndInvisible.isEmpty()) {
                     Predicate restrictedAndNotVisible = criteriaBuilder.or(
                             restrictedAndInvisible.toArray(new Predicate[0]));
-                    Predicate alwaysVisible = criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned);
+                    Predicate alwaysVisible = criteriaBuilder.or(reporterSelf, assigneeSelf);
                     predicates.add(criteriaBuilder.or(alwaysVisible, criteriaBuilder.not(restrictedAndNotVisible)));
                 }
             }

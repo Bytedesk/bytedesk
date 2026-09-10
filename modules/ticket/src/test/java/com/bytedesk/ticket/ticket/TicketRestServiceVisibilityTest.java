@@ -147,6 +147,39 @@ class TicketRestServiceVisibilityTest {
         assertThat(invokeCanViewTicket(service, ticket)).isTrue();
     }
 
+    @Test
+    void canNotViewExternalTicketWithoutDepartmentWhenCategoryUsesDepartmentBasedAndCurrentDepartmentNotAllowed() {
+        AuthService authService = mock(AuthService.class);
+        TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+        MemberRepository memberRepository = mock(MemberRepository.class);
+        TicketRestService service = newService(authService, ticketSettingsRestService, memberRepository);
+
+        UserEntity currentUser = buildUser("user-4");
+        when(authService.getUser()).thenReturn(currentUser);
+        when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-4", "org-1"))
+                .thenReturn(Optional.of(buildMember(currentUser, "dept-z")));
+        when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.EXTERNAL.name()))
+                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.EXTERNAL, TicketVisibilitySettingsData.builder()
+                        .mode(TicketVisibilityModeEnum.CATEGORY_BASED.name())
+                        .categoryRules(List.of(TicketVisibilityCategoryRuleData.builder()
+                                .categoryUid("cat-3")
+                                .visibility(TicketVisibilityModeEnum.DEPARTMENT_BASED.name())
+                                .departmentUids(List.of("dept-a"))
+                                .build()))
+                        .build())));
+
+        TicketEntity ticket = TicketEntity.builder()
+                .uid("ticket-5")
+                .orgUid("org-1")
+                .type(TicketTypeEnum.EXTERNAL.name())
+                .categoryUid("cat-3")
+                .departmentUid(null)
+                .userUid("reporter-5")
+                .build();
+
+        assertThat(invokeCanViewTicket(service, ticket)).isFalse();
+    }
+
     private static TicketRestService newService(AuthService authService,
             TicketSettingsRestService ticketSettingsRestService,
             MemberRepository memberRepository) {
@@ -182,17 +215,21 @@ class TicketRestServiceVisibilityTest {
                 .build();
     }
 
-    private static TicketSettingsEntity buildSettings(TicketVisibilitySettingsData data) {
+        private static TicketSettingsEntity buildSettings(TicketTypeEnum type, TicketVisibilitySettingsData data) {
         return TicketSettingsEntity.builder()
                 .uid("settings-1")
                 .orgUid("org-1")
-                .type(TicketTypeEnum.INTERNAL.name())
+                                .type(type.name())
                 .visibilitySettings(TicketVisibilitySettingsEntity.builder()
                         .uid("visibility-1")
                         .content(data)
                         .build())
                 .build();
     }
+
+        private static TicketSettingsEntity buildSettings(TicketVisibilitySettingsData data) {
+                return buildSettings(TicketTypeEnum.INTERNAL, data);
+        }
 
     private static boolean invokeCanViewTicket(TicketRestService service, TicketEntity ticket) {
         try {

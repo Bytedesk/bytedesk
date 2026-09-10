@@ -39,7 +39,7 @@ public class ProcessInitializer implements SmartInitializingSingleton {
         processRestService.initProcess(orgUid);
         // processRestService.initThreadProcess(orgUid);
         // 初始化演示流程模板
-        processRestService.initProcessDemos(orgUid);
+        // processRestService.initProcessDemos(orgUid);
         // 迁移：为缺少 flowgramSchema 的旧流程生成默认 JSON
         processRestService.migrateFlowgramSchemas();
     }

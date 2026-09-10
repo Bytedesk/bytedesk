@@ -14,6 +14,8 @@
 package com.bytedesk.ticket.process;
 
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.utils.Utils;
+import com.bytedesk.ticket.ticket.TicketConsts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -51,5 +53,25 @@ public class ProcessResponse extends BaseResponse {
     @JsonProperty("deployed")
     public boolean isDeployed() {
         return ProcessStatusEnum.DEPLOYED.name().equalsIgnoreCase(this.status);
+    }
+
+    @JsonProperty("systemDefault")
+    public boolean isSystemDefault() {
+        if (this.getOrgUid() == null || this.getUid() == null) {
+            return false;
+        }
+
+        if (ProcessTypeEnum.TICKET_INTERNAL.name().equalsIgnoreCase(this.type)) {
+            return Utils.formatUid(this.getOrgUid(), TicketConsts.TICKET_PROCESS_KEY).equals(this.getUid());
+        }
+
+        if (ProcessTypeEnum.TICKET_EXTERNAL.name().equalsIgnoreCase(this.type)) {
+            return Utils.formatUid(
+                    this.getOrgUid(),
+                    TicketConsts.TICKET_PROCESS_KEY + TicketConsts.TICKET_EXTERNAL_PROCESS_UID_SUFFIX)
+                    .equals(this.getUid());
+        }
+
+        return false;
     }
 }

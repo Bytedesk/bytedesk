@@ -2,18 +2,23 @@ package com.bytedesk.ticket.ticket.assignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.flowable.engine.TaskService;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -24,6 +29,7 @@ import com.bytedesk.ticket.process.ProcessRepository;
 import com.bytedesk.ticket.service.TicketNotificationService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketRepository;
+import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
@@ -153,6 +159,47 @@ class TicketAssignmentServiceTest {
         assertTrue(result.isResolved());
         assertEquals("member-random-1", result.assigneeUid());
                 assertEquals(TicketAssignmentModeEnum.DEFAULT.name(), result.strategy());
+    }
+
+    @Test
+    void autoAssignShouldSyncExplicitTicketAssigneeIntoActiveTask() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        UserProtobuf assignee = UserProtobuf.builder()
+                .uid("member-explicit-1")
+                .nickname("Explicit Agent")
+                .build();
+        ticket.setAssignee(assignee.toJson());
+
+        MemberEntity member = MemberEntity.builder()
+                .uid("member-explicit-1")
+                .nickname("Explicit Agent")
+                .build();
+        Task task = mock(Task.class);
+        TaskQuery taskQuery = mock(TaskQuery.class);
+
+        when(fixture.taskService.createTaskQuery()).thenReturn(taskQuery);
+        when(taskQuery.processInstanceId("process-1")).thenReturn(taskQuery);
+        when(taskQuery.active()).thenReturn(taskQuery);
+        when(taskQuery.list()).thenReturn(List.of(task));
+        when(task.getId()).thenReturn("task-1");
+        when(task.getName()).thenReturn("Process Ticket");
+        when(task.getTaskDefinitionKey()).thenReturn("processTicket");
+        when(task.getAssignee()).thenReturn(null);
+        when(fixture.memberRepository.findByUid("member-explicit-1")).thenReturn(Optional.of(member));
+        when(fixture.ticketRepository.findByUid("ticket-1")).thenReturn(Optional.of(ticket));
+        when(fixture.ticketRepository.save(ticket)).thenReturn(ticket);
+        when(fixture.uidUtils.getUid()).thenReturn("assign-log-1");
+
+        AssignmentResolutionResult result = fixture.service.autoAssign(ticket, "process-1");
+
+        assertTrue(result.isResolved());
+        assertEquals("member-explicit-1", result.assigneeUid());
+        assertEquals(TicketStatusEnum.ASSIGNED.name(), ticket.getStatus());
+        assertEquals("member-explicit-1", ticket.getAssignee().getUid());
+        verify(fixture.taskService).claim("task-1", "member-explicit-1");
+        verify(fixture.assignmentLogRepository).save(any(TicketAssignmentLogEntity.class));
+        verify(fixture.ticketNotificationService).notifyTicketAssigned(ticket);
     }
 
     private static TicketEntity buildTicket() {
