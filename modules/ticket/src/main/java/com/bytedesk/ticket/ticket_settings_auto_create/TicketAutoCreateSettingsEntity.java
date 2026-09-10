@@ -33,6 +33,11 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "bytedesk_ticket_auto_create_settings")
 public class TicketAutoCreateSettingsEntity extends BaseEntity {
 
+    private static final List<String> SUPPORTED_AUTO_CREATE_CLOSE_TYPES = List.of(
+            ThreadCloseTypeEnum.AUTO.name(),
+            ThreadCloseTypeEnum.AGENT.name(),
+            ThreadCloseTypeEnum.VISITOR.name());
+
     private static final long serialVersionUID = 1L;
 
     @Builder.Default
@@ -66,6 +71,34 @@ public class TicketAutoCreateSettingsEntity extends BaseEntity {
     @Column(name = "auto_ticket_robot_uid", length = 64)
     private String autoTicketRobotUid;
 
+    /**
+     * 是否启用自动建单时间段限制：仅当当前时刻（按时区计算）落在时间段内时才允许自动建单。
+     */
+    @Builder.Default
+    @Column(name = "time_window_enabled")
+    private Boolean timeWindowEnabled = Boolean.FALSE;
+
+    /**
+     * 时间段开始时间（HH:mm），默认 09:00。
+     */
+    @Builder.Default
+    @Column(name = "time_window_start_time", length = 8)
+    private String timeWindowStartTime = "09:00";
+
+    /**
+     * 时间段结束时间（HH:mm），默认 18:00。早于开始时间视为跨天时段（如 22:00–06:00）。
+     */
+    @Builder.Default
+    @Column(name = "time_window_end_time", length = 8)
+    private String timeWindowEndTime = "18:00";
+
+    /**
+     * 判定当前时刻是否在时间段内所使用的时区，默认 Asia/Shanghai。
+     */
+    @Builder.Default
+    @Column(name = "time_window_timezone", length = 64)
+    private String timeWindowTimezone = "Asia/Shanghai";
+
     public static TicketAutoCreateSettingsEntity fromRequest(TicketAutoCreateSettingsRequest request) {
         TicketAutoCreateSettingsEntity entity = TicketAutoCreateSettingsEntity.builder().build();
         applyRequest(entity, request);
@@ -74,6 +107,10 @@ public class TicketAutoCreateSettingsEntity extends BaseEntity {
 
     public static List<String> defaultCloseTypes() {
         return new ArrayList<>(List.of(ThreadCloseTypeEnum.AUTO.name()));
+    }
+
+    public static boolean isSupportedAutoCreateCloseType(String value) {
+        return SUPPORTED_AUTO_CREATE_CLOSE_TYPES.contains(value);
     }
 
     public static List<String> normalizeCloseTypes(List<String> values) {
@@ -89,11 +126,8 @@ public class TicketAutoCreateSettingsEntity extends BaseEntity {
             if (ThreadCloseTypeEnum.NONE.name().equals(closeType)) {
                 continue;
             }
-            try {
-                ThreadCloseTypeEnum.fromValue(closeType);
+            if (isSupportedAutoCreateCloseType(closeType)) {
                 normalized.add(closeType);
-            } catch (IllegalArgumentException ignored) {
-                // ignore unsupported close type values from stale clients or bad data
             }
         }
         return normalized.isEmpty() ? defaultCloseTypes() : new ArrayList<>(normalized);
@@ -128,6 +162,24 @@ public class TicketAutoCreateSettingsEntity extends BaseEntity {
         }
         if (request.getAutoTicketRobotUid() != null || !StringUtils.hasText(entity.getAutoTicketRobotUid())) {
             entity.setAutoTicketRobotUid(request.getAutoTicketRobotUid());
+        }
+        if (request.getTimeWindowEnabled() != null) {
+            entity.setTimeWindowEnabled(request.getTimeWindowEnabled());
+        }
+        if (StringUtils.hasText(request.getTimeWindowStartTime())) {
+            entity.setTimeWindowStartTime(request.getTimeWindowStartTime().trim());
+        } else if (!StringUtils.hasText(entity.getTimeWindowStartTime())) {
+            entity.setTimeWindowStartTime("09:00");
+        }
+        if (StringUtils.hasText(request.getTimeWindowEndTime())) {
+            entity.setTimeWindowEndTime(request.getTimeWindowEndTime().trim());
+        } else if (!StringUtils.hasText(entity.getTimeWindowEndTime())) {
+            entity.setTimeWindowEndTime("18:00");
+        }
+        if (StringUtils.hasText(request.getTimeWindowTimezone())) {
+            entity.setTimeWindowTimezone(request.getTimeWindowTimezone().trim());
+        } else if (!StringUtils.hasText(entity.getTimeWindowTimezone())) {
+            entity.setTimeWindowTimezone("Asia/Shanghai");
         }
     }
 }

@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -30,6 +32,8 @@ public class FeedbackRestControllerVisitor {
 
     private final FeedbackRestService feedbackRestService;
 
+    @BlackIpFilter(title = "black", action = "feedback-submit")
+    @BlackUserFilter(title = "black", action = "feedback-submit")
     @PostMapping("/submit")
     public ResponseEntity<?> submitFeedback(@RequestBody FeedbackRequest request) {
         

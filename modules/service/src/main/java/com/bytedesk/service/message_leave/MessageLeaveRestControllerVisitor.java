@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -35,6 +37,8 @@ public class MessageLeaveRestControllerVisitor {
 
     private final MessageLeaveRestService messageLeaveRestService;
 
+    @BlackIpFilter(title = "black", action = "leave-msg-create")
+    @BlackUserFilter(title = "black", action = "leave-msg-create")
     @PostMapping("/create")
     @Operation(summary = "创建留言消息")
     public ResponseEntity<?> create(@RequestBody MessageLeaveRequest request) {
@@ -53,6 +57,8 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @BlackIpFilter(title = "black", action = "leave-msg-confirm")
+    @BlackUserFilter(title = "black", action = "leave-msg-confirm")
     @PostMapping("/confirm")
     @Operation(summary = "确认留言消息")
     public ResponseEntity<?> confirm(@RequestBody MessageLeaveRequest request) {
@@ -62,6 +68,8 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @BlackIpFilter(title = "black", action = "leave-msg-reject")
+    @BlackUserFilter(title = "black", action = "leave-msg-reject")
     @PostMapping("/reject")
     @Operation(summary = "拒绝留言消息")
     public ResponseEntity<?> reject(@RequestBody MessageLeaveRequest request) {

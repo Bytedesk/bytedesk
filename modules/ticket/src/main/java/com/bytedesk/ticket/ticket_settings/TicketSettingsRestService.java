@@ -1024,15 +1024,19 @@ public class TicketSettingsRestService extends
                 .map(rule -> TicketVisibilityCategoryRuleRequest.builder()
                     .categoryUid(rule.getCategoryUid())
                     .visibility(rule.getVisibility())
+                    .departmentUids(rule.getDepartmentUids())
                     .build())
                 .collect(Collectors.toList());
 
         if (ticketType != TicketTypeEnum.INTERNAL) {
-            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equalsIgnoreCase(mode)) {
-            mode = TicketVisibilityModeEnum.ORG_WIDE.name();
+            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equalsIgnoreCase(mode)
+                    || TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equalsIgnoreCase(mode)) {
+                mode = TicketVisibilityModeEnum.ORG_WIDE.name();
             }
             categoryRules = categoryRules.stream()
                 .filter(rule -> !TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name()
+                    .equalsIgnoreCase(rule.getVisibility())
+                    && !TicketVisibilityModeEnum.DEPARTMENT_BASED.name()
                     .equalsIgnoreCase(rule.getVisibility()))
                 .collect(Collectors.toList());
         }
@@ -1645,15 +1649,23 @@ public class TicketSettingsRestService extends
         return TicketAutoCreateSettingsResponse.builder()
                 .uid(entity.getUid())
                 .enabled(entity.getEnabled())
-                .closeTypes(entity.getCloseTypes() == null
-                        ? TicketAutoCreateSettingsEntity.defaultCloseTypes()
-                        : new ArrayList<>(entity.getCloseTypes()))
+                .closeTypes(TicketAutoCreateSettingsEntity.normalizeCloseTypes(entity.getCloseTypes()))
                 .minVisitorMessageCount(entity.getMinVisitorMessageCount())
                 .minRobotMessageCount(entity.getMinRobotMessageCount())
                 .requireAiUnresolved(entity.getRequireAiUnresolved())
                 .requireAgentOffline(entity.getRequireAgentOffline())
                 .skipIfTicketExists(entity.getSkipIfTicketExists())
                 .autoTicketRobotUid(entity.getAutoTicketRobotUid())
+                .timeWindowEnabled(entity.getTimeWindowEnabled())
+                .timeWindowStartTime(StringUtils.hasText(entity.getTimeWindowStartTime())
+                        ? entity.getTimeWindowStartTime()
+                        : "09:00")
+                .timeWindowEndTime(StringUtils.hasText(entity.getTimeWindowEndTime())
+                        ? entity.getTimeWindowEndTime()
+                        : "18:00")
+                .timeWindowTimezone(StringUtils.hasText(entity.getTimeWindowTimezone())
+                        ? entity.getTimeWindowTimezone()
+                        : "Asia/Shanghai")
                 .build();
     }
 
@@ -1694,6 +1706,7 @@ public class TicketSettingsRestService extends
                                 .map(rule -> TicketVisibilityCategoryRuleResponse.builder()
                                         .categoryUid(rule.getCategoryUid())
                                         .visibility(rule.getVisibility())
+                                        .departmentUids(rule.getDepartmentUids())
                                         .build())
                                 .collect(Collectors.toList()))
                 .build();
@@ -1848,15 +1861,23 @@ public class TicketSettingsRestService extends
             return;
         }
         target.setEnabled(source.getEnabled());
-        target.setCloseTypes(source.getCloseTypes() == null
-                ? TicketAutoCreateSettingsEntity.defaultCloseTypes()
-                : new ArrayList<>(source.getCloseTypes()));
+        target.setCloseTypes(TicketAutoCreateSettingsEntity.normalizeCloseTypes(source.getCloseTypes()));
         target.setMinVisitorMessageCount(source.getMinVisitorMessageCount());
         target.setMinRobotMessageCount(source.getMinRobotMessageCount());
         target.setRequireAiUnresolved(source.getRequireAiUnresolved());
         target.setRequireAgentOffline(source.getRequireAgentOffline());
         target.setSkipIfTicketExists(source.getSkipIfTicketExists());
         target.setAutoTicketRobotUid(source.getAutoTicketRobotUid());
+        target.setTimeWindowEnabled(source.getTimeWindowEnabled());
+        target.setTimeWindowStartTime(StringUtils.hasText(source.getTimeWindowStartTime())
+                ? source.getTimeWindowStartTime()
+                : "09:00");
+        target.setTimeWindowEndTime(StringUtils.hasText(source.getTimeWindowEndTime())
+                ? source.getTimeWindowEndTime()
+                : "18:00");
+        target.setTimeWindowTimezone(StringUtils.hasText(source.getTimeWindowTimezone())
+                ? source.getTimeWindowTimezone()
+                : "Asia/Shanghai");
     }
 
     private ProcessResponse mapProcess(ProcessEntity entity) {

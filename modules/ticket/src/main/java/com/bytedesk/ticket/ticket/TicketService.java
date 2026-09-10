@@ -47,6 +47,7 @@ import com.bytedesk.ticket.ticket.assignment.TicketAssignmentService;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
+import com.bytedesk.ticket.ticket.dto.TicketTimelineStepResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowActionFieldResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowActionResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
@@ -807,7 +808,7 @@ public class TicketService {
             throw new RuntimeException("非当前任务处理人，不能关单");
         }
         Map<String, Object> variables = new HashMap<>();
-        String targetStatus = resolveConfiguredStatus(runtimeContext.actionConfig(), runtimeContext.nodeData(),
+        String targetStatus = resolveConfiguredStatus(runtimeContext.actionConfig(), null,
                 TicketStatusEnum.CLOSED.name(), "ticketStatus", "ticketStatusOnComplete");
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, targetStatus);
         variables.put("closedBy", operatorUid);
@@ -2411,11 +2412,150 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
 
+    public List<TicketTimelineStepResponse> queryTicketTimeline(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+
+        TicketEntity ticket = null;
+        if (StringUtils.hasText(request.getUid())) {
+            ticket = getTicketOrThrow(request.getUid());
+            if (!StringUtils.hasText(request.getProcessInstanceId())) {
+                request.setProcessInstanceId(ticket.getProcessInstanceId());
+            }
+        }
+
+        List<Comment> comments = StringUtils.hasText(request.getProcessInstanceId())
+                ? taskService.getProcessInstanceComments(request.getProcessInstanceId())
+                : List.of();
+        Map<String, String> assigneeNameMap = buildTicketAssigneeNameMap(ticket, List.of(), comments);
+
+        List<TicketTimelineStepResponse> responses = new ArrayList<>();
+        if (ticket != null && ticket.getCreatedAt() != null) {
+            responses.add(TicketTimelineStepResponse.builder()
+                    .id(ticket.getUid())
+                    .actionKey("CREATE")
+                    .title("创建工单")
+                    .titleKey(I18TicketConsts.I18N_TICKET_ACTION_CREATE)
+                    .assignee(ticket.getReporter() != null ? ticket.getReporter().getUid() : null)
+                    .assigneeName(ticket.getReporter() != null ? ticket.getReporter().getNickname() : null)
+                    .description(ticket.getTitle())
+                    .occurredAt(Date.from(ticket.getCreatedAt().toInstant()))
+                    .build());
+        }
+
+        responses.addAll(comments.stream()
+                .filter(this::shouldDisplayTicketTimelineComment)
+                .map(comment -> buildTicketTimelineStep(comment, assigneeNameMap))
+                .collect(Collectors.toList()));
+
+        return responses.stream()
+                .sorted(Comparator.comparing(
+                    (TicketTimelineStepResponse response) -> response.getOccurredAt(),
+                    Comparator.nullsLast((String left, String right) -> left.compareTo(right))))
+                .collect(Collectors.toList());
+    }
+
+    private boolean shouldDisplayTicketTimelineComment(Comment comment) {
+        if (comment == null || !StringUtils.hasText(comment.getType()) || comment.getTime() == null) {
+            return false;
+        }
+        return switch (comment.getType()) {
+            case "CLAIMED", "ASSIGNED", "PROCESSING", "UNCLAIMED", "TRANSFERRED", "TRANSFERRED_DEPARTMENT",
+                    "HOLDING", "RESUMED", "PENDING", "REOPENED", "CLOSED", "CANCELLED", "COMPLETE",
+                    "COMPLETE_VERIFIED", "COMPLETE_REJECTED", "DELEGATED", "DELEGATION_RESOLVED", "CC",
+                    "ADDSIGN", "ROLLBACK", "REVOKED" -> true;
+            default -> false;
+        };
+    }
+
+    private TicketTimelineStepResponse buildTicketTimelineStep(Comment comment, Map<String, String> assigneeNameMap) {
+        return TicketTimelineStepResponse.builder()
+                .id(comment.getId())
+                .actionKey(comment.getType())
+                .title(resolveTicketTimelineTitle(comment.getType()))
+                .titleKey(resolveTicketTimelineTitleKey(comment.getType()))
+                .description(comment.getFullMessage())
+                .assignee(comment.getUserId())
+                .assigneeName(assigneeNameMap.get(comment.getUserId()))
+                .occurredAt(comment.getTime())
+                .build();
+    }
+
+    private String resolveTicketTimelineTitleKey(String actionKey) {
+        if (!StringUtils.hasText(actionKey)) {
+            return null;
+        }
+        return switch (actionKey) {
+            case "CREATE" -> I18TicketConsts.I18N_TICKET_ACTION_CREATE;
+            case "CLAIMED" -> "ticket.status.claimed";
+            case "ASSIGNED" -> "ticket.status.assigned";
+            case "PROCESSING" -> "ticket.status.processing";
+            case "UNCLAIMED" -> "ticket.status.unclaimed";
+            case "TRANSFERRED" -> "ticket.status.transferred";
+            case "TRANSFERRED_DEPARTMENT" -> I18TicketConsts.I18N_TICKET_ACTION_TRANSFER_DEPARTMENT;
+            case "HOLDING" -> "ticket.status.holding";
+            case "RESUMED" -> "ticket.status.resumed";
+            case "PENDING" -> "ticket.status.pending";
+            case "REOPENED" -> "ticket.status.reopened";
+            case "CLOSED" -> "ticket.status.closed";
+            case "CANCELLED" -> "ticket.status.cancelled";
+            case "COMPLETE" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE;
+            case "COMPLETE_VERIFIED" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_VERIFIED;
+            case "COMPLETE_REJECTED" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_REJECTED;
+            case "DELEGATED" -> I18TicketConsts.I18N_TICKET_ACTION_DELEGATE;
+            case "DELEGATION_RESOLVED" -> I18TicketConsts.I18N_TICKET_ACTION_DELEGATE_RESOLVE;
+            case "CC" -> I18TicketConsts.I18N_TICKET_ACTION_CC;
+            case "ADDSIGN" -> I18TicketConsts.I18N_TICKET_ACTION_ADDSIGN;
+            case "ROLLBACK" -> I18TicketConsts.I18N_TICKET_ACTION_ROLLBACK;
+            case "REVOKED" -> I18TicketConsts.I18N_TICKET_ACTION_REVOKE;
+            default -> null;
+        };
+    }
+
+    private String resolveTicketTimelineTitle(String actionKey) {
+        if (!StringUtils.hasText(actionKey)) {
+            return "活动";
+        }
+        return switch (actionKey) {
+            case "CREATE" -> "创建工单";
+            case "CLAIMED" -> "已认领";
+            case "ASSIGNED" -> "已分配";
+            case "PROCESSING" -> "处理中";
+            case "UNCLAIMED" -> "被退回";
+            case "TRANSFERRED" -> "已转派";
+            case "TRANSFERRED_DEPARTMENT" -> "转派部门";
+            case "HOLDING" -> "挂起";
+            case "RESUMED" -> "恢复";
+            case "PENDING" -> "待处理";
+            case "REOPENED" -> "重新打开";
+            case "CLOSED" -> "已关闭";
+            case "CANCELLED" -> "已取消";
+            case "COMPLETE" -> "已解决";
+            case "COMPLETE_VERIFIED" -> "确认解决";
+            case "COMPLETE_REJECTED" -> "未解决";
+            case "DELEGATED" -> "委托";
+            case "DELEGATION_RESOLVED" -> "委托已归还";
+            case "CC" -> "抄送";
+            case "ADDSIGN" -> "加签";
+            case "ROLLBACK" -> "退回";
+            case "REVOKED" -> "撤销";
+            default -> actionKey;
+        };
+    }
+
     private boolean shouldDisplayTicketActivity(HistoricActivityInstance activity) {
         if (activity == null) {
             return false;
         }
         if ("sequenceFlow".equals(activity.getActivityType())) {
+            return false;
+        }
+        if ("startEvent".equals(activity.getActivityType())) {
+            return false;
+        }
+        if ("endEvent".equals(activity.getActivityType())) {
+            return false;
+        }
+        if ("exclusiveGateway".equals(activity.getActivityType())) {
             return false;
         }
         // 边界定时器（如认领/处理 SLA 超时）不作为流转步骤展示：

@@ -39,9 +39,17 @@ public class TicketVisibilitySettingsData implements Serializable {
                 if (rule == null || !StringUtils.hasText(rule.getCategoryUid())) {
                     continue;
                 }
+                String ruleVisibility = resolveRuleVisibility(rule.getVisibility());
+                List<String> departmentUids = normalizeDepartmentUids(rule.getDepartmentUids());
+                if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(ruleVisibility)
+                        && departmentUids.isEmpty()) {
+                    // 选择部门但未指定任何部门，退化为公司内部可见
+                    ruleVisibility = TicketVisibilityModeEnum.ORG_WIDE.name();
+                }
                 TicketVisibilityCategoryRuleData normalized = TicketVisibilityCategoryRuleData.builder()
                         .categoryUid(rule.getCategoryUid().trim())
-                        .visibility(resolveRuleVisibility(rule.getVisibility()))
+                        .visibility(ruleVisibility)
+                        .departmentUids(departmentUids)
                         .build();
                 deduplicated.put(normalized.getCategoryUid(), normalized);
             }
@@ -63,6 +71,35 @@ public class TicketVisibilitySettingsData implements Serializable {
             }
         }
         return TicketVisibilityModeEnum.ORG_WIDE.name();
+    }
+
+    public List<String> resolveCategoryDepartmentUids(String categoryUid) {
+        if (!StringUtils.hasText(categoryUid) || categoryRules == null) {
+            return new ArrayList<>();
+        }
+        for (TicketVisibilityCategoryRuleData rule : categoryRules) {
+            if (rule != null && categoryUid.equals(rule.getCategoryUid())
+                    && TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(rule.getVisibility())) {
+                return rule.getDepartmentUids() == null ? new ArrayList<>() : rule.getDepartmentUids();
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private List<String> normalizeDepartmentUids(List<String> departmentUids) {
+        if (departmentUids == null) {
+            return new ArrayList<>();
+        }
+        List<String> normalized = new ArrayList<>();
+        for (String departmentUid : departmentUids) {
+            if (StringUtils.hasText(departmentUid)) {
+                String trimmed = departmentUid.trim();
+                if (!normalized.contains(trimmed)) {
+                    normalized.add(trimmed);
+                }
+            }
+        }
+        return normalized;
     }
 
     private TicketVisibilityModeEnum resolveMode(String rawMode) {

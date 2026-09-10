@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
@@ -59,6 +61,8 @@ public class TicketRestControllerVisitor {
     }
 
     // create ticket by visitor
+    @BlackIpFilter(title = "black", action = "ticket-create")
+    @BlackUserFilter(title = "black", action = "ticket-create")
     @PostMapping("/create")
     public ResponseEntity<?> createByVisitor(@RequestBody TicketRequest request) {
 
@@ -67,6 +71,8 @@ public class TicketRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @BlackIpFilter(title = "black", action = "ticket-delete")
+    @BlackUserFilter(title = "black", action = "ticket-delete")
     @PostMapping("/delete")
     public ResponseEntity<?> deleteByVisitor(@RequestBody TicketRequest request) {
 
@@ -104,6 +110,8 @@ public class TicketRestControllerVisitor {
      * 访客端按当前 Flowable 活动任务执行流程动作。
      * 仅当访客是工单报告人时允许执行验证操作。
      */
+    @BlackIpFilter(title = "black", action = "ticket-workflow-action")
+    @BlackUserFilter(title = "black", action = "ticket-workflow-action")
     @PostMapping("/workflow/action")
     public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
 

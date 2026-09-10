@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
@@ -247,20 +248,46 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             return;
         }
 
-        if ("CATEGORY_BASED".equalsIgnoreCase(request.getVisibilityMode())
-                && request.getVisibilityRestrictedCategoryUids() != null
-                && !request.getVisibilityRestrictedCategoryUids().isEmpty()) {
-            List<Predicate> restrictedCategories = new ArrayList<>();
-            for (String categoryUid : request.getVisibilityRestrictedCategoryUids()) {
-                if (StringUtils.hasText(categoryUid)) {
-                    restrictedCategories.add(criteriaBuilder.equal(root.get("categoryUid"), categoryUid));
+        if ("CATEGORY_BASED".equalsIgnoreCase(request.getVisibilityMode())) {
+            List<String> sameDeptCategories = request.getVisibilityRestrictedCategoryUids();
+            Map<String, List<String>> deptBasedCategories = request.getVisibilityRestrictedCategoryDepartmentUids();
+            boolean hasSameDept = sameDeptCategories != null && !sameDeptCategories.isEmpty();
+            boolean hasDeptBased = deptBasedCategories != null && !deptBasedCategories.isEmpty();
+            if (hasSameDept || hasDeptBased) {
+                // 命中受限分类且不在其允许可见范围内 => 视为不可见
+                List<Predicate> restrictedAndInvisible = new ArrayList<>();
+                if (sameDeptCategories != null && !sameDeptCategories.isEmpty()) {
+                    for (String categoryUid : sameDeptCategories) {
+                        if (!StringUtils.hasText(categoryUid)) {
+                            continue;
+                        }
+                        Predicate categoryMatched = criteriaBuilder.equal(root.get("categoryUid"), categoryUid);
+                        restrictedAndInvisible.add(criteriaBuilder.and(categoryMatched,
+                                criteriaBuilder.not(sameDepartment)));
+                    }
                 }
-            }
-            if (!restrictedCategories.isEmpty()) {
-                Predicate restrictedCategory = criteriaBuilder.or(restrictedCategories.toArray(new Predicate[0]));
-                Predicate departmentVisible = criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned,
-                        sameDepartment);
-                predicates.add(criteriaBuilder.or(criteriaBuilder.not(restrictedCategory), departmentVisible));
+                if (deptBasedCategories != null && !deptBasedCategories.isEmpty()) {
+                    for (Map.Entry<String, List<String>> entry : deptBasedCategories.entrySet()) {
+                        String categoryUid = entry.getKey();
+                        List<String> allowedDepartmentUids = entry.getValue();
+                        if (!StringUtils.hasText(categoryUid) || allowedDepartmentUids == null
+                                || allowedDepartmentUids.isEmpty()) {
+                            continue;
+                        }
+                        Predicate categoryMatched = criteriaBuilder.equal(root.get("categoryUid"), categoryUid);
+                        boolean currentDepartmentAllowed = StringUtils.hasText(request.getVisibilityCurrentUserDepartmentUid())
+                                && allowedDepartmentUids.contains(request.getVisibilityCurrentUserDepartmentUid());
+                        if (!currentDepartmentAllowed) {
+                            restrictedAndInvisible.add(categoryMatched);
+                        }
+                    }
+                }
+                if (!restrictedAndInvisible.isEmpty()) {
+                    Predicate restrictedAndNotVisible = criteriaBuilder.or(
+                            restrictedAndInvisible.toArray(new Predicate[0]));
+                    Predicate alwaysVisible = criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned);
+                    predicates.add(criteriaBuilder.or(alwaysVisible, criteriaBuilder.not(restrictedAndNotVisible)));
+                }
             }
         }
     }

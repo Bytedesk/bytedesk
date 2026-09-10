@@ -540,6 +540,7 @@ public class I18Consts {
     public static final String I18N_WORKFLOW_START_NODE_NOT_FOUND = I18N_PREFIX + "workflow.start.node.not.found"; // 工作流中未找到开始节点
     public static final String I18N_ACCESS_DENIED = I18N_PREFIX + "access.denied"; // 无权限访问
     public static final String I18N_VISITOR_MESSAGE_RECEIVE_DENIED = I18N_PREFIX + "visitor.message.receive.denied"; // 当前对方无法接收您的消息！
+    public static final String I18N_VISITOR_BLACKLIST_DENIED = I18N_PREFIX + "visitor.blacklist.denied"; // 您已被列入黑名单，禁止进行此操作
     public static final String I18N_ORG_UID_REQUIRED = I18N_PREFIX + "org.uid.required"; // 非超级管理员必须指定组织
     public static final String I18N_ORGANIZATION_ACCESS_DENIED = I18N_PREFIX + "organization.access.denied"; // 无权访问其他组织数据
     public static final String I18N_ORGANIZATION_NOT_FOUND = I18N_PREFIX + "organization.not.found"; // 组织未找到

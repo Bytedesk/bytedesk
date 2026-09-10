@@ -2,7 +2,6 @@ package com.bytedesk.ticket.ticket.assignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,7 +28,6 @@ import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
-import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 
 class TicketAssignmentServiceTest {
@@ -49,7 +47,7 @@ class TicketAssignmentServiceTest {
     }
 
     @Test
-    void resolveFromWorkflowNodeShouldInheritGlobalAssignmentModeWhenNodeModeBlank() {
+        void resolveFromWorkflowNodeShouldFallbackDisabledGlobalModeToRoundRobinWhenNodeModeBlank() {
         Fixture fixture = new Fixture();
         TicketEntity ticket = buildTicket();
         ticket.setProcessEntityUid("process-1");
@@ -71,14 +69,11 @@ class TicketAssignmentServiceTest {
         when(fixture.processRepository.findByUid("process-1")).thenReturn(Optional.of(process));
         when(fixture.ticketSettingsRepository.findByUid("settings-1")).thenReturn(Optional.of(settings));
         when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-1")).thenReturn(List.of(memberA, memberB));
-        when(fixture.ticketRepository.countByAssigneeContainingAndStatusNotAndStatusNot(anyString(), anyString(), anyString()))
-                .thenReturn(5L, 1L);
-
         AssignmentResolutionResult result = fixture.service.resolveFromWorkflowNode(ticket, "task-1");
 
         assertTrue(result.isResolved());
-        assertEquals("member-b", result.assigneeUid());
-        assertEquals(TicketAssignmentModeEnum.LEAST_ACTIVE.name(), result.strategy());
+        assertEquals("member-a", result.assigneeUid());
+        assertEquals(TicketAssignmentModeEnum.DEFAULT.name(), result.strategy());
     }
 
         @Test
@@ -150,14 +145,14 @@ class TicketAssignmentServiceTest {
         when(fixture.workgroupRestService.findByUid("wg-random")).thenReturn(Optional.of(workgroup));
         when(fixture.ticketSettingsRestService.resolveEntityByWorkgroup("org-1", "wg-random", TicketTypeEnum.EXTERNAL.name()))
                 .thenReturn(settings);
-        when(fixture.workgroupRoutingService.selectAgent(workgroup, null, TicketAssignmentModeEnum.RANDOM.name()))
+        when(fixture.workgroupRoutingService.selectAgent(workgroup, null, TicketAssignmentModeEnum.DEFAULT.name()))
                 .thenReturn(agent);
 
         AssignmentResolutionResult result = fixture.service.resolveByStrategy(ticket);
 
         assertTrue(result.isResolved());
         assertEquals("member-random-1", result.assigneeUid());
-        assertEquals(TicketAssignmentModeEnum.RANDOM.name(), result.strategy());
+                assertEquals(TicketAssignmentModeEnum.DEFAULT.name(), result.strategy());
     }
 
     private static TicketEntity buildTicket() {

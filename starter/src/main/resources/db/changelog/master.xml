@@ -53,4 +53,6 @@
 
     <include file="db/changelog/migration/260908_disable_robot_tools_by_default.xml" />
 
+    <include file="db/changelog/migration/260909_add_ticket_auto_create_time_window_fields.xml" />
+
 </databaseChangeLog>

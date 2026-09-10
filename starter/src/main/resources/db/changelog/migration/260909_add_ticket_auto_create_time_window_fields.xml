@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_ticket_auto_create_settings 新增自动建单时间段（time window）相关字段。
+        - time_window_enabled: 是否启用时间段限制，默认 false（不限制，向后兼容）。
+        - time_window_start_time: 时间段开始时间 HH:mm，默认 09:00。
+        - time_window_end_time: 时间段结束时间 HH:mm，默认 18:00，早于开始时间视为跨天时段（如 22:00-06:00）。
+        - time_window_timezone: 判定当前时刻所用时区，默认 Asia/Shanghai。
+        背景：会话关闭触发自动建单时，仅当当前时刻（按时区计算）落在时间段内才会自动创建工单，
+        时间段外的关闭事件直接跳过、不补建。
+    -->
+    <changeSet id="260909-1-add-ticket-auto-create-time-window-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_enabled"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_enabled" type="BIT(1)" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260909-2-add-ticket-auto-create-time-window-start" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_start_time"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_start_time" type="VARCHAR(8)" defaultValue="09:00">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260909-3-add-ticket-auto-create-time-window-end" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_end_time"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_end_time" type="VARCHAR(8)" defaultValue="18:00">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260909-4-add-ticket-auto-create-time-window-timezone" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_timezone"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_timezone" type="VARCHAR(64)" defaultValue="Asia/Shanghai">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!--
+        回填历史数据：将时间字段为 NULL 的存量行设为默认值。幂等。
+    -->
+    <changeSet id="260909-5-backfill-ticket-auto-create-time-window" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
+            <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_start_time"/>
+            <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_end_time"/>
+            <columnExists tableName="bytedesk_ticket_auto_create_settings" columnName="time_window_timezone"/>
+        </preConditions>
+        <update tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_start_time" value="09:00"/>
+            <where>time_window_start_time IS NULL</where>
+        </update>
+        <update tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_end_time" value="18:00"/>
+            <where>time_window_end_time IS NULL</where>
+        </update>
+        <update tableName="bytedesk_ticket_auto_create_settings">
+            <column name="time_window_timezone" value="Asia/Shanghai"/>
+            <where>time_window_timezone IS NULL</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

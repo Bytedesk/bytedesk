@@ -26,7 +26,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRequest, HolidayResponse> {
+public class HolidayRestService extends BaseRestServiceWithExport<HolidayEntity, HolidayRequest, HolidayResponse, HolidayExcel> {
 
     private final HolidayRepository holidayRepository;
 
@@ -179,6 +179,11 @@ public class HolidayRestService extends BaseRestService<HolidayEntity, HolidayRe
     @Override
     public HolidayResponse convertToResponse(HolidayEntity entity) {
         return modelMapper.map(entity, HolidayResponse.class);
+    }
+
+    @Override
+    public HolidayExcel convertToExcel(HolidayEntity entity) {
+        return modelMapper.map(entity, HolidayExcel.class);
     }
 
     public void initOrganizationHolidays(String orgUid) {

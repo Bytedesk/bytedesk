@@ -7,6 +7,7 @@ public class I18TicketConsts {
     private I18TicketConsts() {}
 
     // 工单工作流动作标签
+    public static final String I18N_TICKET_ACTION_CREATE = I18Consts.I18N_PREFIX + "ticket.action.create";
     public static final String I18N_TICKET_ACTION_CLAIM = I18Consts.I18N_PREFIX + "ticket.action.claim";
     public static final String I18N_TICKET_ACTION_ASSIGN = I18Consts.I18N_PREFIX + "ticket.action.assign";
     public static final String I18N_TICKET_ACTION_TRANSFER = I18Consts.I18N_PREFIX + "ticket.action.transfer";

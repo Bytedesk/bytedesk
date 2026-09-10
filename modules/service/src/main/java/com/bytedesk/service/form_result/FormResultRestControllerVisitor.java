@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,6 +24,8 @@ public class FormResultRestControllerVisitor {
 
 	private final FormResultRestService formResultRestService;
 
+	@BlackIpFilter(title = "black", action = "form-result-create")
+	@BlackUserFilter(title = "black", action = "form-result-create")
 	@Operation(summary = "访客提交表单结果", description = "未登录访客提交表单结果")
 	@ApiResponse(responseCode = "200", description = "提交成功",
 		content = @Content(mediaType = "application/json",

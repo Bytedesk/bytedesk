@@ -50,7 +50,6 @@ import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
-import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 
 import lombok.RequiredArgsConstructor;
@@ -270,9 +269,9 @@ public class TicketAssignmentService {
         }
 
         String strategy = StringUtils.hasText(nodeAssignmentMode)
-            ? TicketAssignmentModeEnum.normalize(nodeAssignmentMode)
-            : getAssignmentMode(ticket);
-        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+            ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
+            : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
         List<MemberEntity> candidates = new ArrayList<>(candidateMap.values());
         String chosenUid = applyStrategy(mode, ticket, candidates);
         if (!StringUtils.hasText(chosenUid)) {
@@ -372,9 +371,9 @@ public class TicketAssignmentService {
                     "no members in department: " + departmentUid);
         }
         String strategy = StringUtils.hasText(nodeAssignmentMode)
-            ? TicketAssignmentModeEnum.normalize(nodeAssignmentMode)
-            : getAssignmentMode(ticket);
-        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+            ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
+            : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
         String chosenUid = applyStrategy(mode, ticket, members);
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
@@ -411,9 +410,9 @@ public class TicketAssignmentService {
         }
 
         String strategy = StringUtils.hasText(nodeAssignmentMode)
-            ? TicketAssignmentModeEnum.normalize(nodeAssignmentMode)
-            : getAssignmentMode(ticket);
-        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+            ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
+            : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
         String chosenUid = applyStrategy(mode, ticket, candidates);
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
@@ -430,8 +429,8 @@ public class TicketAssignmentService {
      * Fallback: use TicketBasicSettings.assignmentMode strategy.
      */
     AssignmentResolutionResult resolveByStrategy(TicketEntity ticket) {
-        String assignmentMode = getAssignmentMode(ticket);
-        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(assignmentMode);
+        String assignmentMode = TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(assignmentMode);
 
         if (mode == TicketAssignmentModeEnum.MANUAL) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.GLOBAL_STRATEGY,
@@ -529,9 +528,9 @@ public class TicketAssignmentService {
         }
 
         String strategy = StringUtils.hasText(assignmentMode)
-                ? TicketAssignmentModeEnum.normalize(assignmentMode)
-                : getAssignmentMode(ticket);
-        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.fromValue(strategy);
+            ? TicketAssignmentModeEnum.normalizeRuntime(assignmentMode)
+            : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+        TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
         if (mode == TicketAssignmentModeEnum.MANUAL) {
             return AssignmentResolutionResult.unresolved(source, "manual mode — no auto-assignment");
         }

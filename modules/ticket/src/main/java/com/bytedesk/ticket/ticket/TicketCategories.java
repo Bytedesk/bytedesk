@@ -76,7 +76,6 @@ public class TicketCategories {
         // I18Consts.I18N_PREFIX + "ticket.category.operation.monitoring_alert",
         // I18Consts.I18N_PREFIX + "ticket.category.operation.security_issue",
         // I18Consts.I18N_PREFIX + "ticket.category.operation.performance_optimization"
-
         // 其他
         I18Consts.I18N_PREFIX + "ticket.category.other",
     };

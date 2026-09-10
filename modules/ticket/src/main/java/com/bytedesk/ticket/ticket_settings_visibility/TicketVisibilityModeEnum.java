@@ -6,5 +6,7 @@ public enum TicketVisibilityModeEnum {
 
     DEPARTMENT_RESTRICTED,
 
+    DEPARTMENT_BASED,
+
     CATEGORY_BASED
 }

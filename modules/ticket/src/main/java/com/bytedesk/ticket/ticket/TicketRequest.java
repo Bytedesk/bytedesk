@@ -14,11 +14,15 @@
 package com.bytedesk.ticket.ticket;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.black.BlacklistCheckable;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 
 import lombok.Data;
@@ -34,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TicketRequest extends BaseRequest {
+public class TicketRequest extends BaseRequest implements BlacklistCheckable {
 
     private static final long serialVersionUID = 1L;
 
@@ -101,6 +105,9 @@ public class TicketRequest extends BaseRequest {
     private Boolean visibilityOrgAdmin;
     @Builder.Default
     private List<String> visibilityRestrictedCategoryUids = new ArrayList<>();
+    // 按分类 + 指定部门限制可见范围：categoryUid -> 允许查看该分类工单的部门 uid 列表
+    @Builder.Default
+    private Map<String, List<String>> visibilityRestrictedCategoryDepartmentUids = new HashMap<>();
 
     // ===================== 工作流增强操作参数（Flowable） =====================
     // 当一个流程实例可能存在多个并行任务（如会签/或签）时，建议明确传入 taskId
@@ -141,5 +148,19 @@ public class TicketRequest extends BaseRequest {
             return null;
         }
         return reporter.toJson();
+    }
+
+    /**
+     * 黑名单校验：访客创建/操作工单时，操作者为工单报告人（reporter）
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        if (StringUtils.hasText(reporterUid)) {
+            return reporterUid;
+        }
+        if (reporter != null && StringUtils.hasText(reporter.getUid())) {
+            return reporter.getUid();
+        }
+        return getUserUid();
     }
 } 

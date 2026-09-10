@@ -14,6 +14,7 @@
 package com.bytedesk.service.form_result;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.black.BlacklistCheckable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +28,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FormResultRequest extends BaseRequest {
+public class FormResultRequest extends BaseRequest implements BlacklistCheckable {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,4 +52,12 @@ public class FormResultRequest extends BaseRequest {
     private String formSchema;
 
     private Integer formVersion;
+
+    /**
+     * 黑名单校验：访客提交表单时，操作者为 user 字段中的访客信息
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        return BlacklistCheckable.extractUidFromUserJson(user);
+    }
 }

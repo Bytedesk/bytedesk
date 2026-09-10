@@ -13,7 +13,10 @@
  */
 package com.bytedesk.service.holiday;
 
+import java.time.LocalDate;
+
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.alibaba.excel.annotation.format.DateTimeFormat;
 import com.alibaba.excel.annotation.write.style.ColumnWidth;
 
 import lombok.Data;
@@ -24,17 +27,41 @@ import lombok.Data;
 @Data
 public class HolidayExcel {
 
-    @ExcelProperty(index = 0, value = "Name")
+    @ExcelProperty(index = 0, value = "名称")
     @ColumnWidth(20)
     private String name;
 
-    @ExcelProperty(index = 1, value = "Type")
+    @ExcelProperty(index = 1, value = "描述")
+    @ColumnWidth(40)
+    private String description;
+
+    @ExcelProperty(index = 2, value = "类型")
     @ColumnWidth(20)
     private String type;
 
-    @ExcelProperty(index = 2, value = "Color")
+    @DateTimeFormat("yyyy-MM-dd")
+    @ExcelProperty(index = 3, value = "日期")
     @ColumnWidth(20)
-    private String color;
+    private LocalDate holidayDate;
 
-    
+    @ExcelProperty(index = 4, value = "年份")
+    @ColumnWidth(15)
+    private Integer holidayYear;
+
+    @ExcelProperty(index = 5, value = "国家/地区代码")
+    @ColumnWidth(20)
+    private String countryCode;
+
+    @ExcelProperty(index = 6, value = "休息日")
+    @ColumnWidth(15)
+    private Boolean offDay;
+
+    @ExcelProperty(index = 7, value = "官方数据")
+    @ColumnWidth(15)
+    private Boolean official;
+
+    @ExcelProperty(index = 8, value = "节假日标识")
+    @ColumnWidth(30)
+    private String holidayKey;
+
 }

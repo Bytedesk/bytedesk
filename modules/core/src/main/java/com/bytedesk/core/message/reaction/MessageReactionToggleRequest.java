@@ -1,5 +1,7 @@
 package com.bytedesk.core.message.reaction;
 
+import com.bytedesk.core.black.BlacklistCheckable;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageReactionToggleRequest {
+public class MessageReactionToggleRequest implements BlacklistCheckable {
 
     /** 消息 uid */
     private String messageUid;
@@ -29,4 +31,12 @@ public class MessageReactionToggleRequest {
 
     /** 可选：用户头像（visitor 侧用于写入 reactions.users） */
     private String userAvatar;
+
+    /**
+     * 黑名单校验：访客切换表情回复时，操作者为 userUid（orgUid 缺省时仅平台级黑名单生效）
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        return userUid;
+    }
 }

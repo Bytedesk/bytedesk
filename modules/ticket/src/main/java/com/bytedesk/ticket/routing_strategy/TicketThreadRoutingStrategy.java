@@ -56,8 +56,8 @@ import com.bytedesk.ticket.ticket.TicketRepository;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
-import com.bytedesk.ticket.ticket_settings_basic.TicketAssignmentModeEnum;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsResponse;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentModeEnum;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -193,7 +193,7 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
     private String getTicketAssignmentMode(TicketEntity ticket) {
         TicketBasicSettingsResponse basicSettings = resolveBasicSettings(ticket);
         if (basicSettings != null && StringUtils.hasText(basicSettings.getAssignmentMode())) {
-            return TicketAssignmentModeEnum.normalize(basicSettings.getAssignmentMode());
+            return TicketAssignmentModeEnum.normalizeRuntime(basicSettings.getAssignmentMode());
         }
         return DEFAULT_ASSIGNMENT_MODE;
     }

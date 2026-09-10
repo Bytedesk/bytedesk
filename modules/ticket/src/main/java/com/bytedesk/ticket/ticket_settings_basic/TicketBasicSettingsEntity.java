@@ -3,6 +3,7 @@ package com.bytedesk.ticket.ticket_settings_basic;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.I18Consts;
 import org.springframework.util.StringUtils;
+import com.bytedesk.ticket.ticket.assignment.TicketAssignmentModeEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

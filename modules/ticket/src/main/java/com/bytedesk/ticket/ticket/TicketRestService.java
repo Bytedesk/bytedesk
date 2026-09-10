@@ -27,9 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -784,11 +787,26 @@ public class TicketRestService
 
         TicketVisibilitySettingsData visibilityData = resolveVisibilitySettingsData(request);
         request.setVisibilityMode(visibilityData.getMode());
+        Map<String, List<String>> departmentRestrictedCategories = new HashMap<>();
         request.setVisibilityRestrictedCategoryUids(visibilityData.getCategoryRules().stream()
             .filter(rule -> TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(rule.getVisibility()))
                 .map(rule -> rule.getCategoryUid())
                 .filter(StringUtils::hasText)
                 .collect(Collectors.toList()));
+        visibilityData.getCategoryRules().stream()
+                .filter(rule -> TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(rule.getVisibility())
+                        && StringUtils.hasText(rule.getCategoryUid()))
+                .forEach(rule -> {
+                    List<String> departmentUids = rule.getDepartmentUids() == null
+                            ? new ArrayList<>()
+                            : rule.getDepartmentUids().stream()
+                                    .filter(StringUtils::hasText)
+                                    .collect(Collectors.toList());
+                    if (!departmentUids.isEmpty()) {
+                        departmentRestrictedCategories.put(rule.getCategoryUid(), departmentUids);
+                    }
+                });
+        request.setVisibilityRestrictedCategoryDepartmentUids(departmentRestrictedCategories);
         request.setVisibilityRestricted(!TicketVisibilityModeEnum.ORG_WIDE.name().equals(visibilityData.getMode()));
     }
 
@@ -876,6 +894,10 @@ public class TicketRestService
                     return true;
                 }
                 return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
+            }
+            if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(categoryVisibility)) {
+                List<String> allowedDepartmentUids = data.resolveCategoryDepartmentUids(ticket.getCategoryUid());
+                return StringUtils.hasText(currentDeptUid) && allowedDepartmentUids.contains(currentDeptUid);
             }
         }
 

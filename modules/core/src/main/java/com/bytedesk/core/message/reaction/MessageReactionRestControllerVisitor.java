@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
@@ -33,6 +35,8 @@ public class MessageReactionRestControllerVisitor {
     private final MessageRepository messageRepository;
     private final IMessageSendService messageSendService;
 
+    @BlackIpFilter(title = "black", action = "reaction-toggle")
+    @BlackUserFilter(title = "black", action = "reaction-toggle")
     @Operation(summary = "切换消息表情回复", description = "同一用户对同一 emoji：已点则取消，未点则添加")
     @PostMapping("/toggle")
     public ResponseEntity<?> toggle(@RequestBody MessageReactionToggleRequest request) {

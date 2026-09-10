@@ -24,6 +24,7 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
+import com.bytedesk.ticket.ticket.dto.TicketTimelineStepResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
 
 import io.swagger.v3.oas.annotations.Hidden;
@@ -361,6 +362,18 @@ public class TicketController {
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
 
         List<TicketHistoryActivityResponse> activities = ticketService.queryTicketActivityHistory(request);
+
+        return ResponseEntity.ok(JsonResult.success(activities));
+    }
+
+    /**
+     * 查询工单简化时间线
+     */
+    @GetMapping("/history/timeline")
+    @Operation(summary = "查询工单简化时间线")
+    public ResponseEntity<?> queryTicketTimeline(TicketRequest request) {
+
+        List<TicketTimelineStepResponse> activities = ticketService.queryTicketTimeline(request);
 
         return ResponseEntity.ok(JsonResult.success(activities));
     }

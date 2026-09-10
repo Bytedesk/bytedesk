@@ -1,5 +1,8 @@
 package com.bytedesk.ticket.ticket_settings_visibility;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bytedesk.core.base.BaseRequest;
 
 import lombok.AllArgsConstructor;
@@ -24,4 +27,7 @@ public class TicketVisibilityCategoryRuleRequest extends BaseRequest {
 
     @Builder.Default
     private String visibility = TicketVisibilityModeEnum.ORG_WIDE.name();
+
+    @Builder.Default
+    private List<String> departmentUids = new ArrayList<>();
 }

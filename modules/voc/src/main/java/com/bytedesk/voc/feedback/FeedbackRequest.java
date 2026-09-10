@@ -16,6 +16,7 @@ package com.bytedesk.voc.feedback;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.black.BlacklistCheckable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeedbackRequest extends BaseRequest {
+public class FeedbackRequest extends BaseRequest implements BlacklistCheckable {
 
     private static final long serialVersionUID = 1L;
 
@@ -77,5 +78,13 @@ public class FeedbackRequest extends BaseRequest {
     private List<String> categoryNames;
 
     private List<String> categoryUids;
+
+    /**
+     * 黑名单校验：匿名反馈无稳定访客身份，优先取请求中的 userUid，否则由 IP 黑名单兜底
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        return getUserUid();
+    }
 
 }

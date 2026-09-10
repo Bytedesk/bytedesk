@@ -14,6 +14,7 @@
 package com.bytedesk.core.upload;
 
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.black.BlacklistCheckable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadRequest extends BaseRequest {
+public class UploadRequest extends BaseRequest implements BlacklistCheckable {
 
     private static final long serialVersionUID = 1L;
 
@@ -66,4 +67,12 @@ public class UploadRequest extends BaseRequest {
     private String watermarkPosition; // 水印位置
     private Integer watermarkFontSize; // 水印字体大小
     private String watermarkColor; // 水印颜色
+
+    /**
+     * 黑名单校验：访客匿名上传时，操作者为 visitorUid
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        return visitorUid != null && !visitorUid.isBlank() ? visitorUid : getUserUid();
+    }
 }

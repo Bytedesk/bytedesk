@@ -158,6 +158,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       # Can be turned off during initial installation; recommended to turn on during upgrades to automatically run database migration scripts. 默认初始安装时可关闭，升级时建议开启以自动执行数据库迁移脚本。 
       # SPRING_LIQUIBASE_ENABLED: "true"
+      # SPRING_LIQUIBASE_CHANGE_LOG: classpath:db/changelog/master.xml
       # 
       SPRING_DATA_REDIS_DATABASE: 0
       SPRING_DATA_REDIS_HOST: redis-bytedesk

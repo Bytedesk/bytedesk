@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.context.annotation.Description;
 
+import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,6 +50,8 @@ public class UploadRestControllerVisitor {
     private final UploadSecurityConfig uploadSecurityConfig;
 
     // 文件上传
+    @BlackIpFilter(title = "black", action = "upload")
+    @BlackUserFilter(title = "black", action = "upload")
     @Operation(summary = "Upload File", description = "Upload file anonymously")
     @PostMapping("/file")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file, UploadRequest request) {
@@ -58,6 +62,8 @@ public class UploadRestControllerVisitor {
     }
 
     // 文件上传（支持水印控制）
+    @BlackIpFilter(title = "black", action = "upload-watermark")
+    @BlackUserFilter(title = "black", action = "upload-watermark")
     @Operation(summary = "Upload File with Watermark", description = "Upload file with watermark control")
     @PostMapping("/file/watermark")
     public ResponseEntity<?> uploadWithWatermark(

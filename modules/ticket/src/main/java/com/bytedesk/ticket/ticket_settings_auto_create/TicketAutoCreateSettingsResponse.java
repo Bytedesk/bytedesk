@@ -36,4 +36,16 @@ public class TicketAutoCreateSettingsResponse extends BaseResponse {
     private Boolean skipIfTicketExists;
 
     private String autoTicketRobotUid;
+
+    /** 是否启用自动建单时间段限制 */
+    private Boolean timeWindowEnabled;
+
+    /** 时间段开始时间（HH:mm） */
+    private String timeWindowStartTime;
+
+    /** 时间段结束时间（HH:mm），早于开始时间视为跨天时段 */
+    private String timeWindowEndTime;
+
+    /** 判定时间段所用时区 */
+    private String timeWindowTimezone;
 }

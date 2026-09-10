@@ -51,6 +51,7 @@ public class TicketVisibilitySettingsEntity extends BaseEntity {
                         .map(rule -> TicketVisibilityCategoryRuleData.builder()
                                 .categoryUid(rule.getCategoryUid())
                                 .visibility(rule.getVisibility())
+                                .departmentUids(rule.getDepartmentUids())
                                 .build())
                         .collect(Collectors.toList());
         TicketVisibilitySettingsData data = TicketVisibilitySettingsData.builder()

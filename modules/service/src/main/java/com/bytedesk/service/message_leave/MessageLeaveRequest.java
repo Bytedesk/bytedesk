@@ -17,7 +17,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRequest;
+import com.bytedesk.core.black.BlacklistCheckable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +34,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageLeaveRequest extends BaseRequest {
+public class MessageLeaveRequest extends BaseRequest implements BlacklistCheckable {
 
     private static final long serialVersionUID = 1L;
 
@@ -137,4 +140,15 @@ public class MessageLeaveRequest extends BaseRequest {
     // 拒绝相关字段
     private String rejectUser;
     private ZonedDateTime rejectedAt;
+
+    /**
+     * 黑名单校验：访客提交留言时，操作者为 user 字段中的访客信息
+     */
+    @Override
+    public String getBlacklistOperatorUid() {
+        if (StringUtils.hasText(getUserUid())) {
+            return getUserUid();
+        }
+        return BlacklistCheckable.extractUidFromUserJson(user);
+    }
 }
