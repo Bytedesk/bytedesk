@@ -68,6 +68,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		// 
 		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
 		if (!userOptional.isPresent()) {
+			// 回退按 email 查找: 第三方登录(CAS/OIDC等)注册的用户, JWT subject 中的 username 可能是 email
+			userOptional = findByEmailAndPlatform(username, PlatformEnum.BYTEDESK.name());
+		}
+		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
 		if (!userOptional.get().isEnabled()) {
@@ -80,6 +84,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		log.debug("loadUserByUsernameAndPlatform username: {}, platform: {}", username, platform);
 		//
 		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, platform);
+		if (!userOptional.isPresent()) {
+			// 回退按 email 查找: 第三方登录(CAS/OIDC等)注册的用户, JWT subject 中的 username 可能是 email
+			userOptional = findByEmailAndPlatform(username, platform);
+		}
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -95,6 +103,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		// log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
 		//
 		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
+		if (!userOptional.isPresent()) {
+			// 回退按 email 查找: 第三方登录(CAS/OIDC等)注册的用户, JWT subject 中的 username 可能是 email
+			userOptional = findByEmailAndPlatform(username, PlatformEnum.fromValue(platform).name());
+		}
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
