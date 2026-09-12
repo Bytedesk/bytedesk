@@ -234,8 +234,20 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
         String assigneePattern = "%\"uid\":\""
                 + escapeLike(request.getVisibilityCurrentUserUid())
                 + "\"%";
-        Predicate reporterSelf = criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserUid());
-        Predicate assigneeSelf = criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR);
+        // 工单 userUid（报告人为成员时）与 assignee JSON 存的是 member uid，与 user uid 不同：双口径匹配，
+        // 避免“处理人看不到自己被分配的工单”
+        Predicate reporterSelf = StringUtils.hasText(request.getVisibilityCurrentUserMemberUid())
+                ? criteriaBuilder.or(
+                        criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserUid()),
+                        criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserMemberUid()))
+                : criteriaBuilder.equal(root.get("userUid"), request.getVisibilityCurrentUserUid());
+        Predicate assigneeSelf = StringUtils.hasText(request.getVisibilityCurrentUserMemberUid())
+                ? criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR),
+                        criteriaBuilder.like(root.get("assignee"),
+                                "%\"uid\":\"" + escapeLike(request.getVisibilityCurrentUserMemberUid()) + "\"%",
+                                LIKE_ESCAPE_CHAR))
+                : criteriaBuilder.like(root.get("assignee"), assigneePattern, LIKE_ESCAPE_CHAR);
         Predicate noDepartmentAssigned = criteriaBuilder.or(
                 criteriaBuilder.isNull(root.get("departmentUid")),
                 criteriaBuilder.equal(root.get("departmentUid"), ""));
@@ -243,8 +255,37 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 ? criteriaBuilder.equal(root.get("departmentUid"), request.getVisibilityCurrentUserDepartmentUid())
                 : criteriaBuilder.disjunction();
 
+        // G2 组合谓词：无 type 的混合列表查询按工单类型分别应用 INTERNAL/EXTERNAL 可见性设置，
+        // 保证「全部工单」=「内部工单」+「外部工单」口径一致（创建人/受理人仍始终可见）
+        if (request.getVisibilityInternalContext() != null || request.getVisibilityExternalContext() != null) {
+            Predicate typeInternal = criteriaBuilder.equal(root.get("type"), "INTERNAL");
+            Predicate typeExternal = criteriaBuilder.equal(root.get("type"), "EXTERNAL");
+            Predicate internalVisible = buildTypeVisibilityPredicate(request.getVisibilityInternalContext(),
+                    root, criteriaBuilder, noDepartmentAssigned, sameDepartment,
+                    request.getVisibilityCurrentUserDepartmentUid());
+            Predicate externalVisible = buildTypeVisibilityPredicate(request.getVisibilityExternalContext(),
+                    root, criteriaBuilder, noDepartmentAssigned, sameDepartment,
+                    request.getVisibilityCurrentUserDepartmentUid());
+            predicates.add(criteriaBuilder.or(
+                    reporterSelf, assigneeSelf,
+                    criteriaBuilder.and(typeInternal, internalVisible),
+                    criteriaBuilder.and(typeExternal, externalVisible)));
+            return;
+        }
+
         if ("DEPARTMENT_RESTRICTED".equalsIgnoreCase(request.getVisibilityMode())) {
             predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf, noDepartmentAssigned, sameDepartment));
+            return;
+        }
+
+        if ("DEPARTMENT_BASED".equalsIgnoreCase(request.getVisibilityMode())) {
+            boolean currentDepartmentAllowed = StringUtils.hasText(request.getVisibilityCurrentUserDepartmentUid())
+                    && request.getVisibilityAllowedDepartmentUids() != null
+                    && request.getVisibilityAllowedDepartmentUids()
+                            .contains(request.getVisibilityCurrentUserDepartmentUid());
+            if (!currentDepartmentAllowed) {
+                predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf));
+            }
             return;
         }
 
@@ -285,6 +326,12 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                         }
                     }
                 }
+                // 未填写分类的工单（如访客提交/自动创建的外部工单）无法套用任何分类规则：
+                // 存在受限分类规则时默认收紧为仅创建人/受理人可见，避免无分类工单全员可见。
+                // 管理员/超级管理员已在 enrichVisibilityContext 中跳过本谓词；无任何受限规则时不生效。
+                restrictedAndInvisible.add(criteriaBuilder.or(
+                        criteriaBuilder.isNull(root.get("categoryUid")),
+                        criteriaBuilder.equal(root.get("categoryUid"), "")));
                 if (!restrictedAndInvisible.isEmpty()) {
                     Predicate restrictedAndNotVisible = criteriaBuilder.or(
                             restrictedAndInvisible.toArray(new Predicate[0]));
@@ -293,5 +340,76 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 }
             }
         }
+    }
+
+    /**
+     * G2：构建单类型（INTERNAL/EXTERNAL）的可见性谓词。
+     * 返回 conjunction()（恒真）表示该类型工单全部可见（未配置/ORG_WIDE/无受限规则）。
+     * 语义与单类型路径一致：DEPARTMENT_RESTRICTED → 无部门或同部门；
+     * CATEGORY_BASED → 未命中受限规则，命中则需部门匹配，未分类工单在有受限规则时收紧。
+     */
+    private static Predicate buildTypeVisibilityPredicate(TicketVisibilityQueryContext context,
+            jakarta.persistence.criteria.Root<TicketEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            Predicate noDepartmentAssigned, Predicate sameDepartment, String currentDepartmentUid) {
+        if (context == null || !context.isRestricted()) {
+            return criteriaBuilder.conjunction();
+        }
+        if ("DEPARTMENT_RESTRICTED".equalsIgnoreCase(context.getMode())) {
+            return criteriaBuilder.or(noDepartmentAssigned, sameDepartment);
+        }
+        if ("DEPARTMENT_BASED".equalsIgnoreCase(context.getMode())) {
+            boolean currentDepartmentAllowed = StringUtils.hasText(currentDepartmentUid)
+                    && context.getAllowedDepartmentUids() != null
+                    && context.getAllowedDepartmentUids().contains(currentDepartmentUid);
+            return currentDepartmentAllowed ? criteriaBuilder.conjunction() : criteriaBuilder.disjunction();
+        }
+        if ("CATEGORY_BASED".equalsIgnoreCase(context.getMode())) {
+            List<String> sameDeptCategories = context.getRestrictedCategoryUids();
+            Map<String, List<String>> deptBasedCategories = context.getRestrictedCategoryDepartmentUids();
+            boolean hasSameDept = sameDeptCategories != null && !sameDeptCategories.isEmpty();
+            boolean hasDeptBased = deptBasedCategories != null && !deptBasedCategories.isEmpty();
+            if (!hasSameDept && !hasDeptBased) {
+                return criteriaBuilder.conjunction();
+            }
+            List<Predicate> restrictedAndInvisible = new ArrayList<>();
+            if (sameDeptCategories != null && !sameDeptCategories.isEmpty()) {
+                for (String categoryUid : sameDeptCategories) {
+                    if (!StringUtils.hasText(categoryUid)) {
+                        continue;
+                    }
+                    restrictedAndInvisible.add(criteriaBuilder.and(
+                            criteriaBuilder.equal(root.get("categoryUid"), categoryUid),
+                            criteriaBuilder.and(
+                                    criteriaBuilder.not(noDepartmentAssigned),
+                                    criteriaBuilder.not(sameDepartment))));
+                }
+            }
+            if (deptBasedCategories != null && !deptBasedCategories.isEmpty()) {
+                for (Map.Entry<String, List<String>> entry : deptBasedCategories.entrySet()) {
+                    String categoryUid = entry.getKey();
+                    List<String> allowedDepartmentUids = entry.getValue();
+                    if (!StringUtils.hasText(categoryUid) || allowedDepartmentUids == null
+                            || allowedDepartmentUids.isEmpty()) {
+                        continue;
+                    }
+                    boolean currentDepartmentAllowed = StringUtils.hasText(currentDepartmentUid)
+                            && allowedDepartmentUids.contains(currentDepartmentUid);
+                    if (!currentDepartmentAllowed) {
+                        restrictedAndInvisible.add(
+                                criteriaBuilder.equal(root.get("categoryUid"), categoryUid));
+                    }
+                }
+            }
+            // 未分类工单收紧（与单类型路径同口径）：存在受限规则时仅创建人/受理人可见
+            restrictedAndInvisible.add(criteriaBuilder.or(
+                    criteriaBuilder.isNull(root.get("categoryUid")),
+                    criteriaBuilder.equal(root.get("categoryUid"), "")));
+            if (restrictedAndInvisible.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.not(criteriaBuilder.or(restrictedAndInvisible.toArray(new Predicate[0])));
+        }
+        return criteriaBuilder.conjunction();
     }
 }

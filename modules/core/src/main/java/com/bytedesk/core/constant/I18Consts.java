@@ -517,6 +517,7 @@ public class I18Consts {
     // 登录链路提示（AuthController/AuthLoginRetryHelper，前端通过 translateString 翻译，带 {0} 占位的用 I18Consts.withArgs 传参）
     public static final String I18N_AUTH_USERNAME_MOBILE_MISMATCH = I18N_PREFIX + "auth.username.mobile.mismatch"; // 用户名和手机号不匹配，请检查后重新输入
     public static final String I18N_AUTH_PASSWORD_REQUIRED = I18N_PREFIX + "auth.password.required"; // 请输入密码
+    public static final String I18N_AUTH_USERNAME_REQUIRED = I18N_PREFIX + "auth.username.required"; // 请输入用户名
     public static final String I18N_AUTH_PASSWORD_DECRYPT_FAILED = I18N_PREFIX + "auth.password.decrypt.failed"; // 密码解密失败，请检查密码格式
     public static final String I18N_AUTH_USER_NOT_REGISTERED = I18N_PREFIX + "auth.user.not.registered"; // 用户未注册，请先通过店铺对接接口创建账号
     public static final String I18N_AUTH_ACCESS_TOKEN_INVALID = I18N_PREFIX + "auth.access.token.invalid"; // accessToken 无效
@@ -838,7 +839,8 @@ public class I18Consts {
     // // 短信服务配置异常，请联系管理员
 
     // "短信服务暂时不可用，请稍后重试"
-    public static final String I18N_SMS_PUSH_SERVICE_UNAVAILABLE = I18N_PREFIX + "sms.push.service.unavailable"; // 短信服务暂时不可用，请稍后重试
+    // 注意：key 与前端各端 locale 中已有的 i18n.sms.service.unavailable 对齐（与 email.service.unavailable 命名一致）
+    public static final String I18N_SMS_PUSH_SERVICE_UNAVAILABLE = I18N_PREFIX + "sms.service.unavailable"; // 短信服务暂时不可用，请稍后重试
 
     // "邮件服务配置异常，请联系管理员"
     public static final String I18N_EMAIL_SERVICE_CONFIG_ERROR = I18N_PREFIX + "email.service.config.error"; // 邮件服务配置异常，请联系管理员

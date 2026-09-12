@@ -2,8 +2,10 @@ package com.bytedesk.ticket.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -70,7 +72,30 @@ class TicketServiceWorkflowTaskResponseTest {
                 when(taskQuery.list()).thenReturn(List.of());
 
                 assertThat(fixture.service.queryWorkflowActions(request)).isEmpty();
-                verify(fixture.ticketRestService).assertTicketVisibleIfAuthenticated(ticket);
+                // 无 channel 的请求视为非管理后台渠道（adminPrivilege=false），管理员同受可见性限制
+                verify(fixture.ticketRestService).assertTicketVisibleIfAuthenticated(eq(ticket), eq(false));
+        }
+
+        @Test
+        void queryWorkflowActionsShouldReturnEmptyForClosedTicket() {
+                Fixture fixture = new Fixture();
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("ticket-3")
+                                .orgUid("org-1")
+                                .processEntityUid("process-3")
+                                .processInstanceId("process-instance-3")
+                                .status(TicketStatusEnum.CLOSED.name())
+                                .build();
+                TicketRequest request = new TicketRequest();
+                request.setUid(ticket.getUid());
+                request.setAssigneeUid("member-ticket-1");
+
+                when(fixture.ticketRestService.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
+
+                assertThat(fixture.service.queryWorkflowActions(request)).isEmpty();
+                verify(fixture.ticketRestService).assertTicketVisibleIfAuthenticated(eq(ticket), eq(false));
+                // 终态工单不应再查询活动任务
+                verify(fixture.taskService, never()).createTaskQuery();
         }
 
         @Test
@@ -83,7 +108,7 @@ class TicketServiceWorkflowTaskResponseTest {
                 when(fixture.ticketRestService.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
 
                 assertThat(fixture.service.queryTicketActivityHistory(request)).isEmpty();
-                verify(fixture.ticketRestService).assertTicketVisibleIfAuthenticated(ticket);
+                verify(fixture.ticketRestService).assertTicketVisibleIfAuthenticated(eq(ticket), eq(false));
         }
 
     private static TicketWorkflowTaskResponse invokeBuildWorkflowTaskResponse(TicketService service,

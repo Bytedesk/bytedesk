@@ -127,6 +127,12 @@ public class TicketAssignmentService {
 
         // 4. Apply assignment
         if (result.isResolved()) {
+            // 防御：报告人节点不做成员级分配，保持 Flowable 静态归属
+            if (result.source() == AssignmentSource.REPORTER) {
+                log.debug("autoAssign: reporter-owned task {} keeps flowable assignee, ticket={}",
+                        activeTask.getTaskDefinitionKey(), ticket.getUid());
+                return result;
+            }
             applyAssignment(ticket, activeTask, result.assigneeUid());
             writeAssignmentLog(ticket, processInstanceId, activeTask.getTaskDefinitionKey(),
                     null, result);
@@ -166,6 +172,14 @@ public class TicketAssignmentService {
             }
 
             if (result.isResolved()) {
+                // 报告人节点（如 customerVerify）：任务归属由 Flowable 静态表达式（${reporterUid}）决定，
+                // 不做成员级自动分配——报告人可能为访客（无 MemberEntity），成员级改派会剥夺访客端的
+                // 「确认解决/未解决」验证入口（外部工单转派后验证按钮错落到客服端的根因）
+                if (result.source() == AssignmentSource.REPORTER) {
+                    log.debug("autoAssignForNextNode: reporter-owned task {} keeps flowable assignee, ticket={}",
+                            activeTask.getTaskDefinitionKey(), ticket.getUid());
+                    return result;
+                }
                 String previousAssignee = ticket.getAssigneeString();
                 UserProtobuf currentAssignee = ticket.getAssignee();
                 if (currentAssignee != null && result.assigneeUid().equals(currentAssignee.getUid())) {
@@ -230,7 +244,7 @@ public class TicketAssignmentService {
         String nodeAssignmentMode = data.getString("assignmentMode");
 
         return switch (assigneeType) {
-            case "user" -> resolveSpecificUser(assigneeUids);
+            case "user" -> resolveSpecificUser(assigneeUids, ticket);
             case "department" -> resolveNodeDepartment(assigneeUids, ticket, nodeAssignmentMode);
             case "role" -> resolveRoleMember(ticket, data.getString("roleUid"), nodeAssignmentMode);
             case "reporter" -> resolveReporter(ticket);
@@ -280,6 +294,12 @@ public class TicketAssignmentService {
             ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
             : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
         TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
+        if (mode == TicketAssignmentModeEnum.MANUAL) {
+            // 手动分配：节点未显式配置分配方式时沿用全局设置，不做自动指派，
+            // 工单停留在待认领节点等待成员认领或负责人指派
+            return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
+                    "manual mode — no auto-assignment for configured departments");
+        }
         List<MemberEntity> candidates = new ArrayList<>(candidateMap.values());
         String chosenUid = applyStrategy(mode, ticket, candidates);
         if (!StringUtils.hasText(chosenUid)) {
@@ -292,19 +312,27 @@ public class TicketAssignmentService {
                 "候选部门 " + configuredDepartmentUids.size() + " 个，成员 " + candidates.size() + " 人");
     }
 
-    private AssignmentResolutionResult resolveSpecificUser(JSONArray assigneeUids) {
+    private AssignmentResolutionResult resolveSpecificUser(JSONArray assigneeUids, TicketEntity ticket) {
         if (assigneeUids == null || assigneeUids.isEmpty()) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "assigneeUids is empty for type=user");
         }
+        String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
         List<String> validUids = new ArrayList<>();
         for (int i = 0; i < assigneeUids.size(); i++) {
-            String uid = assigneeUids.getString(i);
-            if (StringUtils.hasText(uid)) {
-                Optional<MemberEntity> memberOpt = memberRepository.findByUid(uid);
-                if (memberOpt.isPresent()) {
-                    validUids.add(uid);
-                }
+            String uid = resolvePlaceholderUid(assigneeUids.getString(i), ticket);
+            if (!StringUtils.hasText(uid)) {
+                continue;
+            }
+            // 报告人节点（${reporterUid} 占位符或显式报告人 uid）：归属交给 Flowable 静态表达式/报告人语义，
+            // 不做成员级分配——报告人可能为访客（无 MemberEntity），
+            // 成员级改派会剥夺访客端的「确认解决/未解决」验证入口
+            if (uid.equals(reporterUid)) {
+                return resolveReporter(ticket);
+            }
+            Optional<MemberEntity> memberOpt = memberRepository.findByUid(uid);
+            if (memberOpt.isPresent()) {
+                validUids.add(uid);
             }
         }
         if (validUids.isEmpty()) {
@@ -315,6 +343,22 @@ public class TicketAssignmentService {
         return AssignmentResolutionResult.resolved(chosenUid, AssignmentSource.NODE_CONFIG,
                 "MANUAL", "节点指定用户: " + chosenUid,
                 "精确指定 " + validUids.size() + " 人");
+    }
+
+    /**
+     * 解析节点配置 assigneeUids 中的占位符（如 ${reporterUid}/${assigneeUid}）为工单上下文中的实际 uid。
+     * 历史缺陷：占位符被当作字面量 member uid 查询导致解析失败，进而回退全局策略把报告人节点
+     * （如 customerVerify）错派给无关客服。
+     */
+    private String resolvePlaceholderUid(String raw, TicketEntity ticket) {
+        if (!StringUtils.hasText(raw)) {
+            return null;
+        }
+        return switch (raw.trim()) {
+            case "${reporterUid}" -> ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
+            case "${assigneeUid}" -> ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null;
+            default -> raw.trim();
+        };
     }
 
     private AssignmentResolutionResult resolveReporter(TicketEntity ticket) {
@@ -382,6 +426,11 @@ public class TicketAssignmentService {
             ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
             : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
         TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
+        if (mode == TicketAssignmentModeEnum.MANUAL) {
+            // 手动分配：不自动指派，工单停留在待认领节点等待认领/指派（修复内部工单设置手动分配仍被自动分配的问题）
+            return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
+                    "manual mode — no auto-assignment for department " + departmentUid);
+        }
         String chosenUid = applyStrategy(mode, ticket, members);
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
@@ -421,6 +470,11 @@ public class TicketAssignmentService {
             ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
             : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
         TicketAssignmentModeEnum mode = TicketAssignmentModeEnum.resolveRuntimeMode(strategy);
+        if (mode == TicketAssignmentModeEnum.MANUAL) {
+            // 手动分配：不自动指派，工单停留在待认领节点等待认领/指派
+            return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
+                    "manual mode — no auto-assignment for role " + roleUid);
+        }
         String chosenUid = applyStrategy(mode, ticket, candidates);
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
@@ -477,6 +531,9 @@ public class TicketAssignmentService {
             case RANDOM -> randomAssign(candidates);
             case CONSISTENT_HASH -> consistentHashAssign(ticket, candidates);
             case RECENT -> recentAssign(ticket, candidates);
+            // 手动分配：不自动指派任何候选成员，返回 null 由调用方按未分配处理（防御分支：
+            // 正常流程在上游 resolve* 方法已拦截 MANUAL，这里避免新增调用路径遗漏时误取第一个候选人）
+            case MANUAL -> null;
             default -> candidates.get(0).getUid();
         };
     }

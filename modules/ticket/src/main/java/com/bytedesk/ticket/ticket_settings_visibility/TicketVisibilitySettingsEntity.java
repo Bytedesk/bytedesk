@@ -56,6 +56,7 @@ public class TicketVisibilitySettingsEntity extends BaseEntity {
                         .collect(Collectors.toList());
         TicketVisibilitySettingsData data = TicketVisibilitySettingsData.builder()
                 .mode(request.getMode())
+            .departmentUids(request.getDepartmentUids())
                 .categoryRules(rules)
                 .build();
         data.normalize();

@@ -18,4 +18,12 @@ class RoleAuthorityRulesTest {
         assertThat(RoleAuthorityRules.DEFAULT_ROLE_AGENT_EXTRA_AUTHORITY_VALUES)
                 .contains(RoleAuthorityRules.CTI_READ);
     }
+
+    @Test
+    void defaultRoleAgentIncludesQueueMemberAuthorities() {
+        // 会话小结等 AI 接口（POST /api/v1/queue/member/summary）要求 QUEUE_MEMBER_UPDATE，客服角色默认具备
+        assertThat(RoleAuthorityRules.DEFAULT_ROLE_AGENT_EXTRA_AUTHORITY_VALUES)
+                .contains(RoleAuthorityRules.QUEUE_MEMBER_READ)
+                .contains(RoleAuthorityRules.QUEUE_MEMBER_UPDATE);
+    }
 }

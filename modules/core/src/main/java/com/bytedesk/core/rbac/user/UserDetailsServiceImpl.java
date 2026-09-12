@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.PlatformEnum;
@@ -47,26 +48,55 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Cacheable(value = "user", key = "#email + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByEmailAndPlatform(String email, String platform) {
-		return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
+        // 拦截空参数：避免仓储层抛出 IllegalArgumentException 堆栈，按未找到处理
+        if (!StringUtils.hasText(email) || !StringUtils.hasText(platform)) {
+            return Optional.empty();
+        }
+        return userRepository.findByEmailAndPlatformAndDeletedFalse(email, platform);
     }
 
     @Cacheable(value = "user", key = "#mobile + '-' + (T(com.bytedesk.core.utils.CountryCodeUtils).normalize(#country)) + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByMobileAndPlatform(String mobile, String country, String platform) {
-		return userRepository.findByMobileAndCountryAndPlatformAndDeletedFalse(
-		        mobile,
-		        CountryCodeUtils.normalize(country),
-		        platform);
+        // 拦截空参数：避免仓储层抛出 IllegalArgumentException 堆栈，按未找到处理（country 为空时 normalize 兜底为默认区号）
+        if (!StringUtils.hasText(mobile) || !StringUtils.hasText(platform)) {
+            return Optional.empty();
+        }
+        return userRepository.findByMobileAndCountryAndPlatformAndDeletedFalse(
+                mobile,
+                CountryCodeUtils.normalize(country),
+                platform);
     }
 
     @Cacheable(value = "user", key = "#username + '-' + #platform", unless = "#result == null")
     public Optional<UserEntity> findByUsernameAndPlatform(String username, String platform) {
-		return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
+        // 拦截空参数：避免仓储层抛出 IllegalArgumentException 堆栈，按未找到处理
+        if (!StringUtils.hasText(username) || !StringUtils.hasText(platform)) {
+            return Optional.empty();
+        }
+        return userRepository.findByUsernameAndPlatformAndDeletedFalse(username, platform);
     }
+
+	/**
+	 * 按 username 查找用户，未命中时回退按 email 查找。
+	 * 第三方登录（CAS/LDAP/OIDC 等企业模块）自动注册的用户，username 列可能存的是第三方账号
+	 * （如学工号），而签发 JWT 时对有 email 的用户将 email 写入 subject 的 username 字段，
+	 * 仅按 username 列查找会抛 UsernameNotFoundException 导致 401。
+	 * 回退复用 findByEmailAndPlatform（含 deleted=false 过滤），使两类存量数据都能认证通过。
+	 * https://github.com/Bytedesk/bytedesk/pull/27
+	 */
+	private Optional<UserEntity> findByUsernameOrEmailAndPlatform(String username, String platform) {
+		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, platform);
+		if (userOptional.isPresent()) {
+			return userOptional;
+		}
+		// 回退按 email 查找
+		return findByEmailAndPlatform(username, platform);
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		// 
-		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.BYTEDESK.name());
+		Optional<UserEntity> userOptional = findByUsernameOrEmailAndPlatform(username, PlatformEnum.BYTEDESK.name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -79,7 +109,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	public UserDetailsImpl loadUserByUsernameAndPlatform(String username, String platform) {
 		log.debug("loadUserByUsernameAndPlatform username: {}, platform: {}", username, platform);
 		//
-		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, platform);
+		Optional<UserEntity> userOptional = findByUsernameOrEmailAndPlatform(username, platform);
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}
@@ -94,7 +124,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		String platform = JSON.parseObject(subject, JwtSubject.class).getPlatform();
 		// log.debug("loadUserByUsername {}, username {}, platform {}", subject, username, platform);
 		//
-		Optional<UserEntity> userOptional = findByUsernameAndPlatform(username, PlatformEnum.fromValue(platform).name());
+		Optional<UserEntity> userOptional = findByUsernameOrEmailAndPlatform(username, PlatformEnum.fromValue(platform).name());
 		if (!userOptional.isPresent()) {
 			throw new UsernameNotFoundException("username " + username + " is not found");
 		}

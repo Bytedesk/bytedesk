@@ -14,6 +14,7 @@
         时间段外的关闭事件直接跳过、不补建。
     -->
     <changeSet id="260909-1-add-ticket-auto-create-time-window-enabled" author="copilot">
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="bytedesk_ticket_auto_create_settings"/>
             <not>
@@ -21,7 +22,7 @@
             </not>
         </preConditions>
         <addColumn tableName="bytedesk_ticket_auto_create_settings">
-            <column name="time_window_enabled" type="BIT(1)" defaultValueBoolean="false">
+            <column name="time_window_enabled" type="BOOLEAN" defaultValueBoolean="false">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

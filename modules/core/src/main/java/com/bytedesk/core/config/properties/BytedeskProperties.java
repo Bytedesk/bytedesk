@@ -367,6 +367,20 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean loginGithubEnable = false;
         private Boolean loginFacebookEnable = false;
         private Boolean loginGoogleEnable = false;
+        // OIDC 标准登录开关（企业模块 /auth/oidc/*），登录页据此显示 OIDC 按钮
+        private Boolean loginOidcEnable = false;
+        // CAS 单点登录开关（企业模块 /auth/cas/*），登录页据此显示 CAS 按钮
+        private Boolean loginCasEnable = false;
+        // 钉钉登录开关（企业模块 /auth/dingtalk/*）
+        private Boolean loginDingtalkEnable = false;
+        // 抖音登录开关（企业模块 /auth/douyin/*）
+        private Boolean loginDouyinEnable = false;
+        // 飞书登录开关（企业模块 /auth/feishu/*）
+        private Boolean loginFeishuEnable = false;
+        // LDAP 目录登录开关（企业模块 /auth/ldap/*，用户名密码表单）
+        private Boolean loginLdapEnable = false;
+        // OpenID 通用登录开关（企业模块 /auth/openid/*，自配置端点）
+        private Boolean loginOpenidEnable = false;
         private Boolean docUrlShow = true;
         private String docUrl;
         // 是否显示 admin 管理后台帮助文档按钮（HelpDocButton），默认不显示，明确开启才显示

@@ -12,11 +12,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class TicketVisibilitySettingsData implements Serializable {
 
     private static final String LEGACY_DEPARTMENT_ONLY = "DEPARTMENT_ONLY";
@@ -27,10 +29,19 @@ public class TicketVisibilitySettingsData implements Serializable {
     private String mode = TicketVisibilityModeEnum.ORG_WIDE.name();
 
     @Builder.Default
+    private List<String> departmentUids = new ArrayList<>();
+
+    @Builder.Default
     private List<TicketVisibilityCategoryRuleData> categoryRules = new ArrayList<>();
 
     public void normalize() {
         mode = resolveMode(mode).name();
+        departmentUids = normalizeDepartmentUids(departmentUids);
+        if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(mode)
+                && departmentUids.isEmpty()) {
+            log.warn("ticket visibility settings degraded to ORG_WIDE: departmentUids is empty, mode={}", mode);
+            mode = TicketVisibilityModeEnum.ORG_WIDE.name();
+        }
         if (categoryRules == null) {
             categoryRules = new ArrayList<>();
         } else {
@@ -43,7 +54,11 @@ public class TicketVisibilitySettingsData implements Serializable {
                 List<String> departmentUids = normalizeDepartmentUids(rule.getDepartmentUids());
                 if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(ruleVisibility)
                         && departmentUids.isEmpty()) {
-                    // 选择部门但未指定任何部门，退化为公司内部可见
+                    // 选择部门但未指定任何部门，退化为公司内部可见。
+                    // 该告警用于识别发布/保存链路中丢失 departmentUids 的异常数据
+                    //（如历史版本 copyVisibilitySettingsData 丢字段导致的退化），便于运营定位受影响配置并重新发布。
+                    log.warn("ticket visibility category rule degraded to ORG_WIDE: departmentUids is empty, "
+                            + "categoryUid={}, ruleVisibility={}", rule.getCategoryUid(), ruleVisibility);
                     ruleVisibility = TicketVisibilityModeEnum.ORG_WIDE.name();
                 }
                 TicketVisibilityCategoryRuleData normalized = TicketVisibilityCategoryRuleData.builder()
@@ -58,6 +73,9 @@ public class TicketVisibilitySettingsData implements Serializable {
 
         if (!TicketVisibilityModeEnum.CATEGORY_BASED.name().equals(mode)) {
             categoryRules = new ArrayList<>();
+        }
+        if (!TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(mode)) {
+            departmentUids = new ArrayList<>();
         }
     }
 

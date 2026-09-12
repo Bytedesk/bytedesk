@@ -60,6 +60,15 @@ public class ConvertUtils {
             response.getCustom().setLoginMobileEnable(bytedeskProperties.getCustom().getLoginMobileEnable());
             // response.getCustom().setLoginEmailEnable(bytedeskProperties.getCustom().getLoginEmailEnable());
             response.getCustom().setLoginScanEnable(bytedeskProperties.getCustom().getLoginScanEnable());
+            // 第三方登录开关：OIDC/CAS（企业模块 /auth/oidc /auth/cas），登录页据此显示按钮
+            response.getCustom().setLoginOidcEnable(bytedeskProperties.getCustom().getLoginOidcEnable());
+            response.getCustom().setLoginCasEnable(bytedeskProperties.getCustom().getLoginCasEnable());
+            // 第三方登录开关：钉钉/抖音/飞书/LDAP/OpenID（企业模块）
+            response.getCustom().setLoginDingtalkEnable(bytedeskProperties.getCustom().getLoginDingtalkEnable());
+            response.getCustom().setLoginDouyinEnable(bytedeskProperties.getCustom().getLoginDouyinEnable());
+            response.getCustom().setLoginFeishuEnable(bytedeskProperties.getCustom().getLoginFeishuEnable());
+            response.getCustom().setLoginLdapEnable(bytedeskProperties.getCustom().getLoginLdapEnable());
+            response.getCustom().setLoginOpenidEnable(bytedeskProperties.getCustom().getLoginOpenidEnable());
             response.getCustom().setDocUrlShow(bytedeskProperties.getCustom().getDocUrlShow());
             response.getCustom().setDocUrl(bytedeskProperties.getCustom().getDocUrl());
             response.getCustom().setHelpDocButtonEnabled(bytedeskProperties.getCustom().getHelpDocButtonEnabled());

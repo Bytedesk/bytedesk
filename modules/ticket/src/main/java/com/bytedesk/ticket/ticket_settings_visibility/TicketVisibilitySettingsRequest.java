@@ -27,5 +27,8 @@ public class TicketVisibilitySettingsRequest extends BaseRequest {
     private String mode = TicketVisibilityModeEnum.ORG_WIDE.name();
 
     @Builder.Default
+    private List<String> departmentUids = new ArrayList<>();
+
+    @Builder.Default
     private List<TicketVisibilityCategoryRuleRequest> categoryRules = new ArrayList<>();
 }

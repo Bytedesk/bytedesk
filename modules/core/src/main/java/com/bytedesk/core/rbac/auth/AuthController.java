@@ -96,6 +96,13 @@ public class AuthController {
             authRequest.getChannel(),
             authRequest.getDeviceUid());
 
+        // 拦截空用户名：避免空值进入查询链路后在仓储层抛出 IllegalArgumentException 堆栈
+        if (!StringUtils.hasText(authRequest.getUsername())) {
+            log.warn("Login rejected: blank username, platform={}, channel={}",
+                    authRequest.getPlatform(), authRequest.getChannel());
+            return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_USERNAME_REQUIRED, -1, false));
+        }
+
         // 性能测试模式：参考 IpAccessInterceptor，开启 disableIpFilter 后仅保留最基本登录验证流程
         boolean performanceTestingEnabled = bytedeskProperties.isDisableIpFilter();
 
@@ -170,8 +177,12 @@ public class AuthController {
                 log.info("Login blocked by member forceLogout: userUid={}, orgUid={}", e.getUserUid(), e.getOrgUid());
                 // HTTP 200 + code 403：与登录错误约定一致，前端登录页内联展示并翻译 i18n key
                 return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
-            
-        } catch (Exception e) {
+            } catch (IllegalArgumentException e) {
+                // 参数校验类错误（如空用户名/平台触发的仓储层非空校验）：仅记录简要信息，不打印异常堆栈
+                log.warn("Authentication rejected: invalid request parameter: username={}, platform={}, channel={}, reason={}",
+                        authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel(), e.getMessage());
+                return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT, -1, false));
+            } catch (Exception e) {
             // Always log stacktrace for troubleshooting; do not include raw credential fields
             log.error("Authentication failed: username={}, platform={}, channel={}",
                     authRequest.getUsername(), authRequest.getPlatform(), authRequest.getChannel(), e);

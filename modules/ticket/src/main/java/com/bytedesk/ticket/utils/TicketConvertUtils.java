@@ -27,6 +27,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketResponse;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 
 @Slf4j
 @UtilityClass
@@ -69,6 +70,17 @@ public class TicketConvertUtils {
                         .ifPresent(category -> ticketResponse.setCategoryName(category.getName()));
             } catch (Exception e) {
                 log.warn("Failed to load ticket category name for ticket {}: {}", entity.getUid(), e.getMessage());
+            }
+        }
+        //
+        // 加载工单设置名称，便于前端直接显示（可能为 i18n key，由前端翻译），失败不影响工单主流程
+        if (StringUtils.hasText(entity.getTicketSettingsUid())) {
+            try {
+                ApplicationContextHolder.getBean(TicketSettingsRestService.class)
+                        .findByUid(entity.getTicketSettingsUid())
+                        .ifPresent(settings -> ticketResponse.setTicketSettingsName(settings.getName()));
+            } catch (Exception e) {
+                log.warn("Failed to load ticket settings name for ticket {}: {}", entity.getUid(), e.getMessage());
             }
         }
         // 

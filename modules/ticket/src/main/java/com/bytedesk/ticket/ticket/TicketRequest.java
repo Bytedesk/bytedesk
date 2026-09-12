@@ -101,6 +101,9 @@ public class TicketRequest extends BaseRequest implements BlacklistCheckable {
     private Boolean visibilityRestricted;
     private String visibilityMode;
     private String visibilityCurrentUserUid;
+    // 当前用户对应的组织成员 uid：工单 userUid（报告人）/assignee JSON 中存储的是 member uid，
+    // 与 user uid 不同，始终可见判定需双口径匹配（user uid + member uid）
+    private String visibilityCurrentUserMemberUid;
     private String visibilityCurrentUserDepartmentUid;
     private Boolean visibilityOrgAdmin;
     @Builder.Default
@@ -108,6 +111,13 @@ public class TicketRequest extends BaseRequest implements BlacklistCheckable {
     // 按分类 + 指定部门限制可见范围：categoryUid -> 允许查看该分类工单的部门 uid 列表
     @Builder.Default
     private Map<String, List<String>> visibilityRestrictedCategoryDepartmentUids = new HashMap<>();
+    // 顶层指定部门限制可见范围：允许查看当前设置对应工单的部门 uid 列表
+    @Builder.Default
+    private List<String> visibilityAllowedDepartmentUids = new ArrayList<>();
+    // G2 组合可见性上下文：无 type 混合列表查询时按工单类型分别应用 INTERNAL/EXTERNAL 设置；
+    // 显式传 type 或 ticketSettingsUid 时为 null（走上方单类型字段路径）
+    private TicketVisibilityQueryContext visibilityInternalContext;
+    private TicketVisibilityQueryContext visibilityExternalContext;
 
     // ===================== 工作流增强操作参数（Flowable） =====================
     // 当一个流程实例可能存在多个并行任务（如会签/或签）时，建议明确传入 taskId

@@ -172,6 +172,11 @@ public final class RoleAuthorityRules {
     // public static final String QUEUE_CREATE = "QUEUE_CREATE";
     public static final String QUEUE_UPDATE = "QUEUE_UPDATE";
 
+    // queue_member (modules/service)
+    // 客服工作台 AI 能力（会话小结/意图/情绪/智能质检 POST /api/v1/queue/member/summary 等）依赖
+    public static final String QUEUE_MEMBER_READ = "QUEUE_MEMBER_READ";
+    public static final String QUEUE_MEMBER_UPDATE = "QUEUE_MEMBER_UPDATE";
+
     // 
     public static final String ROUTING_POOL_READ = "ROUTING_POOL_READ";
     public static final String ROUTING_POOL_UPDATE = "ROUTING_POOL_UPDATE";
@@ -363,6 +368,9 @@ public final class RoleAuthorityRules {
             // 
             CTI_READ,
             QUEUE_READ,
+            // 会话小结等 AI 接口（/api/v1/queue/member/summary）需要 QUEUE_MEMBER_UPDATE，客服默认具备
+            QUEUE_MEMBER_READ,
+            QUEUE_MEMBER_UPDATE,
             WORKGROUP_READ,
             ROUTING_POOL_READ,
             ROUTING_POOL_UPDATE,

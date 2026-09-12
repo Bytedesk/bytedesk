@@ -1017,35 +1017,50 @@ public class TicketSettingsRestService extends
         }
         TicketTypeEnum ticketType = TicketTypeEnum.fromValue(rawType);
         String mode = request.getMode();
+        List<String> departmentUids = request.getDepartmentUids() == null
+                ? new ArrayList<>()
+                : request.getDepartmentUids().stream()
+                        .filter(StringUtils::hasText)
+                        .map(String::trim)
+                        .distinct()
+                        .collect(Collectors.toList());
         List<TicketVisibilityCategoryRuleRequest> categoryRules = request.getCategoryRules() == null
-            ? new ArrayList<>()
-            : request.getCategoryRules().stream()
-                .filter(Objects::nonNull)
-                .map(rule -> TicketVisibilityCategoryRuleRequest.builder()
-                    .categoryUid(rule.getCategoryUid())
-                    .visibility(rule.getVisibility())
-                    .departmentUids(rule.getDepartmentUids())
-                    .build())
-                .collect(Collectors.toList());
+                ? new ArrayList<>()
+                : request.getCategoryRules().stream()
+                        .filter(Objects::nonNull)
+                        .map(rule -> TicketVisibilityCategoryRuleRequest.builder()
+                                .categoryUid(rule.getCategoryUid())
+                                .visibility(rule.getVisibility())
+                                .departmentUids(rule.getDepartmentUids())
+                                .build())
+                        .collect(Collectors.toList());
 
         if (ticketType != TicketTypeEnum.INTERNAL) {
-            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equalsIgnoreCase(mode)
-                    || TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equalsIgnoreCase(mode)) {
+            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equalsIgnoreCase(mode)) {
                 mode = TicketVisibilityModeEnum.ORG_WIDE.name();
+                departmentUids = new ArrayList<>();
             }
             categoryRules = categoryRules.stream()
-                .filter(rule -> !TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name()
-                    .equalsIgnoreCase(rule.getVisibility()))
-                .collect(Collectors.toList());
+                    .filter(rule -> !TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name()
+                            .equalsIgnoreCase(rule.getVisibility()))
+                    .collect(Collectors.toList());
+        } else if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equalsIgnoreCase(mode)) {
+            mode = TicketVisibilityModeEnum.ORG_WIDE.name();
+            departmentUids = new ArrayList<>();
+        }
+
+        if (!TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equalsIgnoreCase(mode)) {
+            departmentUids = new ArrayList<>();
         }
 
         return TicketVisibilitySettingsRequest.builder()
-            .uid(request.getUid())
-            .orgUid(request.getOrgUid())
-            .userUid(request.getUserUid())
-            .mode(mode)
-            .categoryRules(categoryRules)
-            .build();
+                .uid(request.getUid())
+                .orgUid(request.getOrgUid())
+                .userUid(request.getUserUid())
+                .mode(mode)
+                .departmentUids(departmentUids)
+                .categoryRules(categoryRules)
+                .build();
     }
 
     private TicketCategorySettingsEntity createCategorySettingsEntity(TicketCategorySettingsRequest request,
@@ -1071,7 +1086,8 @@ public class TicketSettingsRestService extends
     }
 
     /**
-     * 与 TicketRestService#initTicketCategory 的分类 uid 规则保持一致：orgUid + "_" + type + "_" + name。
+     * 与 TicketRestService#initTicketCategory 的分类 uid 规则保持一致：orgUid + "_" + type +
+     * "_" + name。
      * 默认分类项必须引用真实的组织级 CategoryEntity，否则 admin 端按分类过滤工单失效、
      * 工单分类列会显示“未知分类”。
      */
@@ -1672,11 +1688,13 @@ public class TicketSettingsRestService extends
                 ? TicketVisibilitySettingsData.builder().build()
                 : TicketVisibilitySettingsData.builder()
                         .mode(source.getMode())
+                        .departmentUids(source.getDepartmentUids())
                         .categoryRules(source.getCategoryRules() == null ? new ArrayList<>()
                                 : source.getCategoryRules().stream()
                                         .map(rule -> TicketVisibilityCategoryRuleData.builder()
                                                 .categoryUid(rule.getCategoryUid())
                                                 .visibility(rule.getVisibility())
+                                                .departmentUids(rule.getDepartmentUids())
                                                 .build())
                                         .collect(Collectors.toList()))
                         .build();
@@ -1699,6 +1717,7 @@ public class TicketSettingsRestService extends
         return TicketVisibilitySettingsResponse.builder()
                 .uid(entity.getUid())
                 .mode(content.getMode())
+                .departmentUids(content.getDepartmentUids())
                 .categoryRules(content.getCategoryRules() == null ? new ArrayList<>()
                         : content.getCategoryRules().stream()
                                 .map(rule -> TicketVisibilityCategoryRuleResponse.builder()

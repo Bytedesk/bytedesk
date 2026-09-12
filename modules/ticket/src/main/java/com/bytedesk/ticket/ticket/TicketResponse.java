@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ticket.ticket;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -86,6 +87,8 @@ public class TicketResponse extends BaseResponse {
 
     // 
      private String ticketSettingsUid;
+    // 工单设置名称（可能为 i18n key，由前端翻译显示）
+    private String ticketSettingsName;
     // 流程实例ID
     private String processInstanceId;
     // 流程定义实体UID，同时作为 Flowable 的 processDefinitionKey
@@ -94,6 +97,10 @@ public class TicketResponse extends BaseResponse {
 
     // 客户验证
     private Boolean verified;
+    // 解决时间
+    private ZonedDateTime resolvedTime;
+    // 关闭时间
+    private ZonedDateTime closedTime;
     // 自定义表单 json schema
     private String schema;
 

@@ -35,6 +35,7 @@ public class QueueMemberStatisticRow {
     private final ZonedDateTime agentFirstResponseAt;
     private final ZonedDateTime agentClosedAt;
     private final Integer agentMaxResponseLength;
+    private final Integer agentAvgResponseLength;
     private final Integer agentMessageCount;
     private final ZonedDateTime robotAcceptedAt;
     private final Integer robotMessageCount;

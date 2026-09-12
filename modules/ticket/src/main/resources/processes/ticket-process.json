@@ -238,10 +238,8 @@
       "data": {
         "title": "工单待验证",
         "description": "验证工单是否已解决。",
-        "assigneeType": "user",
-        "assigneeUids": [
-          "${reporterUid}"
-        ],
+        "assigneeType": "reporter",
+        "assigneeUids": [],
         "assigneeNames": [
           "报告人"
         ],
