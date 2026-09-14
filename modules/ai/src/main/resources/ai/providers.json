@@ -21,7 +21,7 @@
         "status": "PRODUCTION"
     },
     "dashscope": {
-        "nickname": "通义千问",
+        "nickname": "阿里云",
         "logo": "dashscope.png",
         "baseUrl": "https://dashscope.aliyuncs.com",
         "webUrl": "https://dashscope.aliyun.com/",

@@ -438,6 +438,8 @@ services:
       BYTEDESK_AI_TTS_AUDIO_FORMAT: mp3
       # TTS Realtime WebSocket（Qwen-Audio Realtime 中继地址）
       BYTEDESK_AI_TTS_REALTIME_WS_URL: ${BYTEDESK_AI_TTS_REALTIME_WS_URL:-wss://dashscope.aliyuncs.com/api-ws/v1/realtime}
+      # ASR Realtime WebSocket（实时语音识别中继上游地址，浏览器经应用中转连接）
+      BYTEDESK_AI_ASR_REALTIME_WS_URL: ${BYTEDESK_AI_ASR_REALTIME_WS_URL:-wss://dashscope.aliyuncs.com/api-ws/v1/inference}
       BYTEDESK_AI_ASR_SOURCE_FORMAT: mp3
       BYTEDESK_AI_ASR_TIMEOUT_MS: 180000
       BYTEDESK_AI_ASR_POLL_INTERVAL_MS: 1500

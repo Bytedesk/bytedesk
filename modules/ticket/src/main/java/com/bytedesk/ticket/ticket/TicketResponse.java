@@ -93,6 +93,8 @@ public class TicketResponse extends BaseResponse {
     private String processInstanceId;
     // 流程定义实体UID，同时作为 Flowable 的 processDefinitionKey
     private String processEntityUid;
+    // 流程定义名称（便于前端直接显示，可能为 i18n key，由前端翻译）
+    private String processEntityName;
     private String formEntityUid;
 
     // 客户验证

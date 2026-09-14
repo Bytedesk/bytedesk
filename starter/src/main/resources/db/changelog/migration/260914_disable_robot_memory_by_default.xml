@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        机器人多轮记忆（MessageChatMemoryAdvisor）改为默认关闭（opt-in）：清理存量数据。
+
+        背景：
+        - RobotLlm.memoryEnabled 历史默认 true，新组织创建系统机器人（robots.json 初始化）
+          时落库为 1，导致存量机器人未显式配置即注入 MessageChatMemoryAdvisor；
+        - 2026-09-14 线上事故：robot_agent 一次性同步任务（FAQ 相似问法生成等）不携带
+          conversationId，链中存在 MessageChatMemoryAdvisor 时 Spring AI 断言
+          CONVERSATION_ID 非空直接抛 IllegalArgumentException（子租户全量受影响，
+          代码侧已在 invokePromptSync/invokePromptStream 兜底一次性随机 ID）；
+        - 实体侧已改为 memoryEnabled 默认 false（@Builder.Default）；
+        - 本迁移将存量数据按最新默认配置对齐：全部关闭，需管理员在管理后台显式
+          开启后才恢复多轮记忆（VisitorLlm 设置面板）。
+
+        覆盖的数据面：
+        - bytedesk_ai_robot.llm_memory_enabled（RobotLlm @Embedded 多轮记忆开关）：
+          NULL（历史行，@Builder.Default 不覆盖 JPA 直读）与 1（true）统一置为 false。
+
+        说明：
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体新默认值直接建行，无需本迁移；
+        - 所有语句幂等，重复执行无副作用；
+        - Oracle 下布尔列为 NUMBER，单独按数值处理。
+    -->
+
+    <changeSet id="260914-disable-robot-memory-default" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot" />
+        </preConditions>
+
+        <!-- 1. 多轮记忆开关统一关闭（含 NULL 行） -->
+        <sql dbms="mysql,mariadb">
+            UPDATE bytedesk_ai_robot
+            SET llm_memory_enabled = b'0'
+            WHERE llm_memory_enabled IS NULL OR llm_memory_enabled = b'1';
+        </sql>
+        <sql dbms="postgresql,h2,kingbase">
+            UPDATE bytedesk_ai_robot
+            SET llm_memory_enabled = FALSE
+            WHERE llm_memory_enabled IS NULL OR llm_memory_enabled = TRUE;
+        </sql>
+        <sql dbms="oracle">
+            UPDATE bytedesk_ai_robot
+            SET llm_memory_enabled = 0
+            WHERE llm_memory_enabled IS NULL OR llm_memory_enabled = 1;
+        </sql>
+
+        <rollback>
+            <sql dbms="mysql,mariadb">
+                UPDATE bytedesk_ai_robot SET llm_memory_enabled = b'1';
+            </sql>
+            <sql dbms="postgresql,h2,kingbase">
+                UPDATE bytedesk_ai_robot SET llm_memory_enabled = TRUE;
+            </sql>
+            <sql dbms="oracle">
+                UPDATE bytedesk_ai_robot SET llm_memory_enabled = 1;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

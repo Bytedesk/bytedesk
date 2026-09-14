@@ -768,8 +768,12 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
             return Optional.empty();
         }
         if (agents.size() > 1) {
+            // 附带各条 Agent 的 uid/orgUid 便于排查（多组织用户每人每组织一条 Agent 属正常数据，调用方应改用 findByUserUidAndOrgUid）
+            String detail = agents.stream()
+                    .map(a -> "agentUid=" + a.getUid() + ",orgUid=" + a.getOrgUid())
+                    .collect(java.util.stream.Collectors.joining("; "));
             throw new IllegalStateException(
-                    "Multiple agents found for userUid=" + userUid + ", please specify orgUid");
+                    "Multiple agents found for userUid=" + userUid + ", please specify orgUid. Candidates: [" + detail + "]");
         }
 
         AgentEntity agent = agents.get(0);
@@ -805,14 +809,21 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
 
     // @Cacheable(value = "agent", key = "#userUid", unless = "#result == null")
     public Optional<AgentEntity> findByUserUidAndOrgUid(String userUid, String orgUid) {
-        Optional<AgentEntity> agentOptional = agentRepository.findByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
-        // 确保所有延迟加载的关联都被初始化，以便正确缓存
-        agentOptional.ifPresent(agent -> {
-            if (agent.getMember() != null) {
-                agent.getMember().getUser(); // 触发加载
-            }
-        });
-        return agentOptional;
+        // List 底层防御：同 org 出现重复 Agent 数据时取第一条并告警，不再抛 IncorrectResultSizeDataAccessException
+        List<AgentEntity> agents = agentRepository.findAllByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
+        if (agents == null || agents.isEmpty()) {
+            return Optional.empty();
+        }
+        if (agents.size() > 1) {
+            log.warn("Multiple agents found for userUid={} orgUid={}, using first. Agents: {}",
+                    userUid, orgUid,
+                    agents.stream().map(a -> a.getUid()).collect(java.util.stream.Collectors.joining(",")));
+        }
+        AgentEntity agent = agents.get(0);
+        if (agent != null && agent.getMember() != null) {
+            agent.getMember().getUser();
+        }
+        return Optional.ofNullable(agent);
     }
 
     public Boolean existsByUserUidAndOrgUid(String userUid, String orgUid) {

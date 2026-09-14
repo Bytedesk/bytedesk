@@ -36,7 +36,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -93,6 +96,43 @@ public class ThreadRestService
     // @Cacheable(value = "thread", key = "#uid", unless = "#result == null")
     public Optional<ThreadEntity> findByUid(String uid) {
         return threadRepository.findByUid(uid);
+    }
+
+    /**
+     * 在独立只读事务中加载会话，返回游离（detached）实体。
+     *
+     * <p>供工单创建等“只读绑定”场景使用：普通 findByUid 会把会话实体挂进
+     * 调用方事务的持久化上下文，一旦该会话行被并发更新（version 变化），
+     * 调用方事务提交/flush 时就会抛乐观锁异常并整体回滚
+     * （如会话关闭自动建单：Unexpected row count, expected 1 but was 0）。
+     * 独立只读事务读出的游离实体不参与调用方事务的脏检查，天然隔离该风险。
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+    public Optional<ThreadEntity> findByUidReadOnly(String uid) {
+        return threadRepository.findByUid(uid);
+    }
+
+    /**
+     * 事务提交后再发布 ThreadCloseEvent。
+     *
+     * <p>BytedeskEventPublisher 是 @Async 的：若在事务内直接发布，监听器
+     * （自动建单、队列清理、关闭消息下发、会话小结等）会立即在其他线程开跑，
+     * 与发布者事务并发读写同一会话行，极易触发乐观锁冲突；监听器在提交前
+     * 也可能读到未落库的中间状态。提交后发布保证监听器看到的是终态数据；
+     * 无事务上下文时（如直接在非事务方法中调用）保持原行为直接发布。
+     * 与 TicketEntityListener#publishAfterCommit 同一模式。
+     */
+    private void publishThreadCloseEventAfterCommit(ThreadEntity thread) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(ThreadRestService.this, thread));
+                }
+            });
+        } else {
+            bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, thread));
+        }
     }
 
     public Boolean existsByUid(String uid) {
@@ -837,8 +877,8 @@ public class ThreadRestService
                     .build();
             topicSubscriptionRestService.remove(topicRequest);
         }
-        // 发布关闭事件
-        bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
+        // 发布关闭事件（提交后发布，避免监听器与发布者事务并发读写同一会话行）
+        publishThreadCloseEventAfterCommit(updateThread);
         //
         return convertToResponse(updateThread);
     }
@@ -901,8 +941,8 @@ public class ThreadRestService
                 throw new RuntimeException("thread save failed");
             }
 
-            // 发布关闭事件（每条 thread 都要发）
-            bytedeskEventPublisher.publishEvent(new ThreadCloseEvent(this, updateThread));
+            // 发布关闭事件（每条 thread 都要发；提交后发布避免与发布者事务并发）
+            publishThreadCloseEventAfterCommit(updateThread);
             lastUpdatedThread = updateThread;
 
             if (StringUtils.hasText(request.getUid()) && request.getUid().equals(updateThread.getUid())) {

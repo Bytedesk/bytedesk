@@ -992,17 +992,18 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * 同步调用并可选地传入 conversationId（用于 Memory Advisor 的会话隔离）。
      *
-     * <p>conversationId 为 {@code null} 或空时不传 advisor param，行为与旧签名一致（健康检查、无 thread 请求
-     * 走无记忆路径，避免 Spring AI 在缺少 CONVERSATION_ID 时断言失败）。</p>
+     * <p>conversationId 为空时自动兜底为一次性随机 ID：当 advisor 链包含 MessageChatMemoryAdvisor
+     * （robot.llm.memoryEnabled=true）时，Spring AI 要求 CONVERSATION_ID 非空，否则 Assert 直接抛
+     * IllegalArgumentException 导致整个请求失败（2026-09-14 子租户 robot_agent 同步任务报错根因）。
+     * 一次性随机 ID 语义等同“无记忆”：读取历史为空、不与其他会话串扰。</p>
      *
      * @param conversationId 会话标识，约定取 {@code threadTopic}（与 PromptHelper 手动历史同键，见规划 v3.2）
      */
     protected ChatResponse invokePromptSync(ChatClient chatClient, Prompt prompt, String conversationId) {
         Assert.notNull(chatClient, "ChatClient must not be null");
         var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
-        if (StringUtils.hasText(conversationId)) {
-            request = request.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
-        }
+        request = request.advisors(
+                a -> a.param(ChatMemory.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
         return request.call().chatResponse();
     }
 
@@ -1017,17 +1018,26 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * 流式调用并可选地传入 conversationId（用于 Memory Advisor 的会话隔离）。
      *
-     * <p>conversationId 为 {@code null} 或空时不传 advisor param，行为与旧签名一致。</p>
-     *
-     * @param conversationId 会话标识，约定取 {@code threadTopic}（与 PromptHelper 手动历史同键，见规划 v3.2）
+     * <p>conversationId 为空时兜底一次性随机 ID，语义等同“无记忆”，原因见
+     * {@link #invokePromptSync(ChatClient, Prompt, String)}。</p>
      */
     protected Flux<ChatResponse> invokePromptStream(ChatClient chatClient, Prompt prompt, String conversationId) {
         Assert.notNull(chatClient, "ChatClient must not be null");
         var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
-        if (StringUtils.hasText(conversationId)) {
-            request = request.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId));
-        }
+        request = request.advisors(
+                a -> a.param(ChatMemory.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
         return request.stream().chatResponse();
+    }
+
+    /**
+     * conversationId 为空时的兜底：生成一次性随机会话 ID。
+     *
+     * <p>MessageChatMemoryAdvisor 处于 advisor 链时要求 CONVERSATION_ID 非空；一次性随机 ID 读取历史为空、
+     * 不与其他会话串扰（仅在记忆表落当前请求的两条记录）。</p>
+     */
+    private static String resolveConversationIdOrDefault(String conversationId) {
+        return StringUtils.hasText(conversationId) ? conversationId
+                : "oneshot-" + java.util.UUID.randomUUID();
     }
 
     protected Flux<ChatResponse> invokePromptStream(ChatModel chatModel, Prompt prompt) {

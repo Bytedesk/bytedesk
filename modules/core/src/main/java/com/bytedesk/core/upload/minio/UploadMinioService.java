@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
@@ -32,6 +34,7 @@ import io.minio.SetBucketPolicyArgs;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.BdDateUtils;
 
+import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
@@ -331,6 +334,27 @@ public class UploadMinioService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    /**
+     * 下载 MinIO 对象到本地文件
+     * 用于后端服务（如 ASR 语音转写）需要读取 MinIO 中文件的场景，
+     * 不依赖存储桶公开读策略（走 MinIO 客户端鉴权读取）
+     *
+     * @param objectPath 对象路径（如：audios/20260914170900_xxx.webm）
+     * @param targetFile 目标本地文件路径
+     */
+    public void downloadObject(String objectPath, Path targetFile) {
+        try (InputStream inputStream = minioClient.getObject(
+                GetObjectArgs.builder()
+                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .object(objectPath)
+                    .build())) {
+            Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception e) {
+            log.error("下载 MinIO 文件失败: objectPath={}, reason={}", objectPath, e.getMessage(), e);
+            throw new RuntimeException("下载 MinIO 文件失败: " + e.getMessage(), e);
         }
     }
 

@@ -120,6 +120,23 @@ public class TicketService {
     }
 
     /**
+     * 只读查询路径专用（如工单时间线）：常规可见性校验未通过时，
+     * 允许通过"工单卡片分享"豁免（查看者订阅的会话中存在该工单的卡片消息）。
+     * 工作流操作等写路径仍走 {@link #getTicketOrThrow(TicketRequest)}，不享受该豁免。
+     */
+    private TicketEntity getTicketOrThrowForRead(TicketRequest request) {
+        Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new RuntimeException("工单不存在: " + request.getUid());
+        }
+        TicketEntity ticket = ticketOptional.get();
+        ticketRestService.assertTicketVisibleOrSharedCard(ticket,
+                ChannelEnum.WEB_ADMIN.name().equalsIgnoreCase(request.getChannel()),
+                request.getThreadUid());
+        return ticket;
+    }
+
+    /**
      * 工单是否处于终态（不再提供任何工作流可执行动作）。
      */
     private boolean isTerminalTicketStatus(String status) {
@@ -2543,7 +2560,60 @@ public class TicketService {
 
         TicketEntity ticket = null;
         if (StringUtils.hasText(request.getUid())) {
-            ticket = getTicketOrThrow(request);
+            ticket = getTicketOrThrowForRead(request);
+            if (!StringUtils.hasText(request.getProcessInstanceId())) {
+                request.setProcessInstanceId(ticket.getProcessInstanceId());
+            }
+        }
+
+        List<Comment> comments = StringUtils.hasText(request.getProcessInstanceId())
+                ? taskService.getProcessInstanceComments(request.getProcessInstanceId())
+                : List.of();
+        Map<String, String> assigneeNameMap = buildTicketAssigneeNameMap(ticket, List.of(), comments);
+
+        List<TicketTimelineStepResponse> responses = new ArrayList<>();
+        if (ticket != null && ticket.getCreatedAt() != null) {
+            responses.add(TicketTimelineStepResponse.builder()
+                    .id(ticket.getUid())
+                    .actionKey("CREATE")
+                    .title("创建工单")
+                    .titleKey(I18TicketConsts.I18N_TICKET_ACTION_CREATE)
+                    .assignee(ticket.getReporter() != null ? ticket.getReporter().getUid() : null)
+                    .assigneeName(ticket.getReporter() != null ? ticket.getReporter().getNickname() : null)
+                    .description(ticket.getTitle())
+                    .occurredAt(Date.from(ticket.getCreatedAt().toInstant()))
+                    .build());
+        }
+
+        responses.addAll(comments.stream()
+                .filter(this::shouldDisplayTicketTimelineComment)
+                .map(comment -> buildTicketTimelineStep(comment, assigneeNameMap))
+                .collect(Collectors.toList()));
+
+        return responses.stream()
+                .sorted(Comparator.comparing(
+                    (TicketTimelineStepResponse response) -> response.getOccurredAt(),
+                    Comparator.nullsLast((String left, String right) -> left.compareTo(right))))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 工单卡片步骤专用只读时间线：
+     * 不受工单可见性限制，仅要求工单存在且组织匹配。
+     */
+    public List<TicketTimelineStepResponse> queryTicketTimelineForCard(TicketRequest request) {
+        Assert.notNull(request, "ticket request required");
+
+        TicketEntity ticket = null;
+        if (StringUtils.hasText(request.getUid())) {
+            Optional<TicketEntity> ticketOptional = ticketRestService.findByUid(request.getUid());
+            if (ticketOptional.isEmpty()) {
+                throw new RuntimeException("工单不存在: " + request.getUid());
+            }
+            ticket = ticketOptional.get();
+            if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
+                throw new RuntimeException("工单不存在: " + request.getUid());
+            }
             if (!StringUtils.hasText(request.getProcessInstanceId())) {
                 request.setProcessInstanceId(ticket.getProcessInstanceId());
             }

@@ -118,7 +118,7 @@ public class AdvisorChainFactory {
         // ---- Memory：多轮对话记忆 ----
         // order 设为 HIGHEST_PRECEDENCE + 1100（> ToolCallingAdvisor 默认 +1000），确保位于 tool 循环外侧，
         // 避免每次 tool 迭代重复持久化中间消息污染记忆（见规划 §2.2）。
-        // memoryEnabled 默认 true（向后兼容）；chatMemoryRepository 不可用时安全降级（社区版无 JDBC starter）。
+        // memoryEnabled 默认 false（2026-09-14 改为 opt-in，Liquibase 260914 存量对齐）；chatMemoryRepository 不可用时安全降级（社区版无 JDBC starter）。
         if (Boolean.TRUE.equals(llm.getMemoryEnabled()) && chatMemoryRepository != null) {
             int maxMessages = llm.getContextMsgCount() != null && llm.getContextMsgCount() > 0
                     ? llm.getContextMsgCount() : 10;

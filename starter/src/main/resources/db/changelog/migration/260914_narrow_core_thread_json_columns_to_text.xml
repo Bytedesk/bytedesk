@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        将 bytedesk_core_thread 中被 260817 加宽为 LONGTEXT(clob) 的 JSON 快照列收敛回 TEXT。
+
+        背景（2026-09-14 决策：thread 快照列不需要太宽）：
+        - thread_user / agent / robot / workgroup / transfer 五列仅用于存储用户、机器人、
+          工作组等身份快照信息（正常 < 1KB），TEXT(64KB) 上限足够；
+        - 260817 当初选择 clob(MySQL->LONGTEXT 4GB) 是因为 LLM 会话把完整 RobotProtobuf JSON
+          （含 llm.prompt、tools 等大字段）写入这些列；现已在数据面修复——
+          RobotRestService.createLlmThread / updateLlmThread 改存精简版 RobotProtobufBasic，
+          对话管线（RobotService.buildRobotFromThread）按 uid 从数据库重载完整配置，
+          thread 列不再承载大字段，无需 4GB 宽度；
+        - 实体侧 columnDefinition 一直为 TEXT：全新库由 ddl-auto 直接创建 TEXT 列；
+          本迁移负责把"已执行过 260817（现为 LONGTEXT）"的存量库收敛回 TEXT，
+          与实体定义保持一致。
+
+        说明：
+        - 仅在 MySQL/MariaDB 生效（LONGTEXT 是 MySQL 方言类型；PG/Kingbase 的 TEXT 无长度
+          上限、H2/Oracle 走 CLOB，260817 在这些库上本就未产生超宽列）；
+        - 通过 information_schema 检查当前列类型是否为 longtext，不是则 CONTINUE 跳过
+          （全新库/未执行 260817 的 varchar(2048) 库不命中：后者会先由 260817 加宽为
+          LONGTEXT，再由本迁移收敛，最终一致为 TEXT）；
+        - 若存在超过 TEXT 64KB 上限的历史数据导致 ALTER 失败，onError=CONTINUE 跳过该列
+          （列保持 LONGTEXT 不影响使用，超大历史行可用规划文档 P2-3 的诊断 SQL 定位清理）；
+        - 仅收窄类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="260914-1-narrow-core-thread-user-to-text" author="githubcopilot" dbms="mysql,mariadb" runAlways="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_thread'
+                  AND COLUMN_NAME = 'thread_user'
+                  AND DATA_TYPE = 'longtext'
+            </sqlCheck>
+        </preConditions>
+        <comment>将 bytedesk_core_thread.thread_user 由 LONGTEXT 收敛回 TEXT（快照列仅存身份信息，64KB 足够）。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="thread_user" newDataType="text" />
+    </changeSet>
+
+    <changeSet id="260914-2-narrow-core-thread-agent-to-text" author="githubcopilot" dbms="mysql,mariadb" runAlways="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_thread'
+                  AND COLUMN_NAME = 'agent'
+                  AND DATA_TYPE = 'longtext'
+            </sqlCheck>
+        </preConditions>
+        <comment>将 bytedesk_core_thread.agent 由 LONGTEXT 收敛回 TEXT。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="agent" newDataType="text" />
+    </changeSet>
+
+    <changeSet id="260914-3-narrow-core-thread-robot-to-text" author="githubcopilot" dbms="mysql,mariadb" runAlways="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_thread'
+                  AND COLUMN_NAME = 'robot'
+                  AND DATA_TYPE = 'longtext'
+            </sqlCheck>
+        </preConditions>
+        <comment>将 bytedesk_core_thread.robot 由 LONGTEXT 收敛回 TEXT。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="robot" newDataType="text" />
+    </changeSet>
+
+    <changeSet id="260914-4-narrow-core-thread-workgroup-to-text" author="githubcopilot" dbms="mysql,mariadb" runAlways="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_thread'
+                  AND COLUMN_NAME = 'workgroup'
+                  AND DATA_TYPE = 'longtext'
+            </sqlCheck>
+        </preConditions>
+        <comment>将 bytedesk_core_thread.workgroup 由 LONGTEXT 收敛回 TEXT。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="workgroup" newDataType="text" />
+    </changeSet>
+
+    <changeSet id="260914-5-narrow-core-thread-transfer-to-text" author="githubcopilot" dbms="mysql,mariadb" runAlways="true">
+        <preConditions onFail="CONTINUE" onError="CONTINUE">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'bytedesk_core_thread'
+                  AND COLUMN_NAME = 'transfer'
+                  AND DATA_TYPE = 'longtext'
+            </sqlCheck>
+        </preConditions>
+        <comment>将 bytedesk_core_thread.transfer 由 LONGTEXT 收敛回 TEXT。</comment>
+        <modifyDataType tableName="bytedesk_core_thread" columnName="transfer" newDataType="text" />
+    </changeSet>
+
+</databaseChangeLog>

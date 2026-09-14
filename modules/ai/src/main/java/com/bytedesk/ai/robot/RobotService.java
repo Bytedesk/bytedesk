@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -29,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot_message.RobotMessageUtils;
 import com.bytedesk.ai.segment.SegmentService;
 import com.bytedesk.ai.service.BaseSpringAIService;
+import com.bytedesk.ai.service.RobotVoiceTranscriber;
 import com.bytedesk.ai.service.SseMessageHelper;
 import com.bytedesk.ai.service.SpringAIServiceRegistry;
 import com.bytedesk.ai.service.SseMessageJsonConsumer;
@@ -36,9 +38,13 @@ import com.bytedesk.ai.service.SsePersistenceControl;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
+import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
+import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.MessageService;
+import com.bytedesk.core.message.content.AudioContent;
 import com.bytedesk.core.message.content.RobotContent;
+import com.bytedesk.core.message.content.VoiceContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -54,12 +60,24 @@ import org.springframework.context.annotation.Description;
 @Description("Robot Service - AI robot message processing and LLM integration service")
 public class RobotService extends AbstractRobotService {
 
+    /**
+     * 语音识别失败提示（机器人开启 asrEnabled 但转写失败时下发，不静默吞掉）
+     */
+    private static final String VOICE_TRANSCRIPTION_FAILED_TIP = "语音识别失败，请稍后重试或改用文字提问";
+
     private final SpringAIServiceRegistry springAIServiceRegistry;
     private final ThreadRestService threadRestService;
     private final MessageService messageService;
+    private final MessageRestService messageRestService;
     private final RobotRestService robotRestService;
     private final SegmentService segmentService;
     private final SseMessageHelper sseMessageHelper;
+
+    /**
+     * 可选注入：语音转写 SPI 实现位于 enterprise/ai（DashScopeRobotVoiceTranscriber）。
+     * 社区版/未授权时 getIfAvailable() 返回 null，跳过转写不影响编译与运行。
+     */
+    private final ObjectProvider<RobotVoiceTranscriber> robotVoiceTranscriberProvider;
 
     @Override
     protected RobotRestService getRobotRestService() {
@@ -290,6 +308,11 @@ public class RobotService extends AbstractRobotService {
         // 使用公共方法获取机器人
         RobotContext robotContext = resolveRobotContext(validationResult.getThreadTopic());
         ThreadEntity threadEntity = robotContext.thread();
+        if (threadEntity == null) {
+            // getThreadByTopic 内部已 orElseThrow 保证非空，此处为防御性兜底：
+            // record 访问器 thread() 无法向编译器空值分析证明非空
+            throw new RuntimeException("thread entity is null, threadTopic: " + validationResult.getThreadTopic());
+        }
         RobotProtobuf robot = robotContext.robot();
         log.info("processSseVisitorMessage thread reply");
 
@@ -315,6 +338,41 @@ public class RobotService extends AbstractRobotService {
                     "visitor-sse-skip",
                     false);
             return;
+        }
+
+        // 语音消息自动 ASR（规划 §4.3）：VOICE/AUDIO 先转文字再送 LLM；
+        // 未开启 ASR / 无转写实现 / 识别失败 → 跳过 AI 处理（修复 VoiceContent JSON 直送 LLM 缺陷，§3 G2）
+        if (isVoiceOrAudioMessage(validationResult.getMessageProtobuf())) {
+            VoiceQueryResult voiceQueryResult = transcribeVoiceQuery(
+                    validationResult.getMessageProtobuf(), robot, threadEntity.getOrgUid(), emitter);
+            if (!StringUtils.hasText(voiceQueryResult.text())) {
+                if (voiceQueryResult.transcriptionFailed()) {
+                    // asrEnabled 但识别失败：明确提示，不静默吞掉（规划 §4.3）
+                    log.warn("Visitor voice transcription failed, send failure tip, threadUid={}",
+                            validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+                    sseMessageHelper.sendDefaultReplySse(query, VOICE_TRANSCRIPTION_FAILED_TIP, robot,
+                            validationResult.getMessageProtobuf(), messageProtobufReply, emitter);
+                    return;
+                }
+                log.info("Skip visitor SSE AI processing for voice message, threadUid={}, reason=asr-disabled-or-unavailable",
+                        validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+                sseMessageHelper.sendStreamEndMessage(
+                        validationResult.getMessageProtobuf(),
+                        messageProtobufReply,
+                        emitter,
+                        0,
+                        0,
+                        0,
+                        null,
+                        LlmProviderConstants.ZHIPUAI,
+                        "visitor-sse-voice-skip",
+                        false);
+                return;
+            }
+            // 转写成功：以识别文本作为 query 送 LLM
+            query = voiceQueryResult.text();
+            log.info("Visitor voice message transcribed, uid={}, textLength={}",
+                    validationResult.getMessageProtobuf().getUid(), query.length());
         }
 
         if (RobotUtils.shouldBypassRobotReply(threadEntity)) {
@@ -365,6 +423,27 @@ public class RobotService extends AbstractRobotService {
                 validationResult.getThreadProtobuf(),
                 robot,
                 validationResult.getMessageProtobuf());
+
+        // 语音消息自动 ASR（同步链路，如微信公众号）：VOICE/AUDIO 先转文字再送 LLM，
+        // 未开启/无实现/失败则不送 LLM（返回空回复，修复 JSON 直送 LLM 缺陷，§3 G2）
+        if (isVoiceOrAudioMessage(validationResult.getMessageProtobuf())) {
+            VoiceQueryResult voiceQueryResult = transcribeVoiceQuery(
+                    validationResult.getMessageProtobuf(), robot, robot != null ? robot.getOrgUid() : null, null);
+            if (!StringUtils.hasText(voiceQueryResult.text())) {
+                log.info("Skip sync visitor AI processing for voice message, threadUid={}, reason=asr-{}",
+                        validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null,
+                        voiceQueryResult.transcriptionFailed() ? "failed" : "disabled-or-unavailable");
+                if (voiceQueryResult.transcriptionFailed()) {
+                    messageProtobufReply.setContent(VOICE_TRANSCRIPTION_FAILED_TIP);
+                } else {
+                    messageProtobufReply.setContent("");
+                }
+                return messageProtobufReply;
+            }
+            query = voiceQueryResult.text();
+            log.info("Sync visitor voice message transcribed, uid={}, textLength={}",
+                    validationResult.getMessageProtobuf().getUid(), query.length());
+        }
 
         // 查询重写 + 分词扩展查询（原 Pipeline 逻辑合并至访客接口）
         String rewritten = query;
@@ -553,6 +632,167 @@ public class RobotService extends AbstractRobotService {
         }
 
         return true;
+    }
+
+    // ==================== 语音消息自动 ASR（规划 §4.3，G2 缺陷修复） ====================
+
+    /**
+     * 语音消息识别结果：text 非空 = 转写成功（以 text 作为 LLM query）；
+     * text 为空 = 跳过 AI 处理（未开启 ASR / 无转写实现 / 识别失败）。
+     */
+    private record VoiceQueryResult(String text, boolean asrEnabled, boolean transcriptionFailed) {
+    }
+
+    private boolean isVoiceOrAudioMessage(MessageProtobuf messageProtobuf) {
+        return messageProtobuf != null
+                && (MessageTypeEnum.VOICE == messageProtobuf.getType()
+                        || MessageTypeEnum.AUDIO == messageProtobuf.getType());
+    }
+
+    /**
+     * 解析语音/音频消息中的文件 URL。
+     */
+    private String extractAudioFileUrl(MessageProtobuf messageProtobuf) {
+        String content = messageProtobuf.getContent();
+        if (!StringUtils.hasText(content)) {
+            return null;
+        }
+        try {
+            if (MessageTypeEnum.VOICE == messageProtobuf.getType()) {
+                VoiceContent voiceContent = VoiceContent.fromJson(content);
+                return voiceContent != null ? voiceContent.getUrl() : null;
+            }
+            AudioContent audioContent = AudioContent.fromJson(content);
+            return audioContent != null ? audioContent.getUrl() : null;
+        } catch (Exception e) {
+            log.warn("Failed to parse voice/audio content json, uid={}, error={}",
+                    messageProtobuf.getUid(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 解析语音消息中前端已携带的识别结果（VoiceContent.text）。
+     * 仅 VOICE 类型有 text 字段；AUDIO 消息返回 null。
+     */
+    private String extractPresetVoiceTranscript(MessageProtobuf messageProtobuf) {
+        if (messageProtobuf == null || MessageTypeEnum.VOICE != messageProtobuf.getType()) {
+            return null;
+        }
+        String content = messageProtobuf.getContent();
+        if (!StringUtils.hasText(content)) {
+            return null;
+        }
+        try {
+            VoiceContent voiceContent = VoiceContent.fromJson(content);
+            return voiceContent != null && StringUtils.hasText(voiceContent.getText())
+                    ? voiceContent.getText().trim()
+                    : null;
+        } catch (Exception e) {
+            log.warn("Failed to parse preset voice transcript, uid={}, error={}",
+                    messageProtobuf.getUid(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 语音消息自动转写：机器人开启 asrEnabled 且存在转写实现（企业版）时，
+     * 先将录音转文字并把识别文本回写到消息内容（VoiceContent.text），
+     * 再以文本作为 query 送大模型。
+     *
+     * 前端已携带识别结果（VoiceContent.text，如 SpeechInputModal 实时识别后发送）时
+     * 直接复用，跳过二次 ASR（识别结果随消息内容已入库，无需回写）。
+     *
+     * 返回值语义见 {@link VoiceQueryResult}：
+     * - 转写成功 → text 非空；
+     * - 未开启 ASR / 无实现 / 无音频 URL / 识别失败 → text 为空（调用方跳过 AI 处理，
+     *   修复现状 VoiceContent JSON 直送 LLM 的缺陷，规划 §3 G2）。
+     */
+    private VoiceQueryResult transcribeVoiceQuery(MessageProtobuf messageProtobuf, RobotProtobuf robot,
+            String orgUid, SseEmitter emitter) {
+        // 前端已携带识别结果：直接作为 query 送 LLM，避免二次识别（与客户端发文本消息同等信任级别）
+        String presetTranscript = extractPresetVoiceTranscript(messageProtobuf);
+        if (StringUtils.hasText(presetTranscript)) {
+            log.info("Voice message already carries transcript text, skip re-transcription, uid={}, textLength={}",
+                    messageProtobuf.getUid(), presetTranscript.length());
+            return new VoiceQueryResult(presetTranscript, true, false);
+        }
+
+        if (robot == null || robot.getLlm() == null || !Boolean.TRUE.equals(robot.getLlm().getAsrEnabled())) {
+            // 未开启语音识别：语音消息不送 LLM（行为修正，规划 §3 G2）
+            log.info("Robot ASR disabled, skip AI processing for voice message, uid={}, threadUid={}",
+                    messageProtobuf.getUid(),
+                    messageProtobuf.getThread() != null ? messageProtobuf.getThread().getUid() : null);
+            return new VoiceQueryResult(null, false, false);
+        }
+
+        RobotVoiceTranscriber transcriber = robotVoiceTranscriberProvider.getIfAvailable();
+        if (transcriber == null) {
+            // 社区版/未授权：无转写实现，跳过（不报错，行为与未开启一致）
+            log.info("RobotVoiceTranscriber not available (community edition?), skip voice message, uid={}",
+                    messageProtobuf.getUid());
+            return new VoiceQueryResult(null, true, false);
+        }
+
+        String fileUrl = extractAudioFileUrl(messageProtobuf);
+        if (!StringUtils.hasText(fileUrl)) {
+            log.warn("Voice message has no audio url, skip transcription, uid={}", messageProtobuf.getUid());
+            return new VoiceQueryResult(null, true, false);
+        }
+
+        String text;
+        try {
+            text = transcriber.transcribe(robot, orgUid, fileUrl);
+        } catch (Exception e) {
+            log.error("Robot voice transcription failed, uid={}, fileUrl={}, error={}",
+                    messageProtobuf.getUid(), fileUrl, e.getMessage(), e);
+            return new VoiceQueryResult(null, true, true);
+        }
+        if (!StringUtils.hasText(text)) {
+            return new VoiceQueryResult(null, true, true);
+        }
+
+        // 转写成功：回写 VoiceContent.text 到 DB，并通过当前 SSE 连接下发「查询消息更新帧」，
+        // 前端按 uid 去重原地更新语音气泡（规划 §4.3 方案 B，零新增推送基础设施）
+        String updatedContent = writeBackVoiceText(messageProtobuf, text);
+        if (updatedContent != null && emitter != null) {
+            messageProtobuf.setContent(updatedContent);
+            sseMessageHelper.sendQueryMessageUpdateFrame(messageProtobuf, emitter);
+        }
+        return new VoiceQueryResult(text, true, false);
+    }
+
+    /**
+     * 将识别文本回写到消息内容（VoiceContent.text；AUDIO 消息无 text 字段则跳过回写），
+     * 返回回写后的 content JSON；消息不存在或非 VOICE 类型返回 null。
+     */
+    private String writeBackVoiceText(MessageProtobuf messageProtobuf, String text) {
+        try {
+            if (!MessageTypeEnum.VOICE.equals(messageProtobuf.getType())
+                    || !StringUtils.hasText(messageProtobuf.getUid())) {
+                return null;
+            }
+            MessageEntity message = messageRestService.findByUid(messageProtobuf.getUid()).orElse(null);
+            if (message == null) {
+                log.warn("Voice message not found for text write-back, uid={}", messageProtobuf.getUid());
+                return null;
+            }
+            if (!MessageTypeEnum.VOICE.name().equals(message.getType())) {
+                return null;
+            }
+            VoiceContent voiceContent = VoiceContent.fromJson(message.getContent());
+            if (voiceContent == null) {
+                voiceContent = VoiceContent.builder().build();
+            }
+            voiceContent.setText(text);
+            message.setContent(voiceContent.toJson());
+            messageRestService.save(message);
+            return message.getContent();
+        } catch (Exception e) {
+            log.warn("Failed to write back voice transcript text, uid={}, error={}",
+                    messageProtobuf.getUid(), e.getMessage());
+            return null;
+        }
     }
 
     /**

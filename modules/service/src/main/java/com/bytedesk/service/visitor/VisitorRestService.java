@@ -38,6 +38,7 @@ import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.AvatarConsts;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -178,7 +179,10 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
         visitor.getDeviceInfo().setBrowser(request.getBrowser());
         visitor.getDeviceInfo().setOs(request.getOs());
         visitor.getDeviceInfo().setDevice(request.getDevice());
-        visitor.setExtra(request.getExtra());
+        // 仅当请求携带非空 extra 时才覆盖，防止内部链路（如关键词转人工）用空值或设置快照冲掉访客资料 extra
+        if (StringUtils.hasText(request.getExtra()) && !BytedeskConsts.EMPTY_JSON_STRING.equals(request.getExtra().trim())) {
+            visitor.setExtra(request.getExtra());
+        }
     }
 
     private VisitorEntity retrySaveExistingVisitor(String visitorUid, String orgUid, VisitorRequest request,

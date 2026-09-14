@@ -62,6 +62,16 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     }
 
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org for workbench, admin visibility restricted")
+    @GetMapping("/query/workbench/org")
+    public ResponseEntity<?> queryByOrgForWorkbench(TicketRequest request) {
+
+        Page<TicketResponse> page = ticketRestService.queryByOrgForWorkbench(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query ticket by user")
     @GetMapping({ "/query", "/query/user" })
     @Override
@@ -79,6 +89,16 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
     public ResponseEntity<?> queryByUid(TicketRequest request) {
         
         TicketResponse response = ticketRestService.queryByUid(request);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket by uid for ticket card drawer")
+    @GetMapping("/query/uid/card")
+    public ResponseEntity<?> queryByUidForCard(TicketRequest request) {
+
+        TicketResponse response = ticketRestService.queryByUidForCard(request);
 
         return ResponseEntity.ok(JsonResult.success(response));
     }

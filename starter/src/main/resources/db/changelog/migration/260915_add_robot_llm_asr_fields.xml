@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_ai_robot 新增机器人级语音识别（ASR）配置字段（RobotLlm embeddable）。
+        - is_asr_enabled: 是否启用语音识别（默认 false）
+        - llm_asr_provider_uid: ASR 厂商 uid（复用 LlmProvider 体系）
+        - llm_asr_model: ASR 模型（默认 paraformer-v2）
+        - llm_asr_api_key_override: 机器人级 apiKey 覆盖项（可选，回退链 provider → 组织级 → 系统级）
+        - llm_asr_language: 识别语言（默认 zh）
+    -->
+    <changeSet id="260915-1-add-robot-llm-asr-fields" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_robot"/>
+            <not>
+                <and>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="is_asr_enabled"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_asr_provider_uid"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_asr_model"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_asr_api_key_override"/>
+                    <columnExists tableName="bytedesk_ai_robot" columnName="llm_asr_language"/>
+                </and>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_robot">
+            <column name="is_asr_enabled" type="BOOLEAN" defaultValueBoolean="false" />
+            <column name="llm_asr_provider_uid" type="varchar(64)" />
+            <column name="llm_asr_model" type="varchar(128)" defaultValue="paraformer-v2" />
+            <column name="llm_asr_api_key_override" type="varchar(512)" />
+            <column name="llm_asr_language" type="varchar(16)" defaultValue="zh" />
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

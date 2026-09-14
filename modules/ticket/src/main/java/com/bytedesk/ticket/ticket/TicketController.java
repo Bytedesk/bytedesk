@@ -378,6 +378,18 @@ public class TicketController {
         return ResponseEntity.ok(JsonResult.success(activities));
     }
 
+    /**
+     * 工单卡片抽屉专用时间线：不受工单可见性限制。
+     */
+    @GetMapping("/history/timeline/card")
+    @Operation(summary = "查询工单卡片简化时间线")
+    public ResponseEntity<?> queryTicketTimelineForCard(TicketRequest request) {
+
+        List<TicketTimelineStepResponse> activities = ticketService.queryTicketTimelineForCard(request);
+
+        return ResponseEntity.ok(JsonResult.success(activities));
+    }
+
     
 
 }

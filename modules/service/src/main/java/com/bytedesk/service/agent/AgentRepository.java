@@ -47,6 +47,12 @@ public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSp
 
     Optional<AgentEntity> findByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
 
+    /**
+     * List 底层查询，用于 findByUserUidAndOrgUid 的防御性实现：
+     * 同 org 出现重复 Agent 数据时取第一条并告警，不抛 NonUniqueResultException。
+     */
+    List<AgentEntity> findAllByUserUidAndOrgUidAndDeletedFalse(String userUid, String orgUid);
+
 
     List<AgentEntity> findByDeletedFalse();
 

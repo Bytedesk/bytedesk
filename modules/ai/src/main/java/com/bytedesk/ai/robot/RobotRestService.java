@@ -211,6 +211,14 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                         llm.getAudioModel() != null ? llm.getAudioModel() : modelConfig.getDefaultVoiceModel());
             }
 
+            // 语音识别（ASR）默认值：模型默认 paraformer-v2，语言默认 zh，开关默认 false（RobotLlm 字段初始化已保证）
+            if (!StringUtils.hasText(llm.getAsrModel())) {
+                llm.setAsrModel("paraformer-v2");
+            }
+            if (!StringUtils.hasText(llm.getAsrLanguage())) {
+                llm.setAsrLanguage("zh");
+            }
+
             // Set default rerank provider and model if not provided
             if (!StringUtils.hasText(llm.getRerankProvider()) || !StringUtils.hasText(llm.getRerankModel())) {
                 llm.setRerankProvider(llm.getRerankProvider() != null ? llm.getRerankProvider()
@@ -367,7 +375,10 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
                 .avatar(userAvatar)
                 .build();
         String user = threadUser.toJson();
-        String robot = ConvertAiUtils.convertToRobotProtobufString(robotEntity);
+        // 存精简版机器人信息（uid/nickname/avatar/type/orgUid），与 createRobotThread 等既有模式一致：
+        // thread.robot/agent 仅存身份信息，完整 LLM 配置由对话管线按 uid 从数据库重载（buildRobotFromThread），
+        // 避免 prompt 等大字段灌进 thread 列（2026-09-14 列宽收敛 TEXT 决策）
+        String robot = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
         // 创建新的 ThreadEntity 并手动设置属性，而不是使用 ModelMapper
         ThreadEntity thread = ThreadEntity.builder()
                 .uid(uidUtils.getUid())
@@ -415,10 +426,14 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         } else {
             log.warn("skip provider lookup: textProviderUid is empty");
         }
-        thread.setAgent(robotProtobuf.toJson());
-        thread.setRobot(robotProtobuf.toJson());
-        thread.setUser(robotProtobuf.toJson());
-        log.info("update thread robot: {}", robotProtobuf.toJson());
+        // 仅存精简版（uid/nickname/avatar/type/orgUid）：thread 列只存身份信息，
+        // 完整 LLM 配置由对话管线按 uid 从数据库重载（buildRobotFromThread），
+        // 避免前端编辑的完整 RobotProtobuf（含 prompt/tools）灌进 thread 列（2026-09-14 列宽收敛 TEXT 决策）
+        String robotBasic = RobotProtobufBasic.fromProtobuf(robotProtobuf).toJson();
+        thread.setAgent(robotBasic);
+        thread.setRobot(robotBasic);
+        thread.setUser(robotBasic);
+        log.debug("update llm thread robot basic: threadUid={}", thread.getUid());
         //
         ThreadEntity savedThread = threadRestService.save(thread);
         if (savedThread == null) {

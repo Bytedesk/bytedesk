@@ -339,8 +339,9 @@ class AgentRestServiceTest {
 
         when(agentRepository.findByUid("agent-1")).thenReturn(Optional.of(currentAgent));
         when(memberRestService.findByUid("member-occupied")).thenReturn(Optional.of(occupiedMember));
-        when(agentRepository.findByUserUidAndOrgUidAndDeletedFalse("user-occupied", "org-1"))
-                .thenReturn(Optional.of(occupiedAgent));
+        // findByUserUidAndOrgUid 已改为 List 底层防御式实现（2026-09-14），stub 对应新查询方法
+        when(agentRepository.findAllByUserUidAndOrgUidAndDeletedFalse("user-occupied", "org-1"))
+                .thenReturn(java.util.Collections.singletonList(occupiedAgent));
 
         assertThatThrownBy(() -> agentRestService.update(request))
                 .isInstanceOf(RuntimeException.class)

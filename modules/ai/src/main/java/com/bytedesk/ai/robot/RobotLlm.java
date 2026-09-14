@@ -113,6 +113,30 @@ public class RobotLlm {
     @Column(name = "llm_audio_model")
     private String audioModel = LlmDefaults.DEFAULT_AUDIO_MODEL;
 
+    // ============ 语音识别（ASR）配置 ============
+    // 是否启用语音识别：机器人会话收到 VOICE/AUDIO 消息时，先 ASR 转文字再送大模型
+    @Builder.Default
+    @Column(name = "is_asr_enabled")
+    private Boolean asrEnabled = false;
+
+    // ASR 厂商 uid（优先复用 LlmProvider 体系，如阿里云百炼/DashScope）
+    @Column(name = "llm_asr_provider_uid")
+    private String asrProviderUid;
+
+    // ASR 模型名称（如 paraformer-v2 / fun-asr）
+    @Builder.Default
+    @Column(name = "llm_asr_model")
+    private String asrModel = "paraformer-v2";
+
+    // 机器人级 apiKey 覆盖项：不填则回退 provider.apiKey → 组织级 ASR key → 系统静态 key
+    @Column(name = "llm_asr_api_key_override", length = 512)
+    private String asrApiKeyOverride;
+
+    // 识别语言（如 zh / en / auto）
+    @Builder.Default
+    @Column(name = "llm_asr_language", length = 16)
+    private String asrLanguage = "zh";
+
     // 启用rerank
     @Builder.Default
     @Column(name = "is_rerank_enabled")
@@ -285,10 +309,10 @@ public class RobotLlm {
     @Column(name = "llm_re_reading_enabled")
     private Boolean reReadingEnabled = false;
 
-    // 多轮记忆开关。默认开启（向后兼容）。阶段3 启用 MessageChatMemoryAdvisor 时生效。
+    // 多轮记忆开关。默认关闭（向后兼容）。阶段3 启用 MessageChatMemoryAdvisor 时生效。
     @Builder.Default
     @Column(name = "llm_memory_enabled")
-    private Boolean memoryEnabled = true;
+    private Boolean memoryEnabled = false;
 
     // Query 改写开关（阶段4 RAG 增强）。默认关闭。
     // 开启后在 KB 检索前用 RewriteQueryTransformer 改写用户 query（不替代 KB 搜索）。

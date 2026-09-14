@@ -38,6 +38,28 @@ public class SseMessageHelper {
         return true;
     }
 
+    /**
+     * 发送「查询消息更新帧」：自动 ASR 转写完成后，把回填识别文本后的原消息
+     * （如 VoiceContent.text）通过当前 SSE 连接下发，前端按 uid 去重即原地更新气泡。
+     * 仅推送，不持久化（消息落库由转写链路负责）。
+     */
+    public void sendQueryMessageUpdateFrame(MessageProtobuf messageProtobufQuery, SseEmitter emitter) {
+        if (messageProtobufQuery == null) {
+            return;
+        }
+        try {
+            if (!isEmitterCompleted(emitter)) {
+                String messageJson = messageProtobufQuery.toJson();
+                notifyConsumer(emitter, messageJson);
+                emitter.send(SseEmitter.event().data(messageJson).id(messageProtobufQuery.getUid()).name("message"));
+            }
+        } catch (org.springframework.web.context.request.async.AsyncRequestNotUsableException e) {
+            log.debug("SSE connection no longer usable during query message update: {}", e.getMessage());
+        } catch (Exception e) {
+            log.error("Error sending query message update frame", e);
+        }
+    }
+
     private void notifyConsumer(SseEmitter emitter, String messageJson) {
         if (emitter instanceof SseMessageJsonConsumer consumer) {
             try {

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.service.agent.AgentGuidancePromptRequest;
 import com.bytedesk.ai.service.agent.AgentGuidancePromptResolution;
@@ -52,25 +53,34 @@ public class PromptHelper {
 
     public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, String guidanceSystemPrompt) {
+        // Spring AI 的 SystemMessage/UserMessage 不允许 null 内容，否则抛 IllegalArgumentException
+        query = query != null ? query : "";
         // 添加空值检查
         if (robot.getLlm() == null) {
-            log.error("robot.getLlm() 为 null,使用默认系统提示词");
+            log.warn("robot.getLlm() 为 null,使用默认系统提示词, robotUid={}", robot.getUid());
             List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(I18Consts.I18N_DEFAULT_SYSTEM_PROMPT));
+            messages.add(new SystemMessage(RobotConsts.resolveDefaultLlmPrompt()));
             addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
             messages.add(new UserMessage(query));
             return messages;
         }
 
+        // 兼容历史数据：@Builder.Default 仅对 builder 生效，JPA 直读数据库时 llm_prompt 列可能为 null/空
         String systemPrompt = robot.getLlm().getPrompt();
+        if (!StringUtils.hasText(systemPrompt)) {
+            log.warn("robot llm prompt 为空,使用默认系统提示词, robotUid={}", robot.getUid());
+            systemPrompt = RobotConsts.resolveDefaultLlmPrompt();
+        }
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
         // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
         // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
+        // 判空口径与 AdvisorChainFactory 保持一致（Boolean.TRUE.equals）：NULL 视为关闭记忆走手动注入，
+        // 否则存量 NULL 行会既无 advisor 又无手动历史（2026-09-14 默认值改 false 后对齐）。
         Integer contextMsgCount = robot.getLlm().getContextMsgCount();
-        boolean memoryAdvisorEnabled = !Boolean.FALSE.equals(robot.getLlm().getMemoryEnabled());
+        boolean memoryAdvisorEnabled = Boolean.TRUE.equals(robot.getLlm().getMemoryEnabled());
         if (contextMsgCount != null && contextMsgCount > 0
                 && !memoryAdvisorEnabled
                 && messageProtobufQuery != null
@@ -104,25 +114,34 @@ public class PromptHelper {
 
     public List<Message> buildMessagesForSync(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery, String guidanceSystemPrompt) {
+        // Spring AI 的 SystemMessage/UserMessage 不允许 null 内容，否则抛 IllegalArgumentException
+        query = query != null ? query : "";
         // 添加空值检查
         if (robot.getLlm() == null) {
-            log.error("robot.getLlm() 为 null,使用默认系统提示词");
+            log.warn("robot.getLlm() 为 null,使用默认系统提示词, robotUid={}", robot.getUid());
             List<Message> messages = new ArrayList<>();
-            messages.add(new SystemMessage(I18Consts.I18N_DEFAULT_SYSTEM_PROMPT));
+            messages.add(new SystemMessage(RobotConsts.resolveDefaultLlmPrompt()));
             addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
             messages.add(new UserMessage(query));
             return messages;
         }
 
+        // 兼容历史数据：@Builder.Default 仅对 builder 生效，JPA 直读数据库时 llm_prompt 列可能为 null/空
         String systemPrompt = robot.getLlm().getPrompt();
+        if (!StringUtils.hasText(systemPrompt)) {
+            log.warn("robot llm prompt 为空,使用默认系统提示词, robotUid={}", robot.getUid());
+            systemPrompt = RobotConsts.resolveDefaultLlmPrompt();
+        }
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
         // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
         // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
+        // 判空口径与 AdvisorChainFactory 保持一致（Boolean.TRUE.equals）：NULL 视为关闭记忆走手动注入，
+        // 否则存量 NULL 行会既无 advisor 又无手动历史（2026-09-14 默认值改 false 后对齐）。
         Integer contextMsgCount = robot.getLlm().getContextMsgCount();
-        boolean memoryAdvisorEnabled = !Boolean.FALSE.equals(robot.getLlm().getMemoryEnabled());
+        boolean memoryAdvisorEnabled = Boolean.TRUE.equals(robot.getLlm().getMemoryEnabled());
         if (contextMsgCount != null && contextMsgCount > 0
                 && !memoryAdvisorEnabled
                 && messageProtobufQuery != null

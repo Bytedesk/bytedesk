@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.ticket.process.ProcessRestService;
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.TicketResponse;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
@@ -81,6 +82,18 @@ public class TicketConvertUtils {
                         .ifPresent(settings -> ticketResponse.setTicketSettingsName(settings.getName()));
             } catch (Exception e) {
                 log.warn("Failed to load ticket settings name for ticket {}: {}", entity.getUid(), e.getMessage());
+            }
+        }
+        //
+        // 加载流程定义名称，便于前端直接显示（可能为 i18n key，由前端翻译），失败不影响工单主流程
+        // findByUid 带 @Cacheable(process) 缓存，列表批量转换时不会产生逐条 DB 查询
+        if (StringUtils.hasText(entity.getProcessEntityUid())) {
+            try {
+                ApplicationContextHolder.getBean(ProcessRestService.class)
+                        .findByUid(entity.getProcessEntityUid())
+                        .ifPresent(process -> ticketResponse.setProcessEntityName(process.getName()));
+            } catch (Exception e) {
+                log.warn("Failed to load process entity name for ticket {}: {}", entity.getUid(), e.getMessage());
             }
         }
         // 

@@ -148,7 +148,45 @@ public class ServiceConvertUtils {
 
     public static String convertToVisitorProtobufJSONString(VisitorRequest visitorRequest) {
         VisitorProtobuf userProtobuf = convertToVisitorProtobuf(visitorRequest);
-        return userProtobuf.toJson();
+        return guardVisitorJsonSize(userProtobuf.toJson(), null);
+    }
+
+    /**
+     * thread_user 列写入护栏（2026-09-14 规划 P1-2.3）：
+     * thread_user 合法内容为轻量访客 JSON（通常 < 1KB），列宽维持 TEXT(64KB) 不变。
+     * 当异常路径（如历史版本的关键词转人工透传设置快照）产生超大 JSON 时：
+     * 1. 超过 32KB（THREAD_USER_WARN_THRESHOLD）：先剥离 extra 字段重新序列化（extra 是已知的膨胀源）；
+     * 2. 剥离后仍超限：截断并告警——保证 INSERT 不再因列超长失败，同时暴露异常数据来源。
+     */
+    private static final int THREAD_USER_WARN_THRESHOLD = 32 * 1024;
+
+    private static final org.slf4j.Logger SERVICE_CONVERT_LOGGER = org.slf4j.LoggerFactory.getLogger(ServiceConvertUtils.class);
+
+    private static String guardVisitorJsonSize(String json, String threadUid) {
+        if (json == null || json.length() <= THREAD_USER_WARN_THRESHOLD) {
+            return json;
+        }
+        int originalLength = json.length();
+        // 剥离 extra 字段（已知膨胀源：设置快照含表单 schema 全文）
+        try {
+            VisitorProtobuf parsed = VisitorProtobuf.fromJson(json);
+            if (parsed != null) {
+                parsed.setExtra(null);
+                String stripped = parsed.toJson();
+                if (stripped.length() <= THREAD_USER_WARN_THRESHOLD) {
+                    SERVICE_CONVERT_LOGGER.warn("thread_user oversized ({} chars), stripped extra field ({} chars), threadUid={}",
+                            originalLength, stripped.length(), threadUid);
+                    return stripped;
+                }
+                String truncated = stripped.substring(0, THREAD_USER_WARN_THRESHOLD);
+                SERVICE_CONVERT_LOGGER.warn("thread_user still oversized after stripping extra ({} chars), truncated to {} chars, threadUid={}",
+                        stripped.length(), truncated.length(), threadUid);
+                return truncated;
+            }
+        } catch (Exception ex) {
+            SERVICE_CONVERT_LOGGER.warn("Failed to guard oversized thread_user json ({} chars), threadUid={}", originalLength, threadUid, ex);
+        }
+        return json;
     }
 
     public static MessageProtobuf convertToMessageProtobuf(MessageEntity lastMessage, ThreadEntity thread) {

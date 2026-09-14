@@ -20,8 +20,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
+
+import jakarta.persistence.QueryHint;
 
 public interface MessageRepository extends JpaRepository<MessageEntity, Long>, JpaSpecificationExecutor<MessageEntity> {
 
@@ -85,6 +88,17 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
     List<MessageEntity> findByThread_UidAndStatusInOrderByCreatedAtAsc(String threadUid, List<String> statuses);
 
     /**
+     * 校验指定会话中是否真实存在引用某个工单的 TICKET 卡片消息。
+     * 用于工单卡片分享的只读详情豁免：仅当查看者所在会话中确实有人发送过该工单的卡片时，
+     * 才允许其越过工单可见性设置查看该工单详情（防止伪造 threadUid 越权查看任意工单）。
+     * content 片段匹配 JSON 序列化后的 "uid":"{ticketUid}" 精确片段。
+     */
+    boolean existsByThread_UidAndTypeAndContentContainingAndDeletedFalse(
+            @Param("threadUid") String threadUid,
+            @Param("type") String type,
+            @Param("contentFragment") String contentFragment);
+
+    /**
      * 查询某客服负责的“含未回复访客消息”的会话 UID（按最早未回复消息时间升序）。
      *
      * 说明：
@@ -133,7 +147,14 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
      * 统计“访客端未读消息数”：当前会话中由客服发送且状态仍为未读（未到 READ）的消息数量。
      *
      * 注意：这里沿用 {@link MessageEntity#isUnread()} 的判定规则，即 status in (SENDING, SUCCESS, DELIVERED) 视为未读。
+     *
+     * 事务注意：本查询为 native SQL，Hibernate 执行前会自动 flush 整个持久化上下文的脏实体
+     * （JPQL 只 flush 查询涉及表的实体，native 无法判定涉及表而全量 flush）。工单创建等写事务中
+     * 调用本查询时，若上下文挂有被并发修改过的会话实体（如会话关闭自动建单场景，消息管线正并发
+     * 回写 thread），会在此处触发乐观锁冲突并回滚整个事务。因此强制 flushMode=COMMIT：
+     * 本查询不触发预 flush，脏实体留待事务提交时统一处理。
      */
+    @QueryHints(@QueryHint(name = "org.hibernate.flushMode", value = "COMMIT"))
     @Query(value = "SELECT COUNT(1) "
             + "FROM bytedesk_core_message m "
             + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        组织级配置表（KV）：存储组织级运行时配置覆盖值（TTS/ASR/OCR apiKey、
+        默认模型/音色/语言等），优先级高于系统级静态配置
+        （spring.ai.dashscope.* / DASHSCOPE_API_KEY）。
+
+        与 bytedesk_core_system_config（平台级，超管 + df_org_uid 哨兵）区别：
+        - orgUid 为各组织真实 uid，读写按登录用户组织隔离；
+        - apiKey 类 key 明文落库（与 LlmProviderEntity.apiKey 治理一致），查询接口脱敏返回。
+
+        策略（双保护，参照 260904_add_system_config_table.xml）：
+        1. 全新环境（表不存在）：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+        3. 唯一索引 (config_key, org_uid) 幂等创建。
+
+        见 docs/plans/2026-09-12-visitor-voice-asr-robot-plan.md §10
+    -->
+
+    <changeSet id="260915-create-organization-config-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_organization_config"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_core_organization_config">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_organization_config" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_organization_config_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="config_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_value" type="TEXT"/>
+            <column name="value_type" type="VARCHAR(16)" defaultValue="STRING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config_group" type="VARCHAR(32)"/>
+            <column name="display_name" type="VARCHAR(128)"/>
+            <column name="description" type="VARCHAR(512)"/>
+            <column name="visible" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- 唯一索引：config_key + org_uid（幂等） -->
+    <changeSet id="260915-add-organization-config-unique-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_organization_config"/>
+            <not>
+                <indexExists tableName="bytedesk_core_organization_config" indexName="uk_organization_config_key_org"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_organization_config_key_org" tableName="bytedesk_core_organization_config" unique="true">
+            <column name="config_key"/>
+            <column name="org_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

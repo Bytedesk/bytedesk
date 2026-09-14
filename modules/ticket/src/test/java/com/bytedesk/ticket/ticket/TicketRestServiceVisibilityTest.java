@@ -13,6 +13,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.bytedesk.core.member.MemberEntity;
@@ -41,6 +44,179 @@ class TicketRestServiceVisibilityTest {
         @AfterEach
         void clearSecurityContext() {
                 SecurityContextHolder.clearContext();
+        }
+
+        // ==================== 工单卡片分享只读豁免（canViewTicketViaSharedCard） ====================
+
+        @Test
+        void sharedCardExemptionAllowsViewWhenTicketCardExistsInSubscribedThread() {
+                // 场景：会话成员点开聊天中的工单卡片。常规可见性不通过（外部工单 DEPARTMENT_BASED 限制），
+                // 但其订阅的会话中确实存在引用该工单的 TICKET 卡片消息 → 放行只读查看
+                AuthService authService = mock(AuthService.class);
+                ThreadRestService threadRestService = mock(ThreadRestService.class);
+                MessageRepository messageRepository = mock(MessageRepository.class);
+                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository topicSubscriptionRepository = mock(
+                                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class);
+                TicketRestService service = newSharedCardService(authService, threadRestService, messageRepository,
+                                topicSubscriptionRepository);
+
+                UserEntity currentUser = buildUser("user-card-1");
+                when(authService.getUser()).thenReturn(currentUser);
+
+                com.bytedesk.core.thread.ThreadEntity sharedThread = com.bytedesk.core.thread.ThreadEntity.builder()
+                                .uid("thread-shared-1")
+                                .orgUid("org-1")
+                                .topic("org/workgroup/wg-1/thread-shared-1")
+                                .build();
+                when(threadRestService.findByUid("thread-shared-1")).thenReturn(Optional.of(sharedThread));
+                when(topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse("user-card-1",
+                                sharedThread.getTopic())).thenReturn(true);
+                when(messageRepository.existsByThread_UidAndTypeAndContentContainingAndDeletedFalse(
+                                "thread-shared-1", "TICKET", "\"uid\":\"ticket-card-1\"")).thenReturn(true);
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("ticket-card-1")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("reporter-other")
+                                .build();
+
+                assertThat(invokeCanViewTicketViaSharedCard(service, ticket, "thread-shared-1")).isTrue();
+        }
+
+        @Test
+        void sharedCardExemptionRejectsWhenThreadHasNoTicketCardMessage() {
+                // 防伪造：会话存在且用户已订阅，但会话中并没有该工单的卡片消息 → 不放行
+                AuthService authService = mock(AuthService.class);
+                ThreadRestService threadRestService = mock(ThreadRestService.class);
+                MessageRepository messageRepository = mock(MessageRepository.class);
+                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository topicSubscriptionRepository = mock(
+                                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class);
+                TicketRestService service = newSharedCardService(authService, threadRestService, messageRepository,
+                                topicSubscriptionRepository);
+
+                UserEntity currentUser = buildUser("user-card-2");
+                when(authService.getUser()).thenReturn(currentUser);
+
+                com.bytedesk.core.thread.ThreadEntity sharedThread = com.bytedesk.core.thread.ThreadEntity.builder()
+                                .uid("thread-shared-2")
+                                .orgUid("org-1")
+                                .topic("org/workgroup/wg-1/thread-shared-2")
+                                .build();
+                when(threadRestService.findByUid("thread-shared-2")).thenReturn(Optional.of(sharedThread));
+                when(topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse("user-card-2",
+                                sharedThread.getTopic())).thenReturn(true);
+                when(messageRepository.existsByThread_UidAndTypeAndContentContainingAndDeletedFalse(
+                                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                                org.mockito.ArgumentMatchers.anyString())).thenReturn(false);
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("ticket-card-2")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("reporter-other")
+                                .build();
+
+                assertThat(invokeCanViewTicketViaSharedCard(service, ticket, "thread-shared-2")).isFalse();
+        }
+
+        @Test
+        void sharedCardExemptionRejectsCrossOrgThread() {
+                // 跨组织伪造：传入的会话不属于工单所在组织 → 不放行
+                AuthService authService = mock(AuthService.class);
+                ThreadRestService threadRestService = mock(ThreadRestService.class);
+                MessageRepository messageRepository = mock(MessageRepository.class);
+                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository topicSubscriptionRepository = mock(
+                                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class);
+                TicketRestService service = newSharedCardService(authService, threadRestService, messageRepository,
+                                topicSubscriptionRepository);
+
+                UserEntity currentUser = buildUser("user-card-3");
+                when(authService.getUser()).thenReturn(currentUser);
+
+                com.bytedesk.core.thread.ThreadEntity otherOrgThread = com.bytedesk.core.thread.ThreadEntity.builder()
+                                .uid("thread-other-org")
+                                .orgUid("org-2")
+                                .topic("org-2/workgroup/wg-2/thread-other-org")
+                                .build();
+                when(threadRestService.findByUid("thread-other-org")).thenReturn(Optional.of(otherOrgThread));
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("ticket-card-3")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("reporter-other")
+                                .build();
+
+                assertThat(invokeCanViewTicketViaSharedCard(service, ticket, "thread-other-org")).isFalse();
+        }
+
+        @Test
+        void sharedCardExemptionRejectsUnsubscribedUser() {
+                // 用户未订阅该会话 → 不放行
+                AuthService authService = mock(AuthService.class);
+                ThreadRestService threadRestService = mock(ThreadRestService.class);
+                MessageRepository messageRepository = mock(MessageRepository.class);
+                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository topicSubscriptionRepository = mock(
+                                com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class);
+                TicketRestService service = newSharedCardService(authService, threadRestService, messageRepository,
+                                topicSubscriptionRepository);
+
+                UserEntity currentUser = buildUser("user-card-4");
+                when(authService.getUser()).thenReturn(currentUser);
+
+                com.bytedesk.core.thread.ThreadEntity sharedThread = com.bytedesk.core.thread.ThreadEntity.builder()
+                                .uid("thread-shared-4")
+                                .orgUid("org-1")
+                                .topic("org/workgroup/wg-1/thread-shared-4")
+                                .build();
+                when(threadRestService.findByUid("thread-shared-4")).thenReturn(Optional.of(sharedThread));
+                when(topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse("user-card-4",
+                                sharedThread.getTopic())).thenReturn(false);
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("ticket-card-4")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("reporter-other")
+                                .build();
+
+                assertThat(invokeCanViewTicketViaSharedCard(service, ticket, "thread-shared-4")).isFalse();
+        }
+
+        private static TicketRestService newSharedCardService(AuthService authService,
+                        ThreadRestService threadRestService,
+                        MessageRepository messageRepository,
+                        com.bytedesk.core.topic_subscription.TopicSubscriptionRepository topicSubscriptionRepository) {
+                return new TicketRestService(
+                                mock(TicketRepository.class),
+                                mock(TicketAttachmentRepository.class),
+                                mock(ModelMapper.class),
+                                authService,
+                                mock(UidUtils.class),
+                                threadRestService,
+                                messageRepository,
+                                topicSubscriptionRepository,
+                                mock(TicketSlaRecordRepository.class),
+                                mock(UploadRestService.class),
+                                mock(ApplicationEventPublisher.class),
+                                mock(CategoryRestService.class),
+                                mock(TicketSettingsRestService.class),
+                                mock(MemberRepository.class));
+        }
+
+        private static boolean invokeCanViewTicketViaSharedCard(TicketRestService service, TicketEntity ticket,
+                        String sharedThreadUid) {
+                try {
+                        Method method = TicketRestService.class.getDeclaredMethod("canViewTicketViaSharedCard",
+                                        TicketEntity.class, String.class);
+                        method.setAccessible(true);
+                        return (boolean) method.invoke(service, ticket, sharedThreadUid);
+                } catch (InvocationTargetException ex) {
+                        throw new RuntimeException(ex.getTargetException());
+                } catch (ReflectiveOperationException ex) {
+                        throw new RuntimeException(ex);
+                }
         }
 
         @Test
@@ -585,6 +761,205 @@ class TicketRestServiceVisibilityTest {
                 assertThat(invokeCanViewTicket(service, ticket, false)).isFalse();
         }
 
+        @Test
+        void workbenchContextRestrictsOrgAdminEvenWithForgedAdminChannel() {
+                // /query/workbench/org：组织管理员伪造 channel=WEB_ADMIN 也无特权，服务端强制受限
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newService(authService, ticketSettingsRestService, memberRepository);
+
+                UserEntity currentUser = buildUser("user-wb-admin-1");
+                currentUser.setSuperUser(Boolean.FALSE);
+                com.bytedesk.core.rbac.role.RoleEntity adminRole = com.bytedesk.core.rbac.role.RoleEntity.builder()
+                                .uid("role-admin")
+                                .name("ROLE_ADMIN")
+                                .build();
+                currentUser.setCurrentRoles(new java.util.LinkedHashSet<>(java.util.List.of(adminRole)));
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-wb-admin-1", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.INTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name())
+                                                                .build())));
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setType(TicketTypeEnum.INTERNAL.name());
+                request.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB_ADMIN.name());
+
+                invokeEnrichVisibilityContext(service, request, false);
+
+                assertThat(request.getVisibilityOrgAdmin()).isFalse();
+                assertThat(request.getVisibilityRestricted()).isTrue();
+                assertThat(request.getVisibilityMode())
+                                .isEqualTo(TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name());
+                assertThat(request.getVisibilityCurrentUserDepartmentUid()).isEqualTo("dept-design");
+        }
+
+        @Test
+        void workbenchContextRestrictsSuperUserEvenWithForgedAdminChannel() {
+                // /query/workbench/org：超级管理员伪造 channel=WEB_ADMIN 同样受限
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newService(authService, ticketSettingsRestService, memberRepository);
+
+                UserEntity currentUser = buildUser("user-wb-super-1");
+                currentUser.setSuperUser(Boolean.TRUE);
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-wb-super-1", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.INTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name())
+                                                                .build())));
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setType(TicketTypeEnum.INTERNAL.name());
+                request.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB_ADMIN.name());
+
+                invokeEnrichVisibilityContext(service, request, false);
+
+                assertThat(request.getVisibilityOrgAdmin()).isFalse();
+                assertThat(request.getVisibilityRestricted()).isTrue();
+        }
+
+        @Test
+        void workbenchContextBehavesSameAsLegacyForMember() {
+                // 普通成员：workbench 强制视角与老接口 desktop 渠道（channel=WEB）行为完全一致（等价性回归）
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newService(authService, ticketSettingsRestService, memberRepository);
+
+                UserEntity currentUser = buildUser("user-wb-member-1");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-wb-member-1", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.EXTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.EXTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_BASED.name())
+                                                                .departmentUids(List.of("dept-kefu"))
+                                                                .build())));
+
+                TicketRequest workbenchRequest = new TicketRequest();
+                workbenchRequest.setOrgUid("org-1");
+                workbenchRequest.setType(TicketTypeEnum.EXTERNAL.name());
+                workbenchRequest.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB.name());
+
+                TicketRequest legacyRequest = new TicketRequest();
+                legacyRequest.setOrgUid("org-1");
+                legacyRequest.setType(TicketTypeEnum.EXTERNAL.name());
+                legacyRequest.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB.name());
+
+                invokeEnrichVisibilityContext(service, workbenchRequest, false);
+                invokeEnrichVisibilityContextLegacy(service, legacyRequest);
+
+                assertThat(workbenchRequest.getVisibilityOrgAdmin()).isEqualTo(legacyRequest.getVisibilityOrgAdmin());
+                assertThat(workbenchRequest.getVisibilityRestricted())
+                                .isEqualTo(legacyRequest.getVisibilityRestricted());
+                assertThat(workbenchRequest.getVisibilityMode()).isEqualTo(legacyRequest.getVisibilityMode());
+                assertThat(workbenchRequest.getVisibilityCurrentUserMemberUid())
+                                .isEqualTo(legacyRequest.getVisibilityCurrentUserMemberUid());
+                assertThat(workbenchRequest.getVisibilityCurrentUserDepartmentUid())
+                                .isEqualTo(legacyRequest.getVisibilityCurrentUserDepartmentUid());
+                assertThat(workbenchRequest.getVisibilityRestricted()).isTrue();
+        }
+
+        @Test
+        void legacyContextStillGrantsOrgAdminOnAdminChannel() {
+                // 老接口 /query/org（channel=WEB_ADMIN + 组织管理员）：特权保留，全见（防回归）
+                AuthService authService = mock(AuthService.class);
+                TicketRestService service = newService(authService, mock(TicketSettingsRestService.class),
+                                mock(MemberRepository.class));
+
+                UserEntity currentUser = buildUser("user-wb-admin-2");
+                com.bytedesk.core.rbac.role.RoleEntity adminRole = com.bytedesk.core.rbac.role.RoleEntity.builder()
+                                .uid("role-admin")
+                                .name("ROLE_ADMIN")
+                                .build();
+                currentUser.setCurrentRoles(new java.util.LinkedHashSet<>(java.util.List.of(adminRole)));
+                when(authService.getUser()).thenReturn(currentUser);
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB_ADMIN.name());
+
+                invokeEnrichVisibilityContextLegacy(service, request);
+
+                assertThat(request.getVisibilityOrgAdmin()).isTrue();
+                assertThat(request.getVisibilityRestricted()).isFalse();
+                assertThat(request.getVisibilityMode()).isEqualTo(TicketVisibilityModeEnum.ORG_WIDE.name());
+        }
+
+        @Test
+        void legacyContextStillRestrictsMemberWithForgedAdminChannel() {
+                // 普通成员伪造 channel=WEB_ADMIN 调老接口：无管理员角色 → 仍受限（现状行为保持）
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newService(authService, ticketSettingsRestService, memberRepository);
+
+                UserEntity currentUser = buildUser("user-wb-member-2");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-wb-member-2", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.INTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name())
+                                                                .build())));
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setType(TicketTypeEnum.INTERNAL.name());
+                request.setChannel(com.bytedesk.core.enums.ChannelEnum.WEB_ADMIN.name());
+
+                invokeEnrichVisibilityContextLegacy(service, request);
+
+                assertThat(request.getVisibilityOrgAdmin()).isFalse();
+                assertThat(request.getVisibilityRestricted()).isTrue();
+        }
+
+        @Test
+        void queryByOrgForWorkbenchNeutralizesSuperUserParam() {
+                // /query/workbench/org：伪造 superUser=true 被归零，不放开组织查询范围
+                AuthService authService = mock(AuthService.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                TicketRestService service = new TicketRestService(
+                                ticketRepository,
+                                mock(TicketAttachmentRepository.class),
+                                mock(ModelMapper.class),
+                                authService,
+                                mock(UidUtils.class),
+                                mock(ThreadRestService.class),
+                                mock(MessageRepository.class),
+                                mock(com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class),
+                                mock(TicketSlaRecordRepository.class),
+                                mock(UploadRestService.class),
+                                mock(ApplicationEventPublisher.class),
+                                mock(CategoryRestService.class),
+                                mock(TicketSettingsRestService.class),
+                                mock(MemberRepository.class));
+                when(authService.getUser()).thenReturn(null);
+                when(ticketRepository.findAll(org.mockito.ArgumentMatchers.<Specification<TicketEntity>>any(),
+                                org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(Page.empty());
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setSuperUser(Boolean.TRUE);
+
+                service.queryByOrgForWorkbench(request);
+
+                assertThat(request.getSuperUser()).isFalse();
+        }
+
         private static TicketRestService newService(AuthService authService,
                         TicketSettingsRestService ticketSettingsRestService,
                         MemberRepository memberRepository) {
@@ -596,6 +971,7 @@ class TicketRestServiceVisibilityTest {
                                 mock(UidUtils.class),
                                 mock(ThreadRestService.class),
                                 mock(MessageRepository.class),
+                                mock(com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class),
                                 mock(TicketSlaRecordRepository.class),
                                 mock(UploadRestService.class),
                                 mock(ApplicationEventPublisher.class),
@@ -634,6 +1010,33 @@ class TicketRestServiceVisibilityTest {
 
         private static TicketSettingsEntity buildSettings(TicketVisibilitySettingsData data) {
                 return buildSettings(TicketTypeEnum.INTERNAL, data);
+        }
+
+        private static void invokeEnrichVisibilityContext(TicketRestService service, TicketRequest request,
+                        boolean allowAdminPrivilege) {
+                try {
+                        Method method = TicketRestService.class.getDeclaredMethod("enrichVisibilityContext",
+                                        TicketRequest.class, boolean.class);
+                        method.setAccessible(true);
+                        method.invoke(service, request, allowAdminPrivilege);
+                } catch (InvocationTargetException ex) {
+                        throw new RuntimeException(ex.getTargetException());
+                } catch (ReflectiveOperationException ex) {
+                        throw new RuntimeException(ex);
+                }
+        }
+
+        private static void invokeEnrichVisibilityContextLegacy(TicketRestService service, TicketRequest request) {
+                try {
+                        Method method = TicketRestService.class.getDeclaredMethod("enrichVisibilityContext",
+                                        TicketRequest.class);
+                        method.setAccessible(true);
+                        method.invoke(service, request);
+                } catch (InvocationTargetException ex) {
+                        throw new RuntimeException(ex.getTargetException());
+                } catch (ReflectiveOperationException ex) {
+                        throw new RuntimeException(ex);
+                }
         }
 
         private static boolean invokeCanViewTicket(TicketRestService service, TicketEntity ticket) {

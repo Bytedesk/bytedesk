@@ -26,6 +26,7 @@ import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadTransferStatusEnum;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.service.visitor.VisitorProtobuf;
 import com.bytedesk.service.visitor.VisitorRequest;
 import com.bytedesk.service.visitor.VisitorRestService;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -228,6 +229,55 @@ public class RobotToAgentKeywordListener {
             log.info("Triggered robot-to-agent transfer for thread {} due to keyword match", thread.getUid());
         } catch (Exception ex) {
             log.error("Failed to trigger robot-to-agent transfer for thread {}", thread.getUid(), ex);
+            rollbackKeywordTransfer(thread, message);
+        }
+    }
+
+    /**
+     * 转人工失败后的补偿回滚：
+     * - 会话若仍停留在 QUEUING（未真正入队）则回退 ROBOTING，transferStatus 还原 NONE，访客可继续与机器人对话并再次触发转人工；
+     * - 回滚触发消息的 agentReplied 标记，避免访客消息被误标「已回复」；
+     * - 清理内存态挂起标记，避免后续 MessageCreateEvent 再次补标。
+     */
+    private void rollbackKeywordTransfer(ThreadEntity thread, MessageResponse message) {
+        if (thread == null || !StringUtils.hasText(thread.getUid())) {
+            return;
+        }
+        try {
+            threadRestService.findByUid(thread.getUid()).ifPresent(latest -> {
+                boolean statusRolledBack = false;
+                if (latest.isQueuing() && !hasAgentAssigned(latest)) {
+                    latest.setRoboting();
+                    latest.setTransferStatus(ThreadTransferStatusEnum.NONE.name());
+                    threadRestService.save(latest);
+                    statusRolledBack = true;
+                    log.warn("Rolled back keyword transfer failure: thread {} restored to ROBOTING", latest.getUid());
+                }
+                if (!statusRolledBack) {
+                    log.warn("Keyword transfer failed but thread {} state already advanced (status={}, agent assigned={}), skip rollback",
+                            latest.getUid(), latest.getStatus(), hasAgentAssigned(latest));
+                }
+            });
+        } catch (Exception rollbackEx) {
+            log.warn("Failed to rollback thread state after keyword transfer failure, threadUid={}", thread.getUid(), rollbackEx);
+        }
+
+        if (message == null || !StringUtils.hasText(message.getUid())) {
+            return;
+        }
+        pendingKeywordReplyMarks.remove(message.getUid());
+        try {
+            messageRestService.findByUid(message.getUid()).ifPresent(entity -> {
+                if (Boolean.TRUE.equals(entity.getAgentReplied())) {
+                    entity.setAgentReplied(false);
+                    entity.setAgentRepliedAt(null);
+                    entity.setAgentRepliedByUid(null);
+                    messageRestService.save(entity);
+                    log.debug("Rolled back agentReplied mark for keyword transfer message {}", entity.getUid());
+                }
+            });
+        } catch (Exception markEx) {
+            log.warn("Failed to rollback agentReplied mark for message {}", message.getUid(), markEx);
         }
     }
 
@@ -315,22 +365,61 @@ public class RobotToAgentKeywordListener {
 
     private VisitorRequest buildVisitorRequest(ThreadEntity thread, WorkgroupEntity workgroup, MessageResponse message) {
         UserProtobuf visitor = resolveVisitor(thread, message);
-        VisitorRequest visitorRequest = VisitorRequest.builder()
+        // 身份口径拆分：visitorUid 必须与首次建会话 resolveVisitorUidForThreadTopic 同源（外部稳定 ID），
+        // 否则转人工会因 topic 后缀不同而新建重复会话，无法复用机器人会话。
+        String visitorUid = resolveVisitorUidForTopic(thread, visitor);
+        VisitorRequest.VisitorRequestBuilder<?, ?> builder = VisitorRequest.builder()
             .uid(visitor != null ? visitor.getUid() : null)
             .userUid(visitor != null ? visitor.getUid() : null)
-            .visitorUid(visitor != null ? visitor.getUid() : null)
+            .visitorUid(visitorUid)
             .nickname(visitor != null ? visitor.getNickname() : null)
             .avatar(visitor != null ? visitor.getAvatar() : null)
             .orgUid(thread.getOrgUid())
             .channel(thread.getChannel())
-            .sid(workgroup.getUid())
-            // .lang(visitor != null ? visitor.getLanguage() : null)
-            .extra(thread.getExtra())
-            .build();
+            .sid(workgroup.getUid());
+        // 仅社交渠道透传源会话 extra（下游 buildWorkgroupExtra 对社交渠道直接使用请求 extra）；
+        // 普通渠道不透传，避免设置快照（含表单 schema 全文）灌进 thread_user/visitor.extra 造成超长与递归膨胀
+        if (isSocialChannel(thread.getChannel())) {
+            builder.extra(thread.getExtra());
+        }
+        VisitorRequest visitorRequest = builder.build();
         visitorRequest.setWorkgroupType();
-        // visitorRequest.setIp(visitor != null ? visitor.getIp() : null);
-        // visitorRequest.setIpLocation(visitor != null ? visitor.getIpLocation() : null);
         return visitorRequest;
+    }
+
+    /**
+     * 解析与首次建会话同源的访客标识（用于 topic 匹配复用）。
+     * 优先级：thread.user 中 VisitorProtobuf.visitorUid → topic 后缀 → 消息发送者 uid。
+     */
+    private String resolveVisitorUidForTopic(ThreadEntity thread, UserProtobuf fallbackVisitor) {
+        String visitorJson = thread.getUser();
+        if (StringUtils.hasText(visitorJson) && !EMPTY_JSON.equals(visitorJson)) {
+            try {
+                VisitorProtobuf visitorProto = VisitorProtobuf.fromJson(visitorJson);
+                if (visitorProto != null && StringUtils.hasText(visitorProto.getVisitorUid())) {
+                    return visitorProto.getVisitorUid();
+                }
+            } catch (Exception ex) {
+                log.debug("Failed to parse visitorUid from thread.user for thread {}", thread.getUid(), ex);
+            }
+        }
+        String topic = thread.getTopic();
+        if (StringUtils.hasText(topic)) {
+            int lastSlash = topic.lastIndexOf('/');
+            if (lastSlash >= 0 && lastSlash + 1 < topic.length()) {
+                return topic.substring(lastSlash + 1);
+            }
+        }
+        return fallbackVisitor != null ? fallbackVisitor.getUid() : null;
+    }
+
+    private boolean isSocialChannel(String channel) {
+        if (!StringUtils.hasText(channel)) {
+            return false;
+        }
+        String lower = channel.toLowerCase(Locale.ROOT);
+        return lower.contains("wechat") || lower.contains("messenger") || lower.contains("telegram")
+                || lower.contains("whatsapp");
     }
 
     private UserProtobuf resolveVisitor(ThreadEntity thread, MessageResponse message) {

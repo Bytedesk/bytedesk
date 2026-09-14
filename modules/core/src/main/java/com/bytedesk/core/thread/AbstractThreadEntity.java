@@ -149,7 +149,8 @@ public abstract class AbstractThreadEntity extends BaseEntity {
      * 群组会话中，存储群组信息
      * 注意：h2 db 不能使用 user, 所以重定义为 thread_user
      * @{UserProtobuf}
-     * 注意：LLM 会话会写入完整 RobotProtobuf JSON（含 llm.prompt 等大字段），需使用 TEXT 类型
+     * 注意：仅存身份快照（正常 < 1KB），完整配置按 uid 从数据库重载；
+     * 列宽维持 TEXT(64KB)，勿写入大字段（2026-09-14 决策）
      */
     @Builder.Default
     @Column(name = "thread_user", columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -157,14 +158,14 @@ public abstract class AbstractThreadEntity extends BaseEntity {
 
     /**
      * 一对一客服对话中，存储客服信息
-     * LLM 会话中存储完整 RobotProtobuf JSON（含 llm 配置），需使用 TEXT 类型
+     * LLM 会话中存精简机器人信息（RobotProtobufBasic）
      * @{UserProtobuf}
      */
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String agent = BytedeskConsts.EMPTY_JSON_STRING;
 
-    // 机器人对话中，存储机器人信息，LLM 会话写入完整 RobotProtobuf JSON，需使用 TEXT 类型
+    // 机器人对话中，存储机器人精简信息（RobotProtobufBasic，完整 LLM 配置按 uid 从数据库重载）
     @Builder.Default
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
     private String robot = BytedeskConsts.EMPTY_JSON_STRING;

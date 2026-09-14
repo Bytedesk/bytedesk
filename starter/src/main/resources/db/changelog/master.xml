@@ -40,6 +40,8 @@
 
     <include file="db/changelog/migration/260817_widen_core_thread_json_columns.xml" />
 
+    <include file="db/changelog/migration/260914_narrow_core_thread_json_columns_to_text.xml" />
+
     <include file="db/changelog/migration/260823_add_wechat_work_contact_tables.xml" />
 
     <include file="db/changelog/migration/260829_widen_core_notification_content.xml" />
@@ -54,5 +56,11 @@
     <include file="db/changelog/migration/260908_disable_robot_tools_by_default.xml" />
 
     <include file="db/changelog/migration/260909_add_ticket_auto_create_time_window_fields.xml" />
+
+    <include file="db/changelog/migration/260914_disable_robot_memory_by_default.xml" />
+
+    <include file="db/changelog/migration/260915_add_robot_llm_asr_fields.xml" />
+
+    <include file="db/changelog/migration/260915_add_organization_config_table.xml" />
 
 </databaseChangeLog>

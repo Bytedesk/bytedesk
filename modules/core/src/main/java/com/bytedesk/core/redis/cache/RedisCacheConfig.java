@@ -90,6 +90,8 @@ public class RedisCacheConfig implements CachingConfigurer {
         cacheConfigurations.put("platformSettings", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
         // 系统全局配置缓存 - 30分钟过期（品牌/协议等 KV 覆盖值，保存后逐次失效）
         cacheConfigurations.put("system_config", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
+        // 组织级配置缓存 - 30分钟过期（TTS/ASR/OCR apiKey 等 KV 覆盖值，保存后逐次失效）
+        cacheConfigurations.put("organization_config", defaultCacheConfiguration().entryTtl(Duration.ofMinutes(30)));
         // 会话缓存 - 4小时过期
         // cacheConfigurations.put("token", defaultCacheConfiguration().entryTtl(Duration.ofHours(24)));
         // 

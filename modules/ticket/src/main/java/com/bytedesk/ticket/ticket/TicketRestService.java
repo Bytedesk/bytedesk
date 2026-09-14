@@ -54,6 +54,7 @@ import com.bytedesk.core.rbac.user.UserDetailsImpl;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.message.MessageRepository;
+import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -61,6 +62,7 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
+import com.bytedesk.core.topic_subscription.TopicSubscriptionRepository;
 import com.bytedesk.core.utils.Utils;
 import com.bytedesk.service.form.FormEntity;
 import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
@@ -105,6 +107,8 @@ public class TicketRestService
 
     private final MessageRepository messageRepository;
 
+    private final TopicSubscriptionRepository topicSubscriptionRepository;
+
     private final TicketSlaRecordRepository ticketSlaRecordRepository;
 
     private final UploadRestService uploadRestService;
@@ -139,6 +143,32 @@ public class TicketRestService
         return page.map(this::convertToResponse);
     }
 
+    /**
+     * 客服工作台专用查询（desktop TicketInternalList / TicketHistory）。
+     * 服务端强制客服工作台视角：无视请求 channel 与调用者角色，
+     * 组织管理员/超级管理员同样按 ticketsettings 可见性设置过滤；
+     * 同时防御性屏蔽 superUser 参数，禁止以此放开组织查询范围。
+     * 管理后台全见特权请使用 /query/org（channel=WEB_ADMIN）。
+     */
+    public Page<TicketResponse> queryByOrgForWorkbench(TicketRequest request) {
+        bindCurrentUserScope(request);
+        if (!StringUtils.hasText(request.getUserUid())) {
+            String reporterUid = resolveReporterUid(request);
+            if (StringUtils.hasText(reporterUid)) {
+                request.setUserUid(reporterUid);
+            }
+        }
+        // 工作台无平台视角：防御性屏蔽 superUser 参数（防伪造放开组织范围）
+        request.setSuperUser(Boolean.FALSE);
+        enrichVisibilityContext(request, false);
+        Pageable pageable = request.getPageable();
+        // 不走 createSpecification：其内部会按渠道重新 enrichVisibilityContext，
+        // 伪造 channel=WEB_ADMIN 会重新获得管理员特权，这里直接构建查询规格
+        Specification<TicketEntity> spec = TicketSpecification.search(request, authService);
+        Page<TicketEntity> page = executePageQuery(spec, pageable);
+        return page.map(this::convertToResponse);
+    }
+
     @Override
     public Page<TicketResponse> queryByUser(TicketRequest request) {
         bindCurrentUserScope(request);
@@ -163,7 +193,28 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
-        assertTicketVisible(ticket, isAdminChannelRequest(request));
+        // 常规可见性校验通过后直接返回；未通过时尝试工单卡片分享只读豁免
+        // （查看者所在会话中确实存在该工单的卡片消息时，放行详情查看）
+        assertTicketVisibleOrSharedCard(ticket, isAdminChannelRequest(request), request.getThreadUid());
+        return convertToResponse(ticket);
+    }
+
+    /**
+     * 工单卡片详情专用只读查询：
+     * 不受 ticketsettings 可见性限制，仅要求工单存在且组织匹配。
+     * 用于 desktop 会话中的 TicketDetailDrawer 查看卡片详情，
+     * 避免不同账号因工单可见性差异看到残缺快照。
+     */
+    public TicketResponse queryByUidForCard(TicketRequest request) {
+        bindCurrentUserScope(request);
+        Optional<TicketEntity> ticketOptional = findByUid(request.getUid());
+        if (!ticketOptional.isPresent()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
+            throw new NotFoundException("ticket not found");
+        }
         return convertToResponse(ticket);
     }
 
@@ -487,7 +538,10 @@ public class TicketRestService
 
         // 优先用前端传入的 threadUid 绑定已有会话
         if (StringUtils.hasText(ticket.getThreadUid())) {
-            Optional<ThreadEntity> existingByUid = threadRestService.findByUid(ticket.getThreadUid());
+            // 只读独立事务加载游离实体：绑定会话仅需 uid/topic，避免源会话
+            // （如自动建单场景下刚关闭的访客会话，正被消息管线并发回写）
+            // 进入本创建事务的持久化上下文后，flush 时因版本冲突导致整个建单回滚
+            Optional<ThreadEntity> existingByUid = threadRestService.findByUidReadOnly(ticket.getThreadUid());
             if (existingByUid.isPresent()) {
                 return existingByUid.get();
             }
@@ -746,6 +800,15 @@ public class TicketRestService
     }
 
     private void enrichVisibilityContext(TicketRequest request) {
+        enrichVisibilityContext(request, isAdminChannelRequest(request));
+    }
+
+    /**
+     * allowAdminPrivilege=false：客服工作台视角（/query/workbench/org 专用），
+     * 服务端强制，无视请求 channel 与调用者角色，一律按可见性设置过滤；
+     * allowAdminPrivilege=true：管理后台视角（channel=WEB_ADMIN），行为与历史版本一致。
+     */
+    private void enrichVisibilityContext(TicketRequest request, boolean allowAdminPrivilege) {
         if (request == null || !StringUtils.hasText(request.getOrgUid())) {
             return;
         }
@@ -772,17 +835,17 @@ public class TicketRestService
             request.setType(TicketTypeEnum.fromValue(request.getType()).name());
         }
 
-        if (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser)) {
-            if (isAdminChannelRequest(request)) {
-                // 管理后台（channel=WEB_ADMIN）：组织管理员/超级管理员不做可见性过滤，查看组织全部数据；
-                // superUser=true 时由查询规格进一步放开组织范围，查看平台所有数据
-                request.setVisibilityOrgAdmin(true);
-                request.setVisibilityRestricted(false);
-                request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
-                return;
-            }
-            // 客服工作台（desktop/mobile 等）：管理员无特权，与普通成员一样按可见性设置过滤
+        if (allowAdminPrivilege && (Boolean.TRUE.equals(currentUser.isSuperUser())
+                || hasOrgAdminRole(currentUser))) {
+            // 管理后台（channel=WEB_ADMIN）：组织管理员/超级管理员不做可见性过滤，查看组织全部数据；
+            // superUser=true 时由查询规格进一步放开组织范围，查看平台所有数据
+            // （/query/workbench/org 传入 allowAdminPrivilege=false，管理员同样受限）
+            request.setVisibilityOrgAdmin(true);
+            request.setVisibilityRestricted(false);
+            request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
+            return;
         }
+        // 客服工作台（desktop/mobile 等）：管理员无特权，与普通成员一样按可见性设置过滤
         request.setVisibilityOrgAdmin(false);
         memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), request.getOrgUid())
                 .ifPresent(member -> {
@@ -940,6 +1003,59 @@ public class TicketRestService
         if (!canViewTicket(ticket, adminPrivilege)) {
             throw new NotFoundException("ticket not found");
         }
+    }
+
+    /**
+     * 工单卡片分享只读豁免：常规可见性未通过时，若查看者订阅的会话中
+     * 确实存在引用该工单的 TICKET 卡片消息，则放行只读详情查看。
+     * <p>
+     * 场景：客服把工单卡片发送到会话中分享，会话成员点开卡片查看详情时，
+     * 不应被工单可见性设置拦截（列表可见性过滤保持不变，此处仅为只读豁免，
+     * 不放开工作流操作等写路径）。
+     */
+    public void assertTicketVisibleOrSharedCard(TicketEntity ticket, boolean adminPrivilege, String sharedThreadUid) {
+        if (canViewTicket(ticket, adminPrivilege)) {
+            return;
+        }
+        if (canViewTicketViaSharedCard(ticket, sharedThreadUid)) {
+            return;
+        }
+        throw new NotFoundException("ticket not found");
+    }
+
+    /**
+     * 判定当前用户是否可通过“工单卡片分享”查看工单：
+     * 1. 指定了卡片所在会话 uid（sharedThreadUid）且该会话存在；
+     * 2. 会话与工单属于同一组织（防止跨组织伪造）；
+     * 3. 当前用户订阅了该会话；
+     * 4. 该会话中确实存在引用此工单的 TICKET 卡片消息（防止伪造 threadUid 越权查看任意工单）。
+     */
+    private boolean canViewTicketViaSharedCard(TicketEntity ticket, String sharedThreadUid) {
+        if (ticket == null || !StringUtils.hasText(sharedThreadUid) || !StringUtils.hasText(ticket.getUid())) {
+            return false;
+        }
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            return false;
+        }
+        if (isVisitorPrincipal()) {
+            return false;
+        }
+        Optional<ThreadEntity> threadOptional = threadRestService.findByUid(sharedThreadUid);
+        if (threadOptional.isEmpty()) {
+            return false;
+        }
+        ThreadEntity thread = threadOptional.get();
+        if (!ticket.getOrgUid().equals(thread.getOrgUid())) {
+            return false;
+        }
+        if (!topicSubscriptionRepository.existsByUserUidAndTopicAndDeletedFalse(currentUser.getUid(), thread.getTopic())) {
+            return false;
+        }
+        return messageRepository.existsByThread_UidAndTypeAndContentContainingAndDeletedFalse(
+                sharedThreadUid,
+                MessageTypeEnum.TICKET.name(),
+                "\"uid\":\"" + ticket.getUid() + "\"");
     }
 
     public void assertTicketVisibleIfAuthenticated(TicketEntity ticket) {

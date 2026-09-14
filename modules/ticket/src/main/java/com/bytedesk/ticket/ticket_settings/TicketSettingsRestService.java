@@ -1021,7 +1021,7 @@ public class TicketSettingsRestService extends
                 ? new ArrayList<>()
                 : request.getDepartmentUids().stream()
                         .filter(StringUtils::hasText)
-                        .map(String::trim)
+                        .map(s -> s.trim())
                         .distinct()
                         .collect(Collectors.toList());
         List<TicketVisibilityCategoryRuleRequest> categoryRules = request.getCategoryRules() == null
