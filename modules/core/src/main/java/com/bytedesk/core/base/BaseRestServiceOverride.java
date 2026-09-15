@@ -15,9 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
-import org.springframework.retry.annotation.Retryable;
 
 import com.bytedesk.core.rbac.auth.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -108,34 +105,51 @@ public abstract class BaseRestServiceOverride<T, TRequest extends PageableReques
     }
 
     /**
-     * 保存实体，带重试机制
+     * 乐观锁重试次数（含首次尝试），与原 @Retryable(maxAttempts = 3) 保持一致
      */
-    @Retryable(
-        retryFor = ObjectOptimisticLockingFailureException.class,
-        maxAttempts = 3,
-        backoff = @Backoff(delay = 100, multiplier = 2)
-    )
+    private static final int SAVE_MAX_ATTEMPTS = 3;
+
+    /**
+     * 重试退避基础时间（毫秒），按尝试次数线性递增：100ms、200ms，
+     * 与原 @Backoff(delay = 100, multiplier = 2) 行为一致
+     */
+    private static final long SAVE_RETRY_BACKOFF_BASE_MS = 100L;
+
+    /**
+     * 保存实体，带乐观锁冲突重试机制。
+     *
+     * 说明：此前使用 spring-retry 的 @Retryable/@Recover 实现，但泛型基类
+     * save(T) 的返回类型为 TypeVariable（擦除后为 Object），spring-retry 2.0.x
+     * 的恢复方法返回类型匹配在泛型擦除场景下无法命中 @Recover 方法，重试耗尽后
+     * 直接抛出 ExhaustedRetryException: Cannot locate recovery method
+     * （生产 P1 问题根因）。因此改为自实现重试循环：耗尽后调用子类
+     * handleOptimisticLockingFailureException 恢复钩子，两个基类一次性修复全部子类。
+     */
     public T save(T entity) {
-        try {
-            return doSave(entity);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            throw e; // 抛出异常以触发重试机制
+        ObjectOptimisticLockingFailureException lastException = null;
+        for (int attempt = 1; attempt <= SAVE_MAX_ATTEMPTS; attempt++) {
+            try {
+                return doSave(entity);
+            } catch (ObjectOptimisticLockingFailureException e) {
+                lastException = e;
+                if (attempt < SAVE_MAX_ATTEMPTS) {
+                    try {
+                        Thread.sleep(SAVE_RETRY_BACKOFF_BASE_MS * attempt);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            }
         }
+        // 重试耗尽（或线程被中断）：落入子类乐观锁恢复钩子，避免直接向调用方抛出异常
+        return handleOptimisticLockingFailureException(lastException, entity);
     }
-    
+
     /**
      * 子类实现具体的保存逻辑
      */
     protected abstract T doSave(T entity);
-    
-    /**
-     * 重试恢复方法
-     */
-    @Recover
-    public T recover(ObjectOptimisticLockingFailureException e, T entity) {
-        // 调用子类实现的处理方法
-        return handleOptimisticLockingFailureException(e, entity);
-    }
 
     public void deleteByOrgUid(String orgUid) {
         // 默认实现，子类可以覆盖

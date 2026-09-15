@@ -92,32 +92,42 @@ public class PasswordCryptoUtils {
             throw new IllegalArgumentException("盐值不能为空");
         }
 
+        // P5：解密前对密文做格式预检，非法载荷尽早拒绝，
+        // 避免后续产生看似底层加密故障的告警噪音
+        byte[] encryptedBytes;
+        try {
+            encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid hash login payload: base64 decode failed");
+            throw new IllegalArgumentException("非法 hash 登录载荷（Base64 解码失败）", e);
+        }
+        if (encryptedBytes.length == 0 || encryptedBytes.length % 16 != 0) {
+            log.warn("Invalid hash login payload: not AES block aligned, encryptedLength={}", encryptedBytes.length);
+            throw new IllegalArgumentException("非法 hash 登录载荷（密文长度非 AES 块对齐）");
+        }
+
         try {
             // 使用盐值生成固定长度的密钥（与前端保持一致）
             String key = generateKeyFromSalt(salt);
-            
+
             // Avoid logging secrets (encrypted payload/salt/key). Keep only safe diagnostics.
             log.debug("解密参数: encryptedPassword长度={}, salt长度={}", encryptedPassword.length(), salt.length());
-            
+
             // 创建密钥规范
             SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), ALGORITHM);
-            
+
             // 创建解密器
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            
-            // 解码Base64
-            byte[] encryptedBytes = Base64.getDecoder().decode(encryptedPassword);
 
             log.debug("Base64解码后数据长度: {}", encryptedBytes.length);
 
-            // 解密
+            // 解密：AES/ECB/PKCS5Padding 模式下 doFinal 已完成去填充，
+            // 不再做二次 removePKCS7Padding（旧实现对明文末字节的误判是
+            // "Invalid PKCS7 padding length" 告警噪音的来源）
             byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
 
-            // 手动去除PKCS7填充
-            byte[] unpaddedBytes = removePKCS7Padding(decryptedBytes);
-
-            String decryptedPassword = new String(unpaddedBytes, StandardCharsets.UTF_8);
+            String decryptedPassword = new String(decryptedBytes, StandardCharsets.UTF_8);
 
             if (decryptedPassword.isEmpty()) {
                 throw new RuntimeException(I18Consts.I18N_PASSWORD_DECRYPT_KEY_INVALID);
@@ -184,43 +194,5 @@ public class PasswordCryptoUtils {
             log.error("加密解密验证失败", e);
             return false;
         }
-    }
-
-    /**
-     * 去除PKCS7填充
-     * @param paddedData 包含填充的数据
-     * @return 去除填充后的数据
-     */
-    private static byte[] removePKCS7Padding(byte[] paddedData) {
-        if (paddedData == null || paddedData.length == 0) {
-            return paddedData;
-        }
-
-        // 获取填充长度（最后一个字节的值）
-        int paddingLength = paddedData[paddedData.length - 1] & 0xFF;
-
-        // 验证填充
-        if (paddingLength < 1 || paddingLength > 16) {
-            // 无效的填充长度，返回原数据
-            log.warn("Invalid PKCS7 padding length: {}", paddingLength);
-            return paddedData;
-        }
-
-        // 验证所有填充字节都正确
-        for (int i = 1; i <= paddingLength; i++) {
-            if ((paddedData[paddedData.length - i] & 0xFF) != paddingLength) {
-                // 填充不正确，返回原数据
-                log.warn("Invalid PKCS7 padding");
-                return paddedData;
-            }
-        }
-
-        // 去除填充
-        byte[] unpadded = new byte[paddedData.length - paddingLength];
-        System.arraycopy(paddedData, 0, unpadded, 0, unpadded.length);
-
-        log.debug("Removed PKCS7 padding: {} -> {} bytes", paddedData.length, unpadded.length);
-
-        return unpadded;
     }
 }

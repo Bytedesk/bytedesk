@@ -31,25 +31,28 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
     boolean existsByUid(String uid);
 
+    // P2：未读消息去 ThreadEntity 关联后，thread 维度查询全部改走 thread_topic 标量列，
+    // 不再 join thread 表；历史数据由 Liquibase 变更集回填
+
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("DELETE FROM MessageUnreadEntity mu WHERE mu.thread.topic LIKE CONCAT('%', :threadTopic, '%') AND mu.user NOT LIKE CONCAT('%', :userUid, '%')")
+    @Query("DELETE FROM MessageUnreadEntity mu WHERE mu.threadTopic LIKE CONCAT('%', :threadTopic, '%') AND mu.user NOT LIKE CONCAT('%', :userUid, '%')")
     int deleteByThreadTopicContainsAndUserNotContains(@Param("threadTopic") String threadTopic, @Param("userUid") String userUid);
 
-        @Query("SELECT COUNT(mu) FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        @Query("SELECT COUNT(mu) FROM MessageUnreadEntity mu WHERE mu.threadTopic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
         long countByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
             @Param("threadTopic") String threadTopic,
             @Param("orgUid") String orgUid,
             @Param("userUid") String userUid);
 
-        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false ORDER BY mu.createdAt ASC")
+        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.threadTopic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false ORDER BY mu.createdAt ASC")
         Page<MessageUnreadEntity> findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
             @Param("threadTopic") String threadTopic,
             @Param("orgUid") String orgUid,
             @Param("userUid") String userUid,
             Pageable pageable);
 
-        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        @Query("SELECT mu FROM MessageUnreadEntity mu WHERE mu.threadTopic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
         List<MessageUnreadEntity> findByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
             @Param("threadTopic") String threadTopic,
             @Param("orgUid") String orgUid,
@@ -57,7 +60,7 @@ public interface MessageUnreadRepository extends JpaRepository<MessageUnreadEnti
 
         @Transactional
         @Modifying(clearAutomatically = true, flushAutomatically = true)
-        @Query("UPDATE MessageUnreadEntity mu SET mu.deleted = true WHERE mu.thread.topic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
+        @Query("UPDATE MessageUnreadEntity mu SET mu.deleted = true WHERE mu.threadTopic = :threadTopic AND mu.orgUid = :orgUid AND mu.userUid <> :userUid AND mu.deleted = false")
         int softDeleteByThreadTopicAndOrgUidAndUserUidNotAndDeletedFalse(
             @Param("threadTopic") String threadTopic,
             @Param("orgUid") String orgUid,

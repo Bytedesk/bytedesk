@@ -48,6 +48,9 @@ public class RedisConsts {
     // 转接超时相关常量
     public static final String TRANSFER_TIMEOUT_PREFIX = BYTEDESK_REDIS_PREFIX + "transfer:timeout:";
 
+    // 邀请超时相关常量
+    public static final String INVITE_TIMEOUT_PREFIX = BYTEDESK_REDIS_PREFIX + "invite:timeout:";
+
     // Redis监听频道相关常量
     public static final String REDIS_KEYEVENT_EXPIRED_CHANNEL = "__keyevent@0__:expired";
     public static final String REDIS_KEYEVENT_EXPIRED_PATTERN = "__keyevent@*__:expired";

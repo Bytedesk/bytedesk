@@ -13,6 +13,9 @@
  */
 package com.bytedesk.core.thread;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.modelmapper.ModelMapper;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -90,10 +93,11 @@ public class ThreadConvertUtils {
         if (thread.getInvites() != null) {
             // 清空列表，防止modelMapper自动映射产生的空对象
             threadResponse.getInvites().clear();
+            Set<String> inviteUids = new HashSet<>();
             // 将string[]为UserProtobuf[]，并存入threadResponse.setInvites()中
             for (String invite : thread.getInvites()) {
                 UserProtobuf inviteUser = UserProtobuf.fromJson(invite);
-                if (inviteUser != null) {
+                if (inviteUser != null && inviteUser.getUid() != null && inviteUids.add(inviteUser.getUid())) {
                     threadResponse.getInvites().add(inviteUser);
                 }
             }

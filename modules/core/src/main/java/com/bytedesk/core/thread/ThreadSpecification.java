@@ -15,6 +15,7 @@ package com.bytedesk.core.thread;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.jpa.domain.Specification;
@@ -33,6 +34,31 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadRequest> {
+
+    private static Predicate buildParticipantLikePredicate(jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            Root<ThreadEntity> root,
+            String fieldName,
+            List<String> candidateUids,
+            String fallbackUid) {
+        List<String> effectiveUids = candidateUids;
+        if (effectiveUids == null || effectiveUids.isEmpty()) {
+            effectiveUids = StringUtils.hasText(fallbackUid) ? Collections.singletonList(fallbackUid) : List.of();
+        }
+        if (effectiveUids.isEmpty()) {
+            return criteriaBuilder.disjunction();
+        }
+
+        List<Predicate> predicates = new ArrayList<>();
+        for (String candidateUid : effectiveUids) {
+            if (StringUtils.hasText(candidateUid)) {
+                predicates.add(criteriaBuilder.like(root.get(fieldName), "%" + candidateUid + "%"));
+            }
+        }
+        if (predicates.isEmpty()) {
+            return criteriaBuilder.disjunction();
+        }
+        return criteriaBuilder.or(predicates.toArray(new Predicate[0]));
+    }
 
     private static void applyUpdatedAtRange(ThreadRequest request,
             Root<ThreadEntity> root,
@@ -93,6 +119,7 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
      */
     public static Specification<ThreadEntity> searchForUser(ThreadRequest request, String userUid, String orgUid) {
         return (root, query, criteriaBuilder) -> {
+            ThreadRequest effectiveRequest = request != null ? request : ThreadRequest.builder().build();
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("deleted"), false));
             predicates.add(criteriaBuilder.equal(root.get("hide"), false));
@@ -113,14 +140,18 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             }
 
             // 当前客服参与会话（owner / invites / monitors / assistants / ticketors）
-            Predicate participatedPredicate = criteriaBuilder.or(
+                Predicate participatedPredicate = criteriaBuilder.or(
                     criteriaBuilder.and(
                             criteriaBuilder.isNotNull(root.get("owner")),
                             criteriaBuilder.equal(root.get("owner").get("uid"), userUid)),
-                    criteriaBuilder.like(root.get("invites"), "%" + userUid + "%"),
-                    criteriaBuilder.like(root.get("monitors"), "%" + userUid + "%"),
-                    criteriaBuilder.like(root.get("assistants"), "%" + userUid + "%"),
-                    criteriaBuilder.like(root.get("ticketors"), "%" + userUid + "%"));
+                        buildParticipantLikePredicate(criteriaBuilder, root, "invites",
+                            effectiveRequest.getInviteUids(), userUid),
+                        buildParticipantLikePredicate(criteriaBuilder, root, "monitors",
+                            effectiveRequest.getMonitorUids(), userUid),
+                        buildParticipantLikePredicate(criteriaBuilder, root, "assistants",
+                            effectiveRequest.getAssistantUids(), userUid),
+                        buildParticipantLikePredicate(criteriaBuilder, root, "ticketors",
+                            effectiveRequest.getTicketorUids(), userUid));
 
             Predicate robotingWorkgroupPredicate = criteriaBuilder.disjunction();
             if (StringUtils.hasText(orgUid)) {
@@ -139,41 +170,41 @@ public class ThreadSpecification extends BaseSpecification<ThreadEntity, ThreadR
             applyUpdatedAtRange(request, root, criteriaBuilder, predicates);
 
             // 基础筛选
-            if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+            if (StringUtils.hasText(effectiveRequest.getType())) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), effectiveRequest.getType()));
             }
 
-            if (StringUtils.hasText(request.getStatus())) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), request.getStatus()));
+            if (StringUtils.hasText(effectiveRequest.getStatus())) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), effectiveRequest.getStatus()));
             }
 
-            if (StringUtils.hasText(request.getUid())) {
-                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + request.getUid() + "%"));
+            if (StringUtils.hasText(effectiveRequest.getUid())) {
+                predicates.add(criteriaBuilder.like(root.get("uid"), "%" + effectiveRequest.getUid() + "%"));
             }
 
-            if (StringUtils.hasText(request.getTopic())) {
-                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + request.getTopic() + "%"));
+            if (StringUtils.hasText(effectiveRequest.getTopic())) {
+                predicates.add(criteriaBuilder.like(root.get("topic"), "%" + effectiveRequest.getTopic() + "%"));
             }
 
-            if (StringUtils.hasText(request.getChannel())) {
-                predicates.add(criteriaBuilder.equal(root.get("channel"), request.getChannel()));
+            if (StringUtils.hasText(effectiveRequest.getChannel())) {
+                predicates.add(criteriaBuilder.equal(root.get("channel"), effectiveRequest.getChannel()));
             }
 
-            if (StringUtils.hasText(request.getSearchText())) {
-                String searchText = request.getSearchText();
+            if (StringUtils.hasText(effectiveRequest.getSearchText())) {
+                String searchText = effectiveRequest.getSearchText();
                 Predicate threadMatch = criteriaBuilder.or(
                         criteriaBuilder.like(root.get("content"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("user"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("topic"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("uid"), "%" + searchText + "%"));
-                Predicate messageMatch = buildMessageContentPredicate(request, searchText, root, query,
+                Predicate messageMatch = buildMessageContentPredicate(effectiveRequest, searchText, root, query,
                         criteriaBuilder);
                 predicates.add(messageMatch == null ? threadMatch : criteriaBuilder.or(threadMatch, messageMatch));
             }
 
             // 兼容：若只传 messageSearchText（旧用法），仅按消息内容过滤
-            if (!StringUtils.hasText(request.getSearchText()) && StringUtils.hasText(request.getMessageSearchText())) {
-                Predicate messageOnly = buildMessageContentPredicate(request, request.getMessageSearchText(), root,
+            if (!StringUtils.hasText(effectiveRequest.getSearchText()) && StringUtils.hasText(effectiveRequest.getMessageSearchText())) {
+                Predicate messageOnly = buildMessageContentPredicate(effectiveRequest, effectiveRequest.getMessageSearchText(), root,
                         query, criteriaBuilder);
                 if (messageOnly != null) {
                     predicates.add(messageOnly);

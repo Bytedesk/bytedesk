@@ -66,6 +66,30 @@ public interface FaqRepository extends JpaRepository<FaqEntity, Long>, JpaSpecif
     @Query("update FaqEntity f set f.kbase = :kbase where f.uid = :uid")
     int updateKbaseByUid(@Param("uid") String uid, @Param("kbase") com.bytedesk.kbase.kbase.KbaseEntity kbase);
 
+    // ==================== 计数类原子更新（P1 方案 A：消除并发读-改-写乐观锁冲突） ====================
+    // bulk update 不会自动维护 @Version，需显式递增 version，
+    // 避免并发读-改-写基于旧 version 覆盖计数；coalesce 兼容历史 NULL 行
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.clickCount = coalesce(f.clickCount, 0) + 1, f.version = f.version + 1 where f.uid = :uid")
+    int increaseClickCountByUid(@Param("uid") String uid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.upCount = coalesce(f.upCount, 0) + 1, f.version = f.version + 1 where f.uid = :uid")
+    int increaseUpCountByUid(@Param("uid") String uid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.downCount = coalesce(f.downCount, 0) + 1, f.version = f.version + 1 where f.uid = :uid")
+    int increaseDownCountByUid(@Param("uid") String uid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.feedbackCount = coalesce(f.feedbackCount, 0) + 1, f.version = f.version + 1 where f.uid = :uid")
+    int increaseFeedbackCountByUid(@Param("uid") String uid);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update FaqEntity f set f.transferCount = coalesce(f.transferCount, 0) + 1, f.version = f.version + 1 where f.uid = :uid")
+    int increaseTransferCountByUid(@Param("uid") String uid);
+
     /**
      * 查询已过期但仍残留在索引中的 FAQ（endDate < now 且 elastic/vector 状态为 SUCCESS）
      * 供过期清理定时任务分页使用

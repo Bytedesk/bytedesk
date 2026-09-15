@@ -20,7 +20,6 @@ import java.util.List;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
-import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
@@ -314,30 +313,13 @@ public class ThreadEntity extends AbstractThreadEntity {
             return 0;
         }
 
-        // MEMBER：以 thread.owner 作为“我”，统计“非我发送”的未读消息。
-        // 前提：消息表中每个接收者对应独立消息记录（或 status 能反映对该 owner 的已读）。
+        // MEMBER：一对一会话在库中是成对的两个 thread（topic 互为反转），消息只挂载在
+        // 发送方自己的 thread 上，本 thread 的 messages 集合中只有自己发送的消息，
+        // 此处无法统计到对方发来的未读数（恒为 0）。真实未读数由
+        // ThreadRestService#enrichMemberThreadUnreadCount 按“正反 topic 对”跨 thread 统计。
+        // 这里直接短路返回，避免为得出一个恒为 0 的结果而加载整个消息集合。
         if (isMember()) {
-            UserEntity owner = getOwner();
-            String ownerUid = owner != null ? owner.getUid() : null;
-            if (ownerUid == null) {
-                return 0;
-            }
-
-            int count = 0;
-            for (MessageEntity message : messages) {
-                if (message == null || message.isDeleted()) {
-                    continue;
-                }
-                if (!message.isUnread()) {
-                    continue;
-                }
-                // 自己发的消息不计入“对我未读”
-                if (ownerUid.equals(message.getUserUid())) {
-                    continue;
-                }
-                count++;
-            }
-            return count;
+            return 0;
         }
 
         // 遍历消息列表，统计未读消息数量

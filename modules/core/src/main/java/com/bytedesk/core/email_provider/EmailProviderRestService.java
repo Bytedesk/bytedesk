@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.platform_config.PlatformSecretUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import lombok.AllArgsConstructor;
@@ -87,6 +88,8 @@ public class EmailProviderRestService extends BaseRestServiceWithExport<EmailPro
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
+        // 密码加密入库：明文 → ENC(密文)
+        entity.setEmailPassword(PlatformSecretUtils.encrypt(entity.getEmailPassword()));
         // 
         EmailProviderEntity savedEntity = save(entity);
         return convertToResponse(savedEntity);
@@ -97,7 +100,15 @@ public class EmailProviderRestService extends BaseRestServiceWithExport<EmailPro
         Optional<EmailProviderEntity> optional = emailRepository.findByUid(request.getUid());
         if (optional.isPresent()) {
             EmailProviderEntity entity = optional.get();
+            String existingPassword = entity.getEmailPassword();
             modelMapper.map(request, entity);
+            // 前端回传掩码或空值时保留原密码，避免被覆盖丢失；新密码加密入库
+            if (!StringUtils.hasText(entity.getEmailPassword())
+                    || PlatformSecretUtils.SECRET_MASK.equals(entity.getEmailPassword())) {
+                entity.setEmailPassword(existingPassword);
+            } else {
+                entity.setEmailPassword(PlatformSecretUtils.encrypt(entity.getEmailPassword()));
+            }
             //
             EmailProviderEntity savedEntity = save(entity);
             return convertToResponse(savedEntity);
@@ -152,7 +163,11 @@ public class EmailProviderRestService extends BaseRestServiceWithExport<EmailPro
 
     @Override
     public EmailProviderResponse convertToResponse(EmailProviderEntity entity) {
-        return modelMapper.map(entity, EmailProviderResponse.class);
+        EmailProviderResponse response = modelMapper.map(entity, EmailProviderResponse.class);
+        // 密码脱敏：已配置返回 ***，否则为空，永不回显明文/密文
+        response.setEmailPassword(
+                StringUtils.hasText(entity.getEmailPassword()) ? PlatformSecretUtils.SECRET_MASK : null);
+        return response;
     }
 
     @Override

@@ -63,4 +63,8 @@
 
     <include file="db/changelog/migration/260915_add_organization_config_table.xml" />
 
+    <include file="db/changelog/migration/260915_add_message_unread_thread_columns.xml" />
+
+    <include file="db/changelog/migration/260915_add_thread_rating_attachments_column.xml" />
+
 </databaseChangeLog>

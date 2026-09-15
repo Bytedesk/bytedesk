@@ -287,7 +287,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
 
     // 注意：不能加 @Transactional。读-改-写放在同一事务时，UPDATE 会延迟到外层事务提交才执行，
-    // 乐观锁冲突在提交期抛出，BaseRestService.save 的 @Retryable 捕获不到，导致请求直接报
+    // 乐观锁冲突在提交期抛出，BaseRestService.save 的重试循环捕获不到，导致请求直接报
     // "Optimistic locking failure"（如访客心跳与定时离线任务并发更新同一访客）。
     // 这里改为每次尝试读取最新数据，并在独立短事务内 saveAndFlush 立即暴露冲突后重试。
     public int updateStatus(String uid, String newStatus) {

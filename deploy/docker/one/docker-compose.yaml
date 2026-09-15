@@ -550,10 +550,13 @@ services:
       # wechat config
       WECHAT_PAY_ENABLED: "false"
       WECHAT_PAY_CERTPATH: ''
+      # 阿里云访问密钥（短信与 OSS 共用），获取 https://ram.console.aliyun.com/profile/access-keys
+      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
+      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
       # 阿里云短信服务的签名，可以在控制台找到，如是中文，请转为Unicode
-      ALIYUN_SMS_SIGNNAME: ''
+      ALIYUN_SMS_SIGNNAME: ${ALIYUN_SMS_SIGNNAME:-}
       #阿里云短信服务的模板Code，可以在控制台找到
-      ALIYUN_SMS_TEMPLATECODE: ''
+      ALIYUN_SMS_TEMPLATECODE: ${ALIYUN_SMS_TEMPLATECODE:-}
       # Artemis JMS 配置
       SPRING_ARTEMIS_MODE: embedded
       # SPRING_ARTEMIS_MODE: native

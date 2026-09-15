@@ -15,6 +15,7 @@ package com.bytedesk.core.message;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.util.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -49,6 +50,17 @@ public class MessagePersistService {
 
     /** 回执重试信息存储在 extra 字段中的 JSON key */
     private static final String RECEIPT_RETRY_KEY = "_receiptRetries";
+
+    /**
+     * 转接/邀请回执消息类型（接受/拒绝/超时/取消）：
+     * 回执不作为独立消息入库，而是同步更新原转接/邀请消息的状态，
+     * 保证历史消息重载/多端登录时原消息状态正确（不再显示为待处理可点击）
+     */
+    private static final Set<MessageTypeEnum> TRANSFER_INVITE_RECEIPT_TYPES = Set.of(
+            MessageTypeEnum.TRANSFER_ACCEPT, MessageTypeEnum.TRANSFER_REJECT,
+            MessageTypeEnum.TRANSFER_TIMEOUT, MessageTypeEnum.TRANSFER_CANCEL,
+            MessageTypeEnum.INVITE_ACCEPT, MessageTypeEnum.INVITE_REJECT,
+            MessageTypeEnum.INVITE_TIMEOUT, MessageTypeEnum.INVITE_CANCEL);
 
     private final MessageRestService messageRestService;
 
@@ -229,6 +241,11 @@ public class MessagePersistService {
             return true;
         }
 
+        // 转接/邀请回执（接受/拒绝/超时/取消）：同步更新原消息状态，回执本身不入库
+        if (TRANSFER_INVITE_RECEIPT_TYPES.contains(type)) {
+            return dealWithTransferInviteReceipt(type, messageProtobuf);
+        }
+
         // 消息撤回 - 从数据库中删除
         if (MessageTypeEnum.RECALL.equals(type)) {
             dealWithMessageRecall(messageProtobuf);
@@ -323,6 +340,62 @@ public class MessagePersistService {
     private void dealWithMessageRecall(MessageProtobuf message) {
         // content为撤回消息的uid
         messageRestService.deleteByUid(message.getContent());
+    }
+
+    /**
+     * 处理转接/邀请回执：content 为 ThreadTransferExtra/ThreadInviteExtra JSON（含顶层 messageUid 与 status）。
+     * 根据回执同步更新原消息的 content.status 与 status 字段，回执本身不再作为独立消息入库。
+     * 仍会更新会话摘要（与普通入库路径相同的 updateThreadContent），保持会话列表预览与排序新鲜。
+     * 兼容：content 无法解析为顶层 messageUid/status（旧版客户端 notice 包装格式）、
+     * 或目标消息不存在时，回退为普通消息入库（保留旧客户端回执卡片的展示行为）。
+     */
+    private Boolean dealWithTransferInviteReceipt(MessageTypeEnum type, MessageProtobuf messageProtobuf) {
+        String content = messageProtobuf.getContent();
+        if (!StringUtils.hasText(content)) {
+            return false;
+        }
+        try {
+            com.alibaba.fastjson2.JSONObject payload = com.alibaba.fastjson2.JSON.parseObject(content);
+            if (payload == null) {
+                return false;
+            }
+            String targetMessageUid = payload.getString("messageUid");
+            String targetStatus = payload.getString("status");
+            // 仅识别新版回执格式（后端统一发送的 extra JSON，含顶层 messageUid/status）；
+            // 旧版客户端手动发送的回执为 notice 包装结构（无顶层 messageUid），走普通入库保持旧行为
+            if (!StringUtils.hasText(targetMessageUid) || !StringUtils.hasText(targetStatus)) {
+                return false;
+            }
+            Optional<MessageEntity> targetOpt = messageRestService.findByUid(targetMessageUid);
+            if (targetOpt.isEmpty()) {
+                log.warn("transfer/invite receipt target not found, fallback to normal persist: type {}, targetUid {}",
+                        type, targetMessageUid);
+                return false;
+            }
+            // 更新原消息：content JSON 中的 status 字段（气泡据此展示处理结果标签）+ 消息状态字段
+            MessageEntity target = targetOpt.get();
+            com.alibaba.fastjson2.JSONObject targetContent = com.alibaba.fastjson2.JSON.parseObject(target.getContent());
+            if (targetContent != null) {
+                targetContent.put("status", targetStatus);
+                target.setContent(targetContent.toJSONString());
+            }
+            target.setStatus(targetStatus);
+            messageRestService.save(target);
+            log.info("transfer/invite receipt applied: type {}, targetUid {}, status {}, receiptUid {}",
+                    type, targetMessageUid, targetStatus, messageProtobuf.getUid());
+            //
+            // 仍更新会话摘要与 updatedAt（与普通入库路径一致），保持会话列表预览与排序新鲜
+            String threadUid = messageProtobuf.getThread().getUid();
+            Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
+            if (threadOpt.isPresent()) {
+                updateThreadContent(threadOpt.get(), type, messageProtobuf);
+            }
+            return true;
+        } catch (Exception e) {
+            log.warn("transfer/invite receipt parse failed, fallback to normal persist: type {}, error {}",
+                    type, e.getMessage());
+            return false;
+        }
     }
 
     /**

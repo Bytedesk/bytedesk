@@ -531,8 +531,12 @@ services:
       # 
       WECHAT_PAY_ENABLED: "false"
       WECHAT_PAY_CERTPATH: ''
-      ALIYUN_SMS_SIGNNAME: ''
-      ALIYUN_SMS_TEMPLATECODE: ''
+      # Aliyun AccessKey / 阿里云访问密钥（短信与 OSS 共用），获取 https://ram.console.aliyun.com/profile/access-keys
+      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
+      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
+      # Aliyun SMS sign/template / 阿里云短信签名与模板Code，在 .env 中配置
+      ALIYUN_SMS_SIGNNAME: ${ALIYUN_SMS_SIGNNAME:-}
+      ALIYUN_SMS_TEMPLATECODE: ${ALIYUN_SMS_TEMPLATECODE:-}
       ALIYUN_SMS_DOMAIN: dysmsapi.aliyuncs.com
       ALIYUN_SMS_VERSION: 2017-05-25
       ALIYUN_SMS_ACTION: SendSms

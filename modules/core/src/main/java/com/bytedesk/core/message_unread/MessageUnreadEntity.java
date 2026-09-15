@@ -18,6 +18,7 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -50,10 +51,27 @@ public class MessageUnreadEntity extends AbstractMessageEntity  {
      * Associated conversation thread containing this message
      * Many-to-one relationship: multiple messages can belong to one thread
      */
+    /**
+     * 兼容字段：仅用于读取历史数据的 thread 关联（历史行 thread_id 仍有值）。
+     * P2 修复后新建未读记录不再挂载 ThreadEntity，
+     * 避免新事务 flush 触发 thread 表 UPDATE 引发乐观锁冲突。
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thread_id", referencedColumnName = "id")
     @JsonBackReference
     private ThreadEntity thread;
+
+    /**
+     * 会话线程 UID 快照，写入时直接取自消息体，不再查询/挂载 ThreadEntity
+     */
+    @Column(name = "thread_uid")
+    private String threadUid;
+
+    /**
+     * 会话线程 topic 快照，未读查询/清理直接走标量列，不再 join thread 表
+     */
+    @Column(name = "thread_topic")
+    private String threadTopic;
 
     // 可以在这里添加 MessageEntity 特有的字段（如果有的话）
     public UserProtobuf getUserProtobuf() {

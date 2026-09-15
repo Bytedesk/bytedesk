@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- P2：未读消息去 ThreadEntity 关联 -->
+    <!-- 新增 thread_uid / thread_topic 标量列，未读查询/清理不再 join thread 表； -->
+    <!-- 写入时不再挂载 ThreadEntity，避免新事务 flush 触发 thread 表 UPDATE 引发乐观锁冲突 -->
+
+    <changeSet id="260915-add-message-unread-thread-columns" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message_unread" />
+            <not>
+                <columnExists tableName="bytedesk_core_message_unread" columnName="thread_uid" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_message_unread">
+            <column name="thread_uid" type="VARCHAR(64)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260915-add-message-unread-thread-topic-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message_unread" />
+            <not>
+                <columnExists tableName="bytedesk_core_message_unread" columnName="thread_topic" />
+            </not>
+        </preConditions>
+
+        <addColumn tableName="bytedesk_core_message_unread">
+            <column name="thread_topic" type="VARCHAR(191)">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- 历史数据回填：从 thread 关联行回填标量快照列（标准 SQL 关联子查询，兼容 MySQL/PostgreSQL/H2/Oracle/KingBase） -->
+    <!-- 注意：SET 子句的目标列不能带表别名前缀（PostgreSQL/KingBase 语法不允许 alias.col 作为 SET 目标），
+         关联子查询内引用 mu.thread_id 的限定写法是合法的 -->
+    <changeSet id="260915-backfill-message-unread-thread-columns" author="githubcopilot">
+        <!-- 曾以旧版 SQL（SET 带 mu. 前缀）在部分环境执行过，接受任意校验和以免 checksum 校验失败 -->
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message_unread" />
+            <columnExists tableName="bytedesk_core_message_unread" columnName="thread_uid" />
+            <columnExists tableName="bytedesk_core_message_unread" columnName="thread_topic" />
+        </preConditions>
+
+        <sql>
+            UPDATE bytedesk_core_message_unread mu
+            SET thread_uid = (SELECT t.uuid FROM bytedesk_core_thread t WHERE t.id = mu.thread_id),
+                thread_topic = (SELECT t.thread_topic FROM bytedesk_core_thread t WHERE t.id = mu.thread_id)
+            WHERE mu.thread_id IS NOT NULL
+              AND (thread_uid IS NULL OR thread_topic IS NULL)
+        </sql>
+    </changeSet>
+
+    <!-- 索引：thread_topic（未读按 topic 查询/清理的高频路径） -->
+    <changeSet id="260915-add-message-unread-thread-topic-index" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_message_unread" />
+            <columnExists tableName="bytedesk_core_message_unread" columnName="thread_topic" />
+            <not>
+                <indexExists tableName="bytedesk_core_message_unread" indexName="idx_mu_thread_topic" />
+            </not>
+        </preConditions>
+
+        <createIndex tableName="bytedesk_core_message_unread" indexName="idx_mu_thread_topic">
+            <column name="thread_topic" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

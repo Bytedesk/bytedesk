@@ -350,6 +350,16 @@
 			<version>1.5.2</version>
         </dependency> -->
 
+		<!-- property encryption support：仅编译期使用 StringEncryptor 接口（PlatformSecretUtils），
+			运行时由 starter 的 jasypt-spring-boot-starter 提供实现（版本与 starter/pom.xml 对齐） -->
+		<!-- https://github.com/jasypt/jasypt?tab=readme-ov-file -->
+		<dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>3.0.5</version>
+			<scope>provided</scope>
+		</dependency>
+
 
 	</dependencies>
 

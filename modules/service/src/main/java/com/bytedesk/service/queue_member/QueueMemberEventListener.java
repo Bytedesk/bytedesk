@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -610,27 +611,41 @@ public class QueueMemberEventListener {
                 return;
             }
 
+            // P4：队列统计仅适用于会创建 queue_member 的线程类型（AGENT/WORKGROUP/WORKFLOW/QUEUE）。
+            // 工单/知识库测试/LLM/渠道/历史等线程本就没有 queue_member，
+            // 直接短路避免 4 个统计方法重复报“未找到与会话关联的队列成员”WARN；
+            // agentReplied 簿记与队列无关，不受此门控影响
+            boolean queueStatsApplicable = isQueueStatisticThread(thread);
+            if (!queueStatsApplicable) {
+                log.debug("skip queue member stats, thread type not queue-scoped: threadUid={}, type={}, topic={}, status={}",
+                        thread.getUid(), thread.getType(), thread.getTopic(), thread.getStatus());
+            }
+
             if (isVisitorMessageForUnreplied(message)) {
                 // 访客消息：标记为“待客服回复”
                 ensureVisitorMessageUnreplied(message);
                 // 更新访客消息统计
-                updateVisitorMessageStats(message, thread);
+                if (queueStatsApplicable) {
+                    updateVisitorMessageStats(message, thread);
+                }
             } else if (isAgentOrRobotReplyMessage(thread, message)) {
                 // 客服消息：先抓取“上一次客服回复时间”作为窗口起点（避免扫描整段历史）
                 ZonedDateTime previousAgentLastResponseAt = null;
                 ZonedDateTime visitorFirstMessageAt = null;
-                Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
-                if (queueMemberOpt.isPresent()) {
-                    previousAgentLastResponseAt = queueMemberOpt.get().getAgentLastResponseAt();
-                    visitorFirstMessageAt = queueMemberOpt.get().getVisitorFirstMessageAt();
+                if (queueStatsApplicable) {
+                    Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
+                    if (queueMemberOpt.isPresent()) {
+                        previousAgentLastResponseAt = queueMemberOpt.get().getAgentLastResponseAt();
+                        visitorFirstMessageAt = queueMemberOpt.get().getVisitorFirstMessageAt();
+                    }
                 }
 
                 // 回复消息本身不属于“待回复”消息
                 ensureNonVisitorMessageReplied(message);
-                if (isHumanReplyMessage(thread, message)) {
+                if (queueStatsApplicable && isHumanReplyMessage(thread, message)) {
                     // 更新客服消息统计
                     updateAgentMessageStats(message, thread);
-                } else if (message.isFromRobot()) {
+                } else if (queueStatsApplicable && message.isFromRobot()) {
                     // 处理机器人消息统计
                     updateRobotMessageStats(message, thread);
                 }
@@ -641,12 +656,35 @@ public class QueueMemberEventListener {
                 // 系统消息本身不属于“待回复”消息
                 ensureNonVisitorMessageReplied(message);
                 // 处理系统消息
-                updateSystemMessageStats(message, thread);
+                if (queueStatsApplicable) {
+                    updateSystemMessageStats(message, thread);
+                }
             }
         } catch (Exception e) {
             log.error("处理消息事件时出错: {}", e.getMessage(), e);
         }
     }
+
+    /**
+     * P4：判断线程是否属于队列统计范围。
+     * 只有 AGENT/WORKGROUP/WORKFLOW/QUEUE 类型的线程会创建 queue_member；
+     * 历史数据可能未写 type，保守起见仍进入统计（保持旧行为，由后续查询兜底）。
+     */
+    private boolean isQueueStatisticThread(ThreadEntity thread) {
+        if (thread == null) {
+            return false;
+        }
+        if (!StringUtils.hasText(thread.getType())) {
+            return true;
+        }
+        return QUEUE_STATISTIC_THREAD_TYPES.contains(thread.getType().toUpperCase());
+    }
+
+    private static final Set<String> QUEUE_STATISTIC_THREAD_TYPES = Set.of(
+            ThreadTypeEnum.AGENT.name(),
+            ThreadTypeEnum.WORKGROUP.name(),
+            ThreadTypeEnum.WORKFLOW.name(),
+            ThreadTypeEnum.QUEUE.name());
 
     private void ensureVisitorMessageUnreplied(MessageEntity message) {
         if (!isVisitorMessageForUnreplied(message)) {
@@ -798,7 +836,9 @@ public class QueueMemberEventListener {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOpt.isEmpty()) {
-                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                // P4：补充线程上下文，便于区分“误入统计的非队列线程”与“应有却丢失的队列成员”
+                log.warn("未找到与会话关联的队列成员: threadUid={}, type={}, topic={}, status={}",
+                        thread.getUid(), thread.getType(), thread.getTopic(), thread.getStatus());
                 return;
             }
 
@@ -843,7 +883,9 @@ public class QueueMemberEventListener {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOpt.isEmpty()) {
-                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                // P4：补充线程上下文，便于区分“误入统计的非队列线程”与“应有却丢失的队列成员”
+                log.warn("未找到与会话关联的队列成员: threadUid={}, type={}, topic={}, status={}",
+                        thread.getUid(), thread.getType(), thread.getTopic(), thread.getStatus());
                 return;
             }
 
@@ -911,7 +953,9 @@ public class QueueMemberEventListener {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOpt.isEmpty()) {
-                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                // P4：补充线程上下文，便于区分“误入统计的非队列线程”与“应有却丢失的队列成员”
+                log.warn("未找到与会话关联的队列成员: threadUid={}, type={}, topic={}, status={}",
+                        thread.getUid(), thread.getType(), thread.getTopic(), thread.getStatus());
                 return;
             }
 
@@ -977,7 +1021,9 @@ public class QueueMemberEventListener {
             // 查找关联的队列成员记录
             Optional<QueueMemberEntity> queueMemberOpt = queueMemberRestService.findByThreadUid(thread.getUid());
             if (queueMemberOpt.isEmpty()) {
-                log.warn("未找到与会话关联的队列成员: threadUid={}", thread.getUid());
+                // P4：补充线程上下文，便于区分“误入统计的非队列线程”与“应有却丢失的队列成员”
+                log.warn("未找到与会话关联的队列成员: threadUid={}, type={}, topic={}, status={}",
+                        thread.getUid(), thread.getType(), thread.getTopic(), thread.getStatus());
                 return;
             }
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        会话评价表新增 attachments 列：关闭会话弹窗中"问题未解决"反馈的附件 URL 列表
+        （任意类型文件），TEXT 列存 JSON 数组（实体侧 JsonStringListConverter）。
+
+        策略（双保护，参照 260823_add_wechat_work_contact_tables.xml）：
+        1. 存量库（列不存在）：addColumn 补齐新列，允许 NULL，存量行不受影响。
+        2. ddl-auto 已由 JPA 建列的环境：preConditions MARK_RAN 跳过。
+
+        见 docs/plans/2026-09-15-visitor-close-unresolved-feedback-plan.md
+    -->
+
+    <changeSet id="260915-add-thread-rating-attachments-column" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_service_thread_rating" columnName="attachments"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_thread_rating">
+            <column name="attachments" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.platform_config.PlatformSecretUtils;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
@@ -263,7 +264,8 @@ public class EmailPushSendService {
         mailSender.setHost(emailConfig.getSmtpHost());
         mailSender.setPort(emailConfig.getSmtpPort());
         mailSender.setUsername(emailConfig.getEmailAddress());
-        mailSender.setPassword(emailConfig.getEmailPassword());
+        // 兼容 ENC(...) 入库加密与历史明文
+        mailSender.setPassword(PlatformSecretUtils.decrypt(emailConfig.getEmailPassword()));
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");

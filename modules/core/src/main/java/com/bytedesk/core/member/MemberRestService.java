@@ -851,7 +851,21 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         reverseThread.setOwner(reverseMemberOptional.get().getUser());
 
         // 保存反向线程并返回结果
-        ThreadEntity savedThread = threadRestService.save(reverseThread);
+        // 注意：创建事件监听链可能乒乓触发（反向会话自身的 ThreadCreateEvent 再次调用本方法），
+        // 且原会话可能仍在外层事务中未提交导致 findByUid 查不到，并发插入会撞唯一键；
+        // 此时可插入阻塞直至对方事务提交后报 Duplicate，回查即可返回既有会话（幂等收敛）
+        ThreadEntity savedThread;
+        try {
+            savedThread = threadRestService.save(reverseThread);
+        } catch (Exception e) {
+            Optional<ThreadEntity> existingOptional = threadRestService.findByUid(reverseUid);
+            if (existingOptional.isPresent()) {
+                log.info("reverse thread already created concurrently, reuse: uid={}, topic={}",
+                        reverseUid, reverseTopic);
+                return existingOptional.get();
+            }
+            throw e;
+        }
         if (savedThread == null) {
             throw new RuntimeException("reverseThread save error");
         }

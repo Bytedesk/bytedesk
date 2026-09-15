@@ -13,12 +13,16 @@
  */
 package com.bytedesk.core.email_provider;
 
+import java.util.Properties;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailParseException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +35,8 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.platform_config.PlatformEmailConfig;
+import com.bytedesk.core.platform_config.PlatformEmailConfigProvider;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.mail.internet.MimeMessage;
@@ -38,6 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * 邮件发送服务
@@ -53,6 +60,12 @@ import org.springframework.util.Assert;
 public class EmailSendService {
 
     private final BytedeskProperties bytedeskProperties;
+
+    /**
+     * 平台邮件配置 SPI（实现在 enterprise/core，读取 SuperSystemConfig 平台绑定）。
+     * 无实现/未启用/未配置时为 null，自动回退 properties 配置。
+     */
+    private final ObjectProvider<PlatformEmailConfigProvider> platformEmailConfigProviderProvider;
 
     @Value("${aliyun.access.key.id:}")
     private String accessKeyId;
@@ -98,6 +111,11 @@ public class EmailSendService {
         }
 
         try {
+            // 平台绑定配置优先（超级管理员 SuperSystemConfig 平台邮件配置），未配置/未启用回退 properties
+            PlatformEmailConfig platformConfig = getPlatformEmailConfig();
+            if (platformConfig != null) {
+                return sendPlatformValidateCodeWithResult(email, content, platformConfig);
+            }
             if (bytedeskProperties.getEmailType().equals("aliyun")) {
                 return sendAliyunValidateCodeWithResult(email, content);
             } else {
@@ -108,6 +126,74 @@ public class EmailSendService {
             return EmailSendResult.failure(EmailSendResult.SendCodeErrorType.SEND_FAILED,
                     resolveEmailExceptionMessage(e));
         }
+    }
+
+    // ============ 平台邮件配置（SuperSystemConfig 平台绑定） ============
+
+    /**
+     * 获取平台邮件配置快照；无效/未启用/无 SPI 实现时返回 null（回退 properties）
+     */
+    PlatformEmailConfig getPlatformEmailConfig() {
+        if (platformEmailConfigProviderProvider == null) {
+            return null;
+        }
+        PlatformEmailConfigProvider provider = platformEmailConfigProviderProvider.getIfAvailable();
+        if (provider == null) {
+            return null;
+        }
+        try {
+            PlatformEmailConfig config = provider.getPlatformEmailConfig();
+            if (config == null || !config.enabled()) {
+                return null;
+            }
+            if (!StringUtils.hasText(config.emailAddress()) || !StringUtils.hasText(config.password())
+                    || !StringUtils.hasText(config.smtpHost()) || config.smtpPort() == null) {
+                log.warn("平台邮件配置不完整，回退 properties 配置");
+                return null;
+            }
+            return config;
+        } catch (Exception e) {
+            log.error("读取平台邮件配置失败，回退 properties 配置", e);
+            return null;
+        }
+    }
+
+    /**
+     * 使用平台绑定邮箱（EmailProviderEntity）动态构建 JavaMailSender 发送验证码邮件
+     */
+    EmailSendResult sendPlatformValidateCodeWithResult(String email, String code, PlatformEmailConfig config) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(code, "验证码不能为空");
+
+        log.info("sendPlatformValidateCode email={}, platform sender={}", email, config.emailAddress());
+        String content = "您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
+        String displayName = StringUtils.hasText(config.displayName()) ? config.displayName() : "weiyuai";
+        return sendMailWithResult(createPlatformMailSender(config), config.emailAddress(), displayName,
+                email, "微语验证码", content);
+    }
+
+    /**
+     * 基于平台配置快照动态创建 JavaMailSender（逻辑对齐 EmailPushSendService#createMailSender）
+     */
+    private JavaMailSenderImpl createPlatformMailSender(PlatformEmailConfig config) {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost(config.smtpHost());
+        mailSender.setPort(config.smtpPort());
+        mailSender.setUsername(config.emailAddress());
+        mailSender.setPassword(config.password());
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        if (Boolean.TRUE.equals(config.smtpSslEnabled())) {
+            if (config.smtpPort() != null && config.smtpPort() == 465) {
+                props.put("mail.smtp.ssl.enable", "true");
+            } else {
+                props.put("mail.smtp.starttls.enable", "true");
+            }
+        }
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        return mailSender;
     }
 
     /**
@@ -195,13 +281,25 @@ public class EmailSendService {
         Assert.hasText(subject, "邮件主题不能为空");
         Assert.hasText(content, "邮件内容不能为空");
         
+        return sendMailWithResult(javaMailSender, from, "weiyuai", email, subject, content);
+    }
+
+    /**
+     * 通用 JavaMail 发送（平台动态 sender 与 spring.mail.* 静态 sender 共用）
+     */
+    EmailSendResult sendMailWithResult(JavaMailSender sender, String fromAddress, String fromPersonal,
+            String email, String subject, String content) {
+        Assert.hasText(email, "邮箱地址不能为空");
+        Assert.hasText(subject, "邮件主题不能为空");
+        Assert.hasText(content, "邮件内容不能为空");
+
         // 创建一个邮件消息
-        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessage message = sender.createMimeMessage();
         try {
             // 创建 MimeMessageHelper
             MimeMessageHelper helper = new MimeMessageHelper(message, false);
             // 发件人邮箱和邮件中显示的发件人名字
-            helper.setFrom(from, "weiyuai");
+            helper.setFrom(fromAddress, fromPersonal);
             // 收件人邮箱
             helper.setTo(email);
             // 邮件标题
@@ -210,7 +308,7 @@ public class EmailSendService {
             helper.setText(content, true);
             
             // 发送
-            javaMailSender.send(message);
+            sender.send(message);
             return EmailSendResult.success();
         } catch (MailAuthenticationException e) {
             log.warn("JavaMail邮件配置异常: {}", e.getMessage());

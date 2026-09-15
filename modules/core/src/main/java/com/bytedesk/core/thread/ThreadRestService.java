@@ -1180,7 +1180,38 @@ public class ThreadRestService
     }
 
     public ThreadResponse convertToResponse(ThreadEntity thread) {
-        return ThreadConvertUtils.convertToThreadResponse(thread);
+        ThreadResponse threadResponse = ThreadConvertUtils.convertToThreadResponse(thread);
+        enrichMemberThreadUnreadCount(thread, threadResponse);
+        return threadResponse;
+    }
+
+    /**
+     * MEMBER 同事会话未读数修正。
+     *
+     * 背景：同事一对一会话在库中是成对的两个 thread（topic 互为反转：org/member/A/B 与 org/member/B/A），
+     * 消息只挂载在发送方自己的 thread 上（反转复制仅发生在 MQTT 投递层，不落库），
+     * 因此 {@link ThreadEntity#getUnreadCount()} 遍历本 thread 的 messages 集合
+     * （里面只有自己发送的消息）恒为 0，导致 ThreadList 刷新/重新登录后不显示未读数。
+     *
+     * 这里按“正反 topic 对 + 排除自己发送 + 未读状态”跨 thread 统计真实未读数，
+     * 消息类型口径与前端 desktop shouldIncreaseUnreadCountByMessageType 对齐。
+     */
+    private void enrichMemberThreadUnreadCount(ThreadEntity thread, ThreadResponse threadResponse) {
+        if (!thread.isMember() || !StringUtils.hasText(thread.getTopic())) {
+            return;
+        }
+        // 防御：MEMBER 会话 topic 固定为 org/member/{self}/{other} 四段，异常格式直接跳过
+        if (thread.getTopic().split("/").length != 4) {
+            return;
+        }
+        String ownerUserUid = thread.getOwner() != null ? thread.getOwner().getUid() : null;
+        if (!StringUtils.hasText(ownerUserUid)) {
+            return;
+        }
+        String reverseTopic = TopicUtils.getOrgMemberTopicReverse(thread.getTopic());
+        int unreadCount = (int) messageRestService.countMemberUnreadByTopics(
+                thread.getTopic(), reverseTopic, ownerUserUid);
+        threadResponse.setUnreadCount(unreadCount);
     }
 
     @Override

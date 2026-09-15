@@ -43,6 +43,7 @@ import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageResponse;
 import com.bytedesk.core.message.MessageRestService;
+import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -106,31 +107,32 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
         Optional<FaqEntity> optionalEntity = findByUid(request.getUid());
         if (optionalEntity.isPresent()) {
             FaqEntity entity = optionalEntity.get();
-            entity.increaseClickCount();
-            //
-            FaqEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Failed to update click count");
+            // 点击计数改为数据库原子更新，避免并发读-改-写触发乐观锁冲突（P1 方案 A）
+            faqRepository.increaseClickCountByUid(request.getUid());
+            // 仅用于本次响应展示，不再走整行 save
+            if (entity.getClickCount() != null) {
+                entity.setClickCount(entity.getClickCount() + 1);
             }
             //
-            return convertToResponse(savedEntity);
+            return convertToResponse(entity);
         } else {
             throw new RuntimeException("faq not found");
         }
     }
 
     // 点击faq
+    @Transactional
     public FaqResponse clickFaq(FaqRequest request) {
         Optional<FaqEntity> optionalEntity = findByUid(request.getUid());
         if (optionalEntity.isPresent()) {
             FaqEntity entity = optionalEntity.get();
-            entity.increaseClickCount();
-            //
-            FaqEntity savedEntity = save(entity);
-            if (savedEntity == null) {
-                throw new RuntimeException("Failed to update click count");
+            // 点击计数改为数据库原子更新，避免并发读-改-写触发乐观锁冲突（P1 方案 A）
+            faqRepository.increaseClickCountByUid(request.getUid());
+            // 仅用于本次响应展示，不再走整行 save
+            if (entity.getClickCount() != null) {
+                entity.setClickCount(entity.getClickCount() + 1);
             }
-            FaqResponse faqResponse = convertToResponse(savedEntity);
+            FaqResponse faqResponse = convertToResponse(entity);
 
             // 插入问题 + 答案 两条消息记录，目前放到发送消息里面
             // 插入问题消息
@@ -351,6 +353,42 @@ public class FaqRestService extends BaseRestServiceWithExport<FaqEntity, FaqRequ
     @Transactional
     public void updateKbaseOnly(String uid, KbaseEntity kbase) {
         faqRepository.updateKbaseByUid(uid, kbase);
+    }
+
+    /**
+     * FAQ 点击计数原子更新（供外部调用方使用，走代理以生效事务与缓存驱逐）
+     */
+    @Transactional
+    @CacheEvict(value = "faq", key = "#uid")
+    public int increaseClickCountByUid(String uid) {
+        if (!StringUtils.hasText(uid)) {
+            return 0;
+        }
+        return faqRepository.increaseClickCountByUid(uid);
+    }
+
+    /**
+     * FAQ 评分计数原子更新（点赞/点踩/反馈/转人工），
+     * 消除并发读-改-写触发的乐观锁冲突（P1 方案 A）
+     */
+    @Transactional
+    @CacheEvict(value = "faq", key = "#uid")
+    public int updateRateCountByUid(String uid, MessageStatusEnum rateStatus) {
+        if (!StringUtils.hasText(uid)) {
+            return 0;
+        }
+        switch (rateStatus) {
+            case RATE_UP:
+                return faqRepository.increaseUpCountByUid(uid);
+            case RATE_DOWN:
+                return faqRepository.increaseDownCountByUid(uid);
+            case RATE_FEEDBACK:
+                return faqRepository.increaseFeedbackCountByUid(uid);
+            case RATE_TRANSFER:
+                return faqRepository.increaseTransferCountByUid(uid);
+            default:
+                return 0;
+        }
     }
 
     @Override

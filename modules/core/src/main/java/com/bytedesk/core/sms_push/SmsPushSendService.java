@@ -34,6 +34,8 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.platform_config.PlatformSmsConfig;
+import com.bytedesk.core.platform_config.PlatformSmsConfigProvider;
 import com.bytedesk.core.push.PushStatusEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -45,6 +47,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * 短信发送服务
@@ -55,10 +58,12 @@ public class SmsPushSendService {
 
     public SmsPushSendService(
             ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider,
+            ObjectProvider<PlatformSmsConfigProvider> platformSmsConfigProviderProvider,
             BytedeskProperties bytedeskProperties,
             SmsPushRepository smsPushRepository) {
         this.bytedeskProperties = bytedeskProperties;
         this.smsPushExternalSenderProvider = smsPushExternalSenderProvider;
+        this.platformSmsConfigProviderProvider = platformSmsConfigProviderProvider;
         this.smsPushRepository = smsPushRepository;
     }
 
@@ -128,6 +133,12 @@ public class SmsPushSendService {
     private final BytedeskProperties bytedeskProperties;
 
     private final ObjectProvider<SmsPushExternalSender> smsPushExternalSenderProvider;
+
+    /**
+     * 平台短信配置 SPI（实现在 enterprise/core，读取 SuperSystemConfig 平台绑定）。
+     * 无实现/未启用/未配置时为 null，自动回退 properties 配置。
+     */
+    private final ObjectProvider<PlatformSmsConfigProvider> platformSmsConfigProviderProvider;
 
     private final SmsPushRepository smsPushRepository;
     
@@ -209,7 +220,7 @@ public class SmsPushSendService {
     }
 
     /**
-     * 发送验证码（原有流程，不做任何改动）
+     * 发送验证码（原有流程：平台绑定优先，未配置回退 properties）
      * @param mobile 手机号
      * @param country 国家代码
      * @param code 验证码
@@ -221,8 +232,92 @@ public class SmsPushSendService {
         String normalizedMobile = normalizeAndValidateMobile(mobile);
         log.info("sendValidateCode sms to {}, country: {}, code: {}", normalizedMobile, country, code);
 
+        // 平台绑定配置优先（超级管理员 SuperSystemConfig 平台短信配置），未配置/未启用回退 properties
+        PlatformSmsConfig platformConfig = getPlatformSmsConfig();
+        if (platformConfig != null) {
+            return sendValidateCodeByPlatformConfig(normalizedMobile, country, code, platformConfig);
+        }
+        return sendValidateCodeByProperties(normalizedMobile, country, code);
+    }
+
+    // ============ 平台短信配置（SuperSystemConfig 平台绑定） ============
+
+    /**
+     * 获取平台短信配置快照；无效/未启用/无 SPI 实现时返回 null（回退 properties）
+     */
+    PlatformSmsConfig getPlatformSmsConfig() {
+        if (platformSmsConfigProviderProvider == null) {
+            return null;
+        }
+        PlatformSmsConfigProvider provider = platformSmsConfigProviderProvider.getIfAvailable();
+        if (provider == null) {
+            return null;
+        }
+        try {
+            PlatformSmsConfig config = provider.getPlatformSmsConfig();
+            if (config == null || !config.enabled()) {
+                return null;
+            }
+            if (!StringUtils.hasText(config.accessKeyId()) || !StringUtils.hasText(config.accessKeySecret())) {
+                log.warn("平台短信配置不完整（缺少 AccessKey），回退 properties 配置");
+                return null;
+            }
+            return config;
+        } catch (Exception e) {
+            log.error("读取平台短信配置失败，回退 properties 配置", e);
+            return null;
+        }
+    }
+
+    /**
+     * 使用平台绑定配置发送验证码短信：按 providerType 分派厂商适配，
+     * 签名/模板/区域/域名未在平台配置中填写时逐项回退 properties 默认值
+     */
+    private SmsSendResult sendValidateCodeByPlatformConfig(String mobile, String country, String code,
+            PlatformSmsConfig config) {
+        String providerType = config.providerType() == null ? "" : config.providerType().trim().toUpperCase();
+        if (!"ALIYUN".equals(providerType)) {
+            log.warn("平台短信供应商类型 {} 暂未支持，回退 properties 默认阿里云配置", providerType);
+            return sendValidateCodeByProperties(mobile, country, code);
+        }
+        String phoneNumber = formatPhoneNumber(mobile, country);
+        String effectiveRegion = StringUtils.hasText(config.region()) ? config.region() : regionId;
+        String effectiveDomain = StringUtils.hasText(config.endpoint()) ? config.endpoint() : smsDomain;
+        String effectiveSignName = StringUtils.hasText(config.signName()) ? config.signName() : signName;
+        String effectiveTemplateCode = StringUtils.hasText(config.templateCode()) ? config.templateCode() : templateCode;
+        log.debug("平台短信配置发送: signName={}, templateCode={}, region={}",
+                effectiveSignName, effectiveTemplateCode, effectiveRegion);
+        return doSendAliyunSms(phoneNumber, effectiveSignName, effectiveTemplateCode,
+                "{\"code\":\"" + code + "\"}", effectiveRegion, config.accessKeyId(), config.accessKeySecret(),
+                effectiveDomain);
+    }
+
+    /**
+     * 平台测试短信：使用指定服务商凭证真实发送验证码短信，
+     * 签名/模板回退 properties 验证码配置（供 SettingsRestService#testSmsSettings 使用）
+     */
+    public SmsSendResult sendPlatformTestSms(String mobile, String region, String accessKeyId,
+            String accessKeySecret, String endpoint) {
+        Assert.hasText(mobile, "手机号不能为空");
+        Assert.hasText(accessKeyId, "短信服务商 AccessKeyId 不能为空");
+        Assert.hasText(accessKeySecret, "短信服务商 AccessKeySecret 不能为空");
+
+        String phoneNumber = formatPhoneNumber(normalizeAndValidateMobile(mobile), "86");
+        log.info("sendPlatformTestSms to {}", phoneNumber);
+        return doSendAliyunSms(phoneNumber, signName, templateCode,
+                "{\"code\":\"888888\"}",
+                StringUtils.hasText(region) ? region : regionId,
+                accessKeyId,
+                accessKeySecret,
+                StringUtils.hasText(endpoint) ? endpoint : smsDomain);
+    }
+
+    /**
+     * 使用 properties 默认阿里云配置发送验证码（原有逻辑）
+     */
+    private SmsSendResult sendValidateCodeByProperties(String mobile, String country, String code) {
         // 处理国家代码：只保留数字，中国86可以不添加前缀
-        String phoneNumber = formatPhoneNumber(normalizedMobile, country);
+        String phoneNumber = formatPhoneNumber(mobile, country);
         log.debug("格式化后的手机号: {}", phoneNumber);
 
         DefaultProfile profile = DefaultProfile.getProfile(regionId, accessKeyId, accessKeySecret);

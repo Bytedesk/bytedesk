@@ -43,6 +43,13 @@ public class MessageUnreadResponse extends BaseResponse {
 
     private ThreadResponse thread;
 
+    /**
+     * P2：线程快照字段（新建未读记录不再挂载 ThreadEntity，前端可直接使用标量字段）
+     */
+    private String threadUid;
+
+    private String threadTopic;
+
 	private UserProtobuf user;
 
     // extra格式不固定，前端需要根据type字段来解析，所以此处不能使用MessageExtra

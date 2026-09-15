@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,8 +37,6 @@ import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.redis.RedisService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
-import com.bytedesk.core.thread.ThreadEntity;
-import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.utils.ConvertUtils;
 
 import lombok.AllArgsConstructor;
@@ -54,8 +53,6 @@ public class MessageUnreadRestService
     private final ModelMapper modelMapper;
 
     private final AuthService authService;
-
-    private final ThreadRestService threadRestService;
 
     private final RedisService redisService;
 
@@ -156,7 +153,6 @@ public class MessageUnreadRestService
         //
         MessageTypeEnum type = messageProtobuf.getType();
         String threadUid = messageProtobuf.getThread().getUid();
-        // String threadTopic = messageProtobuf.getThread().getTopic();
 
         // 目前只记录文本、图片和文件类型的未读消息
         if (!MessageTypeEnum.TEXT.equals(type) &&
@@ -189,12 +185,11 @@ public class MessageUnreadRestService
         if (MessageStatusEnum.SENDING.equals(messageProtobuf.getStatus())) {
             messageUnread.setStatus(MessageStatusEnum.SUCCESS.name());
         }
-        // messageUnread.setThreadUid(threadUid);
-        // messageUnread.setThreadTopic(threadTopic);
-        Optional<ThreadEntity> threadEntityOptional = threadRestService.findByUid(threadUid);
-        if (threadEntityOptional.isPresent()) {
-            messageUnread.setThread(threadEntityOptional.get());
-        }
+        // P2：去 ThreadEntity 关联，直接从消息体取线程快照。
+        // 不再查询并挂载 ThreadEntity，避免新事务 flush 触发 thread 表 UPDATE
+        // 与其他会话更新并发冲突（Unexpected row count 0）
+        messageUnread.setThreadUid(threadUid);
+        messageUnread.setThreadTopic(messageProtobuf.getThread().getTopic());
         messageUnread.setUser(messageProtobuf.getUser().toJson());
         messageUnread.setUserUid(messageProtobuf.getUser().getUid());
         //
@@ -224,6 +219,11 @@ public class MessageUnreadRestService
         } catch (ObjectOptimisticLockingFailureException e) {
             // 乐观锁冲突，记录日志但不抛出异常
             log.debug("Optimistic locking conflict for message unread uid: {}, treating as success", uid);
+            return;
+        } catch (OptimisticLockingFailureException e) {
+            // StaleStateException 同族（如 flush 期 Unexpected row count 0）：
+            // 已识别的并发冲突，降级为 WARN 且不抛出，避免监听器层产生 ERROR 噪音
+            log.warn("Optimistic locking conflict for message unread uid: {}, treating as success: {}", uid, e.getMessage());
             return;
         } catch (Exception e) {
             // 其他异常，删除 Redis 标记并重新抛出

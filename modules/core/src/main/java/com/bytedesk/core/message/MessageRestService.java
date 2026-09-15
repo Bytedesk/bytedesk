@@ -141,6 +141,14 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         // return messageEntities.stream().map(MessageProtobuf::convertToProtobuf).collect(Collectors.toList());
     }
 
+    /**
+     * 统计同事(MEMBER)会话“对我的未读消息数”（跨正反两个 topic 聚合）。
+     * 详见 {@link MessageRepository#countMemberUnreadByTopics} 的口径说明。
+     */
+    public long countMemberUnreadByTopics(String topic, String reverseTopic, String ownerUserUid) {
+        return messageRepository.countMemberUnreadByTopics(topic, reverseTopic, ownerUserUid);
+    }
+
     // @Cacheable(value = "message", key = "#uid", unless = "#result == null")
     public Boolean isMessageExists(String uid) {
         return messageRepository.existsByUid(uid);

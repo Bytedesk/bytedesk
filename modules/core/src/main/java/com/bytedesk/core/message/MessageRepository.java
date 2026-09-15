@@ -167,6 +167,36 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + "       OR m.message_user LIKE '%\"type\":\"agent\"%')", nativeQuery = true)
     long countVisitorUnreadByThreadUid(@Param("threadUid") String threadUid);
 
+    /**
+     * 统计同事(MEMBER)会话“对我的未读消息数”。
+     *
+     * 背景：MEMBER 一对一会话在库中是成对的两个 thread（topic 互为反转：org/member/A/B 与 org/member/B/A），
+     * 消息只挂载在发送方自己的 thread 上（MessageSocketService.sendMqttMessage 仅对 MQTT 投递做反转复制，
+     * 不落库），因此统计“我”的未读数必须跨正反两个 topic 聚合。
+     *
+     * 口径：
+     * - 排除自己发送的消息（m.user_uid = 当前会话 owner 对应的用户 uid）；
+     * - 沿用 {@link MessageEntity#isUnread()} 的判定规则，status in (SENDING, SUCCESS, DELIVERED) 视为未读；
+     * - 消息类型与前端 desktop shouldIncreaseUnreadCountByMessageType 对齐（TEXT/IMAGE/FILE/AUDIO/VIDEO/NOTICE），
+     *   保证刷新前后端下发的未读数与客户端本地累加的口径一致。
+     *
+     * 事务注意：与 {@link #countVisitorUnreadByThreadUid} 相同，native SQL 会触发全量 flush，
+     * 强制 flushMode=COMMIT 避免写事务中调用（如 convertToResponse 被写路径复用）时引发乐观锁冲突。
+     */
+    @QueryHints(@QueryHint(name = "org.hibernate.flushMode", value = "COMMIT"))
+    @Query(value = "SELECT COUNT(1) "
+            + "FROM bytedesk_core_message m "
+            + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
+            + "WHERE (t.thread_topic = :topic OR t.thread_topic = :reverseTopic) "
+            + "  AND t.is_deleted = false "
+            + "  AND m.is_deleted = false "
+            + "  AND m.status IN ('SENDING','SUCCESS','DELIVERED') "
+            + "  AND m.message_type IN ('TEXT','IMAGE','FILE','AUDIO','VIDEO','NOTICE') "
+            + "  AND m.user_uid <> :ownerUserUid", nativeQuery = true)
+    long countMemberUnreadByTopics(@Param("topic") String topic,
+            @Param("reverseTopic") String reverseTopic,
+            @Param("ownerUserUid") String ownerUserUid);
+
         /**
          * 查找会话中全部 ROBOT_STREAM 消息（按创建时间升序）。
          * 用于热门问题统计：从 RobotContent.question 提取访客原始提问。

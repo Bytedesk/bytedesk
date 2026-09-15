@@ -388,14 +388,14 @@ public class AuthService {
         
         try {
             // 2. 使用AES解密前端发送的加密密码
+            // P5：解密内部已做载荷预检（Base64/块对齐），非法载荷抛 IllegalArgumentException
             String decryptedPassword = PasswordCryptoUtils.decryptPassword(
                 authRequest.getPasswordHash(),
                 authRequest.getPasswordSalt()
             );
-            log.debug("Password decrypted successfully for user: {}, length: {}, first 3 chars: {}",
-                     authRequest.getUsername(),
-                     decryptedPassword.length(),
-                     decryptedPassword.length() > 3 ? decryptedPassword.substring(0, 3) + "***" : decryptedPassword);
+            // 不记录任何密码片段，仅记录长度
+            log.debug("Password decrypted successfully for user: {}, length: {}",
+                     authRequest.getUsername(), decryptedPassword.length());
 
             return authenticateWithPassword(userDetails, decryptedPassword, authRequest.getUsername());
             
