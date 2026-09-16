@@ -25,6 +25,7 @@ import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.workflow.WorkflowEntity;
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.system_config.SystemConfigRestService;
 import com.bytedesk.kbase.quick_button.QuickButtonResponseVisitor;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
@@ -439,6 +440,20 @@ public class ServiceConvertUtils {
         } else {
             resp.setAutoReplyEnabled(false);
             resp.setAutoReplySettingsUid(null);
+        }
+
+        // 平台级大模型问答开关（ai.disableQa / ai.disableQaReply）：经 thread.extra 下发给 visitor，
+        // 用于前端在发送消息时直接展示固定回复（后端 RobotService 另有硬性兑底拦截）。
+        // bean 不可用（测试/早期启动阶段）时优雅降级：不下发字段，前端按 === true 判断，天然不拦截。
+        try {
+            SystemConfigRestService systemConfigRestService = ApplicationContextHolder
+                    .getBean(SystemConfigRestService.class);
+            if (systemConfigRestService != null) {
+                resp.setDisableAiQa(systemConfigRestService.isAiQaDisabled());
+                resp.setDisableAiQaReply(systemConfigRestService.getAiDisableQaReplyOrDefault());
+            }
+        } catch (Exception ignore) {
+            // keep visitor response resilient; switch stays off when config service is unavailable
         }
 
         return resp;

@@ -34,9 +34,9 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.platform_config.PlatformSmsConfig;
-import com.bytedesk.core.platform_config.PlatformSmsConfigProvider;
 import com.bytedesk.core.push.PushStatusEnum;
+import com.bytedesk.core.system_config.sms.PlatformSmsConfig;
+import com.bytedesk.core.system_config.sms.PlatformSmsConfigProvider;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -351,7 +351,8 @@ public class SmsPushSendService {
             String errorCode = e.getErrCode();
             String errorMessage = resolveAliyunErrorMessage(errorCode, e.getErrMsg());
             if (isAliyunCredentialOrPermissionError(errorCode)) {
-                log.warn("阿里云短信配置异常: code={}, message={}", errorCode, e.getErrMsg());
+                log.warn("阿里云短信配置异常: code={}, message={}, region={}, endpoint={}, accessKeyId={}, accessKeySecret={}",
+                        errorCode, e.getErrMsg(), regionId, smsDomain, accessKeyId, maskCredential(accessKeySecret));
             } else {
                 log.error("阿里云短信发送失败 - ClientException: code={}, message={}", errorCode, e.getErrMsg(), e);
             }
@@ -481,7 +482,8 @@ public class SmsPushSendService {
             String errorCode = e.getErrCode();
             String errorMessage = resolveAliyunErrorMessage(errorCode, e.getErrMsg());
             if (isAliyunCredentialOrPermissionError(errorCode)) {
-                log.warn("阿里云短信配置异常: code={}, message={}", errorCode, e.getErrMsg());
+                log.warn("阿里云短信配置异常: code={}, message={}, region={}, endpoint={}, accessKeyId={}, accessKeySecret={}",
+                        errorCode, e.getErrMsg(), region, domain, keyId, maskCredential(keySecret));
             } else {
                 log.error("阿里云短信发送失败 - ClientException: code={}, message={}", errorCode, e.getErrMsg(), e);
             }
@@ -611,6 +613,16 @@ public class SmsPushSendService {
                 || "Forbidden.RAM".equals(code)
                 || "InvalidSecurityToken.Expired".equals(code)
                 || "InvalidSecurityToken.MismatchWithAccessKey".equals(code);
+    }
+
+    private String maskCredential(String credential) {
+        if (!StringUtils.hasText(credential)) {
+            return null;
+        }
+        if (credential.length() <= 8) {
+            return "****";
+        }
+        return credential.substring(0, 4) + "****" + credential.substring(credential.length() - 4);
     }
 
     /**

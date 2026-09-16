@@ -120,8 +120,11 @@ public class SystemConfigRestService {
                 throw new IllegalArgumentException("unregistered system config key: " + key);
             }
             String value = item.getValue();
+            // 注意：这里查询必须包含软删除记录——软删除记录仍占用 (config_key, org_uid)
+            // 唯一约束。若此前该 key 被「清空恢复默认」软删除（is_deleted=true），
+            // 再用 DeletedFalse 查询会查不到而走 insert，触发 Duplicate entry 冲突。
             Optional<SystemConfigEntity> existing = systemConfigRepository
-                    .findByConfigKeyAndOrgUidAndDeletedFalse(key, orgUid);
+                    .findByConfigKeyAndOrgUid(key, orgUid);
 
             if (StringUtils.hasText(value)) {
                 // 校验值类型合法性（BOOLEAN/INTEGER 非法值直接拒绝，避免脏数据进入下发链路）
@@ -132,6 +135,7 @@ public class SystemConfigRestService {
                 if (existing.isPresent()) {
                     SystemConfigEntity entity = existing.get();
                     entity.setConfigValue(value);
+                    entity.setDeleted(false); // 复用（可能曾软删除）的记录并恢复
                     systemConfigRepository.save(entity);
                 } else {
                     SystemConfigEntity entity = SystemConfigEntity.builder()
@@ -151,11 +155,10 @@ public class SystemConfigRestService {
                     systemConfigRepository.save(entity);
                 }
             } else {
-                // 空值 = 删除覆盖，恢复默认
-                existing.ifPresent(entity -> {
-                    entity.setDeleted(true);
-                    systemConfigRepository.save(entity);
-                });
+                // 空值 = 删除覆盖，恢复默认。
+                // 物理删除：软删除会让记录继续占用 (config_key, org_uid) 唯一约束，
+                // 导致下次保存同 key 时 insert 冲突。
+                existing.ifPresent(systemConfigRepository::delete);
             }
             // 逐 key 保存后失效缓存（缓存粒度为整组 Map，任一 key 变更即整组失效）
             // 注意：不走 @CacheEvict 注解——save 内部自调用会绕过 Spring 代理导致注解失效，
@@ -188,6 +191,29 @@ public class SystemConfigRestService {
     }
 
     /**
+     * 是否禁用全平台大模型问答（平台级开关 ai.disableQa）。
+     *
+     * <p>读取平台级覆盖值（走 Redis 缓存），值为 "true"（忽略大小写）时视为禁用；
+     * 未配置或非 true 一律返回 false（维持现状）。</p>
+     */
+    public boolean isAiQaDisabled() {
+        String value = getOverrideValues(SystemConfigConsts.PLATFORM_CONFIG_ORG_UID)
+                .get(SystemConfigConsts.KEY_AI_DISABLE_QA);
+        return "true".equalsIgnoreCase(value);
+    }
+
+    /**
+     * 禁用大模型问答时的固定回复文案（平台级配置 ai.disableQaReply）。
+     *
+     * <p>DB 有覆盖值时返回自定义文案；否则返回内置 i18n key（前端翻译为对应语言）。</p>
+     */
+    public String getAiDisableQaReplyOrDefault() {
+        String value = getOverrideValues(SystemConfigConsts.PLATFORM_CONFIG_ORG_UID)
+                .get(SystemConfigConsts.KEY_AI_DISABLE_QA_REPLY);
+        return StringUtils.hasText(value) ? value : I18Consts.I18N_AI_QA_DISABLED_REPLY;
+    }
+
+    /**
      * 失效指定 orgUid 的整组覆盖值缓存（save 后调用；因缓存粒度是整组 Map）。
      * 通过 CacheManager 手动失效，规避同类内部调用绕过 AOP 代理的问题。
      */
@@ -216,6 +242,8 @@ public class SystemConfigRestService {
                 return com.bytedesk.core.constant.BytedeskConsts.DEFAULT_ORGANIZATION_UID;
             case PLATFORM_SERVICE_WORKGROUP_UID:
                 return com.bytedesk.core.constant.BytedeskConsts.DEFAULT_WORKGROUP_UID;
+            case AI_DISABLE_QA:
+                return "false";
             default:
                 break;
         }

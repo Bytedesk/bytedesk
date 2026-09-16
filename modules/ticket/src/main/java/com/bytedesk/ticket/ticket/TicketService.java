@@ -234,6 +234,10 @@ public class TicketService {
         // 存量脏数据自愈：旧版本 autoAssignForNextNode 曾把报告人节点（如 customerVerify）改派给客服，
         // 导致「确认解决/未解决」出现在客服端而访客端不可见；查询发现报告人节点归属非报告人时重置回去
         healReporterOwnedTasks(ticket, activeTasks, flowgramSchema);
+        // 存量脏数据自愈：转派曾遗漏同步流程变量 assigneeUid，访客「未解决」回退重建的
+        // 处理人节点携带陈旧归属，导致当前处理人 actionable=false、原处理人按钮被前端禁用，
+        // 工单无人可继续操作；查询发现处理人节点归属与 ticket.assignee 不一致时重置回当前处理人
+        healStaleAssigneeOwnedTasks(ticket, activeTasks, flowgramSchema);
         return activeTasks.stream()
                 .map(task -> buildWorkflowTaskResponse(ticket, task, operatorUid, flowgramSchema))
                 .collect(Collectors.toList());
@@ -290,6 +294,87 @@ public class TicketService {
                 if ("${reporterUid}".equals(String.valueOf(assigneeUids.get(i)).trim())) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 自愈处理人节点的陈旧任务归属：转派路径曾遗漏同步流程变量 assigneeUid，
+     * 访客「未解决」回退重建的 processTicket 任务会携带陈旧归属（原处理人），
+     * 导致当前处理人 queryWorkflowActions 拿到 actionable=false（无按钮）、
+     * 原处理人 actionable=true 但被前端 canChat 禁用，工单无人可继续处理。
+     * 查询发现「当前处理人节点」任务归属与 ticket.assignee 不一致时重置回当前处理人。
+     * 幂等：归属一致、任务未分配、报告人节点、会签/或签、委托中均不产生任何写操作。
+     */
+    private void healStaleAssigneeOwnedTasks(TicketEntity ticket, List<Task> activeTasks, JSONObject flowgramSchema) {
+        String ticketAssigneeUid = ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null;
+        if (!StringUtils.hasText(ticketAssigneeUid) || activeTasks == null || activeTasks.isEmpty()) {
+            return;
+        }
+        for (Task task : activeTasks) {
+            // 报告人节点由 healReporterOwnedTasks 负责，不在此重复处理
+            if (isReporterOwnedNode(flowgramSchema, task.getTaskDefinitionKey())) {
+                continue;
+            }
+            // 仅处理「当前处理人节点」：其任务归属应等于 ticket.assignee.uid，
+            // 避免误改固定审批人/角色/部门等其它归属语义的节点
+            if (!isCurrentAssigneeOwnedNode(flowgramSchema, task.getTaskDefinitionKey())) {
+                continue;
+            }
+            String taskAssignee = task.getAssignee();
+            // 未分配任务不视为陈旧（waitClaim/unclaim 场景保持待认领语义）
+            if (!StringUtils.hasText(taskAssignee) || Objects.equals(ticketAssigneeUid, taskAssignee)) {
+                continue;
+            }
+            // 委托中的任务归属由被委托人持有，不重置
+            if (task.getDelegationState() == DelegationState.PENDING) {
+                continue;
+            }
+            log.warn("healStaleAssigneeOwnedTasks: reset stale task {} ({}) assignee from {} to ticket assignee {} for ticket {}",
+                    task.getId(), task.getTaskDefinitionKey(), taskAssignee, ticketAssigneeUid, ticket.getUid());
+            try {
+                taskService.setAssignee(task.getId(), ticketAssigneeUid);
+                // 同步本地 Task 对象，保证后续 buildWorkflowTaskResponse 的 actionable 判定用修复后的归属
+                task.setAssignee(ticketAssigneeUid);
+            } catch (Exception ex) {
+                log.warn("healStaleAssigneeOwnedTasks: failed to heal task {} for ticket {}",
+                        task.getId(), ticket.getUid(), ex);
+            }
+        }
+    }
+
+    /**
+     * 判定节点是否「当前处理人节点」：任务归属应等于 ticket.assignee.uid。
+     * 默认流程的 processTicket 节点，或 schema 中配置 ${assigneeUid} 占位符的用户节点均属此类；
+     * 会签/或签为多人归属语义，不由单一当前处理人持有，排除。
+     */
+    private boolean isCurrentAssigneeOwnedNode(JSONObject flowgramSchema, String taskDefinitionKey) {
+        if (TicketConsts.TICKET_USER_TASK_PROCESS_TICKET.equals(taskDefinitionKey)) {
+            return true;
+        }
+        if (flowgramSchema == null || !StringUtils.hasText(taskDefinitionKey)) {
+            return false;
+        }
+        JSONObject node = findFlowgramNode(flowgramSchema, taskDefinitionKey);
+        if (node == null) {
+            return false;
+        }
+        String nodeType = node.getString("type");
+        if ("countersign".equals(nodeType) || "orSign".equals(nodeType)) {
+            return false;
+        }
+        JSONObject data = node.getJSONObject("data");
+        if (data == null || !"user".equals(data.getString("assigneeType"))) {
+            return false;
+        }
+        JSONArray assigneeUids = data.getJSONArray("assigneeUids");
+        if (assigneeUids == null) {
+            return false;
+        }
+        for (int i = 0; i < assigneeUids.size(); i++) {
+            if ("${assigneeUid}".equals(String.valueOf(assigneeUids.get(i)).trim())) {
+                return true;
             }
         }
         return false;
@@ -755,6 +840,9 @@ public class TicketService {
 
         Map<String, Object> variables = new HashMap<>();
         variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, ticket.getAssigneeString());
+        // 同步流程变量 assigneeUid：processTicket 节点静态归属为 ${assigneeUid}，
+        // 转派/指派后若不同步，访客「未解决」回退重建任务会携带陈旧处理人
+        variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, targetMember.getUid());
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
         runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
 
@@ -884,6 +972,12 @@ public class TicketService {
         Map<String, Object> variables = new HashMap<>();
         variables.put(TicketConsts.TICKET_VARIABLE_DEPARTMENT_UID, ticket.getDepartmentUid());
         variables.put(TicketConsts.TICKET_VARIABLE_STATUS, ticket.getStatus());
+        if (!StringUtils.hasText(request.getTargetAssigneeUid())) {
+            // 仅转部门不指定处理人：同步清空处理人变量，避免陈旧 assigneeUid
+            // 在回退/循环节点重建任务时捡回旧处理人
+            variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE, "");
+            variables.put(TicketConsts.TICKET_VARIABLE_ASSIGNEE_UID, "");
+        }
         runtimeService.setVariables(ticket.getProcessInstanceId(), variables);
 
         addTaskComment(task, ticket, operatorUid, "TRANSFERRED_DEPARTMENT",

@@ -30,6 +30,7 @@ import com.bytedesk.core.apns_push.ApnsPushService;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
 import com.bytedesk.core.sms_push.SmsPushSendService;
+import com.bytedesk.core.sms_template.SmsTemplateRepository;
 import com.bytedesk.service.visitor.VisitorRepository;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
@@ -49,6 +50,7 @@ class TicketEventListenerTest {
                 VisitorRepository visitorRepository = mock(VisitorRepository.class);
                 EmailProviderRepository emailProviderRepository = mock(EmailProviderRepository.class);
                 SmsPushSendService smsPushSendService = mock(SmsPushSendService.class);
+                SmsTemplateRepository smsTemplateRepository = mock(SmsTemplateRepository.class);
                 ApnsPushService apnsPushService = mock(ApnsPushService.class);
                 EmailPushSendService emailPushSendService = mock(EmailPushSendService.class);
                 TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
@@ -58,7 +60,7 @@ class TicketEventListenerTest {
                 IMessageSendService messageSendService = mock(IMessageSendService.class);
                 TicketNotificationService ticketNotificationService = new TicketNotificationService(
                                 notificationService, memberRestService, workgroupRepository, visitorRepository, emailProviderRepository,
-                                smsPushSendService, apnsPushService, emailPushSendService, ticketSettingsRepository,
+                                smsPushSendService, smsTemplateRepository, apnsPushService, emailPushSendService, ticketSettingsRepository,
                                 ticketRepository, threadRestService, messageRestService, messageSendService);
 
                 AgentEntity agentA = buildAgent("agent-a", "user-a");

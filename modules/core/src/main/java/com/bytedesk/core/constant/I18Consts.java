@@ -676,6 +676,7 @@ public class I18Consts {
     public static final String I18N_ROBOT_DESCRIPTION = I18N_PREFIX + "robot.description"; // 机器人描述
     public static final String I18N_ROBOT_AGENT_ASSISTANT_NICKNAME = I18N_PREFIX + "robot.agent.assistant.nickname"; // 客服助理机器人昵称
     public static final String I18N_ROBOT_DEFAULT_REPLY = I18N_PREFIX + "robot.noreply"; // 机器人回复
+    public static final String I18N_AI_QA_DISABLED_REPLY = I18N_PREFIX + "robot.qa.disabled.reply"; // 禁用大模型问答时的固定回复
     public static final String I18N_ROBOT_TO_AGENT_TIP = I18N_PREFIX + "robot.to.agent.tip"; // 机器人转人工提示
     // 角色相关
     public static final String I18N_ADMIN = I18N_PREFIX + "admin"; // 管理员

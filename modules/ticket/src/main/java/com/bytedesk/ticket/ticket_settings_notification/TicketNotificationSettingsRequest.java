@@ -32,6 +32,7 @@ public class TicketNotificationSettingsRequest extends BaseRequest {
     // SMS notification fields
     private Boolean smsEnabled;
     private String smsProviderUid;
+    private String smsTemplateUid;
     private String smsEvents;
     private String smsTemplateIds;
 

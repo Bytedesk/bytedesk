@@ -79,6 +79,10 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
     @Column(name = "sms_provider_uid")
     private String smsProviderUid;
 
+    /** 短信模板 UID（关联 SmsTemplateEntity），所有工单通知共用同一个模板 */
+    @Column(name = "sms_template_uid")
+    private String smsTemplateUid;
+
     /** 短信事件集合 */
     @Builder.Default
     @Convert(converter = com.bytedesk.core.converter.JsonStringListConverter.class)
@@ -151,6 +155,7 @@ public class TicketNotificationSettingsEntity extends BaseEntity {
         // SMS fields
         if (req.getSmsEnabled() != null) entity.setSmsEnabled(req.getSmsEnabled());
         if (req.getSmsProviderUid() != null && !req.getSmsProviderUid().isEmpty()) entity.setSmsProviderUid(req.getSmsProviderUid());
+        if (req.getSmsTemplateUid() != null && !req.getSmsTemplateUid().isEmpty()) entity.setSmsTemplateUid(req.getSmsTemplateUid());
         if (req.getSmsEvents() != null && !req.getSmsEvents().isEmpty()) {
             try {
                 entity.setSmsEvents(java.util.Arrays.asList(om.readValue(req.getSmsEvents(), String[].class)));

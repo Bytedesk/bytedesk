@@ -174,6 +174,18 @@ public class ServiceSettingsResponseVisitor implements Serializable {
      */
     private String aiDisclaimerText;
 
+    /**
+     * 是否禁用大模型问答（平台级开关 ai.disableQa）。
+     * true 时 visitor 前端发送消息直接展示固定回复，不发起大模型请求。
+     */
+    private Boolean disableAiQa;
+
+    /**
+     * 禁用大模型问答时的固定回复文案（平台级配置 ai.disableQaReply）。
+     * 为空时前端使用 i18n 默认文案。
+     */
+    private String disableAiQaReply;
+
     // 工具栏显示控制（固定字段，未设置则默认为显示）
     private ToolbarSettings toolbar;
 

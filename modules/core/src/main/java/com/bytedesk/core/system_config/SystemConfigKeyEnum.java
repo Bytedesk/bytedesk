@@ -99,6 +99,22 @@ public enum SystemConfigKeyEnum {
             "平台客服工作组 UID",
             "访客联系的工作组，须属于上述组织，默认 df_wg_uid",
             3),
+
+    // ============ 大模型问答（AI） ============
+    AI_DISABLE_QA(
+            SystemConfigConsts.KEY_AI_DISABLE_QA,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.AI,
+            "禁用大模型问答",
+            "开启后全平台访客咨询直接返回固定回复，不再进入大模型问答（用于平台审核等场景）",
+            1),
+    AI_DISABLE_QA_REPLY(
+            SystemConfigConsts.KEY_AI_DISABLE_QA_REPLY,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.AI,
+            "固定回复内容",
+            "禁用大模型问答时，回复给访客的固定文案；留空则使用系统内置默认文案",
+            2),
     ;
 
     private final String key;

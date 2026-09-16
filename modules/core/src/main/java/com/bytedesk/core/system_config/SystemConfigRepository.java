@@ -28,6 +28,12 @@ public interface SystemConfigRepository extends JpaRepository<SystemConfigEntity
 
     Optional<SystemConfigEntity> findByConfigKeyAndOrgUidAndDeletedFalse(String configKey, String orgUid);
 
+    /**
+     * 含软删除记录的查询（upsert 用）：软删除记录仍占用 (config_key, org_uid) 唯一约束，
+     * 保存新值前须先复用/清理，避免 Duplicate entry 冲突。
+     */
+    Optional<SystemConfigEntity> findByConfigKeyAndOrgUid(String configKey, String orgUid);
+
     List<SystemConfigEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
     List<SystemConfigEntity> findByOrgUidAndConfigKeyInAndDeletedFalse(String orgUid, List<String> configKeys);

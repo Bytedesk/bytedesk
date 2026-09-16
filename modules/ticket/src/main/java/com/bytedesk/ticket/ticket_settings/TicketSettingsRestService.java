@@ -1648,6 +1648,7 @@ public class TicketSettingsRestService extends
                 .webhookEvents(entity.getWebhookEvents())
                 .smsEnabled(entity.getSmsEnabled())
                 .smsProviderUid(entity.getSmsProviderUid())
+                .smsTemplateUid(entity.getSmsTemplateUid())
                 .smsEvents(entity.getSmsEvents())
                 .smsTemplateIds(entity.getSmsTemplateIds())
                 .emailNotifyWhenOnline(entity.getEmailNotifyWhenOnline())
@@ -1791,6 +1792,8 @@ public class TicketSettingsRestService extends
             target.setSmsEnabled(source.getSmsEnabled());
         if (source.getSmsProviderUid() != null)
             target.setSmsProviderUid(source.getSmsProviderUid());
+        if (source.getSmsTemplateUid() != null)
+            target.setSmsTemplateUid(source.getSmsTemplateUid());
         if (source.getSmsEvents() != null)
             target.setSmsEvents(source.getSmsEvents());
         if (source.getSmsTemplateIds() != null)
@@ -1822,6 +1825,7 @@ public class TicketSettingsRestService extends
                 : new java.util.ArrayList<>());
         target.setSmsEnabled(source.getSmsEnabled());
         target.setSmsProviderUid(source.getSmsProviderUid());
+        target.setSmsTemplateUid(source.getSmsTemplateUid());
         target.setSmsEvents(source.getSmsEvents() != null ? new java.util.ArrayList<>(source.getSmsEvents())
                 : new java.util.ArrayList<>());
         target.setSmsTemplateIds(
@@ -2076,8 +2080,6 @@ public class TicketSettingsRestService extends
         String mobileCountry = StringUtils.hasText(country) ? country : "86";
         java.util.Map<String, String> testParams = new java.util.HashMap<>();
         testParams.put("name", "测试用户");
-        testParams.put("ticketNumber", "TEST001");
-        testParams.put("status", "测试");
         String orgUid = authService.getCurrentUser().getOrgUid();
         var result = smsPushSendService.sendSmsWithTemplate(to, mobileCountry, signName, templateCode, testParams,
                 orgUid);

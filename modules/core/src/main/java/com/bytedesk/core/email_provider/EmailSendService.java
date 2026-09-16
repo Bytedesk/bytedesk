@@ -35,8 +35,8 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
-import com.bytedesk.core.platform_config.PlatformEmailConfig;
-import com.bytedesk.core.platform_config.PlatformEmailConfigProvider;
+import com.bytedesk.core.system_config.email.PlatformEmailConfig;
+import com.bytedesk.core.system_config.email.PlatformEmailConfigProvider;
 import com.bytedesk.core.utils.Utils;
 
 import jakarta.mail.internet.MimeMessage;

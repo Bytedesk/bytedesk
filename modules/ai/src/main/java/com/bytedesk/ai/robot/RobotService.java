@@ -46,6 +46,7 @@ import com.bytedesk.core.message.content.AudioContent;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.content.VoiceContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
+import com.bytedesk.core.system_config.SystemConfigRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -72,6 +73,7 @@ public class RobotService extends AbstractRobotService {
     private final RobotRestService robotRestService;
     private final SegmentService segmentService;
     private final SseMessageHelper sseMessageHelper;
+    private final SystemConfigRestService systemConfigRestService;
 
     /**
      * 可选注入：语音转写 SPI 实现位于 enterprise/ai（DashScopeRobotVoiceTranscriber）。
@@ -322,6 +324,15 @@ public class RobotService extends AbstractRobotService {
             robot,
             validationResult.getMessageProtobuf());
 
+        // 平台审核开关：禁用大模型问答时，直接返回固定回复，不进入 LLM
+        if (systemConfigRestService != null && systemConfigRestService.isAiQaDisabled()) {
+            log.info("AI QA disabled by platform switch, return fixed reply, threadUid={}",
+                    validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+            sseMessageHelper.sendDefaultReplySse(query, systemConfigRestService.getAiDisableQaReplyOrDefault(),
+                    robot, validationResult.getMessageProtobuf(), messageProtobufReply, emitter);
+            return;
+        }
+
         if (!shouldProcessVisitorSseMessage(validationResult.getMessageProtobuf(), query)) {
             log.info("Skip visitor SSE AI processing for messageType={}, threadUid={}, reason=empty-or-non-ai-query",
                     validationResult.getMessageProtobuf().getType(),
@@ -423,6 +434,14 @@ public class RobotService extends AbstractRobotService {
                 validationResult.getThreadProtobuf(),
                 robot,
                 validationResult.getMessageProtobuf());
+
+        // 平台审核开关：禁用大模型问答时，直接返回固定回复，不进入 LLM
+        if (systemConfigRestService != null && systemConfigRestService.isAiQaDisabled()) {
+            log.info("AI QA disabled by platform switch, return fixed reply (sync), threadUid={}",
+                    validationResult.getThreadProtobuf() != null ? validationResult.getThreadProtobuf().getUid() : null);
+            messageProtobufReply.setContent(systemConfigRestService.getAiDisableQaReplyOrDefault());
+            return messageProtobufReply;
+        }
 
         // 语音消息自动 ASR（同步链路，如微信公众号）：VOICE/AUDIO 先转文字再送 LLM，
         // 未开启/无实现/失败则不送 LLM（返回空回复，修复 JSON 直送 LLM 缺陷，§3 G2）

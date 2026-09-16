@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
-import com.bytedesk.core.platform_config.PlatformSecretUtils;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.push.PushStatusEnum;
+import com.bytedesk.core.system_config.utils.PlatformSecretUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 

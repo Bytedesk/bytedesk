@@ -23,5 +23,7 @@ public enum SystemConfigGroupEnum {
     /** 协议与合规：隐私协议/用户协议 */
     AGREEMENT,
     /** 平台客服：访客端纠纷介入通道 */
-    PLATFORM_SERVICE
+    PLATFORM_SERVICE,
+    /** 大模型问答：全平台问答入口控制 */
+    AI
 }

@@ -34,6 +34,7 @@ public class TicketNotificationSettingsResponse extends BaseResponse {
     // SMS notification fields
     private Boolean smsEnabled;
     private String smsProviderUid;
+    private String smsTemplateUid;
     private List<String> smsEvents;
     private java.util.Map<String, String> smsTemplateIds;
 

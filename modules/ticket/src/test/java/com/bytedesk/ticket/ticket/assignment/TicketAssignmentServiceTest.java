@@ -5,13 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.mockito.ArgumentCaptor;
 
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -292,6 +296,79 @@ class TicketAssignmentServiceTest {
         assertTrue(result.isResolved());
         assertEquals("member-agent-1", result.assigneeUid());
         // 访客点「未解决」回退 processTicket 场景：处理权保持不变，不错派给其他客服
+        verify(fixture.taskService, never()).setAssignee(anyString(), anyString());
+        verify(fixture.taskService, never()).claim(anyString(), anyString());
+    }
+
+    @Test
+    void autoAssignForNextNodeShouldReapplyWhenTaskAssigneeStale() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setProcessEntityUid("process-stale-task");
+        ticket.setAssignee(UserProtobuf.builder().uid("member-agent-1").build().toJson());
+
+        ProcessEntity process = ProcessEntity.builder()
+                .uid("process-stale-task")
+                .flowgramSchema(buildUserNodeSchema("processTicket", "${assigneeUid}"))
+                .build();
+        Task task = mock(Task.class);
+        TaskQuery taskQuery = mock(TaskQuery.class);
+        when(fixture.taskService.createTaskQuery()).thenReturn(taskQuery);
+        when(taskQuery.processInstanceId("process-1")).thenReturn(taskQuery);
+        when(taskQuery.active()).thenReturn(taskQuery);
+        when(taskQuery.list()).thenReturn(List.of(task));
+        when(task.getId()).thenReturn("task-process-stale-1");
+        when(task.getTaskDefinitionKey()).thenReturn("processTicket");
+        // 任务归属为陈旧的原处理人，与 ticket.assignee（当前处理人）不一致
+        when(task.getAssignee()).thenReturn("member-admin-1");
+        when(fixture.processRepository.findByUid("process-stale-task")).thenReturn(Optional.of(process));
+        when(fixture.memberRepository.findByUid("member-agent-1"))
+                .thenReturn(Optional.of(MemberEntity.builder().uid("member-agent-1").build()));
+        when(fixture.ticketRepository.findByUid("ticket-1")).thenReturn(Optional.of(ticket));
+        when(fixture.ticketRepository.save(ticket)).thenReturn(ticket);
+        when(fixture.uidUtils.getUid()).thenReturn("assign-log-stale-1");
+
+        AssignmentResolutionResult result = fixture.service.autoAssignForNextNode(ticket, "process-1");
+
+        assertTrue(result.isResolved());
+        assertEquals("member-agent-1", result.assigneeUid());
+        // 陈旧归属不被「处理人未变」短路掩盖：任务重派回当前处理人并同步流程变量
+        verify(fixture.taskService).setAssignee("task-process-stale-1", "member-agent-1");
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, Object>> variablesCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(fixture.taskService).setVariables(eq("task-process-stale-1"), variablesCaptor.capture());
+        assertEquals("member-agent-1", variablesCaptor.getValue().get("assigneeUid"));
+    }
+
+    @Test
+    void autoAssignForNextNodeShouldKeepSkipWhenTaskUnassignedAndTicketAssigneeMatches() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setProcessEntityUid("process-unassigned-task");
+        ticket.setAssignee(UserProtobuf.builder().uid("member-agent-1").build().toJson());
+
+        ProcessEntity process = ProcessEntity.builder()
+                .uid("process-unassigned-task")
+                .flowgramSchema(buildUserNodeSchema("processTicket", "${assigneeUid}"))
+                .build();
+        Task task = mock(Task.class);
+        TaskQuery taskQuery = mock(TaskQuery.class);
+        when(fixture.taskService.createTaskQuery()).thenReturn(taskQuery);
+        when(taskQuery.processInstanceId("process-1")).thenReturn(taskQuery);
+        when(taskQuery.active()).thenReturn(taskQuery);
+        when(taskQuery.list()).thenReturn(List.of(task));
+        when(task.getId()).thenReturn("task-process-unassigned-1");
+        when(task.getTaskDefinitionKey()).thenReturn("processTicket");
+        // 任务未分配（如等待认领）：不因防御逻辑被误认领
+        when(task.getAssignee()).thenReturn(null);
+        when(fixture.processRepository.findByUid("process-unassigned-task")).thenReturn(Optional.of(process));
+        when(fixture.memberRepository.findByUid("member-agent-1"))
+                .thenReturn(Optional.of(MemberEntity.builder().uid("member-agent-1").build()));
+
+        AssignmentResolutionResult result = fixture.service.autoAssignForNextNode(ticket, "process-1");
+
+        assertTrue(result.isResolved());
+        assertEquals("member-agent-1", result.assigneeUid());
         verify(fixture.taskService, never()).setAssignee(anyString(), anyString());
         verify(fixture.taskService, never()).claim(anyString(), anyString());
     }

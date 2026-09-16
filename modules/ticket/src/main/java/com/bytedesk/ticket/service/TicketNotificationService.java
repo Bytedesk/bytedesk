@@ -35,6 +35,8 @@ import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.sms_push.SmsPushSendService;
+import com.bytedesk.core.sms_template.SmsTemplateEntity;
+import com.bytedesk.core.sms_template.SmsTemplateRepository;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.enums.LevelEnum;
@@ -100,6 +102,8 @@ public class TicketNotificationService {
     private final EmailProviderRepository emailProviderRepository;
 
     private final SmsPushSendService smsPushSendService;
+
+    private final SmsTemplateRepository smsTemplateRepository;
 
     private final ApnsPushService apnsPushService;
 
@@ -891,48 +895,32 @@ public class TicketNotificationService {
                 return;
             }
         }
-        // 获取 ticketSettings 中的短信模板配置（smsTemplateIds: event → {"tc":"...","sn":"..."})
-        Map<String, String> smsTemplateIds = null;
-        if (notifSettings != null && notifSettings.getSmsTemplateIds() != null
-                && !notifSettings.getSmsTemplateIds().isEmpty()) {
-            smsTemplateIds = notifSettings.getSmsTemplateIds();
-        }
-        if (smsTemplateIds == null || smsTemplateIds.isEmpty()) {
-            log.debug("ticket sms notification: no smsTemplateIds configured, skipping for ticketUid={}",
+        // 获取 ticketSettings 中配置的统一短信模板（所有工单通知共用同一个 SmsTemplateEntity）
+        String smsTemplateUid = notifSettings != null ? notifSettings.getSmsTemplateUid() : null;
+        if (!StringUtils.hasText(smsTemplateUid)) {
+            log.debug("ticket sms notification: no smsTemplateUid configured, skipping for ticketUid={}",
                     ticket.getUid());
             return;
         }
-        // 按事件类型查找对应的模板配置 JSON
-        String smsEventKey = resolveEventKey(eventType, currentStatus, ticket);
-        String templateJson = smsTemplateIds.get(smsEventKey);
-        if (!StringUtils.hasText(templateJson)) {
-            log.debug("ticket sms notification: no template configured for eventKey={}, skipping ticketUid={}",
-                    smsEventKey, ticket.getUid());
+        Optional<SmsTemplateEntity> smsTemplateOpt = smsTemplateRepository.findByUid(smsTemplateUid);
+        if (smsTemplateOpt.isEmpty() || smsTemplateOpt.get().isDeleted()) {
+            log.warn("ticket sms notification: sms template not found or deleted, smsTemplateUid={}, ticketUid={}",
+                    smsTemplateUid, ticket.getUid());
             return;
         }
-        // 解析 {"tc":"SMS_xxx","sn":"微语","vars":"[\"name\",\"ticketNumber\",\"status\"]"}
-        String smsTemplateCode = null;
-        String smsSignName = null;
-        List<String> smsVariableNames = List.of("name", "ticketNumber", "status"); // default
-        try {
-            JSONObject tpl = JSON.parseObject(templateJson);
-            smsTemplateCode = tpl.getString("tc");
-            smsSignName = tpl.getString("sn");
-            String varsRaw = tpl.getString("vars");
-            if (StringUtils.hasText(varsRaw)) {
-                smsVariableNames = JSON.parseArray(varsRaw, String.class);
-            }
-        } catch (Exception e) {
-            log.warn("ticket sms notification: failed to parse templateJson={} for eventKey={}, ticketUid={}",
-                    templateJson, smsEventKey, ticket.getUid(), e);
-            return;
-        }
+        SmsTemplateEntity smsTemplate = smsTemplateOpt.get();
+        String smsTemplateCode = smsTemplate.getTemplateCode();
+        String smsSignName = smsTemplate.getSignName();
+        List<String> smsVariableNames = smsTemplate.getVariableNames() != null
+                ? smsTemplate.getVariableNames()
+                : List.of("name", "ticketNumber", "status");
         if (!StringUtils.hasText(smsTemplateCode) || !StringUtils.hasText(smsSignName)) {
-            log.warn("ticket sms notification: incomplete template config (tc={}, sn={}) for eventKey={}, ticketUid={}",
-                    smsTemplateCode, smsSignName, smsEventKey, ticket.getUid());
+            log.warn("ticket sms notification: incomplete sms template (templateCode={}, signName={}), smsTemplateUid={}, ticketUid={}",
+                    smsTemplateCode, smsSignName, smsTemplateUid, ticket.getUid());
             return;
         }
 
+        String smsEventKey = resolveEventKey(eventType, currentStatus, ticket);
         String ticketNumber = StringUtils.hasText(ticket.getTicketNumber())
                 ? ticket.getTicketNumber()
                 : ticket.getUid();
@@ -951,7 +939,7 @@ public class TicketNotificationService {
     }
 
     /**
-     * 将后端 eventType + currentStatus 映射为前端 smsTemplateIds 中的事件 key。
+     * 将后端 eventType + currentStatus 映射为前端 smsEvents 中的事件 key。
      * <ul>
      * <li>TICKET_CREATED → "created"</li>
      * <li>TICKET_STATUS_CHANGED → 根据 currentStatus 映射为 "assigned" / "resolved" /

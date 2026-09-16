@@ -182,7 +182,16 @@ public class TicketAssignmentService {
                 }
                 String previousAssignee = ticket.getAssigneeString();
                 UserProtobuf currentAssignee = ticket.getAssignee();
-                if (currentAssignee != null && result.assigneeUid().equals(currentAssignee.getUid())) {
+                boolean ticketAssigneeMatches = currentAssignee != null
+                        && result.assigneeUid().equals(currentAssignee.getUid());
+                // 以 Flowable 任务实际归属兜底校验：转派路径曾遗漏同步流程变量 assigneeUid，
+                // 回退/循环重建的处理人节点会携带陈旧归属，仅比对 ticket.assignee 会误判
+                // 「未变」而放弃纠正，导致工单重新打开后当前处理人无法操作（actionable=false）。
+                // 任务未分配时保持原跳过语义，不干预 waitClaim 等待认领场景。
+                String taskAssigneeUid = activeTask.getAssignee();
+                boolean taskAssigneeStale = StringUtils.hasText(taskAssigneeUid)
+                        && !result.assigneeUid().equals(taskAssigneeUid);
+                if (ticketAssigneeMatches && !taskAssigneeStale) {
                     log.debug("autoAssignForNextNode: ticket={} assignee unchanged, skipping", ticket.getUid());
                     return result;
                 }
