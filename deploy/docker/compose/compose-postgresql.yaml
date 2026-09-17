@@ -3,7 +3,19 @@
 # 应用侧 DSN 由 start.sh 按所选数据库自动注入（或通过 .env 中 SPRING_DATASOURCE_* 显式配置）
 services:
   bytedesk-postgresql:
-    image: postgres:17
+    # 默认 PostgreSQL 镜像（无全文检索/向量检索/分析扩展）
+    # image: postgres:17
+    # 改用 ParadeDB 镜像：PostgreSQL 的开源增强发行版，内置 pg_search
+    # （Tantivy 驱动的 BM25 全文检索 + 向量检索 + 混合检索）与列式存储/聚合
+    # 分析能力，单库即含搜索引擎，无需再部署 Elasticsearch。
+    # 兼容原生 PostgreSQL 协议与数据，适合知识库、工单、消息等全文检索场景。
+    # 固定到当前最新稳定版 0.25.9（默认基于 PostgreSQL 18；如需 PG17 可改用 latest-pg17）。
+    # 参考：https://github.com/paradedb/paradedb
+    # https://hub.docker.com/r/paradedb/paradedb/tags?name=0.25.9
+    # 注意：PG18+ 镜像要求数据卷挂载在 /var/lib/postgresql（而非旧的 .../data），
+    # 否则会因检测到旧格式数据而拒绝启动，详见：
+    # https://github.com/docker-library/postgres/pull/1259
+    image: paradedb/paradedb:0.25.9
     container_name: postgresql-bytedesk
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-bytedesk}
@@ -13,7 +25,7 @@ services:
     ports:
       - "${POSTGRES_HOST_PORT:-15432}:${POSTGRES_PORT:-5432}"
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgresql_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bytedesk}"]
       interval: 10s
@@ -24,7 +36,7 @@ services:
 
 volumes:
   postgresql_data:
-    name: bytedesk_postgresql_data
+    name: bytedesk_postgresql_data18
 
 networks:
   bytedesk-network:

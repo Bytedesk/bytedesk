@@ -49,6 +49,12 @@ cp .env.example .env
 ./start.sh call webrtc all
 ./start.sh call webrtc middleware obs minio mrcp searxng neo4j  # 任意组合
 ./stop.sh call webrtc middleware obs minio mrcp searxng neo4j down
+## 使用 postgresql
+./start.sh postgresql call webrtc middleware obs minio mrcp searxng neo4j  # 任意组合
+./stop.sh postgresql call webrtc middleware obs minio mrcp searxng neo4j down
+# 之后反复切库，几秒完成
+./switch-db.sh mysql
+./switch-db.sh postgresql
 
 # 可选组件（任意组合）
 ./start.sh all minio searxng

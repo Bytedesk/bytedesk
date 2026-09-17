@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        统一 RAG Query 增强记录表名：
+        早期 Liquibase 建表使用 bytedesk_ai_rag_rewrite_record，
+        后续实体与仓库表名风格统一为 bytedesk_ai_rag_rewrite。
+
+        该变更兼容两类场景：
+        1. 旧库/新库已存在 bytedesk_ai_rag_rewrite_record：重命名为 bytedesk_ai_rag_rewrite。
+        2. 目标表已存在（例如历史上被 JPA 建过）：跳过，不重复操作。
+    -->
+    <changeSet id="260917-rename-rag-rewrite-record-table" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_rag_rewrite_record"/>
+                <not>
+                    <tableExists tableName="bytedesk_ai_rag_rewrite"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <renameTable
+            oldTableName="bytedesk_ai_rag_rewrite_record"
+            newTableName="bytedesk_ai_rag_rewrite"/>
+    </changeSet>
+
+</databaseChangeLog>

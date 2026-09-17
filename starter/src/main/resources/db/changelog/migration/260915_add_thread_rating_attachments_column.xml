@@ -17,9 +17,12 @@
 
     <changeSet id="260915-add-thread-rating-attachments-column" author="copilot">
         <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="bytedesk_service_thread_rating" columnName="attachments"/>
-            </not>
+            <and>
+                <tableExists tableName="bytedesk_service_thread_rating"/>
+                <not>
+                    <columnExists tableName="bytedesk_service_thread_rating" columnName="attachments"/>
+                </not>
+            </and>
         </preConditions>
         <addColumn tableName="bytedesk_service_thread_rating">
             <column name="attachments" type="TEXT">

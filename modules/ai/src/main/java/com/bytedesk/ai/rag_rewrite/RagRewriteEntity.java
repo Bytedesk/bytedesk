@@ -44,7 +44,6 @@ import lombok.experimental.SuperBuilder;
 @Table(
     name = "bytedesk_ai_rag_rewrite",
     indexes = {
-        @Index(name = "idx_rag_rewrite_uid", columnList = "uuid"),
         @Index(name = "idx_rag_rewrite_org_robot", columnList = "org_uid,robot_uid"),
         @Index(name = "idx_rag_rewrite_thread", columnList = "thread_topic")
     }

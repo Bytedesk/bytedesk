@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        收敛 RAG Query 增强记录的历史双表状态。
+
+        PostgreSQL 下曾出现：
+        - Liquibase 建出 bytedesk_ai_rag_rewrite_record；
+        - JPA 又按实体名建出 bytedesk_ai_rag_rewrite；
+        - 旧表上的 idx_rag_rewrite_* 索引名与新表 JPA 建索引冲突。
+
+        对当前安全场景（旧 _record 表为空）做自动清理：
+        1. 删除空的旧表，释放 schema 级索引名；
+        2. 在统一后的 bytedesk_ai_rag_rewrite 上补齐业务索引。
+
+        若旧表存在历史数据，本变更会跳过，避免自动删表；此时需人工迁移数据后再清理。
+    -->
+    <changeSet id="260917-drop-empty-rag-rewrite-record-table" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_rag_rewrite"/>
+                <tableExists tableName="bytedesk_ai_rag_rewrite_record"/>
+                <rowCount tableName="bytedesk_ai_rag_rewrite_record" expectedRows="0"/>
+            </and>
+        </preConditions>
+
+        <dropTable tableName="bytedesk_ai_rag_rewrite_record" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet id="260917-add-rag-rewrite-org-robot-index" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_rag_rewrite"/>
+                <not>
+                    <indexExists indexName="idx_rag_rewrite_org_robot"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createIndex indexName="idx_rag_rewrite_org_robot" tableName="bytedesk_ai_rag_rewrite">
+            <column name="org_uid"/>
+            <column name="robot_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260917-add-rag-rewrite-thread-index" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_rag_rewrite"/>
+                <not>
+                    <indexExists indexName="idx_rag_rewrite_thread"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <createIndex indexName="idx_rag_rewrite_thread" tableName="bytedesk_ai_rag_rewrite">
+            <column name="thread_topic"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
