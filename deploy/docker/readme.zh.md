@@ -47,11 +47,11 @@ cp .env.example .env
 
 # WebRTC 音视频（webrtc = coturn + janus）
 ./start.sh call webrtc all
-./start.sh call webrtc middleware obs minio mrcp searxng neo4j  # 任意组合
-./stop.sh call webrtc middleware obs minio mrcp searxng neo4j down
+./start.sh call webrtc middleware minio searxng neo4j  # 任意组合
+./stop.sh call webrtc middleware minio searxng neo4j down
 ## 使用 postgresql
-./start.sh postgresql call webrtc middleware obs minio mrcp searxng neo4j  # 任意组合
-./stop.sh postgresql call webrtc middleware obs minio mrcp searxng neo4j down
+./start.sh postgresql call webrtc middleware minio searxng neo4j  # 任意组合
+./stop.sh postgresql call webrtc middleware minio searxng neo4j down
 # 之后反复切库，几秒完成
 ./switch-db.sh mysql
 ./switch-db.sh postgresql
@@ -59,6 +59,7 @@ cp .env.example .env
 # 可选组件（任意组合）
 ./start.sh all minio searxng
 ./start.sh middleware obs        # obs = prometheus + grafana + zipkin + otelcol
+./stop.sh middleware obs
 ./start.sh middleware logstash kibana
 ./stop.sh middleware logstash kibana down
 ```

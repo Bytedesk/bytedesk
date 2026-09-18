@@ -53,6 +53,7 @@ cp .env.example .env
 # optional components (any combination)
 ./start.sh all minio searxng
 ./start.sh middleware obs        # obs = prometheus + grafana + zipkin + otelcol
+./stop.sh middleware obs
 ./start.sh middleware logstash kibana
 ./stop.sh middleware logstash kibana down
 ```

@@ -153,6 +153,14 @@
 			<version>${spring-ai.version}</version>
 		</dependency>
 
+		<!-- https://docs.spring.io/spring-ai/reference/api/vectordbs/pgvector.html -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-starter-vector-store-pgvector -->
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+			<version>${spring-ai.version}</version>
+		</dependency> -->
+
 		<!-- https://mvnrepository.com/artifact/org.elasticsearch.client/elasticsearch-rest-client -->
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
