@@ -15,6 +15,8 @@ package com.bytedesk.core.rbac.user;
 
 // import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.SerializationUtils;
 import org.springframework.util.StringUtils;
 
@@ -51,8 +53,15 @@ public class UserEntityListener {
         UserEntity clonedUser = SerializationUtils.clone(user);
         // log.info("user postPersist {}", user.getUid());
         // 
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishUserCreateEvent(clonedUser);
+        // NOTE: 用户创建发生在事务内；BytedeskEventPublisher 本身是 @Async，事件一旦发布，
+        // 异步监听器（如 AssistantEventListener/PublicAccountEventListener，REQUIRES_NEW）
+        // 可能在用户记录提交前就插入引用该用户的外键数据（bytedesk_core_thread.owner_id），
+        // 导致外键约束违反。因此这里注册 afterCommit 回调，在提交后再发布事件。
+        // 与 OrganizationEntityListener/TicketEntityListener 同一模式。
+        publishAfterCommit(() -> {
+            BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+            bytedeskEventPublisher.publishUserCreateEvent(clonedUser);
+        });
     }
 
     // @PreUpdate
@@ -66,8 +75,24 @@ public class UserEntityListener {
         UserEntity clonedUser = SerializationUtils.clone(user);
         // log.info("postUpdate {}", user.getUid());
         //
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishUserUpdateEvent(clonedUser);
+        publishAfterCommit(() -> {
+            BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
+            bytedeskEventPublisher.publishUserUpdateEvent(clonedUser);
+        });
+    }
+
+    private void publishAfterCommit(Runnable publish) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    publish.run();
+                }
+            });
+        } else {
+            // 无事务上下文时保持原有行为，直接发布
+            publish.run();
+        }
     }
 
     // @PreRemove

@@ -39,6 +39,7 @@ import com.bytedesk.core.relation.RelationEntity;
 import com.bytedesk.core.relation.RelationRepository;
 import com.bytedesk.core.relation.RelationTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.webrtc.janus.config.JanusRuntimeProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,8 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
     private final AuthService authService;
     
     private final PermissionService permissionService;
+
+    private final JanusRuntimeProperties janusRuntimeProperties;
     
     @Override
     public Page<RoomEntity> queryByOrgEntity(RoomRequest request) {
@@ -179,6 +182,48 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
     @Override
     public RoomResponse create(RoomRequest request) {
         return createInternal(request, false);
+    }
+
+    /**
+     * 会议加入：按 inviteUid（或 uid）解析房间，记录当前登录用户参与关系，
+     * 返回房间信息 + 用户展示名 + Janus 可用性；房间不存在时抛业务异常
+     */
+    @Transactional
+    public RoomJoinResponse joinRoom(RoomRequest request) {
+        UserEntity user = authService.getUser();
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            throw new RuntimeException("未登录，无法加入会议");
+        }
+
+        String inviteUid = request.getInviteUid();
+        String uid = request.getUid();
+        if (!StringUtils.hasText(inviteUid) && !StringUtils.hasText(uid)) {
+            throw new RuntimeException("会议号不能为空");
+        }
+
+        Optional<RoomEntity> optionalRoom = Optional.empty();
+        if (StringUtils.hasText(inviteUid)) {
+            optionalRoom = findByInviteUid(inviteUid);
+        }
+        if (optionalRoom.isEmpty() && StringUtils.hasText(uid)) {
+            optionalRoom = findByUid(uid);
+        }
+        if (optionalRoom.isEmpty()) {
+            throw new RuntimeException("会议不存在或已结束");
+        }
+
+        RoomEntity room = optionalRoom.get();
+        // 复用既有参与关系记录（幂等：重复加入只刷新 lastInteractionTime）
+        recordRoomParticipation(StringUtils.hasText(inviteUid) ? inviteUid : room.getUid());
+
+        String displayName = StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUid();
+
+        return RoomJoinResponse.builder()
+                .room(convertToResponse(room))
+                .displayName(displayName)
+                .userUid(user.getUid())
+                .janusEnabled(janusRuntimeProperties.isEnabled())
+                .build();
     }
 
     @Transactional

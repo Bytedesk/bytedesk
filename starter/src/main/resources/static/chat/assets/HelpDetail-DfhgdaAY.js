@@ -1,1 +1,0 @@
-import{a as e}from"./intl-vendor-CKZSeOmV.js";var t=e(),n=()=>(0,t.jsx)(`div`,{children:`HelpDetail`});export{n as default};

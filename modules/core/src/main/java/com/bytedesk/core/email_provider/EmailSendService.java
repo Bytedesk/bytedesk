@@ -35,6 +35,10 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.email_template.EmailTemplateContentTypeEnum;
+import com.bytedesk.core.email_template.EmailTemplateEntity;
+import com.bytedesk.core.email_template.EmailTemplateInitData;
+import com.bytedesk.core.email_template.EmailTemplateRepository;
 import com.bytedesk.core.system_config.email.PlatformEmailConfig;
 import com.bytedesk.core.system_config.email.PlatformEmailConfigProvider;
 import com.bytedesk.core.utils.Utils;
@@ -59,7 +63,15 @@ import org.springframework.util.StringUtils;
 @Service
 public class EmailSendService {
 
+    /** 验证码邮件默认文案（模板不可用时的兑底，保持历史行为） */
+    private static final String DEFAULT_VERIFY_CODE_CONTENT = "您的验证码是%s, 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
+
+    /** 验证码邮件默认主题 */
+    private static final String DEFAULT_VERIFY_CODE_SUBJECT = "微语验证码";
+
     private final BytedeskProperties bytedeskProperties;
+
+    private final EmailTemplateRepository emailTemplateRepository;
 
     /**
      * 平台邮件配置 SPI（实现在 enterprise/core，读取 SuperSystemConfig 平台绑定）。
@@ -166,10 +178,57 @@ public class EmailSendService {
         Assert.hasText(code, "验证码不能为空");
 
         log.info("sendPlatformValidateCode email={}, platform sender={}", email, config.emailAddress());
-        String content = "您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
+        EmailTemplateEntity verifyCodeTemplate = findVerifyCodeTemplate();
+        String content = renderVerifyCodeContent(verifyCodeTemplate, code);
+        String subject = resolveVerifyCodeSubject(verifyCodeTemplate);
         String displayName = StringUtils.hasText(config.displayName()) ? config.displayName() : "weiyuai";
         return sendMailWithResult(createPlatformMailSender(config), config.emailAddress(), displayName,
-                email, "微语验证码", content);
+                email, subject, content);
+    }
+
+    /**
+     * 读取验证码邮件模板（EMAIL_VERIFY_CODE）。
+     * 模板不存在、已停用或读取异常时返回 null，发送链路回退默认文案，保证验证码始终能发出。
+     */
+    private EmailTemplateEntity findVerifyCodeTemplate() {
+        try {
+            return emailTemplateRepository.findByUid(EmailTemplateInitData.EMAIL_VERIFY_CODE_UID)
+                    .filter(template -> Boolean.TRUE.equals(template.getEnabled()))
+                    .orElse(null);
+        } catch (Exception e) {
+            log.warn("读取验证码邮件模板失败，回退默认文案: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 解析验证码邮件主题：优先使用模板主题，未配置时回退默认主题
+     */
+    private String resolveVerifyCodeSubject(EmailTemplateEntity template) {
+        if (template != null && StringUtils.hasText(template.getSubject())) {
+            return template.getSubject();
+        }
+        return DEFAULT_VERIFY_CODE_SUBJECT;
+    }
+
+    /**
+     * 渲染验证码邮件内容：将模板中 #{code} / ${code} 占位符替换为验证码。
+     * TEXT 类型模板优先纯文本内容；模板不可用或内容为空时回退默认文案。
+     */
+    private String renderVerifyCodeContent(EmailTemplateEntity template, String code) {
+        String content = null;
+        if (template != null) {
+            if (EmailTemplateContentTypeEnum.TEXT.name().equals(template.getContentType())
+                    && StringUtils.hasText(template.getPlainText())) {
+                content = template.getPlainText();
+            } else if (StringUtils.hasText(template.getContent())) {
+                content = template.getContent();
+            }
+        }
+        if (content == null || content.isBlank()) {
+            return String.format(DEFAULT_VERIFY_CODE_CONTENT, code);
+        }
+        return content.replace("#{code}", code).replace("${code}", code);
     }
 
     /**
@@ -224,8 +283,9 @@ public class EmailSendService {
             request.setTagName("notify");
             request.setReplyToAddress(true);
             request.setToAddress(email);
-            request.setSubject("微语");
-            request.setHtmlBody("您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn");
+            EmailTemplateEntity verifyCodeTemplate = findVerifyCodeTemplate();
+            request.setSubject(resolveVerifyCodeSubject(verifyCodeTemplate));
+            request.setHtmlBody(renderVerifyCodeContent(verifyCodeTemplate, code));
             client.getAcsResponse(request);
             return EmailSendResult.success();
         } catch (ServerException e) {
@@ -259,8 +319,10 @@ public class EmailSendService {
         Assert.hasText(code, "验证码不能为空");
         
         log.info("sendJavaMailValidateCode email={} ,code={}", email, code);
-        String content = "您的验证码是" + code + ", 15分钟内有效。开源在线客服&企业IM系统, https://www.weiyuai.cn";
-        return sendJavaMailWithResult(email, "微语验证码", content);
+        EmailTemplateEntity verifyCodeTemplate = findVerifyCodeTemplate();
+        String content = renderVerifyCodeContent(verifyCodeTemplate, code);
+        String subject = resolveVerifyCodeSubject(verifyCodeTemplate);
+        return sendJavaMailWithResult(email, subject, content);
     }
 
     /**
@@ -297,7 +359,9 @@ public class EmailSendService {
         MimeMessage message = sender.createMimeMessage();
         try {
             // 创建 MimeMessageHelper
-            MimeMessageHelper helper = new MimeMessageHelper(message, false);
+            // 必须显式指定 UTF-8：否则正文/主题/发件人昵称使用系统默认 MIME 字符集，
+            // 在默认字符集非 UTF-8 的环境（如容器 C locale）中文会变成 ?
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
             // 发件人邮箱和邮件中显示的发件人名字
             helper.setFrom(fromAddress, fromPersonal);
             // 收件人邮箱

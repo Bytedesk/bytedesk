@@ -23,6 +23,7 @@ import com.bytedesk.core.relation.RelationEntity;
 import com.bytedesk.core.relation.RelationRepository;
 import com.bytedesk.core.relation.RelationTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.webrtc.janus.config.JanusRuntimeProperties;
 
 @ExtendWith(MockitoExtension.class)
 class RoomRestServiceTest {
@@ -45,6 +46,9 @@ class RoomRestServiceTest {
     @Mock
     private PermissionService permissionService;
 
+    @Mock
+    private JanusRuntimeProperties janusRuntimeProperties;
+
     private RoomRestService roomRestService;
 
     @BeforeEach
@@ -55,7 +59,8 @@ class RoomRestServiceTest {
                 modelMapper,
                 uidUtils,
                 authService,
-                permissionService);
+                permissionService,
+                janusRuntimeProperties);
     }
 
     @Test

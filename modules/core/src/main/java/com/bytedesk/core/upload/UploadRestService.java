@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.I18Consts;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -365,6 +366,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	public Resource loadAsResource(UploadEntity upload) {
 		if (upload.getFileUrl() != null && !upload.getFileUrl().isEmpty()) {
+			// MinIO 直链（{endpoint}/{bucket}/{objectPath}）：经 MinIO 客户端下载到临时文件后返回资源，
+			// 否则本地存储逻辑无法识别该 URL，会回落到原始文件名导致 Invalid filename format
+			Resource minioResource = tryLoadFromMinio(upload.getFileUrl());
+			if (minioResource != null) {
+				return minioResource;
+			}
 			// 从 fileUrl 中提取相对路径
 			String relativePath = extractRelativePathFromUrl(upload.getFileUrl());
 			if (relativePath != null) {
@@ -373,6 +380,75 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 		// 如果 fileUrl 为空或提取失败，则使用 fileName
 		return loadAsResource(upload.getFileName());
+	}
+
+	/**
+	 * 尝试从 MinIO 加载文件资源：fileUrl 命中 {endpoint}/{bucket}/ 前缀时，
+	 * 经 MinIO 客户端鉴权下载到临时文件（不依赖桶公读策略）。
+	 * 未启用 MinIO、URL 不匹配或下载失败时返回 null，回落到本地存储查找。
+	 */
+	private Resource tryLoadFromMinio(String fileUrl) {
+		if (uploadMinioService == null || bytedeskProperties == null
+				|| !Boolean.TRUE.equals(bytedeskProperties.getMinioEnabled())) {
+			return null;
+		}
+		String objectPath = extractMinioObjectPath(fileUrl);
+		if (!StringUtils.hasText(objectPath)) {
+			return null;
+		}
+		try {
+			String extension = BdUploadUtils.getFileExtension(objectPath);
+			String suffix = StringUtils.hasText(extension) ? "." + extension : ".tmp";
+			Path tempFile = Files.createTempFile("bytedesk-upload-minio-", suffix);
+			uploadMinioService.downloadObject(objectPath, tempFile);
+			tempFile.toFile().deleteOnExit();
+			log.info("Loaded MinIO object as resource: fileUrl={}, objectPath={}, tempFile={}",
+					fileUrl, objectPath, tempFile);
+			return new UrlResource(tempFile.toUri());
+		} catch (Exception e) {
+			log.warn("Failed to load MinIO object, fallback to local storage lookup. fileUrl={}, objectPath={}, reason={}",
+					fileUrl, objectPath, e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * 从 MinIO 直链 URL 提取对象路径：
+	 * http://127.0.0.1:19000/bytedesk/documents/xxx.xlsx → documents/xxx.xlsx
+	 */
+	private String extractMinioObjectPath(String fileUrl) {
+		String normalized = fileUrl == null ? null : fileUrl.trim();
+		String endpoint = trimTrailingSlash(bytedeskProperties.getMinioEndpoint());
+		String bucket = bytedeskProperties.getMinioBucketName() == null ? null
+				: bytedeskProperties.getMinioBucketName().trim();
+		if (normalized == null || normalized.isEmpty() || !StringUtils.hasText(endpoint) || !StringUtils.hasText(bucket)) {
+			return null;
+		}
+		String prefix = endpoint + "/" + bucket + "/";
+		if (!normalized.startsWith(prefix)) {
+			return null;
+		}
+		String objectPath = normalized.substring(prefix.length());
+		int queryIndex = objectPath.indexOf('?');
+		if (queryIndex >= 0) {
+			objectPath = objectPath.substring(0, queryIndex);
+		}
+		int fragmentIndex = objectPath.indexOf('#');
+		if (fragmentIndex >= 0) {
+			objectPath = objectPath.substring(0, fragmentIndex);
+		}
+		return StringUtils.hasText(objectPath) ? objectPath : null;
+	}
+
+	private String trimTrailingSlash(String value) {
+		if (value == null) {
+			return null;
+		}
+		String trimmed = value.trim();
+		while (trimmed.endsWith("/")) {
+			trimmed = trimmed.substring(0, trimmed.length() - 1);
+		}
+		return trimmed;
 	}
 
 	/**

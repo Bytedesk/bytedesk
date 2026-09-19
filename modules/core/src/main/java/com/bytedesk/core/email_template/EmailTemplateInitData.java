@@ -81,6 +81,21 @@ public class EmailTemplateInitData {
             </html>
             """;
 
+    /** 邮箱验证码 - 注册/登录/重置密码等验证码邮件使用的默认模板 */
+    public static final String EMAIL_VERIFY_CODE_UID = "EMAIL_VERIFY_CODE";
+    public static final String VERIFY_CODE_NAME = "邮箱验证码（默认）";
+    public static final String VERIFY_CODE_SUBJECT = "微语验证码";
+    public static final String VERIFY_CODE_CONTENT = """
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2>微语验证码</h2>
+                <p>您的验证码为：<strong style="font-size: 22px; letter-spacing: 4px; color: #1890ff;">#{code}</strong></p>
+                <p>验证码 15 分钟内有效，请勿泄露给他人。如非本人操作，请忽略本邮件。</p>
+                <p style="margin-top: 20px; color: #666;">开源在线客服&企业IM系统, https://www.weiyuai.cn</p>
+            </body>
+            </html>
+            """;
+
     /** 工单状态变更通知 - 给客服 */
     public static final String TICKET_STATUS_CHANGED_AGENT_NAME = "工单状态变更通知（客服）";
     public static final String TICKET_STATUS_CHANGED_AGENT_SUBJECT = "工单状态变更 - #{ticketNumber}";
@@ -100,7 +115,7 @@ public class EmailTemplateInitData {
             """;
 
     /** 所有默认邮件模板定义 */
-    public static final EmailTemplateDef[] DEFAULT_TICKET_TEMPLATES = {
+    public static final EmailTemplateDef[] DEFAULT_TEMPLATES = {
         new EmailTemplateDef(
             "TICKET_CREATED_AGENT",
             TICKET_CREATED_AGENT_NAME,
@@ -140,6 +155,14 @@ public class EmailTemplateInitData {
             TICKET_STATUS_CHANGED_AGENT_CONTENT,
             EmailTemplateTypeEnum.TICKET_REPLY.name(),
             "工单状态变更时通知客服的邮件模板"
+        ),
+        new EmailTemplateDef(
+            EMAIL_VERIFY_CODE_UID,
+            VERIFY_CODE_NAME,
+            VERIFY_CODE_SUBJECT,
+            VERIFY_CODE_CONTENT,
+            EmailTemplateTypeEnum.VERIFY_CODE.name(),
+            "发送验证码（注册/登录/重置密码等）使用的默认邮件模板，占位符：#{code}"
         )
     };
 

@@ -138,7 +138,7 @@ public class EmailTemplateRestService extends BaseRestService<EmailTemplateEntit
      * 仅在模板不存在时创建，不会覆盖已有模板
      */
     public void initEmailTemplates(String orgUid) {
-        for (EmailTemplateInitData.EmailTemplateDef def : EmailTemplateInitData.DEFAULT_TICKET_TEMPLATES) {
+        for (EmailTemplateInitData.EmailTemplateDef def : EmailTemplateInitData.DEFAULT_TEMPLATES) {
             String uid = def.uid();
             if (!existsByUid(uid)) {
                 try {

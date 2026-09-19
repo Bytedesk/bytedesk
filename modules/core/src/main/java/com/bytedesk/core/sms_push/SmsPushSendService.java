@@ -295,14 +295,16 @@ public class SmsPushSendService {
     /**
      * 平台测试短信：使用指定服务商凭证真实发送验证码短信，
      * 签名/模板回退 properties 验证码配置（供 SettingsRestService#testSmsSettings 使用）
+     * @param country 国家区号（如 86），为空时默认 86
      */
-    public SmsSendResult sendPlatformTestSms(String mobile, String region, String accessKeyId,
+    public SmsSendResult sendPlatformTestSms(String mobile, String country, String region, String accessKeyId,
             String accessKeySecret, String endpoint) {
         Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(accessKeyId, "短信服务商 AccessKeyId 不能为空");
         Assert.hasText(accessKeySecret, "短信服务商 AccessKeySecret 不能为空");
 
-        String phoneNumber = formatPhoneNumber(normalizeAndValidateMobile(mobile), "86");
+        String effectiveCountry = StringUtils.hasText(country) ? country : "86";
+        String phoneNumber = formatPhoneNumber(normalizeAndValidateMobile(mobile), effectiveCountry);
         log.info("sendPlatformTestSms to {}", phoneNumber);
         return doSendAliyunSms(phoneNumber, signName, templateCode,
                 "{\"code\":\"888888\"}",

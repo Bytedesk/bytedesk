@@ -23,14 +23,27 @@ public class SmsTemplateInitData {
     public static final String TICKET_REPLY_NAME = "工单新回复通知";
     public static final String TICKET_REPLY_CONTENT = "尊敬的${name}，您的工单有新的回复，请注意查收。";
 
+    /** 验证码通知 - 发送验证码使用的默认短信模板 */
+    public static final String VERIFY_CODE_NAME = "验证码通知";
+    public static final String VERIFY_CODE_CONTENT = "您的验证码为${code},十分钟内有效";
+
     /** 所有默认短信模板定义 */
-    public static final SmsTemplateDef[] DEFAULT_TICKET_TEMPLATES = {
+    public static final SmsTemplateDef[] DEFAULT_TEMPLATES = {
         new SmsTemplateDef(
             "SMS_TICKET_REPLY",
             TICKET_REPLY_NAME,
             TICKET_REPLY_CONTENT,
             SmsTemplateTypeEnum.TICKET.name(),
             "工单有新回复时通知访客的统一短信模板",
+            null,  // signName: 留空由用户填写
+            null   // templateCode: 留空由用户填写
+        ),
+        new SmsTemplateDef(
+            "SMS_VERIFY_CODE",
+            VERIFY_CODE_NAME,
+            VERIFY_CODE_CONTENT,
+            SmsTemplateTypeEnum.VERIFY_CODE.name(),
+            "发送验证码时使用的默认短信模板",
             null,  // signName: 留空由用户填写
             null   // templateCode: 留空由用户填写
         )

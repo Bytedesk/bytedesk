@@ -13,7 +13,13 @@
  */
 package com.bytedesk.core.sms_template;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,9 +40,6 @@ import com.bytedesk.core.system_config.utils.PlatformSecretUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JsonResult;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +59,9 @@ public class SmsTemplateRestService extends BaseRestServiceWithExport<SmsTemplat
     private final SmsProviderRestService smsProviderRestService;
 
     private final SmsPushSendService smsPushSendService;
+
+    /** 模板内容占位符变量提取正则，如 ${code} */
+    private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^}]*)\\}");
 
     @Override
     protected Specification<SmsTemplateEntity> createSpecification(SmsTemplateRequest request) {
@@ -191,8 +197,9 @@ public class SmsTemplateRestService extends BaseRestServiceWithExport<SmsTemplat
      * 仅在模板不存在时创建，不会覆盖已有模板
      */
     public void initSmsTemplates(String orgUid) {
-        for (SmsTemplateInitData.SmsTemplateDef def : SmsTemplateInitData.DEFAULT_TICKET_TEMPLATES) {
+        for (SmsTemplateInitData.SmsTemplateDef def : SmsTemplateInitData.DEFAULT_TEMPLATES) {
             String uid = def.uid();
+            List<String> variableNames = extractVariableNames(def.content());
             if (!existsByUid(uid)) {
                 try {
                     SmsTemplateEntity entity = SmsTemplateEntity.builder()
@@ -203,7 +210,7 @@ public class SmsTemplateRestService extends BaseRestServiceWithExport<SmsTemplat
                             .content(def.content())
                             .signName(def.signName())
                             .templateCode(def.templateCode())
-                            .variableNames(List.of("name"))
+                            .variableNames(variableNames)
                             .orgUid(orgUid)
                             .build();
                     sms_templateRepository.save(entity);
@@ -216,10 +223,9 @@ public class SmsTemplateRestService extends BaseRestServiceWithExport<SmsTemplat
                     Optional<SmsTemplateEntity> existingOpt = sms_templateRepository.findByUid(uid);
                     if (existingOpt.isPresent()) {
                         SmsTemplateEntity existing = existingOpt.get();
-                        if (SmsTemplateTypeEnum.TICKET.name().equals(existing.getType())
-                                && (existing.getVariableNames() == null
-                                        || !existing.getVariableNames().equals(List.of("name")))) {
-                            existing.setVariableNames(List.of("name"));
+                        if (existing.getVariableNames() == null
+                                || !existing.getVariableNames().equals(variableNames)) {
+                            existing.setVariableNames(variableNames);
                             sms_templateRepository.save(existing);
                             log.info("initSmsTemplates normalized variableNames for uid={}", uid);
                         }
@@ -229,6 +235,24 @@ public class SmsTemplateRestService extends BaseRestServiceWithExport<SmsTemplat
                 }
             }
         }
+    }
+
+    /**
+     * 从模板内容中提取占位符变量名，如 "您的验证码为${code},十分钟内有效" -> ["code"]
+     */
+    private List<String> extractVariableNames(String content) {
+        if (!StringUtils.hasText(content)) {
+            return List.of();
+        }
+        Matcher matcher = VARIABLE_PATTERN.matcher(content);
+        List<String> names = new ArrayList<>();
+        while (matcher.find()) {
+            String name = matcher.group(1).trim();
+            if (StringUtils.hasText(name) && !names.contains(name)) {
+                names.add(name);
+            }
+        }
+        return List.copyOf(names);
     }
 
     public JsonResult<Boolean> sendTestSms(SmsTemplateTestRequest request) {

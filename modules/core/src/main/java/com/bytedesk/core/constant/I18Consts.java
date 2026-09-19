@@ -804,7 +804,7 @@ public class I18Consts {
     public static final String I18N_USER_PREFIX = I18N_PREFIX + "user.prefix";
     public static final String I18N_ASSISTANT_PREFIX = I18N_PREFIX + "assistant.prefix";
     public static final String I18N_DEFAULT_SYSTEM_PROMPT = I18N_PREFIX + "default.system.prompt";
-
+    
     // 线程路由策略相关常量
     /** 默认欢迎消息 */
     public static final String I18N_DEFAULT_WELCOME_MESSAGE = I18N_PREFIX + "default.welcome.message";
@@ -1005,5 +1005,7 @@ public class I18Consts {
     public static final String I18N_MESSAGE_TYPE_WECHAT_NUMBER = I18N_PREFIX + "message.type.wechat.number";
     public static final String I18N_MESSAGE_TYPE_BLOG = I18N_PREFIX + "message.type.blog";
     
+    // 
+    public static final String I18N_PARTICIPANT = I18N_PREFIX + "participant";
 
 }

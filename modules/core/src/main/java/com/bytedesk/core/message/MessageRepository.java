@@ -20,6 +20,8 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
@@ -102,45 +104,49 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
      * 查询某客服负责的“含未回复访客消息”的会话 UID（按最早未回复消息时间升序）。
      *
      * 说明：
-     * - 以 message.agent_replied = 0 标识“未回复访客消息”。
+        * - 以 message.agentReplied = false 标识“未回复访客消息”，由 Hibernate 按数据库方言生成布尔条件。
      * - 通过 JSON 序列化后的精确片段匹配访客消息，避免误匹配 visitor:false，并保持多数据库兼容。
      * - 通过 thread.agent 中的 uid 片段过滤到当前客服，避免依赖各数据库 JSON 函数方言。
      */
-    @Query(value = "SELECT t.uuid AS thread_uid, MIN(m.created_at) AS first_unreplied_at "
-            + "FROM bytedesk_core_message m "
-            + "INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
-            + "WHERE m.agent_replied = 0 "
-            + "  AND m.message_type NOT IN ('SYSTEM', 'NOTICE') "
-            + "  AND (m.message_user LIKE '%\"visitor\":true%' "
-            + "       OR m.message_user LIKE '%\"type\":\"VISITOR\"%' "
-            + "       OR m.message_user LIKE '%\"type\":\"visitor\"%') "
-            + "  AND t.is_deleted = false "
-            + "  AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
-            + "  AND t.agent IS NOT NULL AND t.agent != '' "
-            + "  AND t.agent LIKE :agentUidPattern "
-            + "GROUP BY t.uuid "
-            + "ORDER BY first_unreplied_at ASC "
-            + "LIMIT :limit OFFSET :offset", nativeQuery = true)
-    List<Object[]> pageUnrepliedVisitorThreadUidsByAgentUid(
+    default List<Object[]> pageUnrepliedVisitorThreadUidsByAgentUid(
             @Param("agentUidPattern") String agentUidPattern,
             @Param("limit") int limit,
-            @Param("offset") int offset);
+            @Param("offset") int offset) {
+        return pageUnrepliedVisitorThreadUidsByAgentUid(
+                agentUidPattern,
+                PageRequest.of(offset / limit, limit));
+    }
 
-    @Query(value = "SELECT COUNT(1) FROM (" 
-            + "  SELECT t.uuid "
-            + "  FROM bytedesk_core_message m "
-            + "  INNER JOIN bytedesk_core_thread t ON m.thread_id = t.id "
-            + "  WHERE m.agent_replied = 0 "
-            + "    AND m.message_type NOT IN ('SYSTEM', 'NOTICE') "
-            + "    AND (m.message_user LIKE '%\"visitor\":true%' "
-            + "         OR m.message_user LIKE '%\"type\":\"VISITOR\"%' "
-            + "         OR m.message_user LIKE '%\"type\":\"visitor\"%') "
-            + "    AND t.is_deleted = false "
-            + "    AND t.thread_status NOT IN ('CLOSED', 'TIMEOUT') "
-            + "    AND t.agent IS NOT NULL AND t.agent != '' "
-            + "    AND t.agent LIKE :agentUidPattern "
-            + "  GROUP BY t.uuid "
-            + ") x", nativeQuery = true)
+    @Query("SELECT t.uid, MIN(m.createdAt) "
+            + "FROM MessageEntity m "
+            + "JOIN m.thread t "
+            + "WHERE m.agentReplied = false "
+            + "  AND m.type NOT IN ('SYSTEM', 'NOTICE') "
+            + "  AND (m.user LIKE '%\"visitor\":true%' "
+            + "       OR m.user LIKE '%\"type\":\"VISITOR\"%' "
+            + "       OR m.user LIKE '%\"type\":\"visitor\"%') "
+            + "  AND t.deleted = false "
+            + "  AND t.status NOT IN ('CLOSED', 'TIMEOUT') "
+            + "  AND t.agent IS NOT NULL AND t.agent <> '' "
+            + "  AND t.agent LIKE :agentUidPattern "
+            + "GROUP BY t.uid "
+            + "ORDER BY MIN(m.createdAt) ASC")
+    List<Object[]> pageUnrepliedVisitorThreadUidsByAgentUid(
+            @Param("agentUidPattern") String agentUidPattern,
+            Pageable pageable);
+
+    @Query("SELECT COUNT(DISTINCT t.uid) "
+            + "FROM MessageEntity m "
+            + "JOIN m.thread t "
+            + "WHERE m.agentReplied = false "
+            + "  AND m.type NOT IN ('SYSTEM', 'NOTICE') "
+            + "  AND (m.user LIKE '%\"visitor\":true%' "
+            + "       OR m.user LIKE '%\"type\":\"VISITOR\"%' "
+            + "       OR m.user LIKE '%\"type\":\"visitor\"%') "
+            + "  AND t.deleted = false "
+            + "  AND t.status NOT IN ('CLOSED', 'TIMEOUT') "
+            + "  AND t.agent IS NOT NULL AND t.agent <> '' "
+            + "  AND t.agent LIKE :agentUidPattern")
     long countUnrepliedVisitorThreadsByAgentUid(@Param("agentUidPattern") String agentUidPattern);
 
     /**

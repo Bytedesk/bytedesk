@@ -6,8 +6,11 @@
 # 仅启动 Janus，不启用 nginx；启动后可在浏览器访问端口（用于连通性），但直接 GET 通常会返回 404（正常）：
 # - http://localhost:18089
 # - ws://localhost:18188/janus （WebSocket API，需通过客户端连接，非普通网页）
+# Admin/Monitor HTTP API（管理后台 Janus 监控，需携带 admin_secret）：
+# - http://localhost:18091/admin （映射容器 7088）
 # 正确检查方式（HTTP API 需 POST 到 /janus）：
 # curl -sS -X POST -H 'Content-Type: application/json' --data '{"janus":"ping","transaction":"check"}' http://localhost:18089/janus
+# curl -sS -X POST -H 'Content-Type: application/json' --data '{"janus":"get_status","transaction":"check","admin_secret":"janusoverlord"}' http://localhost:18091/admin
 services:
   bytedesk-janus:
     image: registry.cn-hangzhou.aliyuncs.com/bytedesk/janus:latest
@@ -16,6 +19,7 @@ services:
     ports:
       - "18089:8088/tcp"
       - "18090:8089/tcp"
+      - "18091:7088/tcp"
       - "18188:8188/tcp"
       - "17188:7188/tcp"
       - "18178:3478/udp"

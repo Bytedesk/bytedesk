@@ -90,6 +90,16 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(room));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "join room by inviteUid")
+    @Operation(summary = "Join Room", description = "Join a conference room by inviteUid with the current logged-in user info")
+    @PostMapping("/join")
+    public ResponseEntity<?> join(@RequestBody RoomRequest request) {
+        
+        RoomJoinResponse joinResponse = roomRestService.joinRoom(request);
+
+        return ResponseEntity.ok(JsonResult.success(joinResponse));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_UPDATE, description = "update room")
     @Operation(summary = "Update Room", description = "Update an existing room")
     @Override
