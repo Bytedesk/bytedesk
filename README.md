@@ -13,7 +13,7 @@
 -->
 # Bytedesk - Chat as a Service
 
-AI powered Omnichannel customer service With Team Cooperation
+AI powered Omnichannel customer service With Team IM
 
 **Language:** [English](README.md) | [中文](README.zh.md) | [Demo](https://www.weiyuai.cn/reactdemo?lang=en)
 
