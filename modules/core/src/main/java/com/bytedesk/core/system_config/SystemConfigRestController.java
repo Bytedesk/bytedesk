@@ -23,9 +23,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.annotation.ApiRateLimiter;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
@@ -66,5 +68,17 @@ public class SystemConfigRestController {
     public ResponseEntity<?> save(@RequestBody SystemConfigRequest request) {
         List<SystemConfigResponse> configs = systemConfigRestService.save(request);
         return ResponseEntity.ok(JsonResult.success(configs));
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_SYSTEM_CONFIG, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query secret plaintext value")
+    @Operation(summary = "Query System Config Secret", description = "Decrypt and return the plaintext value of a secret config key (super admin only; not configured returns null)")
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ApiRateLimiter(qps = 1, timeout = 2)
+    @GetMapping("/secret")
+    public ResponseEntity<?> querySecret(@RequestParam("key") String key) {
+        String value = systemConfigRestService.querySecretValue(key);
+        // 注意：JsonResult.success(String) 单参重载会把参数当 message（data 变布尔 true），
+        // 必须用双参重载 success(message, data) 把明文放进 data
+        return ResponseEntity.ok(JsonResult.success("query secret success", value));
     }
 }

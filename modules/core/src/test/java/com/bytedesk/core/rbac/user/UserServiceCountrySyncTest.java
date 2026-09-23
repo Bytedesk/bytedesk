@@ -20,6 +20,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -50,6 +51,7 @@ class UserServiceCountrySyncTest {
     @Test
     void updateUserFromMemberShouldCopyCountryBeforeUpdatingRoles() {
         UserRepository userRepository = mock(UserRepository.class);
+        OrganizationRepository organizationRepository = mock(OrganizationRepository.class);
 
         UserService userService = new UserService(
                 userRepository,
@@ -58,10 +60,11 @@ class UserServiceCountrySyncTest {
                 mock(BytedeskProperties.class),
                 mock(BCryptPasswordEncoder.class),
                 mock(UidUtils.class),
-                mock(OrganizationRepository.class),
+                organizationRepository,
                 mock(BytedeskEventPublisher.class),
                 mock(AuthService.class),
-                mock(TokenRestService.class));
+                mock(TokenRestService.class),
+                mock(MemberRepository.class));
 
         UserEntity user = UserEntity.builder()
                 .id(1L)
@@ -89,6 +92,7 @@ class UserServiceCountrySyncTest {
         request.setRoleUids(new java.util.LinkedHashSet<>(java.util.Set.of(BytedeskConsts.DEFAULT_ROLE_USER_UID)));
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(organizationRepository.findByUid("org-1")).thenReturn(Optional.of(organization));
 
         UserEntity updated = userService.updateUserFromMember(user, request);
 
@@ -102,6 +106,7 @@ class UserServiceCountrySyncTest {
         UserRepository userRepository = mock(UserRepository.class);
         RoleRestService roleRestService = mock(RoleRestService.class);
         EntityManager entityManager = mock(EntityManager.class);
+        OrganizationRepository organizationRepository = mock(OrganizationRepository.class);
 
         UserService userService = new UserService(
                 userRepository,
@@ -110,10 +115,11 @@ class UserServiceCountrySyncTest {
                 mock(BytedeskProperties.class),
                 mock(BCryptPasswordEncoder.class),
                 mock(UidUtils.class),
-                mock(OrganizationRepository.class),
+                organizationRepository,
                 mock(BytedeskEventPublisher.class),
                 mock(AuthService.class),
-                mock(TokenRestService.class));
+                mock(TokenRestService.class),
+                mock(MemberRepository.class));
         ReflectionTestUtils.setField(userService, "entityManager", entityManager);
 
         OrganizationEntity organization = OrganizationEntity.builder()
@@ -139,6 +145,7 @@ class UserServiceCountrySyncTest {
                 .build();
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(organizationRepository.findByUid("org-1")).thenReturn(Optional.of(organization));
         when(roleRestService.findByUid(BytedeskConsts.DEFAULT_ROLE_USER_UID)).thenReturn(Optional.of(defaultUserRole));
         when(roleRestService.findByUid("custom-role-uid")).thenReturn(Optional.of(customRole));
         when(entityManager.find(RoleEntity.class, 100L)).thenReturn(defaultUserRole);
@@ -166,7 +173,8 @@ class UserServiceCountrySyncTest {
                 mock(OrganizationRepository.class),
                 mock(BytedeskEventPublisher.class),
                 authService,
-                mock(TokenRestService.class));
+                mock(TokenRestService.class),
+                mock(MemberRepository.class));
 
         UserEntity authUser = UserEntity.builder().uid("auth-user").build();
         UserEntity storedUser = UserEntity.builder()
@@ -207,7 +215,8 @@ class UserServiceCountrySyncTest {
                                 mock(OrganizationRepository.class),
                                 mock(BytedeskEventPublisher.class),
                                 mock(AuthService.class),
-                                mock(TokenRestService.class));
+                                mock(TokenRestService.class),
+                                mock(MemberRepository.class));
 
                 when(userRepository.existsByMobileAndCountryAndPlatformAndDeletedFalse(
                                 "13800138000",

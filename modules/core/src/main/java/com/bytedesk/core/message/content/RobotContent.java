@@ -60,6 +60,7 @@ public class RobotContent extends BaseContent {
         CHUNK("chunk", "文档片段"),
         WEBPAGE("webpage", "网页内容"),
         FILE("file", "文件内容"),
+        FEISHU("feishu", "飞书文档"),
         DOCUMENT("document", "文档"),
         ARTICLE("article", "文章"),
         IMAGE("image", "图片"),

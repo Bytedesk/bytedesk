@@ -26,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.bytedesk.core.apns_push.ApnsPushService;
 import com.bytedesk.core.email_provider.EmailProviderEntity;
 import com.bytedesk.core.email_provider.EmailProviderRepository;
 import com.bytedesk.core.email_push.EmailPushSendService;
@@ -43,6 +42,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
+import com.bytedesk.core.push_apns.PushApnsService;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -105,7 +105,7 @@ public class TicketNotificationService {
 
     private final SmsTemplateRepository smsTemplateRepository;
 
-    private final ApnsPushService apnsPushService;
+    private final PushApnsService apnsPushService;
 
     private final EmailPushSendService emailPushSendService;
 

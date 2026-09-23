@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.bytedesk.core.constant.RedisConsts;
 
@@ -25,10 +24,10 @@ public class ConnectionHeartbeatFlushTask {
     private final StringRedisTemplate stringRedisTemplate;
     private final ConnectionRestService connectionRestService;
 
-    
-    // 每 10 秒批量刷新一次
+    // 每 10 秒批量刷新一次；
+    // 不加 @Transactional：避免把全部行更新 + Redis 清理裹进一个长事务（多行锁交叉持有会引发 PostgreSQL 死锁），
+    // 每行更新由 flushHeartbeatCacheBatch 内以独立短事务完成
     @Scheduled(fixedDelay = 10_000)
-    @Transactional
     public void flush() {
         if (stringRedisTemplate == null) {
             return;

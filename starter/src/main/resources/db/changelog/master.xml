@@ -71,4 +71,16 @@
 
     <include file="db/changelog/migration/260917_finalize_rag_rewrite_table_unification.xml" />
 
+    <include file="db/changelog/migration/260920_rename_video_webrtc_settings_table.xml" />
+
+    <include file="db/changelog/migration/260920_add_feishu_doc_sync.xml" />
+
+    <include file="db/changelog/migration/260920_add_settings_verify_code_template_bindings.xml" />
+
+    <include file="db/changelog/migration/260920_add_settings_purpose_table.xml" />
+
+    <include file="db/changelog/migration/260922_add_push_device_table.xml" />
+
+    <include file="db/changelog/migration/260923_add_push_android_table.xml" />
+
 </databaseChangeLog>

@@ -166,10 +166,19 @@ public class SmsPushSendService {
      * @return SmsPushSendResult 发送结果
      */
     public SmsSendResult sendSmsWithResult(String mobile, String country, String content, HttpServletRequest request) {
+        return sendSmsWithResult(mobile, country, content, null, request);
+    }
+
+    /**
+     * 发送短信并返回详细结果（携带业务用途 type，P1 用途模型）
+     * @param type 业务用途代码（AuthTypeEnum 名称，如 MOBILE_LOGIN）；空时走平台默认配置
+     */
+    public SmsSendResult sendSmsWithResult(String mobile, String country, String content, String type,
+            HttpServletRequest request) {
         Assert.hasText(content, "短信内容不能为空");
         
         String normalizedMobile = normalizeAndValidateMobile(mobile);
-        log.info("send sms to {}, country: {}, content: {}", normalizedMobile, country, content);
+        log.info("send sms to {}, country: {}, type: {}, content: {}", normalizedMobile, country, type, content);
 
         // 白名单手机号使用固定验证码，无需真正发送验证码。超级管理员手机号也认为发送成功，无论是否在白名单中，方便测试和管理员使用。
         if (bytedeskProperties.isInWhitelist(normalizedMobile) || bytedeskProperties.isAdminIdentifier(normalizedMobile)) {
@@ -185,7 +194,7 @@ public class SmsPushSendService {
         }
 
         try {
-            return sendValidateCode(normalizedMobile, country, content);
+            return sendValidateCode(normalizedMobile, country, content, type);
         } catch (Exception e) {
             log.error("发送短信失败", e);
             return SmsSendResult.failure(SmsSendResult.SendCodeErrorType.SEND_FAILED, "发送短信异常: " + e.getMessage());
@@ -227,10 +236,27 @@ public class SmsPushSendService {
      * @return SmsPushSendResult 发送结果
      */
     public SmsSendResult sendValidateCode(String mobile, String country, String code) {
+        return sendValidateCode(mobile, country, code, null);
+    }
+
+    /**
+     * 发送验证码（P1 用途模型）：用途绑定优先，未绑定/未启用回退平台默认配置，再回退 properties
+     * @param type 业务用途代码（AuthTypeEnum 名称，如 MOBILE_LOGIN）；空时直接走平台默认配置
+     */
+    public SmsSendResult sendValidateCode(String mobile, String country, String code, String type) {
         Assert.hasText(code, "验证码不能为空");
 
         String normalizedMobile = normalizeAndValidateMobile(mobile);
-        log.info("sendValidateCode sms to {}, country: {}, code: {}", normalizedMobile, country, code);
+        log.info("sendValidateCode sms to {}, country: {}, type: {}, code: {}", normalizedMobile, country, type, code);
+
+        // P1：优先使用该业务用途绑定的供应商/模板（可不同于平台默认绑定）
+        if (StringUtils.hasText(type)) {
+            PlatformSmsConfig purposeConfig = getPlatformSmsConfig(type);
+            if (purposeConfig != null) {
+                log.debug("使用用途回绑配置发送验证码: purpose={}", type);
+                return sendValidateCodeByPlatformConfig(normalizedMobile, country, code, purposeConfig);
+            }
+        }
 
         // 平台绑定配置优先（超级管理员 SuperSystemConfig 平台短信配置），未配置/未启用回退 properties
         PlatformSmsConfig platformConfig = getPlatformSmsConfig();
@@ -246,6 +272,14 @@ public class SmsPushSendService {
      * 获取平台短信配置快照；无效/未启用/无 SPI 实现时返回 null（回退 properties）
      */
     PlatformSmsConfig getPlatformSmsConfig() {
+        return getPlatformSmsConfig(null);
+    }
+
+    /**
+     * 获取平台短信配置快照（用途感知，P1）：purpose 非空时优先读取用途绑定快照，
+     * 未绑定/未启用/配置不完整返回 null（回退平台默认配置）
+     */
+    PlatformSmsConfig getPlatformSmsConfig(String purpose) {
         if (platformSmsConfigProviderProvider == null) {
             return null;
         }
@@ -254,17 +288,19 @@ public class SmsPushSendService {
             return null;
         }
         try {
-            PlatformSmsConfig config = provider.getPlatformSmsConfig();
+            PlatformSmsConfig config = StringUtils.hasText(purpose)
+                    ? provider.getPlatformSmsConfig(purpose)
+                    : provider.getPlatformSmsConfig();
             if (config == null || !config.enabled()) {
                 return null;
             }
             if (!StringUtils.hasText(config.accessKeyId()) || !StringUtils.hasText(config.accessKeySecret())) {
-                log.warn("平台短信配置不完整（缺少 AccessKey），回退 properties 配置");
+                log.warn("平台短信配置不完整（缺少 AccessKey），回退默认配置: purpose={}", purpose);
                 return null;
             }
             return config;
         } catch (Exception e) {
-            log.error("读取平台短信配置失败，回退 properties 配置", e);
+            log.error("读取平台短信配置失败，回退默认配置: purpose={}", purpose, e);
             return null;
         }
     }
@@ -297,8 +333,23 @@ public class SmsPushSendService {
      * 签名/模板回退 properties 验证码配置（供 SettingsRestService#testSmsSettings 使用）
      * @param country 国家区号（如 86），为空时默认 86
      */
+    /**
+     * 平台测试短信：使用指定服务商凭证真实发送验证码短信，
+     * 签名/模板回退 properties 验证码配置（供 SettingsRestService#testSmsSettings 使用）
+     * @param country 国家区号（如 86），为空时默认 86
+     */
     public SmsSendResult sendPlatformTestSms(String mobile, String country, String region, String accessKeyId,
             String accessKeySecret, String endpoint) {
+        return sendPlatformTestSms(mobile, country, region, accessKeyId, accessKeySecret, endpoint, null, null);
+    }
+
+    /**
+     * 平台测试短信（可指定验证码模板签名/模板码）：
+     * signName/templateCode 为空时回退 properties 验证码配置，
+     * 与业务验证码发送链路（sendValidateCodeByPlatformConfig）保持同一回退策略
+     */
+    public SmsSendResult sendPlatformTestSms(String mobile, String country, String region, String accessKeyId,
+            String accessKeySecret, String endpoint, String signName, String templateCode) {
         Assert.hasText(mobile, "手机号不能为空");
         Assert.hasText(accessKeyId, "短信服务商 AccessKeyId 不能为空");
         Assert.hasText(accessKeySecret, "短信服务商 AccessKeySecret 不能为空");
@@ -306,7 +357,9 @@ public class SmsPushSendService {
         String effectiveCountry = StringUtils.hasText(country) ? country : "86";
         String phoneNumber = formatPhoneNumber(normalizeAndValidateMobile(mobile), effectiveCountry);
         log.info("sendPlatformTestSms to {}", phoneNumber);
-        return doSendAliyunSms(phoneNumber, signName, templateCode,
+        return doSendAliyunSms(phoneNumber,
+                StringUtils.hasText(signName) ? signName : this.signName,
+                StringUtils.hasText(templateCode) ? templateCode : this.templateCode,
                 "{\"code\":\"888888\"}",
                 StringUtils.hasText(region) ? region : regionId,
                 accessKeyId,

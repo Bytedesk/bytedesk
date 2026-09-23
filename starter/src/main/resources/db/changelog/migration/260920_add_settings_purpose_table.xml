@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        平台验证码业务用途绑定表（P1 用途模型）：
+        按 (purpose_channel, purpose_code) 唯一绑定"验证码业务用途 → 供应商 + 模板"。
+        - purpose_code 复用 modules/core AuthTypeEnum 名称（MOBILE_LOGIN / EMAIL_PASSWORD_RESET 等）
+        - purpose_channel = SMS 时使用 sms_provider_id + sms_template_id
+        - purpose_channel = EMAIL 时使用 email_id + email_template_id
+        - is_enabled = false 时该用途回退平台默认配置（SettingsEntity）
+
+        策略（双保护，参照 260915_add_organization_config_table.xml）：
+        1. 全新环境：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+
+        见 docs/plans/2026-09-20-sms-email-purpose-template-config-plan.md §5.2 路径 B
+    -->
+    <changeSet id="260920-create-settings-purpose-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_settings_purpose"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_core_settings_purpose">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_settings_purpose" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_settings_purpose_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="name" type="VARCHAR(128)"/>
+            <column name="description" type="VARCHAR(512)"/>
+            <column name="purpose_channel" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="purpose_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sms_provider_id" type="BIGINT"/>
+            <column name="sms_template_id" type="BIGINT"/>
+            <column name="email_id" type="BIGINT"/>
+            <column name="email_template_id" type="BIGINT"/>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- 唯一索引：purpose_channel + purpose_code（幂等） -->
+    <changeSet id="260920-add-settings-purpose-unique-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_settings_purpose"/>
+            <not>
+                <indexExists tableName="bytedesk_core_settings_purpose" indexName="uk_settings_purpose_channel_code"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_settings_purpose_channel_code" tableName="bytedesk_core_settings_purpose" unique="true">
+            <column name="purpose_channel"/>
+            <column name="purpose_code"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

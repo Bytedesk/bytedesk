@@ -25,5 +25,7 @@ public record PlatformEmailConfig(
         Integer smtpPort,
         Boolean smtpSslEnabled,
         /** 发件人显示名称 */
-        String displayName) {
+        String displayName,
+        /** 平台绑定的验证码邮件模板UID；为空时发送侧回退默认 EMAIL_VERIFY_CODE 模板 */
+        String verifyCodeTemplateUid) {
 }

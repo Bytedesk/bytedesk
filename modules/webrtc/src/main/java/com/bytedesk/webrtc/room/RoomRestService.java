@@ -62,6 +62,23 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
     private final PermissionService permissionService;
 
     private final JanusRuntimeProperties janusRuntimeProperties;
+
+    /** 会议默认最大同时发布人数（videoroom publishers 上限） */
+    public static final int DEFAULT_MAX_PARTICIPANTS = 24;
+
+    /** 会议最大同时发布人数硬上限（防滥用；超出取值收敛到该值） */
+    public static final int MAX_PARTICIPANTS_LIMIT = 100;
+
+    /**
+     * 容量归一化：null/非正数回退默认 24；超过硬上限 100 收敛到 100。
+     * 不限制为固定档位集合（6/12/24 仅为前端推荐档位），便于后续扩展更大会议
+     */
+    private Integer normalizeMaxParticipants(Integer maxParticipants) {
+        if (maxParticipants == null || maxParticipants < 1) {
+            return DEFAULT_MAX_PARTICIPANTS;
+        }
+        return Math.min(maxParticipants, MAX_PARTICIPANTS_LIMIT);
+    }
     
     @Override
     public Page<RoomEntity> queryByOrgEntity(RoomRequest request) {
@@ -218,11 +235,18 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
 
         String displayName = StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUid();
 
+        // 历史房间 max_participants 可能为 NULL，读取侧回退默认值
+        Integer publisherLimit = room.getMaxParticipants() != null && room.getMaxParticipants() > 0
+                ? room.getMaxParticipants()
+                : DEFAULT_MAX_PARTICIPANTS;
+
         return RoomJoinResponse.builder()
                 .room(convertToResponse(room))
                 .displayName(displayName)
                 .userUid(user.getUid())
+                .hostUid(room.getUserUid())
                 .janusEnabled(janusRuntimeProperties.isEnabled())
+                .publisherLimit(publisherLimit)
                 .build();
     }
 
@@ -285,6 +309,8 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
         if (!StringUtils.hasText(request.getUid())) {
             entity.setUid(uidUtils.getUid());
         }
+        // 容量归一化：null/非法回退默认值，超上限收敛
+        entity.setMaxParticipants(normalizeMaxParticipants(request.getMaxParticipants()));
         // 
         RoomEntity savedEntity = save(entity);
         if (savedEntity == null) {
@@ -300,6 +326,7 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
         if (optional.isPresent()) {
             RoomEntity entity = optional.get();
             String existingInviteUid = entity.getInviteUid();
+            Integer existingMaxParticipants = entity.getMaxParticipants();
             
             // 检查用户是否有权限更新该实体
             if (!permissionService.hasEntityPermission(RoomPermissions.MODULE_NAME, "UPDATE", entity)) {
@@ -310,6 +337,12 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
             entity.setType(RoomTypeEnum.fromValue(entity.getType()).name());
             if (!StringUtils.hasText(request.getInviteUid())) {
                 entity.setInviteUid(existingInviteUid);
+            }
+            // 容量：请求未携带时保留原值（避免 null 覆盖），携带时归一化
+            if (request.getMaxParticipants() == null) {
+                entity.setMaxParticipants(existingMaxParticipants);
+            } else {
+                entity.setMaxParticipants(normalizeMaxParticipants(request.getMaxParticipants()));
             }
             if (!StringUtils.hasText(entity.getInviteUid())) {
                 entity.setInviteUid(uidUtils.getUid());
@@ -342,6 +375,7 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
                 latestEntity.setDescription(entity.getDescription());
                 latestEntity.setType(entity.getType());
                 latestEntity.setInviteUid(entity.getInviteUid());
+                latestEntity.setMaxParticipants(entity.getMaxParticipants());
                 // latestEntity.setOrder(entity.getOrder());
                 // latestEntity.setDeleted(entity.isDeleted());
                 return roomRepository.save(latestEntity);

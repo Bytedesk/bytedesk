@@ -42,6 +42,12 @@ public class RoomRequest extends BaseRequest {
 
     private Integer order;
 
+    /**
+     * 会议最大同时发布人数上限（videoroom publishers）；
+     * null/非法值由后端归一化（回退默认 24，超上限收敛），不强制固定档位集合
+     */
+    private Integer maxParticipants;
+
     @Override
     public Pageable getPageable() {
         return super.getPageable();

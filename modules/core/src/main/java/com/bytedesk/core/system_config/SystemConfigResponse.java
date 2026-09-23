@@ -71,6 +71,9 @@ public class SystemConfigResponse extends BaseResponse {
     /** 是否启用自定义品牌（仅 custom.enabled 项返回，前端用于联动提示；其余项为 null） */
     private Boolean customBrandEnabled;
 
+    /** 敏感字段是否已配置（仅 appSecret 类 key 返回；掩码回显时前端据此区分「已配置但掩码」与「未配置」） */
+    private Boolean secretConfigured;
+
     /** 生效来源常量 */
     public static final String SOURCE_DB = "DB";
     public static final String SOURCE_DEFAULT = "DEFAULT";

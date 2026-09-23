@@ -31,6 +31,12 @@ import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorSearchResult;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 import com.bytedesk.kbase.llm_faq.FaqRestService;
+import com.bytedesk.kbase.llm_feishu.elastic.FeishuDocElastic;
+import com.bytedesk.kbase.llm_feishu.elastic.FeishuDocElasticSearchResult;
+import com.bytedesk.kbase.llm_feishu.elastic.FeishuDocElasticService;
+import com.bytedesk.kbase.llm_feishu.vector.FeishuDocVector;
+import com.bytedesk.kbase.llm_feishu.vector.FeishuDocVectorSearchResult;
+import com.bytedesk.kbase.llm_feishu.vector.FeishuDocVectorService;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElastic;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticSearchResult;
 import com.bytedesk.kbase.llm_faq.elastic.FaqElasticService;
@@ -78,7 +84,9 @@ public class KbaseSearchHelper {
             TextRestService textRestService,
             ChunkRestService chunkRestService,
             WebpageRestService webpageRestService,
-            ArticleRestService articleRestService) {
+            ArticleRestService articleRestService,
+            ObjectProvider<FeishuDocVectorService> feishuDocVectorServiceProvider,
+            FeishuDocElasticService feishuDocElasticService) {
         this.faqElasticService = faqElasticService;
         this.textElasticService = textElasticService;
         this.chunkElasticService = chunkElasticService;
@@ -94,6 +102,8 @@ public class KbaseSearchHelper {
         this.chunkRestService = chunkRestService;
         this.webpageRestService = webpageRestService;
         this.articleRestService = articleRestService;
+        this.feishuDocElasticService = feishuDocElasticService;
+        this.feishuDocVectorService = feishuDocVectorServiceProvider.getIfAvailable();
     }
 
     private static final int DEFAULT_VECTOR_RECALL_LIMIT = 5;
@@ -120,6 +130,10 @@ public class KbaseSearchHelper {
     private final ChunkRestService chunkRestService;
     private final WebpageRestService webpageRestService;
     private final ArticleRestService articleRestService;
+
+    private final FeishuDocElasticService feishuDocElasticService;
+
+    private final FeishuDocVectorService feishuDocVectorService;
 
     // 2. 知识库搜索相关方法
     public List<FaqProtobuf> searchKnowledgeBase(String query, RobotProtobuf robot) {
@@ -391,6 +405,7 @@ public class KbaseSearchHelper {
         boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
         boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
         boolean allowArticle = allowAll || "ARTICLE".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowFeishu = allowAll || "FEISHU".equalsIgnoreCase(sourceTypeFilter);
 
         int recallLimit = DEFAULT_FULLTEXT_RECALL_LIMIT;
         try {
@@ -528,6 +543,28 @@ public class KbaseSearchHelper {
                 }
             }
 
+            if (allowFeishu) {
+                List<FeishuDocElasticSearchResult> feishuResults = feishuDocElasticService.searchDocs(query, kbUid,
+                        null, null, recallLimit, language == null ? null : List.of(language));
+                for (FeishuDocElasticSearchResult withScore : feishuResults) {
+                    FeishuDocElastic doc = withScore.getFeishuDocElastic();
+                    FaqProtobuf faqProtobuf = FaqProtobuf.fromFeishuDoc(doc);
+                    searchResultList.add(faqProtobuf);
+
+                    RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                            .sourceType(RobotContent.SourceTypeEnum.FEISHU)
+                            .sourceUid(StringUtils.hasText(doc.getSourceUid()) ? doc.getSourceUid() : doc.getUid())
+                            .sourceName(doc.getTitle())
+                            .contentSummary(getContentSummary(doc.getContent(), 200))
+                            .language(doc.getLanguage())
+                            .searchChannel(RobotSearchTypeEnum.FULLTEXT.name())
+                            .score((double) withScore.getScore())
+                            .highlighted(false)
+                            .build();
+                    sourceReferences.add(sourceRef);
+                }
+            }
+
             if (searchResultList.size() > resultSizeBefore) {
                 log.debug("Fulltext language fallback hit: language={}, results={}", language,
                         searchResultList.size() - resultSizeBefore);
@@ -567,6 +604,7 @@ public class KbaseSearchHelper {
         boolean allowChunk = allowAll || "CHUNK".equalsIgnoreCase(sourceTypeFilter);
         boolean allowWebpage = allowAll || "WEBPAGE".equalsIgnoreCase(sourceTypeFilter);
         boolean allowArticle = allowAll || "ARTICLE".equalsIgnoreCase(sourceTypeFilter);
+        boolean allowFeishu = allowAll || "FEISHU".equalsIgnoreCase(sourceTypeFilter);
 
         // Vector 召回数量：默认 5；若配置了 topK，则至少取 topK；并设置上限防止过大查询
         int recallLimit = DEFAULT_VECTOR_RECALL_LIMIT;
@@ -727,6 +765,33 @@ public class KbaseSearchHelper {
                     }
                 } catch (Exception e) {
                     log.warn("ArticleVectorService search failed: {}", e.getMessage());
+                }
+            }
+
+            if (allowFeishu && feishuDocVectorService != null) {
+                try {
+                    List<FeishuDocVectorSearchResult> feishuResults = feishuDocVectorService.searchDocVector(query,
+                            kbUid, null, null, recallLimit, language);
+                    for (FeishuDocVectorSearchResult withScore : feishuResults) {
+                        FeishuDocVector docVector = withScore.getFeishuDocVector();
+                        FaqProtobuf faqProtobuf = FaqProtobuf.fromFeishuDocVector(docVector);
+                        searchResultList.add(faqProtobuf);
+
+                        RobotContent.SourceReference sourceRef = RobotContent.SourceReference.builder()
+                                .sourceType(RobotContent.SourceTypeEnum.FEISHU)
+                                .sourceUid(StringUtils.hasText(docVector.getSourceUid()) ? docVector.getSourceUid()
+                                        : docVector.getUid())
+                                .sourceName(docVector.getTitle())
+                                .contentSummary(getContentSummary(docVector.getContent(), 200))
+                                .language(docVector.getLanguage())
+                                .searchChannel(RobotSearchTypeEnum.VECTOR.name())
+                                .score((double) withScore.getScore())
+                                .highlighted(false)
+                                .build();
+                        sourceReferences.add(sourceRef);
+                    }
+                } catch (Exception e) {
+                    log.warn("FeishuDocVectorService search failed: {}", e.getMessage());
                 }
             }
 

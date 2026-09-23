@@ -40,6 +40,22 @@ public final class OrganizationI18nExceptions {
         return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_DEFAULT_DELETE_DENIED);
     }
 
+    public static ForbiddenException defaultOrganizationTransferDenied() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_DEFAULT_TRANSFER_DENIED);
+    }
+
+    public static ForbiddenException organizationAdminTransferDenied() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_ADMIN_TRANSFER_DENIED);
+    }
+
+    public static ForbiddenException organizationAdminTargetInvalid() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_ADMIN_TARGET_INVALID);
+    }
+
+    public static ForbiddenException organizationAdminTargetInOtherOrg() {
+        return CommonI18nExceptions.forbidden(I18Consts.I18N_ORGANIZATION_ADMIN_TARGET_IN_OTHER_ORG);
+    }
+
     public static ForbiddenException superUserDisableDenied() {
         return CommonI18nExceptions.forbidden(I18Consts.I18N_USER_SUPER_DISABLE_DENIED);
     }

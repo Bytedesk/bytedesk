@@ -18,7 +18,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,13 +35,16 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.ResourceI18nExceptions;
 import com.bytedesk.core.rbac.auth.AuthService;
+import com.bytedesk.core.rbac.organization.event.OrganizationAdminTransferEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -60,6 +67,21 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
     private final UidUtils uidUtils;
 
     private final ModelMapper modelMapper;
+
+    private final CacheManager cacheManager;
+
+    /** 同步事件发布器：AFTER_COMMIT 事件必须在事务内同步发布，不能走 @Async 的 BytedeskEventPublisher */
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    /** 延迟注入避免循环依赖：MemberRestService 依赖 OrganizationRestService */
+    private final ObjectProvider<MemberRestService> memberRestServiceProvider;
+
+    private void evictOrganizationCache() {
+        Cache cache = cacheManager.getCache("organization");
+        if (cache != null) {
+            cache.clear();
+        }
+    }
 
     private int resolveDefaultVipLevel() {
         return OrganizationDefaults.resolveDefaultVipLevel(bytedeskProperties);
@@ -310,6 +332,7 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (StringUtils.hasText(request.getUserUid())) {
             UserEntity user = userService.findByUid(request.getUserUid())
                 .orElseThrow(ResourceI18nExceptions::userNotFound);
+            validateAdminCandidate(user, organization);
             organization.setUser(user);
             
         }
@@ -403,6 +426,155 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         // 非平台管理员/超级管理员：只能查询自己创建的组织
         // assertOwnerOrPrivileged(organization);
         return convertToResponse(organization);
+    }
+
+    /**
+     * 统一的「更换组织管理员」入口（超级管理员 或 该组织管理员本人）。
+     *
+     * 语义（与规划 2026-09-20-org-admin-transfer-sync-plan 对齐）：
+     * 1. organization.user 指向新管理员；
+     * 2. 新管理员：currentOrganization 指向本组织 + ROLE_ADMIN + 幂等补齐 MemberEntity（事务内）；
+     * 3. 原管理员：仅移除本组织管理员角色，保留成员身份/客服资格/其它组织关系；
+     *    仅当显式「移除成员」时才清理成员记录并级联停用客服；
+     * 4. 事务提交后发布 OrganizationAdminTransferEvent，由 service 模块为新管理员创建默认一对一客服。
+     *
+     * 注意：不要复用 OrganizationCreateEvent，那会重放全部组织初始化监听器。
+     */
+    @Transactional
+    public OrganizationResponse transferAdmin(OrganizationRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid()) || !StringUtils.hasText(request.getUserUid())) {
+            throw new RuntimeException(I18Consts.I18N_ORG_UID_REQUIRED);
+        }
+
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+
+        // 事务内直接查库，拿到受管实体（不走 @Cacheable 缓存，避免懒加载问题）
+        OrganizationEntity organization = organizationRepository.findByUid(request.getUid())
+                .orElseThrow(() -> OrganizationI18nExceptions.organizationNotFound(request.getUid()));
+        if (organization.isDeleted()) {
+            throw OrganizationI18nExceptions.organizationNotFound(request.getUid());
+        }
+        // 默认组织（平台组织）不允许通过本接口更换管理员
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(organization.getUid())) {
+            throw OrganizationI18nExceptions.defaultOrganizationTransferDenied();
+        }
+        // 目标组织必须启用
+        if (Boolean.FALSE.equals(organization.getEnabled())) {
+            throw OrganizationI18nExceptions.organizationAccessDenied();
+        }
+
+        // 权限：超级管理员 或 该组织管理员本人（organization.user 对应用户）
+        boolean isSuper = authUser.isSuperUser();
+        boolean isOrgAdminOwner = organization.getUser() != null
+                && StringUtils.hasText(organization.getUser().getUid())
+                && authUser.getUid().equals(organization.getUser().getUid());
+        if (!isSuper && !isOrgAdminOwner) {
+            throw OrganizationI18nExceptions.organizationAdminTransferDenied();
+        }
+
+        // 目标用户：按预取组织关系加载，校验真实组织归属（不用 currentOrganization 单字段判断）
+        UserEntity newUser = userService.findByUidWithOrganizations(request.getUserUid())
+                .orElseThrow(ResourceI18nExceptions::userNotFound);
+        boolean adminUnchanged = organization.getUser() != null
+            && request.getUserUid().equals(organization.getUser().getUid());
+        if (!adminUnchanged) {
+            validateAdminCandidate(newUser, organization);
+        }
+
+        UserEntity originalUser = organization.getUser();
+        organization.setUser(newUser);
+        OrganizationEntity updatedOrganization = save(organization);
+        if (updatedOrganization == null) {
+            throw CommonI18nExceptions.updateFailed();
+        }
+
+        applyAdminTransfer(updatedOrganization, newUser, originalUser);
+
+        return convertToResponse(updatedOrganization);
+    }
+
+    /**
+     * 校验组织管理员目标用户（createBySuper/updateBySuper/transferAdmin 三入口共用）：
+     * - 不得是平台超级用户/系统账号；
+     * - 不得已是其它真实组织的管理员（避免一人同时担任多个组织管理员、原组织管理员指针悬空）；
+     * - 其它组织的普通成员允许，转移后保留其原组织成员/角色关系（多组织并存）。
+     * 平台默认组织 df_org_uid 视为“无组织”，不计入管理员归属冲突。
+     */
+    private void validateAdminCandidate(UserEntity targetUser, OrganizationEntity organization) {
+        if (targetUser.isSuperUser()
+                || BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID.equals(targetUser.getUid())
+                || BytedeskConsts.DEFAULT_SYSTEM_UID.equals(targetUser.getUid())) {
+            throw OrganizationI18nExceptions.organizationAdminTargetInvalid();
+        }
+
+        List<OrganizationEntity> otherAdminOrganizations = organizationRepository
+                .findActiveOtherOrganizationsByUser(
+                        targetUser,
+                        organization.getUid(),
+                        BytedeskConsts.DEFAULT_ORGANIZATION_UID);
+        if (otherAdminOrganizations != null && !otherAdminOrganizations.isEmpty()) {
+            log.warn("admin candidate denied, target user is already an admin of other orgs: userUid={}, orgs={}",
+                    targetUser.getUid(),
+                    otherAdminOrganizations.stream().map(otherOrg -> otherOrg.getUid()).toList());
+            throw OrganizationI18nExceptions.organizationAdminTargetInOtherOrg();
+        }
+    }
+
+    /**
+     * 统一的管理员转移逻辑（transferAdmin 与 updateBySuper 共用）：
+     * 1. 新管理员：currentOrganization + ROLE_ADMIN + 成员补齐（事务内，幂等）；
+     * 2. 原管理员：仅移除本组织管理员角色（保留成员身份与其它组织关系，不调用“移除成员”）；
+     * 3. 事务内同步发布 OrganizationAdminTransferEvent，由 AFTER_COMMIT 监听器创建默认客服。
+     */
+    private void applyAdminTransfer(OrganizationEntity organization, UserEntity newUser, UserEntity originalUser) {
+        // 1. 新管理员
+        newUser.setCurrentOrganization(organization);
+        userService.addRoleAdmin(newUser);
+        UserEntity savedNewUser = userService.save(newUser);
+        if (savedNewUser != null) {
+            newUser = savedNewUser;
+        }
+        // 成员补齐（事务内，保证数据不变量：管理员必有本组织 MemberEntity）
+        memberRestServiceProvider.getObject().ensureMemberForOrganizationAdmin(newUser, organization);
+
+        // 2. 原管理员：仅移除本组织的管理员角色
+        if (originalUser != null
+                && StringUtils.hasText(originalUser.getUid())
+                && !originalUser.getUid().equals(newUser.getUid())
+                && !originalUser.isSuperUser()) {
+            removeAdminRoleForOrganization(originalUser, organization);
+        }
+
+        // 3. 提交后事件（AFTER_COMMIT 消费，回滚不触发）
+        String oldAdminUserUid = originalUser != null ? originalUser.getUid() : null;
+        applicationEventPublisher.publishEvent(new OrganizationAdminTransferEvent(
+                this, organization.getUid(), oldAdminUserUid, newUser.getUid()));
+        log.info("organization admin transferred: orgUid={}, oldAdmin={}, newAdmin={}",
+                organization.getUid(), oldAdminUserUid, newUser.getUid());
+    }
+
+    /**
+     * 仅移除原管理员在指定组织上的管理员角色。
+     * 角色操作以 currentOrganization 为准：若原管理员当前组织不是目标组织，
+     * 临时切换到目标组织移除后再恢复，避免误删其它组织的角色。
+     */
+    private void removeAdminRoleForOrganization(UserEntity oldAdmin, OrganizationEntity organization) {
+        String originalOrgUid = oldAdmin.getCurrentOrganization() != null
+                && StringUtils.hasText(oldAdmin.getCurrentOrganization().getUid())
+                        ? oldAdmin.getCurrentOrganization().getUid()
+                        : null;
+        boolean needRestore = originalOrgUid != null && !originalOrgUid.equals(organization.getUid());
+        if (needRestore) {
+            userService.ensureCurrentOrganization(oldAdmin, organization.getUid());
+        }
+        userService.removeRoleAdmin(oldAdmin);
+        if (needRestore) {
+            userService.ensureCurrentOrganization(oldAdmin, originalOrgUid);
+        }
+        userService.save(oldAdmin);
     }
 
     // update by super
@@ -500,6 +672,11 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (StringUtils.hasText(request.getUserUid())) {
             newUser = userService.findByUid(request.getUserUid())
                     .orElseThrow(ResourceI18nExceptions::userNotFound);
+            boolean adminChanged = originalUser == null
+                    || !originalUser.getUid().equals(newUser.getUid());
+            if (adminChanged) {
+                validateAdminCandidate(newUser, organization);
+            }
             organization.setUser(newUser);
         }
         
@@ -513,27 +690,15 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (newUser != null) {
             // 判断是否与原先用户相同
             if (originalUser == null || !originalUser.getUid().equals(newUser.getUid())) {
-                // 用户发生变化，需要处理组织和角色
-                
-                // 1. 清除原先用户的当前组织和角色（如果存在）
-                if (originalUser != null) {
-                    originalUser.setCurrentOrganization(null);
-                    originalUser.removeOrganizationRoles();
-                    userService.removeRoleAdmin(originalUser);
-                    userService.save(originalUser);
-                    log.info("Cleared original user's current organization and roles: {}", originalUser.getUid());
-                }
-                
-                // 2. 设置新用户的当前组织和角色
-                newUser.setCurrentOrganization(updatedOrganization);
-                userService.addRoleAdmin(newUser);
-                log.info("Set new user's current organization and admin role: {}", newUser.getUid());
+                // 管理员变更：复用统一的管理员转移逻辑（含成员补齐与提交后事件发布），
+                // 原管理员仅移除本组织管理员角色，保留成员身份，与 transferAdmin 语义一致
+                applyAdminTransfer(updatedOrganization, newUser, originalUser);
             } else {
                 // 用户相同，无需重复设置
                 log.info("User unchanged, no need to update organization and roles: {}", newUser.getUid());
             }
         } else if (originalUser != null) {
-            // 新用户为空，但原先有用户，需要清除原先用户的组织和角色
+            // 新用户为空，但原先有用户，需要清除原先用户的组织和角色（保持既有语义，不走管理员转移逻辑）
             originalUser.setCurrentOrganization(null);
             originalUser.removeOrganizationRoles();
             userService.removeRoleAdmin(originalUser);
@@ -551,6 +716,10 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     @Cacheable(value = "organization", key = "#uid", unless = "#result == null")
     public Optional<OrganizationEntity> findByUid(String uid) {
+        return organizationRepository.findByUid(uid);
+    }
+
+    public Optional<OrganizationEntity> findFreshByUid(String uid) {
         return organizationRepository.findByUid(uid);
     }
 
@@ -608,14 +777,14 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         return convertToResponse(updatedOrganization);
     }
 
-    @Cacheable(value = "organization", key = "#organization.uid", unless = "#result == null")
     @Override
     @Transactional
     protected OrganizationEntity doSave(OrganizationEntity entity) {
-        return organizationRepository.save(entity);
+        OrganizationEntity saved = organizationRepository.save(entity);
+        evictOrganizationCache();
+        return saved;
     }
 
-    @Cacheable(value = "organization", key = "#organization.uid", unless = "#result == null")
     @Override
     public OrganizationEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             OrganizationEntity organization) {
@@ -648,7 +817,9 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 latestEntity.setCustomServerHost(organization.getCustomServerHost());
 
                 // 保存更新后的数据
-                return organizationRepository.save(latestEntity);
+                OrganizationEntity saved = organizationRepository.save(latestEntity);
+                evictOrganizationCache();
+                return saved;
             }
         } catch (Exception ex) {
             log.error("Error retrieving latest organization: " + ex.getMessage());

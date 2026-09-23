@@ -33,6 +33,8 @@ import com.bytedesk.core.push.strategy.AuthValidationStrategy;
 import com.bytedesk.core.push.strategy.AuthValidationStrategyFactory;
 import com.bytedesk.core.rbac.auth.AuthRequest;
 import com.bytedesk.core.rbac.auth.AuthTypeEnum;
+import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserService;
 import com.bytedesk.core.sms_push.SmsPushSendService;
 import com.bytedesk.core.sms_push.SmsSendResult;
 import com.bytedesk.core.utils.Utils;
@@ -41,6 +43,7 @@ import com.bytedesk.core.push.PushFilterService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 /**
  * 验证码发送服务
@@ -57,6 +60,7 @@ public class PushSendService {
     private final IpService ipService;
     private final PushFilterService pushFilterService;
     private final PushRestService pushRestService;
+    private final UserService userService;
 
     public PushSendResult sendCode(AuthRequest authRequest, HttpServletRequest request) {
         
@@ -104,19 +108,49 @@ public class PushSendService {
     }
 
     private String generateCode(String receiver) {
-        if (bytedeskProperties.isInWhitelist(receiver) || bytedeskProperties.isAdminIdentifier(receiver)) {
+        if (bytedeskProperties.isInWhitelist(receiver) || isSuperAdminIdentifier(receiver)) {
             return bytedeskProperties.getValidateCode();
         }
         return Utils.getRandomCode();
     }
 
+    /**
+     * D3 固定验证码口径：超管判定以数据库 superUser=true 用户为权威（复用 getSuper() 的 admin 缓存，
+     * 无新增查库压力；UserService.changeMobile/changeEmail 已同步失效该缓存），
+     * 配置值 bytedesk.admin.mobile/email 仅作首次启动/异常场景兑底，
+     * 避免超管改手机号后配置残留旧号仍可获取固定验证码。
+     */
+    boolean isSuperAdminIdentifier(String receiver) {
+        if (!StringUtils.hasText(receiver)) {
+            return false;
+        }
+        if (bytedeskProperties.isAdminIdentifier(receiver)) {
+            return true;
+        }
+        return userService.getSuper()
+                .map(superUser -> matchesSuperIdentifier(superUser, receiver.trim()))
+                .orElse(false);
+    }
+
+    private boolean matchesSuperIdentifier(UserEntity superUser, String receiver) {
+        if (superUser == null) {
+            return false;
+        }
+        if (StringUtils.hasText(superUser.getMobile()) && receiver.equals(superUser.getMobile().trim())) {
+            return true;
+        }
+        return StringUtils.hasText(superUser.getEmail()) && receiver.equalsIgnoreCase(superUser.getEmail().trim());
+    }
+
     private PushSendResult sendCodeByType(AuthRequest authRequest, String receiver, String country, 
                                   String code, HttpServletRequest request) {
+        // P1 用途模型：透传 AuthTypeEnum 名称，发送侧优先使用该用途绑定的供应商/模板
+        String type = authRequest.getType();
         if (authRequest.isEmail()) {
-            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, code, request);
+            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, code, type, request);
             return convertEmailResult(emailResult);
         } else if (authRequest.isMobile()) {
-            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, code, request);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, code, type, request);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, I18Consts.I18N_CAPTCHA_UNSUPPORTED_TYPE);
@@ -221,15 +255,15 @@ public class PushSendService {
     }
 
     /**
-     * 根据类型重新发送
+     * 根据类型重新发送（透传 type，P1 用途模型下重发同样使用该用途绑定的供应商/模板）
      */
     private PushSendResult resendByType(String type, String receiver, String country, String content) {
         // 判断是邮箱还是手机号类型
         if (isEmailType(type)) {
-            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, content, null);
+            EmailSendResult emailResult = emailSendService.sendEmailWithResult(receiver, content, type, null);
             return convertEmailResult(emailResult);
         } else if (isMobileType(type)) {
-            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, content, null);
+            SmsSendResult smsResult = smsPushSendService.sendSmsWithResult(receiver, country, content, type, null);
             return convertSmsResult(smsResult);
         }
         return PushSendResult.failure(PushSendResult.SendCodeErrorType.SEND_FAILED, "不支持的推送类型");

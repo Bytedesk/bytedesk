@@ -13,6 +13,23 @@
  */
 package com.bytedesk.core.push.service;
 
+import com.bytedesk.core.push_android_device.service.AliyunPushDeviceService;
+import com.bytedesk.core.push_android_device.service.PushDeviceRouter;
+
+/**
+ * 小米厂商通道推送（历史空壳）
+ *
+ * @deprecated 小米通道已并入阿里云 EMAS Push 聚合接入（华为/小米/OPPO/vivo/荣耀/魅族/FCM 统一走
+ *             {@link AliyunPushDeviceService}，按账号维度推送），不再单独对接 MiPush SDK。
+ *             保留类名仅为兼容既有引用；新代码请统一使用
+ *             {@link PushDeviceRouter#pushToUser(String, String, String, java.util.Map)}。
+ * @see PushDeviceRouter
+ * @see AliyunPushDeviceService
+ */
+@Deprecated
 public class PushMiService {
-    
+
+    public PushMiService() {
+        // 路由桩：无独立实现，厂商通道统一走 AgentDevicePushRouter → AliyunDevicePushService
+    }
 }

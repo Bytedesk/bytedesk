@@ -4,7 +4,7 @@
 
 ## 目录结构
 
-```
+```text
 ftl/
 ├── index.ftl              # 首页
 ├── home.ftl               # 主页
@@ -27,8 +27,8 @@ ftl/
 │   ├── workflow.ftl       # 工作流平台
 │   ├── kanban.ftl         # 任务管理 - 看板
 │   ├── callcenter.ftl     # 呼叫中心
-│   ├── video.ftl          # 视频会议
-│   ├── office.ftl         # 在线客服
+│   ├── meet.ftl           # 微语会议（已合并原视频会议/视频客服）
+│   ├── office.ftl         # 微语文档
 │   └── scrm.ftl           # SCRM - 客户管理
 ├── pages/                 # 静态页面
 │   ├── about.ftl          # 关于我们
@@ -57,42 +57,53 @@ ftl/
 ## 页面分类说明
 
 ### features/ - 产品功能页面
+
 包含所有产品功能的详细介绍页面，每个页面展示：
+
 - 功能特点（6个核心特性）
 - 技术优势/平台支持
 - 应用场景（4个典型用例）
 
 **访问路径**: `/{feature-name}` 或 `/{feature-name}.html`
+
 - 例如：`/team`、`/ai.html`、`/kbase`
 
 ### pages/ - 静态页面
+
 包含网站的静态信息页面：
+
 - 关于我们
 - 联系方式
 - 下载中心
 - 法律条款（隐私政策、服务条款）
 
 **访问路径**: `/{page-name}` 或 `/{page-name}.html`
+
 - 例如：`/about`、`/contact.html`、`/privacy`
 
 ### plan/ - 计划/套餐页面
+
 包含各产品线的定价计划和套餐介绍。
 
 ### common/ - 通用组件
+
 可复用的页面组件和布局模板。
 
 ## Controller 映射
 
 ### PageRouteController.java
+
 - **静态页面**: `handlePageRoutes()` - 处理 pages/ 目录下的模板
 - **功能页面**: `handleFeatureRoutes()` - 处理 features/ 目录下的模板
 
 ### PageTemplateController.java
+
 - **静态化**: `/temp/static` - 生成所有页面的静态HTML文件（支持多语言）
 
 ## 国际化支持
 
 所有页面都支持多语言：
+
 - 简体中文 (zh-CN)
 - 繁体中文 (zh-TW)
 - English (en)
@@ -128,4 +139,3 @@ ftl/
 ## Legacy
 
 - [eduport](http://localhost:8903/eduport/index-7.html)
-

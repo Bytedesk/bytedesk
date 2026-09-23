@@ -109,6 +109,15 @@ public class EmailSendService {
      * @return EmailSendResult 发送结果
      */
     public EmailSendResult sendEmailWithResult(String email, String content, HttpServletRequest request) {
+        return sendEmailWithResult(email, content, null, request);
+    }
+
+    /**
+     * 发送邮件并返回详细结果（携带业务用途 type，P1 用途模型）
+     * @param type 业务用途代码（AuthTypeEnum 名称，如 EMAIL_PASSWORD_RESET）；空时走平台默认配置
+     */
+    public EmailSendResult sendEmailWithResult(String email, String content, String type,
+            HttpServletRequest request) {
         Assert.hasText(email, "邮箱地址不能为空");
         Assert.hasText(content, "邮件内容不能为空");
 
@@ -123,8 +132,9 @@ public class EmailSendService {
         }
 
         try {
-            // 平台绑定配置优先（超级管理员 SuperSystemConfig 平台邮件配置），未配置/未启用回退 properties
-            PlatformEmailConfig platformConfig = getPlatformEmailConfig();
+            // P1：优先使用该业务用途绑定的邮箱/模板（可不同于平台默认绑定），
+            // 未绑定/未启用回退平台默认配置，再回退 properties
+            PlatformEmailConfig platformConfig = getPlatformEmailConfig(type);
             if (platformConfig != null) {
                 return sendPlatformValidateCodeWithResult(email, content, platformConfig);
             }
@@ -146,6 +156,14 @@ public class EmailSendService {
      * 获取平台邮件配置快照；无效/未启用/无 SPI 实现时返回 null（回退 properties）
      */
     PlatformEmailConfig getPlatformEmailConfig() {
+        return getPlatformEmailConfig(null);
+    }
+
+    /**
+     * 获取平台邮件配置快照（用途感知，P1）：purpose 非空时优先读取用途绑定快照，
+     * 未绑定/未启用/配置不完整返回 null（回退平台默认配置）
+     */
+    PlatformEmailConfig getPlatformEmailConfig(String purpose) {
         if (platformEmailConfigProviderProvider == null) {
             return null;
         }
@@ -154,20 +172,30 @@ public class EmailSendService {
             return null;
         }
         try {
-            PlatformEmailConfig config = provider.getPlatformEmailConfig();
+            PlatformEmailConfig config = StringUtils.hasText(purpose)
+                    ? provider.getPlatformEmailConfig(purpose)
+                    : provider.getPlatformEmailConfig();
             if (config == null || !config.enabled()) {
                 return null;
             }
             if (!StringUtils.hasText(config.emailAddress()) || !StringUtils.hasText(config.password())
                     || !StringUtils.hasText(config.smtpHost()) || config.smtpPort() == null) {
-                log.warn("平台邮件配置不完整，回退 properties 配置");
+                log.warn("平台邮件配置不完整，回退默认配置: purpose={}", purpose);
                 return null;
             }
             return config;
         } catch (Exception e) {
-            log.error("读取平台邮件配置失败，回退 properties 配置", e);
+            log.error("读取平台邮件配置失败，回退默认配置: purpose={}", purpose, e);
             return null;
         }
+    }
+
+    /**
+     * 平台用途测试邮件：使用指定配置快照发送验证码测试邮件（固定验证码 888888），
+     * 与业务链路（sendEmailWithResult(email, code, type)）同一模板解析策略
+     */
+    public EmailSendResult sendPlatformTestEmail(String testEmail, PlatformEmailConfig config) {
+        return sendPlatformValidateCodeWithResult(testEmail, "888888", config);
     }
 
     /**
@@ -178,7 +206,8 @@ public class EmailSendService {
         Assert.hasText(code, "验证码不能为空");
 
         log.info("sendPlatformValidateCode email={}, platform sender={}", email, config.emailAddress());
-        EmailTemplateEntity verifyCodeTemplate = findVerifyCodeTemplate();
+        // 优先使用平台绑定的验证码邮件模板，未绑定时回退默认 EMAIL_VERIFY_CODE 模板
+        EmailTemplateEntity verifyCodeTemplate = findVerifyCodeTemplate(config.verifyCodeTemplateUid());
         String content = renderVerifyCodeContent(verifyCodeTemplate, code);
         String subject = resolveVerifyCodeSubject(verifyCodeTemplate);
         String displayName = StringUtils.hasText(config.displayName()) ? config.displayName() : "weiyuai";
@@ -187,12 +216,22 @@ public class EmailSendService {
     }
 
     /**
-     * 读取验证码邮件模板（EMAIL_VERIFY_CODE）。
-     * 模板不存在、已停用或读取异常时返回 null，发送链路回退默认文案，保证验证码始终能发出。
+     * 读取默认验证码邮件模板（EMAIL_VERIFY_CODE）。
      */
     private EmailTemplateEntity findVerifyCodeTemplate() {
+        return findVerifyCodeTemplate(null);
+    }
+
+    /**
+     * 读取验证码邮件模板：优先使用平台绑定的模板UID，为空时回退默认 EMAIL_VERIFY_CODE。
+     * 模板不存在、已停用或读取异常时返回 null，发送链路回退默认文案，保证验证码始终能发出。
+     */
+    private EmailTemplateEntity findVerifyCodeTemplate(String templateUid) {
         try {
-            return emailTemplateRepository.findByUid(EmailTemplateInitData.EMAIL_VERIFY_CODE_UID)
+            String effectiveUid = StringUtils.hasText(templateUid)
+                    ? templateUid
+                    : EmailTemplateInitData.EMAIL_VERIFY_CODE_UID;
+            return emailTemplateRepository.findByUid(effectiveUid)
                     .filter(template -> Boolean.TRUE.equals(template.getEnabled()))
                     .orElse(null);
         } catch (Exception e) {

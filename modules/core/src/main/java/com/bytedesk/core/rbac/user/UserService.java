@@ -41,6 +41,8 @@ import com.bytedesk.core.exception.EmailExistsException;
 import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.UsernameExistsException;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.member.MemberRequest;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -94,6 +96,8 @@ public class UserService {
     private final AuthService authService;
 
     private final TokenRestService tokenRestService;
+
+    private final MemberRepository memberRepository;
 
     @Transactional
     @Caching(evict = {
@@ -216,11 +220,13 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "admin", condition = "#request.mobile != null or #request.email != null")
     public UserResponse update(UserRequest request) {
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
+            boolean contactsChanged = false;
 
             if (StringUtils.hasText(request.getUsername())) {
                 // 如果新用户名跟旧用户名不同，需要首先判断新用户名是否已经存在，如果存在则抛出异常
@@ -252,6 +258,7 @@ public class UserService {
                     }
                 }
                 user.setEmail(request.getEmail());
+                contactsChanged = true;
             }
 
             if (StringUtils.hasText(request.getMobile())) {
@@ -269,6 +276,7 @@ public class UserService {
                 }
                 user.setMobile(request.getMobile());
                 user.setCountry(normalizedCountry);
+                contactsChanged = true;
             } else if (StringUtils.hasText(request.getCountry()) && StringUtils.hasText(user.getMobile())) {
                 String normalizedCountry = CountryCodeUtils.normalize(request.getCountry());
                 boolean countryChanged = !normalizedCountry.equals(CountryCodeUtils.normalize(user.getCountry()));
@@ -278,6 +286,7 @@ public class UserService {
                             I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, user.getMobile()));
                 }
                 user.setCountry(normalizedCountry);
+                contactsChanged = true;
             }
 
             if (StringUtils.hasText(request.getDescription())) {
@@ -287,6 +296,11 @@ public class UserService {
             UserEntity updatedUser = save(user);
             if (updatedUser == null) {
                 throw new RuntimeException("User update failed..!!");
+            }
+
+            // T1 正向同步：联系方式变更后镜像到该用户名下所有有效 Member
+            if (contactsChanged) {
+                syncMemberContacts(updatedUser);
             }
 
             return UserConvertUtils.convertToUserResponse(user);
@@ -372,6 +386,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "admin")
     public UserResponse changeEmail(UserRequest request) {
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
@@ -394,6 +409,8 @@ public class UserService {
             }
             user.setEmailVerified(true);
             user = save(user);
+            // T1 正向同步：邮箱变更后镜像到该用户名下所有有效 Member
+            syncMemberContacts(user);
             //
             return UserConvertUtils.convertToUserResponse(user);
         } else {
@@ -402,6 +419,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(value = "admin")
     public UserResponse changeMobile(UserRequest request) {
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
@@ -429,6 +447,8 @@ public class UserService {
             user.setCountry(normalizedCountry);
             user.setMobileVerified(true);
             user = save(user);
+            // T1 正向同步：手机号变更后镜像到该用户名下所有有效 Member
+            syncMemberContacts(user);
 
             return UserConvertUtils.convertToUserResponse(user);
         } else {
@@ -692,6 +712,151 @@ public class UserService {
             return user;
         }
         return updateUserRoles(user, request.getRoleUids(), request.getOrgUid(), true);
+    }
+
+    /**
+     * T1 正向同步：User 联系方式变更后，镜像到该用户名下所有有效（未软删）Member。
+     *
+     * 语义依据：Member.mobile/email/country 是关联 User 联系方式在组织维度的镜像副本——
+     * MemberRestService.create 以 member 联系方式作为平台用户解析的 join key
+     * （findByMobileAndPlatform(...).orElseGet(() -> createUserFromMember(...))），
+     * 组织内唯一校验（existsByMobileAndOrgUid）也依赖该镜像表达“同一人在同一组织只出现一次”。
+     *
+     * 冲突预检：新值若已被同组织内“其他用户”的有效成员占用，抛出异常，
+     * 由外层事务整体回滚（禁止 User 已改而 Member 半改的部分成功状态）。
+     * 覆盖组织侧手工改动属预期行为，同步前记录 before 值审计日志。
+     */
+    public void syncMemberContacts(UserEntity user) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return;
+        }
+        List<MemberEntity> members = memberRepository.findByUser_UidAndDeletedFalse(user.getUid());
+        if (members == null || members.isEmpty()) {
+            return;
+        }
+        String country = CountryCodeUtils.normalize(user.getCountry());
+        // 冲突预检：新手机号/邮箱不得被同组织内其他用户的有效成员占用
+        if (StringUtils.hasText(user.getMobile())) {
+            for (MemberEntity member : members) {
+                memberRepository
+                        .findByMobileAndCountryAndOrgUidAndDeletedFalse(user.getMobile(), country, member.getOrgUid())
+                        .filter(other -> other.getUser() == null
+                                || !StringUtils.hasText(other.getUser().getUid())
+                                || !other.getUser().getUid().equals(user.getUid()))
+                        .ifPresent(other -> {
+                            log.warn("member contact sync conflict: mobile {} occupied by member {} (user {}) in org {}",
+                                    user.getMobile(), other.getUid(),
+                                    other.getUser() != null ? other.getUser().getUid() : null, member.getOrgUid());
+                            throw new MobileExistsException(
+                                    I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, user.getMobile()));
+                        });
+            }
+        }
+        if (StringUtils.hasText(user.getEmail())) {
+            for (MemberEntity member : members) {
+                memberRepository
+                        .findByEmailAndOrgUidAndDeletedFalse(user.getEmail(), member.getOrgUid())
+                        .filter(other -> other.getUser() == null
+                                || !StringUtils.hasText(other.getUser().getUid())
+                                || !other.getUser().getUid().equals(user.getUid()))
+                        .ifPresent(other -> {
+                            log.warn("member contact sync conflict: email {} occupied by member {} (user {}) in org {}",
+                                    user.getEmail(), other.getUid(),
+                                    other.getUser() != null ? other.getUser().getUid() : null, member.getOrgUid());
+                            throw new EmailExistsException(
+                                    I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, user.getEmail()));
+                        });
+            }
+        }
+        //
+        for (MemberEntity member : members) {
+            if (java.util.Objects.equals(trimToNull(member.getMobile()), trimToNull(user.getMobile()))
+                    && equalsIgnoreCaseSafe(trimToNull(member.getEmail()), trimToNull(user.getEmail()))
+                    && java.util.Objects.equals(CountryCodeUtils.normalize(member.getCountry()), country)) {
+                continue;
+            }
+            log.info("sync member contacts: memberUid={}, orgUid={}, userUid={}, mobile {} -> {}, email {} -> {}, country {} -> {}",
+                    member.getUid(), member.getOrgUid(), user.getUid(),
+                    member.getMobile(), user.getMobile(),
+                    member.getEmail(), user.getEmail(),
+                    member.getCountry(), country);
+            member.setMobile(trimToNull(user.getMobile()));
+            member.setEmail(trimToNull(user.getEmail()));
+            member.setCountry(country);
+        }
+        memberRepository.saveAll(members);
+    }
+
+    /**
+     * T2 反向同步：管理员编辑成员联系方式后，镜像回关联 User（平台级身份），并复用正向同步
+     * 覆盖该 User 在其他组织的有效 Member。
+     *
+     * 边界：仅传播非空值——清空成员侧联系方式不会清空平台账号联系方式（避免破坏登录身份）；
+     * 平台值变化前做平台级唯一校验（platform 取关联 User 实际值，不依赖可能为空的 request.platform），
+     * 命中其他用户时抛出异常，由外层事务整体回滚。
+     */
+    @Transactional
+    public UserEntity syncUserContactsFromMember(UserEntity user, String mobile, String email, String country) {
+        if (user == null || user.getId() == null) {
+            return user;
+        }
+        UserEntity managedUser = userRepository.findById(user.getId()).orElse(user);
+        boolean changed = false;
+        String normalizedCountry = CountryCodeUtils.normalize(country);
+        //
+        if (StringUtils.hasText(mobile) && !mobile.trim().equals(managedUser.getMobile())) {
+            if (Boolean.TRUE.equals(existsByMobileAndPlatform(mobile.trim(), normalizedCountry,
+                    managedUser.getPlatform()))) {
+                Optional<UserEntity> existing = findByMobileAndPlatform(mobile.trim(), normalizedCountry,
+                        managedUser.getPlatform());
+                if (existing.isEmpty() || !existing.get().getUid().equals(managedUser.getUid())) {
+                    throw new MobileExistsException(
+                            I18Consts.withArgs(I18Consts.I18N_MOBILE_ALREADY_EXISTS, mobile.trim()));
+                }
+            }
+            log.info("reverse sync user mobile: userUid={}, mobile {} -> {}", managedUser.getUid(),
+                    managedUser.getMobile(), mobile.trim());
+            managedUser.setMobile(mobile.trim());
+            changed = true;
+        }
+        if (StringUtils.hasText(email)
+                && (managedUser.getEmail() == null || !email.trim().equalsIgnoreCase(managedUser.getEmail().trim()))) {
+            if (Boolean.TRUE.equals(existsByEmailAndPlatform(email.trim(), managedUser.getPlatform()))) {
+                Optional<UserEntity> existing = findByEmailAndPlatform(email.trim(), managedUser.getPlatform());
+                if (existing.isEmpty() || !existing.get().getUid().equals(managedUser.getUid())) {
+                    throw new EmailExistsException(
+                            I18Consts.withArgs(I18Consts.I18N_EMAIL_ALREADY_EXISTS, email.trim()));
+                }
+            }
+            log.info("reverse sync user email: userUid={}, email {} -> {}", managedUser.getUid(),
+                    managedUser.getEmail(), email.trim());
+            managedUser.setEmail(email.trim());
+            changed = true;
+        }
+        if (!normalizedCountry.equals(CountryCodeUtils.normalize(managedUser.getCountry()))) {
+            managedUser.setCountry(normalizedCountry);
+            changed = true;
+        }
+        if (!changed) {
+            return managedUser;
+        }
+        UserEntity saved = save(managedUser);
+        syncMemberContacts(saved);
+        return saved;
+    }
+
+    private static String trimToNull(String value) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private static boolean equalsIgnoreCaseSafe(String left, String right) {
+        if (left == null || right == null) {
+            return left == right;
+        }
+        return left.equalsIgnoreCase(right);
     }
 
     private void syncCurrentRolesForCurrentOrganization(UserEntity user) {
@@ -1017,6 +1182,15 @@ public class UserService {
     // @Cacheable(value = "user", key = "#uid", unless = "#result == null")
     public Optional<UserEntity> findByUid(String uid) {
         return userRepository.findByUid(uid);
+    }
+
+    /**
+     * 按uid加载用户并预取组织关系（currentOrganization/userOrganizationRoles/organization/roles）。
+     * 不走缓存，供需要判断“用户真实组织归属”的场景使用（如管理员转移校验），
+     * 避免缓存反序列化后懒加载集合为 null 导致误判。
+     */
+    public Optional<UserEntity> findByUidWithOrganizations(String uid) {
+        return userRepository.findByUidWithOrganizations(uid);
     }
 
     @Cacheable(value = "admin", unless = "#result == null")

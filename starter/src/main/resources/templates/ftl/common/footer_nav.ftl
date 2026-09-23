@@ -97,7 +97,7 @@
 						<a href="${langPrefix}/features/callcenter.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.callcenter">呼叫中心</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
-						<a href="${langPrefix}/features/video.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.videocall">视频会议</@t></a>
+						<a href="${langPrefix}/features/meet.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.meet">微语会议</@t></a>
 					</div>
 					<div class="col-6 col-lg-3">
 						<a href="${langPrefix}/features/scrm.html" class="text-white-50 d-inline-block mb-1"><@t key="suite.scrm">客户管理</@t></a>

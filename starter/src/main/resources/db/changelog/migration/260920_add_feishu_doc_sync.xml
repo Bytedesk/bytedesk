@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        飞书云文档知识库同步（docs/plans/2026-09-20-feishu-doc-sync-plan.md P0）：
+        1. 新表 bytedesk_kbase_feishu_doc：同步落库的飞书 wiki 文档（modules/kbase llm_feishu）
+        2. bytedesk_channel_feishu 增加 base_url / kb_uid 数据源字段
+
+        策略（双保护，参照 260906_add_office_document_table.xml）：
+        1. 全新环境：createTable / addColumn 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+    -->
+
+    <changeSet id="260920-create-feishu-doc-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_kbase_feishu_doc"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_kbase_feishu_doc">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_feishu_doc" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_feishu_doc_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="feishu_uid" type="VARCHAR(64)"/>
+            <column name="kb_uid" type="VARCHAR(64)"/>
+            <column name="category_uid" type="VARCHAR(64)"/>
+            <column name="resource_type" type="VARCHAR(32)"/>
+            <column name="space_id" type="VARCHAR(64)"/>
+            <column name="node_token" type="VARCHAR(128)"/>
+            <column name="folder_token" type="VARCHAR(128)"/>
+            <column name="obj_token" type="VARCHAR(128)"/>
+            <column name="obj_type" type="VARCHAR(32)"/>
+            <column name="title" type="VARCHAR(512)"/>
+            <column name="content" type="TEXT"/>
+            <column name="source_url" type="VARCHAR(1024)"/>
+            <column name="obj_create_time" type="BIGINT"/>
+            <column name="obj_edit_time" type="BIGINT"/>
+            <column name="content_hash" type="VARCHAR(64)"/>
+            <column name="last_sync_batch_uid" type="VARCHAR(64)"/>
+            <column name="last_sync_error" type="TEXT"/>
+            <column name="sync_status" type="VARCHAR(32)" defaultValue="NEW"/>
+            <column name="elastic_status" type="VARCHAR(32)" defaultValue="NEW"/>
+            <column name="vector_status" type="VARCHAR(32)" defaultValue="NEW"/>
+            <column name="doc_id_list" type="TEXT"/>
+            <column name="is_enabled" type="BOOLEAN" defaultValueBoolean="true"/>
+        </createTable>
+        <createIndex tableName="bytedesk_kbase_feishu_doc" indexName="idx_feishu_doc_org_uid">
+            <column name="org_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_kbase_feishu_doc" indexName="idx_feishu_doc_kb_uid">
+            <column name="kb_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_kbase_feishu_doc" indexName="idx_feishu_doc_feishu_uid">
+            <column name="feishu_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_kbase_feishu_doc" indexName="idx_feishu_doc_space_id">
+            <column name="space_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="260920-add-feishu-datasource-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_channel_feishu"/>
+                <not>
+                    <columnExists tableName="bytedesk_channel_feishu" columnName="base_url"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_feishu">
+            <column name="base_url" type="VARCHAR(255)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260920-add-feishu-datasource-kbuid" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_channel_feishu"/>
+                <not>
+                    <columnExists tableName="bytedesk_channel_feishu" columnName="kb_uid"/>
+                </not>
+            </and>
+        </preConditions>
+        <addColumn tableName="bytedesk_channel_feishu">
+            <column name="kb_uid" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

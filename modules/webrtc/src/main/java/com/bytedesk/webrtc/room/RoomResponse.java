@@ -45,4 +45,9 @@ public class RoomResponse extends BaseResponse {
 
     private Integer order;
 
+    /**
+     * 会议最大同时发布人数上限（videoroom publishers）
+     */
+    private Integer maxParticipants;
+
 }

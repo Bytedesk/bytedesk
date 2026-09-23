@@ -72,6 +72,18 @@ public interface OrganizationRepository
         //
         Page<OrganizationEntity> findByUser(UserEntity user, Pageable pageable);
 
+        @Query("""
+                select o from OrganizationEntity o
+                where o.user = :user
+                        and o.deleted = false
+                        and o.uid <> :organizationUid
+                        and o.uid <> :defaultOrganizationUid
+        """)
+        List<OrganizationEntity> findActiveOtherOrganizationsByUser(
+                @Param("user") UserEntity user,
+                @Param("organizationUid") String organizationUid,
+                @Param("defaultOrganizationUid") String defaultOrganizationUid);
+
         Boolean existsByNameAndDeleted(String name, Boolean deleted);
 
         Boolean existsByCodeAndDeleted(String code, Boolean deleted);

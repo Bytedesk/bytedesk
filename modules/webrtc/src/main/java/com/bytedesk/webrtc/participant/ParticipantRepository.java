@@ -40,6 +40,9 @@ public interface ParticipantRepository extends JpaRepository<ParticipantEntity, 
     /** 某用户在指定会议室的活跃参会记录（在会，未离会） */
     Optional<ParticipantEntity> findByRoomUidAndUserUidAndStatusAndDeletedFalse(String roomUid, String userUid, String status);
 
+    /** 某用户是否参与过指定会议室（不限在会/离会，会议录制可见性判定用） */
+    Boolean existsByRoomUidAndUserUidAndDeletedFalse(String roomUid, String userUid);
+
     /** 按 Janus 参与者 id 查找活跃记录（前端回传 janusParticipantId 时使用） */
     Optional<ParticipantEntity> findByRoomUidAndJanusParticipantIdAndStatusAndDeletedFalse(String roomUid, Long janusParticipantId, String status);
 

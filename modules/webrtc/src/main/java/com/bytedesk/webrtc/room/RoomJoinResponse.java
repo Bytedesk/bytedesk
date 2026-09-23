@@ -45,7 +45,19 @@ public class RoomJoinResponse {
     private String userUid;
 
     /**
+     * 会议室创建者（主持人）uid，仅用于前端展示录制按钮等界面提示；
+     * 录制等写操作仍须由后端再次校验，不能以此字段作为授权依据
+     */
+    private String hostUid;
+
+    /**
      * bytedesk.webrtc.janus.enabled 是否开启
      */
     private Boolean janusEnabled;
+
+    /**
+     * 会议容量（= RoomEntity.maxParticipants，历史房间缺省时回退默认值），
+     * 前端创建 Janus videoroom 房间时作为 publishers 参数使用
+     */
+    private Integer publisherLimit;
 }

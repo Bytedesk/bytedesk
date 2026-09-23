@@ -379,14 +379,20 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     /**
      * 批量刷新心跳缓存到数据库，返回成功更新条数。
      * 该方法供定时任务调用。
+     *
+     * 注意：故意不加 @Transactional —— 每行 updateHeartbeatIfOlder 使用独立短事务（单行事务不可能构成死锁环），
+     * 避免原先“单事务按 HashMap 任意顺序持有全部行锁”与 expireStaleSessions 等批量任务交叉加锁导致 PostgreSQL 死锁。
+     * 单行更新彼此独立且幂等，部分失败由下一轮刷库补偿。
      */
-    @Transactional
     public int flushHeartbeatCacheBatch(java.util.Map<String, Long> heartbeats) {
         if (heartbeats == null || heartbeats.isEmpty()) return 0;
         int updatedCount = 0;
         long now = System.currentTimeMillis();
         long threshold = now - MIN_INTERVAL_MS;
-        for (java.util.Map.Entry<String, Long> e : heartbeats.entrySet()) {
+        // 按 clientId 排序，保证多实例并发时加锁顺序确定
+        List<java.util.Map.Entry<String, Long>> entries = new ArrayList<>(heartbeats.entrySet());
+        entries.sort(java.util.Map.Entry.comparingByKey());
+        for (java.util.Map.Entry<String, Long> e : entries) {
             String clientId = e.getKey();
             Long hbTs = e.getValue();
             if (clientId == null || hbTs == null) continue;
@@ -412,32 +418,37 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
         });
     }
 
-    /** Cleanup expired (stale) connections by TTL */
-    @Transactional
+    /**
+     * Cleanup expired (stale) connections by TTL.
+     *
+     * 使用单条批量 UPDATE（expireAllStale，独立短事务）完成过期：
+     * 语句内加锁顺序由扫描顺序确定、语句结束即提交释放，
+     * 避免原先“一个大事务内逐行 UPDATE”与心跳批量刷库事务以不同顺序锁行导致 PostgreSQL 死锁。
+     * 不加方法级 @Transactional，避免把缓存失效等非 DB 操作拉长锁持有时间。
+     */
+    @Retryable(
+        retryFor = {
+            CannotAcquireLockException.class,
+            PessimisticLockingFailureException.class
+        },
+        maxAttempts = 3,
+        backoff = @Backoff(delay = 100, multiplier = 2)
+    )
     public int expireStaleSessions() {
         long now = System.currentTimeMillis();
-        List<ConnectionEntity> activeConnections = connectionRepository.findByStatusAndDeletedFalse(CONNECTED.name());
-        int changed = 0;
-        Set<String> changedUsers = new HashSet<>();
-        for (ConnectionEntity c : activeConnections) {
-            Long last = c.getLastHeartbeatAt();
-            Integer ttlSeconds = c.getTtlSeconds();
-            if (last == null || ttlSeconds == null || last + ttlSeconds * 1000L >= now) {
-                continue;
-            }
-            int updated = connectionRepository.expireIfStale(c.getId(), CONNECTED.name(), DISCONNECTED.name(), now);
-            if (updated > 0) {
-                changed += updated;
-                if (StringUtils.hasText(c.getUserUid())) {
-                    changedUsers.add(c.getUserUid());
-                }
+        // 先按同一谓词收集受影响用户，用于失效在线状态缓存；
+        // 与 UPDATE 之间存在微小竞态：多失效一次缓存无副作用，漏掉的由下一轮调度补偿
+        List<String> staleUserUids = connectionRepository.findUserUidsByStatusAndStale(CONNECTED.name(), now);
+        if (staleUserUids.isEmpty()) {
+            return 0;
+        }
+        int changed = connectionRepository.expireAllStale(CONNECTED.name(), DISCONNECTED.name(), now);
+        if (changed > 0) {
+            for (String userUid : staleUserUids) {
+                evictPresenceCaches(userUid);
             }
         }
-        for (String userUid : changedUsers) {
-            evictPresenceCaches(userUid);
-        }
-        // long cost = System.currentTimeMillis() - start;
-        // log.info("expireStaleSessions scanned={}, expired={}, costMs={}", scanned, changed, cost);
+        log.debug("expireStaleSessions expired={} staleUsers={}", changed, staleUserUids.size());
         return changed;
     }
 

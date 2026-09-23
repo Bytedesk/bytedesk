@@ -27,6 +27,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -48,6 +49,7 @@ import com.bytedesk.core.exception.MobileExistsException;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.exception.ResourceI18nExceptions;
+import com.bytedesk.core.member.event.MemberDeletedEvent;
 import com.bytedesk.core.message.MessageService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
@@ -64,8 +66,10 @@ import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.CountryCodeUtils;
+import com.bytedesk.core.department.DepartmentConsts;
 import com.bytedesk.core.department.DepartmentEntity;
 import com.bytedesk.core.department.DepartmentRequest;
+import com.bytedesk.core.department.DepartmentResponse;
 import com.bytedesk.core.department.DepartmentRestService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -100,6 +104,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
     private final OrganizationRestService organizationRestService;
 
     private final MessageService messageService;
+
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     private OrganizationEntity requireOrganization(String orgUid) {
         if (!StringUtils.hasText(orgUid)) {
@@ -230,6 +236,15 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (!StringUtils.hasText(member.getCountry()) && StringUtils.hasText(user.getCountry())) {
             member.setCountry(user.getCountry());
         }
+        // R3 修复：组织管理员本人通过成员入口补建成员时，改走管理员专用补齐逻辑，
+        // 避免普通成员角色更新链路触发受限角色校验
+        // （UserService.updateUserRoles 的 RESTRICTED_ROLE_UIDS diff 校验）
+        if (isOrganizationAdminUser(user, request.getOrgUid())) {
+            OrganizationEntity adminOrg = organizationRestService.findByUid(request.getOrgUid())
+                    .orElseThrow(() -> OrganizationI18nExceptions.organizationNotFound(request.getOrgUid()));
+            MemberEntity adminMember = ensureMemberForOrganizationAdmin(user, adminOrg);
+            return convertToResponse(adminMember);
+        }
         user = userService.updateUserFromMember(user, request);
         // 设置用户到成员对象中
         member.setUser(user);
@@ -240,6 +255,112 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         }
         // 
         return convertToResponse(saveMember);
+    }
+
+    /**
+     * 判断用户是否为指定组织的管理员（organization.user 指向该用户）。
+     */
+    private boolean isOrganizationAdminUser(UserEntity user, String orgUid) {
+        if (user == null || !StringUtils.hasText(user.getUid()) || !StringUtils.hasText(orgUid)) {
+            return false;
+        }
+        return organizationRestService.findByUid(orgUid)
+                .map(org -> org.getUser() != null && user.getUid().equals(org.getUser().getUid()))
+                .orElse(false);
+    }
+
+    /**
+     * 为组织管理员补齐成员记录（仅供管理员转移/管理员成员补齐使用，不接受任意 roleUids 输入）。
+     *
+     * 语义对齐 MemberEventListener.onOrganizationCreateEvent 中为新管理员补成员的既有逻辑：
+     * - 已存在成员记录（含历史软删）：恢复/复用，并刷新管理员默认可登录平台
+     * - 不存在：放入 DEPT_ADMIN 部门（不存在时创建），昵称/头像/邮箱/手机号从 user 复制，
+     *   角色 ROLE_ADMIN，allowedLoginPlatforms = defaultForRoleUids(ROLE_ADMIN)
+     * - 不修改通用受限角色校验（UserService.updateUserRoles 的 RESTRICTED_ROLE_UIDS 规则保持不变），
+     *   安全边界：管理员身份只能由管理员转移接口或超级管理员路径设置
+     */
+    @Transactional
+    public MemberEntity ensureMemberForOrganizationAdmin(UserEntity user, OrganizationEntity organization) {
+        if (user == null || organization == null) {
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
+        }
+        final String orgUid = organization.getUid();
+        final Set<String> roleUids = new HashSet<>(Arrays.asList(BytedeskConsts.DEFAULT_ROLE_ADMIN_UID));
+
+        // 1. 复用已存在的成员记录（含历史软删，恢复并幂等，不重复插入）
+        Optional<MemberEntity> existingOptional = memberRepository.findByUser_UidAndOrgUid(user.getUid(), orgUid);
+        if (existingOptional.isPresent()) {
+            MemberEntity existing = existingOptional.get();
+            existing.setDeleted(false);
+            existing.setOrgUid(orgUid);
+            existing.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
+            MemberEntity saved = save(existing);
+            if (saved == null) {
+                throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
+            }
+            return saved;
+        }
+
+        // 2. 组织容量校验（与普通成员创建一致）
+        assertMemberCapacityAvailable(orgUid);
+
+        // 3. 管理员部门（不存在时创建，对齐组织创建自动初始化链）
+        DepartmentResponse departmentResponse = departmentRestService
+                .findByNameAndOrgUid(DepartmentConsts.DEPT_ADMIN, orgUid)
+                .map(departmentRestService::convertToResponse)
+                .orElseGet(() -> {
+                    DepartmentRequest departmentRequest = DepartmentRequest.builder()
+                            .uid(uidUtils.getUid())
+                            .name(DepartmentConsts.DEPT_ADMIN)
+                            .description("Description for" + DepartmentConsts.DEPT_ADMIN)
+                            .orgUid(orgUid)
+                            .build();
+                    return departmentRestService.create(departmentRequest);
+                });
+        if (departmentResponse == null) {
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
+        }
+
+        // 4. 创建管理员成员（角色固定 ROLE_ADMIN，不可由调用方指定）
+        MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
+        memberRequest.setUid(uidUtils.getUid());
+        memberRequest.setJobNo("001");
+        memberRequest.setJobTitle(I18Consts.I18N_ADMIN);
+        memberRequest.setSeatNo("001");
+        memberRequest.setTelephone("001");
+        memberRequest.setMobile(user.getMobile());
+        memberRequest.setCountry(user.getCountry());
+        memberRequest.setStatus(MemberStatusEnum.ACTIVE.name());
+        memberRequest.setRoleUids(roleUids);
+        memberRequest.setDeptUid(departmentResponse.getUid());
+        memberRequest.setOrgUid(orgUid);
+        // 确保本组织存在 ROLE_ADMIN 关联：使用幂等 addRoleAdmin（已存在则无操作），
+        // 不走 updateUserRoles 的整体替换语义，避免误删本组织其它角色（如 ROLE_AGENT）；
+        // 若用户当前登录上下文在其它组织，补齐后恢复原 currentOrganization
+        String originalOrgUid = user.getCurrentOrganization() != null
+                && StringUtils.hasText(user.getCurrentOrganization().getUid())
+                        ? user.getCurrentOrganization().getUid()
+                        : null;
+        user.setCurrentOrganization(organization);
+        user = userService.addRoleAdmin(user);
+        if (originalOrgUid != null && !originalOrgUid.equals(orgUid)) {
+            user = userService.ensureCurrentOrganization(user, originalOrgUid);
+            user = userService.save(user);
+        }
+
+        MemberEntity member = modelMapper.map(memberRequest, MemberEntity.class);
+        member.setUid(memberRequest.getUid());
+        member.setOrgUid(orgUid);
+        member.setDeptUid(departmentResponse.getUid());
+        member.setAvatar(resolveMemberAvatar(null, null));
+        member.setDescription(resolveMemberDescription(null, null));
+        member.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
+        member.setUser(user);
+        MemberEntity savedMember = save(member);
+        if (savedMember == null) {
+            throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
+        }
+        return savedMember;
     }
 
     @Transactional
@@ -294,6 +415,10 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             member.getAllowedLoginPlatforms()));
 
         user = userService.updateUserFromMember(user, request);
+        // T2 反向同步：成员联系方式镜像回关联 User（含平台级唯一校验），
+        // 并复用正向同步覆盖该 User 在其他组织的有效 Member；仅传播非空值
+        user = userService.syncUserContactsFromMember(user, request.getMobile(), request.getEmail(),
+                request.getCountry());
         member.setUser(user);
         //
         MemberEntity savedMember = save(member);
@@ -882,6 +1007,8 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
      * - 删除(软删) MemberEntity
      * - 同步从 UserEntity.userOrganizationRoles 中移除该组织
      * - 若用户当前组织为该组织且仍有其它组织，则切换 currentOrganization
+     * - 吊销该用户在本组织下的所有 token（复用 forceLogout 同款链路，立即下线）
+     * - 事务提交后发布 MemberDeletedEvent，由 service 模块级联软删一对一客服并释放坐席
      */
     @Transactional
     public void removeUserFromOrg(MemberRequest request) {
@@ -901,12 +1028,27 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
             throw new RuntimeException("orgUid mismatch");
         }
 
+        final String userUid = member.getUser() != null ? member.getUser().getUid() : null;
+
         // 先处理 user 的组织归属关系，再软删 member
         if (member.getUser() != null && StringUtils.hasText(orgUid)) {
             userService.removeUserFromOrganization(member.getUser().getUid(), orgUid);
         }
 
         deleteByUid(member.getUid());
+
+        // 被移除成员立即失效在该组织下的登录态（复用 forceLogout 同款 token 失效链路）
+        if (StringUtils.hasText(userUid) && StringUtils.hasText(orgUid)) {
+            tokenRestService.revokeAllByUserUidAndOrgUid(
+                    userUid,
+                    orgUid,
+                    TokenRestService.REVOKE_REASON_MEMBER_FORCE_LOGOUT);
+        }
+
+        // 事务提交后由 modules/service 消费：级联软删该组织下该用户的客服并释放坐席。
+        // 必须同步发布（不走 @Async 的 BytedeskEventPublisher），否则
+        // @TransactionalEventListener(AFTER_COMMIT) 无法感知事务上下文。
+        applicationEventPublisher.publishEvent(new MemberDeletedEvent(this, member));
     }
 
     @Override

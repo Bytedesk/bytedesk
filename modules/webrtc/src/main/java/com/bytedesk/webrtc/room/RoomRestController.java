@@ -32,7 +32,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/room")
 @AllArgsConstructor
@@ -94,10 +96,15 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
     @Operation(summary = "Join Room", description = "Join a conference room by inviteUid with the current logged-in user info")
     @PostMapping("/join")
     public ResponseEntity<?> join(@RequestBody RoomRequest request) {
-        
-        RoomJoinResponse joinResponse = roomRestService.joinRoom(request);
-
-        return ResponseEntity.ok(JsonResult.success(joinResponse));
+        try {
+            RoomJoinResponse joinResponse = roomRestService.joinRoom(request);
+            return ResponseEntity.ok(JsonResult.success(joinResponse));
+        } catch (RuntimeException e) {
+            // 业务校验失败（会议不存在或已结束/未登录/会议号为空等）：降级为业务错误响应，
+            // 不抛给全局异常处理器刷 "not handled exception" ERROR 堆栈；前端按 code!=200 内联展示 message
+            log.warn("join room failed: {}, inviteUid={}, uid={}", e.getMessage(), request.getInviteUid(), request.getUid());
+            return ResponseEntity.ok(JsonResult.error(e.getMessage(), 400));
+        }
     }
 
     @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_UPDATE, description = "update room")

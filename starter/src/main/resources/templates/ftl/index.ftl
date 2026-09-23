@@ -35,144 +35,155 @@ Listed course START -->
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/coding.svg" alt="<@t key='alt.suite.team'>企业IM图标</@t>">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="/features/team.html" class="stretched-link"><@t key="section.suite.item.team.title">企业IM +</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.team.desc">AI群聊助手，AI会话总结，聊天记录监控。按照中大型团队架构使用规模设计，支持数万人同时在线</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.team.desc">AI群聊助手、AI会话总结、聊天记录监控，为中大型团队设计，支持数万人同时在线</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/data-science.svg" alt="<@t key='alt.suite.service'>在线客服图标</@t>">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="/features/service.html" class="stretched-link"><@t key="section.suite.item.service.title">在线客服</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.service.desc">多渠道对接、多账号聚合，私域管理，AI意图识别，AI智能质检、支持人工坐席兜底，数十项在线客服通用功能。
-						来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服(原微客服)</a>.
-					</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.service.desc">多渠道对接、多账号聚合、私域管理，AI意图识别与智能质检，支持人工坐席兜底。来自<a href="http://www.weikefu.net" target="_blank">萝卜丝智能客服</a></@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/online.svg" alt="<@t key='alt.suite.ai'>AI Agent图标</@t>">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="/features/ai.html" class="stretched-link"><@t key="section.suite.item.ai.title">AI Agent</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.ai.desc">对接Ollama/DeepSeek/智谱/Qwen通义千问等大模型，支持私有部署/Api调用大模型.</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.ai.desc">对接Ollama/DeepSeek/智谱/通义千问等大模型，支持私有部署与API调用</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<!-- Image -->
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/engineering.svg" alt="<@t key='alt.suite.kbase'>企业知识库图标</@t>">
 					</div>
 					<!-- Title -->
 					<h5 class="mb-1"><a href="/features/kbase.html" class="stretched-link"><@t key="section.suite.item.kbase.title">企业知识库</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.kbase.desc">内部客服中心，AI写作助手，AI知识库问答，自动撰写内容，内部知识库管理、文档管理、对外知识库、帮助文档、内容公告</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.kbase.desc">AI写作助手、AI知识库问答，内部知识库、文档管理、帮助文档、内容公告一站管理</@t></span>
+				</div>
+			</div>
+
+			<!-- Item: 微语文档 -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/abc.svg" alt="<@t key='alt.suite.office'>微语文档图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="/features/office.html" class="stretched-link"><@t key="section.suite.item.office.title">微语文档</@t></a></h5>
+					<span class="mb-0"><@t key="section.suite.item.office.desc">Word、Excel、PPT、PDF、Markdown 五类文档 + AI 助手，起草、润色、排版一句话完成</@t></span>
 				</div>
 			</div>
 
 			
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/profit.svg" alt="<@t key='alt.suite.voc'>客户之声图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/voc.html" class="stretched-link"><@t key="section.suite.item.voc.title">客户之声</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.voc.desc">AI回复助手，社交媒体评论抓取、第三方平台评论同步、意见反馈、服务投诉、调查问卷</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.voc.desc">AI回复助手，社交媒体评论抓取、第三方评论同步、意见反馈、投诉建议、调查问卷</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/medical.svg" alt="<@t key='alt.suite.ticket'>工单系统图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/ticket.html" class="stretched-link"><@t key="section.suite.item.ticket.title">工单系统</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.ticket.desc">AI工单助手，自动创建工单，自动分配工单，自动关闭工单</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.ticket.desc">AI工单助手：自动创建、智能分配流转、超时提醒、自动关闭，支持多部门协同</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/artist.svg" alt="<@t key='alt.suite.workflow'>工作流图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/workflow.html" class="stretched-link"><@t key="section.suite.item.workflow.title">工作流</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.workflow.desc">AI智能体，自动执行数据操作，自定义工作流、流程编排，Function Calling/Mcp</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.workflow.desc">可视化流程编排与自定义工作流，AI智能体自动执行数据操作，支持MCP工具调用</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/home.svg" alt="<@t key='alt.suite.kanban'>任务管理图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/kanban.html" class="stretched-link"><@t key="section.suite.item.kanban.title">任务管理</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.kanban.desc">任务、日历、待办事项</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.kanban.desc">看板任务管理、日历与待办事项，支持团队协作、进度跟踪与到期提醒</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/data-science.svg" alt="<@t key='alt.suite.call'>呼叫中心图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/callcenter.html" class="stretched-link"><@t key="section.suite.item.call.title">呼叫中心</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.call.desc">AI智能外呼，自动语音识别，智能语音合成，多线路接入，通话录音，质检分析，支持FreeSWITCH</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.call.desc">AI智能外呼、语音识别与合成，多线路接入、通话录音、质检分析，支持FreeSWITCH</@t></span>
 				</div>
 			</div>
 
-			<!-- Item -->
+			<!-- Item: 微语会议（已合并视频会议/视频客服） -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
-						<img src="/assets/images/element/online.svg" alt="<@t key='alt.suite.video'>视频会议图标</@t>">
+						<img src="/assets/images/element/contact.svg" alt="<@t key='alt.suite.meet'>微语会议图标</@t>">
 					</div>
-					<h5 class="mb-1"><a href="/features/video.html" class="stretched-link"><@t key="section.suite.item.video.title">视频会议</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.video.desc">视频会议、视频客服，屏幕共享，远程协助，视频录制，AI视频分析，支持移动端和PC端</@t></span>
+					<h5 class="mb-1"><a href="/features/meet.html" class="stretched-link"><@t key="section.suite.item.meet.title">微语会议</@t></a></h5>
+					<span class="mb-0"><@t key="section.suite.item.meet.desc">音视频会议、屏幕共享、视频客服、远程协助、参会记录，浏览器直接开会免安装</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/profit.svg" alt="<@t key='alt.suite.scrm'>客户管理图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/scrm.html" class="stretched-link"><@t key="section.suite.item.scrm.title">客户管理</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.scrm.desc">AI智能客户画像，客户生命周期管理，营销自动化，销售漏斗分析，多渠道客户数据统一管理</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.scrm.desc">AI客户画像、生命周期管理、营销自动化、销售漏斗分析，多渠道数据统一管理</@t></span>
 				</div>
 			</div>
 
 			<!-- Item -->
 			<div class="col-sm-6 col-md-4 col-xl-3">
-				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 h-100 position-relative btn-transition">
 					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
 						<img src="/assets/images/element/engineering.svg" alt="<@t key='alt.suite.open'>开放平台图标</@t>">
 					</div>
 					<h5 class="mb-1"><a href="/features/open.html" class="stretched-link"><@t key="section.suite.item.open.title">开放平台</@t></a></h5>
-					<span class="mb-0"><@t key="section.suite.item.open.desc">API接口开放，第三方集成，开发者工具，SDK支持，插件生态，开放API文档</@t></span>
+					<span class="mb-0"><@t key="section.suite.item.open.desc">开放API接口，第三方集成，开发者工具与SDK，插件生态与API文档</@t></span>
 				</div>
 			</div>
 			

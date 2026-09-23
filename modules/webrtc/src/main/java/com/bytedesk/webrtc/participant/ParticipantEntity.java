@@ -47,7 +47,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 // @EntityListeners({ParticipantEntityListener.class})
-@Table(name = "bytedesk_core_participant")
+@Table(name = "bytedesk_webrtc_participant")
 public class ParticipantEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

@@ -19,4 +19,5 @@ public enum FaqProtobufTypeEnum {
     CHUNK,
     ARTICLE,
     WEBPAGE,
+    FEISHU,
 }

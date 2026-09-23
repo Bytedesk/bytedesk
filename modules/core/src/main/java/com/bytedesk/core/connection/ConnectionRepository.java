@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.LockModeType;
 
 public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Long>, JpaSpecificationExecutor<ConnectionEntity> {
@@ -34,6 +35,7 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
 
     boolean existsByClientId(String clientId);
 
+    @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update ConnectionEntity c set c.lastHeartbeatAt = :now where c.clientId = :clientId and (c.lastHeartbeatAt is null or c.lastHeartbeatAt <= :threshold)")
     int updateHeartbeatIfOlder(@Param("clientId") String clientId, @Param("now") long now, @Param("threshold") long threshold);
@@ -64,6 +66,40 @@ public interface ConnectionRepository extends JpaRepository<ConnectionEntity, Lo
             @Param("connectedStatus") String connectedStatus,
             @Param("disconnectedStatus") String disconnectedStatus,
             @Param("now") long now);
+
+    /**
+     * 单条批量语句完成 TTL 过期：语句内按扫描顺序一次性加锁，且使用独立短事务、语句结束即提交释放，
+     * 避免与心跳批量刷库等任务交叉持有多行锁导致 PostgreSQL 死锁。
+     * 谓词与 expireIfStale 完全一致（不含 id 条件）。
+     */
+    @Transactional
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update ConnectionEntity c
+        set c.status = :disconnectedStatus,
+            c.disconnectedAt = :now
+        where c.deleted = false
+          and c.status = :connectedStatus
+          and c.lastHeartbeatAt is not null
+          and c.ttlSeconds is not null
+          and c.lastHeartbeatAt + (c.ttlSeconds * 1000) < :now
+        """)
+    int expireAllStale(@Param("connectedStatus") String connectedStatus,
+            @Param("disconnectedStatus") String disconnectedStatus,
+            @Param("now") long now);
+
+    /**
+     * 按与 expireAllStale 相同的谓词，查询即将被过期清理的用户 userUid（用于失效在线状态缓存）。
+     */
+    @Query("""
+        select distinct c.userUid from ConnectionEntity c
+        where c.deleted = false
+          and c.status = :connectedStatus
+          and c.lastHeartbeatAt is not null
+          and c.ttlSeconds is not null
+          and c.lastHeartbeatAt + (c.ttlSeconds * 1000) < :now
+        """)
+    java.util.List<String> findUserUidsByStatusAndStale(@Param("connectedStatus") String connectedStatus, @Param("now") long now);
 
     java.util.List<ConnectionEntity> findByUserUidAndDeletedFalse(String userUid);
 

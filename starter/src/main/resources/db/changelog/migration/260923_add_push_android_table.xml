@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Android 设备推送投递记录表：记录一次「供应商投递请求/受理结果」（账号维度）。
+        由 PushDeviceRouter 调用供应商完成后经 PushAndroidRecordService 终态直写
+        （SUCCESS/ERROR，正常不出现 PENDING 中间态）；status=SUCCESS 仅表示供应商受理。
+
+        策略（双保护，参照 260922_add_push_device_table.xml）：
+        1. 全新环境（表不存在）：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+
+        见 docs/plans/2026-09-23-android-push-record-entity-plan.md
+    -->
+
+    <changeSet id="260923-create-push-android-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_push_android"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_core_push_android">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_push_android" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_push_android_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="sender" type="VARCHAR(255)"/>
+            <column name="receiver" type="VARCHAR(64)"/>
+            <column name="device_id" type="VARCHAR(128)"/>
+            <column name="attempt_uid" type="VARCHAR(64)"/>
+            <column name="request_uid" type="VARCHAR(128)"/>
+            <column name="provider" type="VARCHAR(32)"/>
+            <column name="requested_provider" type="VARCHAR(32)"/>
+            <column name="is_fallback" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="fallback_reason" type="TEXT"/>
+            <column name="message_id" type="VARCHAR(128)"/>
+            <column name="request_id" type="VARCHAR(128)"/>
+            <column name="message_uid" type="VARCHAR(255)"/>
+            <column name="thread_uid" type="VARCHAR(255)"/>
+            <column name="content" type="TEXT"/>
+            <!-- 列名对齐 push_status 惯例（PushStatusEnum） -->
+            <column name="push_android_type" type="VARCHAR(32)"/>
+            <column name="push_status" type="VARCHAR(32)"/>
+            <column name="channel" type="VARCHAR(32)"/>
+            <column name="send_success" type="BOOLEAN"/>
+            <column name="send_message" type="TEXT"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 查询索引：receiver / provider / status / message_id（供应商排障），幂等创建；
+         message_id 不建唯一约束（失败请求可能没有 messageId） -->
+    <changeSet id="260923-add-push-android-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_push_android"/>
+            <not>
+                <indexExists tableName="bytedesk_core_push_android" indexName="idx_push_android_receiver"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_push_android_receiver" tableName="bytedesk_core_push_android">
+            <column name="receiver"/>
+        </createIndex>
+        <createIndex indexName="idx_push_android_provider" tableName="bytedesk_core_push_android">
+            <column name="provider"/>
+        </createIndex>
+        <createIndex indexName="idx_push_android_status" tableName="bytedesk_core_push_android">
+            <column name="push_status"/>
+        </createIndex>
+        <createIndex indexName="idx_push_android_message_id" tableName="bytedesk_core_push_android">
+            <column name="message_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

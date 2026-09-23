@@ -82,6 +82,20 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }
 
+    /**
+     * 「更换组织管理员」候选用户查询（仅超级管理员）：
+     * 返回「无任何组织的用户 ∪ orgUid 对应组织的用户」，服务端按真实组织关系过滤。
+     */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_USER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query transferable admin candidates")
+    @GetMapping("/query/transferable")
+    public ResponseEntity<?> queryTransferable(UserRequest request) {
+
+        Page<UserResponse> userResponse = userRestService.queryTransferable(request);
+
+        return ResponseEntity.ok(JsonResult.success(userResponse));
+    }
+
     @Override
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(UserRequest request) {

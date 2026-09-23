@@ -25,5 +25,7 @@ public enum SystemConfigGroupEnum {
     /** 平台客服：访客端纠纷介入通道 */
     PLATFORM_SERVICE,
     /** 大模型问答：全平台问答入口控制 */
-    AI
+    AI,
+    /** 推送：移动端推送凭据（阿里云 EMAS 应用级 appKey/appSecret）下发控制 */
+    PUSH
 }

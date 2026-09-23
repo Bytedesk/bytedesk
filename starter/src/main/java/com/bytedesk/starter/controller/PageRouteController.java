@@ -89,7 +89,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/{lang:zh-CN|zh-TW|en}/index.html",
-		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
+		"/{lang:zh-CN|zh-TW|en}/features/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}.html",
 		"/{lang:zh-CN|zh-TW|en}/pages/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}.html"
 	})
 	public String multiLanguageStaticPages(
@@ -137,7 +137,7 @@ public class PageRouteController {
 	 */
 	@GetMapping({
 		"/index.html",
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}.html",
+		"/features/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}.html",
 		"/pages/{page:download|contact|about|privacy|terms|termshell|clipper|liangshibao}.html"
 	})
 	public String rootStaticPages(
@@ -542,8 +542,8 @@ public class PageRouteController {
 	 * http://127.0.0.1:9003/features/office
 	 */
 	@GetMapping({ 
-		"/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}", 
-		"/features/{feature:office|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|video|service|open|mcp|cli|skill}"
+		"/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}", 
+		"/features/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}"
 	})
 	public String handleFeatureRoutes(
 			@PathVariable(required = false) String feature, 
@@ -554,6 +554,27 @@ public class PageRouteController {
 		// }
 		
 		return "features/" + feature;
+	}
+
+	/**
+	 * Video Conferencing page has been merged into Meet page (微语会议).
+	 * Keep old video links working via redirect.
+	 * http://127.0.0.1:9003/features/video.html -> /features/meet.html
+	 * http://127.0.0.1:9003/video -> /features/meet.html
+	 * http://127.0.0.1:9003/en/features/video.html -> /en/features/meet.html
+	 */
+	@GetMapping({
+		"/features/video.html",
+		"/features/video",
+		"/video"
+	})
+	public String videoRedirect() {
+		return "redirect:/features/meet.html";
+	}
+
+	@GetMapping("/{lang:zh-CN|zh-TW|en}/features/video.html")
+	public String videoRedirectWithLang(@PathVariable String lang) {
+		return "redirect:/" + lang + "/features/meet.html";
 	}
 
 	/**

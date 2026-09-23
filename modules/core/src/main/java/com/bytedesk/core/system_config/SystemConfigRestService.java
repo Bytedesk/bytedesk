@@ -33,6 +33,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.system_config.utils.PlatformSecretUtils;
 import com.bytedesk.core.uid.UidUtils;
 
 import lombok.AllArgsConstructor;
@@ -73,10 +74,22 @@ public class SystemConfigRestService {
         for (SystemConfigKeyEnum keyEnum : SystemConfigKeyEnum.values()) {
             String defaultValue = getDefaultValue(keyEnum);
             String overrideValue = overrides.get(keyEnum.getKey());
+            boolean secretKey = isSecretKey(keyEnum);
+            boolean secretConfigured = secretKey && StringUtils.hasText(overrideValue);
             String effectiveValue = StringUtils.hasText(overrideValue) ? overrideValue : defaultValue;
             String source = StringUtils.hasText(overrideValue)
                     ? SystemConfigResponse.SOURCE_DB
                     : SystemConfigResponse.SOURCE_DEFAULT;
+
+            // 敏感 key（appSecret 类）：永不回显明文/密文，已配置时统一掩码，
+            // 前端凭 secretConfigured 区分「已配置但掩码」与「未配置」；
+            // defaultValue 静态来源不涉及密钥，敏感 key 一律无静态默认值。
+            String displayEffective = secretKey
+                    ? (secretConfigured ? PlatformSecretUtils.SECRET_MASK : null)
+                    : effectiveValue;
+            String displayOverride = secretKey
+                    ? (secretConfigured ? PlatformSecretUtils.SECRET_MASK : null)
+                    : (StringUtils.hasText(overrideValue) ? overrideValue : null);
 
             responses.add(SystemConfigResponse.builder()
                     .key(keyEnum.getKey())
@@ -84,9 +97,10 @@ public class SystemConfigRestService {
                     .valueType(keyEnum.getValueType().name())
                     .displayName(keyEnum.getDisplayName())
                     .description(keyEnum.getDescription())
-                    .defaultValue(defaultValue)
-                    .overrideValue(StringUtils.hasText(overrideValue) ? overrideValue : null)
-                    .effectiveValue(effectiveValue)
+                    .defaultValue(secretKey ? null : defaultValue)
+                    .overrideValue(displayOverride)
+                    .effectiveValue(displayEffective)
+                    .secretConfigured(secretKey ? secretConfigured : null)
                     .source(source)
                     .sortOrder(keyEnum.getSortOrder())
                     .orgUid(orgUid)
@@ -94,6 +108,32 @@ public class SystemConfigRestService {
                     .build());
         }
         return responses;
+    }
+
+    /**
+     * 查询敏感 key 的明文值（供前端「查看明文/复制」场景按需解密回显）。
+     *
+     * <p>仅超级管理员可调（requireSuperUser 兕底，Controller 层 @PreAuthorize 双保险）；
+     * key 必须为已注册的敏感 key（appSecret 类），普通 key 直接拒绝；
+     * 未配置返回 null；已配置返回解密后明文（兼容历史明文存储，decrypt 对非 ENC 值原样返回）。</p>
+     */
+    public String querySecretValue(String key) {
+        requireSuperUser();
+
+        SystemConfigKeyEnum keyEnum = SystemConfigKeyEnum.fromKey(key);
+        if (keyEnum == null) {
+            throw new IllegalArgumentException("unregistered system config key: " + key);
+        }
+        if (!isSecretKey(keyEnum)) {
+            throw new IllegalArgumentException("not a secret key: " + key);
+        }
+
+        String orgUid = SystemConfigConsts.PLATFORM_CONFIG_ORG_UID;
+        String stored = getOverrideValues(orgUid).get(key);
+        if (!StringUtils.hasText(stored)) {
+            return null;
+        }
+        return PlatformSecretUtils.decrypt(stored);
     }
 
     /**
@@ -120,40 +160,30 @@ public class SystemConfigRestService {
                 throw new IllegalArgumentException("unregistered system config key: " + key);
             }
             String value = item.getValue();
+            boolean secretKey = isSecretKey(keyEnum);
             // 注意：这里查询必须包含软删除记录——软删除记录仍占用 (config_key, org_uid)
             // 唯一约束。若此前该 key 被「清空恢复默认」软删除（is_deleted=true），
             // 再用 DeletedFalse 查询会查不到而走 insert，触发 Duplicate entry 冲突。
             Optional<SystemConfigEntity> existing = systemConfigRepository
                     .findByConfigKeyAndOrgUid(key, orgUid);
 
-            if (StringUtils.hasText(value)) {
+            if (secretKey) {
+                // 敏感 key（appSecret 类）语义与普通 key 不同：
+                // - 非空且非掩码 → 新明文，encrypt() 后 upsert；
+                // - 掩码 *** 或空值 → 保留原值不修改（不删除、不覆盖）；
+                // 避免「空值=恢复默认」误删已配置的生产凭据。
+                if (StringUtils.hasText(value) && !PlatformSecretUtils.SECRET_MASK.equals(value)) {
+                    upsertOverride(keyEnum, existing, PlatformSecretUtils.encrypt(value), orgUid, user);
+                } else {
+                    log.debug("Skip secret key without new value, keep existing: {}", key);
+                }
+            } else if (StringUtils.hasText(value)) {
                 // 校验值类型合法性（BOOLEAN/INTEGER 非法值直接拒绝，避免脏数据进入下发链路）
                 validateValueType(keyEnum, value);
                 // 平台客服 org/workgroup uid：基础格式校验（长度<=64，字符集 [a-zA-Z0-9_-]），防注入
                 validatePlatformServiceUid(keyEnum, value);
 
-                if (existing.isPresent()) {
-                    SystemConfigEntity entity = existing.get();
-                    entity.setConfigValue(value);
-                    entity.setDeleted(false); // 复用（可能曾软删除）的记录并恢复
-                    systemConfigRepository.save(entity);
-                } else {
-                    SystemConfigEntity entity = SystemConfigEntity.builder()
-                            .uid(uidUtils.getUid())
-                            .configKey(key)
-                            .configValue(value)
-                            .valueType(keyEnum.getValueType().name())
-                            .configGroup(keyEnum.getGroup().name())
-                            .displayName(keyEnum.getDisplayName())
-                            .description(keyEnum.getDescription())
-                            .visible(true)
-                            .sortOrder(keyEnum.getSortOrder())
-                            .orgUid(orgUid)
-                            .userUid(user != null ? user.getUid() : null)
-                            .level(LevelEnum.PLATFORM.name())
-                            .build();
-                    systemConfigRepository.save(entity);
-                }
+                upsertOverride(keyEnum, existing, value, orgUid, user);
             } else {
                 // 空值 = 删除覆盖，恢复默认。
                 // 物理删除：软删除会让记录继续占用 (config_key, org_uid) 唯一约束，
@@ -244,6 +274,9 @@ public class SystemConfigRestService {
                 return com.bytedesk.core.constant.BytedeskConsts.DEFAULT_WORKGROUP_UID;
             case AI_DISABLE_QA:
                 return "false";
+            case PUSH_ALIYUN_ENABLED:
+                // 推送默认关闭：需超管显式开启后才向移动端下发凭据
+                return "false";
             default:
                 break;
         }
@@ -318,4 +351,40 @@ public class SystemConfigRestService {
             throw new RuntimeException(I18Consts.I18N_SUPER_ADMIN_REQUIRED);
         }
     }
-}
+    /**
+     * 是否为敏感（加密存储/掩码回显）key：目前为推送 appSecret 类。
+     * 敏感 key 无静态默认值，空值/掩码提交均表示「保留原值不修改」。
+     */
+    private boolean isSecretKey(SystemConfigKeyEnum keyEnum) {
+        return SystemConfigKeyEnum.PUSH_ALIYUN_ANDROID_APP_SECRET.equals(keyEnum)
+                || SystemConfigKeyEnum.PUSH_ALIYUN_IOS_APP_SECRET.equals(keyEnum);
+    }
+
+    /**
+     * upsert 一条覆盖记录（复用/恢复软删除记录或新建）
+     */
+    private void upsertOverride(SystemConfigKeyEnum keyEnum, Optional<SystemConfigEntity> existing,
+            String value, String orgUid, UserEntity user) {
+        if (existing.isPresent()) {
+            SystemConfigEntity entity = existing.get();
+            entity.setConfigValue(value);
+            entity.setDeleted(false); // 复用（可能曾软删除）的记录并恢复
+            systemConfigRepository.save(entity);
+        } else {
+            SystemConfigEntity entity = SystemConfigEntity.builder()
+                    .uid(uidUtils.getUid())
+                    .configKey(keyEnum.getKey())
+                    .configValue(value)
+                    .valueType(keyEnum.getValueType().name())
+                    .configGroup(keyEnum.getGroup().name())
+                    .displayName(keyEnum.getDisplayName())
+                    .description(keyEnum.getDescription())
+                    .visible(true)
+                    .sortOrder(keyEnum.getSortOrder())
+                    .orgUid(orgUid)
+                    .userUid(user != null ? user.getUid() : null)
+                    .level(LevelEnum.PLATFORM.name())
+                    .build();
+            systemConfigRepository.save(entity);
+        }
+    }}

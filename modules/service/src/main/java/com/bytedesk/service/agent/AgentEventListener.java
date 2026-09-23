@@ -17,14 +17,20 @@ import java.util.Optional;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.enums.LanguageEnum;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.member.MemberEntity;
+import com.bytedesk.core.member.event.MemberDeletedEvent;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
+import com.bytedesk.core.rbac.organization.event.OrganizationAdminTransferEvent;
 import com.bytedesk.core.rbac.organization.event.OrganizationCreateEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -81,6 +87,52 @@ public class AgentEventListener {
             return;
         }
         log.warn("agent - skip default agent creation, mobile/email empty for org {}", orgUid);
+    }
+
+    /**
+     * 组织管理员转移后，为新管理员自动创建默认一对一客服（与组织创建自动初始化行为对齐）。
+     * AFTER_COMMIT + REQUIRES_NEW：仅在管理员转移事务提交后执行；失败不影响已提交的转移结果。
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onOrganizationAdminTransferEvent(OrganizationAdminTransferEvent event) {
+        String orgUid = event.getOrgUid();
+        String newAdminUserUid = event.getNewAdminUserUid();
+        if (!StringUtils.hasText(newAdminUserUid)) {
+            return;
+        }
+        log.info("agent - organization admin transferred: orgUid={}, newAdmin={}", orgUid, newAdminUserUid);
+        try {
+            agentRestService.createDefaultAgentForUser(newAdminUserUid, orgUid);
+        } catch (Exception ex) {
+            // 客服容量满等业务异常不应回滚/影响管理员转移结果，仅记录日志便于排查
+            log.warn("agent - create default agent for new admin failed: orgUid={}, userUid={}, reason={}",
+                    orgUid, newAdminUserUid, ex.getMessage());
+        }
+    }
+
+    /**
+     * 成员被移除出组织后，级联软删该组织下该用户的一对一客服并释放坐席。
+     * AFTER_COMMIT + REQUIRES_NEW：成员移除事务回滚时不触发；重复消费幂等。
+     */
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void onMemberDeletedEvent(MemberDeletedEvent event) {
+        MemberEntity member = event.getMember();
+        if (member == null || member.getUser() == null
+                || !StringUtils.hasText(member.getUser().getUid())
+                || !StringUtils.hasText(member.getOrgUid())) {
+            return;
+        }
+        String userUid = member.getUser().getUid();
+        String orgUid = member.getOrgUid();
+        log.info("agent - member deleted cascade: userUid={}, orgUid={}", userUid, orgUid);
+        try {
+            agentRestService.deleteAgentsByUserUidAndOrgUid(userUid, orgUid);
+        } catch (Exception ex) {
+            log.error("agent - member deleted cascade failed: userUid={}, orgUid={}, reason={}",
+                    userUid, orgUid, ex.getMessage(), ex);
+        }
     }
     
     // 新创建客服，创建默认知识库

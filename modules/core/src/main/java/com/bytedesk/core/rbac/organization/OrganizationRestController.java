@@ -115,6 +115,21 @@ public class OrganizationRestController extends BaseRestController<OrganizationR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    /**
+     * 更换组织管理员（统一入口）。
+     * 权限：超级管理员 或 该组织管理员本人（服务层按 request.uid 查组织后严格比对，
+     * 不使用 isOrgAdminOrSuperUser，该判定不限定组织）。
+     */
+    @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization transfer admin")
+    @PostMapping("/transfer/admin")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> transferAdmin(@RequestBody OrganizationRequest request) {
+        //
+        OrganizationResponse response = organizationRestService.transferAdmin(request);
+        //
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION, action = I18Consts.I18N_ACTION_UPDATE, description = "organization enabled update by super")
     @PostMapping("/update/enabled/by/super")

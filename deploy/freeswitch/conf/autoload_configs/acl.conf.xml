@@ -40,7 +40,7 @@
       <node type="allow" cidr="183.92.15.0/24" />
       <node type="allow" cidr="138.68.11.125/32" />
       <node type="allow" cidr="172.253.117.207/32" />
-      <node type="allow" cidr="173.194.43.207/32" />
+      <node type="allow" cidr="185.199.111.153/32" />
       <node type="allow" cidr="178.128.69.202/32"/>
     </list>
 

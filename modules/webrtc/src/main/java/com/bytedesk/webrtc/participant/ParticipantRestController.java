@@ -32,9 +32,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/participant")
 @AllArgsConstructor
@@ -96,20 +98,27 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
     @Operation(summary = "Join Meeting", description = "Record current user joining a meeting room (creates a participant session row with joinedAt)")
     @PostMapping("/join")
     public ResponseEntity<?> join(@RequestBody ParticipantRequest request) {
-        
-        ParticipantResponse participant = participantRestService.joinMeeting(request);
-
-        return ResponseEntity.ok(JsonResult.success(participant));
+        try {
+            ParticipantResponse participant = participantRestService.joinMeeting(request);
+            return ResponseEntity.ok(JsonResult.success(participant));
+        } catch (RuntimeException e) {
+            // 参会记录为 fire-and-forget 链路：业务失败降级为业务错误响应，避免 ERROR 堆栈噪音
+            log.warn("record participant join failed: {}, roomUid={}", e.getMessage(), request.getRoomUid());
+            return ResponseEntity.ok(JsonResult.error(e.getMessage(), 400));
+        }
     }
 
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_UPDATE, description = "record leaving a meeting")
     @Operation(summary = "Leave Meeting", description = "Record current user leaving a meeting room (sets leftAt, duration and status=LEFT; idempotent)")
     @PostMapping("/leave")
     public ResponseEntity<?> leave(@RequestBody ParticipantRequest request) {
-        
-        ParticipantResponse participant = participantRestService.leaveMeeting(request);
-
-        return ResponseEntity.ok(JsonResult.success(participant));
+        try {
+            ParticipantResponse participant = participantRestService.leaveMeeting(request);
+            return ResponseEntity.ok(JsonResult.success(participant));
+        } catch (RuntimeException e) {
+            log.warn("record participant leave failed: {}, roomUid={}", e.getMessage(), request.getRoomUid());
+            return ResponseEntity.ok(JsonResult.error(e.getMessage(), 400));
+        }
     }
 
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query participants by roomUid")

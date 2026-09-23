@@ -72,6 +72,40 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
         return page.map(this::convertToResponse);
     }
 
+    /**
+     * 超级管理员「更换组织管理员」候选用户查询：
+     * 返回所有未删除的普通用户（含已归属其它组织的用户），排除平台超级用户与系统账号。
+     * 「已是其它组织管理员」等提交侧限制由 OrganizationRestService.validateAdminCandidate 统一校验。
+     * orgUid 参数保留用于接口兼容校验，查询本身不再按组织过滤。
+     */
+    public Page<UserResponse> queryTransferable(UserRequest request) {
+        UserEntity authUser = authService.getUser();
+        if (authUser == null) {
+            throw new RuntimeException(I18Consts.I18N_LOGIN_REQUIRED);
+        }
+        if (!authUser.isSuperUser()) {
+            throw OrganizationI18nExceptions.superAdminRequired();
+        }
+        if (!StringUtils.hasText(request.getOrgUid())) {
+            throw new RuntimeException(I18Consts.I18N_ORG_UID_REQUIRED);
+        }
+
+        // like 模式在 Java 侧拼接，避免跨数据库 concat 方言差异；null 表示不过滤
+        String pattern = null;
+        if (StringUtils.hasText(request.getSearchText())) {
+            pattern = "%" + request.getSearchText().trim() + "%";
+        }
+        Set<String> excludedUids = Set.of(
+                BytedeskConsts.DEFAULT_FILE_ASSISTANT_UID,
+                BytedeskConsts.DEFAULT_SYSTEM_UID);
+
+        Page<UserEntity> page = userRepository.findTransferableAdminCandidates(
+            pattern,
+            excludedUids,
+            request.getPageable());
+        return page.map(this::convertToResponse);
+    }
+
     @Override
     public Page<UserResponse> queryByUser(UserRequest request) {
         UserEntity user = authService.getUser();

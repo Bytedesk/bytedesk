@@ -272,19 +272,19 @@
             </a>
             <a href="/notebase" target="_blank" class="button">
                 <i class="fas fa-book"></i>
-                <div class="button-title"><@t key="section.suite.item.kbase.title">企业知识库</@t></div>
-                <div class="button-description"><@t key="section.suite.item.kbase.desc">知识库、帮助文档</@t></div>
+                <div class="button-title"><@t key="default.kbase.title">企业知识库</@t></div>
+                <div class="button-description"><@t key="default.kbase.desc">知识库与文档管理</@t></div>
             </a>
             <a href="/workflow" target="_blank" class="button">
                 <i class="fas fa-diagram-project"></i>
-                <div class="button-title"><@t key="section.suite.item.workflow.title">工作流</@t></div>
-                <div class="button-description"><@t key="section.suite.item.workflow.desc">自定义工作流、流程编排</@t></div>
+                <div class="button-title"><@t key="default.workflow.title">工作流</@t></div>
+                <div class="button-description"><@t key="default.workflow.desc">流程编排与自动化</@t></div>
             </a>
             <#if callFreeswitchEnabled?? && callFreeswitchEnabled>
             <a href="/ippbx" target="_blank" class="button">
                 <i class="fas fa-phone-volume"></i>
-                <div class="button-title"><@t key="section.suite.item.callcenter.title">呼叫中心</@t></div>
-                <div class="button-description"><@t key="section.suite.item.callcenter.desc">呼叫中心管理后台</@t></div>
+                <div class="button-title"><@t key="default.callcenter.title">呼叫中心</@t></div>
+                <div class="button-description"><@t key="default.callcenter.desc">智能外呼与质检</@t></div>
             </a>
             </#if>
         </div>

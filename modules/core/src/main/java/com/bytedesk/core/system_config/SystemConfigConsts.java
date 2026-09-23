@@ -47,6 +47,13 @@ public class SystemConfigConsts {
     public static final String KEY_PLATFORM_SERVICE_ORG_UID = "platform_service.orgUid";
     public static final String KEY_PLATFORM_SERVICE_WORKGROUP_UID = "platform_service.workgroupUid";
 
+    // ============ 推送（PUSH，移动端 EMAS 应用凭据） ============
+    public static final String KEY_PUSH_ALIYUN_ENABLED = "push.aliyun.enabled";
+    public static final String KEY_PUSH_ALIYUN_ANDROID_APP_KEY = "push.aliyun.android.appKey";
+    public static final String KEY_PUSH_ALIYUN_ANDROID_APP_SECRET = "push.aliyun.android.appSecret";
+    public static final String KEY_PUSH_ALIYUN_IOS_APP_KEY = "push.aliyun.ios.appKey";
+    public static final String KEY_PUSH_ALIYUN_IOS_APP_SECRET = "push.aliyun.ios.appSecret";
+
     private SystemConfigConsts() {
     }
 }

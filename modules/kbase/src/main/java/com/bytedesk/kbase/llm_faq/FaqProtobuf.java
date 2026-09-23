@@ -120,6 +120,34 @@ public class FaqProtobuf implements Serializable {
                 .build();
     }
 
+    // from feishu doc elastic
+    public static FaqProtobuf fromFeishuDoc(com.bytedesk.kbase.llm_feishu.elastic.FeishuDocElastic doc) {
+        return FaqProtobuf.builder()
+                .uid(doc.getUid())
+                .question(doc.getTitle())
+                .answer(doc.getContent())
+                .type(FaqProtobufTypeEnum.FEISHU.name())
+                .sourceUid(doc.getSourceUid())
+                .language(doc.getLanguage())
+                .sourceLanguage(null)
+                .translated(false)
+                .build();
+    }
+
+    // from feishu doc vector
+    public static FaqProtobuf fromFeishuDocVector(com.bytedesk.kbase.llm_feishu.vector.FeishuDocVector doc) {
+        return FaqProtobuf.builder()
+                .uid(doc.getUid())
+                .question(doc.getTitle())
+                .answer(doc.getContent())
+                .type(FaqProtobufTypeEnum.FEISHU.name())
+                .sourceUid(doc.getSourceUid())
+                .language(doc.getLanguage())
+                .sourceLanguage(null)
+                .translated(false)
+                .build();
+    }
+
     public static FaqProtobuf fromChunk(ChunkElastic chunk) {
         return FaqProtobuf.builder()
                .uid(chunk.getUid())

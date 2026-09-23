@@ -15,12 +15,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.bytedesk.core.apns_push.ApnsPushService;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
+import com.bytedesk.core.push_apns.PushApnsService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -29,19 +29,19 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 
 @ExtendWith(MockitoExtension.class)
-class AgentApnsPushEventListenerTest {
+class AgentPushApnsEventListenerTest {
 
     @Mock
-    private ApnsPushService apnsPushService;
+    private PushApnsService apnsPushService;
 
     @Mock
     private AgentRestService agentRestService;
 
-    private AgentApnsPushEventListener listener;
+    private AgentPushApnsEventListener listener;
 
     @BeforeEach
     void setUp() {
-        listener = new AgentApnsPushEventListener(apnsPushService, agentRestService);
+        listener = new AgentPushApnsEventListener(apnsPushService, agentRestService);
     }
 
     @Test

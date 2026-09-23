@@ -35,6 +35,8 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.permission.PermissionService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.webrtc.room.RoomEntity;
+import com.bytedesk.webrtc.room.RoomRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +46,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ParticipantRestService extends BaseRestServiceWithExport<ParticipantEntity, ParticipantRequest, ParticipantResponse, ParticipantExcel> {
 
     private final ParticipantRepository participantRepository;
+
+    private final RoomRepository roomRepository;
 
     private final ModelMapper modelMapper;
 
@@ -122,6 +126,13 @@ public class ParticipantRestService extends BaseRestServiceWithExport<Participan
         String displayName = StringUtils.hasText(request.getName()) ? request.getName()
                 : (StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUid());
 
+        // 主持人判定：前端未显式指定时，房间创建者本人加入即标记为主持人
+        Boolean host = request.getHost();
+        if (host == null) {
+            RoomEntity room = roomRepository.findByUid(roomUid).orElse(null);
+            host = room != null && user.getUid().equals(room.getUserUid());
+        }
+
         ParticipantEntity entity = ParticipantEntity.builder()
                 .uid(uidUtils.getUid())
                 .name(displayName)
@@ -130,7 +141,7 @@ public class ParticipantRestService extends BaseRestServiceWithExport<Participan
                 .janusParticipantId(request.getJanusParticipantId())
                 .joinedAt(ZonedDateTime.now())
                 .status(ParticipantStatusEnum.JOINED.name())
-                .host(Boolean.TRUE.equals(request.getHost()))
+                .host(Boolean.TRUE.equals(host))
                 .orgUid(StringUtils.hasText(request.getOrgUid()) ? request.getOrgUid() : user.getOrgUid())
                 .userUid(user.getUid())
                 .level(LevelEnum.ORGANIZATION.name())

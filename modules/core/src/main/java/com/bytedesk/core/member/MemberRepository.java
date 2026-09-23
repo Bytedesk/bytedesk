@@ -57,6 +57,25 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     Optional<MemberEntity> findByUserAndOrgUidAndDeletedFalse(UserEntity user, String orgUid);
 
+    /**
+     * 查询用户在指定组织下的成员记录（含已软删），用于管理员成员补齐时恢复历史软删记录，
+     * 避免重复插入。
+     */
+    Optional<MemberEntity> findByUser_UidAndOrgUid(String userUid, String orgUid);
+
+    /**
+     * 查询用户名下所有有效（未软删）成员记录，用于 User 联系方式变更后的镜像同步。
+     * 语义：Member.mobile/email/country 是关联 User 联系方式在组织维度的镜像副本
+     * （MemberRestService.create 以 member 联系方式作为平台用户解析的 join key）。
+     */
+    List<MemberEntity> findByUser_UidAndDeletedFalse(String userUid);
+
+    /**
+     * T0-3 存量盘点：取全部有效成员并预取关联用户，用于联系方式一致性审计（dry-run）。
+     */
+    @Query("select m from MemberEntity m join fetch m.user where m.deleted = false")
+    List<MemberEntity> findAllActiveWithUser();
+
     long countByOrgUidAndDeletedFalse(String orgUid);
 
     Boolean existsByEmailAndOrgUidAndDeletedFalse(String email, String orgUid);

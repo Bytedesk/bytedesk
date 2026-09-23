@@ -24,6 +24,8 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.ai.robot.RobotEntity;
+import com.bytedesk.ai.robot.settings.RobotEntitlementResult;
+import com.bytedesk.ai.robot.settings.RobotEntitlementService;
 import com.bytedesk.ai.utils.ConvertAiUtils;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -130,6 +132,24 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final IWebrtcService webrtcService;
     private final WorktimeService worktimeService;
     private final WorktimeSettingsResolver worktimeSettingsResolver;
+    private final RobotEntitlementService robotEntitlementService;
+
+    /**
+     * AI 权益门控：判断组织当前是否允许进入大模型机器人对话
+     * （/ai 菜单 enabled 且 组织 vipLevel >= /ai 菜单 vipLevel），
+     * 未通过时由调用方降级为人工路由，不篡改工作组机器人配置。
+     */
+    private boolean isRobotEntitlementAllowed(WorkgroupEntity workgroup, String scene, String threadUid) {
+        RobotEntitlementResult entitlement = robotEntitlementService.evaluate(workgroup.getOrgUid());
+        if (!entitlement.allowed()) {
+            log.info("AI 权益门控未通过，机器人路由降级为人工 - scene: {}, orgUid: {}, threadUid: {}, reason: {}, "
+                    + "orgVipLevel: {}, menuVipLevel: {}, menuEnabled: {}",
+                    scene, workgroup.getOrgUid(), threadUid, entitlement.reason(),
+                    entitlement.orgVipLevel(), entitlement.menuVipLevel(), entitlement.menuEnabled());
+            return false;
+        }
+        return true;
+    }
 
     @Override
     protected ThreadRestService getThreadRestService() {
@@ -380,6 +400,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                             ? workgroup.getSettings().getRobotSettings().getRobot()
                             : null;
             if (robotEntity != null) {
+                // AI 权益门控：权益不通过时不再续接机器人会话，与 forceAgent 路径一致返回 null，
+                // 由后续 routeNewWorkgroupThread → routeToAgent 走现有人工降级链
+                if (!isRobotEntitlementAllowed(workgroup, "existing_robot_thread", thread.getUid())) {
+                    return null;
+                }
                 thread = visitorThreadService.reInitWorkgroupThreadExtra(visitorRequest, thread, workgroup);
                 // 使用精简版存储机器人信息，避免 prompt 过长导致字段超限
                 String robotString = ConvertAiUtils.convertToRobotProtobufBasicString(robotEntity);
@@ -487,6 +512,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                     ? workgroup.getSettings().getRobotSettings().getRobot()
                     : null;
             if (robot != null) {
+                // AI 权益门控：/ai 菜单 enabled 且 组织 vipLevel >= /ai 菜单 vipLevel，
+                // 未通过则降级为人工路由（复用现有 routeToAgent 降级链）
+                if (!isRobotEntitlementAllowed(workgroup, "new_thread", null)) {
+                    return false;
+                }
             log.info("满足机器人路由条件，将路由到机器人 - robotUid: {}, offline: {}, in service time: {}",
                 robot.getUid(), isOffline, isInServiceTime);
                 return true;

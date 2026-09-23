@@ -115,6 +115,43 @@ public enum SystemConfigKeyEnum {
             "固定回复内容",
             "禁用大模型问答时，回复给访客的固定文案；留空则使用系统内置默认文案",
             2),
+
+    // ============ 推送（PUSH） ============
+    PUSH_ALIYUN_ENABLED(
+            SystemConfigConsts.KEY_PUSH_ALIYUN_ENABLED,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.PUSH,
+            "启用阿里云推送",
+            "移动端登录后通过鉴权接口拉取推送凭据的总开关；关闭后移动端跳过阿里云推送初始化",
+            1),
+    PUSH_ALIYUN_ANDROID_APP_KEY(
+            SystemConfigConsts.KEY_PUSH_ALIYUN_ANDROID_APP_KEY,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PUSH,
+            "Android AppKey",
+            "阿里云 EMAS Android 应用 AppKey（应用级凭据，非服务端 OpenAPI 的 AccessKey）",
+            2),
+    PUSH_ALIYUN_ANDROID_APP_SECRET(
+            SystemConfigConsts.KEY_PUSH_ALIYUN_ANDROID_APP_SECRET,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PUSH,
+            "Android AppSecret",
+            "阿里云 EMAS Android 应用 AppSecret；加密存储，保存后掩码显示，留空表示不修改",
+            3),
+    PUSH_ALIYUN_IOS_APP_KEY(
+            SystemConfigConsts.KEY_PUSH_ALIYUN_IOS_APP_KEY,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PUSH,
+            "iOS AppKey（预留）",
+            "阿里云 EMAS iOS 应用 AppKey，当前 iOS 走自建 APNs，此配置位预留",
+            4),
+    PUSH_ALIYUN_IOS_APP_SECRET(
+            SystemConfigConsts.KEY_PUSH_ALIYUN_IOS_APP_SECRET,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.PUSH,
+            "iOS AppSecret（预留）",
+            "阿里云 EMAS iOS 应用 AppSecret；加密存储，保存后掩码显示，留空表示不修改（预留）",
+            5),
     ;
 
     private final String key;

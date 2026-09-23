@@ -13,15 +13,19 @@
  */
 package com.bytedesk.core.rbac.user;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 // import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.jspecify.annotations.Nullable;
 
 /**
  * https://spring.io/guides/tutorials/react-and-spring-data-rest/
@@ -68,6 +72,42 @@ public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpec
                                 )
                         """)
         List<UserEntity> findAllByOrganizationUidWithOrganizations(@Param("orgUid") String orgUid);
+
+        /**
+         * 超级管理员更换组织管理员的候选用户查询：
+         * 所有未删除的普通用户（含已归属其它组织的用户），仅排除平台超级用户与系统账号。
+         *
+         * 归属限制由提交侧统一校验（OrganizationRestService.validateAdminCandidate：
+         * 已担任其它真实组织管理员的用户会被拒绝），候选查询不再按组织过滤。
+         * EntityGraph 保留：convertToResponse 需读取 currentOrganization/userOrganizationRoles，避免分页转换 N+1。
+         * 注意：pattern 为 null 时表示不按关键字过滤（Java 侧拼接 like 模式，避免跨库 concat 方言差异）。
+         * 必须标注 @Nullable：Spring Data JPA 对未标注 @Nullable 的参数传入 null 会直接抛
+         * "Parameter pattern in ... must not be null"（HTTP 500），导致下拉候选整个加载失败。
+         * Spring Framework 7 起 org.springframework.lang.Nullable 已废弃，改用 jspecify。
+         */
+        @EntityGraph(attributePaths = {
+                        "currentOrganization",
+                        "userOrganizationRoles",
+                        "userOrganizationRoles.organization"
+        })
+        @Query("""
+                        select distinct u from UserEntity u
+                        where u.deleted = false
+                                and u.superUser = false
+                                and u.uid not in :excludedUids
+                                and (
+                                        :pattern is null
+                                        or u.uid like :pattern
+                                        or u.username like :pattern
+                                        or u.nickname like :pattern
+                                        or u.email like :pattern
+                                        or u.mobile like :pattern
+                                )
+                        """)
+        Page<UserEntity> findTransferableAdminCandidates(
+                        @Param("pattern") @Nullable String pattern,
+                        @Param("excludedUids") Collection<String> excludedUids,
+                        Pageable pageable);
 
         Optional<UserEntity> findByEmailAndPlatformAndDeletedFalse(String email, String platform);
 

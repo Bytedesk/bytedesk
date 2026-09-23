@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        统一 WebRTC 设置表名：bytedesk_video_webrtc_settings -> bytedesk_webrtc_settings
+        （modules/video 重命名为 modules/webrtc 后，实体 @Table 同步改名，commit 69de6e5e75）
+
+        背景：ddl-auto=update 只会按新表名建出一张空表，旧表数据滞留原处，
+        随后 Hibernate 给 bytedesk_service_agent_settings / bytedesk_service_workgroup_settings
+        创建指向新表的外键时，因引用的 id（如 3、8）不在新表中而失败：
+        "insert or update on table ... violates foreign key constraint ...".
+
+        本变更兼容三类场景：
+        1. 仅旧表存在：直接 renameTable，数据/主键/自增序列全部无损保留；
+        2. 新旧两表并存且新表为空（ddl-auto 已抢先建表的现场，即上述报错现场）：
+           先删除空的新表，再重命名旧表；
+        3. 新旧两表并存且两表均有数据：自动跳过（MARK_RAN），需人工合并数据后处理；
+           仅旧表为空时，删除旧表残留。
+    -->
+
+    <!-- 场景 1：旧表存在、新表不存在 -> 重命名 -->
+    <changeSet id="260920-rename-video-webrtc-settings-table" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_video_webrtc_settings"/>
+                <not>
+                    <tableExists tableName="bytedesk_webrtc_settings"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <renameTable
+            oldTableName="bytedesk_video_webrtc_settings"
+            newTableName="bytedesk_webrtc_settings"/>
+    </changeSet>
+
+    <!-- 场景 2：两表并存且新表为空 -> 删空新表后重命名旧表 -->
+    <changeSet id="260920-merge-video-webrtc-settings-when-target-exists" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_video_webrtc_settings"/>
+                <tableExists tableName="bytedesk_webrtc_settings"/>
+                <rowCount tableName="bytedesk_webrtc_settings" expectedRows="0"/>
+            </and>
+        </preConditions>
+
+        <dropTable tableName="bytedesk_webrtc_settings" cascadeConstraints="true"/>
+        <renameTable
+            oldTableName="bytedesk_video_webrtc_settings"
+            newTableName="bytedesk_webrtc_settings"/>
+    </changeSet>
+
+    <!-- 场景 3 补充：两表并存、旧表为空残留 -> 删除旧表（新表数据为准） -->
+    <changeSet id="260920-drop-empty-leftover-video-webrtc-settings" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_video_webrtc_settings"/>
+                <tableExists tableName="bytedesk_webrtc_settings"/>
+                <rowCount tableName="bytedesk_video_webrtc_settings" expectedRows="0"/>
+            </and>
+        </preConditions>
+
+        <dropTable tableName="bytedesk_video_webrtc_settings" cascadeConstraints="true"/>
+    </changeSet>
+
+    <!--
+        清理指向旧表名的存量外键（重命名后目标已随表更名，语义不变，
+        但 Hibernate 按新表名生成的外键名不同，会再建一组新约束；
+        旧名约束留着会成为重复外键，此处统一删除，由 ddl-auto 重建）。
+        各环境若不存在同名约束则 MARK_RAN 跳过。
+    -->
+    <changeSet id="260920-drop-stale-agent-webrtc-fk-1" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="bytedesk_service_agent_settings" foreignKeyName="fk9608dsb1xhdt6otvm60pi4drw"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="bytedesk_service_agent_settings" constraintName="fk9608dsb1xhdt6otvm60pi4drw"/>
+    </changeSet>
+
+    <changeSet id="260920-drop-stale-agent-webrtc-fk-2" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="bytedesk_service_agent_settings" foreignKeyName="fks2qvq7xk2pptwdvfbcyh2h3lr"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="bytedesk_service_agent_settings" constraintName="fks2qvq7xk2pptwdvfbcyh2h3lr"/>
+    </changeSet>
+
+    <changeSet id="260920-drop-stale-workgroup-webrtc-fk-1" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="bytedesk_service_workgroup_settings" foreignKeyName="fkiu1o2g968tijd68vrpjb804nd"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="bytedesk_service_workgroup_settings" constraintName="fkiu1o2g968tijd68vrpjb804nd"/>
+    </changeSet>
+
+    <changeSet id="260920-drop-stale-workgroup-webrtc-fk-2" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <foreignKeyConstraintExists foreignKeyTableName="bytedesk_service_workgroup_settings" foreignKeyName="fkiv6hx4pwxwfhkiiu9ft6f7501"/>
+        </preConditions>
+        <dropForeignKeyConstraint baseTableName="bytedesk_service_workgroup_settings" constraintName="fkiv6hx4pwxwfhkiiu9ft6f7501"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -30,4 +30,15 @@ public interface PlatformSmsConfigProvider {
      * @return 配置快照；未配置/未启用/配置无效时返回 null（消费方回退 properties）
      */
     PlatformSmsConfig getPlatformSmsConfig();
+
+    /**
+     * 获取指定业务用途（AuthTypeEnum 名称，如 MOBILE_LOGIN）的平台短信配置快照（P1 用途模型）。
+     * 默认返回 null（无用途绑定，回退平台默认配置）；enterprise/core 提供实现。
+     *
+     * @param purpose 业务用途代码（AuthTypeEnum 名称）
+     * @return 用途绑定快照；未绑定/未启用/配置无效时返回 null（消费方回退平台默认配置）
+     */
+    default PlatformSmsConfig getPlatformSmsConfig(String purpose) {
+        return null;
+    }
 }

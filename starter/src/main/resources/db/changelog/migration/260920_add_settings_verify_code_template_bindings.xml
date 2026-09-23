@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        为 bytedesk_core_settings 新增平台验证码模板绑定列（P0 最小修复）：
+        - sms_template_id: 平台验证码短信模板（关联 bytedesk_core_sms_template.id），
+          绑定后平台验证码短信使用该模板的签名/模板码发送，未绑定时回退 properties 配置
+        - email_template_id: 平台验证码邮件模板（关联 bytedesk_core_email_template.id），
+          绑定后验证码邮件使用该模板的主题/正文渲染，未绑定时回退默认 EMAIL_VERIFY_CODE 模板
+        两列均可空，保持现有行为，向后兼容。
+        规划文档：docs/plans/2026-09-20-sms-email-purpose-template-config-plan.md
+    -->
+    <changeSet id="260920-1-add-settings-sms-template-binding" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_core_settings" columnName="sms_template_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_settings">
+            <column name="sms_template_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="260920-2-add-settings-email-template-binding" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_settings"/>
+            <not>
+                <columnExists tableName="bytedesk_core_settings" columnName="email_template_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_settings">
+            <column name="email_template_id" type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

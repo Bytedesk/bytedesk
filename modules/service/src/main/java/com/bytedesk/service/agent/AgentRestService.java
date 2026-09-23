@@ -274,6 +274,58 @@ public class AgentRestService extends BaseRestService<AgentEntity, AgentRequest,
         create(agentRequest);
     }
 
+    /**
+     * 为新任组织管理员创建默认一对一客服（管理员转移 AFTER_COMMIT 事件触发，幂等）。
+     * 与「新建组织自动给管理员配默认客服」的既有行为保持一致；
+     * 成员已在管理员转移事务内补齐，此处可直接查到。
+     */
+    @Transactional
+    public void createDefaultAgentForUser(String userUid, String orgUid) {
+        if (!StringUtils.hasText(userUid) || !StringUtils.hasText(orgUid)) {
+            return;
+        }
+        // 幂等：同组织同用户已存在有效客服则跳过
+        if (findByUserUidAndOrgUid(userUid, orgUid).isPresent()) {
+            return;
+        }
+        Optional<MemberEntity> memberOptional = memberRestService.findByUserUidAndOrgUid(userUid, orgUid);
+        if (!memberOptional.isPresent()) {
+            log.warn("createDefaultAgentForUser: member not found, userUid={}, orgUid={}", userUid, orgUid);
+            return;
+        }
+        MemberEntity member = memberOptional.get();
+        AgentRequest agentRequest = AgentRequest.builder()
+                .uid(uidUtils.getUid())
+                .nickname(member.getNickname())
+            .country(member.getCountry())
+                .email(member.getEmail())
+                .mobile(member.getMobile())
+                .memberUid(member.getUid())
+                .orgUid(orgUid)
+                .build();
+        create(agentRequest);
+    }
+
+    /**
+     * 成员移除级联：软删该组织下该用户的所有一对一客服并释放坐席（幂等）。
+     * 由 MemberDeletedEvent 的 AFTER_COMMIT 监听器触发。
+     */
+    public void deleteAgentsByUserUidAndOrgUid(String userUid, String orgUid) {
+        if (!StringUtils.hasText(userUid) || !StringUtils.hasText(orgUid)) {
+            return;
+        }
+        List<AgentEntity> agents = agentRepository.findAllByUserUidAndOrgUidAndDeletedFalse(userUid, orgUid);
+        if (agents == null || agents.isEmpty()) {
+            return;
+        }
+        for (AgentEntity agent : agents) {
+            // deleteByUid 内部释放坐席 + 软删 + 失效缓存
+            deleteByUid(agent.getUid());
+            log.info("member deleted cascade: soft delete agent {} for userUid={} orgUid={}",
+                    agent.getUid(), userUid, orgUid);
+        }
+    }
+
     @Transactional
     public AgentResponse update(AgentRequest request) {
         //

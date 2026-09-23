@@ -16,6 +16,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationRepository;
@@ -150,7 +151,8 @@ class UserServiceTest {
                 organizationRepository,
                 mock(BytedeskEventPublisher.class),
                 mock(AuthService.class),
-                mock(TokenRestService.class));
+                mock(TokenRestService.class),
+                mock(MemberRepository.class));
         ReflectionTestUtils.setField(userService, "entityManager", entityManager);
         return userService;
     }

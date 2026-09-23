@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
 
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.message.MessageService;
@@ -68,6 +69,9 @@ class MemberRestServiceTest {
     @Mock
     private MessageService messageService;
 
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
+
     private MemberRestService memberRestService;
 
     @BeforeEach
@@ -83,7 +87,8 @@ class MemberRestServiceTest {
                 threadRestService,
                 departmentRestService,
                 organizationRestService,
-                messageService);
+                messageService,
+                applicationEventPublisher);
     }
 
     @Test

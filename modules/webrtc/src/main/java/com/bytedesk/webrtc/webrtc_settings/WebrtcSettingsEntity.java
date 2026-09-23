@@ -42,7 +42,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 // @EntityListeners({WebrtcSettingsEntityListener.class})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@Table(name = "bytedesk_video_webrtc_settings")
+@Table(name = "bytedesk_webrtc_settings")
 public class WebrtcSettingsEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -50,6 +50,5 @@ public class WebrtcSettingsEntity extends BaseEntity {
     // 是否默认启用AI语音助手
     @lombok.Builder.Default
     private Boolean defaultVoiceAgent = false;
-
  
 }

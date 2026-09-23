@@ -58,6 +58,7 @@ public class PageTemplateController {
         pageTemplateService.toHtml("pages/liangshibao");
         // features
         pageTemplateService.toHtml("features/office");
+        pageTemplateService.toHtml("features/meet");
         pageTemplateService.toHtml("features/scrm");
         pageTemplateService.toHtml("features/team");
         pageTemplateService.toHtml("features/ai");
@@ -67,7 +68,7 @@ public class PageTemplateController {
         pageTemplateService.toHtml("features/workflow");
         pageTemplateService.toHtml("features/kanban");
         pageTemplateService.toHtml("features/callcenter");
-        pageTemplateService.toHtml("features/video");
+        pageTemplateService.toHtml("features/meet");
         pageTemplateService.toHtml("features/service");
         pageTemplateService.toHtml("features/open");
         pageTemplateService.toHtml("features/mcp");
@@ -87,6 +88,7 @@ public class PageTemplateController {
         pageTemplateService.toHtmlMulti("pages/liangshibao");
         // features
         pageTemplateService.toHtmlMulti("features/office");
+        pageTemplateService.toHtmlMulti("features/meet");
         pageTemplateService.toHtmlMulti("features/scrm");
         pageTemplateService.toHtmlMulti("features/team");
         pageTemplateService.toHtmlMulti("features/ai");
@@ -96,7 +98,7 @@ public class PageTemplateController {
         pageTemplateService.toHtmlMulti("features/workflow");
         pageTemplateService.toHtmlMulti("features/kanban");
         pageTemplateService.toHtmlMulti("features/callcenter");
-        pageTemplateService.toHtmlMulti("features/video");
+        pageTemplateService.toHtmlMulti("features/meet");
         pageTemplateService.toHtmlMulti("features/service");
         pageTemplateService.toHtmlMulti("features/open");
         pageTemplateService.toHtmlMulti("features/mcp");

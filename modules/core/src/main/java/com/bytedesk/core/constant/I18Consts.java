@@ -47,8 +47,11 @@ public class I18Consts {
     // 通用操作动作与模块标题
     public static final String I18N_TAG = I18N_PREFIX + "tag";
     public static final String I18N_APNS_P12 = I18N_PREFIX + "apns.p12";
+    public static final String I18N_APNS_P12_EXISTS = I18N_PREFIX + "apns.p12.exists"; // APNS证书已存在
     public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";
     public static final String I18N_APNS_PUSH = I18N_PREFIX + "apns.push";
+    public static final String I18N_PUSH_DEVICE = I18N_PREFIX + "push.device";
+    public static final String I18N_PUSH_ANDROID = I18N_PREFIX + "push.android";
     public static final String I18N_EMAIL_PUSH = I18N_PREFIX + "email.push";
     public static final String I18N_PUSH_SETTINGS = I18N_PREFIX + "push.settings";
     public static final String I18N_SYSTEM_CONFIG = I18N_PREFIX + "system.config";
@@ -558,6 +561,14 @@ public class I18Consts {
             + "organization.default.disable.denied"; // 默认组织不允许禁用
     public static final String I18N_ORGANIZATION_DEFAULT_DELETE_DENIED = I18N_PREFIX
             + "organization.default.delete.denied"; // 默认组织不允许删除
+    public static final String I18N_ORGANIZATION_DEFAULT_TRANSFER_DENIED = I18N_PREFIX
+            + "organization.default.transfer.denied"; // 默认组织不允许更换管理员
+    public static final String I18N_ORGANIZATION_ADMIN_TRANSFER_DENIED = I18N_PREFIX
+            + "organization.admin.transfer.denied"; // 仅超级管理员或该组织管理员本人可更换组织管理员
+    public static final String I18N_ORGANIZATION_ADMIN_TARGET_INVALID = I18N_PREFIX
+            + "organization.admin.target.invalid"; // 目标用户不能作为组织管理员
+    public static final String I18N_ORGANIZATION_ADMIN_TARGET_IN_OTHER_ORG = I18N_PREFIX
+            + "organization.admin.target.in.other.org"; // 目标用户已归属其他组织，不能转移管理员
     public static final String I18N_USER_SUPER_DISABLE_DENIED = I18N_PREFIX
             + "user.super.disable.denied"; // 超级管理员用户不允许禁用
     public static final String I18N_EMAIL_REQUIRED = I18N_PREFIX + "email.required"; // 邮箱不能为空

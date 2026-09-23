@@ -71,4 +71,14 @@ public class RoomEntity extends BaseEntity {
     @Column(name = "room_type")
     private String type = RoomTypeEnum.MEETING.name();
 
+    /**
+     * 会议最大同时发布（publish）人数上限：Janus videoroom 的 publishers 上限，
+     * 含纯音频发布者（统一会议默认以纯音频 publisher 身份加入）。
+     * 默认 24；创建/更新时可配置（建议档位 6/12/24，取值不限于固定集合以便后续扩展）。
+     * 历史房间该列可能为 NULL，读取侧需回退默认值
+     */
+    @Builder.Default
+    @Column(name = "max_participants")
+    private Integer maxParticipants = 24;
+
 }

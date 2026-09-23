@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        设备推送绑定对账表：记录「userUid ↔ 供应商 deviceId」绑定关系（阿里云账号维度推送）。
+        由 PushTokenEntity（bytedesk_core_push_token）重构而来，旧表成为无实体映射的遗留表，
+        历史数据不迁移（客户端幂等重报），旧表不 DROP。
+
+        策略（双保护，参照 260904_add_system_config_table.xml）：
+        1. 全新环境（表不存在）：createTable 建完整结构。
+        2. ddl-auto 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+        3. 查询索引 user_uid / device_id 幂等创建；不建 (user_uid, device_type) 唯一索引
+           （软删除会破坏唯一约束，幂等 upsert 靠代码控制）。
+
+        见 docs/plans/2026-09-22-push-device-binding-entity-plan.md
+    -->
+
+    <changeSet id="260922-create-push-device-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_core_push_device"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_core_push_device">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_push_device" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_push_device_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="provider" type="VARCHAR(32)"/>
+            <column name="device_id" type="VARCHAR(128)"/>
+            <column name="account" type="VARCHAR(64)"/>
+            <!-- 列名对齐 token_type/level_type 惯例，规避跨库保留字 -->
+            <column name="device_type" type="VARCHAR(32)"/>
+            <column name="device" type="VARCHAR(32)"/>
+            <column name="channel" type="VARCHAR(32)"/>
+        </createTable>
+    </changeSet>
+
+    <!-- 查询索引：user_uid（候选池判定）/ device_id（换账号对账），幂等创建 -->
+    <changeSet id="260922-add-push-device-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_push_device"/>
+            <not>
+                <indexExists tableName="bytedesk_core_push_device" indexName="idx_push_device_user_uid"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_push_device_user_uid" tableName="bytedesk_core_push_device">
+            <column name="user_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_push_device_device_id" tableName="bytedesk_core_push_device">
+            <column name="device_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

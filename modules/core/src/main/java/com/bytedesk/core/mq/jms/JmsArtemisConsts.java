@@ -54,6 +54,8 @@ public class JmsArtemisConsts {
     // Member批量导入队列
     public static final String QUEUE_MEMBER_BATCH_IMPORT = QUEUE_PREFIX + "member.batch.import";
     
+    // FeishuDoc索引队列（飞书云文档同步）
+    public static final String QUEUE_FEISHU_DOC_INDEX = QUEUE_PREFIX + "feishu_doc.index";
     // 文件Chunk处理队列
     public static final String QUEUE_FILE_CHUNK_PROCESS = QUEUE_PREFIX + "file.chunk.process";
     // 文件Chunk重试队列
