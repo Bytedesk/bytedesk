@@ -13,11 +13,19 @@
  */
 package com.bytedesk.kbase.article;
 
-import com.bytedesk.core.message.enums.MessageTypeEnum;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.bytedesk.core.message.enums.MessageTypeEnum;
+import com.bytedesk.kbase.article_attachment.ArticleAttachmentEntity;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -33,13 +41,20 @@ import jakarta.persistence.PrePersist;
 @Data
 @SuperBuilder
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = { "attachments" })
 @NoArgsConstructor
 @EntityListeners({ ArticleEntityListener.class })
 @Table(name = "bytedesk_kbase_article")
 public class ArticleEntity extends AbstractArticleEntity {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 附件列表：正文之外的独立附件（如截图、文件）
+     */
+    @Builder.Default
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ArticleAttachmentEntity> attachments = new HashSet<>();
 
     @PrePersist
     public void prePersist() {

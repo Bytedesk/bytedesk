@@ -20,11 +20,11 @@ import org.modelmapper.ModelMapper;
 import lombok.experimental.UtilityClass;
 
 import com.bytedesk.core.utils.ApplicationContextHolder;
+import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.upload.UploadResponse;
 import com.bytedesk.kbase.article.ArticleEntity;
 import com.bytedesk.kbase.article.ArticleResponse;
-import com.bytedesk.kbase.article_archive.ArticleArchiveEntity;
-import com.bytedesk.kbase.article_archive.ArticleArchiveResponse;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseResponse;
 import com.bytedesk.kbase.llm_faq.FaqEntity;
@@ -48,12 +48,14 @@ public class KbaseConvertUtils {
         if (entity.getKbase() != null) {
             articleResponse.setKbUid(entity.getKbase().getUid());
         }
-        return articleResponse;
-    }
-
-    public static ArticleArchiveResponse convertToArticleArchiveResponse(ArticleArchiveEntity entity) {
-        ArticleArchiveResponse articleResponse = getModelMapper().map(entity, ArticleArchiveResponse.class);
-        articleResponse.setUser(UserProtobuf.fromJson(entity.getUser()));
+        // 附件列表：过滤已删除/无效关联，映射为 UploadResponse 便于前端直接展示/下载
+        if (entity.getAttachments() != null) {
+            List<UploadResponse> attachments = entity.getAttachments().stream()
+                    .filter(attachment -> !attachment.isDeleted() && attachment.getUpload() != null)
+                    .map(attachment -> ConvertUtils.convertToUploadResponse(attachment.getUpload()))
+                    .collect(Collectors.toList());
+            articleResponse.setAttachments(attachments);
+        }
         return articleResponse;
     }
 

@@ -105,6 +105,9 @@ Listed course START -->
 					<a href="/assets/qr/qr_android.png" target="_blank">
 						<img src="/assets/qr/qr_android.png" style="height: 100px" alt="<@t key='alt.download.androidQR'>Android安卓版本下载二维码</@t>"/>
 					</a>
+					<div class="mt-2">
+						<a href="https://app.mi.com/details?id=com.kefux.im" target="_blank" class="btn btn-sm btn-outline-primary position-relative" style="z-index:2;"><@t key="page.download.android.xiaomi">小米应用商店下载</@t></a>
+					</div>
 				</div>
 			</div>
 

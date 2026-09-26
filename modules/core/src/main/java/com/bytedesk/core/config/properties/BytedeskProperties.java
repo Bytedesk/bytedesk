@@ -397,6 +397,39 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean wechatMpSubscribePromptEnabled = false;
         private String wechatMpSubscribePromptAppId;
         private String wechatMpLoginNoticeTemplateId;
+        // ===== 微信公众号模板消息（WeChatMpTemplateService 常量可配置化：SuperSystemConfig DB 覆盖 > 此处 properties 兕底）=====
+        // 注意：源码不内置任何真实 AppID/模板 ID（本文件会开源），值由部署方在
+        // starter/src/main/resources/properties/<profile>/core-custom.properties 或环境变量配置
+        /** 发送模板消息使用的公众号 AppID（bytedesk.custom.wechat-mp-app-id） */
+        private String wechatMpAppId;
+        /** 模板消息点击后跳转的小程序 AppID（bytedesk.custom.wechat-mp-mini-program-app-id） */
+        private String wechatMpMiniProgramAppId;
+        /** 小程序打开路径（bytedesk.custom.wechat-mp-mini-program-page-path） */
+        private String wechatMpMiniProgramPagePath;
+        /** 绑定成功通知模板 ID（bytedesk.custom.wechat-mp-bind-template-id） */
+        private String wechatMpBindTemplateId;
+        /** 解绑成功通知模板 ID（bytedesk.custom.wechat-mp-unbind-template-id） */
+        private String wechatMpUnbindTemplateId;
+        /** 充值成功通知模板 ID（bytedesk.custom.wechat-mp-recharge-template-id） */
+        private String wechatMpRechargeTemplateId;
+        /** 续费提醒通知模板 ID（bytedesk.custom.wechat-mp-recharge-remind-template-id） */
+        private String wechatMpRechargeRemindTemplateId;
+        /** 续费成功通知模板 ID（bytedesk.custom.wechat-mp-payment-template-id） */
+        private String wechatMpPaymentTemplateId;
+        /** 客服日报统计模板 ID（bytedesk.custom.wechat-mp-statistic-template-id） */
+        private String wechatMpStatisticTemplateId;
+        /** 满意度评价提醒模板 ID（bytedesk.custom.wechat-mp-rate-template-id） */
+        private String wechatMpRateTemplateId;
+        /** 留言跟单提醒模板 ID（bytedesk.custom.wechat-mp-leave-msg-template-id） */
+        private String wechatMpLeaveMsgTemplateId;
+        /** 工单跟单提醒模板 ID（bytedesk.custom.wechat-mp-ticket-template-id） */
+        private String wechatMpTicketTemplateId;
+        /** 意见反馈提醒模板 ID（bytedesk.custom.wechat-mp-feedback-template-id） */
+        private String wechatMpFeedbackTemplateId;
+        /** 登录提醒模板 ID（非扫码登录成功通知，bytedesk.custom.wechat-mp-login-template-id） */
+        private String wechatMpLoginTemplateId;
+        /** 新访客接待提醒模板 ID（bytedesk.custom.wechat-mp-new-visitor-template-id） */
+        private String wechatMpNewVisitorTemplateId;
         /**
          * 自定义默认 LLM Prompt；为空时回退到代码内置默认值。
          */

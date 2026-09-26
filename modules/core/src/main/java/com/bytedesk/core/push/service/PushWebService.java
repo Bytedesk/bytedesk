@@ -13,7 +13,7 @@
  */
 package com.bytedesk.core.push.service;
 
-// push to chrome/firefox/safari/opera/edge
-public class PushWebService {
+// // push to chrome/firefox/safari/opera/edge
+// public class PushWebService {
     
-}
+// }

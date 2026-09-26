@@ -79,7 +79,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected ApplicationEventPublisher applicationEventPublisher;
 
-    protected KbaseSearchHelper knowledgeBaseSearchHelper;
+    protected KbaseSearchHelper kbaseSearchHelper;
 
     protected PromptHelper promptHelper;
 
@@ -169,7 +169,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         this.robotMessageCache = robotMessageCache;
         this.messageRestService = messageRestService;
         this.applicationEventPublisher = applicationEventPublisher;
-        this.knowledgeBaseSearchHelper = knowledgeBaseSearchHelper;
+        this.kbaseSearchHelper = knowledgeBaseSearchHelper;
         this.promptHelper = promptHelper;
         this.messagePersistenceHelper = messagePersistenceHelper;
         this.sseMessageHelper = sseMessageHelper;
@@ -912,7 +912,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             // 诊断：helper bean 未注入时给出明确警告（避免静默降级难以排查）
             log.warn("searchKnowledgeBaseWithSourcesRag: ragQueryRewriteHelper is null (bean not injected), "
                     + "falling back to plain KB search. RAG switches will NOT take effect.");
-            return knowledgeBaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
+            return kbaseSearchHelper.searchKnowledgeBaseWithSources(query, robot);
         }
         return ragQueryRewriteHelper.searchWithRagEnhancement(query, robot, threadTopic, messageUid);
     }
@@ -941,7 +941,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (ragQueryRewriteHelper == null) {
             log.warn("searchKnowledgeBaseRag: ragQueryRewriteHelper is null (bean not injected), "
                     + "falling back to plain KB search. RAG switches will NOT take effect.");
-            return knowledgeBaseSearchHelper.searchKnowledgeBase(query, robot);
+            return kbaseSearchHelper.searchKnowledgeBase(query, robot);
         }
         return ragQueryRewriteHelper.searchKnowledgeBaseWithRag(query, robot, threadTopic, messageUid);
     }

@@ -191,6 +191,28 @@
                             <#else>
                                 <div id="supportArticleContent">${article.contentHtml!''}</div>
                             </#if>
+                            <#-- 附件列表：正文之外的独立附件（如剪藏扩展上传的截图/文件），列表元素为 UploadResponse -->
+                            <#if article.attachments?? && (article.attachments?size > 0)>
+                                <div class="uk-margin-small-top uk-padding-small" style="border: 1px solid #e5e5e5; border-radius: 4px;">
+                                    <p class="uk-article-meta uk-margin-remove-bottom">
+                                        <span uk-icon="icon: attachment"></span> 附件（${article.attachments?size}）
+                                    </p>
+                                    <ul class="uk-list uk-list-divider uk-margin-remove-top">
+                                        <#list article.attachments as file>
+                                            <li>
+                                                <#if file.fileUrl?? && file.fileUrl?has_content>
+                                                    <a href="${file.fileUrl}" target="_blank" rel="noopener noreferrer">${file.fileName!'附件'}</a>
+                                                <#else>
+                                                    ${file.fileName!'附件'}
+                                                </#if>
+                                                <#if file.fileSize?? && file.fileSize?has_content>
+                                                    <span class="uk-text-meta">（${file.fileSize}）</span>
+                                                </#if>
+                                            </li>
+                                        </#list>
+                                    </ul>
+                                </div>
+                            </#if>
                             <#if article.showSource?? && article.showSource && ((article.sourceName?? && article.sourceName?has_content) || (article.sourceUrl?? && article.sourceUrl?has_content))>
                                 <div class="uk-margin-small-top uk-text-meta">
                                     来源：

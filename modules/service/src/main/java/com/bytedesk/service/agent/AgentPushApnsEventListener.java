@@ -15,6 +15,7 @@ package com.bytedesk.service.agent;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -24,7 +25,7 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
-import com.bytedesk.core.push_apns.PushApnsService;
+import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -37,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public class AgentPushApnsEventListener {
 
-    private final PushApnsService apnsPushService;
+    private final ObjectProvider<PushMobileService> mobilePushProvider;
 
     private final AgentRestService agentRestService;
 
@@ -96,7 +97,12 @@ public class AgentPushApnsEventListener {
                     agentOptional.get().getUid(),
                     agentUser.getUid());
 
-            apnsPushService.pushMessageToUser(agentUser.getUid(), message);
+            PushMobileService mobilePush = mobilePushProvider.getIfAvailable();
+            if (mobilePush == null) {
+                log.debug("Skip agent mobile push: no AgentMobilePushService bean (community edition)");
+                return;
+            }
+            mobilePush.pushMessageToUser(agentUser.getUid(), message);
         } catch (Exception e) {
             log.error("Failed to process agent APNS push event, json={}", event.getJson(), e);
         }

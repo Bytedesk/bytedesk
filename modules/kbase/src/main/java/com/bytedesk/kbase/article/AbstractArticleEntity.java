@@ -174,8 +174,5 @@ public abstract class AbstractArticleEntity extends BaseEntity {
     @Builder.Default
     private List<String> docIdList = new ArrayList<>();
 
-    // 多个附件，暂时不启用，直接将链接放在contentMarkdown/contentHtml中即可
-    // @OneToMany
-    // @JoinColumn(name = "article_uid", referencedColumnName = "uuid")
-    // private List<UploadEntity> attachments = new ArrayList<>();
+    // 附件列表已启用：ArticleEntity.attachments + ArticleAttachmentEntity（article_archive 归档模块已删除）
 }

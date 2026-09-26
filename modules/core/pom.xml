@@ -189,14 +189,7 @@
 
 		<!-- ////////////////////// 推送 /////////////////////////////////// -->
 
-		<!-- apple push -->
-		<!-- https://github.com/jchambers/pushy -->
-		<!-- https://mvnrepository.com/artifact/com.eatthepath/pushy -->
-		<dependency>
-			<groupId>com.eatthepath</groupId>
-			<artifactId>pushy</artifactId>
-			<version>0.15.4</version>
-		</dependency>
+		<!-- apple push 已随 push_apns 等包迁入 enterprise/core，pushy 依赖同步迁移 -->
 
 		<!-- https://codelabs.developers.google.com/codelabs/push-notifications#0 -->
 		<!-- https://github.com/web-push-libs/webpush-java -->

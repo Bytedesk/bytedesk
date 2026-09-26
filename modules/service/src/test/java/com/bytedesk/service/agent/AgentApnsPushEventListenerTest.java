@@ -2,6 +2,7 @@ package com.bytedesk.service.agent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,13 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
-import com.bytedesk.core.push_apns.PushApnsService;
+import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -32,7 +34,10 @@ import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 class AgentPushApnsEventListenerTest {
 
     @Mock
-    private PushApnsService apnsPushService;
+    private PushMobileService mobilePushService;
+
+    @Mock
+    private ObjectProvider<PushMobileService> mobilePushProvider;
 
     @Mock
     private AgentRestService agentRestService;
@@ -41,7 +46,8 @@ class AgentPushApnsEventListenerTest {
 
     @BeforeEach
     void setUp() {
-        listener = new AgentPushApnsEventListener(apnsPushService, agentRestService);
+        lenient().when(mobilePushProvider.getIfAvailable()).thenReturn(mobilePushService);
+        listener = new AgentPushApnsEventListener(mobilePushProvider, agentRestService);
     }
 
     @Test
@@ -63,7 +69,7 @@ class AgentPushApnsEventListenerTest {
 
         listener.onMessageJsonEvent(new MessageJsonEvent(this, message.toJson()));
 
-        verify(apnsPushService).pushMessageToUser(eq("agent-user-1"), any(MessageProtobuf.class));
+        verify(mobilePushService).pushMessageToUser(eq("agent-user-1"), any(MessageProtobuf.class));
     }
 
     @Test
@@ -77,7 +83,7 @@ class AgentPushApnsEventListenerTest {
         listener.onMessageJsonEvent(new MessageJsonEvent(this, message.toJson()));
 
         verify(agentRestService, never()).findByUid(any());
-        verify(apnsPushService, never()).pushMessageToUser(any(), any());
+        verify(mobilePushService, never()).pushMessageToUser(any(), any());
     }
 
     private MessageProtobuf buildMessage(ThreadTypeEnum threadType, UserProtobuf threadUser, UserProtobuf sender,

@@ -123,9 +123,9 @@ public enum MessageTypeEnum {
     ARTICLE, // 文章
     BLOG, // 博客
     // 
-    PAY, // 支付
-    PAY_SUCCESS, // 支付成功
-    PAY_FAILURE, // 支付失败
+    PAYMENT, // 支付
+    PAYMENT_SUCCESS, // 支付成功
+    PAYMENT_FAILURE, // 支付失败
     REFUND, // 退款
     REFUND_SUCCESS, // 退款成功
     REFUND_FAILURE, // 退款失败

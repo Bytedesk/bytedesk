@@ -35,6 +35,7 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.Utils;
+import com.bytedesk.kbase.article_attachment.ArticleAttachmentService;
 import com.bytedesk.kbase.kbase.KbaseEntity;
 import com.bytedesk.kbase.kbase.KbaseRepository;
 import com.bytedesk.kbase.llm_webpage.WebpageCrawlerService;
@@ -61,6 +62,8 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
     private final WebpageCrawlerService webpageCrawlerService;
 
     private final KbaseTranslationSyncService kbaseTranslationSyncService;
+
+    private final ArticleAttachmentService articleAttachmentService;
 
     @Override
     protected Specification<ArticleEntity> createSpecification(ArticleRequest request) {
@@ -147,6 +150,12 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
             throw new RuntimeException("kbUid not found");
         }
         //
+        // 附件在首次保存前组装：借助 OneToMany cascade ALL 随文章一起落库，
+        // 同时保证 @CachePut 写入缓存的文章实体包含完整附件（参考 TicketRestService#create）
+        if (request.getUploadUids() != null && !request.getUploadUids().isEmpty()) {
+            entity.setAttachments(articleAttachmentService.buildForArticle(entity, request.getUploadUids()));
+        }
+        //
         ArticleEntity savedArticle = save(entity);
         if (savedArticle == null) {
             throw new RuntimeException("article save failed");
@@ -178,6 +187,11 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
             entity.setSourceName(request.getSourceName());
             entity.setShowSource(request.getShowSource());
             //
+            // 处理附件更新（差量：新增关联/软删除移除，参考 TicketRestService#updateAttachments）
+            if (request.getUploadUids() != null) {
+                articleAttachmentService.updateForArticle(entity, request.getUploadUids());
+            }
+            //
             ArticleEntity savedArticle = save(entity);
             if (savedArticle == null) {
                 throw new RuntimeException("article save failed");
@@ -190,6 +204,10 @@ public class ArticleRestService extends BaseRestServiceWithExport<ArticleEntity,
             throw new RuntimeException("article not found");
         }
     }
+
+    /**
+     * 附件组装与差量更新逻辑已抽取到共享服务 ArticleAttachmentService，供文章/归档两侧复用
+     */
 
     @Override
     public ArticleEntity save(ArticleEntity entity) {

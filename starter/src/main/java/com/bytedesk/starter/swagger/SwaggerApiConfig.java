@@ -1093,18 +1093,6 @@ public class SwaggerApiConfig {
     }
 
     /**
-     * 文章归档管理接口
-     */
-    @Bean
-    public GroupedOpenApi articleArchiveApis() {
-        return GroupedOpenApi.builder()
-                .group("article-archive-apis")
-                .displayName("Article Archive Management APIs")
-                .pathsToMatch("/api/v1/article_archive/**")
-                .build();
-    }
-
-    /**
      * 文章匿名接口
      */
     @Bean

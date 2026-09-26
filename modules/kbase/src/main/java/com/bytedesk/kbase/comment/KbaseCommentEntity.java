@@ -41,8 +41,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Table(name = "bytedesk_kbase_comment")
 public class KbaseCommentEntity extends BaseEntity {
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 
     // 评论内容
     @Column(columnDefinition = TypeConsts.COLUMN_TYPE_TEXT)
@@ -51,12 +51,6 @@ public class KbaseCommentEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "comment_type")
     private String type = KbaseCommentTypeEnum.ARTICLE.name();
-
-    // @Builder.Default
-    // private String level = LevelEnum.ORGANIZATION.name();
-
-    // @Builder.Default
-    // private String platform = PlatformEnum.BYTEDESK.name();
 
     // replyTo comment uid
     private String replyToUid;

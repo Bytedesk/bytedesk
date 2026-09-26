@@ -54,6 +54,24 @@ public class SystemConfigConsts {
     public static final String KEY_PUSH_ALIYUN_IOS_APP_KEY = "push.aliyun.ios.appKey";
     public static final String KEY_PUSH_ALIYUN_IOS_APP_SECRET = "push.aliyun.ios.appSecret";
 
+    // ============ 微信公众号模板消息（WECHAT_MP，WeChatMpTemplateService 常量可配置化） ============
+    public static final String KEY_WECHAT_MP_APP_ID = "wechat_mp.appId";
+    public static final String KEY_WECHAT_MP_LOGIN_NOTICE_TEMPLATE_ID = "wechat_mp.loginNoticeTemplateId";
+    public static final String KEY_WECHAT_MP_MINI_PROGRAM_APP_ID = "wechat_mp.miniProgramAppId";
+    public static final String KEY_WECHAT_MP_MINI_PROGRAM_PAGE_PATH = "wechat_mp.miniProgramPagePath";
+    public static final String KEY_WECHAT_MP_BIND_TEMPLATE_ID = "wechat_mp.bindTemplateId";
+    public static final String KEY_WECHAT_MP_UNBIND_TEMPLATE_ID = "wechat_mp.unbindTemplateId";
+    public static final String KEY_WECHAT_MP_RECHARGE_TEMPLATE_ID = "wechat_mp.rechargeTemplateId";
+    public static final String KEY_WECHAT_MP_RECHARGE_REMIND_TEMPLATE_ID = "wechat_mp.rechargeRemindTemplateId";
+    public static final String KEY_WECHAT_MP_PAYMENT_TEMPLATE_ID = "wechat_mp.paymentTemplateId";
+    public static final String KEY_WECHAT_MP_STATISTIC_TEMPLATE_ID = "wechat_mp.statisticTemplateId";
+    public static final String KEY_WECHAT_MP_RATE_TEMPLATE_ID = "wechat_mp.rateTemplateId";
+    public static final String KEY_WECHAT_MP_LEAVE_MSG_TEMPLATE_ID = "wechat_mp.leaveMsgTemplateId";
+    public static final String KEY_WECHAT_MP_TICKET_TEMPLATE_ID = "wechat_mp.ticketTemplateId";
+    public static final String KEY_WECHAT_MP_FEEDBACK_TEMPLATE_ID = "wechat_mp.feedbackTemplateId";
+    public static final String KEY_WECHAT_MP_LOGIN_TEMPLATE_ID = "wechat_mp.loginTemplateId";
+    public static final String KEY_WECHAT_MP_NEW_VISITOR_TEMPLATE_ID = "wechat_mp.newVisitorTemplateId";
+
     private SystemConfigConsts() {
     }
 }

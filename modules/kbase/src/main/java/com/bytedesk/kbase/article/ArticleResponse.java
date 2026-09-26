@@ -18,6 +18,7 @@ import java.util.List;
 
 import com.bytedesk.core.base.BaseResponse;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.upload.UploadResponse;
 import com.bytedesk.core.utils.BdDateUtils;
 
 import lombok.AllArgsConstructor;
@@ -99,6 +100,9 @@ public class ArticleResponse extends BaseResponse {
 
     // 向量索引状态 (ArticleStatusEnum: PENDING, PROCESSING, SUCCESS, ERROR)
     private String vectorStatus;
+
+    // 附件列表：正文之外的独立附件（如截图、文件）
+    private List<UploadResponse> attachments;
 
     // 
     public String getStartDate() {

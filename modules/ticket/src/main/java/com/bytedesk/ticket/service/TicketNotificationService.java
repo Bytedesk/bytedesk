@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -42,7 +43,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
-import com.bytedesk.core.push_apns.PushApnsService;
+import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -105,7 +106,7 @@ public class TicketNotificationService {
 
     private final SmsTemplateRepository smsTemplateRepository;
 
-    private final PushApnsService apnsPushService;
+    private final ObjectProvider<PushMobileService> mobilePushProvider;
 
     private final EmailPushSendService emailPushSendService;
 
@@ -616,7 +617,12 @@ public class TicketNotificationService {
                 continue;
             }
             try {
-                apnsPushService.pushNotificationToUser(recipientUid, agentPushTitle, agentPushBody, ticket.getUid());
+                PushMobileService mobilePush = mobilePushProvider.getIfAvailable();
+                if (mobilePush == null) {
+                    log.debug("Skip ticket mobile push: no AgentMobilePushService bean (community edition)");
+                    return;
+                }
+                mobilePush.pushNotificationToUser(recipientUid, agentPushTitle, agentPushBody, ticket.getUid());
             } catch (Exception ex) {
                 log.warn("APNs ticket push failed: ticketUid={}, agentUid={}, error={}",
                         ticket.getUid(), recipientUid, ex.getMessage());

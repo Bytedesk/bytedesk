@@ -9,4 +9,4 @@
 - PushFilterService 与 PushExpireCacheService 负责路由前置过滤、条件处理和过期推送数据管理。
 - PushPermissions 与 PushEventListener 提供权限元数据和事件侧集成。
 - service 子包包含 APNs、华为、小米、Web、Email 等渠道发送服务及通用发送结果抽象；strategy 子包封装认证校验策略。
-- 设备推送绑定对账（PushDeviceEntity，原 PushTokenEntity）已迁至同级 `push_device` 包，绑定对账与推送发送解耦。
+- 设备推送绑定（push_android_device）、APNs 推送与记录（push_apns、push_apns_p12、push_apns_token）、Android 推送记录（push_android）、推送凭据下发（push_config）与推送设置（push_settings）已迁至 `enterprise/core`（com.bytedesk.enterprise.core.push_*）。

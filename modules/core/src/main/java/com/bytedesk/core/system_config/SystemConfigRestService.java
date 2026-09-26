@@ -299,6 +299,39 @@ public class SystemConfigRestService {
                 return custom.getPrivacyPolicyUrl();
             case CUSTOM_TERMS_OF_SERVICE_URL:
                 return custom.getTermsOfServiceUrl();
+            // 微信公众号模板消息：properties 兜底（bytedesk.custom.wechat-mp-*）
+            case WECHAT_MP_APP_ID:
+                return custom.getWechatMpAppId();
+            case WECHAT_MP_LOGIN_NOTICE_TEMPLATE_ID:
+                return custom.getWechatMpLoginNoticeTemplateId();
+            case WECHAT_MP_MINI_PROGRAM_APP_ID:
+                return custom.getWechatMpMiniProgramAppId();
+            case WECHAT_MP_MINI_PROGRAM_PAGE_PATH:
+                return custom.getWechatMpMiniProgramPagePath();
+            case WECHAT_MP_BIND_TEMPLATE_ID:
+                return custom.getWechatMpBindTemplateId();
+            case WECHAT_MP_UNBIND_TEMPLATE_ID:
+                return custom.getWechatMpUnbindTemplateId();
+            case WECHAT_MP_RECHARGE_TEMPLATE_ID:
+                return custom.getWechatMpRechargeTemplateId();
+            case WECHAT_MP_RECHARGE_REMIND_TEMPLATE_ID:
+                return custom.getWechatMpRechargeRemindTemplateId();
+            case WECHAT_MP_PAYMENT_TEMPLATE_ID:
+                return custom.getWechatMpPaymentTemplateId();
+            case WECHAT_MP_STATISTIC_TEMPLATE_ID:
+                return custom.getWechatMpStatisticTemplateId();
+            case WECHAT_MP_RATE_TEMPLATE_ID:
+                return custom.getWechatMpRateTemplateId();
+            case WECHAT_MP_LEAVE_MSG_TEMPLATE_ID:
+                return custom.getWechatMpLeaveMsgTemplateId();
+            case WECHAT_MP_TICKET_TEMPLATE_ID:
+                return custom.getWechatMpTicketTemplateId();
+            case WECHAT_MP_FEEDBACK_TEMPLATE_ID:
+                return custom.getWechatMpFeedbackTemplateId();
+            case WECHAT_MP_LOGIN_TEMPLATE_ID:
+                return custom.getWechatMpLoginTemplateId();
+            case WECHAT_MP_NEW_VISITOR_TEMPLATE_ID:
+                return custom.getWechatMpNewVisitorTemplateId();
             default:
                 return null;
         }

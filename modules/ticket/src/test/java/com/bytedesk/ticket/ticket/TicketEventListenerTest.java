@@ -7,6 +7,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.springframework.beans.factory.ObjectProvider;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
@@ -22,7 +24,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
-import com.bytedesk.core.push_apns.PushApnsService;
+import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -51,7 +53,8 @@ class TicketEventListenerTest {
                 EmailProviderRepository emailProviderRepository = mock(EmailProviderRepository.class);
                 SmsPushSendService smsPushSendService = mock(SmsPushSendService.class);
                 SmsTemplateRepository smsTemplateRepository = mock(SmsTemplateRepository.class);
-                PushApnsService apnsPushService = mock(PushApnsService.class);
+                @SuppressWarnings("unchecked")
+                ObjectProvider<PushMobileService> mobilePushProvider = mock(ObjectProvider.class);
                 EmailPushSendService emailPushSendService = mock(EmailPushSendService.class);
                 TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
                 TicketRepository ticketRepository = mock(TicketRepository.class);
@@ -60,7 +63,7 @@ class TicketEventListenerTest {
                 IMessageSendService messageSendService = mock(IMessageSendService.class);
                 TicketNotificationService ticketNotificationService = new TicketNotificationService(
                                 notificationService, memberRestService, workgroupRepository, visitorRepository, emailProviderRepository,
-                                smsPushSendService, smsTemplateRepository, apnsPushService, emailPushSendService, ticketSettingsRepository,
+                                smsPushSendService, smsTemplateRepository, mobilePushProvider, emailPushSendService, ticketSettingsRepository,
                                 ticketRepository, threadRestService, messageRestService, messageSendService);
 
                 AgentEntity agentA = buildAgent("agent-a", "user-a");

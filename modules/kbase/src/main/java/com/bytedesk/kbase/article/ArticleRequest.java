@@ -16,6 +16,7 @@ package com.bytedesk.kbase.article;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.bytedesk.core.base.BaseRequest;
 
@@ -117,4 +118,7 @@ public class ArticleRequest extends BaseRequest {
 
     // used for client query
     private String componentType;
+
+    // 附件 uploadUid 列表：正文之外的独立附件（如截图、文件），参考 TicketRequest.uploadUids
+    private Set<String> uploadUids;
 }

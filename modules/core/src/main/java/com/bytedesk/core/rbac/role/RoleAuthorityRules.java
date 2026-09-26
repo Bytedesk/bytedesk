@@ -17,7 +17,6 @@ public final class RoleAuthorityRules {
     // Keep as literals to avoid core -> kbase module dependency.
     public static final String KBASE_PREFIX = "KBASE_";
     public static final String ARTICLE_PREFIX = "ARTICLE_";
-    public static final String ARTICLE_ARCHIVE_PREFIX = "ARTICLE_ARCHIVE_";
     public static final String MATERIAL_PREFIX = "MATERIAL_";
     public static final String TABOO_PREFIX = "TABOO_";
     public static final String TABOO_MESSAGE_PREFIX = "TABOO_MESSAGE_";
@@ -36,7 +35,6 @@ public final class RoleAuthorityRules {
     public static final Set<String> KBASE_READ_PREFIXES = Set.of(
             KBASE_PREFIX,
             ARTICLE_PREFIX,
-            ARTICLE_ARCHIVE_PREFIX,
             MATERIAL_PREFIX,
             TABOO_PREFIX,
             TABOO_MESSAGE_PREFIX,
