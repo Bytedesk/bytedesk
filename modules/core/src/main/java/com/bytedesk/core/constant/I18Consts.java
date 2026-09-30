@@ -1000,6 +1000,9 @@ public class I18Consts {
             + "message.type.invite.audio.timeout";
     public static final String I18N_MESSAGE_TYPE_INVITE_VIDEO_TIMEOUT = I18N_PREFIX
             + "message.type.invite.video.timeout";
+    // 同事通话记录消息（区别于 INVITE_AUDIO/INVITE_VIDEO 信令，通话终态写入聊天记录）
+    public static final String I18N_MESSAGE_TYPE_WEBRTC_AUDIO = I18N_PREFIX + "message.type.webrtc.audio";
+    public static final String I18N_MESSAGE_TYPE_WEBRTC_VIDEO = I18N_PREFIX + "message.type.webrtc.video";
     public static final String I18N_MESSAGE_TYPE_GROUP_CREATE = I18N_PREFIX + "message.type.group.create";
     public static final String I18N_MESSAGE_TYPE_GROUP_INVITE = I18N_PREFIX + "message.type.group.invite";
     public static final String I18N_MESSAGE_TYPE_GROUP_DISMISS = I18N_PREFIX + "message.type.group.dismiss";
@@ -1018,5 +1021,5 @@ public class I18Consts {
     
     // 
     public static final String I18N_PARTICIPANT = I18N_PREFIX + "participant";
-
+    public static final String I18N_WEBRTC_STATISTIC = I18N_PREFIX + "webrtc.statistic";
 }

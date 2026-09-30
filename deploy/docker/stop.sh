@@ -49,6 +49,7 @@ ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
 ENABLE_OTELCOL=false
 ENABLE_GOTENBERG=false
+ENABLE_JAMES=false
 TARGET=""
 
 set_db() {
@@ -98,6 +99,7 @@ for arg in "$@"; do
     zipkin) ENABLE_ZIPKIN=true ;;
     otelcol|opentelemetry) ENABLE_OTELCOL=true ;;
     gotenberg) ENABLE_GOTENBERG=true ;;
+    james) ENABLE_JAMES=true ;;
     call)
       ENABLE_FREESWITCH=true
       ENABLE_MRCP=true
@@ -122,7 +124,7 @@ for arg in "$@"; do
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: stop|down mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq"
       echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin otelcol gotenberg"
-      echo "        call webrtc obs middleware all"
+      echo "        james call webrtc obs middleware all"
       exit 1
       ;;
   esac
@@ -166,6 +168,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
 [[ "${ENABLE_OTELCOL}" == true ]] && add_file compose-otelcol.yaml
 [[ "${ENABLE_GOTENBERG}" == true ]] && add_file compose-gotenberg.yaml
+[[ "${ENABLE_JAMES}" == true ]] && add_file compose-james.yaml
 
 # TARGET=all（默认）时包含应用文件，保证 down 能一并删除应用容器
 APP_FILE="${COMPOSE_DIR}/compose-bytedesk.yaml"
@@ -200,6 +203,7 @@ components_summary=""
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
 [[ "${ENABLE_OTELCOL}" == true ]] && components_summary="${components_summary} otelcol"
 [[ "${ENABLE_GOTENBERG}" == true ]] && components_summary="${components_summary} gotenberg"
+[[ "${ENABLE_JAMES}" == true ]] && components_summary="${components_summary} james"
 
 echo "[INFO] ${MODE} stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"
 

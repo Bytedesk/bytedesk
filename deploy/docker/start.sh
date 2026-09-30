@@ -21,6 +21,7 @@ PROJECT_NAME="${PROJECT_NAME:-bytedesk}"
 #   freeswitch | mrcp | coturn | janus
 #   searxng(别名 search) | neo4j | logstash | kibana | minio
 #   prometheus | grafana | zipkin | otelcol(别名 opentelemetry) | gotenberg(文件预览转换)
+#   james(私有邮件服务器，自动创建 JAMES_DOMAIN/JAMES_USERNAME 对应的邮件域与账号)
 # 组合关键字：
 #   call   = freeswitch + mrcp
 #   webrtc = coturn + janus
@@ -36,6 +37,7 @@ PROJECT_NAME="${PROJECT_NAME:-bytedesk}"
 #   ./start.sh call middleware                # 呼叫中心中间件（freeswitch + mrcp）
 #   ./start.sh call webrtc all obs logstash kibana
 #   ./start.sh all minio searxng neo4j
+#   ./start.sh all james                # 私有邮件服务器（微语邮箱模块）
 #
 # 说明：
 # - 启用 bytedesk 应用时，脚本会按所选 db/mq 自动注入 SPRING_DATASOURCE_* / MQ
@@ -63,10 +65,11 @@ ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
 ENABLE_OTELCOL=false
 ENABLE_GOTENBERG=false
+ENABLE_JAMES=false
 TARGET=""
 
 usage() {
-  sed -n '10,44p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+  sed -n '10,46p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
   exit 1
 }
 
@@ -116,6 +119,7 @@ for arg in "$@"; do
     zipkin) ENABLE_ZIPKIN=true ;;
     otelcol|opentelemetry) ENABLE_OTELCOL=true ;;
     gotenberg) ENABLE_GOTENBERG=true ;;
+    james) ENABLE_JAMES=true ;;
     call)
       ENABLE_FREESWITCH=true
       ENABLE_MRCP=true
@@ -137,7 +141,7 @@ for arg in "$@"; do
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq redis|elasticsearch|es"
       echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin otelcol gotenberg"
-      echo "        call webrtc obs middleware all"
+      echo "        james call webrtc obs middleware all"
       exit 1
       ;;
   esac
@@ -195,6 +199,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
 [[ "${ENABLE_OTELCOL}" == true ]] && add_file compose-otelcol.yaml
 [[ "${ENABLE_GOTENBERG}" == true ]] && add_file compose-gotenberg.yaml
+[[ "${ENABLE_JAMES}" == true ]] && add_file compose-james.yaml
 
 APP_FILE="${COMPOSE_DIR}/compose-bytedesk.yaml"
 if [[ "${TARGET}" == "all" && ! -f "${APP_FILE}" ]]; then
@@ -545,6 +550,60 @@ ensure_oracle_database() {
 }
 
 # ============================================================
+# James 邮件域/账号自动初始化（幂等，exec 目标服务：bytedesk-james）
+# 通过容器内 james-cli（JMX 9999）创建 .env 配置的邮件域与默认邮箱账号；
+# 官方 jpa-latest 镜像另支持 DOMAIN 环境变量自动建域，此处为兜底（幂等，已存在则跳过）
+# ============================================================
+ensure_james_provisioning() {
+  local james_domain james_user james_password
+  james_domain="$(get_env_value "JAMES_DOMAIN" "bytedesk.local")"
+  james_user="$(get_env_value "JAMES_USERNAME" "support")"
+  james_password="$(get_env_value "JAMES_PASSWORD" "bytedesk123")"
+
+  # James 用户必须是完整邮箱地址；不含 @ 时自动拼接 @${JAMES_DOMAIN}
+  if [[ "${james_user}" != *"@"* ]]; then
+    james_user="${james_user}@${james_domain}"
+  fi
+
+  if [[ -z "${james_password}" ]]; then
+    echo "[WARN] JAMES_PASSWORD is empty, skip James domain/user provisioning"
+    return
+  fi
+
+  local james_cli=(docker compose "${ENV_FILE_ARGS[@]}" -p "${PROJECT_NAME}" "${middleware_files[@]}" exec -T bytedesk-james james-cli -h 127.0.0.1 -p 9999)
+
+  # 等待 James 完全启动（JMX 9999 可用，JPA+Derby 冷启动较慢）
+  local tries=60 i
+  for ((i=1; i<=tries; i++)); do
+    if "${james_cli[@]}" ListDomains >/dev/null 2>&1; then
+      break
+    fi
+    if [[ "${i}" -eq "${tries}" ]]; then
+      echo "[WARN] James is not ready after ${tries} retries, skip domain/user provisioning"
+      echo "[WARN] 可稍后手动创建：docker exec james-bytedesk james-cli AddDomain/AddUser ..."
+      return
+    fi
+    sleep 2
+  done
+
+  # 邮件域（已存在则跳过）
+  # 注意：不可使用 grep -q（匹配后提前退出会让 james-cli 收到 SIGPIPE，
+  # 在 set -o pipefail 下误判为不存在），改用 grep >/dev/null 读完全部输出
+  if ! "${james_cli[@]}" ListDomains 2>/dev/null | grep "${james_domain}" >/dev/null; then
+    if "${james_cli[@]}" AddDomain "${james_domain}"; then
+      echo "[INFO] James mail domain '${james_domain}' created"
+    fi
+  fi
+
+  # 默认邮箱账号（已存在则跳过）
+  if ! "${james_cli[@]}" ListUsers 2>/dev/null | grep "${james_user}" >/dev/null; then
+    if "${james_cli[@]}" AddUser "${james_user}" "${james_password}"; then
+      echo "[INFO] James mail user '${james_user}' created"
+    fi
+  fi
+}
+
+# ============================================================
 # 启动
 # ============================================================
 components_summary=""
@@ -561,6 +620,7 @@ components_summary=""
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"
 [[ "${ENABLE_OTELCOL}" == true ]] && components_summary="${components_summary} otelcol"
 [[ "${ENABLE_GOTENBERG}" == true ]] && components_summary="${components_summary} gotenberg"
+[[ "${ENABLE_JAMES}" == true ]] && components_summary="${components_summary} james"
 
 echo "[INFO] Starting stack: db=${DB}, mq=${MQ}, target=${TARGET}, project=${PROJECT_NAME},${components_summary:- no extra components}"
 
@@ -597,5 +657,10 @@ case "${DB}" in
     ensure_kingbase_database
     ;;
 esac
+
+# 4) James 邮件域/账号自动初始化（幂等）
+if [[ "${ENABLE_JAMES}" == true ]]; then
+  ensure_james_provisioning
+fi
 
 echo "[INFO] Done."

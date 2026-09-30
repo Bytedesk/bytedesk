@@ -24,6 +24,7 @@
         <module>disk</module>
         <module>erp</module>
         <module>forum</module>
+        <module>kanban</module>
         <module>kbase</module>
         <module>mall</module>
         <module>marketing</module>
@@ -212,7 +213,6 @@
 			<artifactId>angus-mail</artifactId>
 		</dependency> -->
 
-        
         <!--
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-configuration-processor -->
         <dependency>

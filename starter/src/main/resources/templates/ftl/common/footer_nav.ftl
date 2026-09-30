@@ -143,6 +143,11 @@
 
 		<hr class="border-secondary"> <!-- Divider -->
 
+		<!-- 禁止用途声明 -->
+		<div class="text-center text-white-50 small pt-2">
+			<@t key="footer.prohibited"><strong>禁止用途</strong>：严禁用于含有木马、病毒、色情、赌博、诈骗等违法违规业务，一经发现，立即举报，绝不姑息</@t>
+		</div>
+
 		<!-- Bottom footer -->
 		<div class="row">
 			<div class="col-12">

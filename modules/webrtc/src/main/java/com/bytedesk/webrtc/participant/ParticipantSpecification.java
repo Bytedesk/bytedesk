@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.rbac.auth.AuthService;
 
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +44,20 @@ public class ParticipantSpecification extends BaseSpecification<ParticipantEntit
             if (StringUtils.hasText(request.getDescription())) {
                 predicates.add(criteriaBuilder.like(root.get("description"), "%" + request.getDescription() + "%"));
             }
-            // type
+            // type - 支持逗号分隔多值（如 AUDIO_SERVICE,VIDEO_SERVICE,MEMBER_CALL），与 RoomSpecification 一致
             if (StringUtils.hasText(request.getType())) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), request.getType()));
+                String[] typeValues = request.getType().split(",");
+                if (typeValues.length > 1) {
+                    CriteriaBuilder.In<Object> typeIn = criteriaBuilder.in(root.get("type"));
+                    for (String typeValue : typeValues) {
+                        if (StringUtils.hasText(typeValue)) {
+                            typeIn.value(typeValue.trim());
+                        }
+                    }
+                    predicates.add(typeIn);
+                } else {
+                    predicates.add(criteriaBuilder.equal(root.get("type"), request.getType().trim()));
+                }
             }
             // level - 如果指定了level则精确过滤
             if (StringUtils.hasText(request.getLevel())) {

@@ -255,6 +255,55 @@ public class RoomRestService extends BaseRestServiceWithExport<RoomEntity, RoomR
         return createInternal(request, true);
     }
 
+    /**
+     * 服务房间入档通道（音频/视频客服通话自动创建，规划 §5.2）：
+     * - 幂等：inviteUid（= callUid）已存在时直接返回既有房间，不重复建档；
+     * - 不做 name+orgUid+type 查重：服务房间「每次通话一个房间」，name 可能重复
+     *   （同双方多次呼叫），唯一标识就是 inviteUid，按 name 复用会错误共享上一通电话的档案；
+     * - 容量：按服务通话配置归一化（访客 + 原接待客服 + 可邀请的其他客服）；
+     * - 系统创建：跳过当前登录用户的层级权限检查（呼叫发起场景无管理端登录上下文）。
+     *
+     * 注意：仅存房间元数据档案，不承载客服呼叫状态机；Janus 实际房间由首个加入的客户端
+     * 按返回容量创建（publishers），本方法不触发 Janus 请求。
+     */
+    @Transactional
+    public RoomResponse createServiceRoom(
+            String inviteUid,
+            RoomTypeEnum type,
+            String name,
+            Integer maxParticipants,
+            String orgUid,
+            String userUid) {
+        if (!StringUtils.hasText(inviteUid)) {
+            throw new RuntimeException("service room inviteUid is required");
+        }
+
+        // 幂等：同一 callUid 重试不产生第二个房间档案
+        Optional<RoomEntity> existing = findByInviteUid(inviteUid);
+        if (existing.isPresent()) {
+            return convertToResponse(existing.get());
+        }
+
+        RoomTypeEnum normalizedType = type != null ? RoomTypeEnum.fromValue(type.name()) : RoomTypeEnum.AUDIO_SERVICE;
+        String roomName = StringUtils.hasText(name) ? name : "服务通话-" + inviteUid;
+
+        RoomEntity entity = RoomEntity.builder()
+                .uid(uidUtils.getUid())
+                .name(roomName)
+                .inviteUid(inviteUid)
+                .type(normalizedType.name())
+                .maxParticipants(normalizeMaxParticipants(maxParticipants))
+                .orgUid(orgUid)
+                .userUid(userUid)
+                .level(LevelEnum.ORGANIZATION.name())
+                .build();
+        RoomEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Create service room failed");
+        }
+        return convertToResponse(savedEntity);
+    }
+
     private RoomResponse createInternal(RoomRequest request, boolean skipPermissionCheck) {
         String normalizedType = RoomTypeEnum.fromValue(request.getType()).name();
         request.setType(normalizedType);

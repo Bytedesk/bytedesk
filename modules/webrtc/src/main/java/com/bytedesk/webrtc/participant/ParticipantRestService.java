@@ -219,6 +219,99 @@ public class ParticipantRestService extends BaseRestServiceWithExport<Participan
                 .toList();
     }
 
+    // ===== 通话参与者（type=AUDIO_SERVICE/VIDEO_SERVICE/MEMBER_CALL，2026-09-29 规划 C 线） =====
+    // 后端内部驱动（WebrtcServiceImplVip 状态机埋点），不依赖前端上报；均幂等。
+
+    /**
+     * 记录加入通话（访客客服/同事通话）：
+     * 先关闭该用户在该通话的遗留活跃记录（上次异常退出未结算），再新建一条（类似 CDR）。
+     * 身份/组织由调用方传入（服务端状态机持有 WebrtcEntity 上下文）。
+     */
+    @Transactional
+    public ParticipantResponse recordCallJoin(String callUid, String type, String roomUid,
+            String actorUid, String displayName, Boolean host, String orgUid) {
+        if (!StringUtils.hasText(callUid) || !StringUtils.hasText(actorUid)) {
+            throw new RuntimeException("callUid/actorUid 不能为空");
+        }
+
+        // 关闭遗留活跃记录（进程崩溃/断网未离开的场景），时长按当前时间结算
+        participantRepository
+                .findByCallUidAndUserUidAndStatusAndDeletedFalse(callUid, actorUid,
+                        ParticipantStatusEnum.JOINED.name())
+                .ifPresent(this::closeParticipantRecord);
+
+        ParticipantEntity entity = ParticipantEntity.builder()
+                .uid(uidUtils.getUid())
+                .name(StringUtils.hasText(displayName) ? displayName : actorUid)
+                .type(StringUtils.hasText(type) ? type : ParticipantTypeEnum.MEMBER_CALL.name())
+                .callUid(callUid)
+                .roomUid(roomUid)
+                .joinedAt(ZonedDateTime.now())
+                .status(ParticipantStatusEnum.JOINED.name())
+                .host(Boolean.TRUE.equals(host))
+                .orgUid(orgUid)
+                .userUid(actorUid)
+                .level(LevelEnum.ORGANIZATION.name())
+                .build();
+
+        ParticipantEntity savedEntity = save(entity);
+        if (savedEntity == null) {
+            throw new RuntimeException(I18Consts.I18N_CREATE_FAILED);
+        }
+        return convertToResponse(savedEntity);
+    }
+
+    /**
+     * 记录离开通话：按（callUid + 参与者）定位在会记录，写入 leftAt/duration 并置 LEFT。
+     * 幂等：无在会记录时直接返回成功。
+     */
+    @Transactional
+    public ParticipantResponse recordCallLeave(String callUid, String actorUid) {
+        if (!StringUtils.hasText(callUid) || !StringUtils.hasText(actorUid)) {
+            throw new RuntimeException("callUid/actorUid 不能为空");
+        }
+        Optional<ParticipantEntity> optional = participantRepository
+                .findByCallUidAndUserUidAndStatusAndDeletedFalse(callUid, actorUid,
+                        ParticipantStatusEnum.JOINED.name());
+        if (optional.isEmpty()) {
+            // 幂等：无在会记录视为已离开
+            return ParticipantResponse.builder().status(ParticipantStatusEnum.LEFT.name()).build();
+        }
+        ParticipantEntity entity = optional.get();
+        closeParticipantRecord(entity);
+        return convertToResponse(save(entity));
+    }
+
+    /**
+     * 终态批量结算：关闭该通话全部在会记录（hangup/reject/cancel 终态时调用）。
+     * 未接通（reject/cancel）场景无在会记录，天然空转。
+     */
+    @Transactional
+    public void closeCallRecords(String callUid) {
+        if (!StringUtils.hasText(callUid)) {
+            return;
+        }
+        participantRepository
+                .findByCallUidAndStatusAndDeletedFalse(callUid, ParticipantStatusEnum.JOINED.name())
+                .forEach(entity -> {
+                    closeParticipantRecord(entity);
+                    save(entity);
+                });
+    }
+
+    /** 某通话全部参会记录（按加入时间倒序） */
+    public List<ParticipantResponse> queryByCallUid(String callUid) {
+        if (!StringUtils.hasText(callUid)) {
+            return List.of();
+        }
+        return participantRepository.findByCallUidAndDeletedFalse(callUid).stream()
+                .sorted((a, b) -> b.getJoinedAt() != null && a.getJoinedAt() != null
+                        ? b.getJoinedAt().compareTo(a.getJoinedAt())
+                        : 0)
+                .map(this::convertToResponse)
+                .toList();
+    }
+
     @Transactional
     public ParticipantResponse createSystemParticipant(ParticipantRequest request) {
         return createInternal(request, true);

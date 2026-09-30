@@ -38,6 +38,10 @@ import lombok.experimental.SuperBuilder;
  *
  * 会议参与者（type=MEETING）：每次加入会议生成一条参会记录（类似 CDR），
  * 记录参与者信息、加入/离开会议时间与参会时长；继承 BaseEntity 的 uid/orgUid/userUid/createdAt 等。
+ *
+ * 通话参与者（type=AUDIO_SERVICE/VIDEO_SERVICE/MEMBER_CALL，2026-09-29 规划 C 线）：
+ * 访客客服与同事通话的加入/离开记录，callUid 关联 WebrtcEntity.uid，
+ * roomUid 为服务通话房间 uid（与录制索引共用同一房间锚点）。
  */
 @Entity
 @Data
@@ -71,10 +75,16 @@ public class ParticipantEntity extends BaseEntity {
     private String type = ParticipantTypeEnum.CUSTOMER.name();
 
     /**
-     * 关联会议室 uid（RoomEntity.uid，type=MEETING 时使用）
+     * 关联会议室 uid（RoomEntity.uid，type=MEETING 及通话场景使用）
      */
     @Column(name = "room_uid", length = 64)
     private String roomUid;
+
+    /**
+     * 关联通话 uid（WebrtcEntity.uid，type=AUDIO_SERVICE/VIDEO_SERVICE/MEMBER_CALL 时使用；会议场景为 NULL）
+     */
+    @Column(name = "call_uid", length = 64)
+    private String callUid;
 
     /**
      * Janus AudioBridge 分配的参与者 id（joined 事件返回的 id，用于回调对齐；可为空）

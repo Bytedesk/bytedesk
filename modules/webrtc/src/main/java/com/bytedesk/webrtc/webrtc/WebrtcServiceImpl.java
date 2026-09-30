@@ -55,7 +55,7 @@ public class WebrtcServiceImpl implements IWebrtcService {
     }
 
     @Override
-    public WebrtcRecordingResponse saveRecording(String callUid, String actorUid, MultipartFile file) {
+    public WebrtcRecordingResponse saveRecording(String callUid, String actorUid, Long duration, MultipartFile file) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'saveRecording'");
     }

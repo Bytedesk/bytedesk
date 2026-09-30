@@ -19,5 +19,11 @@ public enum ParticipantTypeEnum {
     CUSTOMER,
     TICKET,
     /** 会议参与者（RoomEntity 会议的参会记录） */
-    MEETING
+    MEETING,
+    /** 音频客服通话参与者（2026-09-29 规划 C 线，对齐 RoomTypeEnum.AUDIO_SERVICE） */
+    AUDIO_SERVICE,
+    /** 视频客服通话参与者（2026-09-29 规划 C 线，对齐 RoomTypeEnum.VIDEO_SERVICE） */
+    VIDEO_SERVICE,
+    /** 同事间音视频通话参与者（2026-09-29 规划 C 线，对齐 RoomTypeEnum.MEMBER_CALL） */
+    MEMBER_CALL
 }

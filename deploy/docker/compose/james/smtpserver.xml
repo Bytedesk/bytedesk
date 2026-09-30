@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!--
+  微语定制版 Apache James SMTP 配置（基于官方 jpa-app sample-configuration/smtpserver.xml）
+  官方配置说明: https://james.apache.org/server/config-smtp-lmtp.html
+
+  修改点（相对官方默认）：
+  - 25 端口的 authorizedAddresses 由默认 127.0.0.0/8 扩展为 Docker/内网私网段，
+    使微语应用容器（同 bytedesk-network 网络）与内网主机可免认证经 25 端口中继外发邮件
+    （微语应用侧 mail.smtp.auth=true 时，服务器不广播 AUTH 扩展则跳过认证直连，无自签名证书问题）
+  - 465/587 保持官方默认（TLS + 强制认证），供外部邮件客户端使用
+
+  生产环境建议：
+  - 按实际网络收紧 authorizedAddresses（例如仅保留 Docker 网段）
+  - 如需支持 K8s Pod 网段可追加 10.0.0.0/8
+  - 替换 conf/keystore 为正式证书（同时更新各 smtpserver 的 keystore/secret）
+-->
+<smtpservers>
+    <smtpserver enabled="true">
+        <jmxName>smtpserver-global</jmxName>
+        <bind>0.0.0.0:25</bind>
+        <connectionBacklog>200</connectionBacklog>
+        <tls socketTLS="false" startTLS="false">
+            <!-- To create a new keystore execute:
+                 keytool -genkey -alias james -keyalg RSA -storetype PKCS12 -keystore /path/to/james/conf/keystore
+                 本部署由 compose 启动参数自动生成 keystore（默认口令 james72laBalle） -->
+            <keystore>file://conf/keystore</keystore>
+            <keystoreType>PKCS12</keystoreType>
+            <secret>james72laBalle</secret>
+            <provider>org.bouncycastle.jce.provider.BouncyCastleProvider</provider>
+            <algorithm>SunX509</algorithm>
+        </tls>
+        <connectiontimeout>360</connectiontimeout>
+        <connectionLimit>0</connectionLimit>
+        <connectionLimitPerIP>0</connectionLimitPerIP>
+        <auth>
+            <announce>never</announce>
+            <requireSSL>false</requireSSL>
+            <required>false</required>
+            <plainAuthEnabled>true</plainAuthEnabled>
+        </auth>
+        <!-- 微语定制：默认 127.0.0.0/8；扩展私网段后，Docker 网络内的微语应用容器（172.16.0.0/12）
+             与内网主机（192.168.0.0/16）可免认证中继外发。公网来源仍被拒绝（防开放中继） -->
+        <authorizedAddresses>127.0.0.0/8,172.16.0.0/12,192.168.0.0/16</authorizedAddresses>
+        <verifyIdentity>true</verifyIdentity>
+        <maxmessagesize>0</maxmessagesize>
+        <addressBracketsEnforcement>true</addressBracketsEnforcement>
+        <smtpGreeting>Apache JAMES awesome SMTP Server</smtpGreeting>
+        <handlerchain coreHandlersPackage="org.apache.james.smtpserver.NoAuthCmdHandlerLoader">
+            <handler class="org.apache.james.smtpserver.fastfail.ValidRcptHandler"/>
+        </handlerchain>
+    </smtpserver>
+    <smtpserver enabled="true">
+        <jmxName>smtpserver-TLS</jmxName>
+        <bind>0.0.0.0:465</bind>
+        <connectionBacklog>200</connectionBacklog>
+        <tls socketTLS="true" startTLS="false">
+            <keystore>file://conf/keystore</keystore>
+            <keystoreType>PKCS12</keystoreType>
+            <secret>james72laBalle</secret>
+            <provider>org.bouncycastle.jce.provider.BouncyCastleProvider</provider>
+            <algorithm>SunX509</algorithm>
+        </tls>
+        <connectiontimeout>360</connectiontimeout>
+        <connectionLimit>0</connectionLimit>
+        <connectionLimitPerIP>0</connectionLimitPerIP>
+        <auth>
+            <announce>forUnauthorizedAddresses</announce>
+            <requireSSL>true</requireSSL>
+            <plainAuthEnabled>true</plainAuthEnabled>
+            <required>true</required>
+        </auth>
+        <authorizedAddresses>127.0.0.0/8</authorizedAddresses>
+        <verifyIdentity>true</verifyIdentity>
+        <maxmessagesize>0</maxmessagesize>
+        <addressBracketsEnforcement>true</addressBracketsEnforcement>
+        <smtpGreeting>Apache JAMES awesome SMTP Server</smtpGreeting>
+        <handlerchain>
+            <handler class="org.apache.james.smtpserver.fastfail.ValidRcptHandler"/>
+            <handler class="org.apache.james.smtpserver.CoreCmdHandlerLoader"/>
+        </handlerchain>
+    </smtpserver>
+    <smtpserver enabled="true">
+        <jmxName>smtpserver-authenticated</jmxName>
+        <bind>0.0.0.0:587</bind>
+        <connectionBacklog>200</connectionBacklog>
+        <tls socketTLS="false" startTLS="true">
+            <keystore>file://conf/keystore</keystore>
+            <keystoreType>PKCS12</keystoreType>
+            <secret>james72laBalle</secret>
+            <provider>org.bouncycastle.jce.provider.BouncyCastleProvider</provider>
+            <algorithm>SunX509</algorithm>
+        </tls>
+        <connectiontimeout>360</connectiontimeout>
+        <connectionLimit>0</connectionLimit>
+        <connectionLimitPerIP>0</connectionLimitPerIP>
+        <auth>
+            <announce>forUnauthorizedAddresses</announce>
+            <requireSSL>true</requireSSL>
+            <plainAuthEnabled>true</plainAuthEnabled>
+            <required>true</required>
+        </auth>
+        <authorizedAddresses>127.0.0.0/8</authorizedAddresses>
+        <verifyIdentity>true</verifyIdentity>
+        <maxmessagesize>0</maxmessagesize>
+        <addressBracketsEnforcement>true</addressBracketsEnforcement>
+        <smtpGreeting>Apache JAMES awesome SMTP Server</smtpGreeting>
+        <handlerchain>
+            <handler class="org.apache.james.smtpserver.fastfail.ValidRcptHandler"/>
+            <handler class="org.apache.james.smtpserver.CoreCmdHandlerLoader"/>
+        </handlerchain>
+    </smtpserver>
+</smtpservers>

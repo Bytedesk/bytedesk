@@ -41,6 +41,9 @@ public class ParticipantRequest extends BaseRequest {
     /** 关联会议室 uid（type=MEETING） */
     private String roomUid;
 
+    /** 关联通话 uid（type=AUDIO_SERVICE/VIDEO_SERVICE/MEMBER_CALL，按通话查询时使用） */
+    private String callUid;
+
     /** Janus AudioBridge 参与者 id（前端 joined 后回传，可选） */
     private Long janusParticipantId;
 

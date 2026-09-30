@@ -1,0 +1,77 @@
+# 用法：./start.sh james ... 或 docker compose --env-file .env -f compose/compose-james.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware james / ./start.sh all james
+# 说明：Apache James 私有邮件服务器（JPA 单机版，数据存储在内置 Derby 数据库）
+# 定位：完善微语企业内部协同——企业内部员工之间的邮件沟通（邮件数据完全私有化）；
+#       系统通知/验证码/工单通知等轻量邮件推荐继续对接第三方邮箱（管理后台「平台邮件设置」），不依赖本组件
+# - 官方文档: https://james.apache.org/server/index.html
+# - 镜像: https://hub.docker.com/r/apache/james（tag: jpa-latest，仅 linux/amd64，Apple Silicon 走 Rosetta 模拟；
+#   可通过 .env 的 JAMES_IMAGE 固定版本）
+# - 选型：官方 5 个变体中选 jpa（零外部依赖单机版，内置 Derby + 文件卷持久化），
+#   弃用 distributed（需 Cassandra+RabbitMQ+S3+ES 四件套，多节点定位）、cassandra（官方已弃用）、
+#   demo（预置固定密码仅试用）、memory（纯内存不持久化）；详见 readme/readme.james.md 镜像选型说明
+# - 启动后 start.sh 自动创建 .env 中配置的邮件域与账号（JAMES_DOMAIN / JAMES_USERNAME / JAMES_PASSWORD，幂等）
+# - 端口（宿主机 -> 容器）：
+#     10025 -> 25   SMTP（内网收信/中继，对私网免认证；供微语应用容器发信）
+#     10465 -> 465  SMTPS（SSL + 认证，供邮件客户端发信）
+#     10587 -> 587  Submission（STARTTLS + 认证，供邮件客户端发信）
+#     10143 -> 143  IMAP / 10993 -> 993 IMAPS（收信）
+#     10110 -> 110  POP3 / 10995 -> 995 POP3S（收信）
+#     18000 -> 8000 WebAdmin 管理接口（密码见 compose/james/webadmin.properties）
+# - TLS：--generate-keystore 首次启动自动生成自签名证书（写入 james-conf 卷持久保留）；
+#   生产环境建议替换为正式证书 keystore（挂载到 /root/conf/keystore，并移除 --generate-keystore）
+# 详细说明见 readme/readme.james.md
+services:
+  bytedesk-james:
+    image: ${JAMES_IMAGE:-apache/james:jpa-latest}
+    container_name: james-bytedesk
+    hostname: bytedesk-james
+    restart: always
+    # 首次启动自动生成自签名 keystore（幂等，已存在则跳过）
+    command: ["--generate-keystore"]
+    environment:
+      # james 3.9+ 支持：启动时自动创建邮件域（start.sh 也会通过 james-cli 幂等补建）
+      - DOMAIN=${JAMES_DOMAIN:-bytedesk.local}
+      - TZ=${TZ:-Asia/Shanghai}
+      # JVM 内存参数（按需在 .env 中通过 JAMES_JAVA_TOOL_OPTIONS 覆盖）
+      - JAVA_TOOL_OPTIONS=${JAMES_JAVA_TOOL_OPTIONS:--Xms256m -Xmx768m}
+    ports:
+      - "${JAMES_SMTP_HOST_PORT:-10025}:25"        # SMTP（内网免认证中继/收信）
+      - "${JAMES_SMTPS_HOST_PORT:-10465}:465"      # SMTPS（SSL + 认证发信）
+      - "${JAMES_SUBMISSION_HOST_PORT:-10587}:587" # Submission（STARTTLS + 认证发信）
+      - "${JAMES_IMAP_HOST_PORT:-10143}:143"       # IMAP
+      - "${JAMES_IMAPS_HOST_PORT:-10993}:993"      # IMAPS
+      - "${JAMES_POP3_HOST_PORT:-10110}:110"       # POP3
+      - "${JAMES_POP3S_HOST_PORT:-10995}:995"      # POP3S
+      - "${JAMES_WEBADMIN_HOST_PORT:-18000}:8000"  # WebAdmin
+    volumes:
+      - james-conf:/root/conf
+      - james-var:/root/var
+      - james-logs:/logs
+      # 覆盖内置默认配置（相对路径基于 compose/ 目录）：
+      # - smtpserver.xml: 25 端口对 Docker/内网私网段开放免认证中继（官方默认仅 127.0.0.0/8，
+      #   微语应用容器无法经 25 端口外发；465/587 保持官方默认认证策略）
+      # - webadmin.properties: WebAdmin 监听 0.0.0.0 并固定密码（官方默认仅容器内 localhost 且每次启动随机密码）
+      - ./james/smtpserver.xml:/root/conf/smtpserver.xml
+      - ./james/webadmin.properties:/root/conf/webadmin.properties
+    networks:
+      - bytedesk-network
+    healthcheck:
+      # 通过容器内 james-cli（JMX 9999）验证服务完全启动
+      test: ["CMD-SHELL", "james-cli -h 127.0.0.1 -p 9999 ListDomains || exit 1"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 120s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  james-conf:
+  james-var:
+  james-logs:
+
+networks:
+  bytedesk-network:
+    driver: bridge

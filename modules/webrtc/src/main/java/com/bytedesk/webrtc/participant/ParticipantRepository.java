@@ -48,4 +48,15 @@ public interface ParticipantRepository extends JpaRepository<ParticipantEntity, 
 
     /** 某用户参加过的所有会议记录 */
     List<ParticipantEntity> findByUserUidAndTypeAndDeletedFalse(String userUid, String type);
+
+    // ===== 通话参与者（type=AUDIO_SERVICE/VIDEO_SERVICE/MEMBER_CALL，2026-09-29 规划 C 线） =====
+
+    /** 某通话的全部参会记录 */
+    List<ParticipantEntity> findByCallUidAndDeletedFalse(String callUid);
+
+    /** 某通话当前在会参与者 */
+    List<ParticipantEntity> findByCallUidAndStatusAndDeletedFalse(String callUid, String status);
+
+    /** 某用户在指定通话的活跃参会记录（在会，未离会） */
+    Optional<ParticipantEntity> findByCallUidAndUserUidAndStatusAndDeletedFalse(String callUid, String userUid, String status);
 }

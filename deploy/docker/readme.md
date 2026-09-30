@@ -51,7 +51,7 @@ cp .env.example .env
 ./stop.sh call webrtc middleware obs minio mrcp searxng down
 
 # optional components (any combination)
-./start.sh all minio searxng
+./start.sh all minio searxng james
 ./start.sh middleware obs        # obs = prometheus + grafana + zipkin + otelcol
 ./stop.sh middleware obs
 ./start.sh middleware logstash kibana
@@ -68,6 +68,7 @@ cp .env.example .env
 | Call center | `freeswitch` `mrcp`, combo `call` | call supports mysql/postgresql only |
 | WebRTC | `coturn` `janus`, combo `webrtc` | |
 | Search/storage | `searxng`(search) `minio` `neo4j` | enterprise feature |
+| Mail server | `james` | Apache James private mail server for internal employee email (collaboration); lightweight mails (notifications/codes) still best via third-party SMTP, see [James docs](./readme/readme.james.md) |
 | File preview | `gotenberg` | Office→PDF conversion sidecar, enterprise feature; enable via `BYTEDESK_PREVIEW_CONVERT_ENABLED=true` + `BYTEDESK_PREVIEW_CONVERT_MODE=remote` |
 | Logging | `logstash` `kibana` | depends on elasticsearch |
 | Observability | `prometheus` `grafana` `zipkin` `otelcol`(opentelemetry), combo `obs` | tracing backend: zipkin (Brave) or otelcol (OTLP), see [observability readme](./readme/readme.observability.md) |
@@ -86,7 +87,7 @@ Stop: `./stop.sh [stop|down] [keywords...]` — the action keyword may appear an
 
 ## File List
 
-All compose files and their per-component configs (`searxng/`, `grafana/`, `logstash/`, `prometheus.yml`, `ik-plugin-cache/`) live in the [`compose/`](./compose/) folder:
+All compose files and their per-component configs (`searxng/`, `grafana/`, `logstash/`, `prometheus.yml`, `ik-plugin-cache/`, `james/`) live in the [`compose/`](./compose/) folder:
 
 | Compose file (in compose/) | Image | Default ports | Details |
 | --- | --- | --- | --- |
@@ -113,6 +114,7 @@ All compose files and their per-component configs (`searxng/`, `grafana/`, `logs
 | compose/compose-zipkin.yaml | zipkin | 19411 | [Observability](./readme/readme.observability.md) |
 | compose/compose-otelcol.yaml | otel/opentelemetry-collector-contrib | 14317/14318 | [Observability](./readme/readme.observability.md) — OTLP receiver, forwards traces to Zipkin |
 | compose/compose-gotenberg.yaml | gotenberg/gotenberg:8 | internal only (no host port) | File preview conversion sidecar; see [File Preview docs](../../../docs/docs/development/filepreview.md) |
+| compose/compose-james.yaml | apache/james:jpa-latest | 10025/10465/10587/10143/10993/10110/10995/18000 | [James mail server](./readme/readme.james.md) |
 
 Other files: `start.sh`/`stop.sh` (compose launcher), `watchdog.sh` (app watchdog, see [watchdog guide](./readme/readme.watchdog.md)), `.env` (secrets), `one/` (all-in-one deployment).
 
@@ -131,4 +133,4 @@ Note: relative paths inside the compose files (`./searxng`, `../../freeswitch`, 
 
 ## More
 
-Detailed docs live in [readme/](./readme/): [quickstart](./readme/readme.quickstart.md) · [database](./readme/readme.database.md) · [message queue](./readme/readme.mq.md) · [call center](./readme/readme.call.md) · [FreeSWITCH](./readme/readme.freeswitch.md) · [WebRTC](./readme/readme.webrtc.md) · [SearXNG](./readme/readme.searxng.md) · [Neo4j](./readme/readme.neo4j.md) · [Logstash](./readme/readme.logstash.md) · [Kibana](./readme/readme.kibana.md) · [MinIO](./readme/readme.minio.md) · [observability](./readme/readme.observability.md) · [watchdog](./readme/readme.watchdog.md) · [env vars](./readme/readme.env.md) · [migration guide](./readme/readme.migration.md)
+Detailed docs live in [readme/](./readme/): [quickstart](./readme/readme.quickstart.md) · [database](./readme/readme.database.md) · [message queue](./readme/readme.mq.md) · [call center](./readme/readme.call.md) · [FreeSWITCH](./readme/readme.freeswitch.md) · [WebRTC](./readme/readme.webrtc.md) · [SearXNG](./readme/readme.searxng.md) · [Neo4j](./readme/readme.neo4j.md) · [Logstash](./readme/readme.logstash.md) · [Kibana](./readme/readme.kibana.md) · [MinIO](./readme/readme.minio.md) · [James mail server](./readme/readme.james.md) · [observability](./readme/readme.observability.md) · [watchdog](./readme/readme.watchdog.md) · [env vars](./readme/readme.env.md) · [migration guide](./readme/readme.migration.md)

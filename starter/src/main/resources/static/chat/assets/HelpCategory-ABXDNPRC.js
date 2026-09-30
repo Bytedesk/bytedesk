@@ -1,1 +1,0 @@
-import{a as e}from"./intl-vendor-jo1TMjOt.js";var t=e(),n=()=>(0,t.jsx)(`div`,{children:`HelpCategory`});export{n as default};

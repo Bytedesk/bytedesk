@@ -1134,11 +1134,26 @@ public class TicketService {
         }
         addTaskComment(task, ticket, operatorUid, runtimeContext.actionKey(),
                 StringUtils.hasText(request.getProcessComment()) ? request.getProcessComment()
-                        : (StringUtils.hasText(request.getReason()) ? request.getReason() : "流程任务已完成"));
+                        : (StringUtils.hasText(request.getReason()) ? request.getReason()
+                                : resolveCompleteActionDefaultComment(runtimeContext.actionKey())));
         taskService.complete(task.getId(), variables);
         // Auto-assign for next active task node
         ticketAssignmentService.autoAssignForNextNode(ticket, ticket.getProcessInstanceId());
         syncTicketStatusAfterWorkflowComplete(ticket, runtimeContext);
+    }
+
+    /**
+     * complete 类型动作未填写处理意见/原因时的默认备注文案。
+     * 按动作语义区分：客服标记解决、访客确认解决、访客反馈未解决；
+     * 自定义 type=complete 动作或未知 key 保持「流程任务已完成」兼容回退。
+     */
+    private String resolveCompleteActionDefaultComment(String actionKey) {
+        return switch (actionKey) {
+            case "COMPLETE" -> "客服标记工单为已解决";
+            case "COMPLETE_VERIFIED" -> "访客确认工单已解决";
+            case "COMPLETE_REJECTED" -> "访客标记工单为未解决";
+            default -> "流程任务已完成";
+        };
     }
 
     private void syncTicketStatusAfterWorkflowComplete(TicketEntity ticket,

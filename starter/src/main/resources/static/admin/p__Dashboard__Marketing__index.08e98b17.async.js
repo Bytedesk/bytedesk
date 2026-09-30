@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkadmin=self.webpackChunkadmin||[]).push([[8164],{11652:function(n,e,t){t.r(e);var u=t(45461),a=(t(10842),t(339));e.default=function(){return(0,a.jsx)(a.Fragment,{children:(0,a.jsx)(u.Outlet,{})})}}}]);

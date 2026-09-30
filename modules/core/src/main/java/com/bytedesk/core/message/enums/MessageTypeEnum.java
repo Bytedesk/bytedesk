@@ -198,6 +198,9 @@ public enum MessageTypeEnum {
     GROUP_INVITE,
     GROUP_DISMISS,
     // 
+    WEBRTC_AUDIO,
+    WEBRTC_VIDEO,
+    // 
     NOTIFICATION_AGENT_REPLY_TIMEOUT, // 客服回复超时提醒
     NOTIFICATION_RATE_SUBMITTED, // 访客评价提交提醒
     ERROR,

@@ -183,8 +183,12 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
      * 口径：
      * - 排除自己发送的消息（m.user_uid = 当前会话 owner 对应的用户 uid）；
      * - 沿用 {@link MessageEntity#isUnread()} 的判定规则，status in (SENDING, SUCCESS, DELIVERED) 视为未读；
-     * - 消息类型与前端 desktop shouldIncreaseUnreadCountByMessageType 对齐（TEXT/IMAGE/FILE/AUDIO/VIDEO/NOTICE），
-     *   保证刷新前后端下发的未读数与客户端本地累加的口径一致。
+     * - 消息类型与前端 desktop shouldIncreaseUnreadCountByMessageType 对齐（TEXT/IMAGE/FILE/AUDIO/VIDEO/NOTICE
+     *   + TRANSFER/INVITE），保证刷新前后端下发的未读数与客户端本地累加的口径一致；
+     * - TRANSFER/INVITE 为转接/邀请发起消息：待处理期间计入同事会话未读（提醒客服尽快处理），
+     *   接受/拒绝/超时/取消后由 MessagePersistService#dealWithTransferInviteReceipt 将本消息 status
+     *   改写为终态（如 TRANSFER_TIMEOUT），自动退出未读统计；接收方已读后 status=READ 同样退出。
+     *   注意：仅放行两个发起类型，8 类回执类型（TRANSFER_ACCEPT 等）不放行，避免误计。
      *
      * 事务注意：与 {@link #countVisitorUnreadByThreadUid} 相同，native SQL 会触发全量 flush，
      * 强制 flushMode=COMMIT 避免写事务中调用（如 convertToResponse 被写路径复用）时引发乐观锁冲突。
@@ -197,7 +201,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             + "  AND t.is_deleted = false "
             + "  AND m.is_deleted = false "
             + "  AND m.status IN ('SENDING','SUCCESS','DELIVERED') "
-            + "  AND m.message_type IN ('TEXT','IMAGE','FILE','AUDIO','VIDEO','NOTICE') "
+            + "  AND m.message_type IN ('TEXT','IMAGE','FILE','AUDIO','VIDEO','NOTICE','TRANSFER','INVITE') "
             + "  AND m.user_uid <> :ownerUserUid", nativeQuery = true)
     long countMemberUnreadByTopics(@Param("topic") String topic,
             @Param("reverseTopic") String reverseTopic,

@@ -57,12 +57,9 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/service/holiday", "holiday", "calendar", "/service", "menu.service.holiday"));
                 seeds.add(MenuSeed.child("/service/workflow", "workflow", "branches", "/service", "menu.service.workflow"));
 
-                seeds.add(MenuSeed.root("/audio", "audio", "audio", "menu.audio"));
-                seeds.add(MenuSeed.child("/audio/data", "data", "fileText", "/audio", "menu.audio.data"));
-                seeds.add(MenuSeed.child("/audio/voicemail", "voicemail", "message", "/audio", "menu.audio.voicemail"));
-
-                seeds.add(MenuSeed.root("/video", "video", "videoCamera", "menu.video"));
-                seeds.add(MenuSeed.child("/video/data", "data", "fileText", "/video", "menu.video.data"));
+                // 音频/视频客服菜单已合并为音视频客服（/avideo），旧 /audio、/video 链接由 reconcilePlatformMenus 启动时软删除
+                seeds.add(MenuSeed.root("/avideo", "avideo", "videoCamera", "menu.avideo"));
+                seeds.add(MenuSeed.child("/avideo/data", "data", "fileText", "/avideo", "menu.avideo.data"));
 
                 seeds.add(MenuSeed.root("/call", "callcenter", "phone", "menu.callcenter"));
                 seeds.add(MenuSeed.child("/call/cdr", "cdr", "fileText", "/call", "menu.callcenter.cdr"));
@@ -128,8 +125,7 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.child("/super/task", "task", "calendar", "/super", "menu.super.task"));
                 seeds.add(MenuSeed.child("/super/agent", "agent", "user", "/super", "menu.super.agent"));
                 seeds.add(MenuSeed.child("/super/workgroup", "workgroup", "apartment", "/super", "menu.super.workgroup"));
-                seeds.add(MenuSeed.child("/super/audio", "audio", "audio", "/super", "menu.super.audio"));
-                seeds.add(MenuSeed.child("/super/video", "video", "videoCamera", "/super", "menu.super.video"));
+                seeds.add(MenuSeed.child("/super/avideo", "avideo", "videoCamera", "/super", "menu.super.avideo"));
                 // 以下四项前端路由 hideInMenu，后端种子同步标记 enabled=false
                 seeds.add(MenuSeed.child("/super/robot", "robot", "robot", "/super", "menu.super.robot", Boolean.FALSE));
                 seeds.add(MenuSeed.child("/super/robotagent", "robotagent", "user", "/super", "menu.super.robotagent", Boolean.FALSE));

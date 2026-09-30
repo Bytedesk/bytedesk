@@ -57,7 +57,7 @@ cp .env.example .env
 ./switch-db.sh postgresql
 
 # 可选组件（任意组合）
-./start.sh all minio searxng
+./start.sh all minio searxng james
 ./start.sh middleware obs        # obs = prometheus + grafana + zipkin + otelcol
 ./stop.sh middleware obs
 ./start.sh middleware logstash kibana
@@ -74,6 +74,7 @@ cp .env.example .env
 | 呼叫中心 | `freeswitch` `mrcp`，组合 `call` | call 仅支持 mysql/postgresql |
 | WebRTC | `coturn` `janus`，组合 `webrtc` | |
 | 搜索/存储 | `searxng`(search) `minio` `neo4j` | 企业版功能 |
+| 邮件服务器 | `james` | Apache James 私有邮件服务器：定位企业内部员工邮件沟通（协同）；通知/验证码等轻量邮件建议继续用第三方邮箱，详见 [James 文档](./readme/readme.james.md) |
 | 日志 | `logstash` `kibana` | 依赖 elasticsearch |
 | 可观测 | `prometheus` `grafana` `zipkin` `otelcol`(opentelemetry)，组合 `obs` | 追踪后端二选一：zipkin（Brave）或 otelcol（OTLP），详见 [可观测性文档](./readme/readme.observability.md) |
 | 目标 | `middleware` / `all`(bytedesk)，默认 all | 展开见下表 |
@@ -91,7 +92,7 @@ cp .env.example .env
 
 ## 文件清单
 
-所有 compose 文件及各组件配套配置（`searxng/`、`grafana/`、`logstash/`、`prometheus.yml`、`ik-plugin-cache/`）均位于 [`compose/`](./compose/) 目录：
+所有 compose 文件及各组件配套配置（`searxng/`、`grafana/`、`logstash/`、`prometheus.yml`、`ik-plugin-cache/`、`james/`）均位于 [`compose/`](./compose/) 目录：
 
 | compose 文件（位于 compose/） | 镜像 | 默认端口 | 详细说明 |
 | --- | --- | --- | --- |
@@ -117,6 +118,7 @@ cp .env.example .env
 | compose/compose-grafana.yaml | grafana | 13000 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-zipkin.yaml | zipkin | 19411 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-otelcol.yaml | otel/opentelemetry-collector-contrib | 14317/14318 | [可观测性](./readme/readme.observability.md)——OTLP 接收，trace 转发 Zipkin |
+| compose/compose-james.yaml | apache/james:jpa-latest | 10025/10465/10587/10143/10993/10110/10995/18000 | [James 邮件服务器](./readme/readme.james.md) |
 
 其他文件：`start.sh`/`stop.sh`（组合启停）、`watchdog.sh`（应用看门狗，详见 [watchdog 使用说明](./readme/readme.watchdog.md)）、`.env`（敏感配置）、`one/`（all-in-one 单文件部署）。
 
@@ -146,6 +148,7 @@ docker compose --env-file .env -p bytedesk \
 - [Neo4j 知识图谱](./readme/readme.neo4j.md)（企业版）
 - [Logstash 日志采集](./readme/readme.logstash.md) / [Kibana 日志查询](./readme/readme.kibana.md)
 - [MinIO 对象存储](./readme/readme.minio.md)
+- [James 私有邮件服务器](./readme/readme.james.md)
 - [可观测性（Prometheus + Grafana + Zipkin + OTel Collector）](./readme/readme.observability.md)
 - [watchdog.sh 应用看门狗](./readme/readme.watchdog.md)
 - [环境变量说明](./readme/readme.env.md)

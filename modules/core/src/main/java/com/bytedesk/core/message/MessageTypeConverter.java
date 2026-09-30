@@ -142,6 +142,9 @@ public class MessageTypeConverter {
         typeToChineseMap.put(MessageTypeEnum.INVITE_VIDEO_CANCEL.name(), I18Consts.I18N_MESSAGE_TYPE_INVITE_VIDEO_CANCEL);
         typeToChineseMap.put(MessageTypeEnum.INVITE_AUDIO_TIMEOUT.name(), I18Consts.I18N_MESSAGE_TYPE_INVITE_AUDIO_TIMEOUT);
         typeToChineseMap.put(MessageTypeEnum.INVITE_VIDEO_TIMEOUT.name(), I18Consts.I18N_MESSAGE_TYPE_INVITE_VIDEO_TIMEOUT);
+        // 同事通话记录消息（WEBRTC_AUDIO/WEBRTC_VIDEO，通话终态写入聊天记录）
+        typeToChineseMap.put(MessageTypeEnum.WEBRTC_AUDIO.name(), I18Consts.I18N_MESSAGE_TYPE_WEBRTC_AUDIO);
+        typeToChineseMap.put(MessageTypeEnum.WEBRTC_VIDEO.name(), I18Consts.I18N_MESSAGE_TYPE_WEBRTC_VIDEO);
         typeToChineseMap.put(MessageTypeEnum.GROUP_CREATE.name(), I18Consts.I18N_MESSAGE_TYPE_GROUP_CREATE);
         typeToChineseMap.put(MessageTypeEnum.GROUP_INVITE.name(), I18Consts.I18N_MESSAGE_TYPE_GROUP_INVITE);
         typeToChineseMap.put(MessageTypeEnum.GROUP_DISMISS.name(), I18Consts.I18N_MESSAGE_TYPE_GROUP_DISMISS);

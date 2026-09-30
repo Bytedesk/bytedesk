@@ -38,6 +38,12 @@ public class WebrtcResponse extends BaseResponse {
 
     private Long roomId;
 
+    /**
+     * 服务房间容量（= 创建的 RoomEntity.maxParticipants）：发起方客户端创建 Janus 房间时使用；
+     * 非音视频通话（未建档）为 null
+     */
+    private Integer publisherLimit;
+
     private Boolean record;
 
     private String recordFilename;
@@ -57,6 +63,12 @@ public class WebrtcResponse extends BaseResponse {
     private String calleeNickname;
 
     private String calleeAvatar;
+
+    /**
+     * 通话场景（VISITOR_SERVICE 访客客服 / MEMBER_CALL 同事通话，规划 §5.1）；
+     * 存量数据未同列时为 VISITOR_SERVICE
+     */
+    private String scene;
 
     public String getStartedAt() {
         return BdDateUtils.formatDatetimeToString(startedAt);

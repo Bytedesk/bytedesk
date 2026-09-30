@@ -32,4 +32,10 @@ public class WebrtcRequest extends BaseRequest {
     private Boolean record;
 
     private String recordFilename;
+
+    /**
+     * 场景筛选（VISITOR_SERVICE/MEMBER_CALL，规划 §5.7）：空不过滤；
+     * VISITOR_SERVICE 需兼容存量 NULL 行（查询侧 IS NULL OR = 'VISITOR_SERVICE'）。
+     */
+    private String scene;
 }

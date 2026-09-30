@@ -131,6 +131,16 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
         return ResponseEntity.ok(JsonResult.success(participants));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query participants by callUid")
+    @Operation(summary = "Query Participants by Call", description = "Retrieve all join/leave participant records of a webrtc call (visitor service / member call)")
+    @GetMapping("/query/call")
+    public ResponseEntity<?> queryByCall(@org.springframework.web.bind.annotation.RequestParam("callUid") String callUid) {
+
+        List<ParticipantResponse> participants = participantRestService.queryByCallUid(callUid);
+
+        return ResponseEntity.ok(JsonResult.success(participants));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_UPDATE, description = "update participant")
     @Operation(summary = "Update Participant", description = "Update an existing participant")
     @Override
