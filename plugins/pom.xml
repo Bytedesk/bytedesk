@@ -24,7 +24,7 @@
         <!-- <module>remote</module> -->
         <!-- <module>socialhub</module> -->
         <!-- <module>form</module> -->
-        <module>kanban</module>
+        <!-- <module>kanban</module> -->
 
     </modules>
 
