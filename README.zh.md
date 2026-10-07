@@ -203,7 +203,7 @@ bytedesk/
 
 ## 技术栈
 <!-- - [sofaboot](https://github.com/sofastack/sofa-boot/blob/master/README_ZH.md) for im server 基于金融级云原生架构-->
-- [springboot-3.x for 后端](https://github.com/Bytedesk/bytedesk)
+- [springboot for 后端](https://github.com/Bytedesk/bytedesk)
 - [react for web前端](https://github.com/Bytedesk/bytedesk-web)
 - [flutter for 移动客户端(ios&android)](https://github.com/Bytedesk/bytedesk-mobile)
 - [electron for 桌面客户端(windows&mac&linux)](https://github.com/Bytedesk/bytedesk-desktop)
