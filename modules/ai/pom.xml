@@ -236,7 +236,7 @@
 
 		<!-- https://github.com/zai-org/z-ai-sdk-java -->
 		<!-- https://github.com/pengjinning/z-ai-sdk-java -->
-		<!-- https://docs.bigmodel.cn/cn/guide/models/vlm/glm-4.5v#java -->
+		<!-- https://docs.bigmodel.cn/cn/guide/models/text/glm-5.3 -->
 		<!-- https://mvnrepository.com/artifact/ai.z.openapi/zai-sdk -->
 		<dependency>
 			<groupId>ai.z.openapi</groupId>

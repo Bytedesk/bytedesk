@@ -44,6 +44,7 @@ ENABLE_NEO4J=false
 ENABLE_LOGSTASH=false
 ENABLE_KIBANA=false
 ENABLE_MINIO=false
+ENABLE_RUSTFS=false
 ENABLE_PROMETHEUS=false
 ENABLE_GRAFANA=false
 ENABLE_ZIPKIN=false
@@ -94,6 +95,7 @@ for arg in "$@"; do
     logstash) ENABLE_LOGSTASH=true ;;
     kibana) ENABLE_KIBANA=true ;;
     minio) ENABLE_MINIO=true ;;
+    rustfs) ENABLE_RUSTFS=true ;;
     prometheus) ENABLE_PROMETHEUS=true ;;
     grafana) ENABLE_GRAFANA=true ;;
     zipkin) ENABLE_ZIPKIN=true ;;
@@ -123,7 +125,7 @@ for arg in "$@"; do
     *)
       echo "[ERROR] Unknown keyword: '${arg}'"
       echo "Allowed: stop|down mysql|postgresql|pg|oracle|kingbase|kingbase9 artemis|rabbitmq"
-      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio prometheus grafana zipkin otelcol gotenberg"
+      echo "        freeswitch mrcp coturn janus searxng|search neo4j logstash kibana minio rustfs prometheus grafana zipkin otelcol gotenberg"
       echo "        james call webrtc obs middleware all"
       exit 1
       ;;
@@ -163,6 +165,7 @@ add_file "compose-${MQ}.yaml"
 [[ "${ENABLE_LOGSTASH}" == true ]] && add_file compose-logstash.yaml
 [[ "${ENABLE_KIBANA}" == true ]] && add_file compose-kibana.yaml
 [[ "${ENABLE_MINIO}" == true ]] && add_file compose-minio.yaml
+[[ "${ENABLE_RUSTFS}" == true ]] && add_file compose-rustfs.yaml
 [[ "${ENABLE_PROMETHEUS}" == true ]] && add_file compose-prometheus.yaml
 [[ "${ENABLE_GRAFANA}" == true ]] && add_file compose-grafana.yaml
 [[ "${ENABLE_ZIPKIN}" == true ]] && add_file compose-zipkin.yaml
@@ -198,6 +201,7 @@ components_summary=""
 [[ "${ENABLE_LOGSTASH}" == true ]] && components_summary="${components_summary} logstash"
 [[ "${ENABLE_KIBANA}" == true ]] && components_summary="${components_summary} kibana"
 [[ "${ENABLE_MINIO}" == true ]] && components_summary="${components_summary} minio"
+[[ "${ENABLE_RUSTFS}" == true ]] && components_summary="${components_summary} rustfs"
 [[ "${ENABLE_PROMETHEUS}" == true ]] && components_summary="${components_summary} prometheus"
 [[ "${ENABLE_GRAFANA}" == true ]] && components_summary="${components_summary} grafana"
 [[ "${ENABLE_ZIPKIN}" == true ]] && components_summary="${components_summary} zipkin"

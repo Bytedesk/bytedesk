@@ -67,7 +67,7 @@ cp .env.example .env
 | Core middleware | `redis` `elasticsearch`(es) | always included |
 | Call center | `freeswitch` `mrcp`, combo `call` | call supports mysql/postgresql only |
 | WebRTC | `coturn` `janus`, combo `webrtc` | |
-| Search/storage | `searxng`(search) `minio` `neo4j` | enterprise feature |
+| Search/storage | `searxng`(search) `minio` `rustfs` `neo4j` | rustfs = S3-compatible storage, Apache 2.0 MinIO successor; enterprise feature |
 | Mail server | `james` | Apache James private mail server for internal employee email (collaboration); lightweight mails (notifications/codes) still best via third-party SMTP, see [James docs](./readme/readme.james.md) |
 | File preview | `gotenberg` | Office→PDF conversion sidecar, enterprise feature; enable via `BYTEDESK_PREVIEW_CONVERT_ENABLED=true` + `BYTEDESK_PREVIEW_CONVERT_MODE=remote` |
 | Logging | `logstash` `kibana` | depends on elasticsearch |
@@ -109,6 +109,7 @@ All compose files and their per-component configs (`searxng/`, `grafana/`, `logs
 | compose/compose-logstash.yaml | logstash:9.4.2 | 19600 | [Logstash](./readme/readme.logstash.md) |
 | compose/compose-kibana.yaml | kibana:9.4.2 | 15601 | [Kibana](./readme/readme.kibana.md) |
 | compose/compose-minio.yaml | minio | 19000/19001 | [MinIO](./readme/readme.minio.md) |
+| compose/compose-rustfs.yaml | rustfs | 19000/19001 | [RustFS](./readme/readme.rustfs.md) |
 | compose/compose-prometheus.yaml | prometheus | 19090 | [Observability](./readme/readme.observability.md) |
 | compose/compose-grafana.yaml | grafana | 13000 | [Observability](./readme/readme.observability.md) |
 | compose/compose-zipkin.yaml | zipkin | 19411 | [Observability](./readme/readme.observability.md) |

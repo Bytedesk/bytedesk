@@ -73,7 +73,7 @@ cp .env.example .env
 | 核心中间件 | `redis` `elasticsearch`(es) | 任何栈自动包含 |
 | 呼叫中心 | `freeswitch` `mrcp`，组合 `call` | call 仅支持 mysql/postgresql |
 | WebRTC | `coturn` `janus`，组合 `webrtc` | |
-| 搜索/存储 | `searxng`(search) `minio` `neo4j` | 企业版功能 |
+| 搜索/存储 | `searxng`(search) `minio` `rustfs` `neo4j` | rustfs = S3 兼容对象存储（Apache 2.0，MinIO 开源替代）；企业版功能 |
 | 邮件服务器 | `james` | Apache James 私有邮件服务器：定位企业内部员工邮件沟通（协同）；通知/验证码等轻量邮件建议继续用第三方邮箱，详见 [James 文档](./readme/readme.james.md) |
 | 日志 | `logstash` `kibana` | 依赖 elasticsearch |
 | 可观测 | `prometheus` `grafana` `zipkin` `otelcol`(opentelemetry)，组合 `obs` | 追踪后端二选一：zipkin（Brave）或 otelcol（OTLP），详见 [可观测性文档](./readme/readme.observability.md) |
@@ -114,6 +114,7 @@ cp .env.example .env
 | compose/compose-logstash.yaml | logstash:9.4.2 | 19600 | [Logstash](./readme/readme.logstash.md) |
 | compose/compose-kibana.yaml | kibana:9.4.2 | 15601 | [Kibana](./readme/readme.kibana.md) |
 | compose/compose-minio.yaml | minio | 19000/19001 | [MinIO](./readme/readme.minio.md) |
+| compose/compose-rustfs.yaml | rustfs | 19000/19001 | [RustFS](./readme/readme.rustfs.md) |
 | compose/compose-prometheus.yaml | prometheus | 19090 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-grafana.yaml | grafana | 13000 | [可观测性](./readme/readme.observability.md) |
 | compose/compose-zipkin.yaml | zipkin | 19411 | [可观测性](./readme/readme.observability.md) |

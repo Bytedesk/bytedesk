@@ -1,0 +1,137 @@
+import { m as mergeLocales } from "./index-OqF_uRM0.js";
+const locale$1 = { "sheets-table": {
+  columnPrefix: "Columna",
+  tablePrefix: "Tabla",
+  tableNameError: "El nombre de la tabla no puede contener espacios, no puede comenzar con un número y no puede ser idéntico a un nombre de tabla existente"
+} };
+const locale = { "sheets-table-ui": {
+  title: "Tabla",
+  selectRange: "Seleccionar rango de tabla",
+  rename: "Renombrar tabla",
+  renamePlaceholder: "Enter table name",
+  updateRange: "Actualizar rango de tabla",
+  tableRangeWithMergeError: "El rango de la tabla no puede superponerse con celdas combinadas",
+  tableRangeWithOtherTableError: "El rango de la tabla no puede superponerse con otras tablas",
+  tableRangeSingleRowError: "El rango de la tabla no puede ser una sola fila",
+  updateError: "No se puede establecer el rango de la tabla en un área que no se superponga con la original y no esté en la misma fila",
+  tableStyle: "Estilo de tabla",
+  defaultStyle: "Estilo predeterminado",
+  customStyle: "Estilo personalizado",
+  customTooMore: "El número de temas personalizados excede el límite máximo, por favor, elimine algunos temas innecesarios y vuelva a añadirlos",
+  setTheme: "Establecer tema de tabla",
+  removeTable: "Eliminar tabla",
+  cancel: "Cancelar",
+  confirm: "Confirmar",
+  header: "Encabezado",
+  footer: "Pie de página",
+  firstLine: "Primera línea",
+  secondLine: "Segunda línea",
+  columnPrefix: "Columna",
+  tablePrefix: "Tabla",
+  tableNameError: "El nombre de la tabla no puede contener espacios, no puede comenzar con un número y no puede ser idéntico a un nombre de tabla existente",
+  columnMenu: {
+    "insert-left": "Insert 1 table column left",
+    "insert-right": "Insert 1 table column right",
+    delete: "Delete table column"
+  },
+  sort: {
+    "sort-asc": "Ascendente",
+    "sort-desc": "Descendente"
+  },
+  insert: {
+    main: "Insertar tabla",
+    row: "Insertar fila de tabla",
+    col: "Insertar columna de tabla"
+  },
+  remove: {
+    main: "Eliminar tabla",
+    row: "Eliminar fila de tabla",
+    col: "Eliminar columna de tabla"
+  },
+  condition: {
+    string: "Texto",
+    number: "Número",
+    date: "Fecha",
+    empty: "(Vacío)"
+  },
+  string: { compare: {
+    equal: "Igual a",
+    notEqual: "No es igual a",
+    contains: "Contiene",
+    notContains: "No contiene",
+    startsWith: "Empieza por",
+    endsWith: "Termina en"
+  } },
+  number: { compare: {
+    equal: "Igual a",
+    notEqual: "No es igual a",
+    greaterThan: "Mayor que",
+    greaterThanOrEqual: "Mayor o igual que",
+    lessThan: "Menor que",
+    lessThanOrEqual: "Menor o igual que",
+    between: "Entre",
+    notBetween: "No está entre",
+    above: "Por encima",
+    below: "Por debajo",
+    topN: "{0} superiores"
+  } },
+  date: { compare: {
+    equal: "Igual a",
+    notEqual: "No es igual a",
+    after: "Después de",
+    afterOrEqual: "Después o igual a",
+    before: "Antes de",
+    beforeOrEqual: "Antes o igual a",
+    between: "Entre",
+    notBetween: "No está entre",
+    today: "Hoy",
+    yesterday: "Ayer",
+    tomorrow: "Mañana",
+    thisWeek: "Esta semana",
+    lastWeek: "La semana pasada",
+    nextWeek: "La próxima semana",
+    thisMonth: "Este mes",
+    lastMonth: "El mes pasado",
+    nextMonth: "El próximo mes",
+    thisQuarter: "Este trimestre",
+    lastQuarter: "El trimestre pasado",
+    nextQuarter: "El próximo trimestre",
+    thisYear: "Este año",
+    nextYear: "El próximo año",
+    lastYear: "El año pasado",
+    quarter: "Por trimestre",
+    month: "Por mes",
+    q1: "Primer trimestre",
+    q2: "Segundo trimestre",
+    q3: "Tercer trimestre",
+    q4: "Cuarto trimestre",
+    m1: "Enero",
+    m2: "Febrero",
+    m3: "Marzo",
+    m4: "Abril",
+    m5: "Mayo",
+    m6: "Junio",
+    m7: "Julio",
+    m8: "Agosto",
+    m9: "Septiembre",
+    m10: "Octubre",
+    m11: "Noviembre",
+    m12: "Diciembre"
+  } },
+  filter: {
+    "by-values": "Por valores",
+    "by-conditions": "Por condiciones",
+    "clear-filter": "Borrar filtro",
+    cancel: "Cancelar",
+    confirm: "Confirmar",
+    "search-placeholder": "Usa espacio para separar palabras clave",
+    "select-all": "Seleccionar todo"
+  }
+} };
+const i = mergeLocales(
+  locale$1,
+  locale
+);
+export {
+  i as default
+};

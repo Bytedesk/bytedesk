@@ -305,8 +305,11 @@ public class BytedeskProperties implements EnvironmentAware {
     // 腾讯云配置
     private Tencent tencent = new Tencent();
 
-    // MinIO 配置
+    // MinIO 配置（兼容别名，推荐使用 storage 命名空间）
     private Minio minio = new Minio();
+
+    // S3 兼容对象存储配置（MinIO / RustFS / AWS S3 / OSS / COS 等任意 S3 兼容后端）
+    private Storage storage = new Storage();
 
     // 呼叫中心配置
     private Call call = new Call();
@@ -619,6 +622,31 @@ public class BytedeskProperties implements EnvironmentAware {
         private Boolean secure = false;
     }
 
+    /**
+     * S3 兼容对象存储统一配置（推荐命名空间，向下兼容 bytedesk.minio.*）
+     *
+     * provider=local（默认）：本地磁盘存储，行为与 minio.enabled=false 一致
+     * provider=s3：启用 S3 兼容后端（MinIO / RustFS / AWS S3 / 阿里云 OSS / 腾讯云 COS 等）
+     *
+     * 字段解析优先级：storage.* 显式配置优先；未配置时回落到 minio.* 旧键，存量部署零改动
+     */
+    @Getter
+    @Setter
+    public static class Storage {
+        /** local | s3，s3 = 任意 S3 兼容后端；默认 null 表示未配置，回落 minio.enabled 判定 */
+        private String provider;
+        private String endpoint;
+        private String accessKey;
+        private String secretKey;
+        private String bucketName;
+        private String region;
+        private Boolean secure;
+        /** 是否对桶设置公开读策略（默认 true 保持存量行为）；false 时跳过策略并改用预签名直链 */
+        private Boolean publicRead;
+        /** 预签名 URL 有效期（天），SigV4 协议上限 7 天；仅 public-read=false 时生效 */
+        private Integer presignedExpiryDays = 7;
+    }
+
     @Getter
     @Setter
     public static class Call {
@@ -759,6 +787,81 @@ public class BytedeskProperties implements EnvironmentAware {
 
     public Boolean getMinioEnabled() {
         return minio.getEnabled();
+    }
+
+    // ==================== S3 兼容对象存储统一判定（storage.* 优先，minio.* 兜底） ====================
+
+    /** storage.provider 取值：s3（任意 S3 兼容后端） */
+    private static final String PROVIDER_S3 = "s3";
+
+    /** S3 兼容存储是否启用：bytedesk.storage.provider=s3 或旧键 bytedesk.minio.enabled=true 任一成立 */
+    public boolean isS3StorageEnabled() {
+        return isStorageProviderS3() || Boolean.TRUE.equals(minio.getEnabled());
+    }
+
+    /** 是否显式启用新命名空间（storage.provider=s3）；仅此时 storage.* 字段才优先于 minio.* */
+    private boolean isStorageProviderS3() {
+        return PROVIDER_S3.equalsIgnoreCase(storage.getProvider() == null ? "" : storage.getProvider());
+    }
+
+    /** 当前存储 provider 描述，用于日志 */
+    public String getStorageProviderName() {
+        if (!isS3StorageEnabled()) {
+            return "local";
+        }
+        return "s3";
+    }
+
+    public String getStorageEndpoint() {
+        return isStorageProviderS3() && hasText(storage.getEndpoint()) ? storage.getEndpoint() : getMinioEndpoint();
+    }
+
+    public String getStorageAccessKey() {
+        return isStorageProviderS3() && hasText(storage.getAccessKey()) ? storage.getAccessKey() : getMinioAccessKey();
+    }
+
+    public String getStorageSecretKey() {
+        return isStorageProviderS3() && hasText(storage.getSecretKey()) ? storage.getSecretKey() : getMinioSecretKey();
+    }
+
+    public String getStorageBucketName() {
+        return isStorageProviderS3() && hasText(storage.getBucketName()) ? storage.getBucketName() : getMinioBucketName();
+    }
+
+    public String getStorageRegion() {
+        return isStorageProviderS3() && hasText(storage.getRegion()) ? storage.getRegion() : getMinioRegion();
+    }
+
+    public Boolean getStorageSecure() {
+        return isStorageProviderS3() && storage.getSecure() != null ? storage.getSecure() : getMinioSecure();
+    }
+
+    /** 是否对桶设置公开读策略（默认 true 保持存量行为） */
+    public boolean isStoragePublicRead() {
+        if (isStorageProviderS3() && storage.getPublicRead() != null) {
+            return storage.getPublicRead();
+        }
+        return true;
+    }
+
+    /** 预签名 URL 有效期（秒），SigV4 上限 7 天 */
+    public int getStoragePresignedExpirySeconds() {
+        int days = storage.getPresignedExpiryDays() == null ? 7 : storage.getPresignedExpiryDays();
+        if (days < 1) {
+            days = 1;
+        }
+        if (days > 7) {
+            days = 7;
+        }
+        return days * 24 * 3600;
+    }
+
+    public Storage getStorage() {
+        return storage;
+    }
+
+    private static boolean hasText(String text) {
+        return text != null && !text.trim().isEmpty();
     }
 
     public String getMinioEndpoint() {

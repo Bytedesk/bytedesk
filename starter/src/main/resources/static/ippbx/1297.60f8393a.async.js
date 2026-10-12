@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcalladmin=self.webpackChunkcalladmin||[]).push([[1297],{61297:function(t,a,e){e.d(a,{submitFeedback:function(){return u}});var n=e(57301);function u(t){return(0,n.A)({url:"/visitor/api/feedback/submit",method:"post",data:t})}}}]);

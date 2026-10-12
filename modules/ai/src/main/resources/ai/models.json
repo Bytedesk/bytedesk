@@ -28,16 +28,28 @@
             "type": "TEXT"
         },
         {
-            "name": "glm-4.6v",
-            "nickname": "GLM-4.6V",
-            "description": "支持视觉输入的多模态大模型，可以理解和分析图像",
+            "name": "glm-5.3-flash",
+            "nickname": "GLM-5.3-Flash",
+            "description": "原生多模态模型，支持图像、视频、文本和文件输入及1M上下文，适合视觉编程与智能体任务，仅支持开启思考",
             "type": "VISION"
         },
         {
-            "name": "glm-4.6v-flashx",
-            "nickname": "GLM-4.6V-FlashX",
-            "description": "轻量级多模态视觉模型，提供快速的图像理解能力",
+            "name": "glm-5.3-flashx",
+            "nickname": "GLM-5.3-FlashX",
+            "description": "GLM-5.3-Flash的高速版本，支持原生多模态输入及1M上下文，提供更快的推理体验，仅支持开启思考",
             "type": "VISION"
+        },
+        {
+            "name": "glm-ocr",
+            "nickname": "GLM-OCR",
+            "description": "轻量级专业OCR模型，支持PDF及JPG、PNG图片输入，擅长多语言文本识别、复杂表格与公式解析，支持结构化输出",
+            "type": "IMAGE2TEXT"
+        },
+        {
+            "name": "glm-image",
+            "nickname": "GLM-Image",
+            "description": "旗舰文本生成图像模型，采用自回归与扩散解码器混合架构，支持多分辨率生成与精准文字呈现，适合商业海报、科普插画和社交媒体图文",
+            "type": "TEXT2IMAGE"
         },
         {
             "name": "embedding-3",
@@ -46,21 +58,15 @@
             "type": "EMBEDDING"
         },
         {
+            "name": "glm-5.3",
+            "nickname": "GLM-5.3",
+            "description": "GLM-5.3旗舰文本模型，支持1M上下文与128K最大输出，擅长复杂软件工程与智能体任务，仅支持开启思考",
+            "type": "TEXT"
+        },
+        {
             "name": "glm-5.2",
             "nickname": "GLM-5.2",
-            "description": "GLM-5.2 旗舰文本模型，支持复杂推理与超长上下文，适合智能体应用",
-            "type": "TEXT"
-        },
-        {
-            "name": "glm-5.1",
-            "nickname": "GLM-5.1",
-            "description": "GLM-5.1",
-            "type": "TEXT"
-        },
-        {
-            "name": "emohaa",
-            "nickname": "Emohaa",
-            "description": "专业心理咨询模型，擅长情感支持与心理疏导",
+            "description": "GLM-5.2旗舰文本模型，支持1M上下文与128K最大输出，擅长项目级软件工程、长程任务执行与智能体应用",
             "type": "TEXT"
         }
     ],

@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.robot.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot.RobotRestService;
+import com.bytedesk.ai.robot.enums.RobotSearchTypeEnum;
 import com.bytedesk.ai.service.SearchResultWithSources;
 import com.bytedesk.core.utils.JsonResult;
 

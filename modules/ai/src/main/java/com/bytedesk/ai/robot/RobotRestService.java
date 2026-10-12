@@ -33,6 +33,7 @@ import com.bytedesk.ai.llm_provider.LlmProviderEntity;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotJsonLoader.Robot;
 import com.bytedesk.ai.robot.RobotJsonLoader.RobotConfiguration;
+import com.bytedesk.ai.robot.enums.RobotTypeEnum;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.ai.robot_settings.RobotSettingsRestService;
 import com.bytedesk.ai.utils.ConvertAiUtils;

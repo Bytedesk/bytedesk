@@ -121,6 +121,9 @@ Listed course START -->
 					<a href="/assets/qr/qr_ios.png" target="_blank">
 						<img src="/assets/qr/qr_ios.png" style="height: 100px" alt="<@t key='alt.download.iosQR'>iPhone苹果版本下载二维码</@t>"/>
 					</a>
+					<div class="mt-2">
+						<a href="${iosDownloadUrl}" target="_blank" class="btn btn-sm btn-outline-primary position-relative" style="z-index:2;"><@t key="page.download.ios.appstore">App Store 下载</@t></a>
+					</div>
 				</div>
 			</div>
 
@@ -133,6 +136,9 @@ Listed course START -->
 					</div>
 					<!-- Title -->
 						<h5 class="mb-1"><a href="https://github.com/Bytedesk/bytedesk/releases" class="stretched-link" target="_blank"><@t key="page.download.server">服务器端</@t></a></h5>
+					<div class="mt-2">
+						<a href="https://github.com/Bytedesk/bytedesk/releases" target="_blank" class="btn btn-sm btn-outline-primary position-relative" style="z-index:2;"><@t key="page.download.server.github">GitHub 下载</@t></a>
+					</div>
 				</div>
 			</div>
 

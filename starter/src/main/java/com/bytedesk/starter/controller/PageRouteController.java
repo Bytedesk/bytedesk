@@ -536,13 +536,39 @@ public class PageRouteController {
 	}
 
 	/**
+	 * office
+	 * 微语文档 web 版（frontend/office 构建产物，见 frontend/office/cicd/scripts/build-open.sh）
+	 * http://127.0.0.1:9003/office
+	 */
+	@GetMapping("/office")
+	public String office() {
+		// 重定向到带斜杠路径：index.html 中资源为相对路径（./assets/...），
+		// 无斜杠时浏览器会以根目录为基准解析，导致模块脚本 404（MIME 错误）
+		return "redirect:/office/";
+	}
+
+	/**
+	 * office 子路由（SPA 内部跳转），转发到 office/index.html
+	 */
+	@GetMapping({
+			"/office/",
+			"/office/{path:[^\\.]*}",
+			"/office/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/office/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/office/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+		})
+	public String officePath() {
+		return "forward:/office/index.html"; // 默认路径
+	}
+
+	/**
 	 * Features pages - support both with and without /features/ prefix
 	 * For dynamic FTL template rendering (non-.html requests)
-	 * http://127.0.0.1:9003/office
+	 * http://127.0.0.1:9003/meet
 	 * http://127.0.0.1:9003/features/office
 	 */
 	@GetMapping({ 
-		"/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}", 
+		"/{feature:meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}",
 		"/features/{feature:office|meet|scrm|team|ai|kbase|voc|ticket|workflow|kanban|callcenter|service|open|mcp|cli|skill}"
 	})
 	public String handleFeatureRoutes(

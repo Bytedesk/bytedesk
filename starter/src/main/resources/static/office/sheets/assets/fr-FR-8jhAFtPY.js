@@ -1,0 +1,84 @@
+import { m as mergeLocales } from "./index-OqF_uRM0.js";
+const locale$1 = { "sheets-filter": {
+  command: { "not-valid-filter-range": "La plage sélectionnée n'a qu'une seule ligne et n'est pas valide pour le filtre." },
+  msg: { "filter-header-forbidden": "Vous ne pouvez pas déplacer la ligne d'en-tête d'un filtre." }
+} };
+const locale = { "sheets-filter-ui": {
+  toolbar: {
+    "smart-toggle-filter-tooltip": "Inverser le filtre",
+    "clear-filter-criteria": "Effacer les conditions de filtre",
+    "re-calc-filter-conditions": "Recalculer les conditions de filtre"
+  },
+  shortcut: { "smart-toggle-filter": "Inverser le filtre" },
+  panel: {
+    "clear-filter": "Effacer le filtre",
+    cancel: "Annuler",
+    confirm: "Confirmer",
+    "by-values": "Par valeurs",
+    "by-colors": "Par couleurs",
+    "filter-by-cell-fill-color": "Filtrer par couleur de remplissage de cellule",
+    "filter-by-cell-text-color": "Filtrer par couleur de texte de cellule",
+    "filter-by-color-none": "Cette colonne ne contient qu'une seule couleur",
+    "by-conditions": "Par conditions",
+    "filter-only": "Filtrer uniquement",
+    "search-placeholder": "Utilisez un espace pour séparer les mots-clés",
+    "select-all": "Tout sélectionner",
+    "input-values-placeholder": "Saisir des valeurs",
+    and: "ET",
+    or: "OU",
+    empty: "(vide)",
+    "?": "Utilisez “?” pour représenter un seul caractère.",
+    "*": "Utilisez “*” pour représenter plusieurs caractères."
+  },
+  conditions: {
+    none: "Aucun",
+    empty: "Est vide",
+    "not-empty": "N'est pas vide",
+    "text-contains": "Le texte contient",
+    "does-not-contain": "Le texte ne contient pas",
+    "starts-with": "Le texte commence par",
+    "ends-with": "Le texte se termine par",
+    equals: "Le texte est égal à",
+    "greater-than": "Supérieur à",
+    "greater-than-or-equal": "Supérieur ou égal à",
+    "less-than": "Inférieur à",
+    "less-than-or-equal": "Inférieur ou égal à",
+    equal: "Égal à",
+    "not-equal": "Différent de",
+    between: "Entre",
+    "not-between": "Pas entre",
+    custom: "Personnalisé"
+  },
+  date: {
+    1: "Jan",
+    2: "Fév",
+    3: "Mar",
+    4: "Avr",
+    5: "Mai",
+    6: "Juin",
+    7: "Juil",
+    8: "Août",
+    9: "Sept",
+    10: "Oct",
+    11: "Nov",
+    12: "Déc"
+  },
+  sync: {
+    title: "Le filtre est visible par tous",
+    statusTips: {
+      on: "Une fois activé, tous les collaborateurs verront les résultats du filtre",
+      off: "Une fois désactivé, seul vous verrez les résultats du filtre"
+    },
+    switchTips: {
+      on: "“Le filtre est visible par tous” est activé, tous les collaborateurs verront les résultats du filtre",
+      off: "“Le filtre est visible par tous” est désactivé, seul vous verrez les résultats du filtre"
+    }
+  }
+} };
+const f = mergeLocales(
+  locale$1,
+  locale
+);
+export {
+  f as default
+};

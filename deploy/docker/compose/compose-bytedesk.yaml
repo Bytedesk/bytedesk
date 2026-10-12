@@ -208,6 +208,19 @@ services:
       BYTEDESK_MINIO_REGION: us-east-1
       BYTEDESK_MINIO_SECURE: false
       # ===============================
+      # S3-compatible object storage config（推荐命名空间，MinIO / RustFS / AWS S3 / OSS / COS）
+      # 设 BYTEDESK_STORAGE_PROVIDER=s3 启用；未显式配置的 storage 字段自动回落上方 BYTEDESK_MINIO_*
+      # RustFS 部署：./start.sh all rustfs，并设 BYTEDESK_STORAGE_PROVIDER=s3 + ENDPOINT=http://bytedesk-rustfs:9000
+      # ===============================
+      BYTEDESK_STORAGE_PROVIDER: ${BYTEDESK_STORAGE_PROVIDER:-}
+      BYTEDESK_STORAGE_ENDPOINT: ${BYTEDESK_STORAGE_ENDPOINT:-http://bytedesk-rustfs:9000}
+      BYTEDESK_STORAGE_ACCESS_KEY: ${BYTEDESK_STORAGE_ACCESS_KEY:-rustfsadmin}
+      BYTEDESK_STORAGE_SECRET_KEY: ${BYTEDESK_STORAGE_SECRET_KEY:-rustfsadmin}
+      BYTEDESK_STORAGE_BUCKET_NAME: ${BYTEDESK_STORAGE_BUCKET_NAME:-bytedesk}
+      BYTEDESK_STORAGE_REGION: us-east-1
+      BYTEDESK_STORAGE_SECURE: "false"
+      BYTEDESK_STORAGE_PUBLIC_READ: ${BYTEDESK_STORAGE_PUBLIC_READ:-true}
+      # ===============================
       # File preview config（Office 转 PDF，企业版功能，社区版镜像不含此功能）
       # 官方镜像已精简（不含 LibreOffice）。Docker 部署开启预览：./start.sh gotenberg 启动转换 sidecar，
       # 并在 .env 设置 BYTEDESK_PREVIEW_CONVERT_ENABLED=true + BYTEDESK_PREVIEW_CONVERT_MODE=remote

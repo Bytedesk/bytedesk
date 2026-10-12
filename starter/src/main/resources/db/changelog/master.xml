@@ -83,4 +83,8 @@
 
     <include file="db/changelog/migration/260923_add_push_android_table.xml" />
 
+    <include file="db/changelog/migration/261010_drop_organization_custom_server_columns.xml" />
+
+    <include file="db/changelog/migration/261012_add_airline_persistent_sessions.xml" />
+
 </databaseChangeLog>

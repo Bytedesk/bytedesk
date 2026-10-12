@@ -85,12 +85,6 @@ public class OrganizationResponse extends BaseResponseNoOrg {
     // 是否已删除（逻辑删除）
     private Boolean deleted;
 
-    // 是否启用自定义服务器（域名/IP）
-    private Boolean customServerEnabled;
-
-    // 自定义服务器域名或 IP
-    private String customServerHost;
-
     // 组织成员最大数
     private Integer maxMembers;
 

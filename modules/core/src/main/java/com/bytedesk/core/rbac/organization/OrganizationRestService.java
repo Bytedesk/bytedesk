@@ -398,12 +398,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setLogo(request.getLogo());
         organization.setCode(request.getCode());
         organization.setDescription(request.getDescription());
-        if (request.getCustomServerEnabled() != null) {
-            organization.setCustomServerEnabled(request.getCustomServerEnabled());
-        }
-        if (request.getCustomServerHost() != null) {
-            organization.setCustomServerHost(request.getCustomServerHost());
-        }
 
         // 保存更新后的组织
         OrganizationEntity updatedOrganization = save(organization);
@@ -626,12 +620,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         organization.setLogo(request.getLogo());
         organization.setCode(request.getCode());
         organization.setDescription(request.getDescription());
-        if (request.getCustomServerEnabled() != null) {
-            organization.setCustomServerEnabled(request.getCustomServerEnabled());
-        }
-        if (request.getCustomServerHost() != null) {
-            organization.setCustomServerHost(request.getCustomServerHost());
-        }
         // 认证
         organization.setVerifiedType(request.getVerifiedType());
         organization.setIdentityType(request.getIdentityType());
@@ -813,8 +801,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
                 latestEntity.setLogo(organization.getLogo());
                 latestEntity.setCode(organization.getCode());
                 latestEntity.setDescription(organization.getDescription());
-                latestEntity.setCustomServerEnabled(organization.getCustomServerEnabled());
-                latestEntity.setCustomServerHost(organization.getCustomServerHost());
 
                 // 保存更新后的数据
                 OrganizationEntity saved = organizationRepository.save(latestEntity);
@@ -870,8 +856,6 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         response.setVipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled());
         response.setEnabled(organization.getEnabled());
         response.setDeleted(organization.isDeleted());
-        response.setCustomServerEnabled(organization.getCustomServerEnabled());
-        response.setCustomServerHost(organization.getCustomServerHost());
         response.setMaxMembers(organization.getMaxMembers());
         response.setMaxAgents(organization.getMaxAgents());
         response.setMaxWorkgroups(organization.getMaxWorkgroups());

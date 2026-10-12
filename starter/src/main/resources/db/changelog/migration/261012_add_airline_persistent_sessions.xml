@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="261012-airline-user-trip" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_airline_user_trip"/></not></preConditions>
+        <createTable tableName="bytedesk_airline_user_trip">
+            <column name="user_uid" type="VARCHAR(64)"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="passenger_name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="trip_templates" type="CLOB"><constraints nullable="false"/></column>
+            <column name="created_at" type="BIGINT"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+    <changeSet id="261012-airline-thread" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_airline_thread"/></not></preConditions>
+        <createTable tableName="bytedesk_airline_thread">
+            <column name="thread_uid" type="VARCHAR(64)"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="title" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="scenario" type="VARCHAR(255)"/>
+            <column name="run_status" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <column name="updated_at" type="BIGINT"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+    <changeSet id="261012-airline-snapshot" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_airline_snapshot"/></not></preConditions>
+        <createTable tableName="bytedesk_airline_snapshot">
+            <column name="thread_uid" type="VARCHAR(64)"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="state_data" type="CLOB"><constraints nullable="false"/></column>
+        </createTable>
+    </changeSet>
+    <changeSet id="261012-airline-thread-user-index" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><indexExists tableName="bytedesk_airline_thread" indexName="idx_airline_thread_user"/></not></preConditions>
+        <createIndex tableName="bytedesk_airline_thread" indexName="idx_airline_thread_user"><column name="user_uid"/></createIndex>
+    </changeSet>
+    <changeSet id="261012-airline-snapshot-thread-fk" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><foreignKeyConstraintExists foreignKeyName="fk_airline_snapshot_thread"/></not></preConditions>
+        <addForeignKeyConstraint baseTableName="bytedesk_airline_snapshot" baseColumnNames="thread_uid"
+            referencedTableName="bytedesk_airline_thread" referencedColumnNames="thread_uid"
+            constraintName="fk_airline_snapshot_thread"/>
+    </changeSet>
+    <!-- Keep the original checksum valid for databases that already applied this changeset. -->
+    <changeSet id="261012-airline-widen-clob-columns" author="copilot">
+        <validCheckSum>ANY</validCheckSum>
+        <preConditions onFail="MARK_RAN"><and>
+            <not><or><dbms type="mysql"/><dbms type="mariadb"/><dbms type="oracle"/></or></not>
+            <columnExists tableName="bytedesk_airline_snapshot" columnName="state_data"/>
+            <columnExists tableName="bytedesk_airline_user_trip" columnName="trip_templates"/>
+        </and></preConditions>
+        <modifyDataType tableName="bytedesk_airline_snapshot" columnName="state_data" newDataType="TEXT"/>
+        <modifyDataType tableName="bytedesk_airline_user_trip" columnName="trip_templates" newDataType="TEXT"/>
+    </changeSet>
+    <!-- MySQL TEXT is limited to 64 KiB; conversation snapshots need LONGTEXT. -->
+    <changeSet id="261012-airline-widen-clob-columns-mysql" author="copilot" dbms="mysql,mariadb">
+        <preConditions onFail="MARK_RAN"><and>
+            <columnExists tableName="bytedesk_airline_snapshot" columnName="state_data"/>
+            <columnExists tableName="bytedesk_airline_user_trip" columnName="trip_templates"/>
+        </and></preConditions>
+        <modifyDataType tableName="bytedesk_airline_snapshot" columnName="state_data" newDataType="LONGTEXT"/>
+        <modifyDataType tableName="bytedesk_airline_user_trip" columnName="trip_templates" newDataType="LONGTEXT"/>
+    </changeSet>
+    <changeSet id="261012-airline-widen-clob-columns-oracle" author="copilot" dbms="oracle">
+        <preConditions onFail="MARK_RAN"><and>
+            <columnExists tableName="bytedesk_airline_snapshot" columnName="state_data"/>
+            <columnExists tableName="bytedesk_airline_user_trip" columnName="trip_templates"/>
+        </and></preConditions>
+        <modifyDataType tableName="bytedesk_airline_snapshot" columnName="state_data" newDataType="CLOB"/>
+        <modifyDataType tableName="bytedesk_airline_user_trip" columnName="trip_templates" newDataType="CLOB"/>
+    </changeSet>
+</databaseChangeLog>

@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.PostConstruct;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,15 +46,18 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
 /**
- * MinIO 对象存储服务
- * 用于将图片、音频、视频等文件存储到 MinIO
+ * S3 兼容对象存储服务（io.minio 客户端为通用 S3 客户端）
+ * 用于将图片、音频、视频等文件存储到任意 S3 兼容后端
+ * （MinIO / RustFS / AWS S3 / 阿里云 OSS / 腾讯云 COS 等）
+ *
+ * 启用条件见 {@link S3StorageEnabledCondition}
  * 
  * @author bytedesk.com
  */
 @RequiredArgsConstructor
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "bytedesk.minio.enabled", havingValue = "true", matchIfMissing = false)
+@Conditional(S3StorageEnabledCondition.class)
 public class UploadMinioService {
 
     private final BytedeskProperties bytedeskProperties;
@@ -62,18 +65,25 @@ public class UploadMinioService {
     private final MinioClient minioClient;
 
     /**
-     * 初始化 MinIO 存储桶和策略
+     * 初始化 S3 兼容存储桶和策略
      */
     @PostConstruct
     public void initMinio() {
         try {
-            String bucketName = bytedeskProperties.getMinioBucketName();
+            String bucketName = bytedeskProperties.getStorageBucketName();
             
             // 检查存储桶是否存在，如果不存在则创建
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!bucketExists) {
-                log.info("创建 MinIO 存储桶: {}", bucketName);
+                log.info("创建对象存储桶: {}", bucketName);
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+            }
+            
+            // 公开读策略可配置（bytedesk.storage.public-read，默认 true 保持存量行为）
+            if (!bytedeskProperties.isStoragePublicRead()) {
+                log.info("跳过桶公开读策略（bytedesk.storage.public-read=false），fileUrl 将使用预签名直链: bucket={}", bucketName);
+                log.info("对象存储初始化完成，存储桶: {}, 策略: 私有（预签名访问）", bucketName);
+                return;
             }
             
             // 设置存储桶策略为公开读取
@@ -97,18 +107,25 @@ public class UploadMinioService {
                 }
                 """, bucketName);
             
-            log.info("设置 MinIO 存储桶 {} 为公开读取", bucketName);
-            minioClient.setBucketPolicy(
-                SetBucketPolicyArgs.builder()
-                    .bucket(bucketName)
-                    .config(bucketPolicy)
-                    .build()
-            );
-            
-            log.info("MinIO 初始化完成，存储桶: {}, 策略: 公开读取", bucketName);
+            log.info("设置存储桶 {} 为公开读取", bucketName);
+            try {
+                minioClient.setBucketPolicy(
+                    SetBucketPolicyArgs.builder()
+                        .bucket(bucketName)
+                        .config(bucketPolicy)
+                        .build()
+                );
+                log.info("对象存储初始化完成，存储桶: {}, 策略: 公开读取", bucketName);
+            } catch (Exception policyException) {
+                // 部分后端（如 RustFS 早期版本）可能不完全支持 PutBucketPolicy：
+                // 不阻断启动，提示补救路径（预签名 or 控制台/rc anonymous 手动配置）
+                log.warn("设置桶公开读策略失败（不影响启动）: bucket={}, reason={}", bucketName, policyException.getMessage());
+                log.warn("若后端不支持该策略，请任选其一：1) 设 bytedesk.storage.public-read=false 改用预签名直链；"
+                        + " 2) 通过后端控制台或 rc anonymous 手动配置匿名读取");
+            }
             
         } catch (Exception e) {
-            log.error("MinIO 初始化失败: {}", e.getMessage(), e);
+            log.error("对象存储初始化失败: {}", e.getMessage(), e);
         }
     }
 
@@ -134,10 +151,10 @@ public class UploadMinioService {
                 contentType = "application/octet-stream";
             }
 
-            // 上传文件到 MinIO
+            // 上传文件到对象存储
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(contentType)
@@ -172,10 +189,10 @@ public class UploadMinioService {
             // 获取文件内容类型
             String contentType = getContentType(fileName);
 
-            // 上传文件到 MinIO
+            // 上传文件到对象存储
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .stream(Files.newInputStream(localFile.toPath()), localFile.length(), -1)
                     .contentType(contentType)
@@ -210,11 +227,11 @@ public class UploadMinioService {
             // 获取文件内容类型
             String contentType = getContentType(fileName);
 
-            // 从 URL 下载文件并上传到 MinIO
+            // 从 URL 下载文件并上传到对象存储
             try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 minioClient.putObject(
                     PutObjectArgs.builder()
-                        .bucket(bytedeskProperties.getMinioBucketName())
+                        .bucket(bytedeskProperties.getStorageBucketName())
                         .object(objectPath)
                         .stream(inputStream, -1, -1)
                         .contentType(contentType)
@@ -306,11 +323,11 @@ public class UploadMinioService {
         try {
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .build()
             );
-            log.info("成功删除 MinIO 文件: {}", objectPath);
+            log.info("成功删除对象存储文件: {}", objectPath);
         } catch (Exception e) {
             log.error("删除 MinIO 文件失败: {}", e.getMessage(), e);
             throw new RuntimeException("删除 MinIO 文件失败: " + e.getMessage(), e);
@@ -327,7 +344,7 @@ public class UploadMinioService {
         try {
             minioClient.statObject(
                 StatObjectArgs.builder()
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .build()
             );
@@ -348,7 +365,7 @@ public class UploadMinioService {
     public void downloadObject(String objectPath, Path targetFile) {
         try (InputStream inputStream = minioClient.getObject(
                 GetObjectArgs.builder()
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .build())) {
             Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
@@ -370,7 +387,7 @@ public class UploadMinioService {
             return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .expiry(expiry, TimeUnit.SECONDS)
                     .build()
@@ -393,7 +410,7 @@ public class UploadMinioService {
             return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.PUT)
-                    .bucket(bytedeskProperties.getMinioBucketName())
+                    .bucket(bytedeskProperties.getStorageBucketName())
                     .object(objectPath)
                     .expiry(expiry, TimeUnit.SECONDS)
                     .build()
@@ -405,14 +422,20 @@ public class UploadMinioService {
     }
 
     /**
-     * 获取文件访问URL
+     * 获取文件访问URL：按公开读策略分支
+     * - public-read=true（默认，保持存量行为）：裸直链 {endpoint}/{bucket}/{objectPath}，依赖桶公开读策略
+     * - public-read=false：预签名 URL（有效期 bytedesk.storage.presigned-expiry-days，上限 7 天），
+     *   摆脱「桶必须公开读」假设，适配不支持 PutBucketPolicy 的后端（如 RustFS 早期版本）
      * 
      * @param objectPath 对象路径
      * @return 文件访问URL
      */
     private String getFileUrl(String objectPath) {
-        return bytedeskProperties.getMinioEndpoint() + "/" + 
-               bytedeskProperties.getMinioBucketName() + "/" + objectPath;
+        if (!bytedeskProperties.isStoragePublicRead()) {
+            return getDownloadUrl(objectPath, bytedeskProperties.getStoragePresignedExpirySeconds());
+        }
+        return bytedeskProperties.getStorageEndpoint() + "/" + 
+               bytedeskProperties.getStorageBucketName() + "/" + objectPath;
     }
 
     /**

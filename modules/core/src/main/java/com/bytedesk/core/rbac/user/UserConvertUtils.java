@@ -296,8 +296,6 @@ public class UserConvertUtils {
                 .maxWorkgroups(organization.getMaxWorkgroups())
                 .vipExpireDate(organization.getVipExpireDate())
                 .vipExpireLoginCheckEnabled(organization.getVipExpireLoginCheckEnabled())
-                .customServerEnabled(organization.getCustomServerEnabled())
-                .customServerHost(organization.getCustomServerHost())
                 .build();
 
         // owner user（OrganizationEntity.user 默认为 LAZY，未初始化时不强行触发加载）

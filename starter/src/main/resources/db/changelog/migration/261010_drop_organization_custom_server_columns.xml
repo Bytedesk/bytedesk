@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        自定义服务器申请-审核闭环（control 模块）迁移策略：
+
+        1. 新表 bytedesk_control_custom_server / bytedesk_control_custom_server_audit
+           由 JPA（spring.jpa.hibernate.ddl-auto=update）根据 Entity 注解自动创建，
+           含 (org_uid, active_endpoint_key) 组合唯一约束与各索引，Liquibase 不重复建表。
+        2. JPA 不会自动删除列，这里显式删除组织表上的旧自定义服务器字段：
+           - is_custom_server_enabled
+           - custom_server_host
+           删除后组织如需自定义服务器，须在新「申请-审核」流程中重新提交。
+
+        见 docs/plans/2026-10-10-weiyu-multi-server-scan-switch-plan.md
+    -->
+
+    <changeSet id="261010-drop-organization-custom-server-enabled" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization"/>
+                <columnExists tableName="bytedesk_core_organization" columnName="is_custom_server_enabled"/>
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_core_organization" columnName="is_custom_server_enabled"/>
+    </changeSet>
+
+    <changeSet id="261010-drop-organization-custom-server-host" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_core_organization"/>
+                <columnExists tableName="bytedesk_core_organization" columnName="custom_server_host"/>
+            </and>
+        </preConditions>
+        <dropColumn tableName="bytedesk_core_organization" columnName="custom_server_host"/>
+    </changeSet>
+
+</databaseChangeLog>

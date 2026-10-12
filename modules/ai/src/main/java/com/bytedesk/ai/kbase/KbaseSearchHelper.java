@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.robot.RobotSearchTypeEnum;
+import com.bytedesk.ai.robot.enums.RobotSearchTypeEnum;
 import com.bytedesk.ai.service.SearchResultWithSources;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.utils.BdDateUtils;

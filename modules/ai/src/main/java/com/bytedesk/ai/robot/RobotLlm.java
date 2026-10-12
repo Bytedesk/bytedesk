@@ -16,6 +16,8 @@ package com.bytedesk.ai.robot;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bytedesk.ai.robot.enums.RobotReasoningEffortEnum;
+import com.bytedesk.ai.robot.enums.RobotSearchTypeEnum;
 import com.bytedesk.ai.robot_tool.RobotToolIntentContext;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.constant.TypeConsts;

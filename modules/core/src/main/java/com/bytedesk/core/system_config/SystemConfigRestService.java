@@ -33,6 +33,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.system_config.enums.SystemConfigKeyEnum;
 import com.bytedesk.core.system_config.utils.PlatformSecretUtils;
 import com.bytedesk.core.uid.UidUtils;
 

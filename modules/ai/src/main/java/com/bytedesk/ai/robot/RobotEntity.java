@@ -13,6 +13,7 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.ai.robot.enums.RobotTypeEnum;
 import com.bytedesk.ai.robot_settings.RobotSettingsEntity;
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;

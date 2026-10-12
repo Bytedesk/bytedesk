@@ -1,0 +1,3124 @@
+/* Bytedesk Office design tokens — the single source of truth for UI chrome colors.
+ * Theme switching: light defaults in :root, [data-theme='dark'] overrides,
+ * prefers-color-scheme fallback for system mode (no data-theme attribute).
+ * Per-app accents (--accent / --accent-dark / --accent-soft) live in each
+ * app's styles.css. Document content colors (paper, cells, exports, chart
+ * palettes) never live here and never reference these tokens. */
+
+:root {
+  /* chrome */
+  --surface: #ffffff;
+  --surface-subtle: #f6f7f9;
+  --chrome-bg: #ffffff;
+  --canvas: #e6e6e6;
+  --border: #e3e6ea;
+  --border-subtle: #efefef;
+  --border-strong: #d9d9d9;
+  --border-hover: #d3d7dd;
+  --text: #242424;
+  --text-primary: #232425;
+  --text-secondary: #606366;
+  --text-tertiary: #909499;
+  --text-muted: #878e96;
+  --text-dim: #605e5c;
+  --hover: #f5f5f5;
+  --pressed: #edebe9;
+  --active-bg: #eaeaea;
+  --bg-hover: #f5f5f5;
+  --bg-hover-subtle: #f0f2f5;
+  --bg-hover-strong: #e8eaee;
+  --bg-hover-accent: #e0e4ea;
+  --bg-content: #fafafa;
+  --icon-muted: #b9bfc7;
+  --danger: #d13438;
+  --danger-bg: #fdf3f3;
+  --danger-border: #f0c8c9;
+  --success: #107c41;
+  --success-bg: #eaf7ef;
+  --success-border: #c8e8d4;
+  --color-bg-overlay: rgb(0 0 0 / 50%);
+  --shadow-modal-strong: 0 20px 25px rgb(0 0 0 / 10%);
+  --shadow-btn-hover: 0 2px 8px rgb(35 36 37 / 15%);
+  --shadow-menu: 0 8px 24px rgb(0 0 0 / 18%);
+
+  /* AI panel (canonical names from the former per-app copies) */
+  --gs-font-sans:
+    'Arial', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    sans-serif;
+  --color-btn-primary: #232425;
+  --color-btn-primary-hover: #393a3b;
+  --color-btn-primary-text: #ffffff;
+  --color-ai-action: #e8663f;
+  --color-ai-action-hover: #d4552f;
+  --color-ai-action-text: #ffffff;
+  --color-brand-secondary: #0f7fff;
+  --color-text-primary: #232425;
+  --color-text-secondary: #606366;
+  --color-text-tertiary: #909499;
+  --color-bg-page: #ffffff;
+  --color-bg-subtle: #f5f5f5;
+  --color-border-default: #eaeaea;
+  --color-border-strong: #d0d3d8;
+  --color-border-brand: #0f7fff;
+  --color-error: #ef4444;
+  --color-error-hover: #dc2626;
+
+  /* non-color */
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-30: 30px;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --text-body-lg: 18px;
+  --text-small: 14px;
+  --text-caption: 12px;
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --surface: #1e1e1e;
+  --surface-subtle: #2a2a2a;
+  --chrome-bg: #252525;
+  --canvas: #2b2b2b;
+  --border: #3a3a3a;
+  --border-subtle: #3a3a3a;
+  --border-strong: #555;
+  --border-hover: #555;
+  --text: #e4e4e4;
+  --text-primary: #e4e4e4;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #a0a0a0;
+  --text-muted: #8a8a8a;
+  --text-dim: #a0a0a0;
+  --hover: #333;
+  --pressed: #3c3c3c;
+  --active-bg: #454545;
+  --bg-hover: #333;
+  --bg-hover-subtle: #333;
+  --bg-hover-strong: #444;
+  --bg-hover-accent: #444;
+  --bg-content: #1a1a1a;
+  --icon-muted: #666;
+  --danger: #d13438;
+  --danger-bg: #3a2020;
+  --danger-border: #5a3030;
+  --success: #52c082;
+  --success-bg: #20342a;
+  --success-border: #33543f;
+  --color-bg-overlay: rgb(0 0 0 / 60%);
+  --shadow-modal-strong: 0 20px 25px rgb(0 0 0 / 30%);
+  --shadow-btn-hover: 0 2px 8px rgb(0 0 0 / 50%);
+  --shadow-menu: 0 8px 24px rgb(0 0 0 / 55%);
+
+  --color-btn-primary: #e4e4e4;
+  --color-btn-primary-hover: #d0d0d0;
+  --color-btn-primary-text: #1e1e1e;
+  --color-ai-action: #e8663f;
+  --color-ai-action-hover: #f07a55;
+  --color-ai-action-text: #ffffff;
+  --color-brand-secondary: #4a9eff;
+  --color-text-primary: #e4e4e4;
+  --color-text-secondary: #a0a0a0;
+  --color-text-tertiary: #8a8a8a;
+  --color-bg-page: #1e1e1e;
+  --color-bg-subtle: #2a2a2a;
+  --color-border-default: #3a3a3a;
+  --color-border-strong: #555;
+  --color-border-brand: #4a9eff;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    --surface: #1e1e1e;
+    --surface-subtle: #2a2a2a;
+    --chrome-bg: #252525;
+    --canvas: #2b2b2b;
+    --border: #3a3a3a;
+    --border-subtle: #3a3a3a;
+    --border-strong: #555;
+    --border-hover: #555;
+    --text: #e4e4e4;
+    --text-primary: #e4e4e4;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #a0a0a0;
+    --text-muted: #8a8a8a;
+    --text-dim: #a0a0a0;
+    --hover: #333;
+    --pressed: #3c3c3c;
+    --active-bg: #454545;
+    --bg-hover: #333;
+    --bg-hover-subtle: #333;
+    --bg-hover-strong: #444;
+    --bg-hover-accent: #444;
+    --bg-content: #1a1a1a;
+    --icon-muted: #666;
+    --danger: #d13438;
+    --danger-bg: #3a2020;
+    --danger-border: #5a3030;
+    --success: #52c082;
+    --success-bg: #20342a;
+    --success-border: #33543f;
+    --color-bg-overlay: rgb(0 0 0 / 60%);
+    --shadow-modal-strong: 0 20px 25px rgb(0 0 0 / 30%);
+    --shadow-btn-hover: 0 2px 8px rgb(0 0 0 / 50%);
+    --shadow-menu: 0 8px 24px rgb(0 0 0 / 55%);
+
+    --color-btn-primary: #e4e4e4;
+    --color-btn-primary-hover: #d0d0d0;
+    --color-btn-primary-text: #1e1e1e;
+    --color-ai-action: #e8663f;
+    --color-ai-action-hover: #f07a55;
+    --color-ai-action-text: #ffffff;
+    --color-brand-secondary: #4a9eff;
+    --color-text-primary: #e4e4e4;
+    --color-text-secondary: #a0a0a0;
+    --color-text-tertiary: #8a8a8a;
+    --color-bg-page: #1e1e1e;
+    --color-bg-subtle: #2a2a2a;
+    --color-border-default: #3a3a3a;
+    --color-border-strong: #555;
+    --color-border-brand: #4a9eff;
+
+    color-scheme: dark;
+  }
+}
+/* Office-style ScreenTip — themed via the shared tokens (light/dark automatic).
+ * The element is a singleton created by installScreenTips(); visibility is
+ * driven inline by the script, everything visual lives here. */
+
+.ui-screentip {
+  position: fixed;
+  z-index: 100000;
+  max-width: 280px;
+  padding: 5px 10px;
+  border-radius: var(--radius-6);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: 12px/1.45 var(--gs-font-sans);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+  pointer-events: none;
+  visibility: hidden;
+  /* some tips carry embedded newlines (e.g. pdf note pins: contents + hint) */
+  white-space: pre-line;
+}
+
+.ui-screentip-kbd {
+  margin-left: 6px;
+  color: var(--text-tertiary);
+}
+
+.ui-screentip-detail {
+  margin-top: 2px;
+  color: var(--text-secondary);
+}
+/* Shared select-replacement dropdown (Dropdown in dropdown.tsx): themed
+ * trigger + anchored popover. Colors are chrome tokens only; apps size the
+ * control via a class on the .gs-dd wrapper. */
+
+.gs-dd {
+  position: relative;
+  display: inline-flex;
+  anchor-name: --gs-dd;
+  anchor-scope: --gs-dd;
+}
+
+.gs-dd-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  height: 26px;
+  /* right 5px: caret glyph right edge lands 6px from the outer edge, matching
+   * the format-pane caret alignment line */
+  padding: 0 5px 0 6px;
+  border: 1px solid var(--border-strong);
+  border-radius: 3px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gs-dd-btn:focus-visible {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.gs-dd-btn:disabled {
+  color: var(--text-dim);
+  cursor: default;
+}
+
+.gs-dd-value {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gs-dd-caret {
+  flex-shrink: 0;
+  display: flex;
+  color: var(--text-dim);
+}
+
+/* fixed + anchored so scroll-container overflow never clips the popover or
+ * its shadow; flips above the trigger near the viewport bottom */
+.gs-dd-pop {
+  position: fixed;
+  position-anchor: --gs-dd;
+  top: calc(anchor(bottom) + 2px);
+  left: anchor(left);
+  min-width: anchor-size(width);
+  /* flip-inline: a popover wider than its trigger near the window's right edge would
+   * otherwise run offscreen and clip (fixed positioning clips at the viewport) —
+   * flipping right-aligns it to the trigger so it grows leftwards instead */
+  position-try-fallbacks:
+    flip-block,
+    flip-inline,
+    flip-block flip-inline;
+  position-visibility: anchors-visible;
+  z-index: 80;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow-menu);
+}
+
+.gs-dd-item {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  border-radius: 3px;
+  padding: 5px 6px;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gs-dd-item.active {
+  background: var(--hover);
+}
+
+.gs-dd-item:disabled {
+  color: var(--text-dim);
+  cursor: default;
+}
+
+.gs-dd-item.selected {
+  background: var(--accent-soft);
+}
+@font-face{font-display:block;font-family:KaTeX_AMS;font-style:normal;font-weight:400;src:url(./KaTeX_AMS-Regular-BQhdFMY1.woff2) format("woff2"),url(./KaTeX_AMS-Regular-DMm9YOAa.woff) format("woff"),url(./KaTeX_AMS-Regular-DRggAlZN.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:700;src:url(./KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2) format("woff2"),url(./KaTeX_Caligraphic-Bold-BEiXGLvX.woff) format("woff"),url(./KaTeX_Caligraphic-Bold-ATXxdsX0.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Caligraphic;font-style:normal;font-weight:400;src:url(./KaTeX_Caligraphic-Regular-Di6jR-x-.woff2) format("woff2"),url(./KaTeX_Caligraphic-Regular-CTRA-rTL.woff) format("woff"),url(./KaTeX_Caligraphic-Regular-wX97UBjC.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:700;src:url(./KaTeX_Fraktur-Bold-CL6g_b3V.woff2) format("woff2"),url(./KaTeX_Fraktur-Bold-BsDP51OF.woff) format("woff"),url(./KaTeX_Fraktur-Bold-BdnERNNW.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Fraktur;font-style:normal;font-weight:400;src:url(./KaTeX_Fraktur-Regular-CTYiF6lA.woff2) format("woff2"),url(./KaTeX_Fraktur-Regular-Dxdc4cR9.woff) format("woff"),url(./KaTeX_Fraktur-Regular-CB_wures.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:700;src:url(./KaTeX_Main-Bold-Cx986IdX.woff2) format("woff2"),url(./KaTeX_Main-Bold-Jm3AIy58.woff) format("woff"),url(./KaTeX_Main-Bold-waoOVXN0.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:700;src:url(./KaTeX_Main-BoldItalic-DxDJ3AOS.woff2) format("woff2"),url(./KaTeX_Main-BoldItalic-SpSLRI95.woff) format("woff"),url(./KaTeX_Main-BoldItalic-DzxPMmG6.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:italic;font-weight:400;src:url(./KaTeX_Main-Italic-NWA7e6Wa.woff2) format("woff2"),url(./KaTeX_Main-Italic-BMLOBm91.woff) format("woff"),url(./KaTeX_Main-Italic-3WenGoN9.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Main;font-style:normal;font-weight:400;src:url(./KaTeX_Main-Regular-B22Nviop.woff2) format("woff2"),url(./KaTeX_Main-Regular-Dr94JaBh.woff) format("woff"),url(./KaTeX_Main-Regular-ypZvNtVU.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:700;src:url(./KaTeX_Math-BoldItalic-CZnvNsCZ.woff2) format("woff2"),url(./KaTeX_Math-BoldItalic-iY-2wyZ7.woff) format("woff"),url(./KaTeX_Math-BoldItalic-B3XSjfu4.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Math;font-style:italic;font-weight:400;src:url(./KaTeX_Math-Italic-t53AETM-.woff2) format("woff2"),url(./KaTeX_Math-Italic-DA0__PXp.woff) format("woff"),url(./KaTeX_Math-Italic-flOr_0UB.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:700;src:url(./KaTeX_SansSerif-Bold-D1sUS0GD.woff2) format("woff2"),url(./KaTeX_SansSerif-Bold-DbIhKOiC.woff) format("woff"),url(./KaTeX_SansSerif-Bold-CFMepnvq.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:italic;font-weight:400;src:url(./KaTeX_SansSerif-Italic-C3H0VqGB.woff2) format("woff2"),url(./KaTeX_SansSerif-Italic-DN2j7dab.woff) format("woff"),url(./KaTeX_SansSerif-Italic-YYjJ1zSn.ttf) format("truetype")}@font-face{font-display:block;font-family:"KaTeX_SansSerif";font-style:normal;font-weight:400;src:url(./KaTeX_SansSerif-Regular-DDBCnlJ7.woff2) format("woff2"),url(./KaTeX_SansSerif-Regular-CS6fqUqJ.woff) format("woff"),url(./KaTeX_SansSerif-Regular-BNo7hRIc.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Script;font-style:normal;font-weight:400;src:url(./KaTeX_Script-Regular-D3wIWfF6.woff2) format("woff2"),url(./KaTeX_Script-Regular-D5yQViql.woff) format("woff"),url(./KaTeX_Script-Regular-C5JkGWo-.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size1;font-style:normal;font-weight:400;src:url(./KaTeX_Size1-Regular-mCD8mA8B.woff2) format("woff2"),url(./KaTeX_Size1-Regular-C195tn64.woff) format("woff"),url(./KaTeX_Size1-Regular-Dbsnue_I.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size2;font-style:normal;font-weight:400;src:url(./KaTeX_Size2-Regular-Dy4dx90m.woff2) format("woff2"),url(./KaTeX_Size2-Regular-oD1tc_U0.woff) format("woff"),url(./KaTeX_Size2-Regular-B7gKUWhC.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size3;font-style:normal;font-weight:400;src:url(data:font/woff2;base64,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) format("woff2"),url(./KaTeX_Size3-Regular-CTq5MqoE.woff) format("woff"),url(./KaTeX_Size3-Regular-DgpXs0kz.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Size4;font-style:normal;font-weight:400;src:url(./KaTeX_Size4-Regular-Dl5lxZxV.woff2) format("woff2"),url(./KaTeX_Size4-Regular-BF-4gkZK.woff) format("woff"),url(./KaTeX_Size4-Regular-DWFBv043.ttf) format("truetype")}@font-face{font-display:block;font-family:KaTeX_Typewriter;font-style:normal;font-weight:400;src:url(./KaTeX_Typewriter-Regular-CO6r4hn1.woff2) format("woff2"),url(./KaTeX_Typewriter-Regular-C0xS9mPB.woff) format("woff"),url(./KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf) format("truetype")}.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;position:relative;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.47"}.katex .katex-mathml{border:0;-webkit-clip-path:inset(50%);clip-path:inset(50%);height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .mathsfit,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .smash{display:inline;line-height:0}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex svg{fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+/* Per-app accent (word-blue family) + markdown-only tokens.
+ * Chrome tokens (surface/text/border/…, AI panel --color-*) come from
+ * @bytedesk/ui/tokens.css; nothing here may shadow those names. */
+:root {
+  --accent: #185abd;
+  --accent-dark: #124a9e;
+  --accent-soft: #e8f1fb;
+  --word-blue: var(--accent);
+
+  --md-link: #0a69da;
+  --md-code-bg: #f6f8fa;
+  --md-code-inline-bg: rgb(129 139 152 / 14%);
+  --md-table-header-bg: #f6f8fa;
+  --md-ai-changed: rgb(255 213 79 / 40%);
+  --md-ai-anchor-bg: rgb(80 128 220 / 14%);
+  --md-ai-anchor-line: #5080dc;
+  --md-on-accent: #ffffff;
+  --md-selection: color-mix(in srgb, var(--accent) 10%, transparent);
+  --md-text-selection: color-mix(in srgb, var(--accent) 32%, transparent);
+  --md-focus: var(--accent);
+  --md-node-outline: color-mix(in srgb, var(--accent) 60%, transparent);
+  --md-focus-ring: rgb(35 36 37 / 20%);
+  --md-focus-ring-blue: rgb(74 141 246 / 30%);
+  --md-error: #c62828;
+  --md-error-border: rgb(198 40 40 / 45%);
+  --md-error-bg: rgb(198 40 40 / 8%);
+  --md-shadow-color: rgb(0 0 0 / 13%);
+  --md-shadow-soft: rgb(0 0 0 / 9%);
+  --md-shimmer-base: #666666;
+  --md-shimmer-hi: #d9d9d9;
+  --md-pop-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+  --md-tip-shadow: 0 4px 6px rgb(0 0 0 / 10%);
+  /* same paper shadow as the pdf app's --pdf-shadow-page */
+  --md-page-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+  /* toast pill is a dark surface in both themes */
+  --md-toast-bg: rgb(35 35 37 / 92%);
+  --md-toast-error-bg: rgb(196 49 75 / 95%);
+  --md-toast-ink: #ffffff;
+  --md-toast-ok: #34c759;
+}
+
+[data-theme='dark'] {
+  --accent: #4a9eff;
+  --accent-dark: #3a8eef;
+  --accent-soft: #1e3a5f;
+
+  --md-link: #4a9eff;
+  --md-code-bg: #23272e;
+  --md-code-inline-bg: rgb(129 139 152 / 22%);
+  --md-table-header-bg: #282c32;
+  --md-ai-changed: rgb(255 213 79 / 28%);
+  --md-ai-anchor-bg: rgb(96 148 240 / 22%);
+  --md-ai-anchor-line: #6a9aec;
+  --md-on-accent: #ffffff;
+  --md-selection: color-mix(in srgb, var(--accent) 20%, transparent);
+  --md-text-selection: color-mix(in srgb, var(--accent) 40%, transparent);
+  --md-focus: var(--accent);
+  --md-node-outline: color-mix(in srgb, var(--accent) 70%, transparent);
+  --md-focus-ring: rgb(228 228 228 / 25%);
+  --md-focus-ring-blue: rgb(74 158 255 / 40%);
+  --md-error: #f28b82;
+  --md-error-border: rgb(242 139 130 / 45%);
+  --md-error-bg: rgb(242 139 130 / 12%);
+  --md-shadow-color: rgb(0 0 0 / 55%);
+  --md-shadow-soft: rgb(0 0 0 / 45%);
+  --md-shimmer-base: #8a8a8a;
+  --md-shimmer-hi: #d0d0d0;
+  --md-pop-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+  --md-tip-shadow: 0 4px 6px rgb(0 0 0 / 35%);
+  --md-page-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+  --md-toast-bg: rgb(35 35 37 / 92%);
+  --md-toast-error-bg: rgb(196 49 75 / 95%);
+  --md-toast-ink: #ffffff;
+  --md-toast-ok: #34c759;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    --accent: #4a9eff;
+    --accent-dark: #3a8eef;
+    --accent-soft: #1e3a5f;
+
+    --md-link: #4a9eff;
+    --md-code-bg: #23272e;
+    --md-code-inline-bg: rgb(129 139 152 / 22%);
+    --md-table-header-bg: #282c32;
+    --md-ai-changed: rgb(255 213 79 / 28%);
+    --md-ai-anchor-bg: rgb(96 148 240 / 22%);
+    --md-ai-anchor-line: #6a9aec;
+    --md-on-accent: #ffffff;
+    --md-selection: color-mix(in srgb, var(--accent) 20%, transparent);
+    --md-text-selection: color-mix(in srgb, var(--accent) 40%, transparent);
+    --md-focus: var(--accent);
+    --md-node-outline: color-mix(in srgb, var(--accent) 70%, transparent);
+    --md-focus-ring: rgb(228 228 228 / 25%);
+    --md-focus-ring-blue: rgb(74 158 255 / 40%);
+    --md-error: #f28b82;
+    --md-error-border: rgb(242 139 130 / 45%);
+    --md-error-bg: rgb(242 139 130 / 12%);
+    --md-shadow-color: rgb(0 0 0 / 55%);
+    --md-shadow-soft: rgb(0 0 0 / 45%);
+    --md-shimmer-base: #8a8a8a;
+    --md-shimmer-hi: #d0d0d0;
+    --md-pop-shadow: 0 8px 24px rgb(0 0 0 / 50%);
+    --md-tip-shadow: 0 4px 6px rgb(0 0 0 / 35%);
+    --md-page-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+    --md-toast-bg: rgb(35 35 37 / 92%);
+    --md-toast-error-bg: rgb(196 49 75 / 95%);
+    --md-toast-ink: #ffffff;
+    --md-toast-ok: #34c759;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* UI CJK fonts per language, same table as the docs/slides chrome
+ * (documentElement.lang is set at bootstrap and on switch) */
+:root {
+  --ui-cjk: 'PingFang SC', 'Microsoft YaHei';
+}
+
+:root:lang(ja) {
+  --ui-cjk: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', 'Meiryo';
+}
+
+:root:lang(ko) {
+  --ui-cjk: 'Apple SD Gothic Neo', 'Malgun Gothic';
+}
+
+:root:lang(zh-TW) {
+  --ui-cjk: 'PingFang TC', 'Microsoft JhengHei';
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  /* same UI stack as the docs/slides chrome ('Segoe UI' first + per-language
+     CJK token) so shared toolbar controls measure identically across apps */
+  font-family:
+    'Segoe UI',
+    -apple-system,
+    BlinkMacSystemFont,
+    var(--ui-cjk),
+    sans-serif;
+  color: var(--text);
+  background: var(--surface-subtle);
+  /* grayscale AA like the docs/sheets/slides/pdf chrome — macOS subpixel
+     rendering paints the same weight visibly heavier */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* buttons follow the chrome font instead of the UA default, like docs */
+button {
+  font-family: inherit;
+}
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.center-note {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.editor-scroll {
+  flex: 1;
+  overflow-y: auto;
+  /* same canvas backdrop as the slides workspace; the doc page stays white */
+  background: var(--canvas);
+}
+
+.doc-page {
+  max-width: 860px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: 40px 72px 120px;
+  background: var(--surface);
+  box-shadow: var(--md-page-shadow);
+}
+
+.status-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  user-select: none;
+}
+
+.status-file {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-save {
+  margin-left: auto;
+}
+
+.status-failed {
+  color: var(--danger);
+}
+
+/* ---- editor content ---- */
+
+.doc-editor {
+  outline: none;
+  font-size: 16px;
+  line-height: 1.75;
+  word-wrap: break-word;
+}
+
+.doc-editor > *:first-child {
+  margin-top: 0;
+}
+
+.doc-editor h1,
+.doc-editor h2,
+.doc-editor h3,
+.doc-editor h4,
+.doc-editor h5,
+.doc-editor h6 {
+  line-height: 1.3;
+  margin: 1.4em 0 0.5em;
+  font-weight: 650;
+}
+
+.doc-editor h1 {
+  font-size: 2em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-editor h2 {
+  font-size: 1.5em;
+}
+
+.doc-editor h3 {
+  font-size: 1.25em;
+}
+
+.doc-editor h4 {
+  font-size: 1.1em;
+}
+
+.doc-editor p {
+  margin: 0.6em 0;
+}
+
+.doc-editor ul,
+.doc-editor ol {
+  padding-left: 1.6em;
+  margin: 0.6em 0;
+}
+
+.doc-editor li > p {
+  margin: 0.15em 0;
+}
+
+.doc-editor blockquote {
+  margin: 0.8em 0;
+  padding: 0.1em 1em;
+  border-left: 3px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.doc-editor code {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  background: var(--md-code-inline-bg);
+  border-radius: 4px;
+  padding: 0.15em 0.35em;
+}
+
+.doc-editor pre {
+  background: var(--md-code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+
+.doc-editor pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.85em;
+  line-height: 1.6;
+}
+
+.doc-editor hr {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 1.6em 0;
+}
+
+.doc-editor a {
+  color: var(--md-link);
+}
+
+.doc-editor img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- tables ---- */
+
+.doc-editor .tableWrapper {
+  margin: 0.8em 0;
+  overflow-x: auto;
+}
+
+.doc-editor table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0;
+}
+
+.doc-editor th,
+.doc-editor td {
+  border: 1px solid var(--border-strong);
+  padding: 6px 10px;
+  vertical-align: top;
+  text-align: start;
+}
+
+/* cells hold paragraph nodes — the document paragraph margin would bloat rows */
+.doc-editor th > p,
+.doc-editor td > p {
+  margin: 0;
+}
+
+.doc-editor th {
+  background: var(--md-table-header-bg);
+  font-weight: 600;
+}
+
+/* ---- ribbon ---- */
+
+.ribbon {
+  flex: 0 0 auto;
+  /* white chrome + shared toolbar ink, same as the docs ribbon */
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  user-select: none;
+  color: var(--text-primary);
+}
+
+/* slim quick-access row above the toolbar (save / undo / redo / autosave),
+ * same metrics as the docs tab row; it doubles as the window drag strip */
+.ribbon-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 10px 0;
+  /* docs/slides size this row with their menu tabs (13px semibold labels,
+     7/6 padding + 2.5px underline ⇒ 39px measured); markdown has no menu
+     tabs, so pin the row so the toolbar bottom edge lines up across tabs */
+  min-height: 39px;
+  -webkit-app-region: drag;
+}
+
+/* While a popover is open the row must deliver presses (drag regions swallow
+   them), so outside-press dismissal can see presses on the blank band */
+html.genoffice-popover-open .ribbon-tabs {
+  -webkit-app-region: no-drag;
+}
+
+.ribbon-tabs button,
+.ribbon-tabs .autosave-toggle {
+  -webkit-app-region: no-drag;
+}
+
+/* the toolbar row below the QAT row (old single-row ribbon) */
+.ribbon-body {
+  display: flex;
+  /* stretch like the docs ribbon: groups fill the band and the tall AI
+     buttons top-align at the same size/position as docs */
+  align-items: stretch;
+  /* band metrics shared with the docs/slides/pdf ribbons; no row gap — groups
+     own their spacing (2px 4px padding) exactly like the docs/slides ribbons */
+  padding: 6px 12px;
+  /* HARD-fixed height like the other editors' ribbons, so switching shell tabs
+     never shifts the toolbar's bottom edge (no wrap-driven growth) */
+  height: 80px;
+  /* groups never shrink, so a narrow window scrolls the row inside the ribbon
+     instead of spilling controls out of reach (matching the docs ribbon). The
+     .rb-link-pop dropdown is position: fixed + anchor-positioned, so this
+     clip cannot cut it off */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.ribbon-body::-webkit-scrollbar {
+  display: none;
+}
+
+.rb-sep {
+  width: 1px;
+  flex-shrink: 0;
+  align-self: stretch;
+  background: var(--border);
+  /* 2px matches the groups' vertical padding — same inset as docs/slides */
+  margin: 2px 6px;
+}
+
+.rb-spacer {
+  flex: 1;
+}
+
+/* ---- quick-access buttons (save / undo / redo), same as the docs QAT ---- */
+
+.qa-btn {
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.qa-btn svg {
+  display: block;
+  margin: 0 auto;
+}
+
+.qa-btn:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.qa-btn:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+/* ---- autosave toggle (pill), same as the docs one ---- */
+
+.autosave-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  margin-left: 4px;
+  margin-right: 4px;
+  user-select: none;
+}
+
+.autosave-toggle input {
+  display: none;
+}
+
+.autosave-knob {
+  width: 26px;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--border-strong, var(--border));
+  position: relative;
+  transition: background 0.15s;
+}
+
+.autosave-knob::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface);
+  transition: left 0.15s;
+}
+
+.autosave-toggle.on .autosave-knob {
+  background: var(--accent);
+}
+
+.autosave-toggle.on .autosave-knob::after {
+  left: 14px;
+}
+
+.autosave-text {
+  font-size: 11px;
+  /* same ink as the docs/slides autosave label */
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* inline toolbar button + suite-wide states (ink/hover/neutral selected
+ * plate, no brand color) — same metrics as the docs/slides .rb-icon
+ * (28px min box, 30px tall, 3px radius, 15px letterform glyphs) */
+.rb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 30px;
+  padding: 0 4px;
+  white-space: nowrap;
+  border: none;
+  border-radius: 3px;
+  font-size: 15px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.rb-btn:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.rb-btn.active {
+  background: var(--active-bg);
+  color: var(--text-primary);
+}
+
+.rb-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---- docs-parity ribbon group with tall AI buttons ---- */
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2px 4px;
+  /* groups never shrink below content, same as the docs/slides ribbons */
+  flex-shrink: 0;
+}
+
+.ribbon-group-items {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+}
+
+.rb-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  padding: 4px 7px 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.rb-big-icon {
+  min-height: 28px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  /* same icon-row box as docs: full button width with horizontal bleed */
+  align-self: stretch;
+  border-radius: 4px;
+  padding: 3px 4px;
+  margin: 0 -4px;
+}
+
+.rb-big:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* the AI entries read as one piece: hover/press tint the whole button */
+.rb-big.ai-entry:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+/* neutral gray open state, same control across docs/sheets/slides ribbons */
+.rb-big.ai-entry.active {
+  background: var(--active-bg);
+  color: var(--text-primary);
+}
+
+.ai-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-brand-secondary);
+}
+
+.ai-feature-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* typographic letterform glyphs (B/I/U/S): 15px/600 like the docs inline row */
+.rb-mono {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11.5px;
+}
+
+/* block-style picker (shared @bytedesk/ui gs-dd dropdown): same box as the
+ * docs/slides font pickers (28px tall, 3px radius, 13px label, 7px inline
+ * padding, strong border) */
+.rb-style.gs-dd {
+  min-width: 108px;
+}
+
+.rb-style .gs-dd-btn {
+  height: 28px;
+  padding: 0 7px;
+  border-color: var(--color-border-strong);
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+/* Anchor for the link popover, which is position: fixed so it escapes the
+   ribbon-body scroll clip while tracking its trigger (same pattern as the
+   docs ribbon dropdowns) */
+.rb-link-anchor {
+  position: relative;
+  display: inline-flex;
+  anchor-name: --rb-link-anchor;
+  anchor-scope: --rb-link-anchor;
+}
+
+.rb-link-pop {
+  position: fixed;
+  position-anchor: --rb-link-anchor;
+  top: calc(anchor(bottom) + 2px);
+  left: anchor(left);
+  position-try-fallbacks: flip-inline;
+  position-visibility: anchors-visible;
+  z-index: 30;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--md-shadow-color);
+}
+
+.rb-link-pop input {
+  width: 240px;
+  height: 26px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  padding: 0 8px;
+  font-size: 12.5px;
+  outline: none;
+}
+
+.rb-link-pop button {
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  background: var(--color-btn-primary);
+  color: var(--color-btn-primary-text);
+  font-size: 12.5px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.rb-link-pop button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ---- slash menu ---- */
+
+.slash-menu {
+  z-index: 40;
+  min-width: 180px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 10px 32px var(--md-shadow-color);
+}
+
+.slash-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13.5px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.slash-item.active {
+  background: var(--pressed);
+}
+
+.slash-empty {
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ---- block drag handle ---- */
+
+.md-drag-handle-legacy {
+  position: absolute;
+  z-index: 20;
+  width: 18px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  color: var(--icon-muted);
+  cursor: grab;
+}
+
+.md-drag-handle-legacy:hover {
+  background: var(--hover);
+  color: var(--text-muted);
+}
+
+/* ---- task list ---- */
+
+.doc-editor ul[data-type='taskList'] {
+  list-style: none;
+  padding-left: 0.4em;
+}
+
+.doc-editor ul[data-type='taskList'] li {
+  display: flex;
+  gap: 8px;
+}
+
+.doc-editor ul[data-type='taskList'] li > label {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  /* match the first line box (16px x 1.75) so the checkbox centers on it */
+  height: 1.75em;
+  margin-top: 0.15em;
+  user-select: none;
+}
+
+.doc-editor ul[data-type='taskList'] li > label input[type='checkbox'] {
+  margin: 0;
+}
+
+.doc-editor ul[data-type='taskList'] li > div {
+  flex: 1;
+}
+
+/* the task text lives in li > div > p, so the generic `li > p` list
+ * override misses it and it keeps the full 0.6em paragraph margin */
+.doc-editor ul[data-type='taskList'] li > div > p {
+  margin: 0.15em 0;
+}
+
+.doc-editor ul[data-type='taskList'] li[data-checked='true'] > div {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* ---- table selection ---- */
+
+.doc-editor .selectedCell {
+  background: var(--md-selection);
+}
+
+.doc-editor table .column-resize-handle {
+  background: var(--md-focus);
+}
+
+/* ---- placeholder ---- */
+
+.doc-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--icon-muted);
+  pointer-events: none;
+  height: 0;
+}
+
+/* ---- frontmatter panel ---- */
+
+.fm-panel {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-content);
+  overflow: hidden;
+}
+
+.fm-title {
+  padding: 6px 12px 0;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.fm-textarea {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: vertical;
+  padding: 6px 12px 10px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  outline: none;
+}
+
+/* ---- editor drop cursor / node selection ---- */
+
+.doc-editor .ProseMirror-selectednode {
+  outline: 2px solid var(--md-node-outline);
+  border-radius: 4px;
+}
+/* ── AI sidebar (aligned with docs/sheets panel language) ── */
+
+/* dock wrapper: its width animates between the panel and the 34px collapsed rail
+ * (docs-parity 180ms ease); the panel inside keeps its natural width and is clipped */
+.ai-dock {
+  display: flex;
+  flex-shrink: 0;
+  min-height: 0;
+  width: var(--ai-panel-width, 360px);
+  overflow: hidden;
+  transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-dock.collapsed {
+  width: 34px;
+}
+
+/* while dragging the resizer, follow the pointer without easing */
+.ai-dock:has(.ai-panel-resizing) {
+  transition: none;
+}
+
+/* the panel stays mounted (chat history survives) but hidden while collapsed */
+.ai-dock.collapsed .copilot {
+  display: none;
+}
+
+/* the rail stretches to fill the dock while the width animates */
+.ai-dock .ai-rail {
+  flex: 1;
+  width: auto;
+}
+
+/* right-docked variant: the dock sits at the window's right edge (flex order, so
+ * the panel never remounts and keeps its state); its chrome — divider border,
+ * drag handle, rail hairline — flips to the panel's left side */
+.ai-dock.right {
+  order: 2;
+}
+
+.ai-dock.right .copilot {
+  border-right: none;
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.ai-dock.right .ai-rail {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+.ai-dock.right .ai-panel-resizer {
+  right: auto;
+  left: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-dock {
+    transition: none;
+  }
+}
+
+/* collapsed AI sidebar: thin rail on the left edge (same as docs) */
+.ai-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 34px;
+  padding: 12px 2px;
+  border: none;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ai-rail:hover {
+  background: var(--hover);
+}
+
+.copilot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 360px;
+  flex-shrink: 0;
+  min-height: 0;
+  overflow: hidden;
+  /* same visible divider as the docs panel: strong border so it doesn't drown */
+  border-right: 1px solid var(--color-border-strong);
+  background: var(--color-bg-page);
+  font-family: var(--gs-font-sans);
+  color: var(--color-text-primary);
+}
+
+/* drag handle on the panel's right edge — resize the panel horizontally */
+.ai-panel-resizer {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 20;
+  background: transparent;
+}
+
+/* while dragging: keep the col-resize cursor everywhere, no text selection */
+.ai-panel-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+.ai-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 10px 14px;
+  border-bottom: 1px solid var(--color-border-default);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.ai-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* Bytedesk brand logo (shared by the collapsed entry and the AI panel title) */
+.bytedesk-badge {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}
+
+.ai-panel-title .bytedesk-badge {
+  width: 18px;
+  height: 18px;
+}
+
+.ai-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ai-header-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-8);
+  color: var(--color-text-secondary);
+  padding: 0;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ai-header-btn:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.ai-chat {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  /* uniform 16px flex gap between blocks, messages carry no margin */
+  gap: 16px;
+  overflow-y: auto;
+  padding: 32px 16px;
+  font-family: var(--gs-font-sans);
+}
+
+/* Boundary between the restored transcript and the live turn */
+.ai-history-sep {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  font-size: 14px;
+  color: var(--text-tertiary);
+}
+
+.ai-chat-empty {
+  margin-top: 36px;
+  padding: 0 10px;
+  text-align: center;
+  font-family: var(--gs-font-sans);
+}
+
+.ai-chat-empty-title {
+  font-size: var(--text-body-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.ai-chat-empty-body {
+  color: var(--color-text-secondary);
+  font-size: var(--text-small);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* clickable starter prompts in the empty state — suggestion chips:
+ * 30px-radius outline pills, 13px/400 (same as docs) */
+.ai-starter-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.ai-starter {
+  padding: 8px 16px;
+  border-radius: var(--radius-30);
+  border: 1px solid var(--color-border-default);
+  background: var(--color-bg-page);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ai-starter:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-subtle);
+}
+
+.ai-starter:active {
+  filter: brightness(0.88);
+  transform: scale(0.98);
+}
+
+/* Chat messages (scaled to the 14px panel): user = gray pill, AI = plain text without a bubble, no accent colors */
+.ai-msg {
+  position: relative;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* User pill: gray, fully rounded (no tail) */
+.ai-msg-user {
+  align-self: flex-end;
+  color: var(--text-primary);
+  background: var(--color-bg-subtle);
+  padding: 8px 16px;
+  border-radius: 14px;
+  max-width: 80%;
+  line-height: 1.5;
+}
+
+.ai-msg-assistant {
+  align-self: stretch;
+  border: none;
+  background: none;
+  padding: 0;
+  max-width: 100%;
+  color: var(--text-primary);
+  white-space: normal;
+}
+
+.ai-msg-error {
+  border-color: var(--md-error-border);
+  color: var(--md-error);
+}
+
+.ai-md p,
+.ai-md ul,
+.ai-md ol {
+  margin: 0 0 16px;
+}
+
+.ai-md :last-child {
+  margin-bottom: 0;
+}
+
+/* blank markdown paragraphs would each eat a 16px margin — the stream never renders them */
+.ai-md p:empty {
+  display: none;
+}
+
+.ai-md .ai-md-h {
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 20px 0 8px;
+}
+
+.ai-md .ai-md-h:first-child {
+  margin-top: 0;
+}
+
+.ai-md ul,
+.ai-md ol {
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+.ai-md li {
+  margin-left: 20px;
+  line-height: 28px;
+}
+
+/* inline code: neutral gray chip (deliberately not red), 2px below body size */
+.ai-md code {
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: var(--color-bg-subtle);
+  color: var(--color-text-secondary);
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 14px;
+}
+
+/* Collapsible tool-activity group (ported from docs) */
+.ai-work-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 12px;
+}
+
+.ai-msg-assistant .ai-work-group:first-child,
+.ai-work-group:only-child {
+  margin-top: 0;
+}
+
+.ai-work-group-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+  transition: color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-work-group-summary:hover {
+  color: var(--color-text-secondary);
+}
+
+.ai-work-group-summary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--md-focus-ring);
+  border-radius: 4px;
+}
+
+.ai-work-group-summary.running {
+  color: var(--color-text-secondary);
+}
+
+.ai-work-group-summary.running .ai-work-group-label {
+  animation: ai-summary-pulse 1500ms linear infinite;
+}
+
+@keyframes ai-summary-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.ai-work-group-body {
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-work-group-body.open {
+  grid-template-rows: 1fr;
+}
+
+.ai-work-group-body-inner {
+  overflow: hidden;
+  min-height: 0;
+  padding: 0 0 0 8px;
+  transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-work-group-body.open .ai-work-group-body-inner {
+  padding: 4px 0 8px 8px;
+}
+
+/* Step rows inside the group: 20px icon slot + 1px connector */
+.ai-step-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  color: var(--color-text-tertiary);
+  animation: ai-row-ease-in 320ms ease-out;
+}
+
+.ai-step-row:not(:last-child) {
+  padding-bottom: 16px;
+}
+
+.ai-step-row:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 9.5px;
+  top: 32px;
+  bottom: -4px;
+  width: 1px;
+  background: var(--color-border-default);
+}
+
+.ai-step-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+}
+
+.ai-step-icon.done {
+  color: var(--color-text-secondary);
+}
+
+.ai-step-icon.error {
+  color: var(--md-error);
+}
+
+.ai-step-icon.running svg {
+  animation: ai-hourglass-flip 1.8s ease-in-out infinite;
+}
+
+@keyframes ai-hourglass-flip {
+  0%,
+  12% {
+    transform: rotate(0);
+  }
+  44%,
+  56% {
+    transform: rotate(180deg);
+  }
+  88%,
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-step-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 1px;
+}
+
+.ai-step-title {
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--color-text-secondary);
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: inherit;
+}
+
+.ai-step-title.clickable {
+  cursor: pointer;
+  transition: color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-step-title.clickable:hover {
+  color: var(--text-primary);
+}
+
+.ai-step-title.clickable:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--md-focus-ring);
+  border-radius: 4px;
+}
+
+/* Step detail opens instantly, no animation */
+.ai-step-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-step-row,
+  .ai-step-icon.running svg,
+  .ai-work-group-summary.running .ai-work-group-label {
+    animation: none;
+  }
+}
+
+/* Running tool row: two grow/shrink brand dots */
+.ai-tool-chip-spinner {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 12px;
+}
+
+.ai-tool-chip-spinner::before,
+.ai-tool-chip-spinner::after {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-brand-secondary);
+}
+
+.ai-tool-chip-spinner::before {
+  animation: ai-tool-dot-grow 2s infinite;
+}
+
+.ai-tool-chip-spinner::after {
+  animation: ai-tool-dot-shrink 2s infinite;
+}
+
+@keyframes ai-tool-dot-grow {
+  0%,
+  100% {
+    transform: scale(0.333);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ai-tool-dot-shrink {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.333);
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-tool-chip-spinner::before,
+  .ai-tool-chip-spinner::after {
+    animation: none;
+    opacity: 0.65;
+  }
+}
+
+/* Elapsed run time next to the typing indicator */
+.ai-typing-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+/* caret: text glyph right after the label, always visible, rotates open */
+.ai-tool-chip-caret {
+  margin-left: 4px;
+  opacity: 0.7;
+  display: inline-block;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-tool-chip-caret.open {
+  transform: rotate(90deg);
+}
+
+/* stream rows ease in */
+@keyframes ai-row-ease-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* expanded step detail: subtle gray card, no border */
+.ai-tool-output {
+  background: var(--color-bg-subtle);
+  border: none;
+  border-radius: 12px;
+  font-family:
+    ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 14px;
+  color: var(--text-primary);
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ai-tool-output-pre {
+  padding: 12px 16px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+/* Thinking indicator: shimmer label above two grow/shrink dots */
+.ai-typing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.ai-typing-label {
+  display: inline-block;
+  position: relative;
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--md-shimmer-base);
+  -webkit-text-fill-color: transparent;
+  background: var(--md-shimmer-base)
+    linear-gradient(
+      to left,
+      var(--md-shimmer-base),
+      var(--md-shimmer-hi) 50%,
+      var(--md-shimmer-base)
+    );
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-repeat: no-repeat;
+  background-size: 70% 100%;
+  animation: ai-thinking-shimmer 1.2s infinite alternate linear;
+}
+
+.ai-typing-elapsed {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes ai-thinking-shimmer {
+  0% {
+    background-position: -100% top;
+  }
+  100% {
+    background-position: 250% top;
+  }
+}
+
+.ai-typing-dots {
+  height: 12px;
+  display: flex;
+  gap: 2px;
+}
+
+.ai-typing-dot-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 12px;
+}
+
+.ai-typing-dot-grow,
+.ai-typing-dot-shrink {
+  background: var(--color-brand-secondary);
+  border-radius: 50%;
+}
+
+.ai-typing-dot-grow {
+  animation: ai-dot-grow 2s infinite;
+}
+
+.ai-typing-dot-shrink {
+  animation: ai-dot-shrink 2s infinite;
+}
+
+@keyframes ai-dot-grow {
+  0%,
+  100% {
+    width: 4px;
+    height: 4px;
+    opacity: 0.45;
+  }
+  50% {
+    width: 12px;
+    height: 12px;
+    opacity: 1;
+  }
+}
+
+@keyframes ai-dot-shrink {
+  0%,
+  100% {
+    width: 12px;
+    height: 12px;
+    opacity: 1;
+  }
+  50% {
+    width: 4px;
+    height: 4px;
+    opacity: 0.45;
+  }
+}
+
+/* streaming caret at the tail of streaming assistant text */
+.ai-msg-streaming .ai-md > :last-child::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 1em;
+  margin-left: 2px;
+  border-radius: 1px;
+  background: var(--color-text-secondary);
+  vertical-align: text-bottom;
+  animation: ai-caret-blink 900ms steps(1, end) infinite;
+}
+
+@keyframes ai-caret-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-typing-label,
+  .ai-msg-streaming .ai-md > :last-child::after {
+    animation: none;
+  }
+}
+
+/* hover actions under assistant messages (copy / regenerate):
+ * borderless 30px icon buttons, radius 8, hover = subtle gray fill (same as docs) */
+.ai-msg-toolbar {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ai-msg-tool-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 30px;
+  min-width: 30px;
+  padding: 5px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-msg-tool-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ai-msg-tool-btn:hover {
+  background: var(--color-bg-subtle);
+}
+
+.ai-msg-tool-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--md-focus-ring-blue);
+}
+
+.ai-msg-tool-btn:active {
+  filter: brightness(0.88);
+  transform: scale(0.98);
+}
+
+/* Version snapshots footer (same as docs) */
+.ai-versions {
+  border-top: 1px solid var(--border);
+  padding: 8px 14px 10px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.ai-versions-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+
+.ai-version-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  padding: 4px 8px;
+  margin: 0 -8px;
+  border-radius: 6px;
+}
+
+.ai-version-row:hover {
+  background: var(--hover);
+}
+
+.ai-version-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--text);
+  min-width: 0;
+}
+
+.ai-version-label > :last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-version-time {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.ai-version-rollback {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--word-blue);
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.ai-version-rollback:hover {
+  background: var(--active-bg);
+}
+
+.ai-version-rollback:disabled {
+  color: var(--text-dim);
+  cursor: default;
+  background: none;
+}
+
+/* Composer floats over the chat scroll area — no top border (agent-shell §4.6) */
+.ai-composer {
+  border-top: none;
+  padding: 8px 12px 12px;
+  background: var(--color-bg-page);
+  font-family: var(--gs-font-sans);
+}
+
+/* composer card — 16px radius, default border, production float shadow */
+.ai-input-box {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-16);
+  background: var(--color-bg-page);
+  box-shadow: 0 6px 30px var(--md-shadow-soft);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* textarea: 16px / 24px fixed line-height, same text spec as the slides
+ * composer; auto-grow band (resting height matches the other AI panels) */
+.ai-input-box textarea {
+  display: block;
+  width: 100%;
+  resize: none;
+  border: none;
+  background: none;
+  border-radius: var(--radius-16) var(--radius-16) 0 0;
+  padding: 12px 14px 4px;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 24px;
+  outline: none;
+  color: var(--color-text-primary);
+  min-height: 64px;
+  max-height: 147px;
+  overflow-y: auto;
+}
+
+.ai-input-box textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.ai-input-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 8px 10px;
+}
+
+.ai-input-hint {
+  font-size: var(--text-caption);
+  color: var(--color-text-tertiary);
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* icon-only enter key: transparent button chrome, visuals come from brand-supplied PNGs
+ * (gray arrow = disabled, black arrow = enabled), 36×36, same as the other AI panels */
+.ai-send-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-left: auto;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 35%;
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.ai-send-btn img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ai-send-btn:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.ai-send-btn:active:not(:disabled) {
+  filter: brightness(0.88);
+  transform: scale(0.98);
+}
+
+.ai-send-btn:disabled {
+  cursor: default;
+}
+
+/* Stop button while generating: brand-supplied art (white square on black), transparent button chrome */
+.ai-send-btn.ai-stop-btn {
+  background: transparent;
+}
+
+.ai-send-btn.ai-stop-btn:hover {
+  filter: brightness(0.92);
+}
+
+/* ── pdfjs text layer (select/copy); structure requirements per pdfjs TextLayer ── */
+
+/* Matches pdf.js's official text_layer.css: spans laid out in unrotated page space,
+   whole layer rotated via data-main-rotation; font size/scale driven by --font-height/--scale-x vars */
+.textLayer {
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-size-adjust: none;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  caret-color: CanvasText;
+}
+
+.textLayer[data-main-rotation='90'] {
+  transform: rotate(90deg) translateY(-100%);
+}
+
+.textLayer[data-main-rotation='180'] {
+  transform: rotate(180deg) translate(-100%, -100%);
+}
+
+.textLayer[data-main-rotation='270'] {
+  transform: rotate(270deg) translateX(-100%);
+}
+
+.textLayer span,
+.textLayer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.textLayer > :not(.markedContent),
+.textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.textLayer .markedContent {
+  display: contents;
+}
+
+.textLayer span::selection {
+  background: var(--md-text-selection);
+}
+
+/* pdfjs uses endOfContent to carry cross-page selection */
+.textLayer .endOfContent {
+  display: block;
+  position: absolute;
+  inset: 100% 0 0;
+  z-index: -1;
+  cursor: default;
+  user-select: none;
+}
+
+.ai-msg-undelivered {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--md-error);
+}
+
+.ai-retry-btn {
+  border: 1px solid var(--md-error-border);
+  border-radius: 4px;
+  background: none;
+  padding: 1px 8px;
+  font-size: 12px;
+  color: var(--md-error);
+  cursor: pointer;
+}
+
+.ai-retry-btn:hover {
+  background: var(--md-error-bg);
+}
+
+/* ================= status bar (unified chrome shared with docs/sheets/slides) ================= */
+
+.status-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 12px;
+  height: 24px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  background: var(--surface-subtle);
+  border-top: 1px solid var(--border);
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status-item {
+  margin-right: 14px;
+  flex-shrink: 0;
+}
+
+.status-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.zoom-btn {
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  line-height: 1;
+}
+
+.zoom-btn:hover {
+  background: var(--active-bg);
+}
+
+.zoom-slider {
+  width: 110px;
+  accent-color: var(--text-muted);
+  height: 3px;
+}
+
+.zoom-value {
+  min-width: 38px;
+  text-align: right;
+}
+
+/* body row (AI dock + content column) — the status bar spans only the content
+   column so the dock runs the full height of the window */
+.app-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- main layout: AI dock (left) + editor ---- */
+
+.app-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.app-main .editor-scroll {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---- transient AI-change highlight ---- */
+
+.doc-editor .ai-changed {
+  background: var(--md-ai-changed);
+  border-radius: 2px;
+  transition: background 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- code block chrome ---- */
+
+.md-codeblock {
+  position: relative;
+  margin: 0.8em 0;
+}
+
+.md-codeblock pre {
+  margin: 0;
+}
+
+.md-codeblock-bar {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.md-codeblock:hover .md-codeblock-bar,
+.md-codeblock-bar:focus-within {
+  opacity: 1;
+}
+
+/* language picker (shared @bytedesk/ui gs-dd dropdown), sized like the copy
+   button beside it */
+.md-codeblock-lang .gs-dd-btn {
+  height: 22px;
+  border-radius: 5px;
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  padding: 0 4px;
+}
+
+.md-codeblock-copy {
+  height: 22px;
+  border: 1px solid var(--border-strong);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  padding: 0 8px;
+  cursor: pointer;
+  outline: none;
+}
+
+.md-codeblock-copy:hover {
+  background: var(--hover);
+}
+
+/* ---- floating table menu ---- */
+
+.table-menu {
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px var(--md-shadow-color);
+}
+
+.tm-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tm-btn:hover {
+  background: var(--hover);
+}
+
+.tm-btn.active {
+  background: var(--active-bg);
+  color: var(--color-text-primary);
+}
+
+.tm-btn.danger:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.tm-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 3px;
+}
+
+/* ---- block gutter (+ and grip) & block menu ---- */
+
+.md-block-gutter {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.md-gutter-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 22px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--icon-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.md-gutter-btn:hover {
+  background: var(--hover);
+  color: var(--text-muted);
+}
+
+.md-gutter-grip {
+  cursor: grab;
+}
+
+.md-block-menu {
+  position: absolute;
+  z-index: 30;
+  min-width: 150px;
+  padding: 5px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 10px 32px var(--md-shadow-color);
+}
+
+.md-block-menu-item {
+  display: block;
+  width: 100%;
+  text-align: start;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.md-block-menu-item:hover {
+  background: var(--hover);
+}
+
+.md-block-menu-item.danger {
+  color: var(--danger);
+}
+
+.md-block-menu-item.danger:hover {
+  background: var(--danger-bg);
+}
+
+/* ---- math (KaTeX) nodes & LaTeX edit popover ---- */
+
+.tiptap-mathematics-render {
+  border-radius: 5px;
+}
+
+span.tiptap-mathematics-render {
+  display: inline-block;
+  padding: 0 2px;
+}
+
+div.tiptap-mathematics-render {
+  padding: 8px 12px;
+  margin: 0.5em 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.tiptap-mathematics-render--editable {
+  cursor: pointer;
+}
+
+.tiptap-mathematics-render--editable:hover {
+  background: var(--hover);
+}
+
+.tiptap-mathematics-render.ProseMirror-selectednode {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* KaTeX parse failure: show the raw source in the code font */
+.tiptap-mathematics-render.block-math-error,
+.tiptap-mathematics-render.inline-math-error {
+  color: var(--danger);
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  white-space: pre-wrap;
+}
+
+.md-math-pop {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 400px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: 0 10px 32px var(--md-shadow-color);
+}
+
+.md-math-input {
+  resize: vertical;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 6px 8px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  outline: none;
+}
+
+.md-math-input:focus {
+  border-color: var(--accent);
+}
+
+.md-math-preview {
+  display: flex;
+  /* `safe` keeps the start edge reachable when a tall formula scrolls */
+  align-items: safe center;
+  justify-content: safe center;
+  min-height: 36px;
+  max-height: 40vh;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--hover);
+  overflow: auto;
+}
+
+.md-math-preview-empty {
+  display: none;
+}
+
+.md-math-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.md-math-actions button {
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12.5px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.md-math-apply {
+  background: var(--color-btn-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.md-math-delete {
+  background: transparent;
+  color: var(--danger);
+}
+
+.md-math-delete:hover {
+  background: var(--danger-bg);
+}
+
+/* ---- selection scope chip in the AI composer header ---- */
+
+.ai-scope-row {
+  margin-bottom: 7px;
+}
+
+.ai-scope-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-30);
+  background: var(--accent-soft);
+  font-size: 11.5px;
+  color: var(--accent-dark);
+  font-weight: 500;
+}
+
+.ai-scope-hint::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ai-scope-hint .ai-scope-label,
+.ai-scope-hint .ai-scope-clear {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ai-scope-hint .ai-scope-clear {
+  opacity: 0.65;
+}
+
+.ai-scope-hint .ai-scope-clear:hover {
+  opacity: 1;
+}
+
+.ai-scope-preview {
+  margin-top: 6px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-8);
+  background: var(--color-bg-page);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  max-height: 96px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* in-answer citation links: click selects and scrolls to the cited block */
+.ai-md .ai-md-nav {
+  color: var(--accent);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.ai-md .ai-md-nav:hover {
+  text-decoration-style: solid;
+}
+
+/* queued-edit anchor highlight inside the document (decoration, never document data) */
+.ai-queue-anchor {
+  background: var(--md-ai-anchor-bg);
+  border-bottom: 2px dashed var(--md-ai-anchor-line);
+  cursor: pointer;
+}
+
+/* ---- floating Ask-AI entry that follows the text selection ---- */
+
+.ai-ask-trigger {
+  position: fixed;
+  z-index: 59;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--color-ai-action);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--md-pop-shadow);
+  cursor: pointer;
+}
+
+.ai-ask-trigger:hover {
+  background: var(--hover);
+}
+
+/* anchored ask popover (shared look with docs/slides, markdown tokens) */
+.ai-ask-pop {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-12);
+  background: var(--surface);
+  box-shadow: var(--md-pop-shadow);
+}
+
+.ai-ask-pop-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+}
+
+.ai-ask-pop-close:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.ai-ask-pop-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.ai-ask-pop-title {
+  padding-right: 24px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ai-ask-pop-sub {
+  margin-top: -4px;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-ask-pop-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-8);
+  background: var(--color-bg-page);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.ai-ask-pop-input:focus {
+  border-color: var(--accent);
+}
+
+.ai-ask-pop-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-ask-chip {
+  padding: 3px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.ai-ask-chip:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.ai-ask-pop-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ai-ask-cancel,
+.ai-ask-confirm {
+  padding: 5px 12px;
+  border-radius: var(--radius-6);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ai-ask-cancel {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.ai-ask-cancel:hover {
+  background: var(--hover);
+}
+
+.ai-ask-cancel:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.ai-ask-confirm {
+  border: 1px solid transparent;
+  background: var(--color-ai-action);
+  color: var(--color-ai-action-text);
+}
+
+.ai-ask-confirm:hover:not(:disabled) {
+  background: var(--color-ai-action-hover);
+}
+
+.ai-ask-confirm:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---- queue card above the composer ---- */
+
+.ai-queue {
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-12);
+  background: var(--color-bg-subtle);
+  overflow: hidden;
+}
+
+.ai-queue-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.ai-queue-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ai-queue-count {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.ai-queue-fold {
+  margin-left: auto;
+  display: inline-flex;
+  padding: 2px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.ai-queue-fold.folded {
+  transform: rotate(-90deg);
+}
+
+.ai-queue-hint {
+  padding: 0 10px 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.ai-queue-list {
+  margin: 0;
+  padding: 0 6px 4px;
+  list-style: none;
+  max-height: 168px;
+  overflow-y: auto;
+}
+
+.ai-queue-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 6px;
+  border-radius: var(--radius-6);
+  font-size: 12px;
+  color: var(--text);
+  cursor: default;
+}
+
+.ai-queue-row:hover {
+  background: var(--hover);
+}
+
+.ai-queue-row.stale {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.ai-queue-ord {
+  flex-shrink: 0;
+  width: 14px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.ai-queue-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ai-queue-target {
+  margin-right: 5px;
+  color: var(--text-dim);
+}
+
+.ai-queue-target::after {
+  content: ' ·';
+}
+
+.ai-queue-edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 6px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-6);
+  background: var(--color-bg-page);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.ai-queue-row-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.ai-queue-row:hover .ai-queue-row-actions {
+  opacity: 1;
+}
+
+.ai-queue-row-btn {
+  display: inline-flex;
+  padding: 2px;
+  border: none;
+  border-radius: var(--radius-6);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.ai-queue-row-btn:hover {
+  background: var(--active-bg);
+  color: var(--text);
+}
+
+.ai-queue-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px 8px;
+}
+
+.ai-queue-confirm {
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
+  color: var(--text-dim);
+}
+
+.ai-queue-discard {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-6);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.ai-queue-discard:hover {
+  background: var(--hover);
+}
+
+.ai-queue-send {
+  margin-left: auto;
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-6);
+  background: var(--accent);
+  color: var(--md-on-accent);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.ai-queue-send:disabled,
+.ai-queue-discard:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ================= transient toast (action feedback) ================= */
+
+.app-toast {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translate(-50%, -8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--md-toast-bg);
+  color: var(--md-toast-ink);
+  font-size: 13px;
+  box-shadow: var(--md-pop-shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+  max-width: 60vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.app-toast.error {
+  background: var(--md-toast-error-bg);
+}
+
+.app-toast-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.app-toast.success .app-toast-icon {
+  color: var(--md-toast-ok);
+}

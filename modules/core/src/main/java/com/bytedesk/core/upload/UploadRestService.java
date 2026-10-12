@@ -389,7 +389,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	private Resource tryLoadFromMinio(String fileUrl) {
 		if (uploadMinioService == null || bytedeskProperties == null
-				|| !Boolean.TRUE.equals(bytedeskProperties.getMinioEnabled())) {
+				|| !bytedeskProperties.isS3StorageEnabled()) {
 			return null;
 		}
 		String objectPath = extractMinioObjectPath(fileUrl);
@@ -418,9 +418,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	private String extractMinioObjectPath(String fileUrl) {
 		String normalized = fileUrl == null ? null : fileUrl.trim();
-		String endpoint = trimTrailingSlash(bytedeskProperties.getMinioEndpoint());
-		String bucket = bytedeskProperties.getMinioBucketName() == null ? null
-				: bytedeskProperties.getMinioBucketName().trim();
+		String endpoint = trimTrailingSlash(bytedeskProperties.getStorageEndpoint());
+		String bucket = bytedeskProperties.getStorageBucketName() == null ? null
+				: bytedeskProperties.getStorageBucketName().trim();
 		if (normalized == null || normalized.isEmpty() || !StringUtils.hasText(endpoint) || !StringUtils.hasText(bucket)) {
 			return null;
 		}
@@ -655,8 +655,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 
 			// 4. 存储文件并获取实际的文件URL
 			String fileUrl;
-			if (bytedeskProperties.getMinioEnabled()) {
-				log.info("MinIO 已启用，使用 MinIO 存储文件");
+			if (bytedeskProperties.isS3StorageEnabled()) {
+				log.info("S3 兼容对象存储已启用，使用对象存储保存文件");
 				fileUrl = storeToMinio(file, safeFileName, request);
 			} else {
 				log.info("MinIO 未启用，使用本地文件系统存储文件");
@@ -705,9 +705,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 文件访问URL
 	 */
 	public String storeToMinio(MultipartFile file, String fileName, UploadRequest request) {
-		// 检查 MinIO 是否启用
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		// 检查 S3 兼容对象存储是否启用
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
@@ -772,9 +772,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 文件访问URL
 	 */
 	public String storeLocalFileToMinio(String localFilePath, String fileName, UploadRequest request) {
-		// 检查 MinIO 是否启用
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		// 检查 S3 兼容对象存储是否启用
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
@@ -819,9 +819,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 文件访问URL
 	 */
 	public String storeUrlToMinio(String url, String fileName, UploadRequest request) {
-		// 检查 MinIO 是否启用
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		// 检查 S3 兼容对象存储是否启用
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
@@ -921,8 +921,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @param objectPath 对象路径
 	 */
 	public void deleteFromMinio(String objectPath) {
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
@@ -950,7 +950,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 是否存在
 	 */
 	public boolean fileExistsInMinio(String objectPath) {
-		if (!bytedeskProperties.getMinioEnabled()) {
+		if (!bytedeskProperties.isS3StorageEnabled()) {
 			return false;
 		}
 
@@ -970,8 +970,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 预签名URL
 	 */
 	public String getMinioDownloadUrl(String objectPath, int expiry) {
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用
@@ -990,8 +990,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 * @return 预签名URL
 	 */
 	public String getMinioUploadUrl(String objectPath, int expiry) {
-		if (!bytedeskProperties.getMinioEnabled()) {
-			throw new UploadStorageException("存储服务未启用（MinIO）", 503);
+		if (!bytedeskProperties.isS3StorageEnabled()) {
+			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
 		}
 
 		// 检查 MinIO 服务是否可用

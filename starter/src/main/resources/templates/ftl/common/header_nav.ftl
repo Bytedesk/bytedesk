@@ -33,6 +33,7 @@
 			<#assign privateDeployUrl = docBaseUrl + 'docs/category/private-deployment'>
 			<#assign helpCenterUrl = 'https://www.weiyuai.cn/helpcenter/df_org_uid_df_kb_hc_uid/index.html'>
 			<#assign aiAgentDemoUrl = 'https://www.weiyuai.cn/demos/'>
+			<#assign openBudyUrl = 'https://www.weiyuai.cn/openbudy/'>
 			<#assign visitorDemoUrl = 'https://www.weiyuai.cn/reactdemo/'>
 			<#assign githubUrl = 'https://github.com/Bytedesk/bytedesk'>
 			<#assign giteeUrl = 'https://gitee.com/bytedesk/weiyu'>
@@ -78,6 +79,9 @@
 						<li><a class="dropdown-item" href="${aiAgentDemoUrl}" target="_blank">AI Agent 演示</a></li>
 					</ul>
 				</li>
+
+				<!-- Nav item: OpenBudy -->
+				<li class="nav-item dropdown"><a class="nav-link" href="${openBudyUrl}" target="_blank"><@t key="nav.openbudy">OpenBudy</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${visitorDemoUrl}" target="_blank"><@t key="nav.visitor.demo">访客对接演示</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>

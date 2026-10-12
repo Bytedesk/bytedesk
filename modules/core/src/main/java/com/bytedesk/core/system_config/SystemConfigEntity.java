@@ -16,6 +16,8 @@ package com.bytedesk.core.system_config;
 
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.TypeConsts;
+import com.bytedesk.core.system_config.enums.SystemConfigValueTypeEnum;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;

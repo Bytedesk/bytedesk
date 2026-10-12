@@ -70,12 +70,6 @@ public class OrganizationResponseSimple implements Serializable {
     // 会员到期后是否禁止登录
     private Boolean vipExpireLoginCheckEnabled;
 
-    // 是否启用自定义服务器（域名/IP）
-    private Boolean customServerEnabled;
-
-    // 自定义服务器域名或 IP
-    private String customServerHost;
-
     // owner user
     private UserResponseSimple user;
 }

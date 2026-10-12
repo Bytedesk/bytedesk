@@ -1,0 +1,44 @@
+# 用法：./start.sh rustfs ... 或 docker compose --env-file .env -f compose/compose-rustfs.yaml up -d（在 deploy/docker 目录执行）
+# 或通过组合关键字：./start.sh middleware rustfs
+# 说明：RustFS 对象存储（独立组件，默认不启用）
+# - MinIO 已 archived 并转向闭源/AGPL，RustFS 是 Apache 2.0 的 S3 兼容替代（Rust 编写）
+# - RustFS Console: http://127.0.0.1:19001（使用 .env 中的 RUSTFS_ACCESS_KEY/RUSTFS_SECRET_KEY 登录）
+# - RustFS API: http://127.0.0.1:19000（S3 兼容，io.minio 客户端可直连）
+# - 应用侧需同时开启对象存储：.env 设 BYTEDESK_STORAGE_PROVIDER=s3（推荐）
+#   或旧键 BYTEDESK_MINIO_ENABLED=true + BYTEDESK_MINIO_ENDPOINT=http://bytedesk-rustfs:9000
+# - RustFS 默认凭据 rustfsadmin/rustfsadmin（生产必须修改，且 access 5~20 / secret 8~40 字符、纯字母数字）
+# 详细说明见 readme/readme.rustfs.md
+services:
+  # RustFS 对象存储服务
+  # http://localhost:19000 - RustFS S3 API
+  # http://localhost:19001 - RustFS Console
+  bytedesk-rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs-bytedesk
+    restart: always
+    environment:
+      - RUSTFS_ACCESS_KEY=${RUSTFS_ACCESS_KEY:-rustfsadmin}
+      - RUSTFS_SECRET_KEY=${RUSTFS_SECRET_KEY:-rustfsadmin}
+      - TZ=Asia/Shanghai
+    ports:
+      - "19000:9000"   # S3 API（与 MinIO 同端口布局，可平替）
+      - "19001:9001"   # Console
+    volumes:
+      # 命名卷免 uid 10001（容器内非 root 用户 rustfs）的 bind-mount 权限问题
+      - rustfs_data:/data
+    networks:
+      - bytedesk-network
+    # PoC 实测（2026-10-02）：镜像内置 curl，且 RustFS 提供 MinIO 兼容健康端点 /minio/health/live（HTTP 200）
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  rustfs_data:
+    name: bytedesk_rustfs_data
+
+networks:
+  bytedesk-network:
+    driver: bridge
