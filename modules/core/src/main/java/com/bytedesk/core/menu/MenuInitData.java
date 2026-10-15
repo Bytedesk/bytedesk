@@ -87,6 +87,8 @@ public final class MenuInitData {
 
                 seeds.add(MenuSeed.root("/ticket", "ticket", "profile", "menu.ticket"));
                 seeds.add(MenuSeed.child("/ticket/data", "data", "table", "/ticket", "menu.ticket.data"));
+                // 工单维度满意度评价：THREAD_RATING 权限可见，支持后台菜单开关/vipLevel 控制
+                seeds.add(MenuSeed.child("/ticket/rating", "rating", "star", "/ticket", "menu.ticket.rating"));
                 seeds.add(MenuSeed.child("/ticket/process", "process", "branches", "/ticket", "menu.ticket.process"));
                 seeds.add(MenuSeed.child("/ticket/settings", "settings", "setting", "/ticket", "menu.ticket.settings"));
 

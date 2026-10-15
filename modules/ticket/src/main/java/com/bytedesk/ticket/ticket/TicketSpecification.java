@@ -24,6 +24,7 @@ import com.bytedesk.core.base.BaseSpecification;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityModeEnum;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordEntity;
 
 import jakarta.persistence.criteria.Predicate;
@@ -128,6 +129,12 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getDepartmentUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("departmentUid"), request.getDepartmentUid()));
             }
+            // ticketSettingsUid：显式按设置查询时同时缩小结果集（不只是切换权限上下文），
+            // 与详情 canViewTicket 以工单自身 ticketSettingsUid 为准的口径一致
+            if (StringUtils.hasText(request.getTicketSettingsUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("ticketSettingsUid"),
+                        request.getTicketSettingsUid()));
+            }
 
             // reporterUid (stored in JSON string column: reporter)
             if (StringUtils.hasText(request.getReporterUid())) {
@@ -210,14 +217,18 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
         };
     }
 
+    // 单层转义：Hibernate 以参数形式传递 pattern，仅需为 LIKE 元字符加一个转义符。
+    // 之前写成 "\\\\%"（两个反斜杠）导致 pattern 变成"字面反斜杠+任意字符"，
+    // 含下划线的 uid（如内置 df_mb_uid/df_super_uid）全部匹配 0 行，
+    // 表现为受理人豁免/待我处理过滤失效
     private static String escapeLike(String value) {
         if (value == null) {
             return null;
         }
         return value
-                .replace("\\\\", "\\\\\\\\")
-                .replace("%", "\\\\%")
-                .replace("_", "\\\\_");
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
     private static void appendVisibilityPredicates(TicketRequest request,
@@ -256,20 +267,50 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 : criteriaBuilder.disjunction();
 
         // G2 组合谓词：无 type 的混合列表查询按工单类型分别应用 INTERNAL/EXTERNAL 可见性设置，
-        // 保证「全部工单」=「内部工单」+「外部工单」口径一致（创建人/受理人仍始终可见）
+        // 保证「全部工单」=「内部工单」+「外部工单」口径一致（创建人/受理人仍始终可见）。
+        // 阶段1对齐：EXTERNAL 侧进一步按“工单自身绑定设置”分组过滤（与详情 canViewTicket 同口径），
+        // INTERNAL 侧同样支持按绑定设置分组（内部显式自定义设置列为同类回归）
         if (request.getVisibilityInternalContext() != null || request.getVisibilityExternalContext() != null) {
             Predicate typeInternal = criteriaBuilder.equal(root.get("type"), "INTERNAL");
             Predicate typeExternal = criteriaBuilder.equal(root.get("type"), "EXTERNAL");
-            Predicate internalVisible = buildTypeVisibilityPredicate(request.getVisibilityInternalContext(),
+            Predicate internalVisible = buildSettingsScopedVisibilityPredicate(
+                    request.getVisibilityInternalContext(),
+                    request.getVisibilityInternalSettingsContexts(),
                     root, criteriaBuilder, noDepartmentAssigned, sameDepartment,
                     request.getVisibilityCurrentUserDepartmentUid());
-            Predicate externalVisible = buildTypeVisibilityPredicate(request.getVisibilityExternalContext(),
+            Predicate externalVisible = buildSettingsScopedVisibilityPredicate(
+                    request.getVisibilityExternalContext(),
+                    request.getVisibilityExternalSettingsContexts(),
                     root, criteriaBuilder, noDepartmentAssigned, sameDepartment,
                     request.getVisibilityCurrentUserDepartmentUid());
             predicates.add(criteriaBuilder.or(
                     reporterSelf, assigneeSelf,
                     criteriaBuilder.and(typeInternal, internalVisible),
                     criteriaBuilder.and(typeExternal, externalVisible)));
+            return;
+        }
+
+        // 单类型查询（显式 type=EXTERNAL/INTERNAL）同样按“工单绑定设置”分组过滤；
+        // 未提供分组（如管理员豁免后残值、旧调用方）时保持既有单设置平铺路径
+        if (request.getVisibilityInternalSettingsContexts() != null
+                || request.getVisibilityExternalSettingsContexts() != null) {
+            Map<String, TicketVisibilityQueryContext> settingsContexts = request.getVisibilityExternalSettingsContexts() != null
+                    ? request.getVisibilityExternalSettingsContexts()
+                    : request.getVisibilityInternalSettingsContexts();
+            boolean defaultRestricted = StringUtils.hasText(request.getVisibilityMode())
+                    && !TicketVisibilityModeEnum.ORG_WIDE.name()
+                            .equalsIgnoreCase(request.getVisibilityMode());
+            TicketVisibilityQueryContext typeDefaultContext = TicketVisibilityQueryContext.builder()
+                    .mode(request.getVisibilityMode())
+                    .restricted(defaultRestricted)
+                    .allowedDepartmentUids(request.getVisibilityAllowedDepartmentUids())
+                    .restrictedCategoryUids(request.getVisibilityRestrictedCategoryUids())
+                    .restrictedCategoryDepartmentUids(request.getVisibilityRestrictedCategoryDepartmentUids())
+                    .build();
+            Predicate settingsScoped = buildSettingsScopedVisibilityPredicate(typeDefaultContext,
+                    settingsContexts, root, criteriaBuilder, noDepartmentAssigned, sameDepartment,
+                    request.getVisibilityCurrentUserDepartmentUid());
+            predicates.add(criteriaBuilder.or(reporterSelf, assigneeSelf, settingsScoped));
             return;
         }
 
@@ -340,6 +381,67 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
                 }
             }
         }
+    }
+
+    /**
+     * 阶段1（缺口A修复）：按“工单自身绑定设置”构建可见性谓词，与详情 canViewTicket 口径对齐。
+     *
+     * <p>结构（与规划示意一致）：
+     * <pre>
+     * or(
+     *   and(未命中已解析设置, 类型默认谓词),   // 含 NULL、空串及未知 uid（含软删除/物理删除的设置引用）
+     *   and(ticketSettingsUid = s1, s1 谓词),
+     *   and(ticketSettingsUid = s2, s2 谓词), ...)
+     * </pre>
+     *
+     * <p>“未命中”显式覆盖 SQL NULL 语义：{@code isNull(uid) OR uid='' OR uid NOT IN(已解析UID集合)}；
+     * 已解析集合为空时不产生 NOT IN 分支（避免空 IN 语义歧义）。
+     * 每个设置的谓词复用 {@link #buildTypeVisibilityPredicate}（与单类型路径同口径）。
+     * 豁免（reporterSelf/assigneeSelf）由调用方在外层 OR，不在此处绕过 org/deleted/type 等业务条件。
+     *
+     * @param typeDefaultContext 该工单类型的组织默认设置上下文（未命中回退口径；可为 null，视为 ORG_WIDE）
+     * @param settingsContexts   settingsUid -> 已解析设置的上下文；null 表示不按设置分组（维持旧行为）
+     * @param currentDepartmentUid 当前用户部门 uid（DEPARTMENT_BASED 内存判定用）
+     */
+    private static Predicate buildSettingsScopedVisibilityPredicate(
+            TicketVisibilityQueryContext typeDefaultContext,
+            Map<String, TicketVisibilityQueryContext> settingsContexts,
+            jakarta.persistence.criteria.Root<TicketEntity> root,
+            jakarta.persistence.criteria.CriteriaBuilder criteriaBuilder,
+            Predicate noDepartmentAssigned, Predicate sameDepartment, String currentDepartmentUid) {
+        if (settingsContexts == null) {
+            return buildTypeVisibilityPredicate(typeDefaultContext, root, criteriaBuilder,
+                    noDepartmentAssigned, sameDepartment, currentDepartmentUid);
+        }
+        List<Predicate> branches = new ArrayList<>();
+        // 未命中已解析设置的工单 → 按类型默认设置口径过滤
+        Predicate defaultVisible = buildTypeVisibilityPredicate(typeDefaultContext, root, criteriaBuilder,
+                noDepartmentAssigned, sameDepartment, currentDepartmentUid);
+        List<String> resolvedUids = settingsContexts.keySet().stream()
+                .filter(StringUtils::hasText)
+                .collect(java.util.stream.Collectors.toList());
+        List<Predicate> notMatchedConditions = new ArrayList<>();
+        notMatchedConditions.add(criteriaBuilder.isNull(root.get("ticketSettingsUid")));
+        notMatchedConditions.add(criteriaBuilder.equal(root.get("ticketSettingsUid"), ""));
+        if (!resolvedUids.isEmpty()) {
+            notMatchedConditions.add(criteriaBuilder.not(
+                    root.get("ticketSettingsUid").in(resolvedUids)));
+        }
+        branches.add(criteriaBuilder.and(
+                criteriaBuilder.or(notMatchedConditions.toArray(new Predicate[0])),
+                defaultVisible));
+        // 命中已解析设置的工单 → 按该设置的可见性过滤
+        for (Map.Entry<String, TicketVisibilityQueryContext> entry : settingsContexts.entrySet()) {
+            String settingsUid = entry.getKey();
+            if (!StringUtils.hasText(settingsUid)) {
+                continue;
+            }
+            Predicate settingsMatched = criteriaBuilder.equal(root.get("ticketSettingsUid"), settingsUid);
+            Predicate settingsVisible = buildTypeVisibilityPredicate(entry.getValue(), root, criteriaBuilder,
+                    noDepartmentAssigned, sameDepartment, currentDepartmentUid);
+            branches.add(criteriaBuilder.and(settingsMatched, settingsVisible));
+        }
+        return criteriaBuilder.or(branches.toArray(new Predicate[0]));
     }
 
     /**

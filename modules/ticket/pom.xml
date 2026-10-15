@@ -143,6 +143,38 @@
 			<version>${flowable.version}</version>
 		</dependency> -->
 
+		<!-- H2 for @DataJpaTest visibility specification regression tests -->
+		<!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Spring Boot 4 拆分了测试切片注解：@DataJpaTest / TestEntityManager / @AutoConfigureTestDatabase -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-data-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jpa-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-jdbc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- PostgreSQL 驱动：可见性谓词对实际部署数据库的定向回归
+		     （运行方式见 docs/plans/2026-10-15-ticket-visibility-assignee-fix-plan.md 8.3 节：
+		     spring.test.database.replace=none + spring.datasource.* 系统属性指向专用测试库） -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

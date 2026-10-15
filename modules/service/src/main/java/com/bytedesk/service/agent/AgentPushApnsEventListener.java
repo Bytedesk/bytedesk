@@ -25,7 +25,9 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
+import com.bytedesk.core.push.service.AgentPushGateService;
 import com.bytedesk.core.push.service.PushMobileService;
+import com.bytedesk.core.push.service.PushReachProperties;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadProtobuf;
@@ -41,6 +43,10 @@ public class AgentPushApnsEventListener {
     private final ObjectProvider<PushMobileService> mobilePushProvider;
 
     private final AgentRestService agentRestService;
+
+    private final AgentPushGateService agentPushGateService;
+
+    private final PushReachProperties pushReachProperties;
 
     @EventListener
     public void onMessageJsonEvent(MessageJsonEvent event) {
@@ -96,6 +102,15 @@ public class AgentPushApnsEventListener {
                     sender.getUid(),
                     agentOptional.get().getUid(),
                     agentUser.getUid());
+
+            // 触达闸门：离线才推（在线已实时下发，推送只会双提醒）+ 同 user+thread 节流合并
+            if (!pushReachProperties.getChat().isEnabled()) {
+                log.debug("Skip agent mobile push because chat reach disabled, messageUid={}", message.getUid());
+                return;
+            }
+            if (!agentPushGateService.shouldPush(agentUser.getUid(), thread != null ? thread.getUid() : null)) {
+                return;
+            }
 
             PushMobileService mobilePush = mobilePushProvider.getIfAvailable();
             if (mobilePush == null) {

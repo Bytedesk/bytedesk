@@ -30,7 +30,14 @@ public class NotificationEventListener {
 
     @EventListener
     public void onNotificationCreateEvent(NotificationCreateEvent event) {
-        notificationRealtimeService.onNotificationCreateEvent(event);
+        try {
+            notificationRealtimeService.onNotificationCreateEvent(event);
+        } catch (Exception | LinkageError ex) {
+            // 通知推送属于旁路逻辑，拦截异常避免中断同一事件的其他监听器
+            log.error("handle notification create event failed: notificationUid={}, error={}",
+                    event.getNotification() != null ? event.getNotification().getUid() : null,
+                    ex.toString(), ex);
+        }
     }
 
 }

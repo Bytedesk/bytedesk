@@ -22,7 +22,9 @@ import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.message.event.MessageJsonEvent;
+import com.bytedesk.core.push.service.AgentPushGateService;
 import com.bytedesk.core.push.service.PushMobileService;
+import com.bytedesk.core.push.service.PushReachProperties;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -42,12 +44,18 @@ class AgentPushApnsEventListenerTest {
     @Mock
     private AgentRestService agentRestService;
 
+    @Mock
+    private AgentPushGateService agentPushGateService;
+
     private AgentPushApnsEventListener listener;
 
     @BeforeEach
     void setUp() {
         lenient().when(mobilePushProvider.getIfAvailable()).thenReturn(mobilePushService);
-        listener = new AgentPushApnsEventListener(mobilePushProvider, agentRestService);
+        // 默认放行：离线（不在线）+ 节流窗口内首条
+        lenient().when(agentPushGateService.shouldPush(any(), any())).thenReturn(true);
+        listener = new AgentPushApnsEventListener(mobilePushProvider, agentRestService,
+                agentPushGateService, new PushReachProperties());
     }
 
     @Test

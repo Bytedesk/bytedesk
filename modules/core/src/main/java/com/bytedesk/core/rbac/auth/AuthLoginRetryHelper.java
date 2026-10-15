@@ -85,8 +85,9 @@ public class AuthLoginRetryHelper {
                 String timeStr = minutes > 0 ? minutes + "分" + seconds + "秒" : seconds + "秒";
                 return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_RETRY_AFTER, timeStr), -1, false));
             } else {
-                // 锁定时间已过，解锁用户
+                // 锁定时间已过，解锁用户并重置失败次数，避免锁定到期后立即被再次锁定
                 redisLoginRetryService.unlockUser(username);
+                redisLoginRetryService.resetLoginFailedCount(username);
             }
         }
         return null;
@@ -105,12 +106,22 @@ public class AuthLoginRetryHelper {
             if (currentFailedCount >= config.maxRetryCount) {
                 // 达到最大重试次数，锁定用户
                 if (config.lockTimeMinutes > 0) {
-                    redisLoginRetryService.lockUser(username, config.lockTimeMinutes * 60L);
+                    lockUserAndResetCount(username, config.lockTimeMinutes * 60L);
                     return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_MINUTES, config.lockTimeMinutes), -1, false));
                 }
             }
         }
         return null;
+    }
+
+    /**
+     * 锁定用户并重置失败次数
+     * 锁定时重置失败次数，确保锁定时间到期后用户可以重新尝试登录，
+     * 而不是因残留的失败次数被立即再次锁定
+     */
+    private void lockUserAndResetCount(String username, long lockSeconds) {
+        redisLoginRetryService.lockUser(username, lockSeconds);
+        redisLoginRetryService.resetLoginFailedCount(username);
     }
 
     /**
@@ -130,7 +141,7 @@ public class AuthLoginRetryHelper {
             } else {
                 // 达到最大重试次数，锁定用户
                 if (config.lockTimeMinutes > 0) {
-                    redisLoginRetryService.lockUser(username, config.lockTimeMinutes * 60L);
+                    lockUserAndResetCount(username, config.lockTimeMinutes * 60L);
                     return ResponseEntity.ok().body(JsonResult.error(I18Consts.withArgs(I18Consts.I18N_AUTH_ACCOUNT_LOCKED_MINUTES, config.lockTimeMinutes), -1, false));
                 } else {
                     return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_USERNAME_OR_PASSWORD_INCORRECT, -1, false));

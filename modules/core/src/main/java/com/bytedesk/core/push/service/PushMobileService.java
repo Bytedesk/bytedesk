@@ -16,6 +16,8 @@ package com.bytedesk.core.push.service;
 
 import com.bytedesk.core.message.MessageProtobuf;
 
+import java.util.Map;
+
 /**
  * 移动端推送网关（坐席/工单通知场景）
  *
@@ -24,7 +26,7 @@ import com.bytedesk.core.message.MessageProtobuf;
  * 社区版无实现 bean，调用方需经 ObjectProvider 判空后优雅跳过。
  *
  * <p>接口只收录开源模块实际用到的方法；返回实体的方法（如
- * pushNotificationToUserForResult）只留在企业实现类上，避免接口反向依赖企业实体。
+ * pushNotificationToTokenForResult）只留在企业实现类上，避免接口反向依赖企业实体。
  */
 public interface PushMobileService {
 
@@ -45,4 +47,20 @@ public interface PushMobileService {
      * @param trackingUid 通知去重/追踪 uid（工单 uid 等）
      */
     void pushNotificationToUser(String userUid, String title, String body, String trackingUid);
+
+    /**
+     * 带业务扩展字段的纯文本通知推送（四类触达统一入口：聊天/排队/转接/邀请/工单等）
+     *
+     * <p>extras 契约（规划 §4.4）：type=chat|thread_queue|thread_routing_pool|thread_transfer|thread_invite|ticket，
+     * 另携带 threadUid/threadTopic/workgroupUid 等供客户端点击通知深链路由。
+     *
+     * @param userUid     接收用户 uid
+     * @param title       通知标题
+     * @param body        通知内容
+     * @param trackingUid 通知去重/追踪 uid（threadUid/ticketUid 等）
+     * @param type        触达类型（extras.type 同值），企业实现据此落推送记录类型；可为 null（缺省按工单口径）
+     * @param extras      业务扩展字段，写入 APNs payload 自定义键 bytedesk；可为 null
+     */
+    void pushNotificationToUser(String userUid, String title, String body, String trackingUid, String type,
+            Map<String, String> extras);
 }

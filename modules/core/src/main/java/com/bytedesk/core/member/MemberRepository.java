@@ -41,6 +41,11 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
 
     List<MemberEntity> findByDeptUidAndDeletedFalse(String deptUid);
 
+    /**
+     * 查询组织下全部有效成员：用于内部工单未选择部门时的自动分配候选人兜底。
+     */
+    List<MemberEntity> findByOrgUidAndDeletedFalse(String orgUid);
+
     Optional<MemberEntity> findByUid(String uid);
 
     Optional<MemberEntity> findByUser_UidAndOrgUidAndDeletedFalse(String uid, String orgUid);

@@ -1071,4 +1071,177 @@ class TicketRestServiceVisibilityTest {
                         throw new RuntimeException(ex);
                 }
         }
+
+        // ==================== 阶段1（缺口A）：enrichVisibilityContext 按工单绑定设置对齐 ====================
+
+        private static TicketRestService newServiceWithRepository(AuthService authService,
+                        TicketSettingsRestService ticketSettingsRestService,
+                        MemberRepository memberRepository, TicketRepository ticketRepository) {
+                return new TicketRestService(
+                                ticketRepository,
+                                mock(TicketAttachmentRepository.class),
+                                mock(ModelMapper.class),
+                                authService,
+                                mock(UidUtils.class),
+                                mock(ThreadRestService.class),
+                                mock(MessageRepository.class),
+                                mock(com.bytedesk.core.topic_subscription.TopicSubscriptionRepository.class),
+                                mock(TicketSlaRecordRepository.class),
+                                mock(UploadRestService.class),
+                                mock(ApplicationEventPublisher.class),
+                                mock(CategoryRestService.class),
+                                ticketSettingsRestService,
+                                memberRepository);
+        }
+
+        @Test
+        void mixedListEnrichLoadsSettingsContextsAndAggregatesRestricted() {
+                // 默认设置 ORG_WIDE + 自定义设置受限 → visibilityRestricted 必须为 true（不能只看默认）
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                TicketRestService service = newServiceWithRepository(authService, ticketSettingsRestService,
+                                memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("user-settings-1");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-settings-1", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-other")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.INTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.ORG_WIDE.name())
+                                                                .build())));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.EXTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.EXTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.ORG_WIDE.name())
+                                                                .build())));
+                when(ticketRepository.findDistinctTicketSettingsUids("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(List.of());
+                when(ticketRepository.findDistinctTicketSettingsUids("org-1", TicketTypeEnum.EXTERNAL.name()))
+                                .thenReturn(List.of("settings-custom-1"));
+                TicketSettingsEntity customSettings = TicketSettingsEntity.builder()
+                                .uid("settings-custom-1")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .visibilitySettings(TicketVisibilitySettingsEntity.builder()
+                                                .uid("visibility-custom-1")
+                                                .content(TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_BASED
+                                                                                .name())
+                                                                .departmentUids(List.of("dept-kefu"))
+                                                                .build())
+                                                .build())
+                                .build();
+                when(ticketSettingsRestService.findByUidIn(List.of("settings-custom-1")))
+                                .thenReturn(List.of(customSettings));
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+
+                invokeEnrichVisibilityContext(service, request, false);
+
+                assertThat(request.getVisibilityRestricted()).isTrue();
+                assertThat(request.getVisibilityExternalSettingsContexts()).containsKey("settings-custom-1");
+                assertThat(request.getVisibilityExternalSettingsContexts().get("settings-custom-1").isRestricted())
+                                .isTrue();
+                assertThat(request.getVisibilityExternalSettingsContexts().get("settings-custom-1")
+                                .getAllowedDepartmentUids()).containsExactly("dept-kefu");
+                assertThat(request.getVisibilityInternalSettingsContexts()).isEmpty();
+        }
+
+        @Test
+        void enrichClearsClientForgedVisibilityFields() {
+                // 客户端伪造的可见性字段在 enrich 入口被清空，权限上下文只能由服务端生成
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                TicketRestService service = newServiceWithRepository(authService, ticketSettingsRestService,
+                                memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("user-settings-2");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-settings-2", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.INTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.ORG_WIDE.name())
+                                                                .build())));
+                when(ticketSettingsRestService.findDefaultByOrgUidAndType("org-1", TicketTypeEnum.EXTERNAL.name()))
+                                .thenReturn(Optional.of(buildSettings(TicketTypeEnum.EXTERNAL,
+                                                TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.ORG_WIDE.name())
+                                                                .build())));
+                when(ticketRepository.findDistinctTicketSettingsUids("org-1", TicketTypeEnum.INTERNAL.name()))
+                                .thenReturn(List.of());
+                when(ticketRepository.findDistinctTicketSettingsUids("org-1", TicketTypeEnum.EXTERNAL.name()))
+                                .thenReturn(List.of());
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                // 客户端伪造值
+                request.setVisibilityOrgAdmin(true);
+                request.setVisibilityRestricted(false);
+                request.setVisibilityMode(TicketVisibilityModeEnum.ORG_WIDE.name());
+                request.setVisibilityInternalContext(TicketVisibilityQueryContext.builder()
+                                .mode("ORG_WIDE").build());
+                request.setVisibilityInternalSettingsContexts(new java.util.HashMap<>(java.util.Map.of("forged",
+                                TicketVisibilityQueryContext.builder().mode("ORG_WIDE").build())));
+
+                invokeEnrichVisibilityContext(service, request, false);
+
+                assertThat(request.getVisibilityOrgAdmin()).isFalse();
+                assertThat(request.getVisibilityInternalSettingsContexts()).isEmpty();
+                assertThat(request.getVisibilityInternalContext()).isNotNull();
+                assertThat(request.getVisibilityInternalContext().isRestricted()).isFalse();
+        }
+
+        @Test
+        void singleTypeEnrichKeepsExplicitSettingsUidSingleSettingsPath() {
+                // 显式 ticketSettingsUid：不加载按引用设置的分组（Specification 已按该 uid 缩小结果）
+                AuthService authService = mock(AuthService.class);
+                TicketSettingsRestService ticketSettingsRestService = mock(TicketSettingsRestService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                TicketRestService service = newServiceWithRepository(authService, ticketSettingsRestService,
+                                memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("user-settings-3");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-settings-3", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
+                TicketSettingsEntity explicitSettings = TicketSettingsEntity.builder()
+                                .uid("settings-explicit-1")
+                                .orgUid("org-1")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .visibilitySettings(TicketVisibilitySettingsEntity.builder()
+                                                .uid("visibility-explicit-1")
+                                                .content(TicketVisibilitySettingsData.builder()
+                                                                .mode(TicketVisibilityModeEnum.DEPARTMENT_BASED
+                                                                                .name())
+                                                                .departmentUids(List.of("dept-kefu"))
+                                                                .build())
+                                                .build())
+                                .build();
+                when(ticketSettingsRestService.findByUid("settings-explicit-1"))
+                                .thenReturn(Optional.of(explicitSettings));
+
+                TicketRequest request = new TicketRequest();
+                request.setOrgUid("org-1");
+                request.setType(TicketTypeEnum.EXTERNAL.name());
+                request.setTicketSettingsUid("settings-explicit-1");
+
+                invokeEnrichVisibilityContext(service, request, false);
+
+                assertThat(request.getVisibilityMode())
+                                .isEqualTo(TicketVisibilityModeEnum.DEPARTMENT_BASED.name());
+                assertThat(request.getVisibilityRestricted()).isTrue();
+                assertThat(request.getVisibilityExternalSettingsContexts()).isNull();
+                assertThat(request.getVisibilityInternalSettingsContexts()).isNull();
+                org.mockito.Mockito.verifyNoInteractions(ticketRepository);
+        }
 }

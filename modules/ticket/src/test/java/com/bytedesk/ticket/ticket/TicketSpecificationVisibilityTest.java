@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
@@ -284,6 +285,71 @@ class TicketSpecificationVisibilityTest {
         verify(context.criteriaBuilder).conjunction();
     }
 
+    @Test
+    void appendVisibilityPredicatesBuildsSettingsScopedBranchesForMixedList() {
+        // 阶段1：EXTERNAL 侧按“工单绑定设置”分组：未命中走默认谓词 + 命中 s1 走 s1 谓词
+        TicketRequest request = TicketRequest.builder()
+                .visibilityRestricted(true)
+                .visibilityCurrentUserUid("user-1")
+                .visibilityCurrentUserMemberUid("member-1")
+                .visibilityCurrentUserDepartmentUid("dept-z")
+                .visibilityInternalContext(TicketVisibilityQueryContext.builder()
+                        .mode("ORG_WIDE")
+                        .restricted(false)
+                        .build())
+                .visibilityExternalContext(TicketVisibilityQueryContext.builder()
+                        .mode("ORG_WIDE")
+                        .restricted(false)
+                        .build())
+                .visibilityExternalSettingsContexts(Map.of(
+                        "settings-strict",
+                        TicketVisibilityQueryContext.builder()
+                                .mode("DEPARTMENT_BASED")
+                                .restricted(true)
+                                .allowedDepartmentUids(List.of("dept-a"))
+                                .build()))
+                .build();
+
+        CriteriaContext context = newCriteriaContext();
+        List<Predicate> predicates = new ArrayList<>();
+
+        invokeAppendVisibilityPredicates(request, context.root, context.criteriaBuilder, predicates);
+
+        assertThat(predicates).hasSize(1);
+        // 未命中分支：isNull(ticketSettingsUid) / ='' / not in(已解析)
+        verify(context.criteriaBuilder).isNull(context.ticketSettingsUidPath);
+        verify(context.criteriaBuilder).equal(context.ticketSettingsUidPath, "");
+        // 命中分支：ticketSettingsUid = settings-strict
+        verify(context.criteriaBuilder).equal(context.ticketSettingsUidPath, "settings-strict");
+        // 当前用户部门 dept-z 不在 settings-strict 允许部门内 → disjunction（不可见）
+        verify(context.criteriaBuilder).disjunction();
+    }
+
+    @Test
+    void searchFiltersByExplicitTicketSettingsUid() {
+        // 显式 ticketSettingsUid 查询：结果集按该 uid 缩小（不只是切换权限上下文）
+        TicketRequest request = TicketRequest.builder()
+                .ticketSettingsUid("settings-explicit-1")
+                .build();
+        request.setOrgUid("org-1");
+
+        CriteriaContext context = newCriteriaContext();
+        @SuppressWarnings("rawtypes")
+        jakarta.persistence.criteria.CriteriaQuery query = mock(jakarta.persistence.criteria.CriteriaQuery.class);
+        @SuppressWarnings("unchecked")
+        Path orgUidPath = mock(Path.class);
+        when(context.root.get("orgUid")).thenReturn(orgUidPath);
+        @SuppressWarnings("unchecked")
+        Path deletedPath = mock(Path.class);
+        when(context.root.get("deleted")).thenReturn(deletedPath);
+        when(context.criteriaBuilder.equal(deletedPath, false)).thenReturn(mock(Predicate.class));
+
+        Specification<TicketEntity> spec = TicketSpecification.search(request, null);
+        spec.toPredicate(context.root, query, context.criteriaBuilder);
+
+        verify(context.criteriaBuilder).equal(context.ticketSettingsUidPath, "settings-explicit-1");
+    }
+
     private static void invokeAppendVisibilityPredicates(TicketRequest request,
             Root<TicketEntity> root,
             CriteriaBuilder criteriaBuilder,
@@ -317,6 +383,8 @@ class TicketSpecificationVisibilityTest {
         when(root.get("departmentUid")).thenReturn(departmentPath);
         when(root.get("categoryUid")).thenReturn(categoryPath);
         when(root.get("type")).thenReturn(typePath);
+        Path ticketSettingsUidPath = mock(Path.class);
+        when(root.get("ticketSettingsUid")).thenReturn(ticketSettingsUidPath);
 
         when(criteriaBuilder.equal(any(), any())).thenReturn(mock(Predicate.class));
         when(criteriaBuilder.like(any(), any(String.class), eq('\\'))).thenReturn(mock(Predicate.class));
@@ -330,7 +398,7 @@ class TicketSpecificationVisibilityTest {
                 .thenReturn(mock(Predicate.class));
         when(criteriaBuilder.or(any(Predicate[].class))).thenReturn(mock(Predicate.class));
 
-        return new CriteriaContext(root, criteriaBuilder, departmentPath, categoryPath, userUidPath, assigneePath, typePath);
+        return new CriteriaContext(root, criteriaBuilder, departmentPath, categoryPath, userUidPath, assigneePath, typePath, ticketSettingsUidPath);
     }
 
     private record CriteriaContext(
@@ -340,6 +408,7 @@ class TicketSpecificationVisibilityTest {
             Path<?> categoryPath,
             Path<?> userUidPath,
             Path<?> assigneePath,
-            Path<?> typePath) {
+            Path<?> typePath,
+            Path<?> ticketSettingsUidPath) {
     }
 }

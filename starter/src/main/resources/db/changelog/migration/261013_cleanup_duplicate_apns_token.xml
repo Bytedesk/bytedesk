@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        APNs token 重复数据清理（配合 ApnsTokenRepository.findByTokenAndDeletedFalse 改为 List）。
+
+        背景（生产 2026-10-13 事故）：
+        - 同一 device token 被不同用户绑定（设备换账号登录）时，createOrUpdateForCurrentUser
+          仅按 (token, userUid) 去重，导致同一 token 存在多条 is_deleted=false 记录；
+        - findByToken → findByTokenAndDeletedFalse 走 getSingleResult，命中 2 行抛出
+          IncorrectResultSizeDataAccessException（GET /api/v1/apns_token/is/registered → 500）。
+
+        清理策略：
+        - 仅软删除（is_deleted=true）「同一 token 已存在 ACTIVE 行」的非 ACTIVE 重复行，
+          例如已登出（LOGOUT）用户留下的旧绑定，保留当前正在使用的 ACTIVE 行；
+        - 代码层已保证：findByToken 容错多行；设备换账号重新登录时会把其他用户的
+          ACTIVE 绑定降级为 LOGOUT，不再产生新的多 ACTIVE 行。
+
+        说明：
+        - 语句幂等，重复执行无副作用；
+        - 全新数据库（表/status 列尚不存在）时 MARK_RAN 跳过，随后由 Hibernate 建表；
+        - 不删除多 ACTIVE 场景（代码层容忍，且新流程不会再产生）。
+    -->
+
+    <changeSet id="261013-cleanup-duplicate-apns-token" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_apns_token" />
+            <columnExists tableName="bytedesk_core_apns_token" columnName="status" />
+        </preConditions>
+
+        <sql dbms="mysql,mariadb">
+            UPDATE bytedesk_core_apns_token
+            SET is_deleted = b'1'
+            WHERE is_deleted = b'0'
+              AND status &lt;&gt; 'ACTIVE'
+              AND EXISTS (
+                  SELECT 1 FROM bytedesk_core_apns_token x
+                  WHERE x.is_deleted = b'0'
+                    AND x.device_token = bytedesk_core_apns_token.device_token
+                    AND x.status = 'ACTIVE'
+                    AND x.uuid &lt;&gt; bytedesk_core_apns_token.uuid
+              );
+        </sql>
+
+        <sql dbms="postgresql,h2,oracle,kingbase">
+            UPDATE bytedesk_core_apns_token
+            SET is_deleted = TRUE
+            WHERE is_deleted = FALSE
+              AND status &lt;&gt; 'ACTIVE'
+              AND EXISTS (
+                  SELECT 1 FROM bytedesk_core_apns_token x
+                  WHERE x.is_deleted = FALSE
+                    AND x.device_token = bytedesk_core_apns_token.device_token
+                    AND x.status = 'ACTIVE'
+                    AND x.uuid &lt;&gt; bytedesk_core_apns_token.uuid
+              );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

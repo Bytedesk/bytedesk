@@ -26,6 +26,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.user.UserProtobuf;
+import com.bytedesk.core.redis.RedisRoundRobinSequenceService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.service.agent.AgentEntity;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
@@ -57,6 +58,83 @@ class TicketAssignmentServiceTest {
         assertTrue(result.isResolved());
         assertEquals("member-1", result.assigneeUid());
         assertEquals(TicketAssignmentModeEnum.DEFAULT.name(), result.strategy());
+    }
+
+    @Test
+    void roundRobinShouldCycleAcrossCandidatesOnRepeatedDepartmentTickets() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        MemberEntity memberA = MemberEntity.builder().uid("member-a").orgUid("org-1").build();
+        MemberEntity memberB = MemberEntity.builder().uid("member-b").orgUid("org-1").build();
+        MemberEntity memberC = MemberEntity.builder().uid("member-c").orgUid("org-1").build();
+        when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-1"))
+                .thenReturn(List.of(memberC, memberA, memberB));
+
+        // 三名候选连续 6 单：必须严格 A/B/C 循环各 2 次，与仓储返回顺序无关
+        List<String> picked = new java.util.ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            AssignmentResolutionResult result = fixture.service.resolveByStrategy(ticket);
+            assertTrue(result.isResolved());
+            picked.add(result.assigneeUid());
+        }
+        assertEquals(List.of("member-a", "member-b", "member-c", "member-a", "member-b", "member-c"), picked);
+    }
+
+    @Test
+    void roundRobinShouldNormalizeBlankDepartmentToOrganizationScope() {
+        Fixture fixture = new Fixture();
+        // 桌面端“全公司”传空串/纯空白：候选解析按组织兜底，序列归一化到 ORGANIZATION 作用域，
+        // 与 NULL 部门的工单共享同一序列，不再依赖 IS NULL 历史查询
+        TicketEntity blankDeptTicket = TicketEntity.builder()
+                .uid("ticket-blank")
+                .orgUid("org-1")
+                .type(TicketTypeEnum.INTERNAL.name())
+                .departmentUid("   ")
+                .build();
+        TicketEntity nullDeptTicket = TicketEntity.builder()
+                .uid("ticket-null")
+                .orgUid("org-1")
+                .type(TicketTypeEnum.INTERNAL.name())
+                .build();
+        MemberEntity memberA = MemberEntity.builder().uid("member-a").orgUid("org-1").build();
+        MemberEntity memberB = MemberEntity.builder().uid("member-b").orgUid("org-1").build();
+        when(fixture.memberRepository.findByOrgUidAndDeletedFalse("org-1"))
+                .thenReturn(List.of(memberB, memberA));
+
+        AssignmentResolutionResult first = fixture.service.resolveByStrategy(blankDeptTicket);
+        AssignmentResolutionResult second = fixture.service.resolveByStrategy(nullDeptTicket);
+
+        assertTrue(first.isResolved());
+        assertTrue(second.isResolved());
+        assertEquals("member-a", first.assigneeUid());
+        assertEquals("member-b", second.assigneeUid());
+    }
+
+    @Test
+    void roundRobinShouldDeduplicateMembersAcrossConfiguredNodeDepartments() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setProcessEntityUid("process-multi-dept");
+
+        ProcessEntity process = ProcessEntity.builder()
+                .uid("process-multi-dept")
+                .flowgramSchema(buildDepartmentNodeSchema("task-multi", List.of("dept-1", "dept-2")))
+                .build();
+        // 两部门重叠同一成员：去重后不得增加轮询权重
+        MemberEntity shared = MemberEntity.builder().uid("member-shared").orgUid("org-1").build();
+        MemberEntity onlyDept2 = MemberEntity.builder().uid("member-dept2").orgUid("org-1").build();
+        when(fixture.processRepository.findByUid("process-multi-dept")).thenReturn(Optional.of(process));
+        when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-1")).thenReturn(List.of(shared));
+        when(fixture.memberRepository.findByDeptUidAndDeletedFalse("dept-2")).thenReturn(List.of(shared, onlyDept2));
+
+        List<String> picked = new java.util.ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            AssignmentResolutionResult result = fixture.service.resolveFromWorkflowNode(ticket, "task-multi");
+            assertTrue(result.isResolved());
+            picked.add(result.assigneeUid());
+        }
+        // 稳定循环：去重后 2 人各 2 次，shared 不因出现在两个部门而被连续选中
+        assertEquals(List.of("member-dept2", "member-shared", "member-dept2", "member-shared"), picked);
     }
 
     @Test
@@ -126,7 +204,7 @@ class TicketAssignmentServiceTest {
                 .build();
 
         when(fixture.workgroupRestService.findByUid("wg-1")).thenReturn(Optional.of(workgroup));
-        when(fixture.workgroupRoutingService.selectAgent(workgroup, null, TicketAssignmentModeEnum.DEFAULT.name()))
+        when(fixture.workgroupRoutingService.selectAgentForTicket(workgroup, TicketTypeEnum.EXTERNAL.name(), TicketAssignmentModeEnum.DEFAULT.name()))
                 .thenReturn(agent);
 
         AssignmentResolutionResult result = fixture.service.resolveByStrategy(ticket);
@@ -158,7 +236,7 @@ class TicketAssignmentServiceTest {
         when(fixture.workgroupRestService.findByUid("wg-random")).thenReturn(Optional.of(workgroup));
         when(fixture.ticketSettingsRestService.resolveEntityByWorkgroup("org-1", "wg-random", TicketTypeEnum.EXTERNAL.name()))
                 .thenReturn(settings);
-        when(fixture.workgroupRoutingService.selectAgent(workgroup, null, TicketAssignmentModeEnum.DEFAULT.name()))
+        when(fixture.workgroupRoutingService.selectAgentForTicket(workgroup, TicketTypeEnum.EXTERNAL.name(), TicketAssignmentModeEnum.DEFAULT.name()))
                 .thenReturn(agent);
 
         AssignmentResolutionResult result = fixture.service.resolveByStrategy(ticket);
@@ -667,6 +745,9 @@ class TicketAssignmentServiceTest {
         private final WorkgroupRestService workgroupRestService = mock(WorkgroupRestService.class);
         private final WorkgroupRoutingService workgroupRoutingService = mock(WorkgroupRoutingService.class);
         private final UidUtils uidUtils = mock(UidUtils.class);
+        private final StubSequenceService stubSequenceService = new StubSequenceService();
+        private final TicketRoundRobinScopeService roundRobinScopeService =
+                new TicketRoundRobinScopeService(stubSequenceService);
 
         private final TicketAssignmentService service = new TicketAssignmentService(
                 processRepository,
@@ -680,6 +761,23 @@ class TicketAssignmentServiceTest {
                 ticketNotificationService,
                 workgroupRestService,
                 workgroupRoutingService,
-                uidUtils);
+                uidUtils,
+                roundRobinScopeService);
+    }
+    /** 测试桩：进程内原子取号，模拟 Redis INCR 的严格递增语义（按 scopeKey 独立计数） */
+    static final class StubSequenceService extends RedisRoundRobinSequenceService {
+
+        private final java.util.Map<String, java.util.concurrent.atomic.AtomicLong> counters =
+                new java.util.concurrent.ConcurrentHashMap<>();
+
+        StubSequenceService() {
+            super(null);
+        }
+
+        @Override
+        public long nextSequence(String scopeKey) {
+            return counters.computeIfAbsent(scopeKey, k -> new java.util.concurrent.atomic.AtomicLong())
+                    .incrementAndGet();
+        }
     }
 }

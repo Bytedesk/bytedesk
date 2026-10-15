@@ -51,6 +51,7 @@ import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
+import com.bytedesk.core.redis.RedisRoundRobinSequenceService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,6 +73,7 @@ public class TicketAssignmentService {
     private final WorkgroupRestService workgroupRestService;
     private final WorkgroupRoutingService workgroupRoutingService;
     private final UidUtils uidUtils;
+    private final TicketRoundRobinScopeService roundRobinScopeService;
 
     private static final Random RANDOM = new Random();
     private static final String DEFAULT_ASSIGNMENT_MODE = TicketAssignmentModeEnum.DEFAULT.name();
@@ -254,8 +256,8 @@ public class TicketAssignmentService {
 
         return switch (assigneeType) {
             case "user" -> resolveSpecificUser(assigneeUids, ticket);
-            case "department" -> resolveNodeDepartment(assigneeUids, ticket, nodeAssignmentMode);
-            case "role" -> resolveRoleMember(ticket, data.getString("roleUid"), nodeAssignmentMode);
+            case "department" -> resolveNodeDepartment(assigneeUids, ticket, nodeAssignmentMode, taskDefinitionKey);
+            case "role" -> resolveRoleMember(ticket, data.getString("roleUid"), nodeAssignmentMode, taskDefinitionKey);
             case "reporter" -> resolveReporter(ticket);
             case "leader" -> resolveLeader(ticket);
             default -> AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
@@ -265,7 +267,8 @@ public class TicketAssignmentService {
 
     private AssignmentResolutionResult resolveNodeDepartment(JSONArray assigneeUids,
                                                              TicketEntity ticket,
-                                                             String nodeAssignmentMode) {
+                                                             String nodeAssignmentMode,
+                                                             String taskDefinitionKey) {
         if (assigneeUids == null || assigneeUids.isEmpty()) {
             return resolveDepartmentMemberWithStrategy(ticket, nodeAssignmentMode);
         }
@@ -310,7 +313,15 @@ public class TicketAssignmentService {
                     "manual mode — no auto-assignment for configured departments");
         }
         List<MemberEntity> candidates = new ArrayList<>(candidateMap.values());
-        String chosenUid = applyStrategy(mode, ticket, candidates);
+        // 节点明确指定多个部门：使用 NODE_DEPARTMENTS 作用域（流程+节点+部门集合），
+        // 与表单部门(DEPARTMENT)、组织兜底(ORGANIZATION)序列相互隔离
+        List<String> sortedDepartmentUids = configuredDepartmentUids.stream()
+                .distinct()
+                .sorted()
+                .toList();
+        MemberEntity selected = roundRobinScopeService.roundRobinNodeDepartments(
+                ticket, ticket.getProcessEntityUid(), taskDefinitionKey, sortedDepartmentUids, candidates);
+        String chosenUid = selected != null ? selected.getUid() : null;
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "strategy returned no result for configured department members");
@@ -423,6 +434,26 @@ public class TicketAssignmentService {
             if (isExternalWorkgroupTicket(ticket)) {
                 return resolveWorkgroupMemberWithStrategy(ticket, nodeAssignmentMode, AssignmentSource.NODE_CONFIG);
             }
+            // 内部工单未选部门：回退到组织全部有效成员，避免设置自动分配时无部门工单无法分配
+            if (StringUtils.hasText(ticket.getOrgUid())) {
+                List<MemberEntity> orgMembers = memberRepository.findByOrgUidAndDeletedFalse(ticket.getOrgUid());
+                if (!orgMembers.isEmpty()) {
+                    String orgStrategy = StringUtils.hasText(nodeAssignmentMode)
+                        ? TicketAssignmentModeEnum.normalizeRuntime(nodeAssignmentMode)
+                        : TicketAssignmentModeEnum.normalizeRuntime(getAssignmentMode(ticket));
+                    TicketAssignmentModeEnum orgMode = TicketAssignmentModeEnum.resolveRuntimeMode(orgStrategy);
+                    if (orgMode == TicketAssignmentModeEnum.MANUAL) {
+                        return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
+                                "manual mode — no auto-assignment for org fallback");
+                    }
+                    String orgChosenUid = applyStrategy(orgMode, ticket, orgMembers);
+                    if (StringUtils.hasText(orgChosenUid)) {
+                        return AssignmentResolutionResult.resolved(orgChosenUid, AssignmentSource.NODE_CONFIG,
+                                orgStrategy, "组织成员按 " + orgStrategy + " 分配（未选部门兜底）",
+                                "组织成员 " + orgMembers.size() + " 人");
+                    }
+                }
+            }
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "no department uid for type=department");
         }
@@ -451,7 +482,7 @@ public class TicketAssignmentService {
     }
 
     private AssignmentResolutionResult resolveRoleMember(TicketEntity ticket, String roleUid,
-                                                          String nodeAssignmentMode) {
+                                                          String nodeAssignmentMode, String taskDefinitionKey) {
         if (!StringUtils.hasText(roleUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "no roleUid configured for type=role");
@@ -484,7 +515,10 @@ public class TicketAssignmentService {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "manual mode — no auto-assignment for role " + roleUid);
         }
-        String chosenUid = applyStrategy(mode, ticket, candidates);
+        // 节点角色：使用 NODE_ROLE 作用域（流程+节点+roleUid），与其他候选来源序列隔离
+        MemberEntity selected = roundRobinScopeService.roundRobinNodeRole(
+                ticket, ticket.getProcessEntityUid(), taskDefinitionKey, roleUid, candidates);
+        String chosenUid = selected != null ? selected.getUid() : null;
         if (!StringUtils.hasText(chosenUid)) {
             return AssignmentResolutionResult.unresolved(AssignmentSource.NODE_CONFIG,
                     "strategy returned no result for role members");
@@ -581,6 +615,13 @@ public class TicketAssignmentService {
 
     /**
      * Get candidate members for assignment based on ticket's department.
+     * <p>
+     * 候选人解析优先级：
+     * <ol>
+     * <li>工单已选部门 → 部门成员（部门无人则不分配，尊重显式部门选择）</li>
+     * <li>外部工单且绑定工作组 → 工作组可用客服</li>
+     * <li>内部工单未选部门 → 组织全部有效成员兜底（修复：设置自动分配时无部门工单不分配的问题）</li>
+     * </ol>
      */
     List<MemberEntity> getCandidates(TicketEntity ticket) {
         if (StringUtils.hasText(ticket.getDepartmentUid())) {
@@ -588,6 +629,11 @@ public class TicketAssignmentService {
         }
         if (isExternalWorkgroupTicket(ticket)) {
             return getWorkgroupMembers(ticket);
+        }
+        // 兜底：内部工单未选部门时，使用组织全部有效成员，
+        // 保证 TicketBasicSettings 配置自动分配时无论是否选择部门都能分配处理人
+        if (StringUtils.hasText(ticket.getOrgUid())) {
+            return memberRepository.findByOrgUidAndDeletedFalse(ticket.getOrgUid());
         }
         return List.of();
     }
@@ -609,11 +655,22 @@ public class TicketAssignmentService {
             return AssignmentResolutionResult.unresolved(source, "manual mode — no auto-assignment");
         }
 
-        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, null, mode.name());
+        // 工单独立选人：不复用客服会话预计算的 nextAgentUid，也不发布异步推进事件；
+        // 通过原子取号在工作组客服快照（不要求在线）中严格轮询，避免连续分配集中到同一人，
+        // 且不受工作组自身 routingMode（如 MANUAL 不推进游标）干扰
+        AgentEntity selectedAgent;
+        try {
+            selectedAgent = workgroupRoutingService.selectAgentForTicket(workgroup, ticket.getType(), mode.name());
+        } catch (RedisRoundRobinSequenceService.RoundRobinSequenceException ex) {
+            log.error("resolveWorkgroupMemberWithStrategy: round robin sequence failed for ticket={}, workgroup={}",
+                    ticket.getUid(), workgroup.getUid(), ex);
+            return AssignmentResolutionResult.unresolved(source,
+                    "round robin sequence unavailable: " + ex.getMessage());
+        }
         if (selectedAgent == null || selectedAgent.getMember() == null
                 || !StringUtils.hasText(selectedAgent.getMember().getUid())) {
             return AssignmentResolutionResult.unresolved(source,
-                    "no available workgroup agents: " + workgroup.getUid());
+                    "no valid member-backed workgroup agents: " + workgroup.getUid());
         }
 
         return AssignmentResolutionResult.resolved(
@@ -621,7 +678,7 @@ public class TicketAssignmentService {
                 source,
                 mode.name(),
                 "工作组 " + workgroup.getUid() + " 按 " + mode.name() + " 分配",
-                "工作组可用客服 " + workgroup.getAvailableAgentCount() + " 人");
+                "工单按工作组客服（去重后）选中 " + selectedAgent.getMember().getUid());
     }
 
     private boolean isExternalWorkgroupTicket(TicketEntity ticket) {
@@ -677,26 +734,17 @@ public class TicketAssignmentService {
         if (candidates.isEmpty()) {
             return null;
         }
-        TicketEntity lastAssigned = ticketRepository
-                .findFirstByDepartmentUidAndAssigneeNotAndAssigneeNotOrderByCreatedAtDesc(
-                        ticket.getDepartmentUid(),
-                        BytedeskConsts.EMPTY_JSON_STRING,
-                        BytedeskConsts.EMPTY_JSON_STRING)
-                .orElse(null);
-
-        if (lastAssigned == null || lastAssigned.getAssignee() == null
-                || !StringUtils.hasText(lastAssigned.getAssignee().getUid())) {
-            return candidates.get(0).getUid();
+        // 原子取号轮询：不再从历史工单推导游标（历史查询存在无部门 NULL/空串不一致、
+        // createdAt 排序偏差、并发窗口与作用域混用问题）。按实际候选来源隔离序列：
+        // 有部门 → DEPARTMENT/departmentUid；未选部门（NULL、空串、纯空白统一归一化）→ ORGANIZATION/orgUid。
+        // Redis 取号失败时抛出 RoundRobinSequenceException，向上传播为分配失败，不回退首人。
+        MemberEntity selected;
+        if (StringUtils.hasText(ticket.getDepartmentUid())) {
+            selected = roundRobinScopeService.roundRobinDepartment(ticket, ticket.getDepartmentUid(), candidates);
+        } else {
+            selected = roundRobinScopeService.roundRobinOrganization(ticket, candidates);
         }
-
-        String lastAssigneeUid = lastAssigned.getAssignee().getUid();
-        for (int i = 0; i < candidates.size(); i++) {
-            if (lastAssigneeUid.equals(candidates.get(i).getUid())) {
-                int nextIndex = (i + 1) % candidates.size();
-                return candidates.get(nextIndex).getUid();
-            }
-        }
-        return candidates.get(0).getUid();
+        return selected != null ? selected.getUid() : null;
     }
 
     private String leastActiveAssign(List<MemberEntity> candidates) {
@@ -746,13 +794,24 @@ public class TicketAssignmentService {
         if (candidates.isEmpty()) {
             return null;
         }
-        // Find the most recently assigned ticket among all candidates
-        for (MemberEntity candidate : candidates) {
-            Optional<TicketEntity> lastTicket = ticketRepository
+        // 部门维度查询最近已分配工单；内部工单未选部门时回退到组织维度（department_uid 为空）
+        Optional<TicketEntity> lastTicketBase;
+        if (StringUtils.hasText(ticket.getDepartmentUid())) {
+            lastTicketBase = ticketRepository
                     .findFirstByDepartmentUidAndAssigneeNotAndAssigneeNotOrderByCreatedAtDesc(
                             ticket.getDepartmentUid(),
                             BytedeskConsts.EMPTY_JSON_STRING,
-                            BytedeskConsts.EMPTY_JSON_STRING)
+                            BytedeskConsts.EMPTY_JSON_STRING);
+        } else {
+            lastTicketBase = ticketRepository
+                    .findFirstByOrgUidAndDepartmentUidIsNullAndAssigneeNotAndAssigneeNotOrderByCreatedAtDesc(
+                            ticket.getOrgUid(),
+                            BytedeskConsts.EMPTY_JSON_STRING,
+                            BytedeskConsts.EMPTY_JSON_STRING);
+        }
+        // Find the most recently assigned ticket among all candidates
+        for (MemberEntity candidate : candidates) {
+            Optional<TicketEntity> lastTicket = lastTicketBase
                     .filter(t -> {
                         var a = t.getAssignee();
                         return a != null && candidate.getUid().equals(a.getUid());
@@ -777,8 +836,27 @@ public class TicketAssignmentService {
             MemberEntity member = memberOpt.get();
 
             // 重新加载最新工单实体：调用方传入的可能是游离态旧版本引用，
-            // 直接 merge 会因版本过期触发 ObjectOptimisticLockingFailureException
-            TicketEntity current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
+            // 直接 merge 会因版本过期触发 ObjectOptimisticLockingFailureException。
+            // 使用悲观行锁读取：与并发分配事务（会话补分配/重复事件重试）互斥，
+            // 保证“重读 → 幂等判断 → 写入”是跨实例原子临界区
+            TicketEntity current;
+            try {
+                current = ticketRepository.findByUidForAssignment(ticket.getUid()).orElse(ticket);
+            } catch (Exception lockEx) {
+                // 行锁不可用（如非事务上下文/测试桩）时退回普通读取，保持可测试性
+                log.debug("applyAssignment: pessimistic read unavailable, fallback to findByUid, ticket={}",
+                        ticket.getUid(), lockEx);
+                current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
+            }
+            // 分配幂等保护：重读后若工单已有有效处理人，复用既有分配，不二次写入/消费轮询名额
+            // （重复创建事件、会话补分配竞态等场景；显式指派路径在上游已拦截，不会走到这里）
+            if (hasValidAssignee(current) && !assigneeUid.equals(current.getAssignee().getUid())) {
+                log.info("applyAssignment: ticket={} already assigned to {}, skip reassignment to {}",
+                        ticket.getUid(), current.getAssignee().getUid(), assigneeUid);
+                ticket.setAssignee(current.getAssigneeString());
+                ticket.setStatus(current.getStatus());
+                return;
+            }
             UserProtobuf assigneeProtobuf = buildAssigneeProtobuf(member);
             current.setAssignee(assigneeProtobuf.toJson());
 
@@ -823,6 +901,26 @@ public class TicketAssignmentService {
             }
         } catch (Exception e) {
             log.error("applyAssignment: failed for ticket={}, assigneeUid={}", ticket.getUid(), assigneeUid, e);
+            // 分配成功以落地为准：写入/流程操作失败必须向上传播，阻止调用方写“成功分配”日志或发出成功通知
+            throw new AssignmentApplyException("apply assignment failed for ticket " + ticket.getUid(), e);
+        }
+    }
+
+    /** 分配写入失败（工单/Flowable 任务/流程变量落地失败）时抛出，阻止调用方按成功处理 */
+    public static class AssignmentApplyException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        public AssignmentApplyException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    private boolean hasValidAssignee(TicketEntity ticket) {
+        try {
+            return ticket.getAssignee() != null && StringUtils.hasText(ticket.getAssignee().getUid());
+        } catch (Exception ex) {
+            return false;
         }
     }
 
@@ -835,8 +933,17 @@ public class TicketAssignmentService {
             }
             MemberEntity member = memberOpt.get();
 
-            // 与 applyAssignment 相同：重新加载最新实体，规避游离态旧版本 merge 失败
-            TicketEntity current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
+            // 与 applyAssignment 相同：重新加载最新实体 + 悲观行锁，规避游离态旧版本 merge 失败，
+            // 并与并发分配事务（创建监听/会话补分配/重复事件重试）互斥
+            TicketEntity current;
+            try {
+                current = ticketRepository.findByUidForAssignment(ticket.getUid()).orElse(ticket);
+            } catch (Exception lockEx) {
+                // 行锁不可用（如非事务上下文/测试桩）时退回普通读取，保持可测试性
+                log.debug("applyAssignmentForNextNode: pessimistic read unavailable, fallback to findByUid, ticket={}",
+                        ticket.getUid(), lockEx);
+                current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
+            }
             UserProtobuf assigneeProtobuf = buildAssigneeProtobuf(member);
             current.setAssignee(assigneeProtobuf.toJson());
 
@@ -866,6 +973,9 @@ public class TicketAssignmentService {
         } catch (Exception e) {
             log.error("applyAssignmentForNextNode: failed for ticket={}, assigneeUid={}",
                     ticket.getUid(), assigneeUid, e);
+            // 与 applyAssignment 一致：失败必须传播，不写成功分配日志
+            throw new AssignmentApplyException(
+                    "apply assignment for next node failed for ticket " + ticket.getUid(), e);
         }
     }
 

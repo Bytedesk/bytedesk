@@ -25,6 +25,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class QueueMemberStatisticRow {
 
+    private final ZonedDateTime createdAt;
+    private final String agentUid;
     private final String threadUid;
     private final String threadStatus;
     private final ZonedDateTime visitorEnqueueAt;

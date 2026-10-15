@@ -24,6 +24,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.SystemContent;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
+import com.bytedesk.core.push.service.AgentPushGateService;
 import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -55,6 +56,7 @@ class TicketEventListenerTest {
                 SmsTemplateRepository smsTemplateRepository = mock(SmsTemplateRepository.class);
                 @SuppressWarnings("unchecked")
                 ObjectProvider<PushMobileService> mobilePushProvider = mock(ObjectProvider.class);
+                AgentPushGateService agentPushGateService = mock(AgentPushGateService.class);
                 EmailPushSendService emailPushSendService = mock(EmailPushSendService.class);
                 TicketSettingsRepository ticketSettingsRepository = mock(TicketSettingsRepository.class);
                 TicketRepository ticketRepository = mock(TicketRepository.class);
@@ -63,7 +65,8 @@ class TicketEventListenerTest {
                 IMessageSendService messageSendService = mock(IMessageSendService.class);
                 TicketNotificationService ticketNotificationService = new TicketNotificationService(
                                 notificationService, memberRestService, workgroupRepository, visitorRepository, emailProviderRepository,
-                                smsPushSendService, smsTemplateRepository, mobilePushProvider, emailPushSendService, ticketSettingsRepository,
+                                smsPushSendService, smsTemplateRepository, mobilePushProvider, agentPushGateService, emailPushSendService,
+                                ticketSettingsRepository,
                                 ticketRepository, threadRestService, messageRestService, messageSendService);
 
                 AgentEntity agentA = buildAgent("agent-a", "user-a");

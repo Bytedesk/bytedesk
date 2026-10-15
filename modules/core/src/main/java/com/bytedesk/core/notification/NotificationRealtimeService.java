@@ -84,18 +84,18 @@ public class NotificationRealtimeService {
         String mqttTopic = TopicUtils.getSystemTopic(userUid);
         log.info("[NOTICE-DIAG] sendMqttNotification: userUid={} topic={} title={}",
                 userUid, mqttTopic, notification.getTitle());
-        MessageProto.Message message = buildMqttNotice(notification, mqttTopic);
-        if (message == null) {
-            log.info("[NOTICE-DIAG] sendMqttNotification SKIPPED: buildMqttNotice returned null");
-            return;
-        }
-
         try {
+            MessageProto.Message message = buildMqttNotice(notification, mqttTopic);
+            if (message == null) {
+                log.info("[NOTICE-DIAG] sendMqttNotification SKIPPED: buildMqttNotice returned null");
+                return;
+            }
             messageSocketService.sendMqttMessageToUser(userUid, mqttTopic, message);
             log.info("[NOTICE-DIAG] sendMqttNotification sent successfully to userUid={}", userUid);
-        } catch (Exception ex) {
+        } catch (Exception | LinkageError ex) {
+            // NoSuchMethodError 等属于 Error 而非 Exception，需显式拦截，避免中断事件分发及异步线程
             log.warn("send notification mqtt event failed: topic={}, notificationUid={}, error={}",
-                    mqttTopic, notification.getUid(), ex.getMessage());
+                    mqttTopic, notification.getUid(), ex.toString());
         }
     }
 
@@ -136,9 +136,9 @@ public class NotificationRealtimeService {
 
         try {
             return MessageConvertUtils.toProtoBean(MessageProto.Message.newBuilder(), message.toJson());
-        } catch (IOException ex) {
+        } catch (IOException | RuntimeException | LinkageError ex) {
             log.warn("build notification mqtt message failed: notificationUid={}, error={}",
-                    notification.getUid(), ex.getMessage());
+                    notification.getUid(), ex.toString());
             return null;
         }
     }

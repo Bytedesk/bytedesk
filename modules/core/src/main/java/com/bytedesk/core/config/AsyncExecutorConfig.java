@@ -17,18 +17,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.support.TaskExecutorAdapter;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * async executor config
  * https://www.baeldung.com/spring-async
  * https://spring.io/guides/gs/async-method
  */
+@Slf4j
 @EnableAsync
 @Configuration
 public class AsyncExecutorConfig implements AsyncConfigurer {
@@ -52,5 +57,21 @@ public class AsyncExecutorConfig implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
         return applicationTaskExecutor();
+    }
+
+    /**
+     * @Async 方法内事件监听器抛出 Error（如 protobuf 代码不一致导致的 NoSuchMethodError）时，
+     * 会被包装为 UndeclaredThrowableException 并传播到异步线程。默认的
+     * SimpleAsyncUncaughtExceptionHandler 每次都会打印完整堆栈，此处兜底记录一行摘要日志，
+     * 具体异常已在各事件监听器内部拦截处理
+     */
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (throwable, method, params) -> {
+            Throwable cause = NestedExceptionUtils.getMostSpecificCause(throwable);
+            log.error("async method uncaught exception: method={}, rootCause={}: {}",
+                    method.getDeclaringClass().getSimpleName() + "." + method.getName(),
+                    cause.getClass().getName(), cause.getMessage());
+        };
     }
 }

@@ -19,7 +19,9 @@ public enum PushStatusEnum {
     CONFIRMED,
     EXPIRED,
     SUCCESS,
-    ERROR;
+    ERROR,
+    /** 未尝试发送（如接收方无 APNs token 绑定），区别于已发送但失败的 ERROR */
+    SKIPPED;
 
     // 根据字符串查找对应的枚举常量
     public static PushStatusEnum fromValue(String value) {

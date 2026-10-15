@@ -311,9 +311,17 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
             return latestThread;
         }
 
-        // 按 TicketBasicSettingsEntity.assignmentMode 选择客服（MANUAL 时返回 null 即不分配）
+        // 按 TicketBasicSettingsEntity.assignmentMode 选择客服（MANUAL 时返回 null 即不分配）。
+        // 使用工单独立选人入口：原子取号轮询，不复用/推进客服会话的预计算路由状态
         String assignmentMode = getTicketAssignmentMode(ticket);
-        AgentEntity selectedAgent = workgroupRoutingService.selectAgent(workgroup, latestThread, assignmentMode);
+        AgentEntity selectedAgent;
+        try {
+            selectedAgent = workgroupRoutingService.selectAgentForTicket(workgroup, ticket.getType(), assignmentMode);
+        } catch (com.bytedesk.core.redis.RedisRoundRobinSequenceService.RoundRobinSequenceException ex) {
+            log.error("ensureThreadAgentAssigned: round robin sequence failed for ticket {}, workgroup {}",
+                    ticket.getUid(), workgroupUid, ex);
+            return latestThread;
+        }
         if (selectedAgent == null) {
             log.info("No available agent for ticket {}, workgroup {}, assignmentMode={}",
                     ticket.getUid(), workgroupUid, assignmentMode);
@@ -328,43 +336,64 @@ public class TicketThreadRoutingStrategy extends AbstractThreadRoutingStrategy {
 
         // 同步工单 assignee/status：自动分配成功后，工单从 NEW/UNCLAIMED 进入 ASSIGNED
         try {
+            // 悲观行锁重读最新工单：与创建监听分配事务互斥，防止基于旧实体覆盖并发分配结果
+            TicketEntity current;
+            try {
+                current = ticketRepository.findByUidForAssignment(ticket.getUid()).orElse(ticket);
+            } catch (Exception lockEx) {
+                log.debug("ensureThreadAgentAssigned: pessimistic read unavailable, fallback to findByUid, ticket={}",
+                        ticket.getUid(), lockEx);
+                current = ticketRepository.findByUid(ticket.getUid()).orElse(ticket);
+            }
             boolean ticketHasAssignee = false;
             try {
-                UserProtobuf existingAssignee = ticket.getAssignee();
+                UserProtobuf existingAssignee = current.getAssignee();
                 ticketHasAssignee = existingAssignee != null && StringUtils.hasText(existingAssignee.getUid());
             } catch (Exception ignore) {
                 ticketHasAssignee = false;
             }
+            if (ticketHasAssignee) {
+                // 并发分配已落地：不二次取号覆盖；尝试把当前处理人映射为会话客服，
+                // 保证创建监听与本补分配竞态时最终处理人成员身份一致
+                AgentEntity concurrentAgent = resolveAssignedAgentFromTicket(current, workgroup);
+                if (concurrentAgent != null) {
+                    return applyAgentToThread(latestThread, workgroup, concurrentAgent);
+                }
+                log.info("ensureThreadAgentAssigned: ticket {} already assigned to {} by concurrent writer, "
+                        + "no matching workgroup agent, skip", ticket.getUid(), current.getAssignee().getUid());
+                return latestThread;
+            }
 
             boolean wroteTicketAssignee = false;
-            if (!ticketHasAssignee) {
-                MemberEntity member = selectedAgent.getMember();
-                if (member != null && StringUtils.hasText(member.getUid())) {
-                    UserProtobuf assigneeMember = UserProtobuf.builder()
-                            .uid(member.getUid())
-                            .nickname(member.getNickname())
-                            .avatar(member.getAvatar())
-                            .type(UserTypeEnum.MEMBER.name())
-                            .build();
-                    ticket.setAssignee(assigneeMember.toJson());
-                    wroteTicketAssignee = true;
-                } else {
-                    log.warn("Selected agent {} has no member, skip syncing ticket assignee for ticket {}",
-                            selectedAgent.getUid(), ticket.getUid());
-                }
+            MemberEntity member = selectedAgent.getMember();
+            if (member != null && StringUtils.hasText(member.getUid())) {
+                UserProtobuf assigneeMember = UserProtobuf.builder()
+                        .uid(member.getUid())
+                        .nickname(member.getNickname())
+                        .avatar(member.getAvatar())
+                        .type(UserTypeEnum.MEMBER.name())
+                        .build();
+                current.setAssignee(assigneeMember.toJson());
+                wroteTicketAssignee = true;
+            } else {
+                log.warn("Selected agent {} has no member, skip syncing ticket assignee for ticket {}",
+                        selectedAgent.getUid(), ticket.getUid());
+                return latestThread;
             }
 
             if (wroteTicketAssignee) {
-                String status = ticket.getStatus();
+                String status = current.getStatus();
                 if (!StringUtils.hasText(status)
                         || TicketStatusEnum.NEW.name().equalsIgnoreCase(status)
                         || TicketStatusEnum.UNCLAIMED.name().equalsIgnoreCase(status)) {
-                    ticket.setStatus(TicketStatusEnum.ASSIGNED.name());
+                    current.setStatus(TicketStatusEnum.ASSIGNED.name());
                 }
-                ticketRepository.save(ticket);
+                ticketRepository.save(current);
             }
         } catch (Exception e) {
-            log.warn("Failed to sync ticket assignee/status for ticket {}: {}", ticket.getUid(), e.getMessage());
+            // 工单同步失败：不继续宣称分配成功并写会话客服，避免工单处理人与会话归属不一致
+            log.error("Failed to sync ticket assignee/status for ticket {}: {}", ticket.getUid(), e.getMessage(), e);
+            return latestThread;
         }
 
         ThreadEntity savedThread = applyAgentToThread(latestThread, workgroup, selectedAgent);

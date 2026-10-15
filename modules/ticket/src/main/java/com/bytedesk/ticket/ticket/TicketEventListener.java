@@ -78,6 +78,14 @@ public class TicketEventListener {
     // 用于防止同一消息重复处理
     private final Set<String> processedMessageUids = ConcurrentHashMap.newKeySet();
 
+    private boolean hasValidTicketAssignee(TicketEntity ticket) {
+        try {
+            return ticket.getAssignee() != null && StringUtils.hasText(ticket.getAssignee().getUid());
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
     @Order(3)
     @EventListener
     public void onOrganizationCreateEvent(OrganizationCreateEvent event) {
@@ -92,6 +100,25 @@ public class TicketEventListener {
     public void handleTicketCreateEvent(TicketCreateEvent event) {
         TicketEntity ticket = event.getTicket();
         log.info("开始创建工单流程实例: ticketUid={}, orgUid={}", ticket.getUid(), ticket.getOrgUid());
+
+        // 重复事件保护：启动/关联流程前重查工单，已有 processInstanceId 说明此前的事件消费
+        // 已启动过流程（重复创建事件/并发消费），直接复用既有流程，防止创建两个流程实例
+        Optional<TicketEntity> committedOpt = ticketRepository.findByUid(ticket.getUid());
+        if (committedOpt.isPresent() && StringUtils.hasText(committedOpt.get().getProcessInstanceId())) {
+            TicketEntity committed = committedOpt.get();
+            log.info("handleTicketCreateEvent: ticket {} already has processInstanceId={}, skip duplicate create event",
+                    ticket.getUid(), committed.getProcessInstanceId());
+            // 若此前分配未生效（流程已存在但工单无处理人），仍尝试补一次自动分配
+            if (!hasValidTicketAssignee(committed)) {
+                try {
+                    ticketAssignmentService.autoAssign(committed, committed.getProcessInstanceId());
+                } catch (Exception ex) {
+                    log.error("handleTicketCreateEvent: retry autoAssign failed for ticket {}", ticket.getUid(), ex);
+                }
+            }
+            return;
+        }
+
         // 1. 准备流程变量
         Map<String, Object> variables = new HashMap<>();
         // 基本变量

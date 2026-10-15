@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        工单生成方式列（TicketCreateTypeEnum：MANUAL/AUTO）：
+        - MANUAL 手动生成：用户/访客通过页面或接口主动创建；
+        - AUTO 自动生成：会话关闭后按自动建单规则生成。
+
+        策略（参照 261013_add_apns_token_status_column.xml）：
+        1. 全新环境（列不存在）：addColumn 增加 create_type，存量数据默认 MANUAL。
+        2. ddl-auto=update 已由 JPA 自动建列的环境：preConditions MARK_RAN 跳过。
+    -->
+
+    <changeSet id="261014-add-ticket-create-type-column" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_ticket" columnName="create_type"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ticket">
+            <column name="create_type" type="VARCHAR(32)" defaultValue="MANUAL">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

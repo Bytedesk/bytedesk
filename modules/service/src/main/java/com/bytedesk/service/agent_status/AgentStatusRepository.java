@@ -26,6 +26,9 @@ public interface AgentStatusRepository extends JpaRepository<AgentStatusEntity, 
 
     List<AgentStatusDashboardRow> findByOrgUidAndDeletedFalseAndCreatedAtBetween(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
 
+    // 实体列表查询：用于按客服分组统计在线/挂起时长（需要 agent JSON 中的客服 uid）
+    List<AgentStatusEntity> findEntityByOrgUidAndDeletedFalseAndCreatedAtBetween(String orgUid, ZonedDateTime startTime, ZonedDateTime endTime);
+
     // 修改为根据agent中是否含有uid进行查询
     List<AgentStatusEntity> findByAgentContainsAndCreatedAtBetween(String agentUid, ZonedDateTime startTime, ZonedDateTime endTime);
     // List<AgentStatusEntity> findByAgentUidAndCreatedAtBetween(String agentUid, ZonedDateTime startTime, ZonedDateTime endTime);

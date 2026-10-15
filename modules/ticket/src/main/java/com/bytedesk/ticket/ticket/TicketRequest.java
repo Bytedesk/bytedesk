@@ -60,10 +60,13 @@ public class TicketRequest extends BaseRequest implements BlacklistCheckable {
     private String priority;
     // 
     private String threadTopic;
+    // 工单处理会话 uid（由创建流程生成的 TICKET_INTERNAL/TICKET_EXTERNAL 会话）
     private String threadUid;
-    // 内部工单：关联的客服会话（非工单会话）
+    // 工单生成方式(手动/自动)，自动建单场景传入 AUTO
+    private String createType;
+    // 关联的来源客服会话 uid（非工单会话），内部工单与自动创建外部工单时使用
     private String visitorThreadUid;
-    // 内部工单：关联的客服会话topic（非工单会话）
+    // 关联的来源客服会话 topic（非工单会话），内部工单与自动创建外部工单时使用
     private String visitorThreadTopic;
     // 
     private String categoryUid;
@@ -118,6 +121,11 @@ public class TicketRequest extends BaseRequest implements BlacklistCheckable {
     // 显式传 type 或 ticketSettingsUid 时为 null（走上方单类型字段路径）
     private TicketVisibilityQueryContext visibilityInternalContext;
     private TicketVisibilityQueryContext visibilityExternalContext;
+    // 按工单绑定设置过滤（阶段1：列表口径与工单实际绑定设置对齐）：
+    // settingsUid -> 该设置的可见性上下文；由服务端 enrich 一次性批量构建，客户端传入值一律被覆盖清空。
+    // map 非 null 时 Specification 走“设置分组谓词”：命中已解析设置按该设置过滤，未命中回退类型默认口径。
+    private Map<String, TicketVisibilityQueryContext> visibilityInternalSettingsContexts;
+    private Map<String, TicketVisibilityQueryContext> visibilityExternalSettingsContexts;
 
     // ===================== 工作流增强操作参数（Flowable） =====================
     // 当一个流程实例可能存在多个并行任务（如会签/或签）时，建议明确传入 taskId

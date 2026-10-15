@@ -14,6 +14,7 @@
 package com.bytedesk.ticket.ticket_settings;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -149,6 +150,16 @@ public class TicketSettingsRestService extends
     @Override
     public Optional<TicketSettingsEntity> findByUid(String uid) {
         return ticketSettingsRepository.findByUid(uid);
+    }
+
+    /**
+     * 批量按 uid 读取设置（工单可见性列表过滤用），软删除语义与 {@link #findByUid} 一致。
+     */
+    public List<TicketSettingsEntity> findByUidIn(Collection<String> uids) {
+        if (uids == null || uids.isEmpty()) {
+            return List.of();
+        }
+        return ticketSettingsRepository.findByUidIn(uids);
     }
 
     // @Cacheable(value = "ticketSettings", key = "#name + '_' + #orgUid + '_' +

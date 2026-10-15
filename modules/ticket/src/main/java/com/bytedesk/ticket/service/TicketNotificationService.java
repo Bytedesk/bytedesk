@@ -43,6 +43,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.notification.NotificationRequest;
 import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
+import com.bytedesk.core.push.service.AgentPushGateService;
 import com.bytedesk.core.push.service.PushMobileService;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -107,6 +108,8 @@ public class TicketNotificationService {
     private final SmsTemplateRepository smsTemplateRepository;
 
     private final ObjectProvider<PushMobileService> mobilePushProvider;
+
+    private final AgentPushGateService agentPushGateService;
 
     private final EmailPushSendService emailPushSendService;
 
@@ -617,12 +620,23 @@ public class TicketNotificationService {
                 continue;
             }
             try {
+                // 离线才推（D7）：在线坐席已通过站内通知感知，推送只会双提醒；工单为强通知不节流
+                if (agentPushGateService.isUserOnline(recipientUid)) {
+                    log.debug("Skip ticket mobile push because recipient online, ticketUid={}, recipientUid={}",
+                            ticket.getUid(), recipientUid);
+                    continue;
+                }
                 PushMobileService mobilePush = mobilePushProvider.getIfAvailable();
                 if (mobilePush == null) {
                     log.debug("Skip ticket mobile push: no AgentMobilePushService bean (community edition)");
                     return;
                 }
-                mobilePush.pushNotificationToUser(recipientUid, agentPushTitle, agentPushBody, ticket.getUid());
+                java.util.Map<String, String> extras = new java.util.HashMap<>();
+                extras.put("type", "ticket");
+                extras.put("ticketUid", ticket.getUid());
+                extras.put("orgUid", ticket.getOrgUid());
+                mobilePush.pushNotificationToUser(recipientUid, agentPushTitle, agentPushBody, ticket.getUid(),
+                        "ticket", extras);
             } catch (Exception ex) {
                 log.warn("APNs ticket push failed: ticketUid={}, agentUid={}, error={}",
                         ticket.getUid(), recipientUid, ex.getMessage());

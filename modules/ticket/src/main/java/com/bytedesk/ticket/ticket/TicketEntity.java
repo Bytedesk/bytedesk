@@ -25,6 +25,7 @@ import com.bytedesk.ticket.attachment.TicketAttachmentEntity;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket.enums.TicketPriorityEnum;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketCreateTypeEnum;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -121,27 +122,36 @@ public class TicketEntity extends BaseEntity {
     private String type = TicketTypeEnum.EXTERNAL.name();        // 工单领域(内部/外部)
 
     /**
-     * Thread topic for online customer service session
+     * Ticket creation source type (MANUAL/AUTO)
+     * 手动生成：用户/访客主动创建；自动生成：会话关闭后按自动建单规则生成
+     */
+    @Builder.Default
+    @Column(name = "create_type", length = 32)
+    private String createType = TicketCreateTypeEnum.MANUAL.name(); // 工单生成方式(手动/自动)
+
+    /**
+     * Thread topic for ticket processing thread
      * 一对多：threadTopic -> 多条 ticket
      */
     private String threadTopic;
 
     /**
-     * Associated thread UID for ticket conversation
+     * Associated ticket processing thread UID (TICKET_INTERNAL/TICKET_EXTERNAL thread,
+     * created and back-filled by the ticket creation flow)
      * 一对一：threadUid -> 单条 ticket
      */
     private String threadUid;
 
     /**
-     * Visitor/customer-service thread uid associated when creating internal ticket in TicketInternalDrawer
-     * 用于记录内部工单创建时关联的客服会话 uid（非工单会话）
+     * Visitor/customer-service source thread uid associated when creating internal ticket
+     * or auto-creating external ticket on thread close (not the ticket processing thread)
      * 一对多：visitorThreadUid -> 多条 ticket
      */
     private String visitorThreadUid;
 
     /**
-     * Visitor/customer-service thread topic associated when creating internal ticket in TicketInternalDrawer
-     * 用于记录内部工单创建时关联的客服会话 topic（非工单会话）
+     * Visitor/customer-service source thread topic associated when creating internal ticket
+     * or auto-creating external ticket on thread close (not the ticket processing thread)
      * 一对多：visitorThreadTopic -> 多条 ticket
      */
     private String visitorThreadTopic;

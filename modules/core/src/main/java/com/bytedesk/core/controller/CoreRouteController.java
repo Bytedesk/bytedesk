@@ -55,7 +55,7 @@ public class CoreRouteController {
         return "core/index";
     }
 
-    // http://127.0.0.1:9003/core/flow
+    // http://127.0.0.1:9003/module/core/flow
     @GetMapping({"flow", "flow/"})
     public String flow() {
         return "core/flow";

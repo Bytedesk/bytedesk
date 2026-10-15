@@ -68,6 +68,7 @@ public class ConnectionEventListener {
         log.debug("user onMqttDisconnectedEvent uid {}, clientId {}", userUid, clientId);
         // 先标记该 client 断开
         connectionRestService.markDisconnected(clientId);
+        recentConnectedAt.remove(clientId);
     }
 
     /**
@@ -84,4 +85,3 @@ public class ConnectionEventListener {
         log.info("connection onQuartzDay0Event: cleaned {} disconnected records older than 24 hours", deleted);
     }
 }
-

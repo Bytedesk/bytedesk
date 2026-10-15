@@ -136,7 +136,12 @@ public class AuthController {
         try {
             // 非性能测试模式才做预登录检查（失败次数/锁定等）
             if (!performanceTestingEnabled) {
-                authLoginRetryHelper.performPreLoginChecks(authRequest.getUsername());
+                ResponseEntity<?> preLoginCheckResponse = authLoginRetryHelper
+                        .performPreLoginChecks(authRequest.getUsername());
+                if (preLoginCheckResponse != null) {
+                    // 账号已锁定或达到最大失败次数，直接拒绝登录，不进入密码验证
+                    return preLoginCheckResponse;
+                }
             }
 
             Authentication authentication;

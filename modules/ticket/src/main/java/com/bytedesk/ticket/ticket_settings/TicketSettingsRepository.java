@@ -15,6 +15,7 @@ package com.bytedesk.ticket.ticket_settings;
 
 import java.util.Optional;
 import java.util.List;
+import java.util.Collection;
 
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -27,6 +28,13 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface TicketSettingsRepository extends JpaRepository<TicketSettingsEntity, Long>, JpaSpecificationExecutor<TicketSettingsEntity> {
 
     Optional<TicketSettingsEntity> findByUid(String uid);
+
+    /**
+     * 批量按 uid 读取设置（可见性列表过滤用）。
+     * 刻意不过滤软删除，与 findByUid/详情口径（canViewTicket）保持一致：
+     * 旧工单引用的已删除自定义设置仍按其内容判定可见性，不静默回退默认设置。
+     */
+    List<TicketSettingsEntity> findByUidIn(Collection<String> uids);
 
     Boolean existsByUid(String uid);
 

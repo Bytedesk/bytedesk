@@ -42,6 +42,9 @@ import com.bytedesk.core.message.content.QueueNotification;
 import com.bytedesk.core.message.content.RoutingPoolContent;
 import com.bytedesk.core.message.content.RoutingPoolNotification;
 import com.bytedesk.core.message.content.SystemContent;
+import com.bytedesk.core.push.service.AgentPushGateService;
+import com.bytedesk.core.push.service.PushMobileService;
+import com.bytedesk.core.push.service.PushReachProperties;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.thread.event.ThreadAgentOfflineEvent;
@@ -133,6 +136,9 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private final WorktimeService worktimeService;
     private final WorktimeSettingsResolver worktimeSettingsResolver;
     private final RobotEntitlementService robotEntitlementService;
+    private final ObjectProvider<PushMobileService> mobilePushProvider;
+    private final AgentPushGateService agentPushGateService;
+    private final PushReachProperties pushReachProperties;
 
     /**
      * AI 权益门控：判断组织当前是否允许进入大模型机器人对话
@@ -771,6 +777,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                         workgroup.getUid(), agent.getUid(), e.getMessage(), e);
             }
         }
+
+        // 补推：向「离线但有推送能力」的坐席发送移动端推送（规划 2026-10-13 §4.5）
+        notifyOfflineAgentsViaPush(workgroup, thread,
+                availableAgents != null ? availableAgents : java.util.Collections.emptyList(),
+                "thread_routing_pool", 0);
     }
 
     private MessageProtobuf getWorkgroupRoutingPoolMessage(VisitorRequest visitorRequest, ThreadEntity thread) {
@@ -1057,6 +1068,107 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
                 log.error("工作组排队通知发送失败 - workgroupUid: {}, agentUid: {}, error: {}",
                         workgroup.getUid(), agent.getUid(), e.getMessage(), e);
             }
+        }
+
+        // 补推：向「离线但有推送能力」的坐席发送移动端推送（规划 2026-10-13 §4.5）
+        notifyOfflineAgentsViaPush(workgroup, queuedThread,
+                availableAgents != null ? availableAgents : java.util.Collections.emptyList(),
+                "thread_queue", queuingCount);
+    }
+
+    /**
+     * 向工作组内「离线 + AVAILABLE + 有推送绑定」的坐席补发移动端推送。
+     *
+     * <p>不改变路由语义：仅补通知，不把离线坐席加入分配候选（属 2026-09-20 规划阶段 1）。
+     * 节流：workgroup 维度 60s 窗口，避免大工作组重复轰炸。
+     *
+     * @param onlineAgents   已收到站内通知的在线坐席集合（补推时排除）
+     * @param reachType      触达类型：thread_queue（排队）/ thread_routing_pool（路由池）
+     * @param queuingCount   排队位置（路由池场景传 0）
+     */
+    private void notifyOfflineAgentsViaPush(WorkgroupEntity workgroup, ThreadEntity thread,
+            List<AgentEntity> onlineAgents, String reachType, int queuingCount) {
+        if (!pushReachProperties.getThreadQueue().isEnabled()) {
+            return;
+        }
+        PushMobileService mobilePush = mobilePushProvider.getIfAvailable();
+        if (mobilePush == null) {
+            log.debug("离线坐席补推跳过：无 PushMobileService bean（社区版）");
+            return;
+        }
+
+        java.util.Set<String> onlineAgentUids = new java.util.HashSet<>();
+        for (AgentEntity agent : onlineAgents) {
+            onlineAgentUids.add(agent.getUid());
+        }
+
+        String visitorNickname = resolveThreadUserNickname(thread);
+        String title = "thread_queue".equals(reachType) ? "新访客请求" : "新会话待接入";
+        String body = queuingCount > 0
+                ? String.format("访客 %s 正在排队（第 %d 位）", visitorNickname, queuingCount)
+                : String.format("访客 %s 正在等待接入", visitorNickname);
+
+        for (AgentEntity agent : workgroup.getAgents()) {
+            if (agent == null || onlineAgentUids.contains(agent.getUid())) {
+                continue;
+            }
+            // 仅推坐席状态 AVAILABLE 的（离线但未下班的移动端坐席）
+            if (!Boolean.TRUE.equals(agent.isAvailable())) {
+                continue;
+            }
+            try {
+                String agentUserUid = agent.getMember() != null && agent.getMember().getUser() != null
+                        ? agent.getMember().getUser().getUid()
+                        : null;
+                if (!org.springframework.util.StringUtils.hasText(agentUserUid)) {
+                    continue;
+                }
+                // 离线判定 + workgroup 维度节流；无推送绑定时 provider 内部短路（记录 failure）
+                if (!agentPushGateService.shouldPush(agentUserUid, workgroup.getUid())) {
+                    continue;
+                }
+                java.util.Map<String, String> extras = new java.util.HashMap<>();
+                extras.put("type", reachType);
+                extras.put("threadUid", thread.getUid());
+                extras.put("threadTopic", thread.getTopic());
+                extras.put("workgroupUid", workgroup.getUid());
+                extras.put("orgUid", thread.getOrgUid());
+                // 发送方（访客）uid：推送记录 sender 列 + 客户端深链可用
+                extras.put("senderUid", resolveThreadUserUid(thread));
+                extras.put("serverTimestamp", String.valueOf(System.currentTimeMillis()));
+                mobilePush.pushNotificationToUser(agentUserUid, title, body, thread.getUid(), reachType, extras);
+                log.info("离线坐席补推已发送 - reachType: {}, workgroupUid: {}, agentUid: {}", reachType, workgroup.getUid(), agent.getUid());
+            } catch (Exception e) {
+                log.error("离线坐席补推失败 - reachType: {}, workgroupUid: {}, agentUid: {}, error: {}",
+                        reachType, workgroup.getUid(), agent.getUid(), e.getMessage(), e);
+            }
+        }
+    }
+
+    private String resolveThreadUserNickname(ThreadEntity thread) {
+        if (thread == null || !org.springframework.util.StringUtils.hasText(thread.getUser())) {
+            return "访客";
+        }
+        try {
+            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+            return user != null && org.springframework.util.StringUtils.hasText(user.getNickname())
+                    ? user.getNickname()
+                    : "访客";
+        } catch (Exception e) {
+            return "访客";
+        }
+    }
+
+    /** thread.user（访客）uid：推送记录 sender 列 + 客户端深链可用 */
+    private String resolveThreadUserUid(ThreadEntity thread) {
+        if (thread == null || !org.springframework.util.StringUtils.hasText(thread.getUser())) {
+            return null;
+        }
+        try {
+            UserProtobuf user = UserProtobuf.fromJson(thread.getUser());
+            return user != null ? user.getUid() : null;
+        } catch (Exception e) {
+            return null;
         }
     }
 

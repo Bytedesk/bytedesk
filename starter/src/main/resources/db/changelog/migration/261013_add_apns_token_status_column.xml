@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        APNs token 推送状态列（ApnsTokenStatusEnum：ACTIVE/LOGOUT/DISABLED）：
+        - ACTIVE 正常推送；LOGOUT 用户登出（不推会话/通知类消息，记录保留供营销/推广复用）；
+        - DISABLED 预留（手动禁用）。重新登录时恢复 ACTIVE。
+        使用 String status 而非布尔，便于后续扩展更多状态。
+
+        策略（参照 260923_add_push_android_table.xml）：
+        1. 全新环境（列不存在）：addColumn 增加 status，默认 ACTIVE。
+        2. ddl-auto=update 已由 JPA 自动建列的环境：preConditions MARK_RAN 跳过。
+    -->
+
+    <changeSet id="261013-add-apns-token-status-column" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_core_apns_token" columnName="status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_apns_token">
+            <column name="status" type="VARCHAR(32)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

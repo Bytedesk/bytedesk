@@ -55,6 +55,8 @@ public class TicketResponse extends BaseResponse {
     private String status;
     private String priority;
     private String type;
+    // 工单生成方式(手动/自动)
+    private String createType;
     //
     private String channel;
     private String threadTopic;

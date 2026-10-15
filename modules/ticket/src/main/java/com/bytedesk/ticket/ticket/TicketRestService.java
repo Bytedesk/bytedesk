@@ -71,6 +71,7 @@ import com.bytedesk.ticket.process.ProcessEntity;
 import com.bytedesk.ticket.ticket.dto.TicketStatusCountResponse;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
+import com.bytedesk.ticket.ticket.enums.TicketCreateTypeEnum;
 import com.bytedesk.ticket.ticket.event.TicketUpdateAssigneeEvent;
 import com.bytedesk.ticket.ticket.event.TicketUpdateDepartmentEvent;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
@@ -324,6 +325,8 @@ public class TicketRestService
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setType(TicketTypeEnum.getNameFromValue(request.getType()));
+        // 工单生成方式：调用方（如自动建单）显式传入 AUTO；手动入口不传时默认 MANUAL
+        ticket.setCreateType(TicketCreateTypeEnum.getNameFromValue(request.getCreateType()));
         ticket.setUid(uidUtils.getUid());
         // 工单处理人/办理人：仅在确实传入 uid 时写入
         boolean hasAssignee = false;
@@ -813,6 +816,9 @@ public class TicketRestService
             return;
         }
 
+        // 权限上下文只能由服务端生成：先清理客户端可能携带的内部可见性字段（防伪造绕过）
+        clearClientVisibilityFields(request);
+
         bindCurrentUserScope(request);
 
         UserEntity currentUser = authService.getUser();
@@ -856,7 +862,7 @@ public class TicketRestService
 
         // G2 组合谓词：无 type 的混合列表查询（desktop「全部工单」）按工单类型分别加载
         // INTERNAL/EXTERNAL 两份可见性设置，避免笼统按 EXTERNAL 设置过滤导致 INTERNAL 工单漏过/误伤；
-        // 有 ticketSettingsUid（按工作组设置查询）时维持单设置路径
+        // 有 ticketSettingsUid（按指定设置查询）时维持单设置路径
         if (!StringUtils.hasText(request.getType()) && !StringUtils.hasText(request.getTicketSettingsUid())) {
             TicketVisibilityQueryContext internalContext = loadVisibilityQueryContext(
                     request.getOrgUid(), null, TicketTypeEnum.INTERNAL);
@@ -864,11 +870,104 @@ public class TicketRestService
                     request.getOrgUid(), null, TicketTypeEnum.EXTERNAL);
             request.setVisibilityInternalContext(internalContext);
             request.setVisibilityExternalContext(externalContext);
-            request.setVisibilityRestricted(internalContext.isRestricted() || externalContext.isRestricted());
+            // 阶段1（缺口A）：同时按“工单自身绑定设置”分组过滤。一次性批量解析本组织工单引用的
+            // 全部设置 uid（含已解绑/软删除的历史引用），列表口径与详情 canViewTicket 对齐
+            Map<String, TicketVisibilityQueryContext> internalSettingsContexts = loadSettingsVisibilityContexts(
+                    request.getOrgUid(), TicketTypeEnum.INTERNAL);
+            Map<String, TicketVisibilityQueryContext> externalSettingsContexts = loadSettingsVisibilityContexts(
+                    request.getOrgUid(), TicketTypeEnum.EXTERNAL);
+            request.setVisibilityInternalSettingsContexts(internalSettingsContexts);
+            request.setVisibilityExternalSettingsContexts(externalSettingsContexts);
+            request.setVisibilityRestricted(isRestricted(internalContext, internalSettingsContexts)
+                    || isRestricted(externalContext, externalSettingsContexts));
             return;
         }
 
         TicketVisibilitySettingsData visibilityData = resolveVisibilitySettingsData(request);
+        applyFlatVisibilityFields(request, visibilityData);
+
+        // 阶段1（缺口A）：单类型列表同样按“工单绑定设置”分组过滤（旧工单可能引用已解绑的自定义设置）。
+        // 显式 ticketSettingsUid 查询已由 resolveVisibilitySettingsData 按该设置解析，且
+        // Specification 会按该 uid 缩小结果集，无需再按引用设置分组
+        if (StringUtils.hasText(request.getType()) && !StringUtils.hasText(request.getTicketSettingsUid())) {
+            TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
+            Map<String, TicketVisibilityQueryContext> settingsContexts = loadSettingsVisibilityContexts(
+                    request.getOrgUid(), ticketType);
+            if (settingsContexts != null) {
+                if (TicketTypeEnum.INTERNAL.equals(ticketType)) {
+                    request.setVisibilityInternalSettingsContexts(settingsContexts);
+                } else {
+                    request.setVisibilityExternalSettingsContexts(settingsContexts);
+                }
+                request.setVisibilityRestricted(request.getVisibilityRestricted()
+                        || anyRestricted(settingsContexts));
+            }
+        }
+    }
+
+    /**
+     * 清理客户端可能携带的服务端内部可见性字段，保证权限上下文只能由服务端生成。
+     */
+    private void clearClientVisibilityFields(TicketRequest request) {
+        request.setVisibilityRestricted(null);
+        request.setVisibilityMode(null);
+        request.setVisibilityCurrentUserUid(null);
+        request.setVisibilityCurrentUserMemberUid(null);
+        request.setVisibilityCurrentUserDepartmentUid(null);
+        request.setVisibilityOrgAdmin(null);
+        request.setVisibilityAllowedDepartmentUids(new ArrayList<>());
+        request.setVisibilityRestrictedCategoryUids(new ArrayList<>());
+        request.setVisibilityRestrictedCategoryDepartmentUids(new HashMap<>());
+        request.setVisibilityInternalContext(null);
+        request.setVisibilityExternalContext(null);
+        request.setVisibilityInternalSettingsContexts(null);
+        request.setVisibilityExternalSettingsContexts(null);
+    }
+
+    /**
+     * 按工单类型批量加载“工单引用的设置 -> 可见性上下文”。
+     * 返回空 map 表示本组织该类型工单未引用任何设置（全部走默认回退分支），不返回 null。
+     */
+    private Map<String, TicketVisibilityQueryContext> loadSettingsVisibilityContexts(String orgUid,
+            TicketTypeEnum ticketType) {
+        List<String> referencedUids = ticketRepository
+                .findDistinctTicketSettingsUids(orgUid, ticketType.name());
+        List<String> settingsUids = referencedUids == null
+                ? List.of()
+                : referencedUids.stream().filter(StringUtils::hasText).distinct().collect(Collectors.toList());
+        if (settingsUids.isEmpty()) {
+            return new HashMap<>();
+        }
+        Map<String, TicketVisibilityQueryContext> contexts = new HashMap<>();
+        for (TicketSettingsEntity settings : ticketSettingsRestService.findByUidIn(settingsUids)) {
+            if (settings == null || !StringUtils.hasText(settings.getUid())) {
+                continue;
+            }
+            TicketVisibilitySettingsEntity visibilitySettings = settings.getVisibilitySettings();
+            TicketVisibilitySettingsData data = visibilitySettings == null
+                    || visibilitySettings.getContent() == null
+                            ? TicketVisibilitySettingsData.builder().build()
+                            : visibilitySettings.getContent();
+            contexts.put(settings.getUid(), buildVisibilityQueryContext(data));
+        }
+        return contexts;
+    }
+
+    private boolean isRestricted(TicketVisibilityQueryContext typeDefaultContext,
+            Map<String, TicketVisibilityQueryContext> settingsContexts) {
+        return (typeDefaultContext != null && typeDefaultContext.isRestricted())
+                || anyRestricted(settingsContexts);
+    }
+
+    private boolean anyRestricted(Map<String, TicketVisibilityQueryContext> settingsContexts) {
+        return settingsContexts != null
+                && settingsContexts.values().stream().anyMatch(context -> context != null && context.isRestricted());
+    }
+
+    /**
+     * 将单设置可见性数据写入请求的平铺字段（既有单类型路径行为，保持不变）。
+     */
+    private void applyFlatVisibilityFields(TicketRequest request, TicketVisibilitySettingsData visibilityData) {
         request.setVisibilityMode(visibilityData.getMode());
         request.setVisibilityAllowedDepartmentUids(visibilityData.getDepartmentUids() == null
             ? new ArrayList<>()
@@ -927,6 +1026,13 @@ public class TicketRestService
         TicketVisibilitySettingsData data = visibilitySettings == null || visibilitySettings.getContent() == null
                 ? TicketVisibilitySettingsData.builder().build()
                 : visibilitySettings.getContent();
+        return buildVisibilityQueryContext(data);
+    }
+
+    /**
+     * 由已发布的可见性设置数据构建查询上下文（规范化 + 受限分类提取）。
+     */
+    private TicketVisibilityQueryContext buildVisibilityQueryContext(TicketVisibilitySettingsData data) {
         data.normalize();
 
         List<String> allowedDepartmentUids = data.getDepartmentUids() == null

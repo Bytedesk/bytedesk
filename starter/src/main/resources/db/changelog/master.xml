@@ -87,4 +87,10 @@
 
     <include file="db/changelog/migration/261012_add_airline_persistent_sessions.xml" />
 
+    <include file="db/changelog/migration/261013_add_apns_token_status_column.xml" />
+
+    <include file="db/changelog/migration/261013_cleanup_duplicate_apns_token.xml" />
+
+    <include file="db/changelog/migration/261014_add_ticket_create_type_column.xml" />
+
 </databaseChangeLog>

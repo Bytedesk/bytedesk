@@ -3,14 +3,18 @@ package com.bytedesk.service.workgroup_routing;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.config.BytedeskEventPublisher;
+import com.bytedesk.core.redis.RedisRoundRobinSequenceService;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
@@ -51,6 +55,8 @@ public class WorkgroupRoutingService {
     private final ThreadRestService threadRestService;
 
     private final PresenceFacadeService presenceFacadeService;
+
+    private final RedisRoundRobinSequenceService roundRobinSequenceService;
 
     /**
      * 每个工作组创建路由状态时的细粒度锁，避免并发“检查-创建”竞态产生重复行。
@@ -93,6 +99,88 @@ public class WorkgroupRoutingService {
             return null;
         }
         return selectAgentInternal(workgroup, thread, normalizeRoutingMode(assignmentMode));
+    }
+
+    /**
+     * 工单专用选人入口：独立于客服会话的预计算路由状态，按“工单实际分配模式”同步原子取号轮询。
+     *
+     * <p>与 {@link #selectAgent(WorkgroupEntity, ThreadEntity, String)} 的区别：
+     * <ul>
+     *   <li>不读取、不消费 WorkgroupRoutingEntity.nextAgentUid / cursor，也不发布
+     *       WorkgroupRoutingAdvanceEvent/RefreshEvent——客服会话的预计算状态与游标不受工单分配影响</li>
+     *   <li>每次分配通过 {@link RedisRoundRobinSequenceService} 原子 INCR 取号，
+     *       在按 Member UID 去重、稳定排序的工作组客服快照中取模选人，
+     *       彻底消除“读同一预计算值 + 异步推进窗口”导致的连续集中分配</li>
+     *   <li>不受工作组自身 routingMode 干扰：工单配置 ROUND_ROBIN 即严格轮询，
+     *       工作组为 MANUAL 或其他模式时行为不变</li>
+     * </ul>
+     *
+     * <p>候选资格：工作组全部未删除、关联有效 Member 的客服（按 Member UID 去重并稳定排序）。
+     * 工单是异步业务，<b>不要求长连接在线或状态可接待</b>——客服不在线时创建的工单也必须能分配处理人
+     * （否则服务重启后会话重建窗口内建单，处理人持续为空）。在线可接待筛选仅保留给客服会话实时路由。
+     *
+     * @param workgroup      工作组
+     * @param ticketType     工单类型（TicketTypeEnum 值，参与轮询作用域隔离；空值按空段编码）
+     * @param assignmentMode 工单侧实际生效的分配模式（TicketAssignmentModeEnum 值）
+     * @return 选中的客服；无有效候选或 MANUAL 时返回 null；Redis 取号失败时抛出
+     *         {@link RedisRoundRobinSequenceService.RoundRobinSequenceException}，由调用方失败处理
+     */
+    public AgentEntity selectAgentForTicket(WorkgroupEntity workgroup, String ticketType, String assignmentMode) {
+        if (workgroup == null) {
+            return null;
+        }
+        if (assignmentMode != null && "MANUAL".equalsIgnoreCase(assignmentMode.trim())) {
+            log.debug("selectAgentForTicket: MANUAL mode, skip auto-assignment for workgroup={}", workgroup.getUid());
+            return null;
+        }
+        if (assignmentMode != null && !"ROUND_ROBIN".equalsIgnoreCase(assignmentMode.trim())) {
+            // 工单侧当前运行时仅支持 ROUND_ROBIN 自动分配（历史停用模式已在 ticket 侧归一化）；
+            // 其他值按既有三参数入口处理，保持行为兼容
+            return selectAgent(workgroup, null, assignmentMode);
+        }
+
+        // 候选池：工作组全部未删除、且有有效 Member 的客服（工单处理人写 Member UID）。
+        // 不做在线/可接待筛选：工单异步分配不应因客服离线而悬空
+        Map<String, AgentEntity> candidateMap = new TreeMap<>();
+        if (workgroup.getAgents() != null) {
+            for (AgentEntity agent : workgroup.getAgents()) {
+                if (agent == null || agent.isDeleted()
+                        || agent.getMember() == null
+                        || !StringUtils.hasText(agent.getMember().getUid())) {
+                    continue;
+                }
+                candidateMap.putIfAbsent(agent.getMember().getUid(), agent);
+            }
+        }
+        if (candidateMap.isEmpty()) {
+            log.info("selectAgentForTicket: no valid member-backed agents for workgroup={}", workgroup.getUid());
+            return null;
+        }
+
+        // 原子取号：orgUid + ticketType + scopeKind(WORKGROUP) + workgroupUid
+        String scopeKey = buildTicketScopeKey(workgroup.getOrgUid(), ticketType, "WORKGROUP", workgroup.getUid());
+        long sequence = roundRobinSequenceService.nextSequence(scopeKey);
+        List<AgentEntity> ordered = new ArrayList<>(candidateMap.values());
+        int index = (int) Math.floorMod(sequence - 1L, (long) ordered.size());
+        AgentEntity selected = ordered.get(index);
+        log.info("selectAgentForTicket: workgroup={}, sequence={}, candidateCount={}, selected member={}",
+                workgroup.getUid(), sequence, ordered.size(), selected.getMember().getUid());
+        return selected;
+    }
+
+    /**
+     * 构建工单轮询作用域 key：编码各段避免拼接歧义（长度前缀）。
+     * 与 ticket 侧 {@code TicketRoundRobinScopeService} 的作用域规则保持一致：
+     * orgUid + ticketType + scopeKind + scopeId。
+     * scopeId 由调用方保证非空且已去除首尾空白。
+     */
+    static String buildTicketScopeKey(String orgUid, String ticketType, String scopeKind, String scopeId) {
+        return enc(orgUid) + ":" + enc(ticketType) + ":" + enc(scopeKind) + ":" + enc(scopeId);
+    }
+
+    private static String enc(String segment) {
+        String value = segment == null ? "" : segment.trim();
+        return value.length() + "_" + value;
     }
 
     /**

@@ -48,6 +48,9 @@ public class RedisConsts {
     // 转接超时相关常量
     public static final String TRANSFER_TIMEOUT_PREFIX = BYTEDESK_REDIS_PREFIX + "transfer:timeout:";
 
+    // 业务轮询序号相关常量（如工单自动分配按作用域轮询）
+    public static final String ROUND_ROBIN_SEQUENCE_PREFIX = BYTEDESK_REDIS_PREFIX + "round_robin:sequence:";
+
     // 邀请超时相关常量
     public static final String INVITE_TIMEOUT_PREFIX = BYTEDESK_REDIS_PREFIX + "invite:timeout:";
 
@@ -57,6 +60,9 @@ public class RedisConsts {
 
     // 推送验证码发送频率控制相关常量
     public static final String PUSH_CODE_IP_PREFIX = BYTEDESK_REDIS_PREFIX + "push:code:ip:";
+
+    // 四类触达推送节流（同 user+thread/workgroup 窗口内只推首条）
+    public static final String PUSH_REACH_THROTTLE_PREFIX = BYTEDESK_REDIS_PREFIX + "push:reach:throttle:";
 
     // 推送记录过期处理（验证码/扫码登录）
     // ZSET: member=pushUid, score=expireAtEpochMillis

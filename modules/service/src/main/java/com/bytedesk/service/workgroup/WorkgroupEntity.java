@@ -199,15 +199,6 @@ public class WorkgroupEntity extends BaseEntity {
         return WorkgroupTypeEnum.normalize(this.type);
     }
 
-    // agent connected count
-    // @JsonIgnore
-    // public long getConnectedAgentCount() {
-    // if (this.agents == null || this.agents.isEmpty()) {
-    // return 0;
-    // }
-    // return this.agents.stream().filter(agent -> agent.isConnected()).count();
-    // }
-
     // agent available count
     @JsonIgnore
     public long getAvailableAgentCount() {
