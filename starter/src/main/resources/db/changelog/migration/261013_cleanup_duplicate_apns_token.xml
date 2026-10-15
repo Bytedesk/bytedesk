@@ -23,9 +23,15 @@
         - 语句幂等，重复执行无副作用；
         - 全新数据库（表/status 列尚不存在）时 MARK_RAN 跳过，随后由 Hibernate 建表；
         - 不删除多 ACTIVE 场景（代码层容忍，且新流程不会再产生）。
+
+        MySQL 1093 兼容：
+        - MySQL/MariaDB 不允许 UPDATE 的子查询直接引用目标表（error 1093），
+          将 EXISTS 子查询包一层派生表（derived table）绕过，语义不变；
+        - 该 changeset 曾在 H2 环境以旧 SQL 执行过，validCheckSum=ANY 避免校验失败。
     -->
 
     <changeSet id="261013-cleanup-duplicate-apns-token" author="copilot">
+        <validCheckSum>ANY</validCheckSum>
         <preConditions onFail="MARK_RAN" onError="MARK_RAN">
             <tableExists tableName="bytedesk_core_apns_token" />
             <columnExists tableName="bytedesk_core_apns_token" columnName="status" />
@@ -37,11 +43,13 @@
             WHERE is_deleted = b'0'
               AND status &lt;&gt; 'ACTIVE'
               AND EXISTS (
-                  SELECT 1 FROM bytedesk_core_apns_token x
-                  WHERE x.is_deleted = b'0'
-                    AND x.device_token = bytedesk_core_apns_token.device_token
-                    AND x.status = 'ACTIVE'
-                    AND x.uuid &lt;&gt; bytedesk_core_apns_token.uuid
+                  SELECT 1 FROM (
+                      SELECT x.device_token, x.uuid FROM bytedesk_core_apns_token x
+                      WHERE x.is_deleted = b'0'
+                        AND x.status = 'ACTIVE'
+                  ) active_tokens
+                  WHERE active_tokens.device_token = bytedesk_core_apns_token.device_token
+                    AND active_tokens.uuid &lt;&gt; bytedesk_core_apns_token.uuid
               );
         </sql>
 
