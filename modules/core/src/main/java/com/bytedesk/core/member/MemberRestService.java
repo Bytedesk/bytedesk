@@ -242,7 +242,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (isOrganizationAdminUser(user, request.getOrgUid())) {
             OrganizationEntity adminOrg = organizationRestService.findByUid(request.getOrgUid())
                     .orElseThrow(() -> OrganizationI18nExceptions.organizationNotFound(request.getOrgUid()));
-            MemberEntity adminMember = ensureMemberForOrganizationAdmin(user, adminOrg);
+            MemberEntity adminMember = ensureMemberForOrganizationAdmin(user, adminOrg, request.getUid());
             return convertToResponse(adminMember);
         }
         user = userService.updateUserFromMember(user, request);
@@ -281,6 +281,16 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
      */
     @Transactional
     public MemberEntity ensureMemberForOrganizationAdmin(UserEntity user, OrganizationEntity organization) {
+        return ensureMemberForOrganizationAdmin(user, organization, null);
+    }
+
+    /**
+     * @param preferredUid 调用方期望的成员 uid（如系统初始化的 DEFAULT_MEMBER_UID）：
+     *        新建时优先使用（被占用则回退随机 uid）；复用已存在成员时，若指定 uid 空闲则对齐为指定 uid
+     */
+    @Transactional
+    public MemberEntity ensureMemberForOrganizationAdmin(UserEntity user, OrganizationEntity organization,
+            String preferredUid) {
         if (user == null || organization == null) {
             throw new RuntimeException(I18Consts.I18N_MEMBER_SAVE_FAILED);
         }
@@ -291,6 +301,13 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         Optional<MemberEntity> existingOptional = memberRepository.findByUser_UidAndOrgUid(user.getUid(), orgUid);
         if (existingOptional.isPresent()) {
             MemberEntity existing = existingOptional.get();
+            // 系统初始化需要固定 uid（如 DEFAULT_MEMBER_UID）：若调用方明确指定且 uid 空闲，
+            // 将事件监听器链路以随机 uid 先建的成员对齐为指定 uid，避免后续按固定 uid 查找失败
+            if (StringUtils.hasText(preferredUid)
+                    && !preferredUid.equals(existing.getUid())
+                    && !existsByUid(preferredUid)) {
+                existing.setUid(preferredUid);
+            }
             existing.setDeleted(false);
             existing.setOrgUid(orgUid);
             existing.setAllowedLoginPlatforms(MemberLoginPlatformEnum.defaultForRoleUids(roleUids));
@@ -323,7 +340,11 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
 
         // 4. 创建管理员成员（角色固定 ROLE_ADMIN，不可由调用方指定）
         MemberRequest memberRequest = modelMapper.map(user, MemberRequest.class);
-        memberRequest.setUid(uidUtils.getUid());
+        // 优先使用调用方指定的 uid（系统初始化需要固定 uid，如 DEFAULT_MEMBER_UID），
+        // 指定 uid 已被其他记录占用时回退随机 uid，避免破坏既有数据
+        memberRequest.setUid(StringUtils.hasText(preferredUid) && !existsByUid(preferredUid)
+                ? preferredUid
+                : uidUtils.getUid());
         memberRequest.setJobNo("001");
         memberRequest.setJobTitle(I18Consts.I18N_ADMIN);
         memberRequest.setSeatNo("001");

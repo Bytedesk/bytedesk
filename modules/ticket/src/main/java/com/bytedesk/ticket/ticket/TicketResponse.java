@@ -66,9 +66,9 @@ public class TicketResponse extends BaseResponse {
     // 访客端未读消息数量（用于工单列表“对话”按钮角标显示）
     private Integer visitorUnreadCount;
 
-    // 内部工单：关联的客服会话（非工单会话）
+    // 关联的来源客服会话（非工单会话），内部工单、手动外部工单与自动创建外部工单时使用
     private String visitorThreadUid;
-    // 内部工单：关联的客服会话topic（非工单会话）
+    // 关联的来源客服会话topic（非工单会话），内部工单、手动外部工单与自动创建外部工单时使用
     private String visitorThreadTopic;
     // 
     private String categoryUid;

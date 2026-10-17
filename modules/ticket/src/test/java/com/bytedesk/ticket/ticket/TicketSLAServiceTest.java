@@ -189,10 +189,14 @@ class TicketSLAServiceTest {
     void markBreachedDueRecordsShouldBreachRunningRecordsPastDue() {
         Fixture fixture = new Fixture();
         TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().minusSeconds(1));
-        when(fixture.slaRecordRepository.findTop200ByStatusAndDueAtLessThanEqualAndDeletedFalseOrderByDueAtAsc(
-                eq(TicketSlaStatusEnum.RUNNING.name()), any())).thenReturn(List.of(record));
-        when(fixture.slaRecordRepository.findTop200ByStatusAndDueAtLessThanEqualAndDeletedFalseOrderByDueAtAsc(
-                eq(TicketSlaStatusEnum.WARNED.name()), any())).thenReturn(List.of());
+        when(fixture.slaRecordRepository.findMonitorCandidates(
+                eq(TicketSlaStatusEnum.RUNNING.name()), any(), any(), any())).thenReturn(List.of(record));
+        when(fixture.slaRecordRepository.findMonitorCandidates(
+                eq(TicketSlaStatusEnum.WARNED.name()), any(), any(), any())).thenReturn(List.of());
+        when(fixture.ticketRepository.findByUidForSlaUpdate(record.getTicketUid()))
+                .thenReturn(Optional.of(buildTicket()));
+        when(fixture.slaRecordRepository.findByUidForSlaUpdate(record.getUid()))
+                .thenReturn(Optional.of(record));
 
         int updated = fixture.service.markBreachedDueRecords();
 
@@ -202,6 +206,121 @@ class TicketSLAServiceTest {
         verify(fixture.slaRecordRepository, times(1)).save(record);
         verify(fixture.notificationService).sendSLABreachNotification(
                 record.getTicketUid(), record.getSlaType(), record.getBreachReason());
+    }
+
+    @Test
+    void monitorShouldSkipCandidateWhenTicketBecomesTerminalAfterQuery() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().minusMinutes(1));
+        when(fixture.slaRecordRepository.findMonitorCandidates(any(), any(), any(), any()))
+                .thenReturn(List.of(record));
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
+
+        assertEquals(0, fixture.service.markWarningRecords());
+        assertEquals(0, fixture.service.markBreachedDueRecords());
+
+        verify(fixture.slaRecordRepository, never()).save(any(TicketSlaRecordEntity.class));
+        verify(fixture.notificationService, never()).sendSLAWarningNotification(any(), any(), any());
+        verify(fixture.notificationService, never()).sendSLABreachNotification(any(), any(), any());
+    }
+
+    @Test
+    void verifiedOkShouldFinalizeOpenRecordsAtTerminalTime() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
+        ZonedDateTime terminalAt = BdDateUtils.now();
+        TicketSlaRecordEntity claim = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt);
+        claim.setSlaType(TicketSlaTypeEnum.CLAIM.name());
+        TicketSlaRecordEntity response = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt.plusMinutes(20));
+        response.setUid("sla-record-response");
+        response.setSlaType(TicketSlaTypeEnum.FIRST_RESPONSE.name());
+        TicketSlaRecordEntity resolution = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt.plusMinutes(20));
+        resolution.setUid("sla-record-resolution");
+        resolution.setSlaType(TicketSlaTypeEnum.RESOLUTION.name());
+        TicketSlaRecordEntity overdueResolution = buildRecord(TicketSlaStatusEnum.RUNNING,
+                terminalAt.minusSeconds(1));
+        overdueResolution.setUid("sla-record-overdue-resolution");
+        overdueResolution.setSlaType(TicketSlaTypeEnum.RESOLUTION.name());
+        TicketSlaRecordEntity customerVerify = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt);
+        customerVerify.setUid("sla-record-verify");
+        customerVerify.setSlaType(TicketSlaTypeEnum.CUSTOMER_VERIFY.name());
+        TicketSlaRecordEntity nodeResolution = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt.plusMinutes(20));
+        nodeResolution.setUid("sla-record-node-resolution");
+        nodeResolution.setSlaType(TicketSlaTypeEnum.RESOLUTION.name());
+        nodeResolution.setSlaSource("NODE");
+        TicketSlaRecordEntity overdueNode = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt.minusSeconds(1));
+        overdueNode.setUid("sla-record-overdue-node");
+        overdueNode.setSlaType(TicketSlaTypeEnum.RESOLUTION.name());
+        overdueNode.setSlaSource("NODE");
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
+        when(fixture.slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid()))
+                .thenReturn(List.of(claim, response, resolution, overdueResolution, customerVerify,
+                        nodeResolution, overdueNode));
+
+        fixture.service.finalizeOpenRecordsForTerminalTicket(ticket, terminalAt, "agent-1");
+
+        assertEquals(TicketSlaStatusEnum.BREACHED.name(), claim.getStatus());
+        assertTrue(Boolean.TRUE.equals(claim.getBreached()));
+        assertEquals(terminalAt, claim.getBreachedAt());
+        assertEquals(TicketSlaStatusEnum.CANCELED.name(), response.getStatus());
+        assertFalse(Boolean.TRUE.equals(response.getBreached()));
+        assertEquals(terminalAt, response.getCompletedAt());
+        assertEquals(TicketSlaStatusEnum.COMPLETED.name(), resolution.getStatus());
+        assertEquals(terminalAt, resolution.getCompletedAt());
+        assertEquals(TicketSlaStatusEnum.BREACHED.name(), overdueResolution.getStatus());
+        assertEquals(terminalAt, overdueResolution.getCompletedAt());
+        assertTrue(Boolean.TRUE.equals(overdueResolution.getBreached()));
+        assertEquals(TicketSlaStatusEnum.COMPLETED.name(), customerVerify.getStatus());
+        assertEquals(terminalAt, customerVerify.getCompletedAt());
+        assertEquals(TicketSlaStatusEnum.CANCELED.name(), nodeResolution.getStatus());
+        assertEquals(TicketSlaStatusEnum.BREACHED.name(), overdueNode.getStatus());
+        verify(fixture.notificationService, never()).sendSLABreachNotification(any(), any(), any());
+    }
+
+    @Test
+    void terminalFinalizationShouldExtendPausedDeadlineAndCancelUnverifiedCustomerTarget() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        ZonedDateTime terminalAt = BdDateUtils.now();
+        TicketSlaRecordEntity pausedClaim = buildRecord(TicketSlaStatusEnum.PAUSED, terminalAt.minusMinutes(30));
+        pausedClaim.setPausedAt(terminalAt.minusHours(1));
+        pausedClaim.setSlaType(TicketSlaTypeEnum.CLAIM.name());
+        TicketSlaRecordEntity customerVerify = buildRecord(TicketSlaStatusEnum.RUNNING, terminalAt.plusMinutes(30));
+        customerVerify.setUid("sla-record-verify");
+        customerVerify.setSlaType(TicketSlaTypeEnum.CUSTOMER_VERIFY.name());
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
+        when(fixture.slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid()))
+                .thenReturn(List.of(pausedClaim, customerVerify));
+
+        fixture.service.finalizeOpenRecordsForTerminalTicket(ticket, terminalAt, "agent-1");
+
+        assertEquals(TicketSlaStatusEnum.CANCELED.name(), pausedClaim.getStatus());
+        assertNull(pausedClaim.getPausedAt());
+        assertEquals(TicketSlaStatusEnum.CANCELED.name(), customerVerify.getStatus());
+    }
+
+    @Test
+    void terminalReconcilePreviewShouldReportMissingTimeWithoutWritingRecords() {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().plusMinutes(10));
+        when(fixture.slaRecordRepository.findTerminalReconcileCandidates(any(), any(), any(), any()))
+                .thenReturn(List.of(record));
+        when(fixture.ticketRepository.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
+
+        TicketSLAService.TerminalSlaReconcileDryRunBatch batch =
+                fixture.service.previewTerminalSlaReconcile(null, 10);
+
+        assertEquals(1, batch.scannedRecords());
+        assertEquals(0, batch.activeRecords());
+        assertEquals(1, batch.missingTerminalTimeRecords());
+        assertEquals(record.getUid(), batch.nextCursor());
+        verify(fixture.slaRecordRepository, never()).save(any(TicketSlaRecordEntity.class));
     }
 
     @Test
@@ -256,8 +375,10 @@ class TicketSLAServiceTest {
         when(fixture.ticketRepository.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
         TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().minusSeconds(1));
         record.setProcessInstanceId("process-1");
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
         when(fixture.slaRecordRepository.findFirstByProcessInstanceIdAndSlaTypeAndDeletedFalseOrderByCreatedAtDesc(
                 "process-1", TicketSlaTypeEnum.RESOLUTION.name())).thenReturn(Optional.of(record));
+        when(fixture.slaRecordRepository.findByUidForSlaUpdate(record.getUid())).thenReturn(Optional.of(record));
 
         boolean breached = fixture.service.markBreachedByProcessInstance(
                 "process-1", TicketSlaTypeEnum.RESOLUTION, "timer fired");
@@ -277,8 +398,10 @@ class TicketSLAServiceTest {
         when(fixture.ticketRepository.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
         TicketSlaRecordEntity record = buildRecord(TicketSlaStatusEnum.RUNNING, BdDateUtils.now().minusSeconds(1));
         record.setProcessInstanceId("process-2");
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
         when(fixture.slaRecordRepository.findFirstByProcessInstanceIdAndSlaTypeAndDeletedFalseOrderByCreatedAtDesc(
                 "process-2", TicketSlaTypeEnum.RESOLUTION.name())).thenReturn(Optional.of(record));
+        when(fixture.slaRecordRepository.findByUidForSlaUpdate(record.getUid())).thenReturn(Optional.of(record));
 
         boolean breached = fixture.service.markBreachedByProcessInstance(
                 "process-2", TicketSlaTypeEnum.RESOLUTION, "timer fired");
@@ -296,6 +419,7 @@ class TicketSLAServiceTest {
         ticket.setStatus(TicketStatusEnum.RESOLVED.name());
         fixture.enableAutoClose(ticket, 1);
         when(fixture.ticketRepository.findByUid(ticket.getUid())).thenReturn(Optional.of(ticket));
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
         TicketSlaRecordEntity record = TicketSlaRecordEntity.builder()
                 .uid("sla-record-4")
                 .ticketUid("ticket-1")
@@ -311,6 +435,7 @@ class TicketSLAServiceTest {
         when(fixture.slaRecordRepository.findTop200BySlaTypeAndStatusAndDeletedFalseOrderByBreachedAtAsc(
                 TicketSlaTypeEnum.CUSTOMER_VERIFY.name(), TicketSlaStatusEnum.BREACHED.name()))
                 .thenReturn(List.of(record));
+        when(fixture.slaRecordRepository.findByUidForSlaUpdate(record.getUid())).thenReturn(Optional.of(record));
 
         int closed = fixture.service.autoCloseBreachedCustomerVerifyRecords();
 
@@ -350,6 +475,8 @@ class TicketSLAServiceTest {
         when(fixture.slaRecordRepository.findTop200BySlaTypeAndStatusAndDeletedFalseOrderByBreachedAtAsc(
                 TicketSlaTypeEnum.CUSTOMER_VERIFY.name(), TicketSlaStatusEnum.BREACHED.name()))
                 .thenReturn(List.of(record));
+        when(fixture.ticketRepository.findByUidForSlaUpdate(ticket.getUid())).thenReturn(Optional.of(ticket));
+        when(fixture.slaRecordRepository.findByUidForSlaUpdate(record.getUid())).thenReturn(Optional.of(record));
 
         int closed = fixture.service.autoCloseBreachedCustomerVerifyRecords();
 
@@ -420,6 +547,7 @@ class TicketSLAServiceTest {
                 .ticketSettingsUid("settings-1")
                 .priority(TicketPriorityEnum.HIGH.name())
                 .type(TicketTypeEnum.EXTERNAL.name())
+                .status(TicketStatusEnum.PROCESSING.name())
                 .build();
     }
 

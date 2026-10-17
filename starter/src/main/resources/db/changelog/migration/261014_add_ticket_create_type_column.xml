@@ -10,12 +10,17 @@
         - AUTO 自动生成：会话关闭后按自动建单规则生成。
 
         策略（参照 261013_add_apns_token_status_column.xml）：
-        1. 全新环境（列不存在）：addColumn 增加 create_type，存量数据默认 MANUAL。
-        2. ddl-auto=update 已由 JPA 自动建列的环境：preConditions MARK_RAN 跳过。
+        1. 全新环境（表不存在， Liquibase 先于 ddl-auto 建表执行）：由 ddl-auto 建完整表，
+           本 changeset 通过 tableExists 前置条件 MARK_RAN 跳过（2026-10 空库首装事故修复）。
+        2. 列不存在：addColumn 增加 create_type，存量数据默认 MANUAL。
+        3. ddl-auto=update 已由 JPA 自动建列的环境：preConditions MARK_RAN 跳过。
+
+        说明：仅修改 preConditions 不影响 changeset 校验和（Liquibase checksum 只覆盖变更语句）。
     -->
 
     <changeSet id="261014-add-ticket-create-type-column" author="copilot">
-        <preConditions onFail="MARK_RAN">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ticket"/>
             <not>
                 <columnExists tableName="bytedesk_ticket" columnName="create_type"/>
             </not>

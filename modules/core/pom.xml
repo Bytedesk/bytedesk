@@ -219,10 +219,10 @@
 		<!-- ////////////////////// 推送 /////////////////////////////////// -->
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents.client5/httpclient5 -->
+		<!-- 版本由根 pom 的 httpclient5.version 统一管理（覆盖 Spring Boot BOM） -->
 		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
-			<version>5.4.3</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents.core5/httpcore5 -->

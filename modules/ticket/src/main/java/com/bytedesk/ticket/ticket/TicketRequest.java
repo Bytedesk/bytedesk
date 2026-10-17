@@ -64,9 +64,9 @@ public class TicketRequest extends BaseRequest implements BlacklistCheckable {
     private String threadUid;
     // 工单生成方式(手动/自动)，自动建单场景传入 AUTO
     private String createType;
-    // 关联的来源客服会话 uid（非工单会话），内部工单与自动创建外部工单时使用
+    // 关联的来源客服会话 uid（非工单会话），内部工单、手动外部工单与自动创建外部工单时使用
     private String visitorThreadUid;
-    // 关联的来源客服会话 topic（非工单会话），内部工单与自动创建外部工单时使用
+    // 关联的来源客服会话 topic（非工单会话），内部工单、手动外部工单与自动创建外部工单时使用
     private String visitorThreadTopic;
     // 
     private String categoryUid;

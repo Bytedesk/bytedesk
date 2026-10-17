@@ -19,9 +19,11 @@ import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
 
 import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
 
@@ -47,10 +49,11 @@ public class SpringAIDeepseekChatConfig {
     private Double temperature;
 
     @Bean("deepseekApi")
-    DeepSeekApi deepseekApi() {
+    DeepSeekApi deepseekApi(RestClient.Builder restClientBuilder) {
         return DeepSeekApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
+                .restClientBuilder(restClientBuilder)
                 .build();
     }
 
@@ -68,18 +71,21 @@ public class SpringAIDeepseekChatConfig {
      * 否则 ChatModel 层观测缺失，Grafana Provider 分布 / Token 用量面板无数据。
      */
     @Bean("deepseekChatModel")
-    DeepSeekChatModel deepseekChatModel(ObservationRegistry observationRegistry) {
+    DeepSeekChatModel deepseekChatModel(
+            ObservationRegistry observationRegistry,
+            @Qualifier("deepseekApi") DeepSeekApi deepseekApi) {
         return DeepSeekChatModel.builder()
-                .deepSeekApi(deepseekApi())
+                .deepSeekApi(deepseekApi)
                 .options(deepseekChatOptions())
                 .observationRegistry(observationRegistry)
                 .build();
     }
 
     @Bean("deepseekChatClient")
-    ChatClient deepseekChatClient(ChatClientBuilderFactory chatClientBuilderFactory,
-            ObservationRegistry observationRegistry) {
-        return  chatClientBuilderFactory.builder(deepseekChatModel(observationRegistry))
+    ChatClient deepseekChatClient(
+            ChatClientBuilderFactory chatClientBuilderFactory,
+            @Qualifier("deepseekChatModel") DeepSeekChatModel deepseekChatModel) {
+        return chatClientBuilderFactory.builder(deepseekChatModel)
                 .defaultOptions(deepseekChatOptions().mutate())
                 .defaultAdvisors(new SimpleLoggerAdvisor())
                 .build();

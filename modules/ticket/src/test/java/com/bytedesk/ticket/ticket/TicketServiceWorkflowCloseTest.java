@@ -2,6 +2,7 @@ package com.bytedesk.ticket.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,7 +61,21 @@ class TicketServiceWorkflowCloseTest {
         assertThat(variablesCaptor.getValue())
                 .containsEntry("status", TicketStatusEnum.CLOSED.name())
                 .containsEntry("closedBy", "agent-1");
-        verify(fixture.ticketSLAService).completeResolution(ticket, "agent-1");
+        verify(fixture.ticketSLAService, org.mockito.Mockito.never()).completeResolution(any(), any());
+    }
+
+    @Test
+    void terminalStatusPersistenceShouldSetClosedTimeAndFinalizeSla() throws Exception {
+        Fixture fixture = new Fixture();
+        TicketEntity ticket = buildTicket();
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+
+        invokePersistAndNotifyStatusChange(fixture.service, ticket, TicketStatusEnum.PROCESSING.name());
+
+        assertThat(ticket.getClosedTime()).isNotNull();
+        verify(fixture.ticketSLAService).finalizeOpenRecordsForTerminalTicket(
+                org.mockito.ArgumentMatchers.eq(ticket), any(ZonedDateTime.class), isNull());
+        verify(fixture.ticketRestService).save(ticket);
     }
 
     private static TicketEntity buildTicket() {
@@ -106,6 +121,14 @@ class TicketServiceWorkflowCloseTest {
                 runtimeContextClass);
         method.setAccessible(true);
         method.invoke(service, ticket, task, request, operatorUid, runtimeContext);
+    }
+
+    private static void invokePersistAndNotifyStatusChange(TicketService service, TicketEntity ticket,
+            String previousStatus) throws Exception {
+        Method method = TicketService.class.getDeclaredMethod(
+                "persistAndNotifyStatusChange", TicketEntity.class, String.class);
+        method.setAccessible(true);
+        method.invoke(service, ticket, previousStatus);
     }
 
     private static class Fixture {

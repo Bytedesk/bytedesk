@@ -1066,8 +1066,6 @@ public class TicketService {
         taskService.complete(task.getId(), variables);
 
         ticket.setStatus(targetStatus);
-        ticket.setClosedTime(BdDateUtils.now());
-        ticketSLAService.completeResolution(ticket, operatorUid);
     }
 
     private void syncTicketThreadAssignee(TicketEntity ticket, UserProtobuf assignee, MemberEntity member) {
@@ -1168,12 +1166,6 @@ public class TicketService {
                 ticketSLAService.completeResolution(ticket, null);
                 ticketSLAService.startCustomerVerify(ticket);
             }
-            if (TicketStatusEnum.CLOSED.name().equals(configuredCompleteStatus)
-                    || TicketStatusEnum.VERIFIED_OK.name().equals(configuredCompleteStatus)) {
-                ticket.setClosedTime(BdDateUtils.now());
-                ticketSLAService.completeResolution(ticket, null);
-                ticketSLAService.completeCustomerVerify(ticket, null);
-            }
             if (TicketStatusEnum.REOPENED.name().equals(configuredCompleteStatus)) {
                 ticket.setResolvedTime(null);
             }
@@ -1195,9 +1187,6 @@ public class TicketService {
             ticket.setStatus(
                     "COMPLETE_VERIFIED".equals(runtimeContext.actionKey()) ? TicketStatusEnum.VERIFIED_OK.name()
                             : TicketStatusEnum.CLOSED.name());
-            ticket.setClosedTime(BdDateUtils.now());
-            ticketSLAService.completeResolution(ticket, null);
-            ticketSLAService.completeCustomerVerify(ticket, null);
             return;
         }
 
@@ -1303,6 +1292,16 @@ public class TicketService {
     }
 
     private void persistAndNotifyStatusChange(TicketEntity ticket, String previousStatus) {
+        String currentStatus = ticket.getStatus();
+        if (!isTerminalTicketStatus(previousStatus) && isTerminalTicketStatus(currentStatus)) {
+            if (TicketStatusEnum.CLOSED.name().equals(currentStatus)
+                    || TicketStatusEnum.VERIFIED_OK.name().equals(currentStatus)) {
+                ticket.setClosedTime(BdDateUtils.now());
+            }
+            ticketSLAService.finalizeOpenRecordsForTerminalTicket(ticket,
+                    TicketStatusEnum.CANCELLED.name().equals(currentStatus) ? BdDateUtils.now() : ticket.getClosedTime(),
+                    ticket.getAssignee() != null ? ticket.getAssignee().getUid() : null);
+        }
         ticketRestService.save(ticket);
         if (!Objects.equals(previousStatus, ticket.getStatus())) {
             log.info(
@@ -2118,8 +2117,6 @@ public class TicketService {
             if (request.getVerified()) {
                 ticket.setStatus(TicketStatusEnum.VERIFIED_OK.name());
                 ticket.setVerified(true);
-                ticket.setClosedTime(BdDateUtils.now());
-                ticketSLAService.completeCustomerVerify(ticket, assigneeUid);
             } else {
                 ticket.setStatus(TicketStatusEnum.REOPENED.name());
                 ticket.setVerified(false);
@@ -2186,7 +2183,6 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CLOSED.name());
-        ticket.setClosedTime(BdDateUtils.now()); // 添加关闭时间记录
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
@@ -2243,7 +2239,6 @@ public class TicketService {
 
         // 5. 更新工单状态
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
-        ticketSLAService.cancelOpenRecords(ticket, assigneeUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);
@@ -2456,7 +2451,6 @@ public class TicketService {
 
         // 工单侧统一落到 CANCELLED（前端已有该状态）
         ticket.setStatus(TicketStatusEnum.CANCELLED.name());
-        ticketSLAService.cancelOpenRecords(ticket, operatorUid);
         persistAndNotifyStatusChange(ticket, previousStatus);
 
         return TicketConvertUtils.convertToResponse(ticket);

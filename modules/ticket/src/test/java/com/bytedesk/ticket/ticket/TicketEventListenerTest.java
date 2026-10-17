@@ -42,6 +42,8 @@ import com.bytedesk.ticket.ticket.enums.TicketPriorityEnum;
 import com.bytedesk.ticket.ticket.enums.TicketStatusEnum;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
+import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityService;
 
 class TicketEventListenerTest {
 
@@ -67,7 +69,8 @@ class TicketEventListenerTest {
                                 notificationService, memberRestService, workgroupRepository, visitorRepository, emailProviderRepository,
                                 smsPushSendService, smsTemplateRepository, mobilePushProvider, agentPushGateService, emailPushSendService,
                                 ticketSettingsRepository,
-                                ticketRepository, threadRestService, messageRestService, messageSendService);
+                                ticketRepository, threadRestService, messageRestService, messageSendService,
+                                new TicketVisibilityService(mock(TicketSettingsRestService.class)));
 
                 AgentEntity agentA = buildAgent("agent-a", "user-a");
                 AgentEntity agentB = buildAgent("agent-b", "user-b");

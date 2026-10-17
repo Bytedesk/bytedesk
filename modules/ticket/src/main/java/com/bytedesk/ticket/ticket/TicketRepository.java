@@ -32,6 +32,10 @@ public interface TicketRepository extends JpaRepository<TicketEntity, Long>, Jpa
 
     Optional<TicketEntity> findByUid(String uid);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from bytedesk_ticket t where t.uid = :uid and t.deleted = false")
+    Optional<TicketEntity> findByUidForSlaUpdate(@Param("uid") String uid);
+
     /**
      * 悲观行锁读取工单：用于分配阶段互斥（创建监听与会话补分配竞争同一工单时，
      * 持锁重读后再判断是否需要选人/写入，避免双写处理人）。

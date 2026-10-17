@@ -143,15 +143,17 @@ public class TicketEntity extends BaseEntity {
     private String threadUid;
 
     /**
-     * Visitor/customer-service source thread uid associated when creating internal ticket
-     * or auto-creating external ticket on thread close (not the ticket processing thread)
+     * Associated source visitor/customer-service thread uid when creating ticket
+     * from a chat thread (internal ticket, manual external ticket, or auto-created
+     * external ticket on thread close; not the ticket processing thread)
      * 一对多：visitorThreadUid -> 多条 ticket
      */
     private String visitorThreadUid;
 
     /**
-     * Visitor/customer-service source thread topic associated when creating internal ticket
-     * or auto-creating external ticket on thread close (not the ticket processing thread)
+     * Associated source visitor/customer-service thread topic when creating ticket
+     * from a chat thread (internal ticket, manual external ticket, or auto-created
+     * external ticket on thread close; not the ticket processing thread)
      * 一对多：visitorThreadTopic -> 多条 ticket
      */
     private String visitorThreadTopic;

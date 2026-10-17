@@ -30,6 +30,7 @@ import com.bytedesk.ticket.attachment.TicketAttachmentRepository;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket.enums.TicketCreateTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityService;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
 
 /**
@@ -195,6 +196,7 @@ class TicketRestServiceThreadCreationTest {
                                 mock(ApplicationEventPublisher.class),
                                 mock(CategoryRestService.class),
                                 mock(TicketSettingsRestService.class),
-                                mock(MemberRepository.class));
+                                mock(MemberRepository.class),
+                                mock(TicketVisibilityService.class));
         }
 }

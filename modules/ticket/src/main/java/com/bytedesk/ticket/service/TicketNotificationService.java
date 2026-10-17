@@ -45,6 +45,7 @@ import com.bytedesk.core.notification.NotificationService;
 import com.bytedesk.core.notification.NotificationTypeEnum;
 import com.bytedesk.core.push.service.AgentPushGateService;
 import com.bytedesk.core.push.service.PushMobileService;
+import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
@@ -61,6 +62,8 @@ import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRepository;
 import com.bytedesk.ticket.ticket_settings_notification.TicketNotificationSettingsEntity;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityService;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -123,6 +126,8 @@ public class TicketNotificationService {
 
     private final IMessageSendService messageSendService;
 
+    private final TicketVisibilityService ticketVisibilityService;
+
     public void notifyNewTicket(TicketEntity ticket) {
         notifyTicketStatusChanged(ticket, null, ticket != null ? ticket.getStatus() : null);
     }
@@ -140,7 +145,7 @@ public class TicketNotificationService {
         String title = buildTitle(ticket, eventType);
         String content = buildContent(ticket, null, ticket.getStatus(), eventType);
         String extra = buildExtra(ticket, null, ticket.getStatus(), eventType);
-        String assigneeUid = resolveNotificationUserUid(ticket.getAssignee());
+        String assigneeUid = resolveNotificationUserUid(ticket.getAssignee(), ticket, "transferred-assignee");
         if (!StringUtils.hasText(assigneeUid)) {
             return;
         }
@@ -187,7 +192,6 @@ public class TicketNotificationService {
                 : EVENT_TYPE_TICKET_CREATED;
         log.info("[NOTICE-DIAG] notifyTicketStatusChanged: ticketUid={} eventType={} previous={} current={}",
                 ticket.getUid(), eventType, previousStatus, currentStatus);
-        String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
         String title = buildTitle(ticket, eventType);
         String content = buildContent(ticket, previousStatus, currentStatus, eventType);
         String extra = buildExtra(ticket, previousStatus, currentStatus, eventType);
@@ -197,14 +201,25 @@ public class TicketNotificationService {
             emitTicketThreadStatusMessage(ticket, previousStatus, currentStatus, eventType, content);
         }
 
-        Set<String> recipients = resolveRecipientUids(ticket, EVENT_TYPE_TICKET_CREATED.equals(eventType));
+        // 报告人判定与 APNs 排除统一使用解析后的最终 userUid（member uid 需归一，避免误投/漏推）
+        RecipientSnapshot snapshot = resolveRecipientSnapshot(ticket,
+                EVENT_TYPE_TICKET_CREATED.equals(eventType));
+        Set<String> recipients = snapshot.recipients();
+        String reporterUid = snapshot.reporterUid();
         log.info("[NOTICE-DIAG] notifyTicketStatusChanged recipients: size={} uids={}",
                 recipients.size(), recipients);
-        if (recipients.isEmpty()) {
-            log.info("[NOTICE-DIAG] notifyTicketStatusChanged SKIPPED: recipients empty");
-            return;
+        if (!recipients.isEmpty()) {
+            dispatchTicketNotifications(ticket, eventType, title, content, extra, reporterUid, recipients);
+            // Push to agent iOS devices via APNs
+            pushToAgentDevices(ticket, eventType, reporterUid, recipients);
         }
 
+        // 独立联系渠道（邮件/短信）与客服站内投递解耦：客服名单为空不短路报告人既有通知
+        notifyExternalChannels(ticket, previousStatus, currentStatus, eventType, title, content, extra);
+    }
+
+    private void dispatchTicketNotifications(TicketEntity ticket, String eventType, String title, String content,
+            String extra, String reporterUid, Set<String> recipients) {
         for (String recipientUid : recipients) {
             try {
                 boolean isReporter = reporterUid != null && StringUtils.hasText(reporterUid)
@@ -226,11 +241,6 @@ public class TicketNotificationService {
                         ticket.getUid(), recipientUid, ex.getMessage());
             }
         }
-
-        // Push to agent iOS devices via APNs
-        pushToAgentDevices(ticket, eventType, reporterUid, recipients);
-
-        notifyExternalChannels(ticket, previousStatus, currentStatus, eventType, title, content, extra);
     }
 
     private void emitTicketThreadStatusMessage(TicketEntity ticket, String previousStatus, String currentStatus,
@@ -390,18 +400,18 @@ public class TicketNotificationService {
         String extra = buildSlaExtra(ticket, slaType, details, eventType);
 
         emitSlaThreadSystemMessage(ticket, content);
-        notifySlaRecipients(ticket, eventType, title, content, extra);
-        pushToAgentDevices(ticket, eventType, ticket.getReporter() != null ? ticket.getReporter().getUid() : null,
-                resolveRecipientUids(ticket, true));
+        // SLA 站内与 APNs 复用同一收件人快照（单次解析，避免两轮结果不一致）
+        RecipientSnapshot slaSnapshot = resolveRecipientSnapshot(ticket, true);
+        dispatchSlaNotifications(ticket, eventType, title, content, extra, slaSnapshot.recipients());
+        pushToAgentDevices(ticket, eventType, slaSnapshot.reporterUid(), slaSnapshot.recipients());
         notifyExternalChannels(ticket, null, breached ? "BREACHED" : "WARNED", eventType, title, content, extra);
 
         log.info("SLA notification sent: ticketUid={}, slaType={}, eventType={}, details={}",
                 ticketUid, slaType, eventType, details);
     }
 
-    private void notifySlaRecipients(TicketEntity ticket, String eventType, String title, String content,
-            String extra) {
-        Set<String> recipients = resolveRecipientUids(ticket, true);
+    private void dispatchSlaNotifications(TicketEntity ticket, String eventType, String title, String content,
+            String extra, Set<String> recipients) {
         if (recipients.isEmpty()) {
             return;
         }
@@ -551,36 +561,69 @@ public class TicketNotificationService {
                 "工单新回复", null, null);
     }
 
-    private Set<String> resolveRecipientUids(TicketEntity ticket, boolean includeWorkgroupUsers) {
-        Set<String> recipients = new LinkedHashSet<>();
+    /**
+     * 工单通知收件人快照：一次解析得到的去重最终 userUid 集合，站内写入与 APNs 共用。
+     */
+    private record RecipientSnapshot(Set<String> recipients, String reporterUid, String assigneeUid) {
+    }
 
+    private Set<String> resolveRecipientUids(TicketEntity ticket, boolean includeWorkgroupUsers) {
+        return resolveRecipientSnapshot(ticket, includeWorkgroupUsers).recipients();
+    }
+
+    /**
+     * 单次解析本轮全部收件人（报告人/处理人豁免 + 工作组候选部门过滤），供站内与 APNs 复用同一快照。
+     */
+    private RecipientSnapshot resolveRecipientSnapshot(TicketEntity ticket, boolean includeWorkgroupUsers) {
+        Set<String> recipients = new LinkedHashSet<>();
+        if (ticket == null) {
+            return new RecipientSnapshot(recipients, null, null);
+        }
+
+        // 1. 报告人/处理人豁免：始终保留（与详情可见性豁免一致）
         UserProtobuf reporter = ticket.getReporter();
-        String reporterUid = resolveNotificationUserUid(reporter);
+        String reporterUid = resolveNotificationUserUid(reporter, ticket, "reporter");
         if (StringUtils.hasText(reporterUid)) {
             recipients.add(reporterUid);
         }
 
         UserProtobuf assignee = ticket.getAssignee();
-        String assigneeUid = resolveNotificationUserUid(assignee);
+        String assigneeUid = resolveNotificationUserUid(assignee, ticket, "assignee");
         if (StringUtils.hasText(assigneeUid)) {
             recipients.add(assigneeUid);
         }
 
+        // 2. 工作组候选：按已发布可见性设置过滤普通坐席（仅可见者收到通知）
         if (includeWorkgroupUsers && StringUtils.hasText(ticket.getWorkgroupUid())) {
+            TicketVisibilitySettingsData visibility;
+            try {
+                visibility = ticketVisibilityService.resolve(ticket);
+            } catch (Exception ex) {
+                // 决策 D4/5.4：解析失败不得伪装成 ORG_WIDE 公开广播；本轮放弃工作组候选并记录
+                log.warn("ticket notification visibility resolve failed, skip workgroup candidates: "
+                        + "ticketUid={}, orgUid={}, workgroupUid={}, error={}",
+                        ticket.getUid(), ticket.getOrgUid(), ticket.getWorkgroupUid(), ex.getMessage());
+                return new RecipientSnapshot(recipients, reporterUid, assigneeUid);
+            }
+            TicketVisibilitySettingsData visibilitySnapshot = visibility;
             workgroupRepository.findByUid(ticket.getWorkgroupUid())
-                    .filter(workgroup -> !workgroup.isDeleted())
+                    .filter(workgroup -> !workgroup.isDeleted()
+                            && ticket.getOrgUid() != null && ticket.getOrgUid().equals(workgroup.getOrgUid()))
                     .ifPresent(workgroup -> workgroup.getAgents().stream()
                             .filter(agent -> agent != null && !agent.isDeleted())
                             .map(agent -> agent.getMember())
-                            .filter(member -> member != null && !member.isDeleted())
+                            .filter(member -> member != null && !member.isDeleted()
+                                    && ticket.getOrgUid() != null && ticket.getOrgUid().equals(member.getOrgUid()))
+                            .filter(member -> visibilitySnapshot.canViewByDepartment(
+                                    ticket.getCategoryUid(), ticket.getDepartmentUid(), member.getDeptUid()))
                             .map(member -> member.getUser())
-                            .filter(user -> user != null && !user.isDeleted())
+                            .filter(user -> user != null && !user.isDeleted()
+                                    && StringUtils.hasText(user.getUid()))
                             .map(user -> user.getUid())
-                            .filter(StringUtils::hasText)
                             .forEach(recipients::add));
         }
 
-        return recipients;
+        return new RecipientSnapshot(recipients, reporterUid, assigneeUid);
     }
 
     private String resolveNotificationUserUid(UserProtobuf user) {
@@ -598,6 +641,44 @@ public class TicketNotificationService {
         }
 
         return user.getUid();
+    }
+
+    /**
+     * 带上下文的身份解析：MEMBER 解析失败（无有效成员/关联用户）时不再回退 member uid 冒充投递，
+     * 显式记录并跳过（决策 D5）。VISITOR/USER 身份沿用原 uid 语义。
+     */
+    private String resolveNotificationUserUid(UserProtobuf user, TicketEntity ticket, String role) {
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            return null;
+        }
+        if (!UserTypeEnum.MEMBER.name().equals(user.getType())) {
+            return user.getUid();
+        }
+        Optional<MemberEntity> memberOptional;
+        try {
+            memberOptional = memberRestService.findByUid(user.getUid());
+        } catch (Exception ex) {
+            log.warn("ticket notification member resolve failed, skip recipient: ticketUid={}, role={}, "
+                    + "memberUid={}, error={}", ticket.getUid(), role, user.getUid(), ex.getMessage());
+            return null;
+        }
+        if (memberOptional.isEmpty()) {
+            log.warn("ticket notification member not found, skip recipient: ticketUid={}, role={}, memberUid={}",
+                    ticket.getUid(), role, user.getUid());
+            return null;
+        }
+        MemberEntity member = memberOptional.get();
+        if (member.isDeleted()) {
+            log.warn("ticket notification member deleted, skip recipient: ticketUid={}, role={}, memberUid={}",
+                    ticket.getUid(), role, user.getUid());
+            return null;
+        }
+        if (member.getUser() == null || !StringUtils.hasText(member.getUser().getUid())) {
+            log.warn("ticket notification member has no valid user, skip recipient: ticketUid={}, role={}, "
+                    + "memberUid={}", ticket.getUid(), role, user.getUid());
+            return null;
+        }
+        return member.getUser().getUid();
     }
 
     /**

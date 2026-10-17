@@ -26,12 +26,14 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.llm_provider.LlmProviderEntity;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
+import com.bytedesk.ai.springai.config.AcceptEncodingIdentityRestClientCustomizer;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
@@ -50,10 +52,14 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     public SpringAIDeepseekService(
             LlmProviderRestService llmProviderRestService,
             @Qualifier("deepseekChatModel") ObjectProvider<DeepSeekChatModel> defaultChatModelProvider,
-            TokenUsageHelper tokenUsageHelper) {
+            TokenUsageHelper tokenUsageHelper,
+            RestClient.Builder restClientBuilder,
+            AcceptEncodingIdentityRestClientCustomizer acceptEncodingIdentityRestClientCustomizer) {
         this.llmProviderRestService = llmProviderRestService;
         this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
         this.tokenUsageHelper = tokenUsageHelper;
+        this.restClientBuilder = restClientBuilder;
+        this.acceptEncodingIdentityRestClientCustomizer = acceptEncodingIdentityRestClientCustomizer;
     }
 
     private final LlmProviderRestService llmProviderRestService;
@@ -61,6 +67,10 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     private final DeepSeekChatModel defaultChatModel;
 
     private final TokenUsageHelper tokenUsageHelper;
+
+    private final RestClient.Builder restClientBuilder;
+
+    private final AcceptEncodingIdentityRestClientCustomizer acceptEncodingIdentityRestClientCustomizer;
 
     /**
      * 根据机器人配置创建 DeepSeek chat options。
@@ -114,9 +124,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                 log.warn("Failed to create Deepseek options, using default chat model");
                 return defaultChatModel;
             }
+            RestClient.Builder providerRestClientBuilder = restClientBuilder.clone();
+            acceptEncodingIdentityRestClientCustomizer.customizeForBaseUrl(
+                    providerRestClientBuilder, provider.getBaseUrl());
             DeepSeekApi api = DeepSeekApi.builder()
                     .baseUrl(provider.getBaseUrl())
                     .apiKey(provider.getApiKey())
+                    .restClientBuilder(providerRestClientBuilder)
                     .build();
             return DeepSeekChatModel.builder()
                     .deepSeekApi(api)

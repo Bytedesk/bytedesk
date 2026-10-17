@@ -34,6 +34,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.PageRequest;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -196,6 +198,43 @@ public class TicketSLAService {
         }
     }
 
+    public void finalizeOpenRecordsForTerminalTicket(TicketEntity ticket, ZonedDateTime terminalAt,
+            String operatorUid) {
+        if (ticket == null || !StringUtils.hasText(ticket.getUid()) || terminalAt == null
+                || !isTerminalTicketStatus(ticket.getStatus())) {
+            return;
+        }
+        ticketRepository.findByUidForSlaUpdate(ticket.getUid())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Cannot lock ticket before SLA finalization: " + ticket.getUid()));
+        List<TicketSlaRecordEntity> records = slaRecordRepository.findByTicketUidAndDeletedFalse(ticket.getUid());
+        if (TicketStatusEnum.CANCELLED.name().equals(ticket.getStatus())) {
+            records.stream().filter(this::isCancelable)
+                    .forEach(record -> cancelRecord(record, operatorUid, "ticket canceled", terminalAt));
+            return;
+        }
+        for (TicketSlaRecordEntity record : records) {
+            if (!isCancelable(record)) {
+                continue;
+            }
+            if (SLA_SOURCE_NODE.equals(record.getSlaSource())) {
+                finalizeUncompletedRecordAtTerminal(record, terminalAt, operatorUid, ticket.getUid());
+                continue;
+            }
+            if (TicketSlaTypeEnum.RESOLUTION.name().equals(record.getSlaType())
+                    || (TicketSlaTypeEnum.CUSTOMER_VERIFY.name().equals(record.getSlaType())
+                            && TicketStatusEnum.VERIFIED_OK.name().equals(ticket.getStatus()))) {
+                completeRecord(record, operatorUid, terminalAt);
+                continue;
+            }
+            if (TicketSlaTypeEnum.CUSTOMER_VERIFY.name().equals(record.getSlaType())) {
+                cancelRecord(record, operatorUid, "ticket closed before customer verification", terminalAt);
+                continue;
+            }
+            finalizeUncompletedRecordAtTerminal(record, terminalAt, operatorUid, ticket.getUid());
+        }
+    }
+
     public void pauseOpenRecords(TicketEntity ticket, String operatorUid) {
         if (ticket == null || !StringUtils.hasText(ticket.getUid()) || !shouldPauseOnHold(ticket)) {
             return;
@@ -306,11 +345,13 @@ public class TicketSLAService {
     public int markWarningRecords() {
         ZonedDateTime now = BdDateUtils.now();
         List<TicketSlaRecordEntity> candidates = slaRecordRepository
-                .findTop200ByStatusAndDueAtLessThanEqualAndDeletedFalseOrderByDueAtAsc(
-                        TicketSlaStatusEnum.RUNNING.name(), now.plusDays(7));
+                .findMonitorCandidates(TicketSlaStatusEnum.RUNNING.name(), now.plusDays(7),
+                        terminalTicketStatuses(), PageRequest.of(0, 200));
         int updated = 0;
-        for (TicketSlaRecordEntity record : candidates) {
-            if (shouldWarn(record, now)) {
+        for (TicketSlaRecordEntity candidate : candidates) {
+            TicketSlaRecordEntity record = lockOpenMonitorCandidate(candidate);
+            if (record != null && TicketSlaStatusEnum.RUNNING.name().equals(record.getStatus())
+                    && shouldWarn(record, now)) {
                 record.setStatus(TicketSlaStatusEnum.WARNED.name());
                 slaRecordRepository.save(record);
                 addSlaComment(record, "SLA_WARNED", "system",
@@ -330,6 +371,36 @@ public class TicketSLAService {
         updated += markBreachedDueRecords(TicketSlaStatusEnum.RUNNING, now);
         updated += markBreachedDueRecords(TicketSlaStatusEnum.WARNED, now);
         return updated;
+    }
+
+    public TerminalSlaReconcileDryRunBatch previewTerminalSlaReconcile(@Nullable String afterUid,
+            int requestedBatchSize) {
+        int batchSize = Math.max(1, Math.min(requestedBatchSize, 1000));
+        List<TicketSlaRecordEntity> candidates = slaRecordRepository.findTerminalReconcileCandidates(afterUid,
+                List.of(TicketSlaStatusEnum.RUNNING.name(), TicketSlaStatusEnum.WARNED.name(),
+                        TicketSlaStatusEnum.PAUSED.name(), TicketSlaStatusEnum.BREACHED.name()),
+                terminalTicketStatuses(), PageRequest.of(0, batchSize));
+        int activeRecords = 0;
+        int breachedRecords = 0;
+        int missingTerminalTimeRecords = 0;
+        for (TicketSlaRecordEntity record : candidates) {
+            if (TicketSlaStatusEnum.BREACHED.name().equals(record.getStatus())
+                    || Boolean.TRUE.equals(record.getBreached())) {
+                breachedRecords++;
+                continue;
+            }
+            Optional<TicketEntity> ticket = ticketRepository.findByUid(record.getTicketUid());
+            if (ticket.isEmpty()
+                    || (!TicketStatusEnum.CANCELLED.name().equals(ticket.get().getStatus())
+                            && ticket.get().getClosedTime() == null)) {
+                missingTerminalTimeRecords++;
+                continue;
+            }
+            activeRecords++;
+        }
+        String nextCursor = candidates.isEmpty() ? null : candidates.get(candidates.size() - 1).getUid();
+        return new TerminalSlaReconcileDryRunBatch(nextCursor, candidates.size(), activeRecords,
+                breachedRecords, missingTerminalTimeRecords);
     }
 
     private void createRecordIfAbsent(TicketEntity ticket, TicketSlaTypeEnum slaType, ZonedDateTime startedAt) {
@@ -380,17 +451,25 @@ public class TicketSLAService {
     }
 
     private void completeRecord(TicketSlaRecordEntity record, String operatorUid) {
-        ZonedDateTime now = BdDateUtils.now();
-        record.setCompletedAt(now);
+        completeRecord(record, operatorUid, BdDateUtils.now());
+    }
+
+    private void completeRecord(TicketSlaRecordEntity record, String operatorUid, ZonedDateTime completedAt) {
+        record.setCompletedAt(completedAt);
         record.setCompletedBy(operatorUid);
-        if (record.getDueAt() != null && now.isAfter(record.getDueAt())) {
+        ZonedDateTime dueAt = effectiveDueAt(record, completedAt);
+        if (dueAt != null && completedAt.isAfter(dueAt)) {
             record.setStatus(TicketSlaStatusEnum.BREACHED.name());
             record.setBreached(Boolean.TRUE);
-            record.setBreachedAt(record.getBreachedAt() != null ? record.getBreachedAt() : now);
+            record.setBreachedAt(record.getBreachedAt() != null ? record.getBreachedAt() : completedAt);
             record.setBreachReason("completed after SLA due time");
         } else {
             record.setStatus(TicketSlaStatusEnum.COMPLETED.name());
+            record.setBreached(Boolean.FALSE);
+            record.setBreachedAt(null);
+            record.setBreachReason(null);
         }
+        record.setPausedAt(null);
         slaRecordRepository.save(record);
     }
 
@@ -515,9 +594,14 @@ public class TicketSLAService {
     }
 
     private boolean markBreached(TicketSlaRecordEntity record, String reason) {
-        if (record == null || !isOpen(record)) {
+        if (record == null) {
             return false;
         }
+        TicketSlaRecordEntity lockedRecord = lockOpenMonitorCandidate(record);
+        if (lockedRecord == null || !isOpen(lockedRecord)) {
+            return false;
+        }
+        record = lockedRecord;
         ZonedDateTime now = BdDateUtils.now();
         if (record.getDueAt() != null && now.isBefore(record.getDueAt())) {
             log.info("SLA breach skipped before dueAt: ticketUid={}, slaType={}, dueAt={}",
@@ -536,6 +620,70 @@ public class TicketSLAService {
         return true;
     }
 
+    private TicketSlaRecordEntity lockOpenMonitorCandidate(TicketSlaRecordEntity candidate) {
+        if (candidate == null || !StringUtils.hasText(candidate.getTicketUid())
+                || !StringUtils.hasText(candidate.getUid())) {
+            return null;
+        }
+        Optional<TicketEntity> ticket = ticketRepository.findByUidForSlaUpdate(candidate.getTicketUid());
+        if (ticket.isEmpty() || isTerminalTicketStatus(ticket.get().getStatus())) {
+            return null;
+        }
+        return slaRecordRepository.findByUidForSlaUpdate(candidate.getUid()).orElse(null);
+    }
+
+    private void markBreachedAtTerminal(TicketSlaRecordEntity record, ZonedDateTime terminalAt) {
+        record.setStatus(TicketSlaStatusEnum.BREACHED.name());
+        record.setBreached(Boolean.TRUE);
+        record.setBreachedAt(terminalAt);
+        record.setBreachReason("SLA deadline reached before ticket became terminal");
+        record.setPausedAt(null);
+        record.setCompletedAt(null);
+        record.setCompletedBy(null);
+        slaRecordRepository.save(record);
+    }
+
+    private void finalizeUncompletedRecordAtTerminal(TicketSlaRecordEntity record, ZonedDateTime terminalAt,
+            String operatorUid, String ticketUid) {
+        ZonedDateTime effectiveDueAt = effectiveDueAt(record, terminalAt);
+        if (effectiveDueAt == null) {
+            log.warn("SLA terminal finalization skipped deadline classification: ticketUid={}, slaUid={}, slaType={}",
+                    ticketUid, record.getUid(), record.getSlaType());
+            cancelRecord(record, operatorUid, "ticket ended; SLA deadline unavailable", terminalAt);
+        } else if (!effectiveDueAt.isAfter(terminalAt)) {
+            markBreachedAtTerminal(record, terminalAt);
+        } else {
+            cancelRecord(record, operatorUid, "ticket ended before SLA deadline", terminalAt);
+        }
+    }
+
+    private ZonedDateTime effectiveDueAt(TicketSlaRecordEntity record, ZonedDateTime at) {
+        if (record.getDueAt() == null) {
+            return null;
+        }
+        if (TicketSlaStatusEnum.PAUSED.name().equals(record.getStatus()) && record.getPausedAt() != null
+                && at.isAfter(record.getPausedAt())) {
+            long pausedSeconds = Duration.between(record.getPausedAt(), at).getSeconds();
+            return record.getDueAt().plusSeconds(Math.max(0, pausedSeconds));
+        }
+        return record.getDueAt();
+    }
+
+    private List<String> terminalTicketStatuses() {
+        return List.of(TicketStatusEnum.CLOSED.name(), TicketStatusEnum.CANCELLED.name(),
+                TicketStatusEnum.VERIFIED_OK.name());
+    }
+
+    private boolean isTerminalTicketStatus(String status) {
+        return TicketStatusEnum.CLOSED.name().equals(status)
+                || TicketStatusEnum.CANCELLED.name().equals(status)
+                || TicketStatusEnum.VERIFIED_OK.name().equals(status);
+    }
+
+    public record TerminalSlaReconcileDryRunBatch(@Nullable String nextCursor, int scannedRecords,
+            int activeRecords, int breachedRecords, int missingTerminalTimeRecords) {
+    }
+
     public int autoCloseBreachedCustomerVerifyRecords() {
         ZonedDateTime now = BdDateUtils.now();
         List<TicketSlaRecordEntity> records = slaRecordRepository
@@ -544,8 +692,18 @@ public class TicketSLAService {
                         TicketSlaStatusEnum.BREACHED.name());
         int closed = 0;
         for (TicketSlaRecordEntity record : records) {
-            Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(record.getTicketUid());
-            if (ticketOptional.isEmpty()) continue;
+            Optional<TicketEntity> ticketOptional = ticketRepository.findByUidForSlaUpdate(record.getTicketUid());
+            if (ticketOptional.isEmpty() || !StringUtils.hasText(record.getUid())) {
+                continue;
+            }
+            Optional<TicketSlaRecordEntity> currentRecord = slaRecordRepository
+                    .findByUidForSlaUpdate(record.getUid())
+                    .filter(slaRecord -> TicketSlaStatusEnum.BREACHED.name().equals(slaRecord.getStatus())
+                            && TicketSlaTypeEnum.CUSTOMER_VERIFY.name().equals(slaRecord.getSlaType()));
+            if (currentRecord.isEmpty()) {
+                continue;
+            }
+            record = currentRecord.get();
             TicketEntity ticket = ticketOptional.get();
             TicketSlaSettingsEntity settings = resolveSettings(ticket).orElse(null);
             if (settings == null || !Boolean.TRUE.equals(settings.getAutoCloseCustomerPendingEnabled()))
@@ -558,8 +716,8 @@ public class TicketSLAService {
                     : record.getUpdatedAt();
             if (breachedAt == null || now.isBefore(breachedAt.plusHours(autoCloseHours))) continue;
             try {
-                boolean alreadyClosed = TicketStatusEnum.CLOSED.name().equals(ticket.getStatus());
-                if (alreadyClosed) {
+                boolean alreadyTerminal = isTerminalTicketStatus(ticket.getStatus());
+                if (alreadyTerminal) {
                     // 工单已处于关闭状态（此前已自动关单或被人工关闭）：
                     // 仅将 SLA 记录置为终态，避免监控任务每分钟重复评论/重复通知/重复保存工单
                     completeAutoClosedRecord(record, now);
@@ -568,6 +726,7 @@ public class TicketSLAService {
                 }
                 ticket.setStatus(TicketStatusEnum.CLOSED.name());
                 ticket.setClosedTime(now);
+                finalizeOpenRecordsForTerminalTicket(ticket, now, "system");
                 ticketRepository.save(ticket);
                 addSlaComment(record, "SLA_AUTO_CLOSED", "system",
                         "客户验证超时 " + autoCloseHours + " 小时，工单自动关闭");
@@ -687,7 +846,7 @@ public class TicketSLAService {
 
     private int markBreachedDueRecords(TicketSlaStatusEnum status, ZonedDateTime now) {
         List<TicketSlaRecordEntity> records = slaRecordRepository
-                .findTop200ByStatusAndDueAtLessThanEqualAndDeletedFalseOrderByDueAtAsc(status.name(), now);
+                .findMonitorCandidates(status.name(), now, terminalTicketStatuses(), PageRequest.of(0, 200));
         int updated = 0;
         for (TicketSlaRecordEntity record : records) {
             if (markBreached(record,
@@ -708,10 +867,17 @@ public class TicketSLAService {
     }
 
     private void cancelRecord(TicketSlaRecordEntity record, String operatorUid, String reason) {
+        cancelRecord(record, operatorUid, reason, BdDateUtils.now());
+    }
+
+    private void cancelRecord(TicketSlaRecordEntity record, String operatorUid, String reason, ZonedDateTime canceledAt) {
         record.setStatus(TicketSlaStatusEnum.CANCELED.name());
-        record.setCompletedAt(BdDateUtils.now());
+        record.setCompletedAt(canceledAt);
         record.setCompletedBy(operatorUid);
         record.setPausedAt(null);
+        record.setBreached(Boolean.FALSE);
+        record.setBreachedAt(null);
+        record.setBreachReason(null);
         slaRecordRepository.save(record);
         addSlaComment(record, "SLA_CANCELED", operatorUid,
                 "SLA 已取消: " + record.getSlaType()

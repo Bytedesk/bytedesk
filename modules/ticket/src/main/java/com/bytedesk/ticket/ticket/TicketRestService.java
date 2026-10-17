@@ -78,6 +78,7 @@ import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 import com.bytedesk.ticket.ticket_settings_basic.TicketBasicSettingsEntity;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityModeEnum;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityService;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
@@ -121,6 +122,8 @@ public class TicketRestService
     private final TicketSettingsRestService ticketSettingsRestService;
 
     private final MemberRepository memberRepository;
+
+    private final TicketVisibilityService ticketVisibilityService;
 
     // @Cacheable(value = "ticket", key = "#uid", unless = "#result == null")
     @Override
@@ -322,6 +325,9 @@ public class TicketRestService
         Assert.hasText(request.getOrgUid(), "organization uid required");
         normalizeReporterType(request, skipLoginEnforce);
         Assert.hasText(request.getReporterJson(), "reporter info required");
+        // 来源会话校验与补全：以 visitorThreadUid 为权威锚点，校验来源会话
+        // 存在、未删除且组织一致，缺 topic 时以服务端真实值为准补齐
+        resolveSourceVisitorThread(request);
         // 创建工单...
         TicketEntity ticket = modelMapper.map(request, TicketEntity.class);
         ticket.setType(TicketTypeEnum.getNameFromValue(request.getType()));
@@ -521,6 +527,45 @@ public class TicketRestService
                 });
 
         return ticket;
+    }
+
+    /**
+     * 校验并补全创建请求携带的来源客服会话（visitorThread*）。
+     * <p>
+     * visitorThreadUid 为权威锚点：
+     * <ul>
+     * <li>来源会话不存在、已删除或与工单组织不一致时明确失败，不静默降级为“创建成功但不关联”；</li>
+     * <li>前端传入的 visitorThreadTopic 缺失或不一致时，以服务端读取的真实 topic 为准；</li>
+     * <li>仅 visitorThreadTopic 而无 uid 属于不完整来源，明确报错；</li>
+     * <li>两者均为空时不做处理，按独立工单创建。</li>
+     * </ul>
+     * 只读加载来源会话（findByUidReadOnly 返回游离实体），不进入当前创建事务的持久化上下文。
+     */
+    private void resolveSourceVisitorThread(TicketRequest request) {
+        String visitorThreadUid = request.getVisitorThreadUid();
+        String visitorThreadTopic = request.getVisitorThreadTopic();
+        if (!StringUtils.hasText(visitorThreadUid)) {
+            if (StringUtils.hasText(visitorThreadTopic)) {
+                throw new IllegalArgumentException(
+                        "visitorThreadTopic requires visitorThreadUid: source thread uid missing");
+            }
+            return;
+        }
+        ThreadEntity sourceThread = threadRestService.findByUidReadOnly(visitorThreadUid.trim())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "visitor thread not found: " + visitorThreadUid));
+        if (sourceThread.isDeleted()) {
+            throw new IllegalArgumentException("visitor thread deleted: " + visitorThreadUid);
+        }
+        if (!request.getOrgUid().equals(sourceThread.getOrgUid())) {
+            throw new IllegalArgumentException("visitor thread org mismatch: " + visitorThreadUid);
+        }
+        String sourceTopic = sourceThread.getTopic();
+        if (!StringUtils.hasText(sourceTopic)) {
+            throw new IllegalArgumentException("visitor thread topic empty: " + visitorThreadUid);
+        }
+        request.setVisitorThreadUid(sourceThread.getUid());
+        request.setVisitorThreadTopic(sourceTopic);
     }
 
     /**
@@ -1070,25 +1115,8 @@ public class TicketRestService
     }
 
     private TicketVisibilitySettingsData resolveVisibilitySettingsData(TicketRequest request) {
-        TicketVisibilitySettingsEntity visibilitySettings = null;
-        if (StringUtils.hasText(request.getTicketSettingsUid())) {
-            visibilitySettings = ticketSettingsRestService.findByUid(request.getTicketSettingsUid())
-                    .map(settings -> settings.getVisibilitySettings())
-                    .orElse(null);
-        }
-        if (visibilitySettings == null) {
-            TicketTypeEnum ticketType = TicketTypeEnum.fromValue(request.getType());
-            visibilitySettings = ticketSettingsRestService
-                .findDefaultByOrgUidAndType(request.getOrgUid(), ticketType.name())
-                    .map(settings -> settings.getVisibilitySettings())
-                    .orElse(null);
-        }
-
-        TicketVisibilitySettingsData data = visibilitySettings == null || visibilitySettings.getContent() == null
-                ? TicketVisibilitySettingsData.builder().build()
-                : visibilitySettings.getContent();
-        data.normalize();
-        return data;
+        return ticketVisibilityService.resolve(request.getOrgUid(), request.getType(),
+                request.getTicketSettingsUid());
     }
 
     private boolean hasOrgAdminRole(UserEntity currentUser) {
@@ -1225,54 +1253,10 @@ public class TicketRestService
         if (isVisitorPrincipal()) {
             return false;
         }
-        TicketRequest visibilityRequest = TicketRequest.builder()
-            .ticketSettingsUid(ticket.getTicketSettingsUid())
-            .build();
-        visibilityRequest.setOrgUid(ticket.getOrgUid());
-        visibilityRequest.setType(ticket.getType());
-        TicketVisibilitySettingsData data = resolveVisibilitySettingsData(visibilityRequest);
+        TicketVisibilitySettingsData data = ticketVisibilityService.resolve(ticket);
 
-        if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(data.getMode())) {
-            if (!StringUtils.hasText(ticket.getDepartmentUid())) {
-                return true;
-            }
-            return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
-        }
-        if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(data.getMode())) {
-            List<String> allowedDepartmentUids = data.getDepartmentUids() == null
-                    ? new ArrayList<>()
-                    : data.getDepartmentUids();
-            return StringUtils.hasText(currentDeptUid) && allowedDepartmentUids.contains(currentDeptUid);
-        }
-        if (TicketVisibilityModeEnum.CATEGORY_BASED.name().equals(data.getMode())) {
-            // 与列表谓词（appendVisibilityPredicates）保持同口径：
-            // 未填写分类的工单无法套用分类规则，存在受限规则时默认收紧为仅创建人/受理人/管理员可见
-            //（reporter/assignee/管理员已在方法前部放行，此处 return false 仅拦截其他普通成员）。
-            boolean hasRestrictingCategoryRule = data.getCategoryRules() != null
-                    && data.getCategoryRules().stream()
-                            .anyMatch(rule -> rule != null
-                                    && !TicketVisibilityModeEnum.ORG_WIDE.name().equals(rule.getVisibility()));
-            if (!StringUtils.hasText(ticket.getCategoryUid()) && hasRestrictingCategoryRule) {
-                return false;
-            }
-            String categoryVisibility = data.resolveCategoryVisibility(ticket.getCategoryUid());
-            if (TicketVisibilityModeEnum.DEPARTMENT_RESTRICTED.name().equals(categoryVisibility)) {
-                if (!StringUtils.hasText(ticket.getDepartmentUid())) {
-                    return true;
-                }
-                return StringUtils.hasText(currentDeptUid) && ticket.getDepartmentUid().equals(currentDeptUid);
-            }
-            if (TicketVisibilityModeEnum.DEPARTMENT_BASED.name().equals(categoryVisibility)) {
-                List<String> allowedDepartmentUids = data.resolveCategoryDepartmentUids(ticket.getCategoryUid());
-                return StringUtils.hasText(currentDeptUid) && allowedDepartmentUids.contains(currentDeptUid);
-            }
-        }
-
-        if (!TicketTypeEnum.INTERNAL.name().equals(ticket.getType())
-                && TicketVisibilityModeEnum.ORG_WIDE.name().equals(data.getMode())) {
-            return true;
-        }
-        return true;
+        // 共享部门判定（与通知收件人过滤同口径）；未命中任何限制分支时保持公司内部可见
+        return data.canViewByDepartment(ticket.getCategoryUid(), ticket.getDepartmentUid(), currentDeptUid);
     }
 
     /**

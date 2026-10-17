@@ -117,6 +117,14 @@ public class TicketSpecification extends BaseSpecification<TicketEntity, TicketR
             if (StringUtils.hasText(request.getThreadTopic())) {
                 predicates.add(criteriaBuilder.equal(root.get("threadTopic"), request.getThreadTopic()));
             }
+            // visitorThreadUid：来源客服会话 uid 精确过滤（供访客列表/摘要按来源会话反查工单）
+            if (StringUtils.hasText(request.getVisitorThreadUid())) {
+                predicates.add(criteriaBuilder.equal(root.get("visitorThreadUid"), request.getVisitorThreadUid()));
+            }
+            // visitorThreadTopic：来源客服会话 topic 精确过滤
+            if (StringUtils.hasText(request.getVisitorThreadTopic())) {
+                predicates.add(criteriaBuilder.equal(root.get("visitorThreadTopic"), request.getVisitorThreadTopic()));
+            }
             // categoryUid
             if (StringUtils.hasText(request.getCategoryUid())) {
                 predicates.add(criteriaBuilder.equal(root.get("categoryUid"), request.getCategoryUid()));

@@ -37,6 +37,7 @@ import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityCategoryRu
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityModeEnum;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsData;
 import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilitySettingsEntity;
+import com.bytedesk.ticket.ticket_settings_visibility.TicketVisibilityService;
 import com.bytedesk.ticket.ticket_sla_record.TicketSlaRecordRepository;
 
 class TicketRestServiceVisibilityTest {
@@ -202,7 +203,8 @@ class TicketRestServiceVisibilityTest {
                                 mock(ApplicationEventPublisher.class),
                                 mock(CategoryRestService.class),
                                 mock(TicketSettingsRestService.class),
-                                mock(MemberRepository.class));
+                                mock(MemberRepository.class),
+                                mock(TicketVisibilityService.class));
         }
 
         private static boolean invokeCanViewTicketViaSharedCard(TicketRestService service, TicketEntity ticket,
@@ -946,7 +948,8 @@ class TicketRestServiceVisibilityTest {
                                 mock(ApplicationEventPublisher.class),
                                 mock(CategoryRestService.class),
                                 mock(TicketSettingsRestService.class),
-                                mock(MemberRepository.class));
+                                mock(MemberRepository.class),
+                                mock(TicketVisibilityService.class));
                 when(authService.getUser()).thenReturn(null);
                 when(ticketRepository.findAll(org.mockito.ArgumentMatchers.<Specification<TicketEntity>>any(),
                                 org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(Page.empty());
@@ -977,7 +980,9 @@ class TicketRestServiceVisibilityTest {
                                 mock(ApplicationEventPublisher.class),
                                 mock(CategoryRestService.class),
                                 ticketSettingsRestService,
-                                memberRepository);
+                                memberRepository,
+                                // 共享解析服务挂接同一 mock settings：canViewTicket 走真实解析逻辑
+                                new TicketVisibilityService(ticketSettingsRestService));
         }
 
         private static UserEntity buildUser(String userUid) {
@@ -1091,7 +1096,8 @@ class TicketRestServiceVisibilityTest {
                                 mock(ApplicationEventPublisher.class),
                                 mock(CategoryRestService.class),
                                 ticketSettingsRestService,
-                                memberRepository);
+                                memberRepository,
+                                new TicketVisibilityService(ticketSettingsRestService));
         }
 
         @Test
