@@ -117,7 +117,7 @@ public class TicketRoundRobinScopeService {
                 if (member.isDeleted()) {
                     continue;
                 }
-                if (StringUtils.hasText(orgUid) && StringUtils.hasText(member.getOrgUid())
+                if (orgUid != null && StringUtils.hasText(orgUid) && StringUtils.hasText(member.getOrgUid())
                         && !orgUid.equals(member.getOrgUid())) {
                     continue;
                 }

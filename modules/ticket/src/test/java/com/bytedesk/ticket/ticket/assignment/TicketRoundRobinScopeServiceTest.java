@@ -38,7 +38,7 @@ class TicketRoundRobinScopeServiceTest {
         }
 
         long totalCalls() {
-            return counters.values().stream().mapToLong(AtomicLong::get).sum();
+            return counters.values().stream().mapToLong(counter -> counter.get()).sum();
         }
     }
 
@@ -70,7 +70,7 @@ class TicketRoundRobinScopeServiceTest {
                 null));
 
         assertEquals(List.of("member-a", "member-c"),
-                normalized.stream().map(MemberEntity::getUid).toList());
+                normalized.stream().map(member -> member.getUid()).toList());
     }
 
     @Test
@@ -163,7 +163,7 @@ class TicketRoundRobinScopeServiceTest {
                     for (int j = 0; j < perThread; j++) {
                         MemberEntity picked = service.roundRobinDepartment(
                                 internalTicket("t-concurrent", "dept-1"), "dept-1", candidates);
-                        distribution.merge(picked.getUid(), 1, Integer::sum);
+                        distribution.merge(picked.getUid(), 1, (count, add) -> count + add);
                     }
                     return null;
                 });
@@ -176,10 +176,10 @@ class TicketRoundRobinScopeServiceTest {
         }
 
         int total = threads * perThread;
-        assertEquals(total, distribution.values().stream().mapToInt(Integer::intValue).sum());
+        assertEquals(total, distribution.values().stream().mapToInt(count -> count).sum());
         // 原子取号下三人计数差不超过 1（并发按取号顺序分配）
-        int max = distribution.values().stream().mapToInt(Integer::intValue).max().orElseThrow();
-        int min = distribution.values().stream().mapToInt(Integer::intValue).min().orElseThrow();
+        int max = distribution.values().stream().mapToInt(count -> count).max().orElseThrow();
+        int min = distribution.values().stream().mapToInt(count -> count).min().orElseThrow();
         assertTrue(max - min <= 1,
                 "distribution should be fair but was " + distribution);
     }

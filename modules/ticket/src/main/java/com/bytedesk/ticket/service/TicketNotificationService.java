@@ -567,9 +567,9 @@ public class TicketNotificationService {
     private record RecipientSnapshot(Set<String> recipients, String reporterUid, String assigneeUid) {
     }
 
-    private Set<String> resolveRecipientUids(TicketEntity ticket, boolean includeWorkgroupUsers) {
-        return resolveRecipientSnapshot(ticket, includeWorkgroupUsers).recipients();
-    }
+    // private Set<String> resolveRecipientUids(TicketEntity ticket, boolean includeWorkgroupUsers) {
+    //     return resolveRecipientSnapshot(ticket, includeWorkgroupUsers).recipients();
+    // }
 
     /**
      * 单次解析本轮全部收件人（报告人/处理人豁免 + 工作组候选部门过滤），供站内与 APNs 复用同一快照。
@@ -626,22 +626,22 @@ public class TicketNotificationService {
         return new RecipientSnapshot(recipients, reporterUid, assigneeUid);
     }
 
-    private String resolveNotificationUserUid(UserProtobuf user) {
-        if (user == null || !StringUtils.hasText(user.getUid())) {
-            return null;
-        }
+    // private String resolveNotificationUserUid(UserProtobuf user) {
+    //     if (user == null || !StringUtils.hasText(user.getUid())) {
+    //         return null;
+    //     }
 
-        if (UserTypeEnum.MEMBER.name().equals(user.getType())) {
-            return memberRestService.findByUid(user.getUid())
-                    .map(member -> member.getUser())
-                    .filter(Objects::nonNull)
-                    .map(userEntity -> userEntity.getUid())
-                    .filter(StringUtils::hasText)
-                    .orElse(user.getUid());
-        }
+    //     if (UserTypeEnum.MEMBER.name().equals(user.getType())) {
+    //         return memberRestService.findByUid(user.getUid())
+    //                 .map(member -> member.getUser())
+    //                 .filter(Objects::nonNull)
+    //                 .map(userEntity -> userEntity.getUid())
+    //                 .filter(StringUtils::hasText)
+    //                 .orElse(user.getUid());
+    //     }
 
-        return user.getUid();
-    }
+    //     return user.getUid();
+    // }
 
     /**
      * 带上下文的身份解析：MEMBER 解析失败（无有效成员/关联用户）时不再回退 member uid 冒充投递，

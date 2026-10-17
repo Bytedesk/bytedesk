@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 

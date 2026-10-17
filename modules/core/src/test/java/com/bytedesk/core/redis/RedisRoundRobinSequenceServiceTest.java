@@ -7,8 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -108,7 +107,7 @@ class RedisRoundRobinSequenceServiceTest {
 
         int threads = 8;
         int perThread = 100;
-        Map<Long, Integer> seen = new ConcurrentHashMap<>();
+        Set<Long> seen = ConcurrentHashMap.newKeySet();
         ExecutorService pool = Executors.newFixedThreadPool(threads);
         CountDownLatch start = new CountDownLatch(1);
         try {
@@ -116,7 +115,7 @@ class RedisRoundRobinSequenceServiceTest {
                 pool.submit(() -> {
                     start.await();
                     for (int j = 0; j < perThread; j++) {
-                        seen.merge(service.nextSequence("scope-concurrent"), 1, Integer::sum);
+                        seen.add(service.nextSequence("scope-concurrent"));
                     }
                     return null;
                 });
@@ -130,6 +129,5 @@ class RedisRoundRobinSequenceServiceTest {
 
         // 全部序号唯一、无丢失
         assertEquals(threads * perThread, seen.size());
-        assertEquals(List.of(1), seen.values().stream().distinct().toList());
     }
 }

@@ -37,7 +37,6 @@ import com.bytedesk.core.sms_push.SmsPushSendService;
 import com.bytedesk.core.sms_template.SmsTemplateRepository;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.service.agent.AgentEntity;
-import com.bytedesk.service.visitor.VisitorEntity;
 import com.bytedesk.service.visitor.VisitorRepository;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
@@ -76,7 +75,6 @@ class TicketNotificationServiceRecipientVisibilityTest {
         private final ObjectProvider<PushMobileService> mobilePushProvider = mock(ObjectProvider.class);
 
         @BeforeEach
-        @SuppressWarnings("unchecked")
         void setUp() {
                 notificationService = mock(NotificationService.class);
                 memberRestService = mock(MemberRestService.class);
@@ -388,7 +386,7 @@ class TicketNotificationServiceRecipientVisibilityTest {
         private List<String> capturedUserUids() {
                 ArgumentCaptor<NotificationRequest> captor = ArgumentCaptor.forClass(NotificationRequest.class);
                 verify(notificationService, atLeastOnce()).dispatchSystemNotificationToUser(captor.capture());
-                return captor.getAllValues().stream().map(NotificationRequest::getUserUid).toList();
+                return captor.getAllValues().stream().map(request -> request.getUserUid()).toList();
         }
 
         private void stubDefaultVisibility(String mode, List<String> departmentUids) {

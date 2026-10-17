@@ -337,10 +337,10 @@ class TicketSpecificationVisibilityTest {
         @SuppressWarnings("rawtypes")
         jakarta.persistence.criteria.CriteriaQuery query = mock(jakarta.persistence.criteria.CriteriaQuery.class);
         @SuppressWarnings("unchecked")
-        Path orgUidPath = mock(Path.class);
+        Path<Object> orgUidPath = mock(Path.class);
         when(context.root.get("orgUid")).thenReturn(orgUidPath);
         @SuppressWarnings("unchecked")
-        Path deletedPath = mock(Path.class);
+        Path<Object> deletedPath = mock(Path.class);
         when(context.root.get("deleted")).thenReturn(deletedPath);
         when(context.criteriaBuilder.equal(deletedPath, false)).thenReturn(mock(Predicate.class));
 

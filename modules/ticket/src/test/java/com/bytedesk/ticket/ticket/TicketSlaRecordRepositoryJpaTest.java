@@ -58,14 +58,14 @@ class TicketSlaRecordRepositoryJpaTest {
         PageRequest page = PageRequest.of(0, 1);
 
         var first = repository.findTerminalReconcileCandidates(null, statuses, terminalStatuses, page);
-        assertThat(first).extracting(TicketSlaRecordEntity::getUid).containsExactly("sla-001");
+        assertThat(first).extracting(record -> record.getUid()).containsExactly("sla-001");
 
         var second = repository.findTerminalReconcileCandidates(first.getFirst().getUid(),
                 statuses, terminalStatuses, page);
-        assertThat(second).extracting(TicketSlaRecordEntity::getUid).containsExactly("sla-002");
+        assertThat(second).extracting(record -> record.getUid()).containsExactly("sla-002");
         assertThat(repository.findTerminalReconcileCandidates(second.getFirst().getUid(),
                 statuses, terminalStatuses, page)).isEmpty();
         assertThat(repository.findTerminalReconcileCandidates(null, statuses, terminalStatuses, page))
-                .extracting(TicketSlaRecordEntity::getUid).containsExactly("sla-001");
+                .extracting(record -> record.getUid()).containsExactly("sla-001");
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.ticket.ticket.TicketEntity;
 import com.bytedesk.ticket.ticket.enums.TicketTypeEnum;
-import com.bytedesk.ticket.ticket_settings.TicketSettingsEntity;
 import com.bytedesk.ticket.ticket_settings.TicketSettingsRestService;
 
 import lombok.RequiredArgsConstructor;
@@ -47,14 +46,14 @@ public class TicketVisibilityService {
         TicketVisibilitySettingsEntity visibilitySettings = null;
         if (StringUtils.hasText(ticketSettingsUid)) {
             visibilitySettings = ticketSettingsRestService.findByUid(ticketSettingsUid)
-                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .map(settings -> settings.getVisibilitySettings())
                     .orElse(null);
         }
         if (visibilitySettings == null) {
             String normalizedType = TicketTypeEnum.fromValue(type).name();
             visibilitySettings = ticketSettingsRestService
                     .findDefaultByOrgUidAndType(orgUid, normalizedType)
-                    .map(TicketSettingsEntity::getVisibilitySettings)
+                    .map(settings -> settings.getVisibilitySettings())
                     .orElse(null);
         }
         // 子实体存在但 content 为空时按默认 ORG_WIDE 处理（converter 不会返回 null content，
