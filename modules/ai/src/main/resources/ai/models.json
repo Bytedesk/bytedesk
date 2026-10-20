@@ -90,9 +90,15 @@
             "type": "TEXT"
         },
         {
-            "name": "qwen3-max",
-            "nickname": "Qwen3 Max",
-            "description": "通义千问3 Max模型，提供高质量的对话体验",
+            "name": "qwen3.8-max",
+            "nickname": "Qwen3.8 Max",
+            "description": "通义千问3.8 Max模型，提供高质量的对话体验",
+            "type": "TEXT"
+        },
+        {
+            "name": "qwen3.8-flash",
+            "nickname": "Qwen3.8 Flash",
+            "description": "通义千问3.8 Flash模型，提供高质量的对话体验",
             "type": "TEXT"
         },
         {

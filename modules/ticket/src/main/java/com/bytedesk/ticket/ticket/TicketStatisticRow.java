@@ -34,6 +34,9 @@ public interface TicketStatisticRow {
     ZonedDateTime getResolvedTime();
 
     @Nullable
+    ZonedDateTime getClosedTime();
+
+    @Nullable
     String getThreadUid();
 
     @Nullable
@@ -41,6 +44,9 @@ public interface TicketStatisticRow {
 
     @Nullable
     String getAssignee();
+
+    @Nullable
+    String getReporter();
 
     @Nullable
     Boolean getVerified();

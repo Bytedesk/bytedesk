@@ -59,6 +59,7 @@ public class UserInitializer {
                 .superUser(true)
                 .emailVerified(true)
                 .mobileVerified(true)
+                .registerSource(UserEntity.RegisterSource.SYSTEM.name())
                 .build();
         userService.save(superAdmin);
 
@@ -80,6 +81,7 @@ public class UserInitializer {
                         .enabled(true)
                         .emailVerified(true)
                         .mobileVerified(true)
+                        .registerSource(UserEntity.RegisterSource.SYSTEM.name())
                         .build();
                 return userService.save(systemUser);
             });
@@ -95,6 +97,7 @@ public class UserInitializer {
                         .enabled(true)
                         .emailVerified(true)
                         .mobileVerified(true)
+                        .registerSource(UserEntity.RegisterSource.SYSTEM.name())
                         .build();
                 return userService.save(fileAssistant);
             });

@@ -125,6 +125,13 @@
         "webUrl": "https://moonshot.ai/",
         "status": "PRODUCTION"
     },
+    "anthropic": {
+        "nickname": "Anthropic",
+        "logo": "anthropic.png",
+        "baseUrl": "https://api.anthropic.com/",
+        "webUrl": "https://anthropic.com/",
+        "status": "PRODUCTION"
+    },
     "xinghuo": {
         "nickname": "讯飞星火",
         "logo": "xinghuo.png",
@@ -160,13 +167,7 @@
         "webUrl": "https://groq.com/",
         "status": "DEVELOPMENT"
     },
-    "anthropic": {
-        "nickname": "Anthropic",
-        "logo": "anthropic.png",
-        "baseUrl": "https://api.anthropic.com/",
-        "webUrl": "https://anthropic.com/",
-        "status": "DEVELOPMENT"
-    },
+    
     "gemini": {
         "nickname": "Gemini",
         "logo": "gemini.png",

@@ -1,0 +1,1 @@
+import{n as e}from"./antd-dropdown-DfOSa8oK.js";import{n as t}from"./react-vendor-BetsR2pZ.js";var n=t(),r=({children:t,style:r,size:i=`large`})=>(0,n.jsx)(e,{orientation:`vertical`,size:i,style:{width:`100%`,padding:24,boxSizing:`border-box`,...r},children:t});export{r as t};

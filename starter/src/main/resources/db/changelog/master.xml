@@ -93,4 +93,12 @@
 
     <include file="db/changelog/migration/261014_add_ticket_create_type_column.xml" />
 
+    <include file="db/changelog/migration/261017_fix_airline_tinytext_columns.xml" />
+
+    <include file="db/changelog/migration/261020_add_meet_ai_tables.xml" />
+    <include file="db/changelog/migration/261020_fix_meet_ai_reliability.xml" />
+
+    <include file="db/changelog/migration/261020_backfill_user_register_source.xml" />
+    <include file="db/changelog/migration/261020_widen_kbase_llm_file_content.xml" />
+
 </databaseChangeLog>

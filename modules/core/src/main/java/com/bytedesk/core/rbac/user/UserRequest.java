@@ -65,8 +65,10 @@ public class UserRequest extends BaseRequest {
 	@Builder.Default
 	private String description = I18Consts.I18N_USER_DESCRIPTION;
 
-	@Builder.Default
-	private Sex sex = Sex.UNKNOWN;
+	// 性别（MALE, FEMALE, UNKNOWN）
+	// 注意：此处默认不设置，null 表示“未提供”，更新时保留数据库原值；
+	// 新建用户由 UserEntity 的 @Builder.Default 落为 UNKNOWN
+	private Sex sex;
 
 	private Boolean enabled;
 
@@ -76,9 +78,10 @@ public class UserRequest extends BaseRequest {
 
 	private Boolean mobileVerified;
 
-	// 注册来源（例如：USERNAME、EMAIL、MOBILE、GITHUB、WECHAT、GOOGLE、DINGTALK、FEISHU、FACEBOOK、DOUYIN、LDAP、OIDC、OPENID、CAS、ADMIN、IMPORT、UNKNOWN）
-	@Builder.Default
-	private String registerSource = "UNKNOWN";
+	// 注册来源（例如：USERNAME、EMAIL、MOBILE、GITHUB、WECHAT、GOOGLE、DINGTALK、FEISHU、FACEBOOK、DOUYIN、LDAP、OIDC、OPENID、CAS、ADMIN、SUPER、SYSTEM、IMPORT、UNKNOWN）
+	// 注意：此处默认不设置，交由 UserService.register 按请求内容推断（邮箱/手机号/用户名），
+	// 各登录注册入口（如手机验证码自动注册、OAuth）按需显式指定
+	private String registerSource;
 	
 	// 注册验证码
 	private String captchaUid;

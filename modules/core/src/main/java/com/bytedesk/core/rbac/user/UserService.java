@@ -144,7 +144,9 @@ public class UserService {
         user.setUid(uidUtils.getUid());
         user.setPlatform(platform);
         // 设置注册来源：优先取请求值，否则根据提供的信息进行推断
-        String rs = request.getRegisterSource();
+        String rs = StringUtils.hasText(request.getRegisterSource())
+                ? request.getRegisterSource().trim()
+                : null;
         if (!StringUtils.hasText(rs)) {
             if (StringUtils.hasText(request.getEmail())) {
                 rs = UserEntity.RegisterSource.EMAIL.name();
@@ -157,6 +159,10 @@ public class UserService {
             }
         }
         user.setRegisterSource(rs);
+        // 性别：请求未提供时保持实体默认 UNKNOWN（@Builder.Default 已兜底，显式赋值便于阅读）
+        if (user.getSex() == null) {
+            user.setSex(UserEntity.Sex.UNKNOWN.name());
+        }
         //
         if (StringUtils.hasText(request.getNickname())) {
             user.setNickname(request.getNickname());

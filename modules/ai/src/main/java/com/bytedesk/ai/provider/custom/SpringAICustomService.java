@@ -69,13 +69,11 @@ public class SpringAICustomService extends BaseSpringAIService {
         this.tokenUsageHelper = tokenUsageHelper;
     }
 
-
     private final LlmProviderRestService llmProviderRestService;
 
     private final OpenAiChatModel defaultChatModel;
 
     private final TokenUsageHelper tokenUsageHelper;
-
 
     /**
      * 根据机器人配置创建动态的OpenAiChatOptions

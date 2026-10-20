@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        历史用户 register_source 回填。
+
+        背景：
+        - 旧版 UserRequest.registerSource 默认值为 "UNKNOWN"，导致 UserService.register
+          的“按联系方式推断”逻辑从未生效：管理后台创建、自主注册的用户均落为 UNKNOWN；
+        - UserInitializer 创建的内置账号（超级管理员 df_super_uid、系统通知 df_sys_uid、
+          文件助手 df_fa_uid）未设置 register_source，同样落为 UNKNOWN。
+
+        回填策略（与 UserService.register 的推断优先级保持一致：邮箱 > 手机号）：
+        1. 三个内置账号 uuid → SYSTEM；
+        2. 其余 UNKNOWN 且有邮箱 → EMAIL；
+        3. 其余 UNKNOWN 且有手机号 → MOBILE；
+        4. 剩余（无邮箱无手机号的历史数据）保留 UNKNOWN。
+
+        说明：
+        - 语句幂等，重复执行无副作用；
+        - 全新数据库（表/列尚不存在）时 MARK_RAN 跳过，随后由 Hibernate 建表，
+          新数据由修复后的代码写入正确来源；
+        - SQL 仅使用 = / IS NOT NULL / <> 常量比较，MySQL/MariaDB/PostgreSQL/H2/
+          Oracle/KingBase 均兼容（Oracle 空串视为 NULL，email &lt;&gt; '' 为 NULL 即
+          排除该行，语义与预期一致）。
+    -->
+
+    <changeSet id="261020-backfill-user-register-source-system" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_user" />
+            <columnExists tableName="bytedesk_core_user" columnName="register_source" />
+        </preConditions>
+        <comment>内置账号（超级管理员/系统通知/文件助手）回填为 SYSTEM</comment>
+        <sql>
+            UPDATE bytedesk_core_user
+            SET register_source = 'SYSTEM'
+            WHERE register_source = 'UNKNOWN'
+              AND uuid IN ('df_super_uid', 'df_sys_uid', 'df_fa_uid');
+        </sql>
+    </changeSet>
+
+    <changeSet id="261020-backfill-user-register-source-email" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_user" />
+            <columnExists tableName="bytedesk_core_user" columnName="register_source" />
+        </preConditions>
+        <comment>其余 UNKNOWN 且有邮箱的历史用户回填为 EMAIL</comment>
+        <sql>
+            UPDATE bytedesk_core_user
+            SET register_source = 'EMAIL'
+            WHERE register_source = 'UNKNOWN'
+              AND email IS NOT NULL
+              AND email &lt;&gt; '';
+        </sql>
+    </changeSet>
+
+    <changeSet id="261020-backfill-user-register-source-mobile" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_core_user" />
+            <columnExists tableName="bytedesk_core_user" columnName="register_source" />
+        </preConditions>
+        <comment>其余 UNKNOWN 且有手机号的历史用户回填为 MOBILE</comment>
+        <sql>
+            UPDATE bytedesk_core_user
+            SET register_source = 'MOBILE'
+            WHERE register_source = 'UNKNOWN'
+              AND mobile IS NOT NULL
+              AND mobile &lt;&gt; '';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -70,10 +70,8 @@ public class FileEventListener {
                 // 从 upload.extra 读取切块配置
                 FileChunkingConfig chunkingConfig = resolveChunkingConfig(upload);
                 
-                // 使用智能摘要提取方法
-                int maxContentLength = 60000; // 设置最大内容长度，预留一些空间
-                String content = fileService.extractContentSummary(documents, maxContentLength);
-                
+                // content 字段无实际用途（检索数据由 chunks 承载），
+                // 上传路径不落全量摘要，避免超长文本写入失败
                 // 转换为 fileEntity，并保存
                 UserProtobuf userProtobuf = UserProtobuf.fromJson(upload.getUser());
                 FileRequest fileRequest = FileRequest.builder()
@@ -81,7 +79,6 @@ public class FileEventListener {
                     .fileName(upload.getFileName())
                     .fileUrl(upload.getFileUrl())
                     .fileType(upload.getFileType())
-                    .content(content)
                     .chunkingStrategy(chunkingConfig.getStrategy().name())
                     .chunkSize(chunkingConfig.getChunkSize())
                     .chunkOverlap(chunkingConfig.getChunkOverlap())

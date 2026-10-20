@@ -32,6 +32,7 @@ import com.bytedesk.core.category.CategoryRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadEntity;
 import com.bytedesk.core.upload.UploadRestService;
+import com.bytedesk.core.utils.BdStringUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 // import com.bytedesk.core.config.BytedeskEventPublisher;
 // import com.bytedesk.kbase.llm_file.event.FileUpdateDocEvent;
@@ -48,6 +49,19 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileRequest, FileResponse, FileExcel> {
+
+    /**
+     * 响应中 content 字段的最大 UTF-8 字节数。
+     * 与前端编辑抽屉（KbFileDrawer maxLength=10000 字符）对齐：
+     * 10000 个中文字符最多 30000 字节，保证 UI 范围内创建/编辑的内容回存不丢失；
+     * 超长摘要（上传文件写入侧最大 60000 字节）截断后返回，避免列表页大 payload 拖慢渲染。
+     */
+    private static final int FILE_RESPONSE_CONTENT_MAX_BYTES = 30000;
+
+    /**
+     * 入库 content 的兜底上限（UTF-8 字节），略低于 TEXT 列 65535 字节上限
+     */
+    private static final int FILE_ENTITY_CONTENT_MAX_BYTES = 60000;
 
     private final FileRepository fileRepository;
 
@@ -93,6 +107,8 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
     public FileResponse create(FileRequest request) {
         FileEntity entity = modelMapper.map(request, FileEntity.class);
         entity.setUid(uidUtils.getUid());
+        // 防止 API 直写的 content 超过 TEXT 列上限（MySQL 65535 字节）
+        entity.setContent(sanitizeContent(entity.getContent()));
         //
         Optional<KbaseEntity> kbase = kbaseRestService.findByUid(request.getKbUid());
         if (kbase.isPresent()) {
@@ -123,10 +139,10 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
             
             // modelMapper.map(request, entity);
             entity.setFileName(request.getFileName());
-            entity.setContent(request.getContent());
+            entity.setContent(sanitizeContent(request.getContent()));
             entity.setTagList(request.getTagList());
             entity.setFileUrl(request.getFileUrl());
-            entity.setContent(request.getContent());
+            entity.setContent(sanitizeContent(request.getContent()));
             entity.setEnabled(request.getEnabled());
             entity.setStartDate(request.getStartDate());
             entity.setEndDate(request.getEndDate());
@@ -236,7 +252,19 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         FileResponse response = modelMapper.map(entity, FileResponse.class);
         response.setKbase(KbaseConvertUtils.convertToKbaseResponse(entity.getKbase()));
         response.setUpload(ConvertUtils.convertToUploadResponse(entity.getUpload()));
+        // 截断超长内容：列表/详情响应不携带全量摘要，避免大 payload 拖慢前端渲染
+        response.setContent(BdStringUtils.truncateToUtf8Bytes(entity.getContent(), FILE_RESPONSE_CONTENT_MAX_BYTES));
         return response;
+    }
+
+    /**
+     * 入库前兜底截断 content：TEXT 列按字节计上限 65535，预留截断提示空间
+     */
+    private String sanitizeContent(String content) {
+        if (content == null) {
+            return null;
+        }
+        return BdStringUtils.truncateToUtf8Bytes(content, FILE_ENTITY_CONTENT_MAX_BYTES);
     }
 
     @Override
@@ -283,10 +311,8 @@ public class FileRestService extends BaseRestServiceWithExport<FileEntity, FileR
         // 重新解析文档
         List<Document> documents = fileService.parseFileContent(upload);
         
-        // 更新文件内容
-        int maxContentLength = 60000; // 设置最大内容长度
-        String content = fileService.extractContentSummary(documents, maxContentLength);
-        file.setContent(content);
+        // content 字段无实际用途（检索数据由 chunks 承载），重新切分时不再写入全量摘要，
+        // 保留原值不动，避免超长文本写入失败
         
         // 重置状态
         file.setElasticStatus(ChunkStatusEnum.NEW.name());

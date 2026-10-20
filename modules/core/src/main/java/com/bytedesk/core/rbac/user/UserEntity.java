@@ -133,7 +133,7 @@ public class UserEntity extends BaseEntityNoOrg {
 	/**
 	 * Registration source of the user
 	 * Examples: USERNAME, EMAIL, MOBILE, GITHUB, WECHAT, GOOGLE, DINGTALK, FEISHU,
-	 * FACEBOOK, DOUYIN, LDAP, OIDC, OPENID, ADMIN, IMPORT, UNKNOWN
+	 * FACEBOOK, DOUYIN, LDAP, OIDC, OPENID, CAS, ADMIN, SUPER, SYSTEM, IMPORT, UNKNOWN
 	 */
 	@Builder.Default
 	@Column(name = "register_source", length = 32)
@@ -416,6 +416,7 @@ public class UserEntity extends BaseEntityNoOrg {
 		CAS,
 		ADMIN, // 管理员创建
 		SUPER, // 超级管理员创建
+		SYSTEM, // 系统内置（如超级管理员、系统通知、文件助手等初始化账号）
 		UNKNOWN
 	}
 

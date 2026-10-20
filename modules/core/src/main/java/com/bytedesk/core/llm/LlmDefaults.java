@@ -23,14 +23,14 @@ public class LlmDefaults {
     
     // 默认对话模型提供商
     public static final String DEFAULT_CHAT_PROVIDER = LlmProviderConstants.DASHSCOPE;
-    public static final String DEFAULT_CHAT_MODEL = "qwen3-max";
+    public static final String DEFAULT_CHAT_MODEL = "qwen-max";
     
     // 默认文字对话模型提供商
     public static final String DEFAULT_TEXT_PROVIDER = LlmProviderConstants.DASHSCOPE;
-    public static final String DEFAULT_TEXT_MODEL = "qwen3-max";
+    public static final String DEFAULT_TEXT_MODEL = "qwen-max";
 
     // DeepSeek 默认模型
-    public static final String DEFAULT_DEEPSEEK_CHAT_MODEL = "deepseek-v4-flash";
+    public static final String DEFAULT_DEEPSEEK_CHAT_MODEL = "deepseek-flash";
 
     // 默认视觉对话模型提供商
     public static final String DEFAULT_VISION_PROVIDER = LlmProviderConstants.DASHSCOPE;
@@ -50,5 +50,5 @@ public class LlmDefaults {
     
     // 默认rewrite提供商
     public static final String DEFAULT_REWRITE_PROVIDER = LlmProviderConstants.DASHSCOPE;
-    public static final String DEFAULT_REWRITE_MODEL = "qwen3-max";
+    public static final String DEFAULT_REWRITE_MODEL = "qwen-max";
 }

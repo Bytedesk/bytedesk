@@ -76,20 +76,23 @@
 						<li><a class="dropdown-item" href="${docBaseUrl}" target="_blank"><@t key="nav.docs">文档</@t></a></li>
 						<li><a class="dropdown-item" href="${helpCenterUrl}" target="_blank"><@t key="nav.helpcenter">帮助中心</@t></a></li>
 						<li><a class="dropdown-item" href="${privateDeployUrl}" target="_blank"><@t key="nav.private.deploy">私有部署文档</@t></a></li>
-						<li><a class="dropdown-item" href="${aiAgentDemoUrl}" target="_blank">AI Agent 演示</a></li>
+						<li><a class="dropdown-item" href="${openBudyUrl}" target="_blank"><@t key="nav.openbudy">OpenBudy</@t></a></li>
 					</ul>
 				</li>
 
-				<!-- Nav item: OpenBudy -->
-				<li class="nav-item dropdown"><a class="nav-link" href="${openBudyUrl}" target="_blank"><@t key="nav.openbudy">OpenBudy</@t></a></li>
 				<li class="nav-item dropdown"><a class="nav-link" href="${visitorDemoUrl}" target="_blank"><@t key="nav.visitor.demo">访客对接演示</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
-				
-				<#--  <li class="nav-item dropdown"><a class="nav-link" href="./blog" target="_blank">博客</a></li>  -->
-				<#-- pruned: voice, forum, help, architecture -->
-				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="${langPrefix}/pages/about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${aiAgentDemoUrl}" target="_blank"><@t key="nav.aiagent.demo">多Agent客服演示</@t></a></li>
+
+				<!-- Nav item: More -->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="moreMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="nav.more">更多</@t></a>
+					<ul class="dropdown-menu" aria-labelledby="moreMenu">
+						<li><a class="dropdown-item" href="${pricingUrl}" target="_blank"><@t key="nav.pricing">价格</@t></a></li>
+						<li><a class="dropdown-item" href="https://www.weiyuai.cn/blog/df_org_uid_df_kb_bg_uid/index.html" target="_blank"><@t key="nav.blog">博客</@t></a></li>
+						<li><a class="dropdown-item" href="${langPrefix}/pages/download.html" target="_blank"><@t key="nav.download">下载</@t></a></li>
+						<li><a class="dropdown-item" href="${langPrefix}/pages/about.html" target="_blank"><@t key="nav.about">关于</@t></a></li>
+					</ul>
+				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="suiteMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false"><@t key="default.title">系统入口</@t></a>
 					<ul class="dropdown-menu" aria-labelledby="suiteMenu">
@@ -179,7 +182,7 @@
 			<div class="navbar-nav ms-3 d-none d-sm-block">
 				<#include "./macro/i18n.ftl" />
 				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/admin/?lang=${currentLang}')"><@t key="nav.admin">管理后台</@t></button>
-				<button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/agent/?lang=${currentLang}')"><@t key="nav.agent">客服后台</@t></button>
+				<#--  <button class="btn btn-sm btn-dark mb-0" onclick="window.open('https://www.weiyuai.cn/agent/?lang=${currentLang}')"><@t key="nav.agent">客服后台</@t></button>  -->
 			</div>
 
 		</div>

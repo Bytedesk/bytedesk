@@ -64,7 +64,6 @@ public class SpringAIAnthropicService extends BaseSpringAIService {
         this.promptHelper = promptHelper;
     }
 
-
     private final LlmProviderRestService llmProviderRestService;
 
     private final AnthropicChatModel defaultChatModel;
@@ -74,7 +73,6 @@ public class SpringAIAnthropicService extends BaseSpringAIService {
     private final SseMessageHelper sseMessageHelper;
 
     private final PromptHelper promptHelper;
-
 
     /**
      * 根据机器人配置创建 AnthropicChatOptions

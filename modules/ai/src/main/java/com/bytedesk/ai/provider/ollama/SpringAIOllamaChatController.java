@@ -14,10 +14,13 @@
  */
 package com.bytedesk.ai.provider.ollama;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -28,18 +31,30 @@ import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.utils.output.ActorsFilms;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.utils.JsonResult;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -56,9 +71,118 @@ public class SpringAIOllamaChatController {
 
     private final BytedeskProperties bytedeskProperties;
     private final SpringAIOllamaChatService springAIOllamaService;
+    private final RestClient.Builder restClientBuilder;
+
+    @Value("${spring.ai.ollama.base-url:http://127.0.0.1:11434}")
+    private String ollamaBaseUrl;
 
     @Qualifier("virtualAsyncExecutor")
     private final ExecutorService executorService;
+
+    /**
+     * https://ollama.com/library/laya
+     * 
+     * @param request
+     * @return
+     */
+    @GetMapping("/laya")
+    public ResponseEntity<JsonResult<?>> layaGet(@Valid @ModelAttribute LayaTestRequest request) {
+        return laya(request);
+    }
+
+    @PostMapping(value = "/laya", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JsonResult<?>> laya(@Valid @RequestBody LayaTestRequest request) {
+        if (!Boolean.TRUE.equals(bytedeskProperties.getDebug())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(JsonResult.error("Service is not available", 403));
+        }
+
+        Map<String, Object> payload = Map.of(
+                "model", "laya",
+                "keep_alive", "10m",
+                "state", request.message(),
+                "questions", Map.of(
+                        "intention", Map.of(
+                                "type", "choice",
+                                "instructions", "Classify the primary customer-service intent.",
+                                "criteria", Map.of(
+                                        "consult", "Asking about products, pricing, or usage",
+                                        "complaint", "Dissatisfaction, billing dispute, or refund claim",
+                                        "suggestion", "Suggestion or feature request",
+                                        "other", "None of the above")),
+                        "need_agent", Map.of(
+                                "type", "noul",
+                                "instructions", "Does the customer explicitly request a human agent?"),
+                        "urgency", Map.of(
+                                "type", "score",
+                                "instructions", "Rate the urgency expressed in this message.",
+                                "criteria", List.of("No urgency stated", "Wants timely attention",
+                                        "Explicit critical deadline or blocking issue"))));
+
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(3000);
+        requestFactory.setReadTimeout(60000);
+
+        try {
+            Map<String, Object> response = restClientBuilder.clone()
+                    .baseUrl(ollamaBaseUrl)
+                    .requestFactory(requestFactory)
+                    .build()
+                    .post()
+                    .uri("/v1/systemone")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .body(payload)
+                    .retrieve()
+                    .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+
+            if (!isValidLayaTestResponse(response)) {
+                log.warn("Ollama Laya test returned an invalid decision response");
+                return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                        .body(JsonResult.error("Ollama Laya returned an invalid decision response", 502));
+            }
+            return ResponseEntity.ok(JsonResult.success(response));
+        } catch (RestClientResponseException e) {
+            log.warn("Ollama Laya test failed: status={}", e.getStatusCode().value());
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(JsonResult.error("Ollama Laya request failed; check the model and Ollama version", 502));
+        } catch (ResourceAccessException e) {
+            log.warn("Ollama Laya test connection failed or timed out");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(JsonResult.error("Ollama Laya is unavailable or timed out", 503));
+        } catch (RestClientException e) {
+            log.warn("Ollama Laya test could not decode the decision response");
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                    .body(JsonResult.error("Ollama Laya returned an unreadable decision response", 502));
+        }
+    }
+
+    private boolean isValidLayaTestResponse(Map<String, Object> response) {
+        return response != null
+                && response.get("answers") instanceof Map<?, ?> answers
+                && answers.get("intention") instanceof Map<?, ?> intention
+                && "choice".equals(intention.get("type"))
+                && intention.get("choice") instanceof String choice
+                && List.of("consult", "complaint", "suggestion", "other").contains(choice)
+                && isNumberInRange(intention.get("confidence"), 1)
+                && answers.get("need_agent") instanceof Map<?, ?> needAgent
+                && "noul".equals(needAgent.get("type"))
+                && isNumberInRange(needAgent.get("noul"), 1)
+                && answers.get("urgency") instanceof Map<?, ?> urgency
+                && "score".equals(urgency.get("type"))
+                && isNumberInRange(urgency.get("score"), 2)
+                && isNumberInRange(urgency.get("confidence"), 1);
+    }
+
+    private boolean isNumberInRange(Object value, double maximum) {
+        return value instanceof Number number
+                && Double.isFinite(number.doubleValue())
+                && number.doubleValue() >= 0
+                && number.doubleValue() <= maximum;
+    }
+
+    public record LayaTestRequest(@NotBlank @Size(max = 1000) String message) {
+    }
 
     // http://127.0.0.1:9003/ollama/format?actor=&baseUrl=http://127.0.0.1:11434&model=llama3
     // https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html

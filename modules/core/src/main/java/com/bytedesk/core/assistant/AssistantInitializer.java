@@ -30,8 +30,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class AssistantInitializer implements SmartInitializingSingleton {
 
-    // private AssistantRepository assistantRepository;
-
     private AssistantRestService assistantService;
 
     @Override
@@ -63,18 +61,6 @@ public class AssistantInitializer implements SmartInitializingSingleton {
                 .level(LevelEnum.PLATFORM.name())
                 .build();
         assistantService.create(queueAssistantRequest);
-
-        // 剪贴助手
-        // AssistantRequest clipboardAssistantRequest = AssistantRequest.builder()
-        //         .topic(TopicUtils.TOPIC_CLIPBOARD_ASSISTANT)
-        //         .nickname(I18Consts.I18N_CLIPBOARD_ASSISTANT_NAME)
-        //         .avatar(AvatarConsts.getDefaultClipboardAssistantAvatarUrl())
-        //         .description(I18Consts.I18N_CLIPBOARD_ASSISTANT_DESCRIPTION)
-        //         .build();
-        // clipboardAssistantRequest.setUid(BytedeskConsts.DEFAULT_CLIPBOARD_ASSISTANT_UID);
-        // clipboardAssistantRequest.setLevel(LevelEnum.PLATFORM.name());
-        // assistantService.create(clipboardAssistantRequest);
-
     }
     
     

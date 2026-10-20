@@ -271,57 +271,6 @@ public class FileService {
 	}
 
 	/**
-	 * 智能截取文档内容摘要
-	 * @param documents 文档列表
-	 * @param maxLength 最大长度
-	 * @return 截取后的内容摘要
-	 */
-	public String extractContentSummary(List<Document> documents, int maxLength) {
-		if (documents == null || documents.isEmpty()) {
-			return "";
-		}
-		
-		StringBuilder contentBuilder = new StringBuilder();
-		int currentLength = 0;
-		
-		// 优先取每个文档的前部分内容
-		for (Document doc : documents) {
-			String docText = doc.getText();
-			if (docText == null || docText.trim().isEmpty()) {
-				continue;
-			}
-			
-			// 清理文本，移除多余的空白字符和潜在问题字符
-			docText = cleanDocumentText(docText);
-			
-			if (currentLength + docText.length() <= maxLength) {
-				contentBuilder.append(docText).append("\n");
-				currentLength += docText.length() + 1; // +1 for newline
-			} else {
-				// 如果剩余空间足够，添加部分内容
-				int remainingSpace = maxLength - currentLength;
-				if (remainingSpace > 100) { // 至少保留100个字符的空间
-					String truncatedText = docText.substring(0, Math.min(docText.length(), remainingSpace - 50));
-					// 尝试在句号、问号或感叹号处截断
-					int lastSentence = Math.max(
-						Math.max(truncatedText.lastIndexOf('.'), truncatedText.lastIndexOf('。')),
-						Math.max(truncatedText.lastIndexOf('!'), truncatedText.lastIndexOf('？'))
-					);
-					if (lastSentence > truncatedText.length() / 2) {
-						truncatedText = truncatedText.substring(0, lastSentence + 1);
-					}
-					contentBuilder.append(truncatedText).append("...[内容已截断，完整内容将在文档分块中处理]");
-				}
-				break;
-			}
-		}
-		
-		String result = contentBuilder.toString();
-		log.info("内容摘要生成完成，原始文档数: {}, 摘要长度: {}", documents.size(), result.length());
-		return result;
-	}
-
-	/**
 	 * 清理文档文本，移除可能导致问题的特殊字符
 	 * @param text 原始文本
 	 * @return 清理后的文本

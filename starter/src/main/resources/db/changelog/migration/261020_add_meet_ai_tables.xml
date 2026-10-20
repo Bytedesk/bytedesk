@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        微语会议 AI（2026-10-19 规划 §5）：会后离线转写、手动纪要、会后会议助手。
+
+        新增表：
+        - bytedesk_meet_transcript        转写任务主表（每 orgUid+recordingUid 一条稳定记录）
+        - bytedesk_meet_transcript_seg    转写分段（唯一键 transcript_uid+revision+seq）
+        - bytedesk_meet_minutes           纪要主表（重生成新纪录，保留旧版本）
+        - bytedesk_meet_minutes_source    纪要来源（固化材料顺序）
+        - bytedesk_meet_assistant_ctx     助手上下文绑定（thread_uid 唯一）
+        变更列：
+        - bytedesk_webrtc_meeting_recording.audio_scope 可空列（历史 NULL = UNKNOWN）
+
+        策略（双保护，参照 260922_add_push_device_table.xml）：
+        1. 全新环境：createTable 建完整结构；
+        2. ddl-auto=update 已由 JPA 建表的环境：preConditions MARK_RAN 跳过。
+        全部使用 Liquibase 标签（createTable/addColumn/createIndex），跨 MySQL/PostgreSQL/H2/Oracle/KingBase 兼容。
+
+        见 docs/plans/2026-10-19-meet-minutes-transcription-assistant-plan.md
+    -->
+
+    <!-- ============ 转写任务主表 ============ -->
+    <changeSet id="261020-create-meet-transcript-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_meet_transcript"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_meet_transcript">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_meet_transcript" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_transcript_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <!-- 来源 -->
+            <column name="recording_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="room_uid" type="VARCHAR(64)"/>
+            <column name="source_fingerprint" type="VARCHAR(255)"/>
+            <column name="audio_scope" type="VARCHAR(32)"/>
+            <column name="measured_duration_ms" type="BIGINT"/>
+            <!-- 执行 -->
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stage" type="VARCHAR(32)"/>
+            <column name="revision" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ready_revision" type="INT"/>
+            <column name="provider" type="VARCHAR(64)"/>
+            <column name="model_name" type="VARCHAR(128)"/>
+            <column name="language" type="VARCHAR(32)"/>
+            <column name="request_key" type="VARCHAR(128)"/>
+            <column name="asr_record_uid" type="VARCHAR(64)"/>
+            <!-- 分块断点 -->
+            <column name="chunk_manifest" type="TEXT"/>
+            <!-- 恢复与失效 -->
+            <column name="attempt" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="next_retry_at" type="TIMESTAMP"/>
+            <column name="lease_owner" type="VARCHAR(128)"/>
+            <column name="lease_token" type="VARCHAR(64)"/>
+            <column name="lease_until" type="TIMESTAMP"/>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="finished_at" type="TIMESTAMP"/>
+            <column name="error_code" type="VARCHAR(64)"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="invalidated_at" type="TIMESTAMP"/>
+            <column name="invalid_reason" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="261020-create-meet-transcript-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_meet_transcript"/>
+            <not>
+                <indexExists tableName="bytedesk_meet_transcript" indexName="idx_meet_transcript_recording"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_meet_transcript_recording" tableName="bytedesk_meet_transcript">
+            <column name="org_uid"/>
+            <column name="recording_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_meet_transcript_room" tableName="bytedesk_meet_transcript">
+            <column name="org_uid"/>
+            <column name="room_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_meet_transcript_queue" tableName="bytedesk_meet_transcript">
+            <column name="status"/>
+            <column name="next_retry_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 转写分段表 ============ -->
+    <changeSet id="261020-create-meet-transcript-seg-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_meet_transcript_seg"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_meet_transcript_seg">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_meet_transcript_seg" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_transcript_seg_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="transcript_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transcript_revision" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seq" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="chunk_seq" type="INT"/>
+            <column name="start_ms" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_ms" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="TEXT"/>
+            <column name="speaker_label" type="VARCHAR(64)"/>
+            <column name="timing_accuracy" type="VARCHAR(16)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="261020-create-meet-transcript-seg-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_meet_transcript_seg"/>
+            <not>
+                <indexExists tableName="bytedesk_meet_transcript_seg" indexName="idx_meet_transcript_seg_lookup"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_meet_transcript_seg_lookup" tableName="bytedesk_meet_transcript_seg">
+            <column name="transcript_uid"/>
+            <column name="transcript_revision"/>
+            <column name="seq"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 纪要主表 ============ -->
+    <changeSet id="261020-create-meet-minutes-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_meet_minutes"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_meet_minutes">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_meet_minutes" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_minutes_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="room_uid" type="VARCHAR(64)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(32)" defaultValue="PENDING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="summary" type="TEXT"/>
+            <column name="content_markdown" type="TEXT"/>
+            <column name="structured_result" type="TEXT"/>
+            <column name="provider_uid" type="VARCHAR(64)"/>
+            <column name="model_name" type="VARCHAR(128)"/>
+            <column name="prompt_version" type="VARCHAR(32)"/>
+            <column name="token_usage" type="TEXT"/>
+            <column name="request_key" type="VARCHAR(128)"/>
+            <column name="source_hash" type="VARCHAR(128)"/>
+            <column name="parent_uid" type="VARCHAR(64)"/>
+            <column name="lease_owner" type="VARCHAR(128)"/>
+            <column name="lease_token" type="VARCHAR(64)"/>
+            <column name="lease_until" type="TIMESTAMP"/>
+            <column name="next_retry_at" type="TIMESTAMP"/>
+            <column name="attempt" type="INT"/>
+            <column name="started_at" type="TIMESTAMP"/>
+            <column name="finished_at" type="TIMESTAMP"/>
+            <column name="error_code" type="VARCHAR(64)"/>
+            <column name="error_message" type="TEXT"/>
+            <column name="invalidated_at" type="TIMESTAMP"/>
+            <column name="invalid_reason" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="261020-create-meet-minutes-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_meet_minutes"/>
+            <not>
+                <indexExists tableName="bytedesk_meet_minutes" indexName="idx_meet_minutes_room"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_meet_minutes_room" tableName="bytedesk_meet_minutes">
+            <column name="org_uid"/>
+            <column name="room_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_meet_minutes_queue" tableName="bytedesk_meet_minutes">
+            <column name="status"/>
+            <column name="next_retry_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 纪要来源表 ============ -->
+    <changeSet id="261020-create-meet-minutes-source-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_meet_minutes_source"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_meet_minutes_source">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_meet_minutes_source" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_minutes_source_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="minutes_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ordinal" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recording_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transcript_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="transcript_revision" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="261020-create-meet-minutes-source-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_meet_minutes_source"/>
+            <not>
+                <indexExists tableName="bytedesk_meet_minutes_source" indexName="idx_meet_minutes_source_lookup"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_meet_minutes_source_lookup" tableName="bytedesk_meet_minutes_source">
+            <column name="minutes_uid"/>
+            <column name="ordinal"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 助手上下文绑定表 ============ -->
+    <changeSet id="261020-create-meet-assistant-ctx-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_meet_assistant_ctx"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_meet_assistant_ctx">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="pk_meet_assistant_ctx" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_assistant_ctx_uuid"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP"/>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)"/>
+            <column name="platform_type" type="VARCHAR(32)"/>
+            <column name="thread_uid" type="VARCHAR(64)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uk_meet_assistant_ctx_thread"/>
+            </column>
+            <column name="owner_user_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="room_uid" type="VARCHAR(64)"/>
+            <column name="source_hash" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_snapshot" type="TEXT"/>
+            <column name="minutes_uid" type="VARCHAR(64)"/>
+            <column name="ctx_status" type="VARCHAR(32)" defaultValue="ACTIVE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="261020-create-meet-assistant-ctx-indexes" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_meet_assistant_ctx"/>
+            <not>
+                <indexExists tableName="bytedesk_meet_assistant_ctx" indexName="idx_meet_assistant_ctx_user"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_meet_assistant_ctx_user" tableName="bytedesk_meet_assistant_ctx">
+            <column name="org_uid"/>
+            <column name="user_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_meet_assistant_ctx_room" tableName="bytedesk_meet_assistant_ctx">
+            <column name="org_uid"/>
+            <column name="room_uid"/>
+            <column name="user_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- ============ 录制表：音轨覆盖范围列（可空，历史 NULL=UNKNOWN） ============ -->
+    <changeSet id="261020-add-meeting-recording-audio-scope" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_webrtc_meeting_recording"/>
+            <not>
+                <columnExists tableName="bytedesk_webrtc_meeting_recording" columnName="audio_scope"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_webrtc_meeting_recording">
+            <column name="audio_scope" type="VARCHAR(32)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

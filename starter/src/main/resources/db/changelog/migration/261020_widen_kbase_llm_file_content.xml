@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        修正 bytedesk_kbase_llm_file.content 列过窄的安全网迁移。
+
+        背景：
+        - 上传大文件（如 Excel 报表）后 FileEventListener 会将解析出的内容摘要写入 content 列，
+          曾因按字符数（60000 字符）截断摘要，中文等多字节字符实际字节数远超 MySQL TEXT 的
+          65535 字节上限，触发 MySQL 1406 "Data too long for column 'content'"，文件入库失败；
+        - 根因已在写入侧修复：FileService.extractContentSummary 改为按 UTF-8 字节数截断到 60000 字节，
+          无论列宽如何都不会再超限；
+        - 实体自建表起即为 columnDefinition=TEXT（bytedesk_kbase_llm_file 由 Hibernate ddl-auto 创建），
+          正常库该列已是 TEXT，本迁移仅作安全网：修正个别因历史原因（手工改列/异常升级）仍为
+          varchar/tinytext 的存量列，健康的 TEXT/MEDIUMTEXT/LONGTEXT 列不受影响、不降级。
+
+        说明：
+        - 仅在列当前为 varchar/char/tinytext 时修正（sqlCheck 守卫），幂等安全；
+        - 不使用 modifyDataType：Liquibase 5.0.3 在 MySQL 上存在将 TEXT/CLOB 类型重映射为
+          TINYTEXT(255) 的问题（参见 261017_fix_airline_tinytext_columns.xml 的同类修复），故用原生 SQL；
+        - content 列允许为 NULL，MODIFY 不带 NOT NULL 不会改变约束；
+        - 非 MySQL 数据库（PostgreSQL/Kingbase/H2/Oracle）该列由 Hibernate 按 TEXT/CLOB 创建，
+          无已知过窄场景，不执行本迁移。
+    -->
+
+    <changeSet id="261020-1-fix-llm-file-content-column" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_kbase_llm_file"/>
+                <columnExists tableName="bytedesk_kbase_llm_file" columnName="content"/>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                      AND TABLE_NAME = 'bytedesk_kbase_llm_file'
+                      AND COLUMN_NAME = 'content'
+                      AND DATA_TYPE IN ('varchar', 'char', 'tinytext')
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>将 bytedesk_kbase_llm_file.content 由 varchar/tinytext 修正为 TEXT，配合写入侧按 UTF-8 字节截断，彻底修复上传大文件报 Data too long for column 'content' 的问题。</comment>
+        <sql dbms="mysql,mariadb">
+            ALTER TABLE bytedesk_kbase_llm_file MODIFY COLUMN content TEXT
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

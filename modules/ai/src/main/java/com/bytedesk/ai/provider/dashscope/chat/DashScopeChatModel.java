@@ -44,6 +44,7 @@ import com.bytedesk.ai.provider.dashscope.DashScopeBaseUrlSupport;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import lombok.extern.slf4j.Slf4j;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -57,6 +58,7 @@ import reactor.core.publisher.Flux;
  * {@code gen_ai_client_token_usage_total} 指标，模式与 {@code MoonshotChatModel}、
  * {@code DashScopeEmbeddingModel} 保持一致。</p>
  */
+@Slf4j
 public class DashScopeChatModel implements ChatModel {
 
     private static final String DEFAULT_MODEL = "qwen-max";
@@ -163,6 +165,7 @@ public class DashScopeChatModel implements ChatModel {
     }
 
     private com.alibaba.dashscope.aigc.generation.Generation createGeneration() {
+        log.info("DashScope API base URL in use: {}", this.baseUrl);
         return new com.alibaba.dashscope.aigc.generation.Generation("http", this.baseUrl);
     }
 

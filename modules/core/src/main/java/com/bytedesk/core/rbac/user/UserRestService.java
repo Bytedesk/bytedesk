@@ -42,6 +42,7 @@ import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.OrganizationEntity;
 import com.bytedesk.core.rbac.organization.OrganizationResponseSimple;
+import com.bytedesk.core.rbac.user.UserEntity.RegisterSource;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.OrganizationI18nExceptions;
 
@@ -336,6 +337,10 @@ public class UserRestService extends BaseRestServiceWithExport<UserEntity, UserR
 
     @Override
     public UserResponse create(UserRequest request) {
+        // 管理后台（超级管理员权限）创建用户：明确标记注册来源，避免落入 UNKNOWN
+        if (!StringUtils.hasText(request.getRegisterSource())) {
+            request.setRegisterSource(RegisterSource.ADMIN.name());
+        }
         return userService.register(request);
     }
 

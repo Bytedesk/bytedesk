@@ -25,12 +25,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.bytedesk.core.rbac.user.UserIdentityRow;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Tag(name = "agent account info")
 public interface AgentRepository extends JpaRepository<AgentEntity, Long>, JpaSpecificationExecutor<AgentEntity> {
 
     Optional<AgentEntity> findByUid(String uid);
+
+    @Query("select a.uid as uid, a.member.user.uid as userUid from AgentEntity a "
+            + "where a.orgUid = :orgUid and a.member.orgUid = :orgUid and a.uid in :uids")
+    List<UserIdentityRow> findUserIdentitiesByOrgUidAndUidIn(
+            @Param("orgUid") String orgUid, @Param("uids") List<String> uids);
 
     Optional<AgentEntity> findByUserUid(String userUid);
 

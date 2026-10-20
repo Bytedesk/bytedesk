@@ -81,8 +81,13 @@ public class MemberRequest extends BaseRequest {
 
     private String status;
 
-    @Builder.Default
-	private Set<String> roleUids = new HashSet<>(); 
+    /**
+     * 为 null 时表示"保持现有角色不变"（个人资料页头像/昵称等保存场景）；
+     * 显式传入（含空集合）时才走角色整体替换。
+     * 注意：不要给默认空集合，否则省略该字段的请求会被当作"清空角色"，
+     * 触发 updateUserRoles 的受限角色校验或误删 ROLE_AGENT 等既有角色。
+     */
+    private Set<String> roleUids;
 
     @Builder.Default
     private Set<String> allowedLoginPlatforms = new HashSet<>();

@@ -159,6 +159,44 @@ class UserServiceCountrySyncTest {
     }
 
     @Test
+    void memberRequestOmittingRoleUidsShouldKeepNullToPreserveExistingRoles() {
+        // 个人资料页（如头像保存）省略 roleUids 时必须保持 null，
+        // 否则空集合会被当作"清空角色"，触发受限角色校验或误删既有角色
+        MemberRequest omitted = MemberRequest.builder()
+                .nickname("Profile Save")
+                .build();
+        org.junit.jupiter.api.Assertions.assertNull(omitted.getRoleUids());
+
+        // updateUserFromMember 对 null roleUids 不应触发角色更新链路
+        UserService userService = new UserService(
+                mock(UserRepository.class),
+                mock(ModelMapper.class),
+                mock(RoleRestService.class),
+                mock(BytedeskProperties.class),
+                mock(BCryptPasswordEncoder.class),
+                mock(UidUtils.class),
+                mock(OrganizationRepository.class),
+                mock(BytedeskEventPublisher.class),
+                mock(AuthService.class),
+                mock(TokenRestService.class),
+                mock(MemberRepository.class));
+
+        UserEntity user = UserEntity.builder()
+                .id(1L)
+                .uid("user-1")
+                .country("86")
+                .build();
+        MemberRequest request = MemberRequest.builder()
+                .country("1")
+                .build();
+
+        UserEntity updated = userService.updateUserFromMember(user, request);
+
+        assertSame(user, updated);
+        assertEquals("1", updated.getCountry());
+    }
+
+    @Test
     void changeMobileShouldUpdateCountryWhenProvided() {
         UserRepository userRepository = mock(UserRepository.class);
         AuthService authService = mock(AuthService.class);

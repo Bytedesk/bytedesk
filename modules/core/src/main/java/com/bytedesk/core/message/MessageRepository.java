@@ -54,7 +54,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
             ZonedDateTime end);
 
     @Query("SELECT m.thread.uid AS threadUid, m.createdAt AS createdAt, m.agentRepliedAt AS agentRepliedAt, "
-            + "m.type AS type, m.user AS user "
+            + "m.type AS type, m.user AS user, m.extra AS extra, m.deleted AS deleted "
             + "FROM MessageEntity m "
             + "WHERE m.thread.uid IN :threadUids AND m.createdAt BETWEEN :start AND :end "
             + "ORDER BY m.thread.uid ASC, m.createdAt ASC")

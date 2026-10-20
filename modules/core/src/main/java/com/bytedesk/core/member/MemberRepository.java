@@ -26,6 +26,7 @@ import org.springframework.data.repository.query.Param;
 // import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserIdentityRow;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -47,6 +48,11 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long>, Jpa
     List<MemberEntity> findByOrgUidAndDeletedFalse(String orgUid);
 
     Optional<MemberEntity> findByUid(String uid);
+
+    @Query("select m.uid as uid, m.user.uid as userUid from MemberEntity m "
+            + "where m.orgUid = :orgUid and m.uid in :uids")
+    List<UserIdentityRow> findUserIdentitiesByOrgUidAndUidIn(
+            @Param("orgUid") String orgUid, @Param("uids") List<String> uids);
 
     Optional<MemberEntity> findByUser_UidAndOrgUidAndDeletedFalse(String uid, String orgUid);
 

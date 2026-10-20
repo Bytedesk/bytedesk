@@ -23,4 +23,11 @@ public interface MessageStatisticRow {
 
     @Nullable
     String getUser();
+
+    @Nullable
+    String getExtra();
+
+    /** 软删标记：统计时排除已删除消息 */
+    @Nullable
+    Boolean getDeleted();
 }

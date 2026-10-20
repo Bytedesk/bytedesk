@@ -25,7 +25,5 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class ProjectRestController extends BaseRestController<ProjectRequest, ProjectRestService> {
 
-    // BaseRestController.getService() 通过反射查找以 Service/RestService 结尾的字段，
-    // 缺少此字段会导致 "No service field found" 运行时异常
     // private final ProjectRestService projectRestService;
 }

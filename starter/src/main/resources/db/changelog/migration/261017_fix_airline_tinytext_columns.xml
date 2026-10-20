@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        修复 airline 持久化表的大字段列类型。
+
+        背景：
+        - Liquibase 5.0.3 在 MySQL 上将 changelog 中的 CLOB/LONGTEXT 类型重映射为 TINYTEXT（上限 255 字节），
+          导致 261012_add_airline_persistent_sessions 建表及 widen 变更集虽 EXECUTED 但列仍为 tinytext；
+        - 初始化乘客资料（trip_templates，双场景 JSON 约 10KB+）与会话快照（state_data）写入即触发
+          MySQL 1406 "Data too long for column"，前端表现为 500 "服务处理失败"；
+        - 实体已改为 columnDefinition = TypeConsts.COLUMN_TYPE_TEXT（与 bytedesk_core_message.content 一致），
+          本变更集负责把存量 MySQL 库中的 tinytext 列修正为 TEXT，保留 NOT NULL；
+
+        说明：
+        - 仅在列当前为 tinytext 时修正（sqlCheck 守卫）：已手动改为 TEXT/LONGTEXT 的库不受影响、不降级；
+        - modifyDataType 在 MySQL 上会丢失非空约束，故用原生 SQL MODIFY ... NOT NULL，
+          仅作用于 MySQL/MariaDB；非 MySQL 库（PostgreSQL/Kingbase 等）CLOB 正确映射为 text，无需修正；
+        - 仅加宽类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="261017-1-fix-airline-trip-templates-tinytext" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_airline_user_trip"/>
+                <columnExists tableName="bytedesk_airline_user_trip" columnName="trip_templates"/>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                      AND TABLE_NAME = 'bytedesk_airline_user_trip'
+                      AND COLUMN_NAME = 'trip_templates'
+                      AND DATA_TYPE = 'tinytext'
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>将 bytedesk_airline_user_trip.trip_templates 由 tinytext(255) 修正为 TEXT，修复初始化乘客资料写入报 Data too long 的问题。</comment>
+        <sql dbms="mysql,mariadb">
+            ALTER TABLE bytedesk_airline_user_trip MODIFY COLUMN trip_templates TEXT NOT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="261017-2-fix-airline-snapshot-state-data-tinytext" author="githubcopilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_airline_snapshot"/>
+                <columnExists tableName="bytedesk_airline_snapshot" columnName="state_data"/>
+                <sqlCheck expectedResult="1">
+                    SELECT COUNT(*) FROM information_schema.COLUMNS
+                    WHERE TABLE_SCHEMA = DATABASE()
+                      AND TABLE_NAME = 'bytedesk_airline_snapshot'
+                      AND COLUMN_NAME = 'state_data'
+                      AND DATA_TYPE = 'tinytext'
+                </sqlCheck>
+            </and>
+        </preConditions>
+        <comment>将 bytedesk_airline_snapshot.state_data 由 tinytext(255) 修正为 TEXT，修复会话快照写入报 Data too long 的问题。</comment>
+        <sql dbms="mysql,mariadb">
+            ALTER TABLE bytedesk_airline_snapshot MODIFY COLUMN state_data TEXT NOT NULL
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
