@@ -11,8 +11,9 @@ import org.springframework.ai.chat.model.ChatResponse;
 import com.alibaba.dashscope.aigc.generation.GenerationOutput;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.aigc.generation.GenerationUsage;
-import com.bytedesk.ai.provider.dashscope.chat.DashScopeChatModel;
-import com.bytedesk.ai.provider.dashscope.chat.DashScopeChatOptions;
+import com.bytedesk.ai.provider.aliyun.dashscope.DashScopeBaseUrlSupport;
+import com.bytedesk.ai.provider.aliyun.dashscope.chat.DashScopeChatModel;
+import com.bytedesk.ai.provider.aliyun.dashscope.chat.DashScopeChatOptions;
 import com.bytedesk.ai.service.ChatTokenUsage;
 import com.bytedesk.ai.service.TokenUsageHelper;
 

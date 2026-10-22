@@ -35,11 +35,12 @@ public interface QueueMemberRepository
                 extends JpaRepository<QueueMemberEntity, Long>, JpaSpecificationExecutor<QueueMemberEntity> {
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
+                     "FROM QueueMemberEntity qm JOIN qm.thread t " +
                      "WHERE qm.orgUid = :orgUid AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
        List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndCreatedAtBetween(
@@ -48,11 +49,12 @@ public interface QueueMemberRepository
                      @Param("endTime") ZonedDateTime endTime);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
+                     "FROM QueueMemberEntity qm JOIN qm.thread t " +
                      "WHERE qm.orgUid = :orgUid AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
        Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndCreatedAtBetween(
@@ -62,88 +64,94 @@ public interface QueueMemberRepository
                      Pageable pageable);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false " +
+                     "FROM QueueMemberEntity qm JOIN qm.thread t " +
+                     "WHERE qm.orgUid = :orgUid AND qm.workgroupQueue.topic = :workgroupQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndWorkgroupQueueUidAndCreatedAtBetween(
+       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndWorkgroupQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("workgroupQueueUid") String workgroupQueueUid,
+                     @Param("workgroupQueueTopic") String workgroupQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.workgroupQueue.uid = :workgroupQueueUid AND qm.deleted = false " +
+                     "FROM QueueMemberEntity qm JOIN qm.thread t " +
+                     "WHERE qm.orgUid = :orgUid AND qm.workgroupQueue.topic = :workgroupQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndWorkgroupQueueUidAndCreatedAtBetween(
+       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndWorkgroupQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("workgroupQueueUid") String workgroupQueueUid,
+                     @Param("workgroupQueueTopic") String workgroupQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime,
                      Pageable pageable);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
                      "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false " +
+                     "WHERE qm.orgUid = :orgUid AND aq.topic = :agentQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndAgentQueueUidAndCreatedAtBetween(
+       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndAgentQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("agentQueueUid") String agentQueueUid,
+                     @Param("agentQueueTopic") String agentQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
                      "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.agentQueue.uid = :agentQueueUid AND qm.deleted = false " +
+                     "WHERE qm.orgUid = :orgUid AND aq.topic = :agentQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndAgentQueueUidAndCreatedAtBetween(
+       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndAgentQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("agentQueueUid") String agentQueueUid,
+                     @Param("agentQueueTopic") String agentQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime,
                      Pageable pageable);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.robotQueue.uid = :robotQueueUid AND qm.deleted = false " +
+                     "FROM QueueMemberEntity qm LEFT JOIN qm.robotQueue rq JOIN qm.thread t " +
+                     "WHERE qm.orgUid = :orgUid AND rq.topic = :robotQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndRobotQueueUidAndCreatedAtBetween(
+       List<QueueMemberStatisticRow> findStatisticRowsByOrgUidAndRobotQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("robotQueueUid") String robotQueueUid,
+                     @Param("robotQueueTopic") String robotQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime);
 
        @Query("SELECT new com.bytedesk.service.queue_member.QueueMemberStatisticRow(" +
-                     "qm.createdAt, aq.uid, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
+                     "qm.createdAt, t.agent, t.robot, t.uid, t.status, qm.visitorEnqueueAt, qm.visitorFirstMessageAt, qm.visitorLeavedAt, " +
                      "qm.agentAcceptType, qm.agentAcceptedAt, qm.agentFirstResponseAt, qm.agentClosedAt, " +
                      "qm.agentMaxResponseLength, qm.agentAvgResponseLength, qm.agentMessageCount, qm.robotAcceptedAt, qm.robotMessageCount, " +
+                     "qm.robotToAgent, qm.robotToAgentAt, " +
                      "qm.systemClosedAt, qm.visitorMessageCount, qm.messageLeave, qm.systemClose, qm.resolved, qm.agentOffline) " +
-                     "FROM QueueMemberEntity qm LEFT JOIN qm.agentQueue aq JOIN qm.thread t " +
-                     "WHERE qm.orgUid = :orgUid AND qm.robotQueue.uid = :robotQueueUid AND qm.deleted = false " +
+                     "FROM QueueMemberEntity qm LEFT JOIN qm.robotQueue rq JOIN qm.thread t " +
+                     "WHERE qm.orgUid = :orgUid AND rq.topic = :robotQueueTopic AND qm.deleted = false " +
                      "AND qm.createdAt >= :startTime AND qm.createdAt <= :endTime")
-       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndRobotQueueUidAndCreatedAtBetween(
+       Slice<QueueMemberStatisticRow> sliceStatisticRowsByOrgUidAndRobotQueueTopicAndCreatedAtBetween(
                      @Param("orgUid") String orgUid,
-                     @Param("robotQueueUid") String robotQueueUid,
+                     @Param("robotQueueTopic") String robotQueueTopic,
                      @Param("startTime") ZonedDateTime startTime,
                      @Param("endTime") ZonedDateTime endTime,
                      Pageable pageable);
@@ -154,20 +162,20 @@ public interface QueueMemberRepository
                      ZonedDateTime endTime);
 
        @EntityGraph(attributePaths = "thread")
-       List<QueueMemberEntity> findByOrgUidAndWorkgroupQueue_UidAndDeletedFalseAndCreatedAtBetween(String orgUid,
-                     String workgroupQueueUid,
+       List<QueueMemberEntity> findByOrgUidAndWorkgroupQueue_TopicAndDeletedFalseAndCreatedAtBetween(String orgUid,
+                     String workgroupQueueTopic,
                      ZonedDateTime startTime,
                      ZonedDateTime endTime);
 
        @EntityGraph(attributePaths = "thread")
-       List<QueueMemberEntity> findByOrgUidAndAgentQueue_UidAndDeletedFalseAndCreatedAtBetween(String orgUid,
-                     String agentQueueUid,
+       List<QueueMemberEntity> findByOrgUidAndAgentQueue_TopicAndDeletedFalseAndCreatedAtBetween(String orgUid,
+                     String agentQueueTopic,
                      ZonedDateTime startTime,
                      ZonedDateTime endTime);
 
        @EntityGraph(attributePaths = "thread")
-       List<QueueMemberEntity> findByOrgUidAndRobotQueue_UidAndDeletedFalseAndCreatedAtBetween(String orgUid,
-                     String robotQueueUid,
+       List<QueueMemberEntity> findByOrgUidAndRobotQueue_TopicAndDeletedFalseAndCreatedAtBetween(String orgUid,
+                     String robotQueueTopic,
                      ZonedDateTime startTime,
                      ZonedDateTime endTime);
 

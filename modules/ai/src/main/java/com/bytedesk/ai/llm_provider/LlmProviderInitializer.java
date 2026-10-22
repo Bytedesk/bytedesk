@@ -108,6 +108,8 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         }
         //
         // 查询所有组织，复制平台级别的provider和model
+        // 按组织逐个幂等补缺（规划 4.1/B3）：此前跨组织 exists 判断会导致
+        // 任一组织已有该类型 provider 时，其余组织（含新建组织）被跳过
         level = LevelEnum.ORGANIZATION.name();
         for (Map.Entry<String, ProviderJson> entry : providerJsonMap.entrySet()) {
             String providerType = entry.getKey();
@@ -116,21 +118,19 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             String status = providerJson.getStatus();
             if (LlmProviderStatusEnum.PRODUCTION.name().equalsIgnoreCase(status)) {
                 // 
-                if (!llmProviderRestService.existsByTypeAndLevelAndStatus(providerType, level, status)) {
-                    // String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-                    // llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);
-                    List<OrganizationEntity> organizationList = organizationRestService.findAll();
-                    for (OrganizationEntity organizationEntity : organizationList) {
-                        String orgUid = organizationEntity.getUid();
+                List<OrganizationEntity> organizationList = organizationRestService.findAll();
+                for (OrganizationEntity organizationEntity : organizationList) {
+                    String orgUid = organizationEntity.getUid();
+                    if (!llmProviderRestService.existsByTypeAndLevelAndOrgUid(providerType, level, orgUid)) {
                         llmProviderRestService.createFromProviderJson(providerType, providerJson, level, orgUid);
-                    }
-                } else {
-                    // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
-                    List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
-                    if (!providerList.isEmpty()) {
-                        LlmProviderEntity providerEntity = providerList.get(0);
-                        providerEntity.setStatus(status);
-                        llmProviderRestService.save(providerEntity);
+                    } else {
+                        // 如果已经存在，则更新，因为status有可能从DEVELOPMENT变为PRODUCTION
+                        List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
+                        if (!providerList.isEmpty()) {
+                            LlmProviderEntity providerEntity = providerList.get(0);
+                            providerEntity.setStatus(status);
+                            llmProviderRestService.save(providerEntity);
+                        }
                     }
                 }
             }

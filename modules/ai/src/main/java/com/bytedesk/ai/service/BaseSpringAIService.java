@@ -31,7 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.kbase.KbaseSearchHelper;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
-import com.bytedesk.ai.provider.dashscope.tool.DashScopeToolService;
+import com.bytedesk.ai.provider.aliyun.dashscope.tool.DashScopeToolService;
 import com.bytedesk.ai.provider.zhipuai.tool.ZhipuaiToolService;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
@@ -291,7 +291,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return;
         }
         String providerToolChoice = toProviderToolChoice(toolChoice);
-        if (options instanceof com.bytedesk.ai.provider.dashscope.chat.DashScopeChatOptions dashScopeOptions) {
+        if (options instanceof com.bytedesk.ai.provider.aliyun.dashscope.chat.DashScopeChatOptions dashScopeOptions) {
             dashScopeOptions.setToolChoice(providerToolChoice);
         } else if (options instanceof com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiChatOptions zhipuaiOptions) {
             zhipuaiOptions.setToolChoice(providerToolChoice);

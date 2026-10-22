@@ -46,7 +46,8 @@ public class ChatModelPrimaryConfig {
             @Qualifier("openaiChatModel") ObjectProvider<ChatModel> openaiChatModelProvider,
             @Qualifier("openrouterChatModel") ObjectProvider<ChatModel> openrouterChatModelProvider,
             @Qualifier("siliconFlowChatModel") ObjectProvider<ChatModel> siliconflowChatModelProvider,
-            @Qualifier("giteeChatModel") ObjectProvider<ChatModel> giteeChatModelProvider) {
+            @Qualifier("giteeChatModel") ObjectProvider<ChatModel> giteeChatModelProvider,
+            @Qualifier("aliyunOpenaiChatModel") ObjectProvider<ChatModel> aliyunOpenaiChatModelProvider) {
         this.zhipuaiChatModel = zhipuaiChatModelProvider.getIfAvailable();
         this.ollamaChatModel = ollamaChatModelProvider.getIfAvailable();
         this.dashscopeChatModel = dashscopeChatModelProvider.getIfAvailable();
@@ -58,6 +59,7 @@ public class ChatModelPrimaryConfig {
         this.openrouterChatModel = openrouterChatModelProvider.getIfAvailable();
         this.siliconflowChatModel = siliconflowChatModelProvider.getIfAvailable();
         this.giteeChatModel = giteeChatModelProvider.getIfAvailable();
+        this.aliyunOpenaiChatModel = aliyunOpenaiChatModelProvider.getIfAvailable();
     }
 
 
@@ -82,6 +84,9 @@ public class ChatModelPrimaryConfig {
     private final ChatModel siliconflowChatModel;
 
     private final ChatModel giteeChatModel;
+
+    // Aliyun OpenAI-compatible ChatModel（spring.ai.aliyun_openai.chat.enabled=true 时存在）
+    private final ChatModel aliyunOpenaiChatModel;
 
     @Bean
     @Primary
@@ -202,6 +207,17 @@ public class ChatModelPrimaryConfig {
             throw new IllegalStateException("Gitee chat model is not available. Please check if spring.ai.gitee.chat.enabled=true");
         }
         return giteeChatModel;
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.ALIYUN_OPENAI)
+    public ChatModel primaryAliyunOpenaiChatModel() {
+        log.info("Setting Aliyun OpenAI-compatible chat model as Primary");
+        if (aliyunOpenaiChatModel == null) {
+            throw new IllegalStateException("Aliyun OpenAI-compatible chat model is not available. Please check if spring.ai.aliyun_openai.chat.enabled=true");
+        }
+        return aliyunOpenaiChatModel;
     }
 
     // 当没有配置chat model时，不创建任何Primary bean，避免冲突

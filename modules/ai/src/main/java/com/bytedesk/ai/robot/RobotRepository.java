@@ -16,6 +16,8 @@ package com.bytedesk.ai.robot;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -32,5 +34,9 @@ public interface RobotRepository extends JpaRepository<RobotEntity, Long>, JpaSp
     Boolean existsByNicknameAndOrgUidAndDeleted(String nickname, String orgUid, Boolean deleted);
 
     List<RobotEntity> findByLevelAndDeletedFalseAndType(String level, String type);
+
+    List<RobotEntity> findByLlmTextProviderAndDeletedFalse(String textProvider);
+
+    Page<RobotEntity> findByLlmTextProviderAndDeletedFalse(String textProvider, Pageable pageable);
 
 }

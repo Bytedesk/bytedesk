@@ -357,9 +357,15 @@ public class QueueMemberEntity extends BaseEntity {
         this.robotAcceptedAt = BdDateUtils.now();
     }
 
+    /**
+     * 标记机器人转人工（发起口径）：布尔只允许 false->true，
+     * 时间保留首次发起时刻，重复调用/并发重试不得后移。
+     */
     public void transferRobotToAgent() {
         this.robotToAgent = true;
-        this.robotToAgentAt = BdDateUtils.now();
+        if (this.robotToAgentAt == null) {
+            this.robotToAgentAt = BdDateUtils.now();
+        }
     }
 
     // 

@@ -22,8 +22,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.provider.baidu.SpringAIBaiduService;
+import com.bytedesk.ai.provider.aliyun.dashscope.DashscopeService;
+import com.bytedesk.ai.provider.aliyun.openai.SpringAIAliyunOpenaiService;
 import com.bytedesk.ai.provider.custom.SpringAICustomService;
-import com.bytedesk.ai.provider.dashscope.DashscopeService;
 import com.bytedesk.ai.provider.deepseek.SpringAIDeepseekService;
 import com.bytedesk.ai.provider.gitee.SpringAIGiteeService;
 import com.bytedesk.ai.provider.minimax.SpringAIMinimaxService;
@@ -53,6 +54,7 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
     // private final Optional<ZhipuaiService> zhipuaiService;
     @Lazy private final Optional<ZhipuaiService> zhipuaiService;
     @Lazy private final Optional<DashscopeService> springAIDashscopeService;
+    @Lazy private final Optional<SpringAIAliyunOpenaiService> springAIAliyunOpenaiService;
     @Lazy private final Optional<SpringAIOllamaService> springAIOllamaService;
     @Lazy private final Optional<SpringAISiliconFlowService> springAISiliconFlowService;
     @Lazy private final Optional<SpringAIGiteeService> springAIGiteeService;
@@ -70,6 +72,7 @@ public class BaseModuleAIServiceProvider implements SpringAIServiceProvider {
     @PostConstruct
     public void registerServices() {
         springAIDashscopeService.ifPresent(service -> registerService(LlmProviderConstants.DASHSCOPE, service));
+        springAIAliyunOpenaiService.ifPresent(service -> registerService(LlmProviderConstants.ALIYUN_OPENAI, service));
         zhipuaiService.ifPresent(service -> registerService(LlmProviderConstants.ZHIPUAI, service));
         springAIDeepseekService.ifPresent(service -> registerService(LlmProviderConstants.DEEPSEEK, service));
         springAIMinimaxService.ifPresent(service -> registerService(LlmProviderConstants.MINIMAX, service));

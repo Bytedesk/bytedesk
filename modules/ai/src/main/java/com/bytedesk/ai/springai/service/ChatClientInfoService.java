@@ -33,6 +33,7 @@ public class ChatClientInfoService {
             @Qualifier("openrouterChatClient") ObjectProvider<ChatClient> openrouterChatClientProvider,
             @Qualifier("siliconFlowChatClient") ObjectProvider<ChatClient> siliconflowChatClientProvider,
             @Qualifier("giteeChatClient") ObjectProvider<ChatClient> giteeChatClientProvider,
+            @Qualifier("aliyunOpenaiChatClient") ObjectProvider<ChatClient> aliyunOpenaiChatClientProvider,
             ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.zhipuaiChatClient = zhipuaiChatClientProvider.getIfAvailable();
@@ -46,6 +47,7 @@ public class ChatClientInfoService {
         this.openrouterChatClient = openrouterChatClientProvider.getIfAvailable();
         this.siliconflowChatClient = siliconflowChatClientProvider.getIfAvailable();
         this.giteeChatClient = giteeChatClientProvider.getIfAvailable();
+        this.aliyunOpenaiChatClient = aliyunOpenaiChatClientProvider.getIfAvailable();
     }
 
     private final ApplicationContext applicationContext;
@@ -85,6 +87,9 @@ public class ChatClientInfoService {
 
     // Gitee ChatClient
     private final ChatClient giteeChatClient;
+
+    // Aliyun OpenAI-compatible ChatClient（spring.ai.aliyun_openai.chat.enabled=true 时存在）
+    private final ChatClient aliyunOpenaiChatClient;
 
     /**
      * 测试指定的ChatClient
@@ -135,7 +140,7 @@ public class ChatClientInfoService {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> testResults = new HashMap<>();
         
-        String[] providers = {"zhipuai", "ollama", "dashscope", "deepseek", "baidu", "tencent", "volcengine", "openai", "openrouter", "siliconflow", "gitee"};
+        String[] providers = {"zhipuai", "ollama", "dashscope", "deepseek", "baidu", "tencent", "volcengine", "openai", "openrouter", "siliconflow", "gitee", "aliyun_openai"};
         
         for (String provider : providers) {
             testResults.put(provider, testChatClient(provider));
@@ -173,6 +178,7 @@ public class ChatClientInfoService {
             addChatClientInfoIfAvailable(chatClients, "openrouter", openrouterChatClient, "openrouter".equals(primaryChatProvider));
             addChatClientInfoIfAvailable(chatClients, "siliconflow", siliconflowChatClient, "siliconflow".equals(primaryChatProvider));
             addChatClientInfoIfAvailable(chatClients, "gitee", giteeChatClient, "gitee".equals(primaryChatProvider));
+            addChatClientInfoIfAvailable(chatClients, "aliyun_openai", aliyunOpenaiChatClient, "aliyun_openai".equals(primaryChatProvider));
             
             // 添加Primary ChatClient信息
             if (primaryClient != null) {
@@ -409,6 +415,8 @@ public class ChatClientInfoService {
                 return "SiliconFlow对话客户端";
             case "gitee":
                 return "Gitee对话客户端";
+            case "aliyun_openai":
+                return "阿里云百炼OpenAI兼容对话客户端";
             default:
                 return "未知对话客户端";
         }
@@ -453,6 +461,8 @@ public class ChatClientInfoService {
                 return siliconflowChatClient;
             case "gitee":
                 return giteeChatClient;
+            case "aliyun_openai":
+                return aliyunOpenaiChatClient;
             default:
                 return null;
         }

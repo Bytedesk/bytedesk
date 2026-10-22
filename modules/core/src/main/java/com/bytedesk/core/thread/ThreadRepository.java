@@ -41,6 +41,12 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, Jpa
                         String type,
                         List<String> statuses);
 
+        /** 组织内指定类型、指定状态的会话，用于实时进行中会话统计 */
+        List<ThreadEntity> findByOrgUidAndTypeInAndStatusAndDeletedFalse(
+                        String orgUid,
+                        List<String> types,
+                        String status);
+
         Boolean existsByUid(String uid);
 
         /** used for member thread type */

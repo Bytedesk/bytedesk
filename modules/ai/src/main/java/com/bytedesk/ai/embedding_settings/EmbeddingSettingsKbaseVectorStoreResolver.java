@@ -37,8 +37,8 @@ import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 
 import com.bytedesk.core.llm.LlmDefaults;
 import com.bytedesk.core.llm.LlmProviderConstants;
-import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingModel;
-import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.provider.aliyun.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.provider.aliyun.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.provider.zhipuai.ZhipuaiUrlUtils;
 import com.bytedesk.ai.provider.zhipuai.embedding.ZhipuaiEmbeddingModel;

@@ -25,6 +25,8 @@ public class LlmProviderConstants {
     public static final String ZHIPUAI = "zhipuai";
     public static final String DEEPSEEK = "deepseek";
     public static final String DASHSCOPE = "dashscope";
+    // 阿里云百炼 OpenAI 兼容模式（qwen3.8-max / qwen3.8-flash 等最新模型仅支持该协议）
+    public static final String ALIYUN_OPENAI = "aliyun_openai";
     public static final String SILICONFLOW = "siliconflow";
     public static final String GITEE = "gitee";
     public static final String TENCENT = "tencent";

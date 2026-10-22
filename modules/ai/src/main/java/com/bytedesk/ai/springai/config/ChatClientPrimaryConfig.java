@@ -46,7 +46,8 @@ public class ChatClientPrimaryConfig {
             @Qualifier("openaiChatClient") ObjectProvider<ChatClient> openaiChatClientProvider,
             @Qualifier("openrouterChatClient") ObjectProvider<ChatClient> openrouterChatClientProvider,
             @Qualifier("siliconFlowChatClient") ObjectProvider<ChatClient> siliconflowChatClientProvider,
-            @Qualifier("giteeChatClient") ObjectProvider<ChatClient> giteeChatClientProvider) {
+            @Qualifier("giteeChatClient") ObjectProvider<ChatClient> giteeChatClientProvider,
+            @Qualifier("aliyunOpenaiChatClient") ObjectProvider<ChatClient> aliyunOpenaiChatClientProvider) {
         this.zhipuaiChatClient = zhipuaiChatClientProvider.getIfAvailable();
         this.ollamaChatClient = ollamaChatClientProvider.getIfAvailable();
         this.dashscopeChatClient = dashscopeChatClientProvider.getIfAvailable();
@@ -58,6 +59,7 @@ public class ChatClientPrimaryConfig {
         this.openrouterChatClient = openrouterChatClientProvider.getIfAvailable();
         this.siliconflowChatClient = siliconflowChatClientProvider.getIfAvailable();
         this.giteeChatClient = giteeChatClientProvider.getIfAvailable();
+        this.aliyunOpenaiChatClient = aliyunOpenaiChatClientProvider.getIfAvailable();
     }
 
     // @Value("${spring.ai.model.chat:none}")
@@ -84,6 +86,9 @@ public class ChatClientPrimaryConfig {
     private final ChatClient siliconflowChatClient;
 
     private final ChatClient giteeChatClient;
+
+    // Aliyun OpenAI-compatible ChatClient（spring.ai.aliyun_openai.chat.enabled=true 时存在）
+    private final ChatClient aliyunOpenaiChatClient;
 
     @Bean
     @Primary
@@ -204,6 +209,17 @@ public class ChatClientPrimaryConfig {
             throw new IllegalStateException("Gitee chat client is not available. Please check if spring.ai.gitee.chat.enabled=true");
         }
         return giteeChatClient;
+    }
+
+    @Bean
+    @Primary
+    @ConditionalOnProperty(name = SpringAIModelProperties.CHAT_MODEL, havingValue = LlmProviderConstants.ALIYUN_OPENAI)
+    public ChatClient primaryAliyunOpenaiChatClient() {
+        log.info("Setting Aliyun OpenAI-compatible chat client as Primary");
+        if (aliyunOpenaiChatClient == null) {
+            throw new IllegalStateException("Aliyun OpenAI-compatible chat client is not available. Please check if spring.ai.aliyun_openai.chat.enabled=true");
+        }
+        return aliyunOpenaiChatClient;
     }
 
 } 

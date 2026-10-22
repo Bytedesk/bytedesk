@@ -311,6 +311,11 @@ public class QueueMemberRestService extends BaseRestServiceWithExport<QueueMembe
         if (StringUtils.hasText(source.getRobotAcceptType()) && !StringUtils.hasText(target.getRobotAcceptType())) {
             target.setRobotAcceptType(source.getRobotAcceptType());
         }
+
+        // 机器人转人工事实（发起口径）：true 单向不回退，首次发起时间不后移
+        if (Boolean.TRUE.equals(source.getRobotToAgent())) {
+            target.transferRobotToAgent();
+        }
     }
 
     @Override

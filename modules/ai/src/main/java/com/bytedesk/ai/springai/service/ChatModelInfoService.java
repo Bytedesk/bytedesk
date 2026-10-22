@@ -35,6 +35,7 @@ public class ChatModelInfoService {
             @Qualifier("openrouterChatModel") ObjectProvider<ChatModel> openrouterChatModelProvider,
             @Qualifier("siliconFlowChatModel") ObjectProvider<ChatModel> siliconflowChatModelProvider,
             @Qualifier("giteeChatModel") ObjectProvider<ChatModel> giteeChatModelProvider,
+            @Qualifier("aliyunOpenaiChatModel") ObjectProvider<ChatModel> aliyunOpenaiChatModelProvider,
             ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
         this.zhipuaiChatModel = zhipuaiChatModelProvider.getIfAvailable();
@@ -48,6 +49,7 @@ public class ChatModelInfoService {
         this.openrouterChatModel = openrouterChatModelProvider.getIfAvailable();
         this.siliconflowChatModel = siliconflowChatModelProvider.getIfAvailable();
         this.giteeChatModel = giteeChatModelProvider.getIfAvailable();
+        this.aliyunOpenaiChatModel = aliyunOpenaiChatModelProvider.getIfAvailable();
     }
 
 
@@ -88,6 +90,9 @@ public class ChatModelInfoService {
 
     // Gitee ChatModel
     private final ChatModel giteeChatModel;
+
+    // Aliyun OpenAI-compatible ChatModel（spring.ai.aliyun_openai.chat.enabled=true 时存在）
+    private final ChatModel aliyunOpenaiChatModel;
 
     /**
      * 测试指定的ChatModel
@@ -135,7 +140,7 @@ public class ChatModelInfoService {
         Map<String, Object> result = new HashMap<>();
         Map<String, Object> testResults = new HashMap<>();
         
-        String[] providers = {"zhipuai", "ollama", "dashscope", "deepseek", "baidu", "tencent", "volcengine", "openai", "openrouter", "siliconflow", "gitee"};
+        String[] providers = {"zhipuai", "ollama", "dashscope", "deepseek", "baidu", "tencent", "volcengine", "openai", "openrouter", "siliconflow", "gitee", "aliyun_openai"};
         
         for (String provider : providers) {
             testResults.put(provider, testChatModel(provider));
@@ -173,6 +178,7 @@ public class ChatModelInfoService {
             addChatModelInfoIfAvailable(chatModels, "openrouter", openrouterChatModel, "openrouter".equals(primaryChatProvider));
             addChatModelInfoIfAvailable(chatModels, "siliconflow", siliconflowChatModel, "siliconflow".equals(primaryChatProvider));
             addChatModelInfoIfAvailable(chatModels, "gitee", giteeChatModel, "gitee".equals(primaryChatProvider));
+            addChatModelInfoIfAvailable(chatModels, "aliyun_openai", aliyunOpenaiChatModel, "aliyun_openai".equals(primaryChatProvider));
             
             // 添加Primary ChatModel信息
             if (primaryModel != null) {
@@ -401,6 +407,8 @@ public class ChatModelInfoService {
                 return "SiliconFlow对话模型";
             case "gitee":
                 return "Gitee对话模型";
+            case "aliyun_openai":
+                return "阿里云百炼OpenAI兼容对话模型";
             default:
                 return "未知对话模型";
         }
@@ -445,6 +453,8 @@ public class ChatModelInfoService {
                 return siliconflowChatModel;
             case "gitee":
                 return giteeChatModel;
+            case "aliyun_openai":
+                return aliyunOpenaiChatModel;
             default:
                 return null;
         }

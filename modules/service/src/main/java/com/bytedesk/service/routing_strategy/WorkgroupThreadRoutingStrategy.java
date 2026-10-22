@@ -310,6 +310,11 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         // MANUAL 模式：排队态仅表示“等待手动接入”，不自动分配客服
         if (WorkgroupRoutingModeEnum.MANUAL.name().equalsIgnoreCase(workgroup.getRoutingMode())) {
             ThreadEntity latest = getThreadByUid(threadFromRequest.getUid());
+            // 发起口径旁路：该分支不经过 routeToAgent，强制转人工在此入池等待也计一次
+            if (shouldProcessForceTransfer(visitorRequest, latest)) {
+                emitRobotToAgentSystemMessage(latest);
+                markRobotToAgentRequested(latest);
+            }
             return getWorkgroupRoutingPoolMessage(visitorRequest, latest);
         }
 
@@ -328,6 +333,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (!resolveIsInServiceTime(visitorRequest, workgroup)) {
             if (forceTransfer) {
                 emitRobotToAgentSystemMessage(latestThread);
+                // 发起口径：非服务时间降级为离线留言前记录请求事实
+                markRobotToAgentRequested(latestThread);
                 log.info("关键词/强制转人工命中非服务时间，按正常转人工逻辑降级为离线留言 - threadUid: {}", latestThread.getUid());
                 return routeToOfflineMessage(visitorRequest, latestThread, workgroup);
             }
@@ -339,6 +346,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         if (availableAgents == null || availableAgents.isEmpty()) {
             if (forceTransfer) {
                 emitRobotToAgentSystemMessage(latestThread);
+                // 发起口径：无在线客服降级（备用路由/离线留言）前记录请求事实
+                markRobotToAgentRequested(latestThread);
                 log.info("关键词/强制转人工时无在线可用客服，复用正常转人工逻辑降级 - threadUid: {}", latestThread.getUid());
                 MessageProtobuf backupResult = tryRouteToBackup(visitorRequest, workgroup, callType);
                 if (backupResult != null) {
@@ -565,6 +574,8 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
 
         if (shouldProcessForceTransfer(visitorRequest, thread)) {
             emitRobotToAgentSystemMessage(thread);
+            // 发起口径：请求已通过校验并进入路由，无论后续离线/排队/满员/溢出均计一次转人工
+            markRobotToAgentRequested(thread);
         }
 
         // 检查是否在工作时间内
@@ -577,6 +588,27 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
         }
 
         return routeToAgentDuringServiceTime(visitorRequest, thread, workgroup, callType);
+    }
+
+    /**
+     * 机器人转人工发起事实（发起口径）：
+     * 请求通过校验进入人工路由即持久化标记，不等待人工接入成功；
+     * 幂等：成员存在则复用并异步保存，布尔只 false->true、时间保留首次值（实体侧保证）。
+     * 覆盖非服务时间、无在线客服、MANUAL 路由池、全忙排队、溢出留言等所有后续分支。
+     */
+    private void markRobotToAgentRequested(ThreadEntity thread) {
+        if (thread == null || !StringUtils.hasText(thread.getUid())) {
+            return;
+        }
+        try {
+            queueMemberRestService.findByThreadUid(thread.getUid()).ifPresent(member -> {
+                member.transferRobotToAgent();
+                queueMemberRestService.saveAsyncBestEffort(member);
+            });
+        } catch (Exception e) {
+            log.warn("Failed to mark robot-to-agent request fact - threadUid: {}, error: {}",
+                    thread.getUid(), e.getMessage(), e);
+        }
     }
 
     /**
@@ -638,6 +670,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             log.info(
                     "Workgroup queue limit reached, diverting to leave message - workgroupUid: {}, queueSize: {}, maxWaiting: {}",
                     workgroup.getUid(), queuingCount, maxWaiting);
+            // 发起口径：溢出留言提前返回，不经过后续 handleForceAgentTransfer，此处补记请求事实
+            if (shouldProcessForceTransfer(visitorRequest, thread)) {
+                markRobotToAgentRequested(thread);
+            }
             return visitorThreadTimeoutService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
         }
 
@@ -942,6 +978,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
             log.info(
                     "Workgroup queue limit reached, diverting to leave message - workgroupUid: {}, queueSize: {}, maxWaiting: {}",
                     workgroup.getUid(), queuingCount, maxWaiting);
+            // 发起口径：全忙排队溢出留言提前返回，此处补记请求事实
+            if (shouldProcessForceTransfer(visitorRequest, thread)) {
+                markRobotToAgentRequested(thread);
+            }
             return visitorThreadTimeoutService.handleQueueOverflowLeaveMessage(thread, queueMemberEntity);
         }
 
@@ -1673,11 +1713,10 @@ public class WorkgroupThreadRoutingStrategy extends AbstractThreadRoutingStrateg
     private void updateQueueMemberForAgentAccept(QueueMemberEntity queueMemberEntity) {
         try {
             queueMemberEntity.agentAutoAcceptThread();
-
-            // 使用MQ异步处理自动接受会话操作
-            // Map<String, Object> updates = new HashMap<>();
-            // updates.put("agentAutoAcceptThread", true);
-            // queueMemberMessageService.sendUpdateMessage(queueMemberEntity, updates);
+            // queueMemberEntity 来自 queueService.enqueueWorkgroup，可能已脱离持久化上下文，
+            // 必须显式异步保存，否则 agentAcceptedAt/agentAcceptType 不会落库，
+            // 导致 acceptedThreadCount、接通率、机器人转人工数等指标少算（与 updateQueueMemberForRobotAccept 保持一致）
+            queueMemberRestService.saveAsyncBestEffort(queueMemberEntity);
 
             log.debug("Updated queue member status for agent auto-accept: {}", queueMemberEntity.getUid());
         } catch (Exception e) {

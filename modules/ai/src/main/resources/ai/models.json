@@ -90,18 +90,6 @@
             "type": "TEXT"
         },
         {
-            "name": "qwen3.8-max",
-            "nickname": "Qwen3.8 Max",
-            "description": "通义千问3.8 Max模型，提供高质量的对话体验",
-            "type": "TEXT"
-        },
-        {
-            "name": "qwen3.8-flash",
-            "nickname": "Qwen3.8 Flash",
-            "description": "通义千问3.8 Flash模型，提供高质量的对话体验",
-            "type": "TEXT"
-        },
-        {
             "name": "qwen-plus",
             "nickname": "Qwen Plus",
             "description": "通义千问的增强版本，具有更强的理解能力和生成质量",
@@ -111,6 +99,20 @@
             "name": "qwen-max",
             "nickname": "Qwen Max",
             "description": "通义千问的最高规格版本，提供最佳的能力和性能",
+            "type": "TEXT"
+        }
+    ],
+    "aliyun_openai": [
+        {
+            "name": "qwen3.8-max",
+            "nickname": "Qwen3.8 Max",
+            "description": "通义千问3.8 Max模型，仅支持OpenAI兼容协议",
+            "type": "TEXT"
+        },
+        {
+            "name": "qwen3.8-flash",
+            "nickname": "Qwen3.8 Flash",
+            "description": "通义千问3.8 Flash模型，仅支持OpenAI兼容协议",
             "type": "TEXT"
         }
     ],

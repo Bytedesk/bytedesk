@@ -36,8 +36,8 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
-import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingModel;
-import com.bytedesk.ai.provider.dashscope.embedding.DashScopeEmbeddingOptions;
+import com.bytedesk.ai.provider.aliyun.dashscope.embedding.DashScopeEmbeddingModel;
+import com.bytedesk.ai.provider.aliyun.dashscope.embedding.DashScopeEmbeddingOptions;
 import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.provider.zhipuai.ZhipuaiUrlUtils;
 import com.bytedesk.ai.provider.zhipuai.embedding.ZhipuaiEmbeddingModel;
