@@ -30,7 +30,7 @@
     "aliyun_openai": {
         "nickname": "阿里云（OpenAI兼容）",
         "logo": "dashscope.png",
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        "baseUrl": "https://llm-l33c9v25gxaavg8k.cn-beijing.maas.aliyuncs.com/compatible-mode/v1",
         "webUrl": "https://bailian.console.aliyun.com/",
         "status": "PRODUCTION"
     },

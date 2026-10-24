@@ -63,12 +63,12 @@ class TicketStatisticProjectionJpaTest {
         assertThat(row.getResolvedTime()).isNull();
         assertThat(repository.findByOrgUidAndDepartmentUidAndDeletedFalseAndCreatedAtBetween(
                 "org-statistic", "department-statistic", createdAt, createdAt.plusDays(1), page).getContent())
-                .extracting(TicketStatisticRow::getUid).containsExactly("ticket-statistic");
+                .extracting((TicketStatisticRow ticketRow) -> ticketRow.getUid()).containsExactly("ticket-statistic");
         assertThat(repository.findByOrgUidAndWorkgroupUidContainingAndDeletedFalseAndCreatedAtBetween(
                 "org-statistic", "group-statistic", createdAt, createdAt.plusDays(1), page).getContent())
-                .extracting(TicketStatisticRow::getUid).containsExactly("ticket-statistic");
+                .extracting((TicketStatisticRow ticketRow) -> ticketRow.getUid()).containsExactly("ticket-statistic");
         assertThat(repository.findByOrgUidAndAssigneeContainingAndDeletedFalseAndCreatedAtBetween(
                 "org-statistic", "\"uid\":\"handler-member\"", createdAt, createdAt.plusDays(1), page).getContent())
-                .extracting(TicketStatisticRow::getUid).containsExactly("ticket-statistic");
+                .extracting((TicketStatisticRow ticketRow) -> ticketRow.getUid()).containsExactly("ticket-statistic");
     }
 }

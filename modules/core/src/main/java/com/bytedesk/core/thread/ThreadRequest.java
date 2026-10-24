@@ -113,6 +113,10 @@ public class ThreadRequest extends BaseRequest {
     @Builder.Default
     private List<String> ticketorUids = new ArrayList<>();
 
+    // 文件助手“打开即已读”：客户端已观察到的消息 uid，用于服务端落库确认（可选）
+    @Builder.Default
+    private List<String> observedMessageUids = new ArrayList<>();
+
     // group member uids
     @Builder.Default
     private List<String> memberUids = new ArrayList<>();

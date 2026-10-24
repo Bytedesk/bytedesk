@@ -27,15 +27,17 @@ import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
 /**
  * 阿里云百炼 OpenAI 兼容模式聊天配置
  *
- * <p>阿里云百炼（DashScope）的 OpenAI 兼容端点：
- * https://dashscope.aliyuncs.com/compatible-mode/v1，qwen3.8-max / qwen3.8-flash
- * 等最新模型仅支持该协议。本配置与原生 DashScope 协议（DashscopeChatConfig）相互独立。</p>
+ * <p>阿里云百炼（DashScope）的 OpenAI 兼容端点，默认业务空间专属域名：
+ * https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1，
+ * qwen3.8-max / qwen3.8-flash 等最新模型仅支持该协议。共享域名
+ * https://dashscope.aliyuncs.com/compatible-mode/v1 亦可用。本配置与原生
+ * DashScope 协议（DashscopeChatConfig）相互独立。</p>
  */
 @Configuration
-@ConditionalOnProperty(prefix = "spring.ai.aliyun_openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "spring.ai.aliyun_openai.chat", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class SpringAIAliyunOpenaiChatConfig {
 
-    @Value("${spring.ai.aliyun_openai.base-url:https://dashscope.aliyuncs.com/compatible-mode/v1}")
+    @Value("${spring.ai.aliyun_openai.base-url:https://llm-l33c9v25gxaavg8k.cn-beijing.maas.aliyuncs.com/compatible-mode/v1}")
     private String baseUrl;
 
     @Value("${spring.ai.aliyun_openai.api-key:}")

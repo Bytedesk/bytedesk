@@ -154,6 +154,22 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         return messageRepository.existsByUid(uid);
     }
 
+    /**
+     * 文件助手会话批量已读：条件更新未读状态为 READ，返回实际更新条数。
+     * 幂等；不修改已 READ / 失败 / 撤回等终态。需在事务内调用。
+     */
+    public int markThreadUnreadAsRead(String threadUid) {
+        return messageRepository.markThreadUnreadAsRead(threadUid);
+    }
+
+    /** 按 uid 集合查询消息，用于 observedMessageUids 的落库确认。 */
+    public List<MessageEntity> findByUidIn(List<String> uids) {
+        if (uids == null || uids.isEmpty()) {
+            return List.of();
+        }
+        return messageRepository.findByUidIn(uids);
+    }
+
     @Override
     public MessageResponse create(MessageRequest request) {
         // TODO Auto-generated method stub

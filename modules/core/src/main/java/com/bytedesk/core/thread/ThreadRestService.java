@@ -732,6 +732,116 @@ public class ThreadRestService
         return convertToResponse(updateThread);
     }
 
+    /** observedMessageUids 服务端上限：防止客户端一次携带海量 uid 造成慢查询 */
+    private static final int FILE_ASSISTANT_READ_MAX_OBSERVED = 200;
+
+    /**
+     * 文件助手会话“打开即已读”。
+     *
+     * 前置条件（服务端强校验，不信任前端判定）：
+     * - 会话存在且未删除；
+     * - type = ASSISTANT 且 topic 精确等于 file/{当前用户 uid}（本人专属文件助手）；
+     * - owner 为当前用户。
+     *
+     * 行为：
+     * 1. 将会话内所有未读消息（SENDING/SUCCESS/DELIVERED，未删除）条件更新为 READ（幂等，
+     *    不触碰 READ/失败/撤回等终态）；
+     * 2. 清除该会话的手动未读标记（unread = false），不修改 top/mute/star/fold 等其他属性；
+     * 3. observedMessageUids：客户端已观察到的消息 uid 集合（上限 200），用于确认其是否
+     *    已落库——服务端消息经 Redis 队列 + 5 秒定时任务异步持久化，回显到达 ≠ 已落库。
+     *    已落库且属于本会话 → 已随步骤 1 置 READ；未落库或归属异常 → 返回 pendingMessageUids，
+     *    客户端须做有限重试，不得据 updatedCount=0 判定全部成功；
+     * 4. unreadCount 为操作后服务端权威未读数。
+     */
+    @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "thread", key = "#threadUid"),
+    })
+    public ThreadFileAssistantReadResponse markFileAssistantRead(String threadUid, List<String> observedMessageUids) {
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        if (!StringUtils.hasText(threadUid)) {
+            throw CommonI18nExceptions.forbidden("thread.uid.required");
+        }
+        //
+        ThreadEntity thread = threadRepository.findByUid(threadUid)
+                .orElseThrow(ResourceI18nExceptions::threadNotFound);
+        if (thread.isDeleted()) {
+            throw ResourceI18nExceptions.threadNotFound(threadUid);
+        }
+        // 仅允许本人专属文件助手会话：类型 + 精确 topic 联合判定，防止越权清其他 ASSISTANT/通知会话
+        String expectedTopic = TopicUtils.getFileTopic(user.getUid());
+        if (!ThreadTypeEnum.ASSISTANT.name().equals(thread.getType())
+                || !expectedTopic.equals(thread.getTopic())
+                || thread.getOwner() == null
+                || !user.getUid().equals(thread.getOwner().getUid())) {
+            log.warn("markFileAssistantRead rejected: threadUid={}, type={}, topic={}, currentUser={}",
+                    threadUid, thread.getType(), thread.getTopic(), user.getUid());
+            throw CommonI18nExceptions.forbidden("thread.fileAssistant.read.notAllowed");
+        }
+        //
+        // 1. 批量条件更新未读 → READ（幂等）
+        int updatedCount = messageRestService.markThreadUnreadAsRead(threadUid);
+        // 2. 清除手动未读标记（不动其他属性；已为 false 时跳过，避免无谓版本号自增）
+        if (Boolean.TRUE.equals(thread.getUnread())) {
+            thread.setUnread(false);
+            save(thread);
+        }
+        //
+        // 3. observedMessageUids 落库确认
+        List<String> pendingMessageUids = new ArrayList<>();
+        if (observedMessageUids != null && !observedMessageUids.isEmpty()) {
+            List<String> limited = observedMessageUids.stream()
+                    .filter(StringUtils::hasText)
+                    .distinct()
+                    .limit(FILE_ASSISTANT_READ_MAX_OBSERVED + 1L)
+                    .collect(Collectors.toList());
+            if (limited.size() > FILE_ASSISTANT_READ_MAX_OBSERVED) {
+                throw CommonI18nExceptions.forbidden("thread.fileAssistant.read.observedTooMany");
+            }
+            List<MessageEntity> found = messageRestService.findByUidIn(limited);
+            // 未查到（尚未落库）或归属不符（不属于本会话/已删除）→ pending，交客户端有限重试
+            java.util.Set<String> foundInThread = found.stream()
+                    .filter(m -> !m.isDeleted() && threadUid.equals(m.getThread() != null ? m.getThread().getUid() : null))
+                    .map(m -> m.getUid())
+                    .collect(Collectors.toSet());
+            for (String uid : limited) {
+                if (!foundInThread.contains(uid)) {
+                    pendingMessageUids.add(uid);
+                }
+            }
+        }
+        //
+        // 4. 权威未读数：批量更新后 thread.messages 集合可能仍是旧快照，按消息重查
+        int unreadCount = countFileAssistantUnread(threadUid);
+        //
+        log.info("markFileAssistantRead: threadUid={}, updated={}, pending={}, unread={}",
+                threadUid, updatedCount, pendingMessageUids.size(), unreadCount);
+        return ThreadFileAssistantReadResponse.builder()
+                .threadUid(threadUid)
+                .updatedCount(updatedCount)
+                .unreadCount(unreadCount)
+                .pendingMessageUids(pendingMessageUids)
+                .build();
+    }
+
+    /** 文件助手会话权威未读数：未删除 + 状态 SENDING/SUCCESS/DELIVERED 的消息条数 */
+    private int countFileAssistantUnread(String threadUid) {
+        List<MessageEntity> messages = messageRestService.findByThreadUid(threadUid);
+        int count = 0;
+        for (MessageEntity message : messages) {
+            if (message == null || message.isDeleted()) {
+                continue;
+            }
+            if (message.isUnread()) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     // update state
     public ThreadResponse updateStatus(ThreadRequest threadRequest) {
         if (!StringUtils.hasText(threadRequest.getUid())) {

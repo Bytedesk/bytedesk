@@ -144,7 +144,7 @@ class AliyunOpenaiProviderConnectionTest {
                 "key-1");
 
         assertThat(connection.resolveBaseUrl(entity))
-                .isEqualTo("https://dashscope.aliyuncs.com/compatible-mode/v1");
+                .isEqualTo("https://llm-l33c9v25gxaavg8k.cn-beijing.maas.aliyuncs.com/compatible-mode/v1");
     }
 
     @Test

@@ -44,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class AliyunOpenaiProviderConnection {
 
-    public static final String DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1";
+    public static final String DEFAULT_BASE_URL = "https://llm-l33c9v25gxaavg8k.cn-beijing.maas.aliyuncs.com/compatible-mode/v1";
 
     private static final String PLACEHOLDER_KEY = "sk-xxx";
 
@@ -56,7 +56,7 @@ public class AliyunOpenaiProviderConnection {
     @Value("${spring.ai.aliyun_openai.base-url:}")
     private String globalBaseUrl;
 
-    @Value("${spring.ai.aliyun_openai.chat.enabled:false}")
+    @Value("${spring.ai.aliyun_openai.chat.enabled:true}")
     private boolean chatEnabled;
 
     /**

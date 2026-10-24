@@ -76,7 +76,7 @@ public class AliyunOpenaiRobotMigration implements ApplicationRunner {
 
     private final RobotRestService robotRestService;
 
-    @Value("${spring.ai.aliyun_openai.chat.enabled:false}")
+    @Value("${spring.ai.aliyun_openai.chat.enabled:true}")
     private boolean chatEnabled;
 
     /** 独立迁移开关：仅开启 chat 不会触发写库（规划 4.5）。 */

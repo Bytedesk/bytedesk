@@ -95,6 +95,11 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
         return llmProviderRepository.existsByTypeAndLevelAndOrgUidAndDeletedFalse(type, level, orgUid);
     }
 
+    // 组织级精确查询（初始化器使用，不走缓存：save() 不清 provider 缓存，避免读到更新前的过期状态）
+    public Optional<LlmProviderEntity> findByTypeAndLevelAndOrgUid(String type, String level, String orgUid) {
+        return llmProviderRepository.findByTypeAndLevelAndOrgUidAndDeletedFalse(type, level, orgUid);
+    }
+
     @CacheEvict(value = "provider", allEntries = true, beforeInvocation = true)
     @Override
     public LlmProviderResponse create(LlmProviderRequest request) {

@@ -20,6 +20,7 @@ import com.bytedesk.core.llm.LlmProviderConstants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners({ LlmProviderEntityListener.class })
-@Table(name = "bytedesk_ai_provider")
+@Table(
+    name = "bytedesk_ai_provider",
+    indexes = {
+        @Index(name = "idx_ai_provider_type_level_deleted_org", columnList = "provider_type, level_type, is_deleted, org_uid")
+    }
+)
 public class LlmProviderEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;

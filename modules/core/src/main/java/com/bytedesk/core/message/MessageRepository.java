@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
@@ -214,4 +215,22 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long>, J
         List<MessageEntity> findByThread_UidAndTypeOrderByCreatedAtAsc(String threadUid, String type);
 
     boolean existsByUid(String uid);
+
+    /**
+     * 文件助手会话“打开即已读”：把会话内所有未读消息（SENDING/SUCCESS/DELIVERED）
+     * 批量置为 READ。条件更新天然幂等，不触碰已 READ/失败/撤回等终态。
+     * JPQL 不触发 native SQL 的全量 flush 问题，且跨数据库兼容。
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE MessageEntity m SET m.status = 'READ' "
+            + "WHERE m.thread.uid = :threadUid "
+            + "AND m.deleted = false "
+            + "AND m.status IN ('SENDING','SUCCESS','DELIVERED')")
+    int markThreadUnreadAsRead(@Param("threadUid") String threadUid);
+
+    /**
+     * 按 uid 集合查询消息（用于 observedMessageUids 的落库确认，
+     * 文件助手场景下集合大小受服务端上限约束）。
+     */
+    List<MessageEntity> findByUidIn(List<String> uids);
 }

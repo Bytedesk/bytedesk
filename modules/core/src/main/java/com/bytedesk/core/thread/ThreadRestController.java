@@ -331,6 +331,28 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
     }
 
     /**
+     * 文件助手会话“打开即已读”：批量将会话内未读消息置为 READ。
+     *
+     * 仅允许本人专属文件助手会话（type=ASSISTANT 且 topic=file/{当前用户uid}）。
+     * threadUid 与 observedMessageUids 均通过请求体传递。
+     * observedMessageUids 为客户端已观察到的消息 uid（可选，上限 200），服务端确认其
+     * 落库状态；尚未落库（异步持久化队列中）的消息 uid 返回在 pendingMessageUids 中，
+     * 客户端须做有限重试，不得据 updatedCount=0 判定全部成功。
+     */
+    @PostMapping("/file-assistant/read")
+    // @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_UPDATE_UNREAD, description = "mark file assistant thread read")
+    @Operation(summary = "Mark File Assistant Thread Read", description = "Mark all unread messages in the current user's file assistant thread as read")
+    public ResponseEntity<?> markFileAssistantRead(
+            @RequestBody ThreadRequest request) {
+
+        ThreadFileAssistantReadResponse response = threadRestService
+                .markFileAssistantRead(request.getUid(), request.getObservedMessageUids());
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
      * 更新会话状态
      *
      * @param request 更新请求
