@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        LLM 供应商表重复数据清理（AI 模块，配合 LlmProviderInitializer 组织级精确查询）。
+
+        背景（生产 2026-10-24 启动失败）：
+        - 旧版初始化器用 existsByTypeAndLevelAndStatus（跨组织全局判断）决定是否补建，
+          任一组织状态不同即对「所有组织」重复 createFromProviderJson，
+          导致同一 (provider_type, level_type=ORGANIZATION, org_uid) 存在多条 is_deleted=false 记录；
+        - 261022 重构后初始化器按 type+level+orgUid 走 Optional 精确查询
+          （findByTypeAndLevelAndOrgUidAndDeletedFalse），命中 2 行抛出
+          IncorrectResultSizeDataAccessException，应用启动失败
+          （例如 deepseek / 组织 1983727282422002）。
+
+        清理策略：
+        - 系统不变量：每个 (provider_type, level_type, org_uid) 至多一条有效记录
+          （findByTypeAndOrgUid 缓存查询、DashscopeService.resolveProvider 均依赖该假设）；
+        - 每组保留最早创建（id 最小）的记录，其余软删除（is_deleted=true）；
+          最早记录最可能被机器人 textProviderUid / 模型 provider_uid 引用；
+        - 软删除不破坏引用：LlmProviderRepository.findByUid 不过滤 is_deleted，
+          已引用被清理记录的地方仍可解析。
+
+        说明：
+        - 语句幂等，重复执行无副作用；
+        - 全新数据库（表尚不存在）时 MARK_RAN 跳过，随后由 Hibernate 建表；
+          新数据由新版初始化器精确查询保证不再产生重复。
+
+        MySQL 1093 兼容：
+        - MySQL/MariaDB 不允许 UPDATE 的子查询直接引用目标表（error 1093），
+          将子查询包一层派生表（derived table）绕过，语义不变。
+    -->
+
+    <changeSet id="261024-cleanup-duplicate-ai-provider" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <and>
+                <tableExists tableName="bytedesk_ai_provider"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="id"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="provider_type"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="level_type"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="org_uid"/>
+                <columnExists tableName="bytedesk_ai_provider" columnName="is_deleted"/>
+            </and>
+        </preConditions>
+
+        <sql dbms="mysql,mariadb">
+            UPDATE bytedesk_ai_provider
+            SET is_deleted = b'1'
+            WHERE is_deleted = b'0'
+              AND id NOT IN (
+                  SELECT keep_id FROM (
+                      SELECT MIN(id) AS keep_id
+                      FROM bytedesk_ai_provider
+                      WHERE is_deleted = b'0'
+                      GROUP BY provider_type, level_type, org_uid
+                  ) keep_ids
+              );
+        </sql>
+
+        <sql dbms="postgresql,h2,oracle,kingbase">
+            UPDATE bytedesk_ai_provider
+            SET is_deleted = TRUE
+            WHERE is_deleted = FALSE
+              AND id NOT IN (
+                  SELECT MIN(id)
+                  FROM bytedesk_ai_provider
+                  WHERE is_deleted = FALSE
+                  GROUP BY provider_type, level_type, org_uid
+              );
+        </sql>
+
+        <rollback>
+            <!-- 软删除清理无法安全回滚：无法判断哪些行是本次清理产生的 -->
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

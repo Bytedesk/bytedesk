@@ -24,6 +24,8 @@ target/
 # Large files and media
 *.jar
 *.mp4
+# allow README demo video
+!images/bytedesk.mp4
 *.mov
 *.avi
 *.wmv

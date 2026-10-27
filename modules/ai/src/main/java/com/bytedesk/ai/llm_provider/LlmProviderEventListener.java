@@ -50,6 +50,11 @@ public class LlmProviderEventListener {
         List<LlmProviderEntity> providers = llmProviderRestService.findByStatusAndLevel(status, level);
         // 遍历providers，复制provider，设置orgUid，保存到数据库
         for (LlmProviderEntity provider : providers) {
+            // 幂等：同 (type, level, orgUid) 已存在有效记录则跳过，避免产生重复行
+            if (Boolean.TRUE.equals(llmProviderRestService.existsByTypeAndLevelAndOrgUid(
+                    provider.getType(), LevelEnum.ORGANIZATION.name(), orgUid))) {
+                continue;
+            }
             LlmProviderRequest providerRequest = modelMapper.map(provider, LlmProviderRequest.class);
             providerRequest.setLevel(LevelEnum.ORGANIZATION.name());
             providerRequest.setOrgUid(orgUid);

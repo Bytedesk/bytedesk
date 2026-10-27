@@ -101,5 +101,6 @@
     <include file="db/changelog/migration/261020_backfill_user_register_source.xml" />
     <include file="db/changelog/migration/261020_widen_kbase_llm_file_content.xml" />
     <include file="db/changelog/migration/261022_add_ai_provider_org_query_index.xml" />
+    <include file="db/changelog/migration/261024_cleanup_duplicate_ai_provider.xml" />
 
 </databaseChangeLog>
