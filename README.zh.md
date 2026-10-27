@@ -6,10 +6,6 @@
 
 ![weiyu](./images/nin1.png)
 
-## 产品视频
-
-<video src="./images/bytedesk.mp4" controls width="100%"></video>
-
 ## 管理后台
 
 ![chat](./images/admin/chat_zh.png)
