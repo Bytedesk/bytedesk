@@ -85,18 +85,26 @@ public class ThreadRoutingContext {
      */
     public MessageProtobuf createCsThread(VisitorRequest visitorRequest) {
         ThreadTypeEnum type = visitorRequest.formatType();
-        log.debug("Creating thread for type: {}", type);
+        String visitorUid = visitorRequest.getVisitorUid();
+        String visitorIp = visitorRequest.getIp();
+        log.info("Thread routing audit: initiator={}, sourceIp={}, requestedType={}, timestamp={}",
+                visitorUid, visitorIp, type, java.time.Instant.now());
         
         AbstractThreadRoutingStrategy strategy = getStrategy(type);
         if (strategy == null) {
-            log.error("No strategy found for thread type: {}", type);
+            log.error("Thread routing audit: outcome=DENIED, initiator={}, sourceIp={}, requestedType={}, reason=no strategy found",
+                    visitorUid, visitorIp, type);
             throw new IllegalArgumentException("Thread type " + type.name() + " not supported");
         }
         
         try {
-            return strategy.createThread(visitorRequest);
+            MessageProtobuf result = strategy.createThread(visitorRequest);
+            log.info("Thread routing audit: outcome=SUCCESS, initiator={}, sourceIp={}, requestedType={}",
+                    visitorUid, visitorIp, type);
+            return result;
         } catch (Exception e) {
-            log.error("Error creating thread for type {}: {}", type, e.getMessage(), e);
+            log.error("Thread routing audit: outcome=FAILURE, initiator={}, sourceIp={}, requestedType={}, reason={}",
+                    visitorUid, visitorIp, type, e.getMessage(), e);
             throw new RuntimeException("Failed to create thread for type " + type.name(), e);
         }
     }
