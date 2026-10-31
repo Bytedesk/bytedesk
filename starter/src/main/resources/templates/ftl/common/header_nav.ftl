@@ -81,7 +81,7 @@
 				</li>
 
 				<li class="nav-item dropdown"><a class="nav-link" href="${visitorDemoUrl}" target="_blank"><@t key="nav.visitor.demo">访客对接演示</@t></a></li>
-				<li class="nav-item dropdown"><a class="nav-link" href="${aiAgentDemoUrl}" target="_blank"><@t key="nav.aiagent.demo">多Agent客服演示</@t></a></li>
+				<li class="nav-item dropdown"><a class="nav-link" href="${aiAgentDemoUrl}" target="_blank"><@t key="nav.aiagent.demo">Agent客服演示</@t></a></li>
 
 				<!-- Nav item: More -->
 				<li class="nav-item dropdown">

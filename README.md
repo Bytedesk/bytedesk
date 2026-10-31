@@ -218,7 +218,7 @@ bytedesk/
 
 ## License
 
-Copyright (c) 2013-2025 微语 Bytedesk.com, All rights reserved.
+Copyright (c) 2013-2026 微语 Bytedesk.com, All rights reserved.
 
 Licensed under GNU AFFERO GENERAL PUBLIC LICENSE(AGPL v3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
@@ -228,6 +228,6 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 ## Terms of Use
 
-- **Allowed Uses**: Can be used for commercial purposes, but prohibited from resale without prior permission
+- **Allowed Uses**: Can be used for commercial purposes, but prohibited from resale without prior permission, and the logo and copyright information must not be removed or replaced without permission
 - **Prohibited Uses**: Strictly prohibited for use in illegal and non-compliant businesses including trojans, viruses, pornography, gambling, fraud, and other illegal activities
 - **Disclaimer**: This software does not guarantee any form of legal liability. Users are responsible for their own usage risks

@@ -1,1 +1,0 @@
-import e from"./request-hBW0-K-Z.js";function t(t){return e({url:`/visitor/api/feedback/submit`,method:`post`,data:t})}export{t as submitFeedback};

@@ -4,103 +4,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="db/changelog/migration/260730_drop_ticket_basic_settings_unused_timeout_tips.xml" />
+    <!--
+        5.0.0 版本基线：升级到 5.x 前必须先升级到 4.9.9。
+        4.9.9 及之前的迁移脚本已移除，全新安装的表结构由 Hibernate ddl-auto=update
+        依据实体生成。
 
-    <include file="db/changelog/migration/260803_add_queue_member_statistic_indexes.xml" />
-
-    <include file="db/changelog/migration/260803_add_agent_guidance_tables.xml" />
-
-    <include file="db/changelog/migration/260803_fix_ai_robot_llm_varbinary_to_varchar.xml" />
-
-    <include file="db/changelog/migration/260805_add_direction_to_mcp_server.xml" />
-
-    <include file="db/changelog/migration/260806_add_tool_intent_fields.xml" />
-
-    <include file="db/changelog/migration/260806_add_robot_tools_settings_intent_runtime_fields.xml" />
-
-    <include file="db/changelog/migration/260806_drop_robot_tools_settings_default_tool_prompt.xml" />
-
-    <include file="db/changelog/migration/260808_add_tool_mcp_exposure_fields.xml" />
-
-    <include file="db/changelog/migration/260810_add_robot_llm_advisor_fields.xml" />
-
+        保留例外：SPRING_AI_CHAT_MEMORY 由 Spring AI JDBC 管理（无 JPA 实体），
+        且 spring.ai.chat.memory.repository.jdbc.initialize-schema=never，
+        必须由 Liquibase 建表。
+    -->
     <include file="db/changelog/migration/260810_add_spring_ai_chat_memory_table.xml" />
-
-    <include file="db/changelog/migration/260810_add_rag_rewrite_record_table.xml" />
-
-    <include file="db/changelog/migration/260811_add_service_settings_show_avatar_nickname.xml" />
-
-    <include file="db/changelog/migration/260811_backfill_service_settings_show_avatar_nickname.xml" />
-
-    <include file="db/changelog/migration/260811_add_service_settings_visitor_close_tip.xml" />
-
-    <include file="db/changelog/migration/260812_add_robot_settings_ai_disclaimer.xml" />
-
-    <include file="db/changelog/migration/260812_add_workgroup_settings_ai_disclaimer.xml" />
-
-    <include file="db/changelog/migration/260817_widen_core_thread_json_columns.xml" />
-
-    <include file="db/changelog/migration/260914_narrow_core_thread_json_columns_to_text.xml" />
-
-    <include file="db/changelog/migration/260823_add_wechat_work_contact_tables.xml" />
-
-    <include file="db/changelog/migration/260829_widen_core_notification_content.xml" />
-
-    <include file="db/changelog/migration/260904_add_system_config_table.xml" />
-
-    <include file="db/changelog/migration/260905_widen_ticket_description.xml" />
-
-    <include file="db/changelog/migration/260906_add_office_document_table.xml" />
-    <include file="db/changelog/migration/260906_add_office_project_table.xml" />
-
-    <include file="db/changelog/migration/260908_disable_robot_tools_by_default.xml" />
-
-    <include file="db/changelog/migration/260909_add_ticket_auto_create_time_window_fields.xml" />
-
-    <include file="db/changelog/migration/260914_disable_robot_memory_by_default.xml" />
-
-    <include file="db/changelog/migration/260915_add_robot_llm_asr_fields.xml" />
-
-    <include file="db/changelog/migration/260915_add_organization_config_table.xml" />
-
-    <include file="db/changelog/migration/260915_add_message_unread_thread_columns.xml" />
-
-    <include file="db/changelog/migration/260915_add_thread_rating_attachments_column.xml" />
-
-    <include file="db/changelog/migration/260917_rename_rag_rewrite_record_table.xml" />
-
-    <include file="db/changelog/migration/260917_finalize_rag_rewrite_table_unification.xml" />
-
-    <include file="db/changelog/migration/260920_rename_video_webrtc_settings_table.xml" />
-
-    <include file="db/changelog/migration/260920_add_feishu_doc_sync.xml" />
-
-    <include file="db/changelog/migration/260920_add_settings_verify_code_template_bindings.xml" />
-
-    <include file="db/changelog/migration/260920_add_settings_purpose_table.xml" />
-
-    <include file="db/changelog/migration/260922_add_push_device_table.xml" />
-
-    <include file="db/changelog/migration/260923_add_push_android_table.xml" />
-
-    <include file="db/changelog/migration/261010_drop_organization_custom_server_columns.xml" />
-
-    <include file="db/changelog/migration/261012_add_airline_persistent_sessions.xml" />
-
-    <include file="db/changelog/migration/261013_add_apns_token_status_column.xml" />
-
-    <include file="db/changelog/migration/261013_cleanup_duplicate_apns_token.xml" />
-
-    <include file="db/changelog/migration/261014_add_ticket_create_type_column.xml" />
-
-    <include file="db/changelog/migration/261017_fix_airline_tinytext_columns.xml" />
-
-    <include file="db/changelog/migration/261020_add_meet_ai_tables.xml" />
-    <include file="db/changelog/migration/261020_fix_meet_ai_reliability.xml" />
-
-    <include file="db/changelog/migration/261020_backfill_user_register_source.xml" />
-    <include file="db/changelog/migration/261020_widen_kbase_llm_file_content.xml" />
-    <include file="db/changelog/migration/261022_add_ai_provider_org_query_index.xml" />
-    <include file="db/changelog/migration/261024_cleanup_duplicate_ai_provider.xml" />
+    <include file="db/changelog/migration/261031_add_assistant_hilt_tables.xml" />
+    <include file="db/changelog/migration/261031_add_assistant_config_table.xml" />
 
 </databaseChangeLog>

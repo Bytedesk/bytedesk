@@ -182,12 +182,78 @@ public class BytedeskProperties implements EnvironmentAware {
     }
 
     private static boolean isLocalAddress(String hostname) {
-        return "localhost".equalsIgnoreCase(hostname)
-                || hostname.startsWith("127.")
-                || hostname.startsWith("192.168.")
-                || hostname.startsWith("10.")
-                || hostname.startsWith("172.")
-                || "[::1]".equals(hostname);
+        if (hostname == null || hostname.isBlank()) {
+            return false;
+        }
+        String value = hostname.trim();
+        // 处理带方括号的 IPv6 字面量（可能附带端口，如 [::1]:8080）
+        if (value.startsWith("[") && value.indexOf(']') > 0) {
+            value = value.substring(1, value.indexOf(']'));
+        }
+        if ("localhost".equalsIgnoreCase(value)) {
+            return true;
+        }
+        if (value.indexOf(':') >= 0) {
+            return isLocalIpv6Literal(value);
+        }
+        if (value.matches("\\d{1,3}(\\.\\d{1,3}){3}")) {
+            return isLocalIpv4Literal(value);
+        }
+        return false;
+    }
+
+    /**
+     * IPv4 字面量分类：仅 127/8、10/8、172.16-31、192.168/16、169.254/16、0/8 视为本地。
+     * 修复原 startsWith("172.") 将 172.217.x.x 等公网地址误判为本地的问题（规划 5.4）。
+     */
+    private static boolean isLocalIpv4Literal(String value) {
+        String[] parts = value.split("\\.");
+        int[] octets = new int[4];
+        for (int i = 0; i < 4; i++) {
+            octets[i] = Integer.parseInt(parts[i]);
+            if (octets[i] > 255) {
+                return false;
+            }
+        }
+        int first = octets[0];
+        int second = octets[1];
+        if (first == 127 || first == 10 || first == 0) {
+            return true;
+        }
+        if (first == 172 && second >= 16 && second <= 31) {
+            return true;
+        }
+        if (first == 192 && second == 168) {
+            return true;
+        }
+        return first == 169 && second == 254;
+    }
+
+    /**
+     * IPv6 字面量分类：仅十六进制/冒号/点组成且含冒号时才解析，避免对不可信输入做 DNS 外联。
+     * 覆盖 ::1 回环、fe80::/10 链路本地、fc00::/7 唯一本地及 IPv4 映射地址。
+     */
+    private static boolean isLocalIpv6Literal(String value) {
+        // 去掉 zone id，如 fe80::1%eth0
+        String literal = value;
+        int zoneIndex = literal.indexOf('%');
+        if (zoneIndex >= 0) {
+            literal = literal.substring(0, zoneIndex);
+        }
+        if (!literal.matches("[0-9A-Fa-f:.]+") || literal.indexOf(':') < 0) {
+            return false;
+        }
+        try {
+            java.net.InetAddress address = java.net.InetAddress.getByName(literal);
+            if (address.isLoopbackAddress() || address.isLinkLocalAddress() || address.isSiteLocalAddress()) {
+                return true;
+            }
+            byte[] raw = address.getAddress();
+            // fc00::/7 唯一本地地址（InetAddress.isSiteLocalAddress 不覆盖该段）
+            return raw.length == 16 && (raw[0] & 0xfe) == 0xfc;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private static java.util.List<String> splitCsv(String csv) {

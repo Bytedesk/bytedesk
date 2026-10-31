@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        客服助手 HITL：session / run / operation 三表（对应规划 2026-10-16 第 4.3 节）。
+        跨库兼容：仅使用标准标签；TEXT 列在 Oracle/KingBase 下由 Liquibase 映射为 CLOB。
+    -->
+
+    <changeSet id="261031-1-create-assistant-session-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_assistant_session"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_ai_assistant_session">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session_status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_thread_uid" type="VARCHAR(64)"/>
+            <column name="active_run_uid" type="VARCHAR(64)"/>
+            <column name="revision" type="BIGINT"/>
+            <column name="context_version" type="VARCHAR(128)"/>
+            <column name="context_refreshed_at" type="timestamp"/>
+            <column name="messages" type="clob"/>
+            <column name="suggestions" type="clob"/>
+        </createTable>
+        <createIndex tableName="bytedesk_ai_assistant_session" indexName="idx_assistant_session_owner_target">
+            <column name="org_uid"/>
+            <column name="user_uid"/>
+            <column name="target_thread_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261031-2-create-assistant-run-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_assistant_run"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_ai_assistant_run">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session_uid" type="VARCHAR(64)"/>
+            <column name="run_status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="input_kind" type="VARCHAR(32)"/>
+            <column name="instruction" type="clob"/>
+            <column name="context_version" type="VARCHAR(128)"/>
+            <column name="checkpoint_messages" type="clob"/>
+            <column name="failure_stage" type="VARCHAR(32)"/>
+            <column name="error_code" type="VARCHAR(64)"/>
+            <column name="final_answer" type="clob"/>
+            <column name="finished_at" type="timestamp"/>
+        </createTable>
+        <createIndex tableName="bytedesk_ai_assistant_run" indexName="idx_assistant_run_session">
+            <column name="session_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261031-3-create-assistant-operation-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_assistant_operation"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_ai_assistant_operation">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(64)"/>
+            <column name="user_uid" type="VARCHAR(64)"/>
+            <column name="level_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="session_uid" type="VARCHAR(64)"/>
+            <column name="run_uid" type="VARCHAR(64)"/>
+            <column name="tool_call_uid" type="VARCHAR(64)"/>
+            <column name="tool_audit_uid" type="VARCHAR(64)"/>
+            <column name="proposal_message_uid" type="VARCHAR(64)"/>
+            <column name="tool_name" type="VARCHAR(128)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="target_summary" type="VARCHAR(512)"/>
+            <column name="safe_arguments" type="VARCHAR(2048)"/>
+            <column name="operation_status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="decision" type="VARCHAR(16)"/>
+            <column name="decided_at" type="timestamp"/>
+            <column name="expires_at" type="timestamp"/>
+            <column name="result_summary" type="VARCHAR(1024)"/>
+            <column name="error_code" type="VARCHAR(64)"/>
+        </createTable>
+        <createIndex tableName="bytedesk_ai_assistant_operation" indexName="idx_assistant_operation_session">
+            <column name="session_uid"/>
+        </createIndex>
+        <createIndex tableName="bytedesk_ai_assistant_operation" indexName="idx_assistant_operation_status_expiry">
+            <column name="operation_status"/>
+            <column name="expires_at"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

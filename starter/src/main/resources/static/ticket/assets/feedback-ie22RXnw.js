@@ -1,0 +1,1 @@
+import e from"./request-C_WZ00BR.js";function t(t){return e({url:`/visitor/api/feedback/submit`,method:`post`,data:t})}export{t as submitFeedback};

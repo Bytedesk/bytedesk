@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        客服助手个人配置（方案 A，规划 2026-10-16 第 7.6 节）：
+        1. 新增 bytedesk_ai_assistant_config 表（(org_uid,user_uid) 唯一，level=USER）；
+        2. 为既有 bytedesk_ai_assistant_run 追加 config_uid/config_revision/config_snapshot 列（run 冻结快照）。
+        跨库兼容：仅标准标签；clob 在 Oracle/KingBase 由 Liquibase 映射。
+    -->
+
+    <changeSet id="261031-4-create-assistant-config-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_ai_assistant_config"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_ai_assistant_config">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="llm_enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="llm_provider_uid" type="VARCHAR(64)"/>
+            <column name="llm_provider_type" type="VARCHAR(64)"/>
+            <column name="llm_model" type="VARCHAR(191)"/>
+            <column name="llm_prompt" type="clob"/>
+            <column name="llm_temperature" type="DOUBLE"/>
+            <column name="llm_top_p" type="DOUBLE"/>
+            <column name="llm_max_tokens" type="INT"/>
+            <column name="llm_context_msg_count" type="INT"/>
+            <column name="kb_enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="kb_uid" type="VARCHAR(64)"/>
+            <column name="kb_source_enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retrieval_search_type" type="VARCHAR(32)"/>
+            <column name="retrieval_top_k" type="INT"/>
+            <column name="retrieval_score_threshold" type="DOUBLE"/>
+        </createTable>
+        <addUniqueConstraint tableName="bytedesk_ai_assistant_config"
+            constraintName="uk_assistant_config_org_user"
+            columnNames="org_uid, user_uid"/>
+    </changeSet>
+
+    <changeSet id="261031-5-add-run-config-snapshot-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bytedesk_ai_assistant_run" columnName="config_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_ai_assistant_run">
+            <column name="config_uid" type="VARCHAR(64)"/>
+            <column name="config_revision" type="INT"/>
+            <column name="config_snapshot" type="clob"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
