@@ -20,13 +20,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.utils.JwtUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -120,6 +123,18 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.badRequest().body(JsonResult.error("uid or accessToken is required", 400));
     }
 
+    @PostMapping("/restore")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Restore Revoked Token")
+    public ResponseEntity<?> restore(@RequestBody TokenRequest request) {
+
+        if (StringUtils.hasText(request.getUid())) {
+            tokenRestService.restoreByUid(request.getUid());
+            return ResponseEntity.ok(JsonResult.success());
+        }
+
+        return ResponseEntity.badRequest().body(JsonResult.error("uid is required", 400));
+    }
+
     @PostMapping("/refresh")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Refresh Access Token")
     public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
@@ -129,6 +144,66 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-    
-    
+    // ==================== 本人登录会话管理（self）====================
+    // 普通登录用户可管理本人当前组织的有效登录会话；所有归属校验在服务端完成。
+
+    /**
+     * 分页查询本人当前组织的有效登录会话。首页计数可用 pageSize=1。
+     * channel 仅说明操作来源，不用于过滤待查询的会话渠道。
+     */
+    @GetMapping("/query/self")
+    public ResponseEntity<?> querySelfSessions(
+            @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "20") int pageSize,
+            @RequestParam(value = "channel", required = false) String channel,
+            HttpServletRequest request) {
+
+        if (pageNumber < 0 || pageSize < 1 || pageSize > 100) {
+            return ResponseEntity.badRequest()
+                    .body(JsonResult.error("pageNumber must be >= 0 and pageSize must be between 1 and 100", 400));
+        }
+
+        String currentAccessToken = JwtUtils.parseAccessToken(request);
+        TokenSelfPageResponse page = tokenRestService.querySelfSessions(currentAccessToken, pageNumber, pageSize);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
+
+    /**
+     * 查询本人某条登录会话详情（允许返回已撤销/已过期状态）。
+     */
+    @GetMapping("/query/self/uid")
+    public ResponseEntity<?> querySelfSessionByUid(
+            @RequestParam(value = "uid") String uid,
+            HttpServletRequest request) {
+
+        if (!StringUtils.hasText(uid)) {
+            return ResponseEntity.badRequest().body(JsonResult.error("uid is required", 400));
+        }
+
+        String currentAccessToken = JwtUtils.parseAccessToken(request);
+        TokenSelfResponse response = tokenRestService.querySelfSessionByUid(currentAccessToken, uid);
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
+    /**
+     * 撤销本人其他登录会话（当前会话受保护；已撤销按幂等成功处理）。
+     */
+    @PostMapping("/revoke/self")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Revoke Self Login Session")
+    public ResponseEntity<?> revokeSelfSession(@RequestBody TokenSelfRevokeRequest request,
+            HttpServletRequest httpRequest) {
+
+        if (!StringUtils.hasText(request.getUid())) {
+            return ResponseEntity.badRequest().body(JsonResult.error("uid is required", 400));
+        }
+
+        String currentAccessToken = JwtUtils.parseAccessToken(httpRequest);
+        TokenSelfResponse response = tokenRestService.revokeSelfSession(
+                currentAccessToken, request.getUid(), request.getChannel());
+
+        return ResponseEntity.ok(JsonResult.success(response));
+    }
+
 }

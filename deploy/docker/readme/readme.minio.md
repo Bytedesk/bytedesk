@@ -38,28 +38,32 @@ docker compose --env-file .env -f compose/compose-minio.yaml logs -f
 
 ### 启用应用侧 MinIO 存储
 
-仅启动 MinIO 容器不会改变应用的上传行为。应用通过 `bytedesk.minio.enabled` 配置决定是否使用 MinIO：
+仅启动 MinIO 容器不会改变应用的上传行为。应用通过 `bytedesk.storage.provider`（local / s3） 配置决定是否使用 MinIO：
 
 - 关闭（默认）：上传文件保存在应用本地磁盘，应用可独立启动，不依赖 MinIO 容器
 - 开启：上传文件写入 MinIO（应用启动时会自动创建存储桶并设置为公开读取）
 
 ```bash
-# docker 全量启动时，在 .env 中配置（容器内通过服务名访问）
-BYTEDESK_MINIO_ENABLED=true
-BYTEDESK_MINIO_ENDPOINT=http://bytedesk-minio:9000
-BYTEDESK_MINIO_BUCKET_NAME=bytedesk
+# Docker 在 .env 中配置，地址须同时可被应用和用户浏览器访问
+BYTEDESK_STORAGE_PROVIDER=s3
+BYTEDESK_STORAGE_ENDPOINT=https://storage.example.com
+BYTEDESK_STORAGE_ACCESS_KEY=REPLACE_WITH_ACCESS
+BYTEDESK_STORAGE_SECRET_KEY=REPLACE_WITH_STRONG_SECRET
+BYTEDESK_STORAGE_BUCKET_NAME=bytedesk
 
 # 或源码本地运行时，在 properties 中配置（宿主机端口）
-# bytedesk.minio.enabled=true
-# bytedesk.minio.endpoint=http://127.0.0.1:19000
-# bytedesk.minio.access-key=...
-# bytedesk.minio.secret-key=...
-# bytedesk.minio.bucket-name=bytedesk
+# bytedesk.storage.provider=s3
+# bytedesk.storage.endpoint=http://127.0.0.1:19000
+# bytedesk.storage.access-key=...
+# bytedesk.storage.secret-key=...
+# bytedesk.storage.bucket-name=bytedesk
 ```
+
+将占位地址替换为可访问的 S3 API 地址（不是控制台地址），应用访问密钥须显式设置并与 MinIO 账号一致，不会自动继承服务端凭据。
 
 ### 代码侧开关说明
 
-- `bytedesk.minio.enabled=false`（默认）时，`MinioConfig`（MinioClient Bean）与 `UploadMinioService` 均不会装配，应用启动完全不依赖 MinIO
+- `bytedesk.storage.provider=local`（默认）时，`MinioConfig`（MinioClient Bean）与 `UploadMinioService` 均不会装配，应用启动完全不依赖 MinIO
 - `UploadRestService` 通过 `ObjectProvider<UploadMinioService>` 可选注入；上传接口在开关关闭或 Bean 不存在时自动回退本地存储
 - 开启后可调用 `/api/v1/minio/*` 系列接口进行上传、预签名下载等操作
 
@@ -92,27 +96,29 @@ docker compose --env-file .env -f compose/compose-minio.yaml logs -f
 
 ### Enable MinIO storage on the app side
 
-Starting the MinIO container alone does not change upload behavior. The app decides via the `bytedesk.minio.enabled` config:
+Starting the MinIO container alone does not change upload behavior. The app decides via the `bytedesk.storage.provider`（local / s3） config:
 
 - Disabled (default): uploads are stored on the app's local disk; the app starts without any MinIO dependency
 - Enabled: uploads are written to MinIO (the app auto-creates the bucket with a public-read policy on startup)
 
 ```bash
 # Docker full stack: configure in .env (the app container reaches MinIO via the service name)
-BYTEDESK_MINIO_ENABLED=true
-BYTEDESK_MINIO_ENDPOINT=http://bytedesk-minio:9000
-BYTEDESK_MINIO_BUCKET_NAME=bytedesk
+BYTEDESK_STORAGE_PROVIDER=s3
+BYTEDESK_STORAGE_ENDPOINT=http://bytedesk-minio:9000
+BYTEDESK_STORAGE_ACCESS_KEY=REPLACE_WITH_ACCESS
+BYTEDESK_STORAGE_SECRET_KEY=REPLACE_WITH_STRONG_SECRET
+BYTEDESK_STORAGE_BUCKET_NAME=bytedesk
 
 # Or for local source runs, configure in properties (host port)
-# bytedesk.minio.enabled=true
-# bytedesk.minio.endpoint=http://127.0.0.1:19000
-# bytedesk.minio.access-key=...
-# bytedesk.minio.secret-key=...
-# bytedesk.minio.bucket-name=bytedesk
+# bytedesk.storage.provider=s3
+# bytedesk.storage.endpoint=http://127.0.0.1:19000
+# bytedesk.storage.access-key=...
+# bytedesk.storage.secret-key=...
+# bytedesk.storage.bucket-name=bytedesk
 ```
 
 ### How the code-side switch works
 
-- When `bytedesk.minio.enabled=false` (default), `MinioConfig` (the MinioClient bean) and `UploadMinioService` are not loaded at all; startup has zero MinIO dependency
+- When `bytedesk.storage.provider=local` (default), `MinioConfig` (the MinioClient bean) and `UploadMinioService` are not loaded at all; startup has zero MinIO dependency
 - `UploadRestService` injects `UploadMinioService` via `ObjectProvider` (optional); upload endpoints fall back to local storage when the switch is off or the bean is absent
 - Once enabled, the `/api/v1/minio/*` endpoints provide upload and presigned-download operations

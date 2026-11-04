@@ -70,7 +70,7 @@ public class UploadMinioService {
     @PostConstruct
     public void initMinio() {
         try {
-            String bucketName = bytedeskProperties.getStorageBucketName();
+            String bucketName = bytedeskProperties.resolveStorageBucketName();
             
             // 检查存储桶是否存在，如果不存在则创建
             boolean bucketExists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
@@ -80,7 +80,7 @@ public class UploadMinioService {
             }
             
             // 公开读策略可配置（bytedesk.storage.public-read，默认 true 保持存量行为）
-            if (!bytedeskProperties.isStoragePublicRead()) {
+            if (!bytedeskProperties.resolveStoragePublicRead()) {
                 log.info("跳过桶公开读策略（bytedesk.storage.public-read=false），fileUrl 将使用预签名直链: bucket={}", bucketName);
                 log.info("对象存储初始化完成，存储桶: {}, 策略: 私有（预签名访问）", bucketName);
                 return;
@@ -154,7 +154,7 @@ public class UploadMinioService {
             // 上传文件到对象存储
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(contentType)
@@ -192,7 +192,7 @@ public class UploadMinioService {
             // 上传文件到对象存储
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .stream(Files.newInputStream(localFile.toPath()), localFile.length(), -1)
                     .contentType(contentType)
@@ -231,7 +231,7 @@ public class UploadMinioService {
             try (InputStream inputStream = URI.create(url).toURL().openStream()) {
                 minioClient.putObject(
                     PutObjectArgs.builder()
-                        .bucket(bytedeskProperties.getStorageBucketName())
+                        .bucket(bytedeskProperties.resolveStorageBucketName())
                         .object(objectPath)
                         .stream(inputStream, -1, -1)
                         .contentType(contentType)
@@ -323,7 +323,7 @@ public class UploadMinioService {
         try {
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .build()
             );
@@ -344,7 +344,7 @@ public class UploadMinioService {
         try {
             minioClient.statObject(
                 StatObjectArgs.builder()
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .build()
             );
@@ -365,7 +365,7 @@ public class UploadMinioService {
     public void downloadObject(String objectPath, Path targetFile) {
         try (InputStream inputStream = minioClient.getObject(
                 GetObjectArgs.builder()
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .build())) {
             Files.copy(inputStream, targetFile, StandardCopyOption.REPLACE_EXISTING);
@@ -387,7 +387,7 @@ public class UploadMinioService {
             return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .expiry(expiry, TimeUnit.SECONDS)
                     .build()
@@ -410,7 +410,7 @@ public class UploadMinioService {
             return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                     .method(Method.PUT)
-                    .bucket(bytedeskProperties.getStorageBucketName())
+                    .bucket(bytedeskProperties.resolveStorageBucketName())
                     .object(objectPath)
                     .expiry(expiry, TimeUnit.SECONDS)
                     .build()
@@ -431,11 +431,11 @@ public class UploadMinioService {
      * @return 文件访问URL
      */
     private String getFileUrl(String objectPath) {
-        if (!bytedeskProperties.isStoragePublicRead()) {
+        if (!bytedeskProperties.resolveStoragePublicRead()) {
             return getDownloadUrl(objectPath, bytedeskProperties.getStoragePresignedExpirySeconds());
         }
-        return bytedeskProperties.getStorageEndpoint() + "/" + 
-               bytedeskProperties.getStorageBucketName() + "/" + objectPath;
+        return bytedeskProperties.resolveStorageEndpoint() + "/" +
+               bytedeskProperties.resolveStorageBucketName() + "/" + objectPath;
     }
 
     /**

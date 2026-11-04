@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
 import com.bytedesk.ai.llm_model.LlmModelJsonLoader;
 import com.bytedesk.ai.llm_model.LlmModelRestService;
@@ -176,17 +177,25 @@ class LlmProviderInitializerTest {
     }
 
     @Test
-    void duplicateRecords_failExplicitly_notFirstRecord() {
-        // 当前组织有效记录重复：精确查询抛错，显式暴露数据问题，不随机取第一条
+    void duplicateRecords_skipOnlyAffectedOrganizationAndContinue() {
+        // 重复记录不能随机选取；跳过受影响组织，但不阻断其他组织和应用启动
         when(llmProviderJsonService.loadProviders()).thenReturn(Map.of("zhipuai", providerJson("PRODUCTION")));
-        when(organizationRestService.findAll()).thenReturn(List.of(organization("org-a")));
-        when(llmProviderRestService.existsByTypeAndLevel("zhipuai", PLATFORM_LEVEL)).thenReturn(false);
+        when(organizationRestService.findAll()).thenReturn(
+                List.of(organization("org-a"), organization("org-b")));
+        when(llmProviderRestService.existsByTypeAndLevel("zhipuai", PLATFORM_LEVEL)).thenReturn(true);
+        when(llmProviderRestService.findByType("zhipuai", PLATFORM_LEVEL))
+                .thenReturn(List.of(provider("zhipuai", "", "PRODUCTION")));
         when(llmProviderRestService.findByTypeAndLevelAndOrgUid("zhipuai", ORG_LEVEL, "org-a"))
-                .thenThrow(new RuntimeException("Duplicate row: expected single result"));
+                .thenThrow(new IncorrectResultSizeDataAccessException(1, 3));
+        when(llmProviderRestService.findByTypeAndLevelAndOrgUid("zhipuai", ORG_LEVEL, "org-b"))
+                .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> initializer.init())
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Duplicate row");
+        initializer.init();
+
+        verify(llmProviderRestService, never()).createFromProviderJson(
+                eq("zhipuai"), any(ProviderJson.class), eq(ORG_LEVEL), eq("org-a"));
+        verify(llmProviderRestService).createFromProviderJson(
+                eq("zhipuai"), any(ProviderJson.class), eq(ORG_LEVEL), eq("org-b"));
     }
 
     @Test
@@ -199,7 +208,8 @@ class LlmProviderInitializerTest {
         initializer.init();
 
         verify(llmProviderRestService, never()).findByTypeAndLevelAndOrgUid(anyString(), anyString(), anyString());
-        verify(llmProviderRestService, never()).createFromProviderJson(anyString(), any(), anyString(), anyString());
+        verify(llmProviderRestService, never()).createFromProviderJson(
+                anyString(), any(), eq(ORG_LEVEL), anyString());
     }
 
     @Test

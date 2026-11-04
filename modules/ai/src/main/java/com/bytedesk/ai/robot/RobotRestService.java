@@ -694,10 +694,6 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
         }
 
         String robotUid = uidUtils.getUid();
-        if ("airline_booking_assistant".equals(robotJson.getName())) {
-            // External callers rely on a deterministic UID for airline booking tests
-            robotUid = BytedeskConsts.DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID;
-        }
 
         // Ensure the chosen UID is unique. If it already exists (including soft-deleted
         // records), generate a new one to avoid unique constraint violations on `uuid`.

@@ -238,7 +238,6 @@ public class I18Consts {
     public static final String I18N_AGENT_GUIDELINE_BINDING = I18N_PREFIX + "agent.guideline.binding";
     public static final String I18N_AGENT_SCHEDULE = I18N_PREFIX + "agent.schedule";
     public static final String I18N_AGENT_TURN_TRACE = I18N_PREFIX + "agent.turn.trace";
-    public static final String I18N_BOOKING = I18N_PREFIX + "booking";
     public static final String I18N_BRIDGE = I18N_PREFIX + "bridge";
     public static final String I18N_CDR = I18N_PREFIX + "cdr";
     public static final String I18N_CALL_BLOCK = I18N_PREFIX + "call.block";
@@ -653,13 +652,11 @@ public class I18Consts {
     public static final String I18N_UNIFIED_DESCRIPTION = I18N_PREFIX + "unified.description"; // 统一描述
     // 工作组
     public static final String I18N_WORKGROUP_NICKNAME = I18N_PREFIX + "workgroup.nickname"; // 工作组昵称
-    public static final String I18N_WORKGROUP_BOOKING_NICKNAME = I18N_PREFIX + "workgroup.booking.nickname"; // booking
                                                                                                              // 工作组昵称
     public static final String I18N_WORKGROUP_BEFORE_NICKNAME = I18N_PREFIX + "workgroup.before.nickname"; // 工作组前缀昵称
     public static final String I18N_WORKGROUP_AFTER_NICKNAME = I18N_PREFIX + "workgroup.after.nickname"; // 工作组后缀昵称
     public static final String I18N_WORKGROUP_TICKET_NICKNAME = I18N_PREFIX + "workgroup.ticket.nickname"; // 工单工作组昵称
     public static final String I18N_WORKGROUP_DESCRIPTION = I18N_PREFIX + "workgroup.description"; // 工作组描述
-    public static final String I18N_WORKGROUP_BOOKING_DESCRIPTION = I18N_PREFIX + "workgroup.booking.description"; // booking
                                                                                                                    // 工作组描述
     public static final String I18N_WORKGROUP_BEFORE_DESCRIPTION = I18N_PREFIX + "workgroup.before.description"; // 工作组前缀描述
     public static final String I18N_WORKGROUP_AFTER_DESCRIPTION = I18N_PREFIX + "workgroup.after.description"; // 工作组后缀描述
@@ -760,6 +757,9 @@ public class I18Consts {
                                                                                                                    // 未找到角色
     public static final String I18N_TOKEN_NOT_FOUND_FOR_UID = I18N_PREFIX + "token.not.found.for.uid"; // 指定 uid 的 token
                                                                                                        // 未找到
+    public static final String I18N_TOKEN_SELF_AMBIGUOUS_CURRENT = I18N_PREFIX + "token.self.ambiguous.current"; // 当前登录凭证对应多条记录，无法确定本机会话
+    public static final String I18N_TOKEN_SELF_CURRENT_PROTECTED = I18N_PREFIX + "token.self.current.protected"; // 不能撤销当前登录会话
+    public static final String I18N_TOKEN_SELF_NOT_REVOKABLE = I18N_PREFIX + "token.self.not.revokable"; // 该会话已过期或无效，无需撤销
     public static final String I18N_FILE_NOT_FOUND = I18N_PREFIX + "file.not.found"; // 文件未找到
     // public static final String I18N_NOT_LOGIN = "请先登录"; // 请先登录
     public static final String I18N_USER_DISABLED = I18N_PREFIX + "user.disabled"; // 用户已被禁用

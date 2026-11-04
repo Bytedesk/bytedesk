@@ -42,6 +42,7 @@ import com.bytedesk.core.rbac.organization.OrganizationRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.JwtUtils;
 import com.bytedesk.core.utils.PasswordCryptoUtils;
+import com.bytedesk.core.utils.DeviceNameUtils;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -211,10 +212,7 @@ public class AuthService {
         enforceOrganizationMaxMembersIfNeeded(userDetails);
         
         String device = authRequest.getDevice();
-        if (!StringUtils.hasText(device)) {
-            // 如果没有设备信息，使用一个描述性值
-            device = "Unknown Device";
-        }
+        device = DeviceNameUtils.sanitize(device);
 
         String displayName = StringUtils.hasText(userDetails.getNickname()) ? userDetails.getNickname()
             : userDetails.getUsername();
@@ -222,15 +220,18 @@ public class AuthService {
             : (StringUtils.hasText(userDetails.getEmail()) ? userDetails.getEmail() : userDetails.getUsername());
         
         // 使用create接口创建保存token
+        // description 列为 varchar(255)：整体截断，防止超长账号/设备名导致登录插入失败
+        String description = String.format(
+                "login token for %s(uid=%s, org=%s), platform=%s, channel=%s, device=%s",
+                account,
+                userDetails.getUid(),
+                userDetails.getOrgUid(),
+                userDetails.getPlatform(),
+                channel,
+                device);
         TokenRequest tokenRequest = TokenRequest.builder()
             .name(displayName)
-            .description(String.format("login token for %s(uid=%s, org=%s), platform=%s, channel=%s, device=%s",
-                    account,
-                    userDetails.getUid(),
-                    userDetails.getOrgUid(),
-                    userDetails.getPlatform(),
-                    channel,
-                    device))
+            .description(description.length() > 255 ? description.substring(0, 255) : description)
             .accessToken(accessToken)
             .type(TokenTypeEnum.BEARER.name())
             .revoked(false)

@@ -13,6 +13,7 @@
  */
 package com.bytedesk.core.action;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,16 @@ public class ActionSpecification extends BaseSpecification<ActionEntity, ActionR
             if (StringUtils.hasText(request.getNickname())) {
                 predicates
                         .add(criteriaBuilder.like(root.get("user").get("nickname"), "%" + request.getNickname() + "%"));
+            }
+
+            // 时间范围过滤（按 createdAt）
+            ZonedDateTime startAt = request.getStartAt();
+            ZonedDateTime endAt = request.getEndAt();
+            if (startAt != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("createdAt"), startAt));
+            }
+            if (endAt != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("createdAt"), endAt));
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

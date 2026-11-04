@@ -77,6 +77,12 @@ public class ActionEntity extends BaseEntity {
     private String ipLocation;
 
     /**
+     * Client channel of the action, e.g. WEB_ADMIN / UNIAPP_ANDROID,
+     * resolved from the request body when available
+     */
+    private String channel;
+
+    /**
      * Type of action (LOG, LOGIN, LOGOUT, CREATE, UPDATE, DELETE, etc.)
      */
     @Builder.Default

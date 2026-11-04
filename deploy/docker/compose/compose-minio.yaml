@@ -3,7 +3,7 @@
 # 说明：MinIO 对象存储（独立组件，默认不启用）
 # - MinIO Console: http://127.0.0.1:19001（使用 .env 中的 MINIO_ROOT_USER/MINIO_ROOT_PASSWORD 登录）
 # - MinIO API: http://127.0.0.1:19000
-# - 应用侧需同时开启 BYTEDESK_MINIO_ENABLED=true（对应 bytedesk.minio.enabled）
+# - 应用侧设置 BYTEDESK_STORAGE_PROVIDER=s3，并配置 BYTEDESK_STORAGE_ENDPOINT/ACCESS_KEY/SECRET_KEY
 # 详细说明见 readme/readme.minio.md
 services:
   # MinIO 对象存储服务

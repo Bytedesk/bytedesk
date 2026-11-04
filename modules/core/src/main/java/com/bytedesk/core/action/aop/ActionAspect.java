@@ -14,6 +14,9 @@
  */
 package com.bytedesk.core.action.aop;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 // import org.aspectj.lang.annotation.AfterThrowing;
@@ -21,12 +24,14 @@ import org.aspectj.lang.annotation.Aspect;
 // import org.aspectj.lang.annotation.Before;
 // import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.bytedesk.core.action.ActionRequest;
 import com.bytedesk.core.action.ActionRestService;
 import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.base.BaseRequest;
 import com.bytedesk.core.ip.IpService;
 import com.bytedesk.core.ip.IpUtils;
 
@@ -66,6 +71,7 @@ public class ActionAspect {
                 .action(actionAnnotation.action())
                 .description(actionAnnotation.description())
                 .type(actionAnnotation.type().name())
+                .channel(resolveChannel(joinPoint.getArgs()))
                 .build();
         // 
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -86,5 +92,36 @@ public class ActionAspect {
         actionService.create(actionRequest);
     }
 
+    /**
+     * 从请求参数中解析客户端渠道（如登录请求体中的 channel=WEB_ADMIN），
+     * 用于操作日志/登录通知中标识来源端。无法解析时返回 null，不阻断日志记录。
+     */
+    String resolveChannel(Object[] args) {
+        if (args == null) {
+            return null;
+        }
+        for (Object arg : args) {
+            if (arg == null) {
+                continue;
+            }
+            if (arg instanceof BaseRequest baseRequest) {
+                return StringUtils.hasText(baseRequest.getChannel()) ? baseRequest.getChannel().trim() : null;
+            }
+            // 兼容未继承 BaseRequest 但含 channel 字段的请求 DTO（如各 OAuth 登录请求体）
+            try {
+                Method getter = arg.getClass().getMethod("getChannel");
+                if (getter.getReturnType() == String.class) {
+                    Object value = getter.invoke(arg);
+                    if (value instanceof String channelValue && StringUtils.hasText(channelValue)) {
+                        return channelValue.trim();
+                    }
+                    return null;
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                // 无 channel 字段，继续检查下一个参数
+            }
+        }
+        return null;
+    }
 
 }

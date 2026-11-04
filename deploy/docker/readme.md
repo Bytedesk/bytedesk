@@ -56,6 +56,11 @@ cp .env.example .env
 ./stop.sh middleware obs
 ./start.sh middleware logstash kibana
 ./stop.sh middleware logstash kibana down
+
+# view log
+docker logs -f bytedesk -n 100
+# view log dir
+sudo ls -lh /var/lib/docker/volumes/bytedesk_log_data/_data/
 ```
 
 ## Keyword Reference

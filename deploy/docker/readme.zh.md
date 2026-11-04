@@ -23,6 +23,17 @@ cp .env.example .env
 # 访问 http://127.0.0.1:9003，默认账号 admin@email.com / admin
 ```
 
+默认使用本地文件存储（`BYTEDESK_STORAGE_PROVIDER=local`），
+不启动也不使用 MinIO 或 RustFS。无需启动对象存储服务或配置其凭据。
+`minio` / `rustfs` 是可选关键字，仅启动对应组件，不会自动切换应用存储。
+如需使用对象存储，须显式配置 `BYTEDESK_STORAGE_PROVIDER=s3` 及连接信息，
+已有 `.env` 或 shell 中的显式配置仍优先，
+从对象存储切回本地时仅需设置 `BYTEDESK_STORAGE_PROVIDER=local`，
+再运行 `./start.sh` 更新应用容器。
+
+Local、MinIO、RustFS 的完整切换步骤与历史文件迁移注意事项见
+[文件存储切换指南](./readme/readme.upload.md)。
+
 ## 常用命令
 
 ```bash
@@ -62,6 +73,11 @@ cp .env.example .env
 ./stop.sh middleware obs
 ./start.sh middleware logstash kibana
 ./stop.sh middleware logstash kibana down
+
+# 查看启动log
+docker logs -f bytedesk -n 100
+# 查看log目录
+sudo ls -lh /var/lib/docker/volumes/bytedesk_log_data/_data/
 ```
 
 ## 关键字速查

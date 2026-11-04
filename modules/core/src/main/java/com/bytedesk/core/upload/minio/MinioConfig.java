@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  * MinIO / RustFS / AWS S3 / 阿里云 OSS / 腾讯云 COS 等任意 S3 兼容后端）
  *
  * 启用条件见 {@link S3StorageEnabledCondition}：
- * bytedesk.storage.provider=s3 或旧键 bytedesk.minio.enabled=true
+ * bytedesk.storage.provider=s3
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -44,12 +44,12 @@ public class MinioConfig {
     @Bean
     public MinioClient getMinioClient() {
         log.info("初始化 S3 兼容对象存储客户端: endpoint={}, bucket={}", 
-                bytedeskProperties.getStorageEndpoint(), 
-                bytedeskProperties.getStorageBucketName());
+                bytedeskProperties.resolveStorageEndpoint(),
+                bytedeskProperties.resolveStorageBucketName());
         
         MinioClient minioClient = MinioClient.builder()
-                    .endpoint(bytedeskProperties.getStorageEndpoint())
-                    .credentials(bytedeskProperties.getStorageAccessKey(), bytedeskProperties.getStorageSecretKey())
+                    .endpoint(bytedeskProperties.resolveStorageEndpoint())
+                    .credentials(bytedeskProperties.resolveStorageAccessKey(), bytedeskProperties.resolveStorageSecretKey())
                     .build();
         
         log.info("S3 兼容对象存储客户端初始化成功");

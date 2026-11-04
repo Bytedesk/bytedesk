@@ -252,7 +252,6 @@ services:
       SPRING_CACHE_REDIS_USE_KEY_PREFIX: "true"
       SPRING_CACHE_REDIS_KEY_PREFIX: "bytedeskim:cache:"
       # Upload config
-      BYTEDESK_UPLOAD_TYPE: local
       BYTEDESK_UPLOAD_DIR: /app/uploads
       # 上传文件的访问地址，请修改为服务器实际的地址
       BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
@@ -277,13 +276,13 @@ services:
       # BYTEDESK_WATERMARK_MIN_IMAGE_SIZE: 100
       # BYTEDESK_WATERMARK_MAX_IMAGE_SIZE: 5000
       # MinIO配置（当使用MinIO时）
-      BYTEDESK_MINIO_ENABLED: "false"
-      BYTEDESK_MINIO_ENDPOINT: http://bytedesk-minio:9000  # Docker内部通信使用服务名
-      BYTEDESK_MINIO_ACCESS_KEY: minioadmin
-      BYTEDESK_MINIO_SECRET_KEY: minioadmin123
-      BYTEDESK_MINIO_BUCKET_NAME: bytedesk
-      BYTEDESK_MINIO_REGION: us-east-1
-      BYTEDESK_MINIO_SECURE: false
+      BYTEDESK_STORAGE_PROVIDER: local
+      BYTEDESK_STORAGE_ENDPOINT: http://bytedesk-minio:9000  # Docker内部通信使用服务名
+      BYTEDESK_STORAGE_ACCESS_KEY: minioadmin
+      BYTEDESK_STORAGE_SECRET_KEY: minioadmin123
+      BYTEDESK_STORAGE_BUCKET_NAME: bytedesk
+      BYTEDESK_STORAGE_REGION: us-east-1
+      BYTEDESK_STORAGE_SECURE: false
       # Knowledge base config
       # BYTEDESK_KBASE_THEME: default
       # # legacy keys (helpcenter defaults)

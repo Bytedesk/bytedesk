@@ -46,9 +46,15 @@ BYTEDESK_STORAGE_SECRET_KEY=rustfsadmin
 BYTEDESK_STORAGE_BUCKET_NAME=bytedesk
 ```
 
-或使用旧命名空间 `BYTEDESK_MINIO_ENABLED=true` + `BYTEDESK_MINIO_ENDPOINT=http://bytedesk-rustfs:9000` + 对应凭据（向下兼容，效果等同）。
+源码本地运行时在 `properties/<profile>/upload.properties` 中配置（宿主机端口 127.0.0.1:19000）。
 
-源码本地运行时在 `properties/<profile>/minio.properties` 中配置（宿主机端口 127.0.0.1:19000）。
+### 启动报错：No setter found for property: storage-access-key
+
+这是旧版本应用的配置绑定缺陷，不是 RustFS 连接或凭据校验失败。旧版计算 getter 与
+`BYTEDESK_STORAGE_*` 环境变量发生宽松绑定冲突，`storage-endpoint`、`storage-public-read`
+等字段也可能报同类错误。需重新构建并部署包含修复的应用镜像。
+
+请升级包含修复的应用镜像，再使用 `BYTEDESK_STORAGE_PROVIDER` 选择 local 或 s3；不要为绕过绑定错误盲目启用对象存储。
 
 ### 凭据说明
 
@@ -104,9 +110,16 @@ BYTEDESK_STORAGE_SECRET_KEY=rustfsadmin
 BYTEDESK_STORAGE_BUCKET_NAME=bytedesk
 ```
 
-Or use the legacy namespace `BYTEDESK_MINIO_ENABLED=true` + `BYTEDESK_MINIO_ENDPOINT=http://bytedesk-rustfs:9000` + credentials (backward compatible, equivalent).
+For local source runs, configure in `properties/<profile>/upload.properties` (host port 127.0.0.1:19000).
 
-For local source runs, configure in `properties/<profile>/minio.properties` (host port 127.0.0.1:19000).
+### Startup error: No setter found for property: storage-access-key
+
+This is a configuration binding defect in older application images, not a RustFS connection or
+authentication failure. Computed getters collide with relaxed binding of `BYTEDESK_STORAGE_*`;
+other fields such as `storage-endpoint` and `storage-public-read` can fail too.
+Rebuild and deploy an application image containing the fix.
+
+Upgrade to an image containing the fix, then select local or s3 with `BYTEDESK_STORAGE_PROVIDER`. Do not enable S3 merely to bypass binding.
 
 ### Credentials
 

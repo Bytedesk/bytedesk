@@ -13,16 +13,19 @@
  */
 package com.bytedesk.core.rbac.token;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-// import java.time.ZonedDateTime;
+import java.time.ZonedDateTime;
 // import java.time.Duration;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -33,10 +36,13 @@ import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.enums.PlatformEnum;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.BusinessConflictException;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
+import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.JwtUtils;
 
 import lombok.AllArgsConstructor;
@@ -353,6 +359,19 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
     }
 
     /**
+     * 恢复指定 uid 的 token：仅清除撤销标记，不修改 channel 等客户端信息。
+     */
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    public void restoreByUid(String uid) {
+        Optional<TokenEntity> optional = findByUid(uid);
+        if (optional.isPresent()) {
+            TokenEntity entity = optional.get();
+            entity.restore();
+            save(entity);
+        }
+    }
+
+    /**
      * 批量撤销指定用户在指定组织下的所有有效 token。
      * 成员被管理员禁用（forceLogout）时调用：使其在所有前端（admin/desktop/notebase/workflow 等）
      * 的现有会话立即失效——REST 鉴权失败返回 401、MQTT 重连被拒。
@@ -401,6 +420,142 @@ public class TokenRestService extends BaseRestService<TokenEntity, TokenRequest,
         // }
     }
 
-    
+    // ==================== 本人登录会话管理（self） ====================
+    // 口径：当前服务器 + 当前认证用户 + 当前组织 + BEARER + 未删除 + 未撤销 + 永久或未过期。
+    // 不接受请求中的 userUid/orgUid 扩展范围；所有写操作显式校验归属。
+
+    /**
+     * 分页查询本人当前组织的有效登录会话，固定 createdAt、uid 降序。
+     * totalElements 与列表使用同一 serverNow，是有效口径下的精确数量。
+     */
+    public TokenSelfPageResponse querySelfSessions(String currentAccessToken, int pageNumber, int pageSize) {
+        UserEntity currentUser = requireCurrentUser();
+        String orgUid = requireCurrentOrgUid(currentUser);
+
+        ZonedDateTime now = BdDateUtils.now();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize)
+                .withSort(Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("uid")));
+
+        Page<TokenEntity> page = tokenRepository.findValidSelfSessions(
+                currentUser.getUid(), orgUid, TokenTypeEnum.BEARER.name(), now, pageable);
+
+        // 当前凭证记录可能不在本页：单独按凭证查询归属内记录，判断 currentIncluded 与歧义
+        List<TokenEntity> currentRecords = tokenRepository
+                .findByAccessTokenAndUserUidAndOrgUidAndDeletedFalse(currentAccessToken, currentUser.getUid(), orgUid);
+        if (currentRecords.size() > 1) {
+            // 同凭证对应多条记录：无法确定唯一"本机"，按规划返回明确冲突而不是猜测
+            throw new BusinessConflictException(I18Consts.I18N_TOKEN_SELF_AMBIGUOUS_CURRENT);
+        }
+
+        boolean currentIncluded = false;
+        String currentUid = currentRecords.isEmpty() ? null : currentRecords.get(0).getUid();
+        List<TokenSelfResponse> content = page.getContent().stream()
+                .map(entity -> {
+                    boolean isCurrent = entity.getUid().equals(currentUid);
+                    return TokenSelfResponse.fromEntity(entity, isCurrent, now);
+                })
+                .toList();
+        if (currentUid != null) {
+            // currentIncluded 表示"当前凭证在归属内唯一匹配到一条记录"（身份已确认），
+            // 与该记录是否恰好落在当前页无关：totalElements 已包含该记录，
+            // 首页用 pageSize=1 计数时当前记录通常不在本页，不能据此判 false。
+            currentIncluded = true;
+        }
+
+        return TokenSelfPageResponse.builder()
+                .content(content)
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .number(page.getNumber())
+                .size(page.getSize())
+                .currentIncluded(currentIncluded)
+                .asOf(now)
+                .build();
+    }
+
+    /**
+     * 查询本人某条登录会话详情（允许已撤销/已过期，用于展示最终状态）。
+     * 不存在、已删除、他人或其他组织的 UID 统一返回未找到，不泄露目标是否存在。
+     */
+    public TokenSelfResponse querySelfSessionByUid(String currentAccessToken, String uid) {
+        UserEntity currentUser = requireCurrentUser();
+        String orgUid = requireCurrentOrgUid(currentUser);
+
+        TokenEntity entity = tokenRepository
+                .findByUidAndUserUidAndOrgUidAndDeletedFalse(uid, currentUser.getUid(), orgUid)
+                .orElseThrow(() -> new NotFoundException(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID));
+
+        if (!TokenTypeEnum.BEARER.name().equals(entity.getType())) {
+            // 非登录凭证不允许作为本人会话详情访问
+            throw new NotFoundException(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID);
+        }
+
+        // 详情不依赖分页过滤，直接对比当前凭证判断 isCurrent
+        boolean isCurrent = StringUtils.hasText(currentAccessToken)
+                && currentAccessToken.equals(entity.getAccessToken());
+        return TokenSelfResponse.fromEntity(entity, isCurrent, BdDateUtils.now());
+    }
+
+    /**
+     * 撤销本人其他登录会话：
+     * - 校验目标归属本人当前组织，越界/不存在统一未找到；
+     * - 撤销当前会话返回冲突（请走正常登出）；
+     * - 已撤销的其他会话重复提交按幂等成功返回；
+     * - 已过期/无效记录不再报新的撤销成功。
+     */
+    @Transactional
+    @CacheEvict(cacheNames = "token", allEntries = true)
+    public TokenSelfResponse revokeSelfSession(String currentAccessToken, String uid, String channel) {
+        UserEntity currentUser = requireCurrentUser();
+        String orgUid = requireCurrentOrgUid(currentUser);
+
+        TokenEntity entity = tokenRepository
+                .findByUidAndUserUidAndOrgUidAndDeletedFalse(uid, currentUser.getUid(), orgUid)
+                .orElseThrow(() -> new NotFoundException(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID));
+
+        if (!TokenTypeEnum.BEARER.name().equals(entity.getType())) {
+            throw new NotFoundException(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID);
+        }
+
+        if (StringUtils.hasText(currentAccessToken)
+                && currentAccessToken.equals(entity.getAccessToken())) {
+            throw new BusinessConflictException(I18Consts.I18N_TOKEN_SELF_CURRENT_PROTECTED);
+        }
+
+        ZonedDateTime now = BdDateUtils.now();
+        if (Boolean.TRUE.equals(entity.getRevoked())) {
+            // 幂等：已撤销的其他会话重复提交仍返回当前（已撤销）状态
+            return TokenSelfResponse.fromEntity(entity, false, now);
+        }
+
+        if (TokenSelfResponse.statusOf(entity, now) != TokenSelfStatusEnum.VALID) {
+            // 已过期/异常记录：不产生新的撤销成功
+            throw new BusinessConflictException(I18Consts.I18N_TOKEN_SELF_NOT_REVOKABLE);
+        }
+
+        String reason = String.format("revoked by self (channel=%s)",
+                StringUtils.hasText(channel) ? channel : "unknown");
+        entity.revoke(reason);
+        TokenEntity saved = save(entity);
+        log.info("Self session revoked: operator={}, targetUid={}, org={}, channel={}",
+                currentUser.getUid(), uid, orgUid, channel);
+        return TokenSelfResponse.fromEntity(saved, false, now);
+    }
+
+    private UserEntity requireCurrentUser() {
+        UserEntity user = authService.getCurrentUser();
+        if (user == null || !StringUtils.hasText(user.getUid())) {
+            throw new NotFoundException(I18Consts.I18N_TOKEN_NOT_FOUND_FOR_UID);
+        }
+        return user;
+    }
+
+    private String requireCurrentOrgUid(UserEntity user) {
+        String orgUid = user.getOrgUid();
+        if (!StringUtils.hasText(orgUid)) {
+            throw new BusinessConflictException(I18Consts.I18N_ORG_UID_REQUIRED);
+        }
+        return orgUid;
+    }
 
 }

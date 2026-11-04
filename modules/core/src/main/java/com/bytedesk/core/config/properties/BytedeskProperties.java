@@ -371,9 +371,6 @@ public class BytedeskProperties implements EnvironmentAware {
     // 腾讯云配置
     private Tencent tencent = new Tencent();
 
-    // MinIO 配置（兼容别名，推荐使用 storage 命名空间）
-    private Minio minio = new Minio();
-
     // S3 兼容对象存储配置（MinIO / RustFS / AWS S3 / OSS / COS 等任意 S3 兼容后端）
     private Storage storage = new Storage();
 
@@ -602,7 +599,6 @@ public class BytedeskProperties implements EnvironmentAware {
     @Getter
     @Setter
     public static class Upload {
-        private String type;
         private String dir;
         private String url;
     }
@@ -676,39 +672,25 @@ public class BytedeskProperties implements EnvironmentAware {
         private String notifyUrl;
     }
 
-    @Getter
-    @Setter
-    public static class Minio {
-        private Boolean enabled = false;
-        private String endpoint = "http://127.0.0.1:19000";
-        private String accessKey = "minioadmin";
-        private String secretKey = "minioadmin123";
-        private String bucketName = "bytedesk";
-        private String region = "us-east-1";
-        private Boolean secure = false;
-    }
-
     /**
-     * S3 兼容对象存储统一配置（推荐命名空间，向下兼容 bytedesk.minio.*）
+     * S3 兼容对象存储统一配置
      *
-     * provider=local（默认）：本地磁盘存储，行为与 minio.enabled=false 一致
+     * provider=local（默认）：本地磁盘存储
      * provider=s3：启用 S3 兼容后端（MinIO / RustFS / AWS S3 / 阿里云 OSS / 腾讯云 COS 等）
-     *
-     * 字段解析优先级：storage.* 显式配置优先；未配置时回落到 minio.* 旧键，存量部署零改动
      */
     @Getter
     @Setter
     public static class Storage {
-        /** local | s3，s3 = 任意 S3 兼容后端；默认 null 表示未配置，回落 minio.enabled 判定 */
-        private String provider;
-        private String endpoint;
+        /** local | s3，s3 = 任意 S3 兼容后端 */
+        private String provider = "local";
+        private String endpoint = "http://127.0.0.1:19000";
         private String accessKey;
         private String secretKey;
-        private String bucketName;
-        private String region;
-        private Boolean secure;
+        private String bucketName = "bytedesk";
+        private String region = "us-east-1";
+        private Boolean secure = false;
         /** 是否对桶设置公开读策略（默认 true 保持存量行为）；false 时跳过策略并改用预签名直链 */
-        private Boolean publicRead;
+        private Boolean publicRead = true;
         /** 预签名 URL 有效期（天），SigV4 协议上限 7 天；仅 public-read=false 时生效 */
         private Integer presignedExpiryDays = 7;
     }
@@ -811,10 +793,6 @@ public class BytedeskProperties implements EnvironmentAware {
         return cache.getRedisStreamKey();
     }
 
-    public String getUploadType() {
-        return upload.getType();
-    }
-
     public String getUploadDir() {
         return upload.getDir();
     }
@@ -851,23 +829,14 @@ public class BytedeskProperties implements EnvironmentAware {
         return kbase.getApiUrl();
     }
 
-    public Boolean getMinioEnabled() {
-        return minio.getEnabled();
-    }
-
-    // ==================== S3 兼容对象存储统一判定（storage.* 优先，minio.* 兜底） ====================
+    // ==================== S3 兼容对象存储统一判定 ====================
 
     /** storage.provider 取值：s3（任意 S3 兼容后端） */
     private static final String PROVIDER_S3 = "s3";
 
-    /** S3 兼容存储是否启用：bytedesk.storage.provider=s3 或旧键 bytedesk.minio.enabled=true 任一成立 */
+    /** S3 兼容存储仅在 bytedesk.storage.provider=s3 时启用 */
     public boolean isS3StorageEnabled() {
-        return isStorageProviderS3() || Boolean.TRUE.equals(minio.getEnabled());
-    }
-
-    /** 是否显式启用新命名空间（storage.provider=s3）；仅此时 storage.* 字段才优先于 minio.* */
-    private boolean isStorageProviderS3() {
-        return PROVIDER_S3.equalsIgnoreCase(storage.getProvider() == null ? "" : storage.getProvider());
+        return PROVIDER_S3.equalsIgnoreCase(storage.getProvider());
     }
 
     /** 当前存储 provider 描述，用于日志 */
@@ -878,36 +847,34 @@ public class BytedeskProperties implements EnvironmentAware {
         return "s3";
     }
 
-    public String getStorageEndpoint() {
-        return isStorageProviderS3() && hasText(storage.getEndpoint()) ? storage.getEndpoint() : getMinioEndpoint();
+    // Computed values must not be JavaBean properties: relaxed environment binding also matches them.
+    public String resolveStorageEndpoint() {
+        return storage.getEndpoint();
     }
 
-    public String getStorageAccessKey() {
-        return isStorageProviderS3() && hasText(storage.getAccessKey()) ? storage.getAccessKey() : getMinioAccessKey();
+    public String resolveStorageAccessKey() {
+        return storage.getAccessKey();
     }
 
-    public String getStorageSecretKey() {
-        return isStorageProviderS3() && hasText(storage.getSecretKey()) ? storage.getSecretKey() : getMinioSecretKey();
+    public String resolveStorageSecretKey() {
+        return storage.getSecretKey();
     }
 
-    public String getStorageBucketName() {
-        return isStorageProviderS3() && hasText(storage.getBucketName()) ? storage.getBucketName() : getMinioBucketName();
+    public String resolveStorageBucketName() {
+        return storage.getBucketName();
     }
 
-    public String getStorageRegion() {
-        return isStorageProviderS3() && hasText(storage.getRegion()) ? storage.getRegion() : getMinioRegion();
+    public String resolveStorageRegion() {
+        return storage.getRegion();
     }
 
-    public Boolean getStorageSecure() {
-        return isStorageProviderS3() && storage.getSecure() != null ? storage.getSecure() : getMinioSecure();
+    public Boolean resolveStorageSecure() {
+        return storage.getSecure();
     }
 
     /** 是否对桶设置公开读策略（默认 true 保持存量行为） */
-    public boolean isStoragePublicRead() {
-        if (isStorageProviderS3() && storage.getPublicRead() != null) {
-            return storage.getPublicRead();
-        }
-        return true;
+    public boolean resolveStoragePublicRead() {
+        return Boolean.TRUE.equals(storage.getPublicRead());
     }
 
     /** 预签名 URL 有效期（秒），SigV4 上限 7 天 */
@@ -924,34 +891,6 @@ public class BytedeskProperties implements EnvironmentAware {
 
     public Storage getStorage() {
         return storage;
-    }
-
-    private static boolean hasText(String text) {
-        return text != null && !text.trim().isEmpty();
-    }
-
-    public String getMinioEndpoint() {
-        return minio.getEndpoint();
-    }
-
-    public String getMinioAccessKey() {
-        return minio.getAccessKey();
-    }
-
-    public String getMinioSecretKey() {
-        return minio.getSecretKey();
-    }
-
-    public String getMinioBucketName() {
-        return minio.getBucketName();
-    }
-
-    public String getMinioRegion() {
-        return minio.getRegion();
-    }
-
-    public Boolean getMinioSecure() {
-        return minio.getSecure();
     }
 
     /**

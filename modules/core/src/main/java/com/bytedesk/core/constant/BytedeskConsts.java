@@ -42,7 +42,6 @@ public class BytedeskConsts {
     public static final String DEFAULT_UNIFIED_UID = "df_un_uid";
     public static final String DEFAULT_AGENT_UID = "df_ag_uid";
     public static final String DEFAULT_WORKGROUP_UID = "df_wg_uid"; // 默认工作组uid
-    public static final String DEFAULT_WORKGROUP_UID_BOOKING = "df_wg_booking"; // booking 场景工作组uid
     public static final String DEFAULT_WORKGROUP_UID_PRESALES = "df_wg_presales"; // 售前
     public static final String DEFAULT_WORKGROUP_UID_AFTERSALES = "df_wg_aftersales"; // 售后
     public static final String DEFAULT_WORKGROUP_UID_TICKET = "df_wg_ticket"; // 工单
@@ -67,7 +66,6 @@ public class BytedeskConsts {
     public static final String DEFAULT_INTENT_CLASSIFICATION_ASSISTANT_UID = "df_ica_uid"; // 默认意图分类助手uid
     public static final String DEFAULT_INTENT_REWRITE_ASSISTANT_UID = "df_ira_uid"; // 默认意图改写助手uid
     public static final String DEFAULT_EMOTION_ASSISTANT_UID = "df_ea_uid"; // 默认情绪助手uid
-    public static final String DEFAULT_AIRLINE_BOOKING_ASSISTANT_UID = "df_aba_uid"; // 默认航班预订助手uid
     public static final String DEFAULT_CHANNEL_UID = "df_ch_uid"; // 默认渠道uid
     public static final String DEFAULT_AGENT_ASSISTANT_UID = "df_as_uid"; // 默认客服助手uid
     public static final String DEFAULT_SYSTEM_UID = "df_sys_uid"; // 默认系统用户uid

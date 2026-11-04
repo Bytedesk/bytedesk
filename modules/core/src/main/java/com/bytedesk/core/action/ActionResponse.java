@@ -44,6 +44,9 @@ public class ActionResponse extends BaseResponse {
     // according to ip address
     private String ipLocation;
 
+    // client channel, e.g. WEB_ADMIN
+    private String channel;
+
     private String type;
     
     private String extra;

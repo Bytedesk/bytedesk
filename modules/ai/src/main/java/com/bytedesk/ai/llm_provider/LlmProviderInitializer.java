@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Component;
 
 import com.bytedesk.ai.llm_model.LlmModelJsonLoader;
@@ -131,7 +132,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
      * 组织级供应商初始化：把 PRODUCTION 供应商幂等复制到每个组织。
      * 必须按 type + level + orgUid 精确查询当前组织的记录：
      * 1. 不能调用不含 orgUid 的列表查询后取第一条，否则会跨组织加载并可能更新到其他组织的记录；
-     * 2. Optional 精确查询遇到重复记录会抛错，显式暴露数据问题，而不是随机取第一条；
+     * 2. Optional 精确查询遇到重复记录时跳过该组织，避免错误选择配置并阻断整个应用启动；
      * 3. 状态未变化时不写库，避免每次重启都产生无意义的更新。
      */
     private void initOrganizationProviders(Map<String, ProviderJson> providerJsonMap) {
@@ -154,6 +155,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         int created = 0;
         int updated = 0;
         int skipped = 0;
+        int conflicts = 0;
         for (Map.Entry<String, ProviderJson> entry : productionProviderMap.entrySet()) {
             String providerType = entry.getKey();
             ProviderJson providerJson = entry.getValue();
@@ -178,8 +180,11 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                             skipped++;
                         }
                     }
+                } catch (IncorrectResultSizeDataAccessException e) {
+                    conflicts++;
+                    log.error("llm provider '{}' init skipped for organization {} due to duplicate active records: {}",
+                            providerType, orgUid, e.getMessage());
                 } catch (RuntimeException e) {
-                    // 不吞异常：记录失败上下文后继续抛出，让启动失败而不是假装初始化成功
                     log.error("llm provider '{}' init failed for organization {}", providerType, orgUid, e);
                     throw e;
                 }
@@ -192,8 +197,8 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
             log.info("llm provider '{}' init finished in {} ms", providerType,
                     System.currentTimeMillis() - typeStartMillis);
         }
-        log.info("llm provider organization init finished: created={}, updated={}, skipped={}, elapsed {} ms",
-                created, updated, skipped, System.currentTimeMillis() - startMillis);
+        log.info("llm provider organization init finished: created={}, updated={}, skipped={}, conflicts={}, elapsed {} ms",
+                created, updated, skipped, conflicts, System.currentTimeMillis() - startMillis);
     }
 
 }

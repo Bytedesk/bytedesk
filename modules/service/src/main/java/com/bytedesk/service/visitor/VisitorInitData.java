@@ -5,9 +5,7 @@ import java.util.List;
 public class VisitorInitData {
 
 	/**
-	 * 演示访客唯一数据源：modules/service 演示访客、enterprise/ai booking 演示数据（initBookings）、
-	 * 前端 agentdemos 演示用户预设（frontend/apps/agentdemos/src/types/demo-user.ts）均以此为对齐基准。
-	 * 注意：nickname 为 booking 演示按姓名匹配预订的业务键，必须跨语言固定，不能随 locale 变化。
+	 * 演示访客初始化数据。
 	 */
 	public static List<VisitorRequest> getDemoVisitors(String orgUid) {
 		return List.of(

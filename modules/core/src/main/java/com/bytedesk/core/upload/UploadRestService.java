@@ -418,9 +418,9 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	private String extractMinioObjectPath(String fileUrl) {
 		String normalized = fileUrl == null ? null : fileUrl.trim();
-		String endpoint = trimTrailingSlash(bytedeskProperties.getStorageEndpoint());
-		String bucket = bytedeskProperties.getStorageBucketName() == null ? null
-				: bytedeskProperties.getStorageBucketName().trim();
+		String endpoint = trimTrailingSlash(bytedeskProperties.resolveStorageEndpoint());
+		String bucket = bytedeskProperties.resolveStorageBucketName() == null ? null
+				: bytedeskProperties.resolveStorageBucketName().trim();
 		if (normalized == null || normalized.isEmpty() || !StringUtils.hasText(endpoint) || !StringUtils.hasText(bucket)) {
 			return null;
 		}

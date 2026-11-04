@@ -71,6 +71,9 @@ public class JwtUtils {
         // 根据渠道类型计算过期时间
         long expirationMs = calculateExpirationMs(channel, permanent);
 
+        // 注意：access_token 数据库列为 varchar(255)，当前 JWT 长度约 200 字符，
+        // 禁止在此添加 jti 等额外 claim（加 36 位 UUID 会达到 256 字符导致登录插入失败）。
+        // 同秒内重复登录可能生成相同凭证，由 TokenRestService 的同凭证歧义校验兜底。
         return Jwts.builder()
                 .subject(jwtSubject.toJson())
                 .issuedAt(new Date())

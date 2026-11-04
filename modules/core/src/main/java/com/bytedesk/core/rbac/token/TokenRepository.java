@@ -113,6 +113,37 @@ public interface TokenRepository extends JpaRepository<TokenEntity, Long>, JpaSp
             @Param("threshold") ZonedDateTime threshold);
 
     /**
+     * 按归属（本人 + 当前组织）分页查询有效登录会话（BEARER、未撤销、未删除、永久或未过期）。
+     * 有效性过滤在数据库/查询层完成，保证分页 totalElements 即精确的有效会话数。
+     */
+    @Query("""
+            select t from TokenEntity t
+             where t.userUid = :userUid
+               and t.orgUid = :orgUid
+               and t.type = :type
+               and t.revoked = false
+               and t.deleted = false
+               and (t.permanent = true or (t.expiresAt is not null and t.expiresAt > :now))
+            """)
+    Page<TokenEntity> findValidSelfSessions(@Param("userUid") String userUid,
+            @Param("orgUid") String orgUid,
+            @Param("type") String type,
+            @Param("now") ZonedDateTime now,
+            Pageable pageable);
+
+    /**
+     * 按 uid 查询本人会话详情（含已撤销/已过期状态），供详情页展示最终状态。
+     */
+    Optional<TokenEntity> findByUidAndUserUidAndOrgUidAndDeletedFalse(String uid, String userUid, String orgUid);
+
+    /**
+     * 按 accessToken 查询同一归属下的全部记录。当前凭证可能对应多条记录（历史数据歧义），
+     * 返回列表由服务端判断是否存在身份歧义。
+     */
+    List<TokenEntity> findByAccessTokenAndUserUidAndOrgUidAndDeletedFalse(String accessToken,
+            String userUid, String orgUid);
+
+    /**
      * 批量撤销指定用户在指定组织下所有未撤销的 token（成员被禁用时调用，
      * 使其所有前端会话立即失效：REST 鉴权 401、MQTT 重连失败）。
      * JPQL bulk update 绕过 @Version，这里为刻意为之。

@@ -184,7 +184,6 @@ services:
       # Upload config
       # Final file URL = BYTEDESK_UPLOAD_URL + '/' + last segment of BYTEDESK_UPLOAD_DIR + generated relative path. 完整文件访问地址由上传 URL、目录最后一级和系统生成路径组成。
       # ===============================
-      BYTEDESK_UPLOAD_TYPE: local
       BYTEDESK_UPLOAD_DIR: /app/uploads
       BYTEDESK_UPLOAD_URL: ${BYTEDESK_UPLOAD_URL:-http://127.0.0.1:9003}
       # Maximum file size in bytes; default is 10MB. 最大文件大小，单位字节。
@@ -196,30 +195,19 @@ services:
       BYTEDESK_UPLOAD_SECURITY_ENABLE_UPLOAD_LOG: "true"
       BYTEDESK_UPLOAD_SECURITY_ENABLE_VIRUS_SCAN: "false"
       # ===============================
-      # MinIO object storage config
-      # Keep this disabled when using local storage only. 仅使用本地存储时保持关闭。
-      # 需先启动 MinIO：./start.sh all minio，再在 .env 中设置 BYTEDESK_MINIO_ENABLED=true
-      # ===============================
-      BYTEDESK_MINIO_ENABLED: ${BYTEDESK_MINIO_ENABLED:-false}
-      BYTEDESK_MINIO_ENDPOINT: ${BYTEDESK_MINIO_ENDPOINT:-http://bytedesk-minio:9000}
-      BYTEDESK_MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
-      BYTEDESK_MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
-      BYTEDESK_MINIO_BUCKET_NAME: ${BYTEDESK_MINIO_BUCKET_NAME:-bytedesk}
-      BYTEDESK_MINIO_REGION: us-east-1
-      BYTEDESK_MINIO_SECURE: false
-      # ===============================
-      # S3-compatible object storage config（推荐命名空间，MinIO / RustFS / AWS S3 / OSS / COS）
-      # 设 BYTEDESK_STORAGE_PROVIDER=s3 启用；未显式配置的 storage 字段自动回落上方 BYTEDESK_MINIO_*
+      # S3-compatible object storage config（MinIO / RustFS / AWS S3 / OSS / COS）
+      # 默认 local 使用本地存储；设 BYTEDESK_STORAGE_PROVIDER=s3 启用对象存储
       # RustFS 部署：./start.sh all rustfs，并设 BYTEDESK_STORAGE_PROVIDER=s3 + ENDPOINT=http://bytedesk-rustfs:9000
       # ===============================
-      BYTEDESK_STORAGE_PROVIDER: ${BYTEDESK_STORAGE_PROVIDER:-}
+      BYTEDESK_STORAGE_PROVIDER: ${BYTEDESK_STORAGE_PROVIDER:-local}
       BYTEDESK_STORAGE_ENDPOINT: ${BYTEDESK_STORAGE_ENDPOINT:-http://bytedesk-rustfs:9000}
-      BYTEDESK_STORAGE_ACCESS_KEY: ${BYTEDESK_STORAGE_ACCESS_KEY:-rustfsadmin}
-      BYTEDESK_STORAGE_SECRET_KEY: ${BYTEDESK_STORAGE_SECRET_KEY:-rustfsadmin}
+      BYTEDESK_STORAGE_ACCESS_KEY: ${BYTEDESK_STORAGE_ACCESS_KEY:-}
+      BYTEDESK_STORAGE_SECRET_KEY: ${BYTEDESK_STORAGE_SECRET_KEY:-}
       BYTEDESK_STORAGE_BUCKET_NAME: ${BYTEDESK_STORAGE_BUCKET_NAME:-bytedesk}
-      BYTEDESK_STORAGE_REGION: us-east-1
-      BYTEDESK_STORAGE_SECURE: "false"
+      BYTEDESK_STORAGE_REGION: ${BYTEDESK_STORAGE_REGION:-us-east-1}
+      BYTEDESK_STORAGE_SECURE: ${BYTEDESK_STORAGE_SECURE:-false}
       BYTEDESK_STORAGE_PUBLIC_READ: ${BYTEDESK_STORAGE_PUBLIC_READ:-true}
+      BYTEDESK_STORAGE_PRESIGNED_EXPIRY_DAYS: ${BYTEDESK_STORAGE_PRESIGNED_EXPIRY_DAYS:-7}
       # ===============================
       # File preview config（Office 转 PDF，企业版功能，社区版镜像不含此功能）
       # 官方镜像已精简（不含 LibreOffice）。Docker 部署开启预览：./start.sh gotenberg 启动转换 sidecar，

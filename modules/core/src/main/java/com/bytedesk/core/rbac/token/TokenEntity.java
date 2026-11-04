@@ -116,6 +116,12 @@ public class TokenEntity extends BaseEntity {
         this.revokeReason = reason;
     }
 
+    // 恢复token：仅清除撤销标记与原因，不改动其他字段
+    public void restore() {
+        this.revoked = false;
+        this.revokeReason = null;
+    }
+
     // 刷新token过期时间
     public void refresh(ZonedDateTime newExpiresAt) {
         this.expiresAt = newExpiresAt;
