@@ -34,7 +34,7 @@ import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
  * DashScope 协议（DashscopeChatConfig）相互独立。</p>
  */
 @Configuration
-@ConditionalOnProperty(prefix = "spring.ai.aliyun_openai.chat", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "spring.ai.aliyun_openai.chat", name = "enabled", havingValue = "true", matchIfMissing = false)
 public class SpringAIAliyunOpenaiChatConfig {
 
     @Value("${spring.ai.aliyun_openai.base-url:https://llm-l33c9v25gxaavg8k.cn-beijing.maas.aliyuncs.com/compatible-mode/v1}")

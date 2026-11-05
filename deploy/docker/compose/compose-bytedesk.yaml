@@ -365,8 +365,8 @@ services:
       # AI provider and model selection
       # Select default providers first, then configure API keys and model options for the providers you actually use. 先选择默认 provider，再为实际使用的 provider 配置密钥和模型参数。
       # ===============================
-      SPRING_AI_MODEL_CHAT: none
-      SPRING_AI_MODEL_EMBEDDING: none
+      SPRING_AI_MODEL_CHAT: ${SPRING_AI_MODEL_CHAT:-none}
+      SPRING_AI_MODEL_EMBEDDING: ${SPRING_AI_MODEL_EMBEDDING:-none}
       SPRING_AI_MODEL_VISION: none
       SPRING_AI_MODEL_AUDIO: none
       SPRING_AI_MODEL_AUDIO_SPEECH: none
@@ -516,6 +516,12 @@ services:
       SPRING_AI_MCP_SERVER_STDIO: "false"
       SPRING_AI_MCP_SERVER_TYPE: SYNC
       SPRING_AI_VECTORSTORE_WEAVIATE_ENABLED: "false"
+      #
+      # Aliyun Bailian OpenAI-compatible mode / 阿里云百炼 OpenAI 兼容模式
+      # 镜像内默认启用（matchIfMissing=true），会创建 aliyunOpenaiChatClient；
+      # 未配置模型（SPRING_AI_MODEL_CHAT=none）时需禁用，否则 PromptTestController
+      # 因缺少 ElasticsearchVectorStore（依赖 EmbeddingModel）而启动失败
+      SPRING_AI_ALIYUN_OPENAI_CHAT_ENABLED: ${SPRING_AI_ALIYUN_OPENAI_CHAT_ENABLED:-false}
       # 
       LOGGING_LEVEL_COM_BYTEDESK_AI: WARN
       LOGGING_LEVEL_COM_BYTEDESK_CORE: WARN
