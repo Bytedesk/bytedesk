@@ -412,6 +412,7 @@ public class TicketService {
                 case "hold" -> holdWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
                 case "resume" -> resumeWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
                 case "close" -> closeWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
+                case "forceClose" -> forceCloseWorkflowTask(ticket, task, request, operatorUid, runtimeContext);
                 case "delegate" -> delegateTicket(request);
                 case "delegateResolve" -> resolveDelegatedTicket(request);
                 case "cc" -> ccTicket(request);
@@ -452,7 +453,14 @@ public class TicketService {
         boolean assignedToOperator = StringUtils.hasText(effectiveAssignee)
                 && Objects.equals(effectiveAssignee, operatorUid);
         boolean unassigned = !StringUtils.hasText(effectiveAssignee);
-        boolean actionable = assignedToOperator || unassigned;
+        // 报告人节点（如 customerVerify）任务归属访客，但客服侧可对 RESOLVED 工单执行强制关单：
+        // 任务对操作者虽非"归属/未分配"，仍视为 actionable，动作集仅含 FORCE_CLOSE
+        String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
+        boolean agentForceCloseEligible = !assignedToOperator && !unassigned
+                && TicketStatusEnum.RESOLVED.name().equals(ticket.getStatus())
+                && !Objects.equals(operatorUid, reporterUid)
+                && isReporterOwnedNode(flowgramSchema, task.getTaskDefinitionKey());
+        boolean actionable = assignedToOperator || unassigned || agentForceCloseEligible;
 
         return TicketWorkflowTaskResponse.builder()
                 .ticketUid(ticket.getUid())
@@ -465,9 +473,28 @@ public class TicketService {
                 .nodeType(nodeType)
                 .nodeTitle(nodeTitle)
                 .actionable(actionable)
-                .actions(actionable ? buildWorkflowActions(ticket, task, node, nodeTitle, unassigned,
-                        hasVerifiedGatewayAfterNode(flowgramSchema, task.getTaskDefinitionKey())) : List.of())
+                .actions(actionable
+                        ? agentForceCloseEligible && !assignedToOperator && !unassigned
+                                ? buildAgentForceCloseWorkflowActions(task)
+                                : buildWorkflowActions(ticket, task, node, nodeTitle, unassigned,
+                                        hasVerifiedGatewayAfterNode(flowgramSchema, task.getTaskDefinitionKey()))
+                        : List.of())
                 .build();
+    }
+
+    /**
+     * 报告人节点（等待访客验证）任务的客服侧动作集：仅强制关单。
+     * 访客侧（operator=reporter）走 buildVerifiedWorkflowActions，不会进入此分支。
+     */
+    private List<TicketWorkflowActionResponse> buildAgentForceCloseWorkflowActions(Task task) {
+        return List.of(TicketWorkflowActionResponse.builder()
+                .key("FORCE_CLOSE")
+                .label(I18TicketConsts.I18N_TICKET_ACTION_FORCE_CLOSE)
+                .type("forceClose")
+                .taskId(task.getId())
+                .taskDefinitionKey(task.getTaskDefinitionKey())
+                .danger(true)
+                .build());
     }
 
     private List<TicketWorkflowActionResponse> buildWorkflowActions(TicketEntity ticket, Task task, JSONObject node,
@@ -637,6 +664,7 @@ public class TicketService {
             case "COMPLETE" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_TASK;
             case "COMPLETE_VERIFIED" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_VERIFIED;
             case "COMPLETE_REJECTED" -> I18TicketConsts.I18N_TICKET_ACTION_COMPLETE_REJECTED;
+            case "FORCE_CLOSE" -> I18TicketConsts.I18N_TICKET_ACTION_FORCE_CLOSE;
             case "HOLD" -> I18TicketConsts.I18N_TICKET_ACTION_HOLD;
             case "RESUME" -> I18TicketConsts.I18N_TICKET_ACTION_RESUME;
             case "CLOSE" -> I18TicketConsts.I18N_TICKET_ACTION_CLOSE;
@@ -651,6 +679,7 @@ public class TicketService {
             case "TRANSFER" -> "transfer";
             case "TRANSFER_DEPARTMENT" -> "transferDepartment";
             case "COMPLETE", "COMPLETE_VERIFIED", "COMPLETE_REJECTED" -> "complete";
+            case "FORCE_CLOSE" -> "forceClose";
             case "HOLD" -> "hold";
             case "RESUME" -> "resume";
             case "CLOSE" -> "close";
@@ -697,7 +726,12 @@ public class TicketService {
         // availableActions configuration.
         boolean isHoldingResume = "RESUME".equals(actionKey)
                 && TicketStatusEnum.HOLDING.name().equals(ticket.getStatus());
-        if (availableActions != null && !availableActions.isEmpty() && actionConfig == null && !isHoldingResume) {
+        // FORCE_CLOSE 是系统级注入动作（buildAgentForceCloseWorkflowActions），
+        // 同样不需要出现在节点配置的 availableActions 中
+        boolean isAgentForceClose = "FORCE_CLOSE".equals(actionKey)
+                && isReporterOwnedNode(flowgramSchema, task.getTaskDefinitionKey());
+        if (availableActions != null && !availableActions.isEmpty() && actionConfig == null
+                && !isHoldingResume && !isAgentForceClose) {
             throw new RuntimeException("workflow action is not configured on current task: " + actionKey);
         }
         String actionType = actionConfig != null && StringUtils.hasText(actionConfig.getString("type"))
@@ -1066,6 +1100,55 @@ public class TicketService {
         taskService.complete(task.getId(), variables);
 
         ticket.setStatus(targetStatus);
+    }
+
+    /**
+     * 客服强制关单：工单处于 RESOLVED（等待访客验证）且活动任务为报告人节点时，
+     * 由客服代替访客确认解决并终结流程。访客长期未确认时客服可主动关单，
+     * 与 SLA 超时自动验证/自动关单互为补充。
+     */
+    private void forceCloseWorkflowTask(TicketEntity ticket, Task task, TicketRequest request, String operatorUid,
+            TicketWorkflowRuntimeContext runtimeContext) {
+        // 1. 状态守卫：仅等待访客验证阶段可强制关单
+        if (!TicketStatusEnum.RESOLVED.name().equals(ticket.getStatus())) {
+            throw new RuntimeException("工单状态为" + ticket.getStatus() + "，不能强制关单: " + ticket.getUid());
+        }
+        // 2. 任务守卫：仅报告人节点（customerVerify / assigneeType=reporter）可用，
+        //    防止动作 key 被用于处理人等其他节点绕过 closeWorkflowTask 的归属校验
+        if (!isReporterOwnedNode(runtimeContext.flowgramSchema(), task.getTaskDefinitionKey())) {
+            throw new RuntimeException("当前任务不是报告人验证节点，不能强制关单: " + task.getTaskDefinitionKey());
+        }
+        // 3. 操作者守卫：报告人本人应走 COMPLETE_VERIFIED 自助确认，不使用强制关单
+        String reporterUid = ticket.getReporter() != null ? ticket.getReporter().getUid() : null;
+        if (Objects.equals(operatorUid, reporterUid)) {
+            throw new RuntimeException("工单报告人请使用确认解决，无需强制关单: " + ticket.getUid());
+        }
+
+        // 4. 完成报告人任务并按已解决分支推进流程（默认流程经 verifyGateway 走 end）
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("verified", true);
+        variables.put("forceClosed", true);
+        variables.put("forceClosedBy", operatorUid);
+        variables.put("forceClosedTime", new Date());
+        variables.put(TicketConsts.TICKET_VARIABLE_STATUS, TicketStatusEnum.CLOSED.name());
+        if (StringUtils.hasText(request.getProcessComment())) {
+            variables.put("processComment", request.getProcessComment());
+        }
+        addTaskComment(task, ticket, operatorUid, TicketStatusEnum.CLOSED.name(),
+                "客服强制关闭工单（访客未确认）" + buildCommentSuffix(request));
+        taskService.complete(task.getId(), variables);
+
+        // 5. 状态同步：优先 CLOSED；自定义流程报告人节点后仍有后续任务时回退 PROCESSING
+        ticket.setStatus(TicketStatusEnum.CLOSED.name());
+        ticket.setVerified(true);
+        List<Task> nextTasks = taskService.createTaskQuery()
+                .processInstanceId(ticket.getProcessInstanceId())
+                .active()
+                .list();
+        if (nextTasks != null && !nextTasks.isEmpty()) {
+            ticket.setStatus(TicketStatusEnum.PROCESSING.name());
+            ticketAssignmentService.autoAssignForNextNode(ticket, ticket.getProcessInstanceId());
+        }
     }
 
     private void syncTicketThreadAssignee(TicketEntity ticket, UserProtobuf assignee, MemberEntity member) {

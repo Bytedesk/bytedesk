@@ -13,13 +13,10 @@
  */
 package com.bytedesk.core.rbac.organization;
 
-import java.util.Optional;
-
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.stereotype.Component;
 
-import com.bytedesk.core.config.BytedeskEventPublisher;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 
@@ -51,24 +48,22 @@ public class OrganizationEntityListener {
         // 7. workgroup,
         // NOTE: 组织创建发生在事务内；如果异步发布事件，监听器可能在提交前查询不到组织记录。
         // 因此这里注册 afterCommit 回调，在提交后再发布事件。
-        BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        OrganizationRepository organizationRepository = ApplicationContextHolder.getBean(OrganizationRepository.class);
+        // 发布经由 OrganizationCreateEventPublisher 的 NOT_SUPPORTED 代理方法：
+        // afterCommit 阶段原事务连接绑定可能仍在线程上，若直接发布，监听器默认 REQUIRED
+        // 的写事务会参与已提交事务而无法再次提交（写入不可见）。先挂起残留资源再发布。
+        OrganizationCreateEventPublisher eventPublisher = ApplicationContextHolder
+                .getBean(OrganizationCreateEventPublisher.class);
         String orgUid = organization.getUid();
-
-        Runnable publish = () -> {
-            Optional<OrganizationEntity> orgOptional = organizationRepository.findByUid(orgUid);
-            orgOptional.ifPresent(bytedeskEventPublisher::publishOrganizationCreateEvent);
-        };
 
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    publish.run();
+                    eventPublisher.publishAfterCommit(orgUid);
                 }
             });
         } else {
-            publish.run();
+            eventPublisher.publishAfterCommit(orgUid);
         }
     }
 

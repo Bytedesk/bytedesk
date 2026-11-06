@@ -71,6 +71,12 @@ public class AgentEventListener {
         OrganizationEntity organization = (OrganizationEntity) event.getSource();
         UserEntity user = organization.getUser();
         String orgUid = organization.getUid();
+        // 超级管理员可以创建不指定管理员的组织（userUid 为空），此时没有关联用户，
+        // 无法创建默认客服；跳过而非中断后续监听器（与 MemberEventListener 语义一致）
+        if (user == null) {
+            log.info("agent - organization {} created without admin user, skip default agent creation", orgUid);
+            return;
+        }
         if (StringUtils.hasText(user.getUid())
                 && agentRestService.findByUserUidAndOrgUid(user.getUid(), orgUid).isPresent()) {
             return;

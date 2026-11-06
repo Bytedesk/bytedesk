@@ -50,6 +50,12 @@ public class WorkgroupEventListener {
         if (workgroupRestService.findAnyByOrgUid(orgUid).isPresent()) {
             return;
         }
+        // 超级管理员可以创建不指定管理员的组织（userUid 为空），默认工作组依赖管理员
+        // 关联的客服；跳过创建而非 NPE 中断事件链（工单流程等后续初始化不受影响）
+        if (user == null) {
+            log.info("workgroup - organization {} created without admin user, skip default workgroup creation", orgUid);
+            return;
+        }
         // 创建默认workgroup
         log.info("workgroup - organization created: {}", organization.getName());
 

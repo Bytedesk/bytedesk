@@ -61,6 +61,8 @@ cp .env.example .env
 docker logs -f bytedesk -n 100
 # view log dir
 sudo ls -lh /var/lib/docker/volumes/bytedesk_log_data/_data/
+# pull latest image
+docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 ```
 
 ## Keyword Reference

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        零售客服演示会话表重命名（shopping -> retail），保留既有演示会话数据。
+        表由 Hibernate ddl-auto=update 依据实体创建，这里在启动早期原地改名：
+        - 旧表存在且新表不存在时执行 renameTable；
+        - 全新库无旧表，preConditions 不满足则 MARK_RAN，由 Hibernate 直接建新表。
+        跨库兼容：renameTable 为标准标签（MySQL/PostgreSQL/H2/Oracle/KingBase）。
+    -->
+
+    <changeSet id="261106-2-rename-retail-thread-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_shopping_thread"/>
+            <not>
+                <tableExists tableName="bytedesk_retail_thread"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_shopping_thread" newTableName="bytedesk_retail_thread"/>
+    </changeSet>
+
+    <changeSet id="261106-3-rename-retail-snapshot-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_shopping_snapshot"/>
+            <not>
+                <tableExists tableName="bytedesk_retail_snapshot"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_shopping_snapshot" newTableName="bytedesk_retail_snapshot"/>
+    </changeSet>
+</databaseChangeLog>

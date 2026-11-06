@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TokenSelfResponse {
 
-    private static final long serialVersionUID = 1L;
+    // private static final long serialVersionUID = 1L;
 
     private static final DateTimeFormatter ISO_FORMATTER =
             DateTimeFormatter.ISO_OFFSET_DATE_TIME;

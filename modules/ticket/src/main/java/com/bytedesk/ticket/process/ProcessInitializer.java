@@ -30,13 +30,20 @@ public class ProcessInitializer implements SmartInitializingSingleton {
 
     private final AuthorityRestService authorityService;
     private final ProcessRestService processRestService;
+    private final ProcessInitializationService processInitializationService;
 
     @Override
     public void afterSingletonsInstantiated() {
         initAuthority();
         // 初始化默认组织机构的流程
+        // 复用事务化初始化入口（REQUIRES_NEW + 行锁 + 状态矩阵），失败抛出由日志记录；
+        // 默认组织此刻已由 core 各 Initializer 前置持久化（@DependsOn 链）。
         String orgUid = BytedeskConsts.DEFAULT_ORGANIZATION_UID;
-        processRestService.initProcess(orgUid);
+        try {
+            processInitializationService.initDefaultProcesses(orgUid);
+        } catch (Exception e) {
+            log.error("初始化默认组织工单流程失败: orgUid={}", orgUid, e);
+        }
         // processRestService.initThreadProcess(orgUid);
         // 初始化演示流程模板
         // processRestService.initProcessDemos(orgUid);

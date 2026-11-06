@@ -34,6 +34,12 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.util.StringUtils;
+import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -101,6 +107,132 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONTENT_TOO_LARGE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(JsonResult.error(message, HttpStatus.CONTENT_TOO_LARGE.value()));
+    }
+
+    /**
+     * multipart/内容协商请求与目标参数的消息转换器不匹配（如 multipart 提交到 JSON/字符串接口）。
+     * 客户端输入问题：415 + 单行 WARN 摘要，不再落入 Exception 兜底打印全堆栈。
+     */
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<?> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException ex) {
+        warnClientInputEvent("HttpMediaTypeNotSupported", ex.getContentType(), null,
+                "supported=%s", ex.getSupportedMediaTypes());
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_HTTP_MEDIA_TYPE_NOT_SUPPORTED,
+                        HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()));
+    }
+
+    /**
+     * multipart 请求缺少声明 required 的 part（如缺少 file）。
+     * MissingServletRequestPartException 直接继承 ServletException，不会被 binding/multipart 基类覆盖，必须显式注册。
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<?> handleMissingServletRequestPartException(MissingServletRequestPartException ex) {
+        warnClientInputEvent("MissingServletRequestPart", null, ex.getRequestPartName(), null, (Object[]) null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_MISSING_REQUEST_PART, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    /**
+     * 缺少 required 的请求参数。
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException ex) {
+        warnClientInputEvent("MissingServletRequestParameter", null, ex.getParameterName(), null, (Object[]) null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_MISSING_REQUEST_PARAMETER, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    /**
+     * 请求参数类型不匹配（输入值无法转换到声明类型）。
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        warnClientInputEvent("MethodArgumentTypeMismatch", null, ex.getName(), null, (Object[]) null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_TYPE_MISMATCH, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    /**
+     * 入参校验失败：400 + 字段级摘要，避免落入 RuntimeException 兜底刷 error 堆栈。
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        String fields = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField())
+                .distinct()
+                .collect(java.util.stream.Collectors.joining(","));
+        warnClientInputEvent("MethodArgumentNotValid", null, StringUtils.hasText(fields) ? fields : null, null,
+                (Object[]) null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INPUT_INVALID, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    /**
+     * 服务器端不存在可用的属性转换器/编辑器，属于服务器配置/能力缺失，保持 500 + ERROR 可见，
+     * 不能按客户端噪声降级掩盖真实故障（Spring ResponseEntityExceptionHandler 同样映射为 500）。
+     */
+    @ExceptionHandler(ConversionNotSupportedException.class)
+    public ResponseEntity<?> handleConversionNotSupportedException(ConversionNotSupportedException ex) {
+        log.error("not handled exception: conversion not supported for request binding: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(JsonResult.error(I18Consts.I18N_INTERNAL_SERVER_ERROR,
+                        HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    }
+
+    /**
+     * 客户端输入类 4xx 的统一摘要：method/无 query 的 URI/ContentType/contentLength/字段名。
+     * 不记录完整请求体、Authorization、token、rejectedValue 等敏感内容；消息截断并清理 CR/LF 防日志注入。
+     */
+    private void warnClientInputEvent(String event, MediaType contentType, String detailField, String detailFormat,
+            Object... detailArgs) {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
+                    .getRequestAttributes();
+            HttpServletRequest request = attributes != null ? attributes.getRequest() : null;
+            String detail = null;
+            if (detailFormat != null && detailArgs != null && detailArgs.length > 0) {
+                detail = sanitizeLogValue(String.format(detailFormat, detailArgs));
+            }
+            if (request != null) {
+                log.warn("{}: method={} uri={} contentType={} contentLength={} field={} detail={}",
+                        event,
+                        request.getMethod(),
+                        sanitizeLogValue(stripQueryString(request.getRequestURI())),
+                        contentType,
+                        request.getContentLengthLong(),
+                        sanitizeLogValue(detailField),
+                        detail);
+            } else {
+                log.warn("{}: contentType={} field={} detail={}",
+                        event, contentType, sanitizeLogValue(detailField), detail);
+            }
+        } catch (Exception loggingFailure) {
+            log.warn("{} (failed to log request context): {}", event, loggingFailure.getMessage());
+        }
+    }
+
+    private String stripQueryString(String uri) {
+        if (uri == null) {
+            return null;
+        }
+        int queryIndex = uri.indexOf('?');
+        return queryIndex >= 0 ? uri.substring(0, queryIndex) : uri;
+    }
+
+    private String sanitizeLogValue(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.replaceAll("[\r\n\t]", " ").trim();
+        return normalized.length() > 200 ? normalized.substring(0, 200) + "..." : normalized;
     }
 
     @ExceptionHandler(MultipartException.class)

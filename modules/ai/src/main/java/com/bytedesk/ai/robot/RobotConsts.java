@@ -31,9 +31,9 @@ public class RobotConsts {
     // bytedesk key
     public static final String ROBOT_INIT_DEMO_BYTEDESK_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX
             + "robot:init:demo:bytedesk";
-    // shopping key
-    public static final String ROBOT_INIT_DEMO_SHOPPING_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX
-            + "robot:init:demo:shopping";
+    // retail key
+    public static final String ROBOT_INIT_DEMO_RETAIL_KEY = RedisConsts.BYTEDESK_REDIS_PREFIX
+            + "robot:init:demo:retail";
     //
     public static final String CATEGORY_JOB = I18Consts.I18N_PREFIX + "JOB";
     public static final String CATEGORY_LANGUAGE = I18Consts.I18N_PREFIX + "LANGUAGE";

@@ -778,6 +778,11 @@ public class I18Consts {
     public static final String I18N_ENTITY_NOT_FOUND = I18N_PREFIX + "entity.not.found"; // 实体未找到
     public static final String I18N_INVALID_REQUEST_BODY = I18N_PREFIX + "invalid.request.body"; // 请求体格式错误（JSON
                                                                                                  // 不合法/不完整）
+    public static final String I18N_HTTP_MEDIA_TYPE_NOT_SUPPORTED = I18N_PREFIX + "http.media.type.not.supported"; // 请求内容类型不支持
+    public static final String I18N_MISSING_REQUEST_PART = I18N_PREFIX + "missing.request.part"; // 缺少必需的上传文件
+    public static final String I18N_MISSING_REQUEST_PARAMETER = I18N_PREFIX + "missing.request.parameter"; // 缺少必需的请求参数
+    public static final String I18N_TYPE_MISMATCH = I18N_PREFIX + "type.mismatch"; // 请求参数类型不匹配
+    public static final String I18N_INPUT_INVALID = I18N_PREFIX + "input.invalid"; // 请求参数校验失败
     public static final String I18N_CONNECTION_NO_LONGER_AVAILABLE = I18N_PREFIX + "connection.no.longer.available"; // 连接已不可用
     public static final String I18N_EXTERNAL_SERVICE_TEMPORARILY_UNAVAILABLE = I18N_PREFIX
             + "external.service.temporarily.unavailable"; // 外部服务暂时不可用

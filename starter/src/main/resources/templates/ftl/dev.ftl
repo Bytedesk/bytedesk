@@ -180,7 +180,7 @@
             <ul>
                 <li><a href="/chat/demo/airline" target="_blank">${i18n['zh']["airline"]}</a></li>
                 <li><a href="/chat/demo/bytedesk" target="_blank">${i18n['zh']["bytedesk"]}</a></li>
-                <li><a href="/chat/demo/shopping" target="_blank">${i18n['zh']["shopping"]}</a></li>
+                <li><a href="/chat/demo/retail" target="_blank">${i18n['zh']["retail"]}</a></li>
             </ul>  -->
 
 

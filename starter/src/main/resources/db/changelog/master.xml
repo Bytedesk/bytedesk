@@ -16,5 +16,7 @@
     <include file="db/changelog/migration/260810_add_spring_ai_chat_memory_table.xml" />
     <include file="db/changelog/migration/261031_add_assistant_hilt_tables.xml" />
     <include file="db/changelog/migration/261031_add_assistant_config_table.xml" />
+    <include file="db/changelog/migration/261106_rename_consumer_type_shopping_to_retail.xml" />
+    <include file="db/changelog/migration/261106_rename_demo_retail_tables.xml" />
 
 </databaseChangeLog>

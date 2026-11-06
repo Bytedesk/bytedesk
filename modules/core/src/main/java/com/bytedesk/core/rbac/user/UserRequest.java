@@ -50,6 +50,13 @@ public class UserRequest extends BaseRequest {
 	private String oldPassword;
 	private String newPassword;
 
+	// 密文传输模式：AES 密文（可逆加密，非单向 hash），盐值 passwordSalt 与密文同包传输，
+	// 仅用于避免请求字段中出现明文密码，不提供对抗完整请求体读取的保密性
+	// 只要 passwordSalt 或任一密文字段出现即视为密文模式，禁止与明文字段混用
+	private String oldPasswordCiphertext;
+	private String newPasswordCiphertext;
+	private String passwordSalt;
+
 	@Email(message = "email format error")
 	private String email;
 

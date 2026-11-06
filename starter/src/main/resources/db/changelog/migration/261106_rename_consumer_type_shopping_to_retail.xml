@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        演示客户类型枚举 Shopping -> Retail 重命名后的数据迁移：
+        将既有 bytedesk_demo_consumer.consumer_type = 'SHOPPING' 的历史数据更新为 'RETAIL'。
+        该表由 Hibernate ddl-auto=update 维护，全新库中表尚不存在，
+        preConditions 不满足时直接 MARK_RAN（新库无历史数据需要迁移）。
+        跨库兼容：仅使用标准 update 标签。
+    -->
+    <changeSet id="261106-1-rename-consumer-type-shopping-to-retail" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_demo_consumer"/>
+            <columnExists tableName="bytedesk_demo_consumer" columnName="consumer_type"/>
+        </preConditions>
+        <update tableName="bytedesk_demo_consumer">
+            <column name="consumer_type" value="RETAIL"/>
+            <where>consumer_type = 'SHOPPING'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

@@ -31,6 +31,7 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestControllerOverride;
 import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.BusinessException;
 import com.bytedesk.core.push.PushService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.role.RolePermissions;
@@ -393,6 +394,14 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
             }
         }
 
+        // 密文解析必须先于一次性验证码消费：畸形密文直接拒绝，避免白白消耗验证码
+        UserService.TransportedPasswords passwords;
+        try {
+            passwords = userService.resolveTransportedPasswords(userRequest);
+        } catch (BusinessException e) {
+            return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), -1, false));
+        }
+
         // 验证码校验（一次性，命中即置 CONFIRMED，不可重放）
         boolean codeValid = isMobileChannel
                 ? pushService.validateCode(userRequest.getMobile(), userRequest.getCountry(), userRequest.getCode(), request)
@@ -401,7 +410,7 @@ public class UserRestController extends BaseRestControllerOverride<UserRequest> 
             return ResponseEntity.ok().body(JsonResult.error(I18Consts.I18N_AUTH_CAPTCHA_VALIDATE_FAILED, -2, false));
         }
 
-        UserResponse userResponse = userService.resetPassword(userRequest);
+        UserResponse userResponse = userService.resetPassword(userRequest, passwords);
 
         return ResponseEntity.ok(JsonResult.success(userResponse));
     }

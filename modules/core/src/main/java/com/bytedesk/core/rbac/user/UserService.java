@@ -56,6 +56,7 @@ import com.bytedesk.core.rbac.user.event.UserLogoutEvent;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
 import com.bytedesk.core.utils.CountryCodeUtils;
+import com.bytedesk.core.utils.PasswordCryptoUtils;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -316,15 +317,75 @@ public class UserService {
         }
     }
 
+    // 密码传输解析结果：oldPassword/newPassword 均为解密后的明文（或旧格式直接传入的明文）
+    // record 用于在 Controller（验证码消费前）与 Service 之间传递已解析的密码，避免重复解密
+    public record TransportedPasswords(String oldPassword, String newPassword) {
+    }
+
+    /**
+     * 整笔请求解析密码传输模式：
+     * - 密文模式：只要 passwordSalt 或任一 *Ciphertext 字段出现即视为密文模式（fail-closed），
+     *   要求非空 passwordSalt + newPasswordCiphertext，禁止与明文字段混用，解密失败直接抛异常，不回退明文；
+     * - 旧格式：盐和所有密文字段均未提供时，读取明文 oldPassword/newPassword（兼容旧客户端）。
+     * 注意：AES 为可逆加密且盐随包传输，仅避免明文字段出现在请求体，不提供对抗完整请求体读取的保密性。
+     */
+    public TransportedPasswords resolveTransportedPasswords(UserRequest request) {
+        boolean hasSalt = StringUtils.hasText(request.getPasswordSalt());
+        boolean hasOldCiphertext = StringUtils.hasText(request.getOldPasswordCiphertext());
+        boolean hasNewCiphertext = StringUtils.hasText(request.getNewPasswordCiphertext());
+        boolean hasAnyCiphertextField = hasSalt || hasOldCiphertext || hasNewCiphertext;
+
+        if (!hasAnyCiphertextField) {
+            // 旧格式：无任何密文元数据，走明文字段（兼容未迁移客户端）
+            return new TransportedPasswords(request.getOldPassword(), request.getNewPassword());
+        }
+
+        // 密文模式：必须齐全且不得与明文混用
+        if (!hasSalt || !hasNewCiphertext) {
+            log.warn("Invalid password transport request: missing salt or new password ciphertext");
+            throw new BusinessException(I18Consts.I18N_PASSWORD_DECRYPT_FAILED);
+        }
+        if (StringUtils.hasText(request.getOldPassword())
+                || StringUtils.hasText(request.getNewPassword())) {
+            log.warn("Invalid password transport request: ciphertext mixed with plaintext fields");
+            throw new BusinessException(I18Consts.I18N_PASSWORD_DECRYPT_FAILED);
+        }
+
+        String decryptedNewPassword;
+        try {
+            decryptedNewPassword = PasswordCryptoUtils.decryptPassword(
+                    request.getNewPasswordCiphertext(), request.getPasswordSalt());
+        } catch (Exception e) {
+            // 不记录密文/盐等敏感载荷；解密失败与缺字段同样拒绝，不回退明文
+            log.warn("New password ciphertext decrypt failed: {}", e.getMessage());
+            throw new BusinessException(I18Consts.I18N_PASSWORD_DECRYPT_FAILED);
+        }
+
+        // 旧密码密文可省略（手机号登录用户未设置旧密码场景），省略即 null
+        String decryptedOldPassword = null;
+        if (hasOldCiphertext) {
+            try {
+                decryptedOldPassword = PasswordCryptoUtils.decryptPassword(
+                        request.getOldPasswordCiphertext(), request.getPasswordSalt());
+            } catch (Exception e) {
+                log.warn("Old password ciphertext decrypt failed: {}", e.getMessage());
+                throw new BusinessException(I18Consts.I18N_PASSWORD_DECRYPT_FAILED);
+            }
+        }
+
+        return new TransportedPasswords(decryptedOldPassword, decryptedNewPassword);
+    }
+
     @Transactional
     public UserResponse changePassword(UserRequest request) {
+        TransportedPasswords passwords = resolveTransportedPasswords(request);
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
             String oldEncryptedPassword = user.getPassword(); // 假设这是数据库中加密后的密码
-            String oldRawPassword = request.getOldPassword(); // 用户输入的旧密码
-            String newRawPassword = request.getNewPassword(); // 用户输入的新密码
+            String oldRawPassword = passwords.oldPassword(); // 用户输入的旧密码
+            String newRawPassword = passwords.newPassword(); // 用户输入的新密码
 
             // 验证旧密码
             if (oldEncryptedPassword == null || passwordEncoder.matches(oldRawPassword, oldEncryptedPassword)) {
@@ -371,13 +432,14 @@ public class UserService {
 
     // 已登录用户通过手机号/邮箱验证码重置自己的密码（忘记旧密码场景）
     // 绑定校验与验证码校验已在 UserRestController 完成，此处仅更新当前用户密码
+    // passwords 由 Controller 在消费一次性验证码之前预先解析，避免畸形密文白白消耗验证码
     @Transactional
-    public UserResponse resetPassword(UserRequest request) {
+    public UserResponse resetPassword(UserRequest request, TransportedPasswords passwords) {
         UserEntity currentUser = authService.getUser();
         Optional<UserEntity> userOptional = findByUid(currentUser.getUid());
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
-            String newRawPassword = request.getNewPassword(); // 用户输入的新密码
+            String newRawPassword = passwords.newPassword(); // 用户输入的新密码
             // 设置新密码
             String newEncryptedPassword = passwordEncoder.encode(newRawPassword);
             user.setPassword(newEncryptedPassword); // 更新用户密码

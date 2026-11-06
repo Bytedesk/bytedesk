@@ -109,6 +109,7 @@ public class ProcessRestService
         String normalizedType = StringUtils.hasText(request.getType())
                 ? request.getType()
                 : ProcessTypeEnum.TICKET_INTERNAL.name();
+        validateProcessType(normalizedType);
         request.setType(normalizedType);
         // 判断uid是否存在
         if (StringUtils.hasText(request.getUid())) {
@@ -146,7 +147,12 @@ public class ProcessRestService
             entity.setName(request.getName());
             entity.setSchema(request.getSchema());
             entity.setDescription(request.getDescription());
-            entity.setType(request.getType());
+            // type 缺省时保留旧值：ProcessBuilder 保存 BPMN 不传 type，无条件覆盖会把
+            // 已有流程类型清空，破坏类型过滤、默认流程识别与迁移判定
+            if (StringUtils.hasText(request.getType())) {
+                validateProcessType(request.getType());
+                entity.setType(request.getType());
+            }
             if (StringUtils.hasText(request.getFlowgramSchema())) {
                 entity.setFlowgramSchema(request.getFlowgramSchema());
             }
@@ -159,6 +165,15 @@ public class ProcessRestService
             return convertToResponse(savedEntity);
         } else {
             throw new RuntimeException("Process not found");
+        }
+    }
+
+    /** type 必须是受支持的枚举值，防止任意字符串绕过工单部署校验的分类 */
+    private void validateProcessType(String type) {
+        try {
+            ProcessTypeEnum.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Unsupported process type: " + type);
         }
     }
 
@@ -213,6 +228,42 @@ public class ProcessRestService
     @Override
     public ProcessResponse convertToResponse(ProcessEntity entity) {
         return modelMapper.map(entity, ProcessResponse.class);
+    }
+
+    /**
+     * 基于后端配对模板创建自定义工单流程（DRAFT 状态）。
+     * BPMN 与 flowgram 由后端 resources 配对加载，替代前端维护的第二份「默认工单流程」模板，
+     * 保证新建流程自带完整工单语义（ticketStage/availableActions/SLA/监听器）。
+     * 不自动部署、不使用默认固定 uid、不允许替换已有流程。
+     */
+    public ProcessResponse createFromTemplate(String name, String description, String type, String orgUid) {
+        if (!StringUtils.hasText(name)) {
+            throw new RuntimeException("Process name is required");
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            throw new RuntimeException("orgUid is required");
+        }
+        String normalizedType = StringUtils.hasText(type) ? type : ProcessTypeEnum.TICKET_INTERNAL.name();
+        if (!ProcessTypeEnum.TICKET_INTERNAL.name().equalsIgnoreCase(normalizedType)
+                && !ProcessTypeEnum.TICKET_EXTERNAL.name().equalsIgnoreCase(normalizedType)) {
+            throw new RuntimeException("Template creation only supports TICKET_INTERNAL/TICKET_EXTERNAL, got: "
+                    + normalizedType);
+        }
+        ProcessTypeEnum processType;
+        try {
+            processType = ProcessTypeEnum.valueOf(normalizedType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Unsupported process type: " + normalizedType);
+        }
+
+        ProcessRequest request = buildDefaultProcessRequest(uidUtils.getUid(), orgUid,
+                loadTemplateSafely(TicketConsts.TICKET_PROCESS_PATH),
+                loadTemplateSafely(TicketConsts.TICKET_PROCESS_FLOWGRAM_PATH), processType, name);
+        if (StringUtils.hasText(description)) {
+            request.setDescription(description);
+        }
+        // 新建为 DRAFT，由用户在编辑器中调整后手动部署
+        return create(request);
     }
 
     public void initProcess(String orgUid) {
@@ -910,6 +961,18 @@ public class ProcessRestService
         }
     }
 
+    /** 模板加载（IOException 转换保留 cause，不吞异常返回空值） */
+    private String loadTemplateSafely(String path) {
+        try {
+            Resource resource = resourceLoader.getResource("classpath:" + path);
+            try (InputStream inputStream = resource.getInputStream()) {
+                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load process template: " + path, e);
+        }
+    }
+
     private String loadDefaultProcessFlowgramSchema() throws IOException {
         Resource resource = resourceLoader.getResource("classpath:" + TicketConsts.TICKET_PROCESS_FLOWGRAM_PATH);
         try (InputStream inputStream = resource.getInputStream()) {
@@ -1085,6 +1148,10 @@ public class ProcessRestService
     /**
      * 迁移脚本：为缺少 flowgramSchema 的旧流程从 resources/processes/*.json 填充 flowgram JSON
      * 在 ProcessInitializer 中调用，确保升级后旧流程可在 TicketBuilder 中打开编辑
+     *
+     * 收敛规则（避免错位填充）：仅处理「已知默认模板/受支持演示模板」的流程——
+     * 默认 uid 只是候选条件，填充前还须校验 BPMN 任务节点与候选 JSON 的节点 ID 对齐；
+     * 用户手动创建的流程（随机 uid、BPMN 节点与模板不一致）跳过，不得填入默认 JSON 造成语义错位。
      */
     public void migrateFlowgramSchemas() {
         List<ProcessEntity> entities = processRepository.findBySchemaIsNotNullAndFlowgramSchemaIsNull();
@@ -1101,22 +1168,54 @@ public class ProcessRestService
                     continue;
                 }
                 String flowgramJson = loadFlowgramResource(entity.getType(), entity.getName());
-                if (flowgramJson != null) {
-                    entity.setFlowgramSchema(flowgramJson);
-                    save(entity);
-                    migrated++;
-                    log.info("migrateFlowgramSchemas: filled flowgramSchema for processUid={}, type={}",
-                            entity.getUid(), entity.getType());
-                } else {
+                if (flowgramJson == null) {
                     log.warn("migrateFlowgramSchemas: no flowgram resource found for processUid={}, type={}, name={}",
                             entity.getUid(), entity.getType(), entity.getName());
+                    continue;
                 }
+                if (!isBpmnAlignedWithFlowgram(entity.getSchema(), flowgramJson)) {
+                    // BPMN 任务节点与候选 JSON 节点错位（如 ProcessBuilder 手动流程被旧版本
+                    // 无差别填充的场景）：跳过而非填充错误语义，待用户在编辑器中处理
+                    log.warn("migrateFlowgramSchemas: skip misaligned processUid={}, type={} (bpmn task ids not matched)",
+                            entity.getUid(), entity.getType());
+                    continue;
+                }
+                entity.setFlowgramSchema(flowgramJson);
+                save(entity);
+                migrated++;
+                log.info("migrateFlowgramSchemas: filled flowgramSchema for processUid={}, type={}",
+                        entity.getUid(), entity.getType());
             } catch (Exception e) {
                 log.warn("migrateFlowgramSchemas: failed for processUid={}, error={}",
                         entity.getUid(), e.getMessage());
             }
         }
         log.info("migrateFlowgramSchemas: migrated {}/{} processes", migrated, entities.size());
+    }
+
+    /** BPMN userTask 节点与 flowgram 任务节点 ID 双向对齐校验（迁移填充前置条件） */
+    private boolean isBpmnAlignedWithFlowgram(String bpmnXml, String flowgramJson) {
+        if (!StringUtils.hasText(bpmnXml) || !StringUtils.hasText(flowgramJson)) {
+            return false;
+        }
+        try {
+            Set<String> bpmnUserTaskIds = parseBpmnUserTaskIds(bpmnXml);
+            JSONObject flowgram = JSON.parseObject(flowgramJson);
+            JSONArray nodes = flowgram.getJSONArray("nodes");
+            if (nodes == null) {
+                return false;
+            }
+            Set<String> flowgramTaskNodeIds = new HashSet<>();
+            for (int i = 0; i < nodes.size(); i++) {
+                JSONObject node = nodes.getJSONObject(i);
+                if (isFlowgramTaskNode(node.getString("type")) && StringUtils.hasText(node.getString("id"))) {
+                    flowgramTaskNodeIds.add(node.getString("id"));
+                }
+            }
+            return bpmnUserTaskIds.equals(flowgramTaskNodeIds);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

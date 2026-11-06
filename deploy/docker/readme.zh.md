@@ -67,6 +67,8 @@ cp .env.example .env
 docker logs -f bytedesk -n 100
 # 查看log目录
 sudo ls -lh /var/lib/docker/volumes/bytedesk_log_data/_data/
+# 拉取最新版镜像（国内镜像源）
+docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 ```
 
 ## 关键字速查

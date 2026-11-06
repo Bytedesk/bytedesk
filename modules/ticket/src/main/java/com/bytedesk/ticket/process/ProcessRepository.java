@@ -18,6 +18,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import jakarta.persistence.LockModeType;
 
 public interface ProcessRepository extends JpaRepository<ProcessEntity, Long>, JpaSpecificationExecutor<ProcessEntity> {
 
@@ -29,6 +34,15 @@ public interface ProcessRepository extends JpaRepository<ProcessEntity, Long>, J
 
     /** 查找有 BPMN schema 但缺少 flowgramSchema 的流程（用于迁移） */
     List<ProcessEntity> findBySchemaIsNotNullAndFlowgramSchemaIsNull();
+
+    /** 含软删除记录的精确查询：初始化需区分「不存在」与「被软删除」 */
+    @Query("SELECT p FROM ProcessEntity p WHERE p.uid = :uid")
+    Optional<ProcessEntity> findByUidIncludingDeleted(@Param("uid") String uid);
+
+    /** 行锁查询：串行化同组织默认流程的自动/手动初始化，覆盖多实例竞争 */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM ProcessEntity p WHERE p.uid = :uid")
+    Optional<ProcessEntity> findByUidForUpdate(@Param("uid") String uid);
 
     // Boolean existsByPlatform(String platform);
 }

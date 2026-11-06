@@ -19,6 +19,7 @@ public class I18TicketConsts {
     public static final String I18N_TICKET_ACTION_COMPLETE_TASK = I18Consts.I18N_PREFIX + "ticket.action.complete.task";
     public static final String I18N_TICKET_ACTION_COMPLETE_VERIFIED = I18Consts.I18N_PREFIX + "ticket.action.complete.verified";
     public static final String I18N_TICKET_ACTION_COMPLETE_REJECTED = I18Consts.I18N_PREFIX + "ticket.action.complete.rejected";
+    public static final String I18N_TICKET_ACTION_FORCE_CLOSE = I18Consts.I18N_PREFIX + "ticket.action.force.close";
     public static final String I18N_TICKET_ACTION_DELEGATE = I18Consts.I18N_PREFIX + "ticket.action.delegate";
     public static final String I18N_TICKET_ACTION_DELEGATE_RESOLVE = I18Consts.I18N_PREFIX + "ticket.action.delegate.resolve";
     public static final String I18N_TICKET_ACTION_CC = I18Consts.I18N_PREFIX + "ticket.action.cc";

@@ -1477,14 +1477,14 @@ public class SwaggerApiConfig {
     }
 
     /**
-     * 购物管理接口
+     * 零售管理接口
      */
     @Bean
-    public GroupedOpenApi shoppingApis() {
+    public GroupedOpenApi retailApis() {
         return GroupedOpenApi.builder()
-                .group("shopping-apis")
-                .displayName("Shopping Management APIs")
-                .pathsToMatch("/api/v1/shopping/**")
+                .group("retail-apis")
+                .displayName("Retail Management APIs")
+                .pathsToMatch("/api/v1/retail/**")
                 .build();
     }
 
