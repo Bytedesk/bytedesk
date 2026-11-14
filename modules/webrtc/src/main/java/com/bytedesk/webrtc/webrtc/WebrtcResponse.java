@@ -70,6 +70,23 @@ public class WebrtcResponse extends BaseResponse {
      */
     private String scene;
 
+    /**
+     * 来电有效期截止时间（规划 2026-11-07 后台来电 §4.2）：服务端权威响铃窗口，
+     * 序列化为 epoch 毫秒字符串，客户端据此计算剩余时间；迁移期存量行为 null。
+     */
+    private ZonedDateTime expiresAt;
+
+    /** 服务端当前时间（epoch 毫秒字符串），用于客户端校正时钟偏移 */
+    private ZonedDateTime serverNow;
+
+    public String getExpiresAt() {
+        return String.valueOf(BdDateUtils.toTimestamp(expiresAt));
+    }
+
+    public String getServerNow() {
+        return String.valueOf(BdDateUtils.toTimestamp(serverNow));
+    }
+
     public String getStartedAt() {
         return BdDateUtils.formatDatetimeToString(startedAt);
     }

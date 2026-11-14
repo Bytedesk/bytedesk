@@ -42,8 +42,13 @@ public class MemberSpecification extends BaseSpecification<MemberEntity, MemberR
             if (StringUtils.hasText(request.getUsername())) {
                 predicates.add(criteriaBuilder.like(root.get("user").get("username"), "%" + request.getUsername() + "%"));
             }
-            // deptUid and subDeptUids with OR relationship
-            if (StringUtils.hasText(request.getDeptUid()) || (request.getSubDeptUids() != null && request.getSubDeptUids().size() > 0)) {
+            if (Boolean.TRUE.equals(request.getUnassignedDepartment())) {
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.isNull(root.get("deptUid")),
+                        criteriaBuilder.equal(criteriaBuilder.trim(root.<String>get("deptUid")), "")));
+            } else if (StringUtils.hasText(request.getDeptUid())
+                    || (request.getSubDeptUids() != null && !request.getSubDeptUids().isEmpty())) {
+                // deptUid and subDeptUids with OR relationship
                 List<Predicate> deptPredicates = new ArrayList<>();
                 if (StringUtils.hasText(request.getDeptUid())) {
                     deptPredicates.add(criteriaBuilder.equal(root.get("deptUid"), request.getDeptUid()));

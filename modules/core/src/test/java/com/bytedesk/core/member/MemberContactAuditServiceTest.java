@@ -19,6 +19,9 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
+import com.bytedesk.core.member.contact.MemberContactAuditItem;
+import com.bytedesk.core.member.contact.MemberContactAuditService;
+import com.bytedesk.core.member.contact.MemberContactFixResult;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 

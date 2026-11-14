@@ -23,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Lock;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.repository.query.Param;
 
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -33,6 +35,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface ThreadRepository extends JpaRepository<ThreadEntity, Long>, JpaSpecificationExecutor<ThreadEntity> {
         
         Optional<ThreadEntity> findByUid(String uid);
+
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("SELECT t FROM ThreadEntity t WHERE t.uid = :uid AND t.deleted = false")
+        Optional<ThreadEntity> findByUidForRouting(@Param("uid") String uid);
 
         List<ThreadEntity> findByUidInAndDeletedFalse(List<String> uids);
 

@@ -17,6 +17,10 @@
 # 单独启动 MRCP（配合已运行的 freeswitch）
 ./start.sh middleware mrcp
 
+# 重启（关键字与 start.sh 一致；restart 保留容器原配置）
+./restart.sh call            # 重启 freeswitch + mrcp
+./restart.sh freeswitch      # 仅重启 freeswitch
+
 # 停止（关键字保持一致）
 ./stop.sh call webrtc down
 ```

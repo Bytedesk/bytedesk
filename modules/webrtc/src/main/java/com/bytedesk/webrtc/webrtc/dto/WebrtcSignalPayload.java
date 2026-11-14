@@ -53,4 +53,10 @@ public class WebrtcSignalPayload {
      * 客户端据此区分录制责任端（同事通话仅主叫端录制）。
      */
     private String scene;
+
+    /**
+     * 来电有效期截止时间（epoch 毫秒，规划 2026-11-07 后台来电 §4.2）：
+     * 服务端权威响铃窗口，客户端据此计算剩余响铃时间；null 表示存量数据（不参与恢复接听）。
+     */
+    private Long expiresAt;
 }

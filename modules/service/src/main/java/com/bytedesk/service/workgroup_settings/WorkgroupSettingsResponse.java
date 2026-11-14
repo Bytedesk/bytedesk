@@ -13,6 +13,8 @@
  */
 package com.bytedesk.service.workgroup_settings;
 
+import java.util.Map;
+
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsResponse;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsResponse;
 import com.bytedesk.kbase.settings.BaseSettingsResponse;
@@ -43,6 +45,13 @@ public class WorkgroupSettingsResponse extends BaseSettingsResponse {
      * Customer routing mode (ROUND_ROBIN, LEAST_BUSY, etc.)
      */
     private String routingMode;
+
+    private Boolean tagRoutingEnabled;
+
+    /**
+     * 路由标签 -> 客服 绑定（存储在共享设置模板上，key: ROUTE 标签 UID）
+     */
+    private Map<String, String> tagAgentBindings;
 
     /**
      * Manual routing waiting tip for visitors (used when routingMode=MANUAL)

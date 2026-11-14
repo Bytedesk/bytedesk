@@ -123,6 +123,7 @@ public class LlmProviderRestService extends BaseRestService<LlmProviderEntity, L
                 .logo(AvatarConsts.getLlmThreadDefaultAvatarBaseUrl() + providerJson.getLogo())
                 .baseUrl(providerJson.getBaseUrl())
                 .webUrl(providerJson.getWebUrl())
+                .modelListUrl(providerJson.getModelListUrl())
                 .status(providerJson.getStatus())
                 .orgUid(orgUid)
                 .level(level)

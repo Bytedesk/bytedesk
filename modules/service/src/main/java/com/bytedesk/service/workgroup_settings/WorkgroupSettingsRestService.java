@@ -1,6 +1,8 @@
 package com.bytedesk.service.workgroup_settings;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -22,6 +24,8 @@ import com.bytedesk.ai.robot.RobotEntity;
 import com.bytedesk.ai.robot.RobotRepository;
 import com.bytedesk.core.base.BaseRestService;
 import com.bytedesk.core.base.BaseEntity;
+import com.bytedesk.core.tag.TagRestService;
+import com.bytedesk.core.tag.TagTypeEnum;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.settings_auto_resolved.AutoResolvedSettingsEntity;
 import com.bytedesk.kbase.settings_emotion.EmotionSettingEntity;
@@ -35,6 +39,8 @@ import com.bytedesk.kbase.settings_trigger.TriggerSettingsHelper;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsHelper;
+import com.bytedesk.service.agent.AgentEntity;
+import com.bytedesk.service.agent.AgentRestService;
 import com.bytedesk.service.queue_settings.QueueSettingsEntity;
 import com.bytedesk.service.robot_to_agent_settings.RobotToAgentSettingsEntity;
 import com.bytedesk.service.workgroup.WorkgroupRepository;
@@ -81,6 +87,10 @@ public class WorkgroupSettingsRestService
 
     private final RobotRoutingSettingsService workgroupAutoReplyConfigService;
 
+    private final TagRestService tagRestService;
+
+    private final AgentRestService agentRestService;
+
     // IMPORTANT: cache stores Entity only. Do not mix Response types in the same cache name/key.
     // @Cacheable(value = "workgroupSettingsEntity", key = "#uid", unless = "#result == null")
     @Override
@@ -93,9 +103,12 @@ public class WorkgroupSettingsRestService
     public WorkgroupSettingsResponse create(WorkgroupSettingsRequest request) {
         WorkgroupSettingsEntity entity = modelMapper.map(request, WorkgroupSettingsEntity.class);
         entity.setUid(uidUtils.getUid());
+        entity.setTagRoutingEnabled(Boolean.TRUE.equals(request.getTagRoutingEnabled()));
 
         final String orgUid = StringUtils.hasText(entity.getOrgUid()) ? entity.getOrgUid() : request.getOrgUid();
         final String userUid = StringUtils.hasText(entity.getUserUid()) ? entity.getUserUid() : request.getUserUid();
+
+        entity.setTagAgentBindings(validateTagAgentBindings(request.getTagAgentBindings(), orgUid));
 
         ServiceSettingsEntity service = ServiceSettingsEntity.fromRequest(request.getServiceSettings(), modelMapper);
         service.setUid(uidUtils.getUid());
@@ -280,6 +293,13 @@ public class WorkgroupSettingsRestService
         }
         if (request.getRoutingMode() != null) {
             entity.setRoutingMode(request.getRoutingMode());
+        }
+        if (request.getTagRoutingEnabled() != null) {
+            entity.setTagRoutingEnabled(request.getTagRoutingEnabled());
+        }
+        if (request.getTagAgentBindings() != null) {
+            String orgUid = StringUtils.hasText(entity.getOrgUid()) ? entity.getOrgUid() : request.getOrgUid();
+            entity.setTagAgentBindings(validateTagAgentBindings(request.getTagAgentBindings(), orgUid));
         }
         if (request.getManualRoutingTip() != null) {
             entity.setManualRoutingTip(request.getManualRoutingTip());
@@ -629,17 +649,7 @@ public class WorkgroupSettingsRestService
     @Override
     public WorkgroupSettingsEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             WorkgroupSettingsEntity entity) {
-        try {
-            Optional<WorkgroupSettingsEntity> latest = workgroupSettingsRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                WorkgroupSettingsEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                return workgroupSettingsRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
+        throw e;
     }
 
     /**
@@ -1072,6 +1082,39 @@ public class WorkgroupSettingsRestService
         }
     }
 
+    /**
+     * 校验并规范化路由标签绑定：标签须为本组织未删除的 ROUTE 标签；客服须存在、
+     * 未删除且属于本组织。保存时不做工作组成员校验（模板可被多个工作组共享），
+     * 路由时再按实际工作组成员校验。
+     */
+    private Map<String, String> validateTagAgentBindings(Map<String, String> bindings, String orgUid) {
+        Map<String, String> result = new LinkedHashMap<>();
+        if (bindings == null || bindings.isEmpty()) {
+            return result;
+        }
+        bindings.forEach((tagUid, agentUid) -> {
+            if (!StringUtils.hasText(tagUid) || !StringUtils.hasText(agentUid)) {
+                return;
+            }
+            if (!tagUid.matches("[A-Za-z0-9_-]{1,64}") || !agentUid.matches("[A-Za-z0-9_-]{1,64}")) {
+                throw new IllegalArgumentException("Invalid tag/agent UID in tagAgentBindings");
+            }
+            tagRestService.findByUid(tagUid).ifPresent(tag -> {
+                if (!TagTypeEnum.ROUTE.name().equals(tag.getType())
+                        || tag.isDeleted() || !orgUid.equals(tag.getOrgUid())) {
+                    throw new IllegalArgumentException("ROUTE tag not found in this organization: " + tagUid);
+                }
+            });
+            AgentEntity boundAgent = agentRestService.findByUid(agentUid)
+                    .orElseThrow(() -> new IllegalArgumentException("Agent not found: " + agentUid));
+            if (boundAgent.isDeleted() || !orgUid.equals(boundAgent.getOrgUid())) {
+                throw new IllegalArgumentException("Agent not available in this organization: " + agentUid);
+            }
+            result.put(tagUid, agentUid);
+        });
+        return result;
+    }
+
     @Override
     public WorkgroupSettingsResponse convertToResponse(WorkgroupSettingsEntity entity) {
         // 注意：Entity 与 Response 的字段命名不一致：
@@ -1079,6 +1122,10 @@ public class WorkgroupSettingsRestService
         // - Response: robotRoutingSettings / draftRobotRoutingSettings
         // 直接使用 ModelMapper 会导致这两个字段为 null，这里手动补齐映射。
         WorkgroupSettingsResponse resp = modelMapper.map(entity, WorkgroupSettingsResponse.class);
+        resp.setTagRoutingEnabled(Boolean.TRUE.equals(entity.getTagRoutingEnabled()));
+        if (entity.getTagAgentBindings() != null) {
+            resp.setTagAgentBindings(new LinkedHashMap<>(entity.getTagAgentBindings()));
+        }
         resp.setServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getServiceSettings()));
         resp.setDraftServiceSettings(com.bytedesk.kbase.settings_service.ServiceSettingsResponse.fromEntity(entity.getDraftServiceSettings()));
         resp.setAutoResolvedSettings(

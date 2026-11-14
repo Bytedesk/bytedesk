@@ -177,6 +177,28 @@ class RobotToAgentKeywordListenerTest {
                 visitorRestService);
     }
 
+    @Test
+    void notificationFailureDoesNotRollbackCommittedHumanQueueDecision() {
+        RobotToAgentKeywordListener listener = buildListener();
+        ThreadEntity thread = buildWorkgroupThread("WEB");
+        thread.setRoutingTagSnapshot(List.of("tag-1")).setTagRoutingEvaluated(false);
+        ThreadEntity advanced = buildWorkgroupThread("WEB");
+        advanced.setQueuing().setRoutingTagSnapshot(List.of("tag-1")).setTagRoutingEvaluated(true);
+        when(threadRestService.findByUid(THREAD_UID)).thenReturn(Optional.of(thread)).thenReturn(Optional.of(advanced));
+        when(workgroupRestService.findByUid(WORKGROUP_UID)).thenReturn(Optional.of(buildWorkgroup()));
+        when(messageRestService.findByUid("msg-1"))
+                .thenReturn(Optional.empty()).thenReturn(Optional.of(buildRepliedMessage("msg-1")));
+        doThrow(new IllegalStateException("notification failed"))
+                .when(visitorRestService).requestThread(any(VisitorRequest.class));
+        listener.onVisitorRobotMessageEvent(new VisitorRobotMessageEvent(this, buildMessageJson("msg-1", "转人工")));
+        verify(threadRestService, org.mockito.Mockito.times(1)).save(any(ThreadEntity.class));
+        org.junit.jupiter.api.Assertions.assertTrue(advanced.isQueuing());
+        org.junit.jupiter.api.Assertions.assertTrue(advanced.getTagRoutingEvaluated());
+        ArgumentCaptor<VisitorRequest> request = ArgumentCaptor.forClass(VisitorRequest.class);
+        verify(visitorRestService).requestThread(request.capture());
+        org.junit.jupiter.api.Assertions.assertEquals(List.of("tag-1"), request.getValue().getRoutingTags());
+    }
+
     /**
      * 构造工作组机器人会话：
      * - thread.user 中 VisitorProtobuf 的 visitorUid 为外部稳定 ID（EXTRA 模拟历史污染：内含超大设置快照）

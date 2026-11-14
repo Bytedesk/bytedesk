@@ -84,7 +84,7 @@ class TicketServiceForceCloseTest {
                 fixture.service, ticket, task, "visitor-reporter-1", buildVerifiedGatewaySchema());
 
         assertThat(response.getActionable()).isTrue();
-        assertThat(response.getActions()).extracting(TicketWorkflowActionResponse::getKey)
+        assertThat(response.getActions()).extracting(action -> action.getKey())
                 .containsExactlyInAnyOrder("COMPLETE_VERIFIED", "COMPLETE_REJECTED");
     }
 
@@ -256,7 +256,7 @@ class TicketServiceForceCloseTest {
                 fixture.service, ticket, task, "member-agent-1", flowgramSchema);
         assertThat(responseWithReporterType.getActionable()).isTrue();
         assertThat(responseWithReporterType.getActions())
-                .extracting(TicketWorkflowActionResponse::getKey)
+                .extracting(action -> action.getKey())
                 .containsExactly("FORCE_CLOSE");
 
         // 关键回归：节点配置了 availableActions（不含 FORCE_CLOSE）时，

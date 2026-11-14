@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.jobtitle.JobTitleRestService;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 import com.bytedesk.core.rbac.role.RoleInitializer;
 import com.bytedesk.core.rbac.user.UserEntity;
@@ -27,6 +28,9 @@ class OrganizationInitializerDefaultsTest {
 
     @Mock
     private UserInitializer userInitializer;
+
+    @Mock
+    private JobTitleRestService jobTitleRestService;
 
     @Mock
     private OrganizationRepository organizationRepository;
@@ -50,6 +54,7 @@ class OrganizationInitializerDefaultsTest {
         OrganizationInitializer initializer = new OrganizationInitializer(
                 roleInitializer,
                 userInitializer,
+                jobTitleRestService,
                 organizationRepository,
                 bytedeskProperties,
                 userService,

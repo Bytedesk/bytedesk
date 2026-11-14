@@ -2,14 +2,18 @@ package com.bytedesk.ai.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.service.agent.AgentResponseTimingContext;
+import com.volcengine.ark.runtime.exception.ArkHttpException;
 
 import org.springframework.ai.chat.messages.Message;
 import com.bytedesk.core.constant.I18Consts;
@@ -316,7 +320,7 @@ public class SseMessageHelper {
         try {
             if (emitter != null && !isEmitterCompleted(emitter)) {
                 // 以 StreamContent JSON 发送错误，保持与 START/STREAM/END 一致
-                String errorText = I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+                String errorText = resolveErrorText(error);
                 RobotContent errorContent = RobotContent.builder()
                         .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
                         .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null)
@@ -343,7 +347,7 @@ public class SseMessageHelper {
                 }
             } else {
                 log.warn("SSE emitter already completed, skipping sending error message");
-                String errorText = I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+                String errorText = resolveErrorText(error);
                 RobotContent errorContent = RobotContent.builder()
                         .question(messageProtobufQuery != null ? messageProtobufQuery.getContent() : null)
                         .questionUid(messageProtobufQuery != null ? messageProtobufQuery.getUid() : null)
@@ -368,6 +372,87 @@ public class SseMessageHelper {
                 log.debug("Failed to complete emitter with error: {}", ex.getMessage());
             }
         }
+    }
+
+    /**
+     * 提取真实错误信息展示给前端，避免所有异常都显示为通用配置提示。
+     *
+     * <p>优先取最内层 cause 的 message（如供应商异常携带的 code 与描述）；
+     * 但最内层仅有 "HTTP 404" 这类状态码文本时（如 ArkHttpException 的
+     * cause 为 retrofit2.HttpException），逐层向外寻找最近一个携带有效信息的
+     * 异常。ArkHttpException 额外格式化为 "[code] 原始描述" 便于前端阅读。
+     * message 截断防止超长堆栈/HTML 撑爆前端气泡。</p>
+     */
+    public static String resolveErrorText(Throwable error) {
+        if (error != null) {
+            // 由外到内收集异常链，再从最内层向外寻找第一个有信息量的消息
+            List<Throwable> chain = new ArrayList<>();
+            Throwable current = error;
+            while (current != null && !chain.contains(current)) {
+                chain.add(current);
+                current = current.getCause();
+            }
+            for (int i = chain.size() - 1; i >= 0; i--) {
+                Throwable throwable = chain.get(i);
+                String message = throwable.getMessage();
+                if (StringUtils.hasText(message) && !isStatusOnlyMessage(message)) {
+                    return truncate(formatErrorMessage(throwable, message.strip()));
+                }
+            }
+            // 全链路均无有效信息，回退到原有取值逻辑
+            Throwable mostSpecific = NestedExceptionUtils.getMostSpecificCause(error);
+            String message = mostSpecific.getMessage();
+            if (!StringUtils.hasText(message)) {
+                message = error.getMessage();
+            }
+            if (StringUtils.hasText(message)) {
+                return truncate(message.strip());
+            }
+            return mostSpecific.getClass().getSimpleName();
+        }
+        return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+    }
+
+    private static String truncate(String text) {
+        if (text.length() > 500) {
+            return text.substring(0, 500) + "...";
+        }
+        return text;
+    }
+
+    /**
+     * 判断消息是否仅为 HTTP 状态码文本（如 retrofit2.HttpException 的 "HTTP 404 "），
+     * 这类信息对定位问题没有帮助。
+     */
+    private static boolean isStatusOnlyMessage(String message) {
+        String cleaned = message.strip();
+        return cleaned.matches("HTTP \\d{3}") || cleaned.matches("\\d{3}");
+    }
+
+    /**
+     * 对特定供应商异常做可读化格式处理。
+     *
+     * <p>ArkHttpException#getMessage() 返回 toString()，形如
+     * {@code ArkHttpException{statusCode=404, message='xxx', code='ModelNotOpen', ...}}，
+     * 直接展示不友好；从中提取 message 与 code 字段拼为 "[code] 描述"。</p>
+     */
+    private static String formatErrorMessage(Throwable throwable, String message) {
+        if (throwable instanceof ArkHttpException && message.startsWith("ArkHttpException{")) {
+            String detail = extractQuotedField(message, "message");
+            if (StringUtils.hasText(detail)) {
+                String code = extractQuotedField(message, "code");
+                return StringUtils.hasText(code) ? "[" + code + "] " + detail : detail;
+            }
+        }
+        return message;
+    }
+
+    private static String extractQuotedField(String text, String field) {
+        Matcher matcher = Pattern.compile(field + "='((?:\\\\.|[^'])*)'").matcher(text);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     public boolean isEmitterCompleted(SseEmitter emitter) {

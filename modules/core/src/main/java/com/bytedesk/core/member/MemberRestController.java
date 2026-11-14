@@ -82,6 +82,22 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "count members by organization")
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
+    @GetMapping("/count/org")
+    public ResponseEntity<?> countByOrg(MemberRequest request) {
+        long count = memberRestService.countByOrgUid(request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success(count));
+    }
+
+    @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "count unassigned members by organization")
+    @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
+    @GetMapping("/count/unassigned/org")
+    public ResponseEntity<?> countUnassignedByOrg(MemberRequest request) {
+        long count = memberRestService.countUnassignedByOrgUid(request.getOrgUid());
+        return ResponseEntity.ok(JsonResult.success(count));
+    }
+
     @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query member by user")
     @Operation(summary = "Query Members by User", description = "Retrieve member information by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",

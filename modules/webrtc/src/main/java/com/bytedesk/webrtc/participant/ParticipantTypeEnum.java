@@ -25,5 +25,6 @@ public enum ParticipantTypeEnum {
     /** 视频客服通话参与者（2026-09-29 规划 C 线，对齐 RoomTypeEnum.VIDEO_SERVICE） */
     VIDEO_SERVICE,
     /** 同事间音视频通话参与者（2026-09-29 规划 C 线，对齐 RoomTypeEnum.MEMBER_CALL） */
-    MEMBER_CALL
+    MEMBER_CALL,
+    REMOTE_ASSIST
 }

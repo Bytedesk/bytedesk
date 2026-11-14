@@ -107,6 +107,14 @@ public class VisitorRequest extends BaseRequest {
     @Builder.Default
     private List<String> tagList = new ArrayList<>();
 
+    @ToString.Exclude
+    private List<String> routingTags;
+
+    @com.fasterxml.jackson.annotation.JsonSetter("routingTags")
+    public void setRoutingTags(List<?> routingTags) {
+        this.routingTags = VisitorRoutingTags.normalize(routingTags);
+    }
+
 	// 用户自定义字段：字段昵称/字段key/字段值
 	@Builder.Default
 	private List<CustomFieldItem> customFieldList = new ArrayList<>();

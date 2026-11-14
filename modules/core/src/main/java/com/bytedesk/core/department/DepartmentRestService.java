@@ -17,18 +17,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
+import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
@@ -48,6 +58,8 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
     private final UidUtils uidUtils;
 
     private final MemberRepository memberRepository;
+
+    private final CacheManager cacheManager;
 
     @Override
     public DepartmentResponse queryByUid(DepartmentRequest request) {
@@ -160,36 +172,144 @@ public class DepartmentRestService extends BaseRestService<DepartmentEntity, Dep
         return departmentRepository.save(entity);
     }
 
-    @CacheEvict(value = "department", allEntries = true)
     @Override
+    @Transactional
     public void deleteByUid(String uid) {
-        Optional<DepartmentEntity> optional = findByUid(uid);
-        if (optional.isPresent()) {
-            DepartmentEntity department = optional.get();
-            // delete children departments
-            for (DepartmentEntity child : department.getChildren()) {
-                // child.setParent(null);
-                child.setDeleted(true);
-                save(child);
-            }
+        deleteSubtree(uid, null);
+    }
+
+    @Override
+    @Transactional
+    public void delete(DepartmentRequest request) {
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new IllegalArgumentException("department uid is required");
+        }
+        deleteSubtree(request.getUid(), request.getOrgUid());
+    }
+
+    private void deleteSubtree(String uid, String requestedOrgUid) {
+        DepartmentEntity root = departmentRepository.findByUid(uid)
+                .filter(department -> !department.isDeleted())
+                .orElseThrow(() -> new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND));
+
+        assertDeleteScope(root, requestedOrgUid);
+
+        List<DepartmentEntity> activeDepartments = new ArrayList<>();
+        Set<String> visitedUids = new HashSet<>();
+        Set<String> activePathUids = new HashSet<>();
+        collectDepartmentSubtree(root, root.getOrgUid(), visitedUids, activePathUids, activeDepartments);
+
+        Set<String> departmentUids = new HashSet<>();
+        for (DepartmentEntity department : activeDepartments) {
+            departmentUids.add(department.getUid());
             department.setDeleted(true);
-            save(department);
-            // remove department members
-            // memberService.clearDepartmentUid(department.getUid());
-             List<MemberEntity> members = memberRepository.findByDeptUidAndDeletedFalse(department.getUid());
-            for (MemberEntity member : members) {
-                member.setDeptUid(null);
-                memberRepository.save(member);
+        }
+
+        List<MemberEntity> members = memberRepository
+                .findByDeptUidInAndOrgUidAndDeletedFalse(departmentUids, root.getOrgUid());
+        Set<String> memberUids = new HashSet<>();
+        for (MemberEntity member : members) {
+            if (!StringUtils.hasText(member.getUid())) {
+                throw new IllegalStateException("active member is missing uid");
             }
-        } else {
-            log.error("department not found");
+            member.setDeptUid(null);
+            memberUids.add(member.getUid());
+        }
+
+        departmentRepository.saveAll(activeDepartments);
+        memberRepository.saveAll(members);
+        departmentRepository.flush();
+        memberRepository.flush();
+        registerCacheEvictionAfterCommit(memberUids);
+    }
+
+    private void assertDeleteScope(DepartmentEntity department, String requestedOrgUid) {
+        if (!StringUtils.hasText(department.getOrgUid())
+                || (StringUtils.hasText(requestedOrgUid) && !requestedOrgUid.equals(department.getOrgUid()))) {
+            throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
+        }
+
+        UserEntity user = authService.getUser();
+        if (user == null) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        boolean platformOrganizationUser = BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(user.getOrgUid());
+        if (!user.isSuperUser()
+                && !platformOrganizationUser
+                && !department.getOrgUid().equals(user.getOrgUid())) {
             throw new RuntimeException(I18Consts.I18N_RESOURCE_NOT_FOUND);
         }
     }
 
-    @Override
-    public void delete(DepartmentRequest request) {
-        deleteByUid(request.getUid());
+    private void collectDepartmentSubtree(
+            DepartmentEntity department,
+            String orgUid,
+            Set<String> visitedUids,
+            Set<String> activePathUids,
+            List<DepartmentEntity> activeDepartments) {
+        if (department == null || !StringUtils.hasText(department.getUid())) {
+            throw new IllegalStateException("department subtree contains an invalid node");
+        }
+        if (!orgUid.equals(department.getOrgUid())) {
+            throw new IllegalStateException("department subtree crosses organization boundary");
+        }
+        if (activePathUids.contains(department.getUid())) {
+            throw new IllegalStateException("department subtree contains a cycle");
+        }
+        if (!visitedUids.add(department.getUid())) {
+            return;
+        }
+
+        activePathUids.add(department.getUid());
+        if (!department.isDeleted()) {
+            activeDepartments.add(department);
+        }
+        for (DepartmentEntity child : department.getChildren()) {
+            collectDepartmentSubtree(child, orgUid, visitedUids, activePathUids, activeDepartments);
+        }
+        activePathUids.remove(department.getUid());
+    }
+
+    private void registerCacheEvictionAfterCommit(Set<String> memberUids) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            throw new IllegalStateException("department deletion requires an active transaction");
+        }
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                RuntimeException failure = null;
+                failure = evictCache("member", memberUids, failure);
+                failure = evictCache("department", Collections.emptySet(), failure);
+                if (failure != null) {
+                    log.error("Department deletion committed but cache eviction failed", failure);
+                    throw new DepartmentDeletionCommittedException(
+                            "Department deleted, but cache refresh failed", failure);
+                }
+            }
+        });
+    }
+
+    private RuntimeException evictCache(
+            String cacheName,
+            Set<String> keys,
+            RuntimeException previousFailure) {
+        try {
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache == null) {
+                throw new IllegalStateException("cache not configured: " + cacheName);
+            }
+            if (keys.isEmpty()) {
+                cache.clear();
+            } else {
+                keys.forEach(cache::evict);
+            }
+        } catch (RuntimeException exception) {
+            if (previousFailure == null) {
+                return exception;
+            }
+            previousFailure.addSuppressed(exception);
+        }
+        return previousFailure;
     }
 
     @Override

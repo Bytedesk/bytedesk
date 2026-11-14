@@ -64,6 +64,7 @@ public class LlmProviderJsonLoader {
         private String logo;
         private String baseUrl;
         private String webUrl;
+        private String modelListUrl;
         private String status;
     }
     

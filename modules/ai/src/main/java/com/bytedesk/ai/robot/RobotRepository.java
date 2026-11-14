@@ -27,6 +27,11 @@ public interface RobotRepository extends JpaRepository<RobotEntity, Long>, JpaSp
 
     Optional<RobotEntity> findByUid(String uid);
 
+    /**
+     * 批量按 uid 查询未删除机器人（群机器人批量校验/详情用）。
+     */
+    List<RobotEntity> findByUidInAndDeletedFalse(List<String> uids);
+
     Optional<RobotEntity> findByNameAndOrgUidAndDeletedFalse(String name, String orgUid);
     
     Boolean existsByUidAndDeleted(String uid, Boolean deleted);

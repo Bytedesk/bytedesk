@@ -68,6 +68,9 @@ public class LlmProviderEntity extends BaseEntity {
 
     private String webUrl;
 
+    // 官方模型列表文档地址，方便用户跳转查看可添加的模型，如火山引擎方舟模型列表
+    private String modelListUrl;
+
     // 关联的Coze Bot
     private String cozeBotId;
 

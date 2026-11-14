@@ -26,16 +26,20 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.enums.LevelEnum;
+import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.message.content.NoticeContent;
 import com.bytedesk.core.message.enums.MessageNoticeTypeEnum;
 import com.bytedesk.core.message.enums.MessageStatusEnum;
 import com.bytedesk.core.message.utils.MessageUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
+import com.bytedesk.core.rbac.user.UserExtraJobTitleUtils;
+import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.thread.ThreadEntity;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -47,6 +51,8 @@ import lombok.RequiredArgsConstructor;
 public class MessageService {
 
     private final MessagePersistCache messagePersistCache;
+
+    private final MessageRestService messageRestService;
 
     private final ThreadRestService threadRestService;
 
@@ -76,12 +82,64 @@ public class MessageService {
         // 防止客户端时间错误，使用服务器时间戳，指定Asia/Shanghai时区
         messageProtobuf.setCreatedAt(BdDateUtils.now());
 
+        // 普通群聊：以服务端成员数据在首次接收时写入作者职务快照（user.extra.jobTitle）
+        applyGroupSenderJobTitle(messageProtobuf);
+
         // 
         String messageJsonResult = messageProtobuf.toJson();
         // 保存消息
         messagePersistCache.pushForPersist(messageJsonResult);
 
         return messageJsonResult;
+    }
+
+    /**
+     * 普通群聊（GROUP 类型会话）消息在服务端首次接收时，
+     * 用该群所属组织内发送者的成员职务覆盖 user.extra.jobTitle 快照：
+     * - 客户端伪造的 jobTitle 一律被服务端值覆盖（成员无职务时移除该键）
+     * - 消息已存在（回执/重放）时沿用数据库持久化快照，不重查成员
+     * - 成员查询失败按无职务处理，不影响消息正常收发
+     */
+    private void applyGroupSenderJobTitle(MessageProtobuf messageProtobuf) {
+        if (messageProtobuf == null || messageProtobuf.getThread() == null
+                || messageProtobuf.getThread().getType() == null
+                || !ThreadTypeEnum.GROUP.name().equals(messageProtobuf.getThread().getType().name())) {
+            return;
+        }
+        String threadUid = messageProtobuf.getThread().getUid();
+        if (!StringUtils.hasText(threadUid)) {
+            return;
+        }
+        // 已持久化的消息（回执/重放）：保留库中快照
+        if (messageRestService.isMessageExists(messageProtobuf.getUid())) {
+            return;
+        }
+        String orgUid = null;
+        Optional<ThreadEntity> threadOpt = threadRestService.findByUid(threadUid);
+        if (threadOpt.isPresent()) {
+            orgUid = threadOpt.get().getOrgUid();
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            MessageExtra messageExtra = MessageExtra.fromJson(messageProtobuf.getExtra());
+            if (messageExtra != null) {
+                orgUid = messageExtra.getOrgUid();
+            }
+        }
+        if (!StringUtils.hasText(orgUid)) {
+            return;
+        }
+        String senderUserUid = messageProtobuf.getUser() == null ? null : messageProtobuf.getUser().getUid();
+        if (!StringUtils.hasText(senderUserUid)) {
+            return;
+        }
+        String jobTitle = "";
+        Optional<MemberEntity> memberOpt = memberRepository.findByUser_UidAndOrgUidAndDeletedFalse(senderUserUid, orgUid);
+        if (memberOpt.isPresent() && StringUtils.hasText(memberOpt.get().getJobTitle())) {
+            jobTitle = memberOpt.get().getJobTitle();
+        }
+        UserProtobuf user = messageProtobuf.getUser();
+        String extra = UserExtraJobTitleUtils.removeJobTitle(user.getExtra());
+        user.setExtra(UserExtraJobTitleUtils.putJobTitle(extra, jobTitle));
     }
 
     // private void validateThreadReplyPermission(MessageProtobuf messageProtobuf) {

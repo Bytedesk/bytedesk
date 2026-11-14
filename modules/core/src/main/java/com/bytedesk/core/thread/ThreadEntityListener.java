@@ -36,7 +36,11 @@ public class ThreadEntityListener {
         ThreadEntity clonedThread = SerializationUtils.clone(thread);
         // send notifications
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishThreadCreateEvent(clonedThread);
+        if (thread.getTagRoutingEvaluated() != null) {
+            com.bytedesk.core.utils.AfterCommit.run(() -> bytedeskEventPublisher.publishThreadCreateEvent(clonedThread));
+        } else {
+            bytedeskEventPublisher.publishThreadCreateEvent(clonedThread);
+        }
     }
 
     @PostUpdate
@@ -46,7 +50,11 @@ public class ThreadEntityListener {
         // log.info("postUpdate after {}", thread.getAgent());
         // send notifications
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread);
+        if (thread.getTagRoutingEvaluated() != null) {
+            com.bytedesk.core.utils.AfterCommit.run(() -> bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread));
+        } else {
+            bytedeskEventPublisher.publishThreadUpdateEvent(clonedThread);
+        }
     }
 
     

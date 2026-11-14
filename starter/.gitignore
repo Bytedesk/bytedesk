@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 blog/
 helpcenter/
+uploads/
 
 ### STS ###
 .apt_generated

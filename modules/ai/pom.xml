@@ -25,6 +25,8 @@
 		<!-- <ai.djl.version>0.32.0</ai.djl.version> -->
 		<zai-sdk.version>0.3.5</zai-sdk.version>
 		<elasticsearch.version>9.4.2</elasticsearch.version>
+		<!-- https://github.com/volcengine/ark-runtime-java -->
+		<ark-runtime.version>0.17.0</ark-runtime.version>
 	</properties>
 
 	<dependencies>
@@ -243,7 +245,25 @@
 			<artifactId>zai-sdk</artifactId>
 			<version>${zai-sdk.version}</version>
 		</dependency>
-		
+
+		<!-- 火山引擎方舟官方 SDK（2026-11 迁移自 OpenAI 兼容客户端）
+		     https://github.com/volcengine/ark-runtime-java
+		     https://docs.volcengine.com/docs/ark/migrate-ark-runtime-sdk -->
+	    <!-- https://mvnrepository.com/artifact/com.volcengine/ark-runtime -->
+		<dependency>
+			<groupId>com.volcengine</groupId>
+			<artifactId>ark-runtime</artifactId>
+			<version>${ark-runtime.version}</version>
+			<exclusions>
+				<!-- 传递依赖 volcengine-java-sdk-ark 仅用于 AK/SK STS 签名（本项目只用 apiKey 模式），
+				     且其依赖 okhttp 2.7.5 / gson 2.8.1 / swagger-annotations 2.0.0 与项目冲突 -->
+				<exclusion>
+					<groupId>com.volcengine</groupId>
+					<artifactId>volcengine-java-sdk-ark</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<!-- https://github.com/ollama4j/ollama4j -->
 		<!-- https://ollama4j.github.io/ollama4j/intro -->
 		<!-- https://mvnrepository.com/artifact/io.github.ollama4j/ollama4j -->

@@ -473,6 +473,23 @@ public class PageRouteController {
 		return "forward:/kanban/index.html";
 	}
 
+	/**
+	 * demos
+	 * 演示页面
+	 * http://127.0.0.1:9003/demos
+	 */
+	@GetMapping({
+			"/demos",
+			"/demos/",
+			"/demos/{path:[^\\.]*}",
+			"/demos/{path:[^\\.]*}/{path2:[^\\.]*}",
+			"/demos/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+			"/demos/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}"
+	})
+	public String demos() {
+		return "forward:/demos/index.html";
+	}
+
 	@GetMapping({
 			"/reactdemo",
 			"/reactdemo/",

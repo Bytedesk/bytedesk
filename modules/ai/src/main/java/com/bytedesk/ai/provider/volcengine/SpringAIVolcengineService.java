@@ -2,7 +2,7 @@
  * @Author: jackning 270580156@qq.com
  * @Date: 2025-02-28 11:44:03
  * @LastEditors: jackning 270580156@qq.com
- * @LastEditTime: 2025-09-02 16:35:39
+ * @LastEditTime: 2026-11-10
  * @Description: bytedesk.com https://github.com/Bytedesk/bytedesk
  *   Please be aware of the BSL license restrictions before installing Bytedesk IM – 
  *  selling, reselling, or hosting Bytedesk IM as a service is a breach of the terms and automatically terminates your rights under the license. 
@@ -17,68 +17,95 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.llm_provider.LlmProviderEntity;
 import com.bytedesk.ai.llm_provider.LlmProviderRestService;
-import com.bytedesk.ai.provider.openai.OpenAiCompatibleModelFactory;
 import com.bytedesk.ai.robot.RobotLlm;
 import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.ai.service.BaseSpringAIService;
 import com.bytedesk.ai.service.ChatTokenUsage;
+import com.bytedesk.ai.service.SseMessageHelper;
 import com.bytedesk.ai.service.TokenUsageHelper;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConstants;
 import com.bytedesk.core.message.MessageProtobuf;
 import com.bytedesk.core.message.content.RobotContent;
+import io.micrometer.observation.ObservationRegistry;
+import com.volcengine.ark.runtime.service.ArkApi;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 火山引擎方舟服务。
+ *
+ * <p>2026-11 迁移至方舟官方 SDK（com.volcengine:ark-runtime），动态创建
+ * {@link ArkChatModel}（provider apiKey/baseUrl + robot options），经
+ * {@code createChatClient} 注入 Advisor 链（多轮记忆/工具调用/SafeGuard），
+ * 模式对齐 ZhipuaiService / DashscopeService。</p>
+ */
 @Slf4j
 @Service
 public class SpringAIVolcengineService extends BaseSpringAIService {
 
     public SpringAIVolcengineService(
             LlmProviderRestService llmProviderRestService,
-            @Qualifier("volcengineChatModel") ObjectProvider<OpenAiChatModel> defaultChatModelProvider,
-            TokenUsageHelper tokenUsageHelper) {
+            @Qualifier("volcengineChatModel") ObjectProvider<ChatModel> defaultChatModelProvider,
+            TokenUsageHelper tokenUsageHelper,
+            ObjectProvider<ObservationRegistry> observationRegistryProvider,
+            @Value("${spring.ai.volcengine.api-key:}") String globalApiKey,
+            @Value("${spring.ai.volcengine.base-url:https://ark.cn-beijing.volces.com/api/v3}") String globalBaseUrl) {
         this.llmProviderRestService = llmProviderRestService;
         this.defaultChatModel = defaultChatModelProvider.getIfAvailable();
         this.tokenUsageHelper = tokenUsageHelper;
+        this.observationRegistryProvider = observationRegistryProvider;
+        this.globalApiKey = globalApiKey;
+        this.globalBaseUrl = globalBaseUrl;
     }
-
 
     private final LlmProviderRestService llmProviderRestService;
 
-    private final OpenAiChatModel defaultChatModel;
+    /** 全局回退 ChatModel Bean（volcengineChatModel，全局 spring.ai.volcengine.* 配置）。 */
+    private final ChatModel defaultChatModel;
 
     private final TokenUsageHelper tokenUsageHelper;
 
-    
+    /** 动态建 model 时传入的 ObservationRegistry（可选，产生 gen_ai_* 指标）。 */
+    private final ObjectProvider<ObservationRegistry> observationRegistryProvider;
+
+    /** 全局回退 apiKey（来自 spring.ai.volcengine.api-key）。 */
+    private final String globalApiKey;
+
+    /** 全局回退 baseUrl（来自 spring.ai.volcengine.base-url）。 */
+    private final String globalBaseUrl;
+
     /**
-     * 根据机器人配置创建动态的OpenAiChatOptions
-     * 
-     * @param llm 机器人LLM配置
-     * @return 根据机器人配置创建的选项
+     * 根据机器人配置创建动态的ArkChatOptions（含工具回调与思考模式）。
+     * enableThinking 仅在 llm.thinking 显式为 true 时开启；否则不设置
+     * （思考模式由模型名决定，非思考模型设置 thinking 会导致 400）。
      */
-    private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+    private ArkChatOptions createDynamicOptions(RobotLlm llm) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
         try {
-                return applyRobotToolCallbacks(OpenAiChatOptions.builder()
-                .model(llm.getTextModel())
-                .temperature(llm.getTemperature())
-                .topP(llm.getTopP())
-                    .build(), llm);
+            ArkChatOptions.Builder builder = ArkChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .maxTokens(llm.getMaxTokens())
+                    .topP(llm.getTopP());
+            if (Boolean.TRUE.equals(llm.getThinking())) {
+                builder.enableThinking(true);
+            }
+            return applyRobotToolCallbacks(builder.build(), llm);
         } catch (Exception e) {
             log.error("Error creating dynamic Volcengine options for model {}", llm.getTextModel(), e);
             return null;
@@ -86,98 +113,61 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
     }
 
     /**
-     * 根据机器人配置创建动态的OpenAiChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OpenAiChatModel
+     * 根据机器人配置动态创建 ArkChatModel。
+     * provider 缺失 / apiKey 缺失 / options 构建失败时回退 volcengineChatModel Bean（全局配置）。
      */
-    private OpenAiChatModel createVolcengineChatModel(RobotLlm llm) {
-
-        Optional<LlmProviderEntity> llmProviderOptional = llmProviderRestService.findByUid(llm.getTextProviderUid());
-        if (llmProviderOptional.isEmpty()) {
-            log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
+    private ChatModel createVolcengineChatModel(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return defaultChatModel;
         }
-        
-        LlmProviderEntity provider = llmProviderOptional.get();
-        
         try {
-            // 创建选项
-            OpenAiChatOptions options = createDynamicOptions(llm);
+            ArkChatOptions options = createDynamicOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Volcengine options, using default chat model");
                 return defaultChatModel;
             }
-
-            OpenAiChatOptions resolvedOptions = OpenAiCompatibleModelFactory.withConnection(options,
-                    provider.getBaseUrl(), provider.getApiKey());
-            return OpenAiCompatibleModelFactory.chatModel(resolvedOptions);
+            // provider 凭据优先；缺失时回退全局 spring.ai.volcengine.* 配置
+            String apiKey = null;
+            String baseUrl = null;
+            if (StringUtils.hasText(llm.getTextProviderUid())) {
+                Optional<LlmProviderEntity> llmProviderOptional =
+                        llmProviderRestService.findByUid(llm.getTextProviderUid());
+                if (llmProviderOptional.isPresent()) {
+                    LlmProviderEntity provider = llmProviderOptional.get();
+                    apiKey = StringUtils.hasText(provider.getApiKey()) ? provider.getApiKey() : null;
+                    baseUrl = StringUtils.hasText(provider.getBaseUrl())
+                            ? provider.getBaseUrl() : null;
+                } else {
+                    log.warn("LlmProvider with uid {} not found", llm.getTextProviderUid());
+                }
+            }
+            if (apiKey == null && StringUtils.hasText(globalApiKey) && !"sk-xxx".equalsIgnoreCase(globalApiKey)) {
+                apiKey = globalApiKey;
+            }
+            if (apiKey == null) {
+                log.warn("No apiKey available for Volcengine provider, using default chat model");
+                return defaultChatModel;
+            }
+            if (baseUrl == null) {
+                baseUrl = globalBaseUrl;
+            }
+            ArkApi service = ArkServiceFactory.createApi(apiKey,
+                    SpringAIVolcengineChatConfig.normalizeBaseUrl(baseUrl));
+            ObservationRegistry observationRegistry = observationRegistryProvider.getIfAvailable();
+            if (observationRegistry != null) {
+                return new ArkChatModel(service, options, observationRegistry);
+            }
+            return new ArkChatModel(service, options);
         } catch (Exception e) {
-            log.error("Failed to create dynamic Volcengine chat model for provider {}, using default chat model", provider.getUid(), e);
+            log.error("Failed to create dynamic Volcengine chat model, using default chat model", e);
             return defaultChatModel;
         }
     }
 
-    // @Override
-    // protected void processPromptWebsocket(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
-    //         MessageProtobuf messageProtobufReply) {
-    //     log.info("SpringAIVolcengineService processPromptWebsocket with full prompt content");
-    //     // 从robot中获取llm配置
-    // RobotLlm llm = robot.getLlm();
-        
-    //     // 创建动态chatModel
-    //     OpenAiChatModel chatModel = createVolcengineChatModel(llm);
-    //     if (chatModel == null) {
-    //         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-    //         return;
-    //     }
-        
-    //     // 如果有自定义选项，创建新的Prompt
-    //     Prompt requestPrompt = prompt;
-    //     OpenAiChatOptions customOptions = createDynamicOptions(llm);
-    //     if (customOptions != null) {
-    //         requestPrompt = processPromptWithOptions(prompt, customOptions);
-    //     }
-        
-    //     long startTime = System.currentTimeMillis();
-    //     final boolean[] success = {false};
-    //     final ChatTokenUsage[] tokenUsage = {new ChatTokenUsage(0, 0, 0)};
-        
-    //     // 使用动态创建的ChatModel实例
-    //     invokePromptStream(chatModel, requestPrompt).subscribe(
-    //             response -> {
-    //                 if (response != null) {
-    //                     log.info("Volcengine API response metadata: {}", response.getMetadata());
-    //                     List<Generation> generations = response.getResults();
-    //                     for (Generation generation : generations) {
-    //                         AssistantMessage assistantMessage = generation.getOutput();
-    //                         String textContent = assistantMessage.getText();
-
-    //                         sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ROBOT_STREAM, textContent, messageProtobufReply);
-    //                     }
-    //                     // 提取token使用情况
-    //                     tokenUsage[0] = tokenUsageHelper.extractTokenUsage(response);
-    //                     success[0] = true;
-    //                 }
-    //             },
-    //             error -> {
-    //                 log.error("Volcengine API error: ", error);
-    //                 sseMessageHelper.sendMessageWebsocket(MessageTypeEnum.ERROR, I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE, messageProtobufReply);
-    //                 success[0] = false;
-    //             },
-    //             () -> {
-    //                 log.info("Chat stream completed");
-    //                 // 记录token使用情况
-    //                 long responseTime = System.currentTimeMillis() - startTime;
-    //                 String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat";
-    //         tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.VOLCENGINE, modelType, 
-    //                         tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
-    //             });
-    // }
-
     @Override
     protected String processPromptSync(String message, RobotProtobuf robot) {
-        OpenAiChatOptions customOptions = robot != null && robot.getLlm() != null ? createDynamicOptions(robot.getLlm()) : null;
+        ArkChatOptions customOptions = robot != null && robot.getLlm() != null
+                ? createDynamicOptions(robot.getLlm()) : null;
         return processPromptSync(buildUserOnlyPrompt(message, customOptions), robot);
     }
 
@@ -188,14 +178,14 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         boolean success = false;
         ChatTokenUsage tokenUsage = new ChatTokenUsage(0, 0, 0);
         RobotLlm llm = robot != null ? robot.getLlm() : null;
-        OpenAiChatModel chatModel = createVolcengineChatModel(llm);
+        ChatModel chatModel = createVolcengineChatModel(llm);
         if (chatModel == null) {
             return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
         }
 
         try {
             Prompt requestPrompt = prompt;
-            OpenAiChatOptions customOptions = createDynamicOptions(llm);
+            ArkChatOptions customOptions = createDynamicOptions(llm);
             if (customOptions != null) {
                 requestPrompt = processPromptWithOptions(prompt, customOptions);
             }
@@ -207,7 +197,7 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         } catch (Exception e) {
             log.error("Volcengine API call error: ", e);
             success = false;
-            return I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+            return SseMessageHelper.resolveErrorText(e);
         } finally {
             long responseTime = System.currentTimeMillis() - startTime;
             String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat";
@@ -220,23 +210,22 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
     protected void processPromptSse(Prompt prompt, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, List<RobotContent.SourceReference> sourceReferences, SseEmitter emitter) {
         log.info("SpringAIVolcengineService processPromptSse with full prompt content");
-        // 直接实现SSE逻辑，而不是调用不支持fullPromptContent的版本
         // 从robot中获取llm配置
-    RobotLlm llm = robot.getLlm();
+        RobotLlm llm = robot.getLlm();
 
         // 创建动态chatModel
-        OpenAiChatModel chatModel = createVolcengineChatModel(llm);
+        ChatModel chatModel = createVolcengineChatModel(llm);
         if (chatModel == null) {
             sseMessageHelper.handleSseError(new RuntimeException(I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE), messageProtobufQuery, messageProtobufReply, emitter);
             return;
         }
 
         // 发送起始消息
-            sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
+        sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
         // 如果有自定义选项，创建新的Prompt
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        ArkChatOptions customOptions = createDynamicOptions(llm);
         if (customOptions != null) {
             requestPrompt = processPromptWithOptions(prompt, customOptions);
         }
@@ -250,15 +239,13 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
         invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                 response -> {
                     try {
-                        if (response != null) {
+                        if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {
                             List<Generation> generations = response.getResults();
                             for (Generation generation : generations) {
                                 AssistantMessage assistantMessage = generation.getOutput();
                                 String textContent = assistantMessage.getText();
                                 String reasonContent = extractReasoningContent(generation, assistantMessage);
-                                log.info("Volcengine API response metadata: {}, text {}",
-                                        response.getMetadata(), textContent);
-                                
+
                                 sseMessageHelper.sendStreamMessage(messageProtobufQuery, messageProtobufReply, emitter, textContent, reasonContent, sourceReferences);
                             }
                             // 提取token使用情况
@@ -279,23 +266,21 @@ public class SpringAIVolcengineService extends BaseSpringAIService {
                 () -> {
                     log.info("Volcengine API SSE complete");
                     // 发送流结束消息，包含token使用情况和prompt内容
-                    sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter, 
+                    sseMessageHelper.sendStreamEndMessage(messageProtobufQuery, messageProtobufReply, emitter,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), tokenUsage[0].getTotalTokens(), prompt, LlmProviderConstants.VOLCENGINE, (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat");
                     // 记录token使用情况
                     long responseTime = System.currentTimeMillis() - startTime;
                     String modelType = (llm != null && StringUtils.hasText(llm.getTextModel())) ? llm.getTextModel() : "volcengine-chat";
-            tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.VOLCENGINE, modelType, 
+                    tokenUsageHelper.recordAiTokenUsage(robot, LlmProviderConstants.VOLCENGINE, modelType,
                             tokenUsage[0].getPromptTokens(), tokenUsage[0].getCompletionTokens(), success[0], responseTime);
                 });
     }
 
-
-    public OpenAiChatModel getChatModel() {
-        // 由于现在使用动态创建，这个方法可能需要传入RobotLlm参数
-        // 这里返回null，因为不再使用静态注入的chatModel
-        return null;
+    public ChatModel getChatModel() {
+        // 动态创建场景需 robot 配置；此处返回全局 Bean 供调试端点使用
+        return defaultChatModel;
     }
-    
+
     public Boolean isServiceHealthy() {
         try {
             // 由于现在使用动态创建，健康检查需要有效的robot配置

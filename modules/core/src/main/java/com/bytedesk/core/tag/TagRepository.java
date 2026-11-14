@@ -22,6 +22,8 @@ public interface TagRepository extends JpaRepository<TagEntity, Long>, JpaSpecif
 
     Optional<TagEntity> findByUid(String uid);
 
+    Optional<TagEntity> findByUidAndOrgUidAndTypeAndDeletedFalse(String uid, String orgUid, String type);
+
     Boolean existsByUid(String uid);
 
     Optional<TagEntity> findByNameAndOrgUidAndTypeAndDeletedFalse(String name, String orgUid, String type);

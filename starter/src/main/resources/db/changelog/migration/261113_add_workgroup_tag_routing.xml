@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- Incremental upgrade only. On an empty database Liquibase runs before Hibernate;
+         missing tables are subsequently created from the corresponding JPA entities by
+         ddl-auto=update, as required by the 5.x baseline. Existing rows have no snapshot
+         and remain on the legacy routing path. Do not drop these columns for rollback.
+         tag -> agent bindings live on the shared workgroup settings template. -->
+    <changeSet id="261113-2-workgroup-tag-switch" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_workgroup_settings"/>
+            <not><columnExists tableName="bytedesk_service_workgroup_settings" columnName="tag_routing_enabled"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="tag_routing_enabled" type="boolean" defaultValueBoolean="false"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="261113-6-workgroup-settings-tag-agent-bindings" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_workgroup_settings"/>
+            <not><columnExists tableName="bytedesk_service_workgroup_settings" columnName="tag_agent_bindings"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup_settings">
+            <column name="tag_agent_bindings" type="varchar(2048)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="261113-5-workgroup-tag-agent-bindings" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_service_workgroup"/>
+            <not><columnExists tableName="bytedesk_service_workgroup" columnName="tag_agent_bindings"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_service_workgroup">
+            <column name="tag_agent_bindings" type="varchar(2048)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="261113-3-thread-routing-tag-snapshot" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_core_thread"/>
+            <not><columnExists tableName="bytedesk_core_thread" columnName="routing_tag_snapshot"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_thread">
+            <column name="routing_tag_snapshot" type="varchar(1024)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="261113-4-thread-tag-routing-evaluated" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="HALT">
+            <tableExists tableName="bytedesk_core_thread"/>
+            <not><columnExists tableName="bytedesk_core_thread" columnName="tag_routing_evaluated"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_thread">
+            <column name="tag_routing_evaluated" type="boolean"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

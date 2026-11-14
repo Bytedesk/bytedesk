@@ -30,7 +30,12 @@ public class QueueMemberEntityListener {
     public void onPostPersist(QueueMemberEntity queueMember) {
         log.info("QueueMemberEntityListener onPostPersist: {}", queueMember.getUid());
         ApplicationEventPublisher eventPublisher = ApplicationContextHolder.getBean(ApplicationEventPublisher.class);
-        eventPublisher.publishEvent(new QueueMemberCreateEvent(queueMember));
+        if (queueMember.getThread() != null && queueMember.getThread().getTagRoutingEvaluated() != null) {
+            com.bytedesk.core.utils.AfterCommit.run(
+                    () -> eventPublisher.publishEvent(new QueueMemberCreateEvent(queueMember)));
+        } else {
+            eventPublisher.publishEvent(new QueueMemberCreateEvent(queueMember));
+        }
     }
 
     // @PostUpdate

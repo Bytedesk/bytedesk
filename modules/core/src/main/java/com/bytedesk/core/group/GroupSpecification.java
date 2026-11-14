@@ -39,6 +39,12 @@ public class GroupSpecification extends BaseSpecification<GroupEntity, GroupRequ
             if (StringUtils.hasText(request.getName())) {
                 predicates.add(criteriaBuilder.like(root.get("name"), "%" + request.getName() + "%"));
             }
+            if (StringUtils.hasText(request.getSearchText())) {
+                String searchText = request.getSearchText();
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("name"), "%" + searchText + "%"),
+                        criteriaBuilder.like(root.get("description"), "%" + searchText + "%")));
+            }
             //
             // 如果userUid不为空，则查询该用户所在的群组
             if (StringUtils.hasText(request.getUserUid())) {

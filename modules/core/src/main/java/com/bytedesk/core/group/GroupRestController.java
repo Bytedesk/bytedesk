@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.ActionAnnotation;
@@ -152,6 +153,40 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         GroupResponse group = groupRestService.updateGroupTopTip(request);
         
         return ResponseEntity.ok(JsonResult.success(group));
+    }
+
+    @Operation(summary = "Add Robots", description = "Add robots to the group")
+    @ApiResponse(responseCode = "200", description = "Added successfully",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = GroupResponse.class)))
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "add robots to group")
+    @PostMapping("/robot/add")
+    public ResponseEntity<?> addRobots(@RequestBody GroupRequest request) {
+        
+        GroupResponse group = groupRestService.addRobots(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
+    }
+
+    @Operation(summary = "Remove Robots", description = "Remove robots from the group")
+    @ApiResponse(responseCode = "200", description = "Removed successfully",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = GroupResponse.class)))
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_REMOVE, description = "remove robots from group")
+    @PostMapping("/robot/remove")
+    public ResponseEntity<?> removeRobots(@RequestBody GroupRequest request) {
+        
+        GroupResponse group = groupRestService.removeRobots(request);
+
+        return ResponseEntity.ok(JsonResult.success(group));
+    }
+
+    @Operation(summary = "Query Robot Uids", description = "Query robot uids of the group")
+    @ApiResponse(responseCode = "200", description = "Query successfully")
+    @GetMapping("/robot/query")
+    public ResponseEntity<?> queryRobotUids(@RequestParam String uid) {
+
+        return ResponseEntity.ok(JsonResult.success(groupRestService.queryRobotUids(uid)));
     }
 
     @Operation(summary = "Invite Members", description = "Invite members to join the group")

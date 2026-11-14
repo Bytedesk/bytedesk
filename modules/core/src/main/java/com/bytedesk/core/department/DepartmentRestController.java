@@ -15,6 +15,7 @@ package com.bytedesk.core.department;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,10 +101,15 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
     @Override
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DepartmentRequest request) {
-
-        departmentRestService.delete(request);
-
-        return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
+        try {
+            departmentRestService.delete(request);
+            return ResponseEntity.ok().body(JsonResult.success("delete dep success"));
+        } catch (DepartmentDeletionCommittedException exception) {
+            return ResponseEntity.ok().body(JsonResult.error(
+                    exception.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    java.util.Map.of("deletionCommitted", true)));
+        }
     }
 
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT)

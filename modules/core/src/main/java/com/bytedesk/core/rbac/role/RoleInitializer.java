@@ -133,6 +133,13 @@ public class RoleInitializer {
         authorityValuesToCreate.add(RoleAuthorityRules.SETTINGS_DELETE);
         authorityValuesToCreate.add(RoleAuthorityRules.SETTINGS_EXPORT);
 
+        // 职务字典权限（modules/core jobtitle）。ROLE_USER 默认集只含 READ，
+        // 写权限 authority 须在此显式创建，ROLE_ADMIN/SUPER 绑定才能命中
+        authorityValuesToCreate.add(RoleAuthorityRules.JOBTITLE_READ);
+        authorityValuesToCreate.add(RoleAuthorityRules.JOBTITLE_CREATE);
+        authorityValuesToCreate.add(RoleAuthorityRules.JOBTITLE_UPDATE);
+        authorityValuesToCreate.add(RoleAuthorityRules.JOBTITLE_DELETE);
+
         // 确保 ROLE_USER 默认权限对应的 authority 全部存在（后续绑定时才能 findByValue 命中）
         // 这里会包含 USER/MESSAGE/THREAD/TICKET 等基础权限，避免在上面重复 add。
         authorityValuesToCreate.addAll(RoleAuthorityRules.DEFAULT_ROLE_USER_AUTHORITY_VALUES);

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        群机器人 + 论坛群支持：
+        - bytedesk_team_groups 增加 robot_uids 列（CSV 存储，core 层不依赖 ai 模块实体）
+        - 帖子/评论/点赞复用消息表既有列（type/content/extra），无新表
+        跨库兼容：addColumn 为标准标签（MySQL/PostgreSQL/H2/Oracle/KingBase）。
+    -->
+
+    <changeSet id="261107-1-group-add-robot-uids" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_team_groups"/>
+            <not>
+                <columnExists tableName="bytedesk_team_groups" columnName="robot_uids"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_team_groups">
+            <column name="robot_uids" type="varchar(2048)" defaultValue="">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

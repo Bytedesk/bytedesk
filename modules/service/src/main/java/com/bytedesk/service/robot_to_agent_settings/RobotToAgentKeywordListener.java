@@ -246,7 +246,8 @@ public class RobotToAgentKeywordListener {
         try {
             threadRestService.findByUid(thread.getUid()).ifPresent(latest -> {
                 boolean statusRolledBack = false;
-                if (latest.isQueuing() && !hasAgentAssigned(latest)) {
+                if (latest.isQueuing() && !hasAgentAssigned(latest)
+                        && !Boolean.TRUE.equals(latest.getTagRoutingEvaluated())) {
                     latest.setRoboting();
                     latest.setTransferStatus(ThreadTransferStatusEnum.NONE.name());
                     threadRestService.save(latest);
@@ -375,6 +376,7 @@ public class RobotToAgentKeywordListener {
             .nickname(visitor != null ? visitor.getNickname() : null)
             .avatar(visitor != null ? visitor.getAvatar() : null)
             .orgUid(thread.getOrgUid())
+            .routingTags(thread.getRoutingTagSnapshot())
             .channel(thread.getChannel())
             .sid(workgroup.getUid());
         // 仅社交渠道透传源会话 extra（下游 buildWorkgroupExtra 对社交渠道直接使用请求 extra）；

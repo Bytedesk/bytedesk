@@ -1124,7 +1124,12 @@ public class ThreadRestService
         ThreadEntity savedEntity = threadRepository.save(entity);
         // 更新活跃会话缓存
         if (savedEntity != null) {
-            activeThreadCacheService.addOrUpdateActiveThread(savedEntity);
+            if (savedEntity.getTagRoutingEvaluated() != null) {
+                com.bytedesk.core.utils.AfterCommit.run(
+                        () -> activeThreadCacheService.addOrUpdateActiveThread(savedEntity));
+            } else {
+                activeThreadCacheService.addOrUpdateActiveThread(savedEntity);
+            }
         }
         return savedEntity;
     }
@@ -1141,6 +1146,10 @@ public class ThreadRestService
     })
     public ThreadEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e,
             ThreadEntity entity) {
+        if (entity.getTagRoutingEvaluated() != null) {
+            // A stale human decision must not merge its ownership/status over a newer allocation.
+            throw e;
+        }
         try {
             Optional<ThreadEntity> latestOptional = threadRepository.findByUid(entity.getUid());
             if (latestOptional.isPresent()) {

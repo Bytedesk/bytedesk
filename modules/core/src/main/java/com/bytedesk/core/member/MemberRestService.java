@@ -142,6 +142,7 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         if (user == null) {
             throw CommonI18nExceptions.loginRequired();
         }
+
         if (!StringUtils.hasText(request.getOrgUid())) {
             throw new IllegalArgumentException("orgUid is required");
         }
@@ -151,6 +152,27 @@ public class MemberRestService extends BaseRestServiceWithExport<MemberEntity, M
         } else {
             throw ResourceI18nExceptions.memberNotFound();
         }
+    }
+
+    public long countByOrgUid(String orgUid) {
+        requireOrganization(orgUid);
+
+        MemberRequest countRequest = new MemberRequest();
+        countRequest.setOrgUid(orgUid);
+        countRequest.setDeleted(false);
+        Specification<MemberEntity> specification = MemberSpecification.search(countRequest, authService);
+        return memberRepository.count(specification);
+    }
+
+    public long countUnassignedByOrgUid(String orgUid) {
+        requireOrganization(orgUid);
+
+        MemberRequest countRequest = new MemberRequest();
+        countRequest.setOrgUid(orgUid);
+        countRequest.setDeleted(false);
+        countRequest.setUnassignedDepartment(true);
+        Specification<MemberEntity> specification = MemberSpecification.search(countRequest, authService);
+        return memberRepository.count(specification);
     }
 
     public MemberResponse queryByUserUid(MemberRequest request) {

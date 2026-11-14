@@ -109,6 +109,17 @@ public class QueueService {
             QueueEntity agentOrRobotQueue = getAgentOrRobotQueue(agent, threadEntity.getOrgUid());
             validateQueue(agentOrRobotQueue, "Agent queue is full or not active");
 
+            if (threadEntity.getTagRoutingEvaluated() != null
+                    && org.springframework.transaction.support.TransactionSynchronizationManager
+                            .isActualTransactionActive()) {
+                if (agent.isAgent()) {
+                    member.setAgentQueue(agentOrRobotQueue);
+                } else {
+                    member.setRobotQueue(agentOrRobotQueue);
+                }
+                return queueMemberRestService.save(member);
+            }
+
             // 避免在当前事务中直接提交对已有 queue_member 的修改，
             // 否则与并发统计更新叠加时容易在主流程提交点触发乐观锁异常。
             entityManager.detach(member);

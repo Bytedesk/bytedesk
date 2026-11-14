@@ -62,7 +62,8 @@ public class GroupResponse extends BaseResponse {
     
     private List<UserProtobuf> admins;
 
-    // private List<RobotProtobuf> robots;
+    // 群机器人UID列表（机器人详情由前端通过 /api/v1/robot/query/uids 批量获取）
+    private List<String> robotUids;
 
     private UserProtobuf creator;
 

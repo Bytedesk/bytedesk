@@ -201,6 +201,12 @@ public final class RoleAuthorityRules {
     public static final String TAG_DELETE = "TAG_DELETE";
     public static final String TAG_EXPORT = "TAG_EXPORT";
 
+    // jobtitle (modules/core) 职务字典
+    public static final String JOBTITLE_READ = "JOBTITLE_READ";
+    public static final String JOBTITLE_CREATE = "JOBTITLE_CREATE";
+    public static final String JOBTITLE_UPDATE = "JOBTITLE_UPDATE";
+    public static final String JOBTITLE_DELETE = "JOBTITLE_DELETE";
+
     // visitor (modules/service)
     public static final String VISITOR_READ = "VISITOR_READ";
     public static final String VISITOR_CREATE = "VISITOR_CREATE";
@@ -333,6 +339,9 @@ public final class RoleAuthorityRules {
             TAG_READ,
             TAG_UPDATE,
             TAG_DELETE,
+
+            // jobtitle 职务字典：普通成员仅读（MemberDrawer 候选项）
+            JOBTITLE_READ,
 
             // robot
             ROBOT_READ,

@@ -255,6 +255,8 @@ public class WorkgroupRoutingService {
         return WorkgroupRoutingStateResponse.builder()
                 .workgroupUid(workgroup.getUid())
                 .routingMode(routingMode)
+                .tagRoutingEnabled(workgroup.getSettings() != null
+                        && Boolean.TRUE.equals(workgroup.getSettings().getTagRoutingEnabled()))
                 .nextAgentUid(next == null ? state.getNextAgentUid() : next.getUid())
                 .nextAgent(next == null ? null : next.toUserProtobuf())
                 .availableAgents(availableAgents == null ? List.of() : availableAgents.stream().map(agent -> agent.toUserProtobuf()).toList())

@@ -18,5 +18,11 @@
     <include file="db/changelog/migration/261031_add_assistant_config_table.xml" />
     <include file="db/changelog/migration/261106_rename_consumer_type_shopping_to_retail.xml" />
     <include file="db/changelog/migration/261106_rename_demo_retail_tables.xml" />
+    <include file="db/changelog/migration/261107_add_group_forum_features.xml" />
+    <include file="db/changelog/migration/261107_add_group_forum_tables.xml" />
+    <include file="db/changelog/migration/261109_add_webrtc_expires_at.xml" />
+    <include file="db/changelog/migration/261112_add_jobtitle_table.xml" />
+    <include file="db/changelog/migration/261112_add_remote_assistance_tables.xml" />
+    <include file="db/changelog/migration/261113_add_workgroup_tag_routing.xml" />
 
 </databaseChangeLog>

@@ -46,6 +46,8 @@ public class LlmProviderRequest extends BaseRequest {
     private String baseUrl;
     private String apiKey;
     private String webUrl;
+    // 官方模型列表文档地址
+    private String modelListUrl;
 
     // 关联的Coze Bot
     private String cozeBotId;

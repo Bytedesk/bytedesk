@@ -14,6 +14,8 @@
  */
 package com.bytedesk.core.message;
 
+import java.util.List;
+
 import com.bytedesk.core.base.BaseExtra;
 import com.bytedesk.core.message.enums.MessageVisibilityEnum;
 
@@ -51,6 +53,13 @@ public class MessageExtra extends BaseExtra {
 
     // 如果来自快捷按钮，可记录按钮 uid 以便追溯
     private String quickButtonUid;
+
+    /**
+     * @提及列表（群聊 @成员/@机器人/@所有人）。
+     * start/end 为正文中 "@昵称" 片段的 UTF-16 code unit 起止位置，end 为开区间；
+     * 后端用于识别 @机器人触发 AI 回复，前端用于高亮。
+     */
+    private List<MessageMention> mentions;
 
     public static MessageExtra fromJson(String json) {
         MessageExtra result = BaseExtra.fromJson(json, MessageExtra.class);

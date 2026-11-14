@@ -30,7 +30,7 @@ deploy/docker/
 │   ├── grafana/ logstash/ searxng/   # 各组件配置（与对应 compose 文件同目录）
 │   ├── prometheus.yml      # Prometheus 抓取配置
 │   └── ik-plugin-cache/    # ES IK 分词插件离线缓存
-├── start.sh / stop.sh     # 关键字组合启停脚本
+├── start.sh / stop.sh / restart.sh  # 关键字组合启停/重启脚本（restart = docker restart）
 ├── watchdog.sh            # bytedesk 应用看门狗
 ├── .env / .env.example    # 环境变量（敏感信息集中在 .env）
 ├── readme/                # 详细说明文档

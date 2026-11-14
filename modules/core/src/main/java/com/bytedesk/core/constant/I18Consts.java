@@ -44,8 +44,12 @@ public class I18Consts {
     public static final String I18N_CITY_INIT_SCHEDULED = I18N_PREFIX + "city.init.scheduled";
     public static final String I18N_CITY_INIT_SKIPPED = I18N_PREFIX + "city.init.skipped";
 
+    // 职务初始化相关（后端返回 i18n key，前端通过 translateString 翻译，{0} 为新增数量）
+    public static final String I18N_JOBTITLE_INIT_SUCCESS = I18N_PREFIX + "jobtitle.init.success";
+
     // 通用操作动作与模块标题
     public static final String I18N_TAG = I18N_PREFIX + "tag";
+    public static final String I18N_JOBTITLE = I18N_PREFIX + "jobtitle";
     public static final String I18N_APNS_P12 = I18N_PREFIX + "apns.p12";
     public static final String I18N_APNS_P12_EXISTS = I18N_PREFIX + "apns.p12.exists"; // APNS证书已存在
     public static final String I18N_APNS_TOKEN = I18N_PREFIX + "apns.token";

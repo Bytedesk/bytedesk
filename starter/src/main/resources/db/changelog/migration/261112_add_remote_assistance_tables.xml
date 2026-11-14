@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="261112-20-remote-device" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_desktop_device"/></not></preConditions>
+        <createTable tableName="bytedesk_desktop_device">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"/>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="device_name" type="VARCHAR(128)"/>
+            <column name="os_type" type="VARCHAR(32)"/>
+            <column name="online" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="last_online" type="timestamp"/>
+        </createTable>
+        <createIndex tableName="bytedesk_desktop_device" indexName="idx_remote_device_org"><column name="org_uid"/></createIndex>
+    </changeSet>
+    <changeSet id="261112-21-remote-session" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_desktop_session"/></not></preConditions>
+        <createTable tableName="bytedesk_desktop_session">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"/>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="thread_uid" type="VARCHAR(255)"/>
+            <column name="active_thread_uid" type="VARCHAR(255)"><constraints unique="true"/></column>
+            <column name="room_uid" type="VARCHAR(255)"/>
+            <column name="viewer_uid" type="VARCHAR(255)"/>
+            <column name="viewer_name" type="VARCHAR(255)"/>
+            <column name="host_uid" type="VARCHAR(255)"/>
+            <column name="host_device_uid" type="VARCHAR(255)"/>
+            <column name="session_status" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <column name="invitation_hash" type="VARCHAR(64)"/>
+            <column name="host_token_hash" type="VARCHAR(64)"/>
+            <column name="invitation_expires_at" type="timestamp"/>
+            <column name="expires_at" type="timestamp"/>
+            <column name="started_at" type="timestamp"/>
+            <column name="ended_at" type="timestamp"/>
+            <column name="host_seen_at" type="timestamp"/>
+            <column name="viewer_seen_at" type="timestamp"/>
+            <column name="control_requested" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="control_granted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="input_count" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="termination_reason" type="VARCHAR(64)"/>
+            <column name="host_signals" type="CLOB"/>
+            <column name="viewer_signals" type="CLOB"/>
+        </createTable>
+        <createIndex tableName="bytedesk_desktop_session" indexName="idx_remote_session_org"><column name="org_uid"/><column name="viewer_uid"/></createIndex>
+        <createIndex tableName="bytedesk_desktop_session" indexName="idx_remote_session_expiry"><column name="session_status"/><column name="expires_at"/></createIndex>
+    </changeSet>
+    <changeSet id="261112-22-remote-audit" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_desktop_audit_log"/></not></preConditions>
+        <createTable tableName="bytedesk_desktop_audit_log">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"/>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="session_uid" type="VARCHAR(255)"/>
+            <column name="event_type" type="VARCHAR(64)"/>
+            <column name="details" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex tableName="bytedesk_desktop_audit_log" indexName="idx_remote_audit_session"><column name="session_uid"/><column name="created_at"/></createIndex>
+    </changeSet>
+</databaseChangeLog>

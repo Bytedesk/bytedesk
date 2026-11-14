@@ -414,130 +414,172 @@
     ],
     "volcengine": [
         {
-            "name": "doubao-1-5-vision-pro-32k-250115",
-            "nickname": "doubao-1.5-vision-pro",
-            "description": "火山引擎豆包1.5视觉专业版，支持32K上下文和图像理解",
+            "name": "doubao-seed-evolving",
+            "nickname": "Doubao-Seed-Evolving",
+            "description": "火山引擎豆包Seed快速迭代模型，周级更新，专注编码与智能体能力，支持深度思考、多模态理解与工具调用，1024K上下文",
             "type": "VISION"
         },
         {
-            "name": "doubao-1-5-pro-32k-250115",
-            "nickname": "doubao-1.5-pro-32k",
-            "description": "火山引擎豆包1.5专业版，支持32K上下文的对话能力",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-1-5-pro-32k-character-250228",
-            "nickname": "doubao-1.5-pro-32k-character",
-            "description": "火山引擎豆包1.5角色扮演专业版，支持32K上下文",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-1-5-pro-256k-250115",
-            "nickname": "Doubao-1.5-pro-256k",
-            "description": "火山引擎豆包1.5专业版，支持256K超长上下文的对话能力",
-            "type": "TEXT"
-        },
-        {
-            "name": "deepseek-r1-250120",
-            "nickname": "DeepSeek-R1",
-            "description": "火山引擎提供的深度求索R1模型，专注于推理能力",
-            "type": "REASONING"
-        },
-        {
-            "name": "deepseek-r1-distill-qwen-32b-250120",
-            "nickname": "DeepSeek-R1-Distill-Qwen-32B",
-            "description": "深度求索R1知识蒸馏到通义千问32B的模型版本",
-            "type": "REASONING"
-        },
-        {
-            "name": "deepseek-r1-distill-qwen-7b-250120",
-            "nickname": "DeepSeek-R1-Distill-Qwen-7B",
-            "description": "深度求索R1知识蒸馏到通义千问7B的轻量级模型",
-            "type": "REASONING"
-        },
-        {
-            "name": "deepseek-v3-250324",
-            "nickname": "DeepSeek-V3",
-            "description": "火山引擎提供的深度求索V3模型，第三代通用对话能力",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-pro-32k-241215",
-            "nickname": "Doubao-pro-32k",
-            "description": "火山引擎豆包专业版，支持32K上下文的对话模型",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-pro-32k-functioncall-241028",
-            "nickname": "Doubao-pro-32k-functioncall-241028",
-            "description": "支持函数调用的豆包专业版，适合开发工具型应用",
-            "type": "function"
-        },
-        {
-            "name": "doubao-pro-32k-character-241215",
-            "nickname": "Doubao-pro-32k-character-241215",
-            "description": "支持角色扮演的豆包专业版，适合定制化对话场景",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-pro-256k-241115",
-            "nickname": "Doubao-pro-256k",
-            "description": "火山引擎豆包专业版，支持256K超长上下文的对话模型",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-lite-4k-character-240828",
-            "nickname": "Doubao-lite-4k-character-240828",
-            "description": "轻量级角色扮演豆包模型，支持4K上下文",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-lite-32k-240828",
-            "nickname": "Doubao-lite-32k",
-            "description": "火山引擎豆包轻量版，支持32K上下文的高效对话模型",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-lite-32k-character-241015",
-            "nickname": "Doubao-lite-32k-character-241015",
-            "description": "轻量级角色扮演豆包模型，支持32K上下文",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-lite-128k-240828",
-            "nickname": "Doubao-lite-128k",
-            "description": "火山引擎豆包轻量版，支持128K上下文的对话模型",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-1-5-lite-32k-250115",
-            "nickname": "Doubao-1.5-lite-32k",
-            "description": "火山引擎豆包1.5轻量版，支持32K上下文的对话模型",
-            "type": "TEXT"
-        },
-        {
-            "name": "doubao-embedding-large-text-240915",
-            "nickname": "Doubao-embedding-large",
-            "description": "火山引擎豆包大规模文本嵌入模型，用于高质量文本向量化",
-            "type": "EMBEDDING"
-        },
-        {
-            "name": "doubao-embedding-text-240715",
-            "nickname": "Doubao-embedding",
-            "description": "火山引擎豆包文本嵌入模型，用于文本向量表示",
-            "type": "EMBEDDING"
-        },
-        {
-            "name": "doubao-embedding-vision-241215",
-            "nickname": "Doubao-embedding-vision",
-            "description": "火山引擎豆包视觉嵌入模型，用于图像特征向量化",
-            "type": "EMBEDDING"
-        },
-        {
-            "name": "doubao-vision-lite-32k-241015",
-            "nickname": "Doubao-vision-lite-32k",
-            "description": "火山引擎豆包视觉轻量版，支持32K上下文的多模态模型",
+            "name": "doubao-seed-2-1-pro-260915",
+            "nickname": "Doubao-Seed-2.1-Pro",
+            "description": "火山引擎豆包Seed 2.1旗舰模型，支持深度思考、多模态理解、GUI任务处理与工具调用，1024K上下文",
             "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-2-1-lite-260915",
+            "nickname": "Doubao-Seed-2.1-Lite",
+            "description": "火山引擎豆包Seed 2.1轻量版，支持深度思考、多模态理解与工具调用，高并发低延迟，1024K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-2-1-turbo-260628",
+            "nickname": "Doubao-Seed-2.1-Turbo",
+            "description": "火山引擎豆包Seed 2.1 Turbo版，支持深度思考、多模态理解与工具调用，256K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-2-1-pro-260628",
+            "nickname": "Doubao-Seed-2.1-Pro-256k",
+            "description": "火山引擎豆包Seed 2.1专业版，支持深度思考、多模态理解、GUI任务处理与工具调用，256K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-2-0-lite-260428",
+            "nickname": "Doubao-Seed-2.0-Lite",
+            "description": "火山引擎豆包Seed 2.0轻量版LTS长效版本，支持深度思考、多模态理解与工具调用，256K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-2-0-mini-260428",
+            "nickname": "Doubao-Seed-2.0-Mini",
+            "description": "火山引擎豆包Seed 2.0迷你版LTS长效版本，支持深度思考、多模态理解与工具调用，256K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-character-260628",
+            "nickname": "Doubao-Seed-Character",
+            "description": "火山引擎豆包角色扮演模型，支持深度思考、多模态理解与工具调用，适合拟人化对话场景，128K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "doubao-seed-character-251128",
+            "nickname": "Doubao-Seed-Character-251128",
+            "description": "火山引擎豆包角色扮演模型，支持工具调用，适合定制化角色对话场景，128K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "doubao-seed-translation-250915",
+            "nickname": "Doubao-Seed-Translation",
+            "description": "火山引擎豆包翻译增强模型，专为多语种翻译优化，支持工具调用",
+            "type": "TEXT"
+        },
+        {
+            "name": "glm-5-3-flash-260828",
+            "nickname": "GLM-5.3-Flash",
+            "description": "智谱GLM-5.3-Flash原生多模态模型（火山引擎方舟托管），支持深度思考、多模态理解与工具调用，1024K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "glm-5-2-260617",
+            "nickname": "GLM-5.2",
+            "description": "智谱GLM-5.2旗舰文本模型（火山引擎方舟托管），支持深度思考与工具调用，1024K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "kimi-k3-1-pro-261024",
+            "nickname": "Kimi-K3.1-Pro",
+            "description": "月之暗面Kimi K3.1 Pro模型（火山引擎方舟托管），支持深度思考、多模态理解与工具调用，1024K上下文",
+            "type": "VISION"
+        },
+        {
+            "name": "deepseek-v4-1-flash-261017",
+            "nickname": "DeepSeek-V4.1-Flash",
+            "description": "深度求索DeepSeek V4.1 Flash模型（火山引擎方舟托管），支持深度思考与工具调用，1024K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "deepseek-v4-1-flash-260910",
+            "nickname": "DeepSeek-V4.1-Flash-260910",
+            "description": "深度求索DeepSeek V4.1 Flash模型历史版本（火山引擎方舟托管），支持深度思考与工具调用，1024K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "deepseek-v4-1-flash-economy-261017",
+            "nickname": "DeepSeek-V4.1-Flash-Economy",
+            "description": "深度求索DeepSeek V4.1 Flash经济版（火山引擎方舟托管），高性价比，支持深度思考与工具调用",
+            "type": "TEXT"
+        },
+        {
+            "name": "deepseek-v4-pro-ga-260813",
+            "nickname": "DeepSeek-V4-Pro",
+            "description": "深度求索DeepSeek V4 Pro正式版（火山引擎方舟托管），支持深度思考与工具调用，1024K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "deepseek-v4-flash-ga-260731",
+            "nickname": "DeepSeek-V4-Flash",
+            "description": "深度求索DeepSeek V4 Flash正式版（火山引擎方舟托管），支持深度思考与工具调用，1024K上下文",
+            "type": "TEXT"
+        },
+        {
+            "name": "doubao-seedance-2-5-260628",
+            "nickname": "Doubao-Seedance-2.5",
+            "description": "火山引擎豆包高性能视频生成模型，支持文生视频、参考生视频、首尾帧生视频与视频编辑，4~30秒，最高1080p",
+            "type": "TEXT2VIDEO"
+        },
+        {
+            "name": "doubao-seedance-2-0-260128",
+            "nickname": "Doubao-Seedance-2.0",
+            "description": "火山引擎豆包视频生成模型，支持全模态参考生视频与视频编辑，4~15秒，最高4K分辨率",
+            "type": "TEXT2VIDEO"
+        },
+        {
+            "name": "doubao-seedance-2-0-fast-260128",
+            "nickname": "Doubao-Seedance-2.0-Fast",
+            "description": "火山引擎豆包视频生成高速版，快速生成480p/720p视频，4~15秒",
+            "type": "TEXT2VIDEO"
+        },
+        {
+            "name": "doubao-seedance-2-0-mini-260615",
+            "nickname": "Doubao-Seedance-2.0-Mini",
+            "description": "火山引擎豆包视频生成轻量版，高性价比，支持参考生视频与视频编辑",
+            "type": "TEXT2VIDEO"
+        },
+        {
+            "name": "doubao-seedream-5-0-pro-260628",
+            "nickname": "Doubao-Seedream-5.0-Pro",
+            "description": "火山引擎豆包最新图像创作模型，支持文生图、图生图、多参考图生图与图层拆分",
+            "type": "TEXT2IMAGE"
+        },
+        {
+            "name": "doubao-seedream-5-0-flash-260915",
+            "nickname": "Doubao-Seedream-5.0-Flash",
+            "description": "火山引擎豆包图像生成高速版，支持文生图、图生图、多参考图生图与图层拆分",
+            "type": "TEXT2IMAGE"
+        },
+        {
+            "name": "doubao-seed3d-2-0-260328",
+            "nickname": "Doubao-Seed3D-2.0",
+            "description": "火山引擎豆包3D生成模型，图生3D，输出带纹理和PBR材质的模型文件",
+            "type": "TEXT2IMAGE_3D"
+        },
+        {
+            "name": "hyper3d-gen2-260112",
+            "nickname": "Hyper3D-Gen2",
+            "description": "火山引擎方舟托管Hyper3D Gen2模型，支持文生3D与图生3D，输出白模或带纹理PBR模型",
+            "type": "TEXT2IMAGE_3D"
+        },
+        {
+            "name": "hitem3d-2-0-251223",
+            "nickname": "Hitem3D-2.0",
+            "description": "火山引擎方舟托管Hitem3D模型，图生3D，支持标准与高精度模式",
+            "type": "TEXT2IMAGE_3D"
+        },
+        {
+            "name": "doubao-embedding-vision-251215",
+            "nickname": "Doubao-Embedding-Vision",
+            "description": "火山引擎豆包多模态向量化模型，支持文本、图片、视频输入，最高2048维向量，支持1024降维",
+            "type": "MULTIMODAL_EMBEDDING"
         }
     ],
     "minimax": [

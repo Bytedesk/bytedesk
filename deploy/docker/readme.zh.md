@@ -31,6 +31,12 @@ cp .env.example .env
 ./stop.sh              # 停止
 ./stop.sh down         # 删除容器（保留数据卷）
 
+# 重启（等价 docker restart，保留容器原配置；不传参数 = 重启项目内全部容器）
+./restart.sh freeswitch   # 仅重启 FreeSWITCH
+./restart.sh call         # 重启 freeswitch + mrcp
+./restart.sh app          # 仅重启 bytedesk 应用
+./restart.sh              # 重启全部（按依赖顺序，应用最后）
+
 # 仅中间件（源码本地开发，不启动 bytedesk 应用镜像）
 ./start.sh middleware
 ./stop.sh middleware down
@@ -97,6 +103,8 @@ docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 
 停止动作：`./stop.sh [stop|down] [关键字...]`，动作词可在任意位置，关键字与启动时一致；`down` 删除容器保留数据卷。
 
+重启动作：`./restart.sh [关键字...]`，关键字与 start.sh 一致（额外支持 `app` 仅重启应用），直达容器执行 `docker restart`；容器不存在时跳过。注意：restart 不会应用 `.env` 新改动，修改配置后请重新执行 `./start.sh`。
+
 ## 文件清单
 
 所有 compose 文件及各组件配套配置（`searxng/`、`grafana/`、`logstash/`、`prometheus.yml`、`ik-plugin-cache/`、`james/`）均位于 [`compose/`](./compose/) 目录：
@@ -128,7 +136,7 @@ docker pull registry.cn-hangzhou.aliyuncs.com/bytedesk/bytedesk:latest
 | compose/compose-otelcol.yaml | otel/opentelemetry-collector-contrib | 14317/14318 | [可观测性](./readme/readme.observability.md)——OTLP 接收，trace 转发 Zipkin |
 | compose/compose-james.yaml | apache/james:jpa-latest | 10025/10465/10587/10143/10993/10110/10995/18000 | [James 邮件服务器](./readme/readme.james.md) |
 
-其他文件：`start.sh`/`stop.sh`（组合启停）、`watchdog.sh`（应用看门狗，详见 [watchdog 使用说明](./readme/readme.watchdog.md)）、`.env`（敏感配置）、`one/`（all-in-one 单文件部署）。
+其他文件：`start.sh`/`stop.sh`/`restart.sh`（组合启停/重启）、`watchdog.sh`（应用看门狗，详见 [watchdog 使用说明](./readme/readme.watchdog.md)）、`.env`（敏感配置）、`one/`（all-in-one 单文件部署）。
 
 ## 手动执行 docker compose
 

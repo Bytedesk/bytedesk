@@ -45,6 +45,8 @@ import com.bytedesk.service.queue_member.QueueMemberEntity;
 import com.bytedesk.service.queue_member.QueueMemberRestService;
 import com.bytedesk.service.utils.ServiceConvertUtils;
 import com.bytedesk.service.visitor.VisitorRequest;
+import com.bytedesk.service.visitor.VisitorRoutingTags;
+import com.bytedesk.core.enums.VisitorCallTypeEnum;
 import com.bytedesk.service.workgroup.WorkgroupEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsEntity;
 import com.bytedesk.service.agent_settings.AgentSettingsRestService;
@@ -178,6 +180,10 @@ public class VisitorThreadService
                 .channel(visitorRequest.getChannel())
                 .orgUid(workgroup.getOrgUid())
                 .build();
+        if (visitorRequest.formatCallType() == VisitorCallTypeEnum.TEXT) {
+            thread.setRoutingTagSnapshot(VisitorRoutingTags.normalize(visitorRequest.getRoutingTags()));
+            thread.setTagRoutingEvaluated(false);
+        }
         // 保存
         ThreadEntity savedEntity = threadRestService.save(thread);
         if (savedEntity == null) {

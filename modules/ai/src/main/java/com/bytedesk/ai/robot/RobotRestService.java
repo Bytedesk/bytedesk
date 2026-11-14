@@ -14,7 +14,10 @@
 package com.bytedesk.ai.robot;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -123,6 +126,53 @@ public class RobotRestService extends BaseRestServiceWithExport<RobotEntity, Rob
             throw new RuntimeException("robot not found by uid: " + request.getUid());
         }
         return convertToResponse(robotOptional.get());
+    }
+
+    /**
+     * 批量按 uid 查询机器人轻量详情（群机器人展示用）。
+     * 只返回展示字段，不暴露 provider/模型/提示词等配置；上限 50 个；
+     * 失效 uid 以 valid=false 标记，保证前端能区分「已删除的群机器人」。
+     */
+    public List<Map<String, Object>> queryLightweightByUids(List<String> uids) {
+        int MAX_BATCH = 50;
+        if (uids == null || uids.isEmpty()) {
+            throw new RuntimeException("uids required");
+        }
+        List<String> normalized = uids.stream()
+                .filter(StringUtils::hasText)
+                .map(uid -> uid.trim())
+                .distinct()
+                .collect(Collectors.toList());
+        if (normalized.isEmpty()) {
+            throw new RuntimeException("uids required");
+        }
+        if (normalized.size() > MAX_BATCH) {
+            throw new RuntimeException("uids size exceeds limit: " + MAX_BATCH);
+        }
+        //
+        List<RobotEntity> robots = robotRepository.findByUidInAndDeletedFalse(normalized);
+        return normalized.stream().map(uid -> {
+            RobotEntity robot = robots.stream()
+                    .filter(item -> uid.equals(item.getUid()))
+                    .findFirst()
+                    .orElse(null);
+            Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("uid", uid);
+            if (robot == null) {
+                item.put("valid", false);
+                item.put("nickname", uid);
+                item.put("avatar", "");
+                item.put("description", "");
+                item.put("type", "");
+            } else {
+                item.put("valid", true);
+                item.put("nickname", robot.getNickname());
+                item.put("avatar", robot.getAvatar());
+                item.put("description", robot.getDescription());
+                item.put("type", robot.getType());
+            }
+            return item;
+        }).collect(Collectors.toList());
     }
 
     @Transactional

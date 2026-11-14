@@ -16,6 +16,7 @@ package com.bytedesk.core.member;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -41,6 +42,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface MemberRepository extends JpaRepository<MemberEntity, Long>, JpaSpecificationExecutor<MemberEntity> {
 
     List<MemberEntity> findByDeptUidAndDeletedFalse(String deptUid);
+
+    List<MemberEntity> findByDeptUidInAndOrgUidAndDeletedFalse(Set<String> deptUids, String orgUid);
 
     /**
      * 查询组织下全部有效成员：用于内部工单未选择部门时的自动分配候选人兜底。

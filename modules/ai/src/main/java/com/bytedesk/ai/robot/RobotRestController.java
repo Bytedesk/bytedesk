@@ -28,6 +28,9 @@ import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponse;
 import com.bytedesk.core.utils.JsonResult;
 
+import java.util.List;
+import java.util.Map;
+
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,6 +94,24 @@ public class RobotRestController extends BaseRestController<RobotRequest, RobotR
         RobotResponse robot = robotRestService.queryByUid(request);
 
         return ResponseEntity.ok(JsonResult.success(robot));
+    }
+
+    /**
+     * 批量按 uid 查询机器人轻量详情（群机器人展示用）。
+     * 只返回展示字段（uid/nickname/avatar/description/type），不暴露 provider/模型/提示词等配置。
+     * 上限 50 个 uid；失效 uid 以 valid=false 单独标记，不整体失败。
+     */
+    @Operation(summary = "Query Robots by UIDs", description = "Batch query lightweight robot details by uids for group robot display")
+    @ApiResponse(responseCode = "200", description = "Query successful")
+    @PreAuthorize("isAuthenticated()")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query robots by uids")
+    @PostMapping("/query/uids")
+    public ResponseEntity<?> queryByUids(@RequestBody Map<String, List<String>> body) {
+
+        List<String> uids = body == null ? null : body.get("uids");
+        List<Map<String, Object>> result = robotRestService.queryLightweightByUids(uids);
+
+        return ResponseEntity.ok(JsonResult.success(result));
     }
     
     @Operation(summary = "Create Robot", description = "Create a new robot")

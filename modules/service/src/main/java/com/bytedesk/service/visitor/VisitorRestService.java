@@ -246,6 +246,7 @@ public class VisitorRestService extends BaseRestServiceWithExport<VisitorEntity,
     }
 
     public MessageProtobuf requestThread(VisitorRequest request) {
+        request.setRoutingTags(request.getRoutingTags());
         return threadRoutingContext.createCsThread(request);
     }
 

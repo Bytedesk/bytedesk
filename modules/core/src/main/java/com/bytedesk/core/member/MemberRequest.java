@@ -98,4 +98,6 @@ public class MemberRequest extends BaseRequest {
     // 存储deptUid对应的子部门uid列表
     @Builder.Default
     private Set<String> subDeptUids = new HashSet<>();
+
+    private Boolean unassignedDepartment;
 }

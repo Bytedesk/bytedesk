@@ -631,7 +631,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return answer;
         } catch (Exception e) {
             log.error("Error in sendSyncMessage", e);
-            String errorMessage = I18Consts.I18N_SERVICE_TEMPORARILY_UNAVAILABLE;
+            String errorMessage = SseMessageHelper.resolveErrorText(e);
             RobotContent streamError = RobotContent.builder()
                     .question(query)
                     .answer("")

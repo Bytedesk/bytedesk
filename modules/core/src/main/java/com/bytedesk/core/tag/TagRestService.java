@@ -24,6 +24,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseRestServiceWithExport;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
@@ -99,14 +100,33 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
     }
 
     private TagResponse createInternal(TagRequest request, boolean skipPermissionCheck) {
+        boolean routeTag = TagTypeEnum.ROUTE.name().equals(request.getType());
+        String level = request.getLevel();
+        if (!StringUtils.hasText(level)) {
+            level = LevelEnum.ORGANIZATION.name();
+            request.setLevel(level);
+        }
+
+        if (routeTag) {
+            if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TagPermissions.MODULE_NAME, level)) {
+                throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
+            }
+        }
+
         // 判断是否已经存在
         if (StringUtils.hasText(request.getUid()) && existsByUid(request.getUid())) {
+            if (routeTag) {
+                throw new IllegalStateException("ROUTE tag already exists");
+            }
             return convertToResponse(findByUid(request.getUid()).get());
         }
         // 检查name+orgUid+type是否已经存在
         if (StringUtils.hasText(request.getName()) && StringUtils.hasText(request.getOrgUid()) && StringUtils.hasText(request.getType())) {
             Optional<TagEntity> tag = findByNameAndOrgUidAndType(request.getName(), request.getOrgUid(), request.getType());
             if (tag.isPresent()) {
+                if (routeTag) {
+                    throw new IllegalStateException("ROUTE tag already exists");
+                }
                 return convertToResponse(tag.get());
             }
         }
@@ -118,14 +138,8 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
         }
         
         // 确定数据层级
-        String level = request.getLevel();
-        if (!StringUtils.hasText(level)) {
-            level = LevelEnum.ORGANIZATION.name();
-            request.setLevel(level);
-        }
-        
         // 检查用户是否有权限创建该层级的数据
-        if (!skipPermissionCheck && !permissionService.canCreateAtLevel(TagPermissions.MODULE_NAME, level)) {
+        if (!routeTag && !skipPermissionCheck && !permissionService.canCreateAtLevel(TagPermissions.MODULE_NAME, level)) {
             throw new RuntimeException(I18Consts.I18N_PERMISSION_CREATE_DENIED);
         }
         
@@ -153,8 +167,17 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
             if (!permissionService.hasEntityPermission(TagPermissions.MODULE_NAME, "UPDATE", entity)) {
                 throw new RuntimeException(I18Consts.I18N_PERMISSION_UPDATE_DENIED);
             }
-            
+
+            String originalOrgUid = entity.getOrgUid();
+            String finalType = request.getType() == null ? entity.getType() : request.getType();
             modelMapper.map(request, entity);
+            entity.setType(finalType);
+            if (TagTypeEnum.ROUTE.name().equals(finalType)) {
+                if (request.getOrgUid() != null && !request.getOrgUid().equals(originalOrgUid)) {
+                    throw new IllegalArgumentException("ROUTE tag organization cannot be changed");
+                }
+                entity.setOrgUid(originalOrgUid);
+            }
             //
             TagEntity savedEntity = save(entity);
             if (savedEntity == null) {
@@ -174,21 +197,7 @@ public class TagRestService extends BaseRestServiceWithExport<TagEntity, TagRequ
 
     @Override
     public TagEntity handleOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e, TagEntity entity) {
-        try {
-            Optional<TagEntity> latest = tagRepository.findByUid(entity.getUid());
-            if (latest.isPresent()) {
-                TagEntity latestEntity = latest.get();
-                // 合并需要保留的数据
-                latestEntity.setName(entity.getName());
-                // latestEntity.setOrder(entity.getOrder());
-                // latestEntity.setDeleted(entity.isDeleted());
-                return tagRepository.save(latestEntity);
-            }
-        } catch (Exception ex) {
-            log.error("无法处理乐观锁冲突: {}", ex.getMessage(), ex);
-            throw new RuntimeException("无法处理乐观锁冲突: " + ex.getMessage(), ex);
-        }
-        return null;
+        throw e;
     }
 
     @Transactional

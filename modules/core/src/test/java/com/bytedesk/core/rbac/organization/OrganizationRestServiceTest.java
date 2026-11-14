@@ -22,6 +22,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.exception.ForbiddenException;
+import com.bytedesk.core.jobtitle.JobTitleRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
@@ -54,6 +55,7 @@ class OrganizationRestServiceTest {
                 mock(ModelMapper.class),
                 cacheManager,
                 mock(ApplicationEventPublisher.class),
+                mock(JobTitleRestService.class),
                 mock(ObjectProvider.class));
     }
 

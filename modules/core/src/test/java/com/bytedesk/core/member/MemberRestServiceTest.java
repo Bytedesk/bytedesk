@@ -17,7 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.mockito.ArgumentMatchers;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.jpa.domain.Specification;
+
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 import com.bytedesk.core.exception.OrgMaxMembersExceededException;
 import com.bytedesk.core.message.MessageService;
@@ -128,6 +137,69 @@ class MemberRestServiceTest {
     }
 
     @Test
+    void countByOrgUidUsesAFilteredMemberSpecification() {
+        OrganizationEntity organization = new OrganizationEntity();
+        organization.setUid("org-1");
+        when(organizationRestService.findByUid("org-1")).thenReturn(Optional.of(organization));
+        when(memberRepository.count(ArgumentMatchers.<Specification<MemberEntity>>any())).thenReturn(10L);
+
+        long count = memberRestService.countByOrgUid("org-1");
+
+        assertThat(count).isEqualTo(10L);
+        verify(memberRepository).count(ArgumentMatchers.<Specification<MemberEntity>>any());
+    }
+
+    @Test
+    void countByOrgUidRejectsMissingOrganization() {
+        assertThrows(IllegalArgumentException.class, () -> memberRestService.countByOrgUid(" "));
+    }
+
+    @Test
+    void countUnassignedByOrgUidUsesMemberSpecification() {
+        OrganizationEntity organization = new OrganizationEntity();
+        organization.setUid("org-1");
+        when(organizationRestService.findByUid("org-1")).thenReturn(Optional.of(organization));
+        when(memberRepository.count(ArgumentMatchers.<Specification<MemberEntity>>any())).thenReturn(3L);
+
+        long count = memberRestService.countUnassignedByOrgUid("org-1");
+
+        assertThat(count).isEqualTo(3L);
+        verify(memberRepository).count(ArgumentMatchers.<Specification<MemberEntity>>any());
+    }
+
+    @Test
+    void unassignedDepartmentSpecificationMatchesNullAndBlankDepartmentUids() {
+        MemberRequest request = new MemberRequest();
+        request.setOrgUid("org-1");
+        request.setDeleted(false);
+        request.setUnassignedDepartment(true);
+
+        @SuppressWarnings("unchecked")
+        Root<MemberEntity> root = org.mockito.Mockito.mock(Root.class);
+        CriteriaQuery<?> query = org.mockito.Mockito.mock(CriteriaQuery.class);
+        CriteriaBuilder criteriaBuilder = org.mockito.Mockito.mock(CriteriaBuilder.class);
+        @SuppressWarnings("unchecked")
+        Path<String> departmentUidPath = org.mockito.Mockito.mock(Path.class);
+        @SuppressWarnings("unchecked")
+        Expression<String> trimmedDepartmentUid = org.mockito.Mockito.mock(Expression.class);
+        Predicate nullPredicate = org.mockito.Mockito.mock(Predicate.class);
+        Predicate blankPredicate = org.mockito.Mockito.mock(Predicate.class);
+
+        when(root.get(anyString())).thenAnswer(invocation -> departmentUidPath);
+        when(criteriaBuilder.trim(departmentUidPath)).thenReturn(trimmedDepartmentUid);
+        when(criteriaBuilder.isNull(departmentUidPath)).thenReturn(nullPredicate);
+        lenient().when(criteriaBuilder.equal(trimmedDepartmentUid, "")).thenReturn(blankPredicate);
+        when(criteriaBuilder.or(nullPredicate, blankPredicate)).thenReturn(blankPredicate);
+
+        MemberSpecification.search(request, authService).toPredicate(root, query, criteriaBuilder);
+
+        verify(criteriaBuilder).isNull(departmentUidPath);
+        verify(criteriaBuilder).trim(departmentUidPath);
+        verify(criteriaBuilder).equal(trimmedDepartmentUid, "");
+        verify(criteriaBuilder).or(nullPredicate, blankPredicate);
+    }
+
+    @Test
     void convertExcelToMemberRejectsWhenOrganizationHasReachedMaxMembers() {
         MemberExcelImport excel = new MemberExcelImport();
         excel.setNickname("Imported Member");
@@ -214,6 +286,7 @@ class MemberRestServiceTest {
                                 .build();
 
                 when(memberRepository.findByUid("member-super")).thenReturn(Optional.of(member));
+                when(authService.isOrgAdminOrSuperUser()).thenReturn(true);
 
                 RuntimeException exception = assertThrows(
                                 RuntimeException.class,
@@ -233,6 +306,7 @@ class MemberRestServiceTest {
                                 .build();
 
                 when(memberRepository.findByUid("member-1")).thenReturn(Optional.of(member));
+                when(authService.isOrgAdminOrSuperUser()).thenReturn(true);
                 // save 直接返回同一实体，模拟禁用落库成功
                 when(memberRepository.save(any(MemberEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
                 // convertToResponse 依赖的两个映射

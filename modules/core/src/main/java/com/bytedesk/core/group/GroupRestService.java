@@ -13,12 +13,14 @@
  */
 package com.bytedesk.core.group;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,9 +29,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseRestServiceWithExport;
+import com.bytedesk.core.constant.BytedeskConsts;
+import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -59,6 +64,10 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
     private final MemberRestService memberRestService;
 
     private final ThreadRestService threadRestService;
+
+    // 可选注入：ai 模块实现校验，starter 聚合时自动装配。
+    // fail-closed：core 单独部署（无 ai 模块）时，机器人管理接口直接拒绝，而不是跳过校验。
+    private final ObjectProvider<GroupRobotValidator> groupRobotValidatorProvider;
 
     @Override
     protected Specification<GroupEntity> createSpecification(GroupRequest request) {
@@ -171,6 +180,14 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
         group.setUserUid(creator.getUid());
         group.setOrgUid(creator.getOrgUid());
         //
+        // 处理创建时的机器人列表（fail-closed：ai 未装配或校验失败均拒绝创建）
+        if (request.getRobotUids() != null && !request.getRobotUids().isEmpty()) {
+            List<String> robotUids = normalizeRobotUids(request.getRobotUids(), "create");
+            validateRobotUids(robotUids, creator.getOrgUid(), creator.getUid());
+            robotUids.forEach(group::addRobot);
+            validateRobotUidCapacity(group.getRobotUids());
+        }
+        //
         GroupEntity saved = save(group);
         if (saved == null) {
             throw new RuntimeException("Failed to create group");
@@ -268,6 +285,121 @@ public class GroupRestService extends BaseRestServiceWithExport<GroupEntity, Gro
         }
         //
         throw new RuntimeException("Failed to update group top tip by uid: " + request.getUid());
+    }
+
+    // 添加群机器人（仅群主/群管理员）
+    @Transactional
+    public GroupResponse addRobots(GroupRequest request) {
+        UserEntity operator = requireGroupAdmin(request.getUid());
+        GroupEntity group = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("Failed to find group by uid: " + request.getUid()));
+
+        List<String> robotUids = normalizeRobotUids(request.getRobotUids(), "add");
+        validateRobotUids(robotUids, group.getOrgUid(), operator.getUid());
+        robotUids.forEach(group::addRobot);
+        validateRobotUidCapacity(group.getRobotUids());
+
+        GroupEntity saved = save(group);
+        if (saved == null) {
+            throw new RuntimeException("Failed to add robots to group");
+        }
+        return convertToResponse(saved);
+    }
+
+    // 移除群机器人（仅群主/群管理员），幂等：移除不存在的机器人返回当前状态
+    @Transactional
+    public GroupResponse removeRobots(GroupRequest request) {
+        requireGroupAdmin(request.getUid());
+        GroupEntity group = findByUid(request.getUid())
+                .orElseThrow(() -> new RuntimeException("Failed to find group by uid: " + request.getUid()));
+
+        List<String> robotUids = normalizeRobotUids(request.getRobotUids(), "remove");
+        robotUids.forEach(group::removeRobot);
+
+        GroupEntity saved = save(group);
+        if (saved == null) {
+            throw new RuntimeException("Failed to remove robots from group");
+        }
+        // TODO: 一期 A4 任务表落地后，此处同时取消该群未执行的机器人任务
+        return convertToResponse(saved);
+    }
+
+    // 查询群机器人UID列表（群成员/管理员可见）
+    public List<String> queryRobotUids(String groupUid) {
+        GroupEntity group = findByUid(groupUid)
+                .orElseThrow(() -> new RuntimeException("Failed to find group by uid: " + groupUid));
+        List<String> robotUids = group.getRobotUids();
+        return robotUids == null ? new ArrayList<>() : new ArrayList<>(robotUids);
+    }
+
+    /**
+     * 校验操作者为群主或群管理员，返回操作者。群组不存在/已解散时抛 NotFound。
+     */
+    private UserEntity requireGroupAdmin(String groupUid) {
+        UserEntity operator = authService.getUser();
+        if (operator == null || !StringUtils.hasText(operator.getUid())) {
+            throw CommonI18nExceptions.loginRequired();
+        }
+        GroupEntity group = findByUid(groupUid)
+                .orElseThrow(() -> new RuntimeException("Failed to find group by uid: " + groupUid));
+        boolean isAdmin = group.getCreator() != null && operator.getUid().equals(group.getCreator().getUid());
+        if (!isAdmin) {
+            isAdmin = group.getAdmins().stream()
+                    .anyMatch(admin -> admin != null && operator.getUid().equals(admin.getUid()));
+        }
+        if (!isAdmin) {
+            throw CommonI18nExceptions.forbidden("group.robot.admin.required");
+        }
+        return operator;
+    }
+
+    /**
+     * 规范化机器人UID输入：trim、去空、去重，拒绝非法字符。
+     */
+    private List<String> normalizeRobotUids(List<String> robotUids, String action) {
+        if (robotUids == null || robotUids.isEmpty()) {
+            throw new RuntimeException("No robots to " + action);
+        }
+        // CSV 存储：UID 中不允许逗号/换行；系统 UID 为数字串，此处按白名单字符校验
+        List<String> normalized = robotUids.stream()
+                .filter(StringUtils::hasText)
+                .map(uid -> uid.trim())
+                .distinct()
+                .collect(Collectors.toList());
+        if (normalized.isEmpty()) {
+            throw new RuntimeException("No robots to " + action);
+        }
+        for (String uid : normalized) {
+            if (uid.length() > 128 || !uid.matches("[a-zA-Z0-9_-]+")) {
+                throw new RuntimeException("Invalid robot uid: " + uid);
+            }
+        }
+        return normalized;
+    }
+
+    /**
+     * fail-closed 校验：ai 模块未装配或校验不通过时拒绝，绝不静默入库。
+     */
+    private void validateRobotUids(List<String> robotUids, String orgUid, String operatorUserUid) {
+        GroupRobotValidator validator = groupRobotValidatorProvider.getIfAvailable();
+        if (validator == null) {
+            throw new RuntimeException("Group robot capability is not available on this deployment");
+        }
+        List<String> invalid = validator.findInvalidRobotUids(robotUids, orgUid, operatorUserUid);
+        if (invalid != null && !invalid.isEmpty()) {
+            throw new RuntimeException("Failed to find robots by uids: " + String.join(",", invalid));
+        }
+    }
+
+    /**
+     * 序列化容量校验：CSV 长度必须落在列宽内，避免数据库静默截断。
+     */
+    private void validateRobotUidCapacity(List<String> robotUids) {
+        int maxTotalLength = BytedeskConsts.COLUMN_EXTRA_LENGTH; // 与列定义一致
+        int total = robotUids.stream().mapToInt(uid -> uid.length()).sum() + Math.max(0, robotUids.size() - 1); // 逗号分隔符
+        if (total > maxTotalLength) {
+            throw new RuntimeException("Group robot uid capacity exceeded: " + total + " > " + maxTotalLength);
+        }
     }
 
     // invite

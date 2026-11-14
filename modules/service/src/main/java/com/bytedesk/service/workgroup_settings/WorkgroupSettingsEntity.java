@@ -5,8 +5,12 @@
  */
 package com.bytedesk.service.workgroup_settings;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.bytedesk.ai.robot.settings.RobotRoutingSettingsEntity;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.converter.JsonStringListMapConverter;
 import com.bytedesk.kbase.auto_reply.settings.AutoReplySettingsEntity;
 import com.bytedesk.kbase.settings.BaseSettingsEntity;
 import com.bytedesk.service.message_leave_settings.MessageLeaveSettingsEntity;
@@ -19,6 +23,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -75,6 +80,22 @@ public class WorkgroupSettingsEntity extends BaseSettingsEntity {
      */
     @lombok.Builder.Default
     private String routingMode = com.bytedesk.service.workgroup_routing.WorkgroupRoutingModeEnum.ROUND_ROBIN.name();
+
+    /**
+     * Whether visitor route tags may influence workgroup assignment.
+     */
+    @lombok.Builder.Default
+    @Column(name = "tag_routing_enabled")
+    private Boolean tagRoutingEnabled = false;
+
+    /**
+     * 路由标签 -> 客服 的绑定关系（存储在共享设置模板上，所有引用该模板的工作组共享）。
+     * key: ROUTE 标签 UID；value: 该标签命中时优先分配的客服 agentUid。
+     */
+    @lombok.Builder.Default
+    @Convert(converter = JsonStringListMapConverter.class)
+    @Column(name = "tag_agent_bindings", length = 2048)
+    private Map<String, String> tagAgentBindings = new LinkedHashMap<>();
 
     /**
      * Manual routing waiting tip for visitors (used when routingMode=MANUAL)

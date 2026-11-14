@@ -29,7 +29,8 @@ public enum RoomTypeEnum {
      * 同事间音视频通话房间（2026-09-29 规划 §5.4，单值不拆音频/视频：媒体类型由 WebrtcEntity.type 表达）。
      * 由 MEMBER_CALL 通话 invite 自动建档，不出现在普通会议创建入口。
      */
-    MEMBER_CALL;
+    MEMBER_CALL,
+    REMOTE_ASSIST;
 
     /**
      * 解析房间类型：忽略大小写精确匹配；空/未知值统一回退 MEETING。

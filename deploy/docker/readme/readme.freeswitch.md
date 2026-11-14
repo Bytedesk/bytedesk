@@ -47,6 +47,23 @@ docker logs --tail 200 freeswitch-bytedesk 2>&1 | grep -E "NO SUITABLE DATABASE 
 
 - 预期结果：`Health=healthy`，且日志不再出现上述错误关键字。
 
+## 重启 FreeSWITCH
+
+修改宿主机挂载的 conf/scripts 后（`deploy/freeswitch/conf`、`deploy/freeswitch/scripts`），无需重建容器，直接重启即可加载新配置：
+
+```bash
+cd deploy/docker
+./restart.sh freeswitch   # 仅重启 FreeSWITCH（等价 docker restart freeswitch-bytedesk）
+./restart.sh call         # 重启 freeswitch + mrcp（组合关键字）
+./restart.sh -h           # 查看全部关键字
+```
+
+说明：
+
+- `restart.sh` 直达容器名执行 `docker restart`，保留容器原有配置；容器不存在时跳过并提示。
+- 重启后用 `fs_cli` 验证就绪：`docker exec freeswitch-bytedesk fs_cli -p <ESL密码> -x "status"`。
+- 若修改的是 `.env`（镜像、端口、环境变量等），restart 不会生效，需重新执行 `./start.sh call ...` 让 compose 按需重建容器。
+
 ```bash
 docker compose --env-file .env -p bytedesk \
  -f compose/compose-redis.yaml \

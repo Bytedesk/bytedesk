@@ -199,14 +199,23 @@ public class WorkgroupRestService extends BaseRestService<WorkgroupEntity, Workg
         WorkgroupEntity workgroup = workgroupOptional.get();
         //
         // modelMapper.map(workgroupRequest, workgroup); // 会把orgUid给清空为null
-        workgroup.setNickname(request.getNickname());
-        workgroup.setAvatar(request.getAvatar());
-        workgroup.setDescription(request.getDescription());
+        // 部分更新语义：null 字段不覆盖既有值（如仅更新 tagAgentBindings 时不传 nickname）
+        if (request.getNickname() != null) {
+            workgroup.setNickname(request.getNickname());
+        }
+        if (request.getAvatar() != null) {
+            workgroup.setAvatar(request.getAvatar());
+        }
+        if (request.getDescription() != null) {
+            workgroup.setDescription(request.getDescription());
+        }
         if (request.getType() != null) {
             workgroup.setType(WorkgroupTypeEnum.normalize(request.getType()));
         }
         // workgroup.setRoutingMode(request.getRoutingMode());
-        workgroup.setStatus(request.getStatus());
+        if (request.getStatus() != null) {
+            workgroup.setStatus(request.getStatus());
+        }
         //
         // 如果前端未传 agentUids，则不改动现有客服列表；只有在明确传入时才覆盖
         boolean agentsChanged = false;

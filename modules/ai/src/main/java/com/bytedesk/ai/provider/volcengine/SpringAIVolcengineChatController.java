@@ -20,11 +20,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.ai.converter.StructuredOutputConverter;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -84,7 +83,7 @@ public class SpringAIVolcengineChatController {
                 .build();
         Prompt prompt = new Prompt(promptTemplate.createMessage());
 
-        OpenAiChatModel model = springAIVolcengineService.getChatModel();
+        ChatModel model = springAIVolcengineService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
@@ -126,7 +125,7 @@ public class SpringAIVolcengineChatController {
                         .build()
                         .createMessage());
 
-        OpenAiChatModel model = springAIVolcengineService.getChatModel();
+        ChatModel model = springAIVolcengineService.getChatModel();
         if (model == null) {
             return ResponseEntity.ok(JsonResult.error("Volcengine service is not available"));
         }
@@ -166,7 +165,7 @@ public class SpringAIVolcengineChatController {
         }
                 
         Prompt prompt = new Prompt(new UserMessage(message));
-        OpenAiChatModel model = springAIVolcengineService.getChatModel();
+        ChatModel model = springAIVolcengineService.getChatModel();
         if (model != null) {
             return model.stream(prompt);
         } else {
@@ -219,7 +218,7 @@ public class SpringAIVolcengineChatController {
      */
     @GetMapping("/chat/custom")
     public ResponseEntity<?> chatCustom(
-            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {OpenAiChatModel model = springAIVolcengineService.getChatModel();
+            @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {ChatModel model = springAIVolcengineService.getChatModel();
         if (!bytedeskProperties.getDebug()) {
             return ResponseEntity.ok(JsonResult.error("Service is not available"));
         }
@@ -231,8 +230,8 @@ public class SpringAIVolcengineChatController {
             ChatResponse response = model.call(
                 new Prompt(
                     message,
-                    OpenAiChatOptions.builder()
-                        .model("volcengine-chat")
+                    ArkChatOptions.builder()
+                        .model("doubao-1-5-pro-32k-250115")
                         .temperature(0.7)
                         .topP(0.9)
                         .build()

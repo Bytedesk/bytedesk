@@ -25,6 +25,9 @@ public class WorkgroupRoutingStateResponse {
 
     private String routingMode;
 
+    /** 是否启用访客标签路由（人工分配时优先按 ROUTE 标签绑定客服定向） */
+    private Boolean tagRoutingEnabled;
+
     private String nextAgentUid;
 
     private UserProtobuf nextAgent;

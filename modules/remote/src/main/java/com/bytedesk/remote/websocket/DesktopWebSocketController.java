@@ -12,7 +12,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
 
 import com.bytedesk.remote.protocol.DesktopMessageProto;
 
@@ -31,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * - /topic/desktop/{sessionId}/control - Subscribe to control events
  */
 @Slf4j
-@Controller
+// Legacy base64/STOMP forwarding has no participant authorization. Do not register it.
 @AllArgsConstructor
 public class DesktopWebSocketController {
 

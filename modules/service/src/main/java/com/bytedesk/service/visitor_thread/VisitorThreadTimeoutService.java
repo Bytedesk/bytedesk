@@ -329,6 +329,13 @@ public class VisitorThreadTimeoutService {
         return triggerQueueLeaveMessage(thread, queueMember);
     }
 
+    public MessageProtobuf handleQueueOverflowLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember,
+            java.util.function.Consumer<MessageProtobuf> sendAfterCommit) {
+        Assert.notNull(thread, "ThreadEntity must not be null");
+        Assert.notNull(queueMember, "QueueMemberEntity must not be null");
+        return triggerQueueLeaveMessage(thread, queueMember, sendAfterCommit, true);
+    }
+
     private QueueSettingsEntity resolveQueueSettings(ThreadEntity thread) {
         try {
             if (thread.isAgentType()) {
@@ -378,6 +385,11 @@ public class VisitorThreadTimeoutService {
     }
 
     private MessageProtobuf triggerQueueLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember) {
+        return triggerQueueLeaveMessage(thread, queueMember, messageSendService::sendProtobufMessage, false);
+    }
+
+    private MessageProtobuf triggerQueueLeaveMessage(ThreadEntity thread, QueueMemberEntity queueMember,
+            java.util.function.Consumer<MessageProtobuf> send, boolean synchronous) {
         String leaveMessageTip = resolveLeaveMessageTip(thread);
 
         thread.setOffline().setContent(ThreadContent.of(MessageTypeEnum.LEAVE_MSG, leaveMessageTip, leaveMessageTip).toJson());
@@ -386,12 +398,18 @@ public class VisitorThreadTimeoutService {
         queueMember.setMessageLeave(true);
         queueMember.setMessageLeaveAt(BdDateUtils.now());
         queueMember.setVisitorLeavedAt(BdDateUtils.now());
-        queueMemberRestService.saveAsyncBestEffort(queueMember);
+        if (synchronous) {
+            if (queueMemberRestService.save(queueMember) == null) {
+                throw new IllegalStateException("Could not save queue overflow outcome");
+            }
+        } else {
+            queueMemberRestService.saveAsyncBestEffort(queueMember);
+        }
 
         MessageEntity message = ThreadMessageUtil.getThreadOfflineMessage(leaveMessageTip, savedThread);
         messageRestService.save(message);
         MessageProtobuf protobuf = ServiceConvertUtils.convertToMessageProtobuf(message, savedThread);
-        messageSendService.sendProtobufMessage(protobuf);
+        send.accept(protobuf);
         return protobuf;
     }
 

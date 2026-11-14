@@ -1,6 +1,5 @@
 /**
- * 企业IM系统控制器层
- * 处理HTTP请求，实现RESTful API接口
+ * Remote application page routing. Domain REST APIs live in their feature packages.
  */
 @NullMarked
 package com.bytedesk.remote.controller;

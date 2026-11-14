@@ -67,6 +67,7 @@
         "logo": "doubao.png",
         "baseUrl": "https://ark.cn-beijing.volces.com/api/v3",
         "webUrl": "https://console.volcengine.com/ark/",
+        "modelListUrl": "https://console.volcengine.com/ark/region:cn-beijing/docs/model-list",
         "status": "PRODUCTION"
     },
     "minimax": {

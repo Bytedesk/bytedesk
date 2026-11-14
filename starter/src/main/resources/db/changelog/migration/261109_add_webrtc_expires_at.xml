@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        WebRTC 来电有效期（规划 docs/plans/2026-11-07-weiyu-background-webrtc-call-alert-plan.md §4.2）：
+        - bytedesk_webrtc 增加 expires_at 列（服务端权威响铃窗口截止时间）
+        - 全新安装由 Hibernate ddl-auto=update 自动建列；本 changeset 兜底存量升级库
+        - 存量行保持 NULL：历史终态仅查询；旧 INVITED 行不通过推送恢复接听
+        跨库兼容：addColumn + timestamp 为标准标签（MySQL/PostgreSQL/H2/Oracle/KingBase）。
+    -->
+
+    <changeSet id="261109-1-webrtc-add-expires-at" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_webrtc"/>
+            <not>
+                <columnExists tableName="bytedesk_webrtc" columnName="expires_at"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_webrtc">
+            <column name="expires_at" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

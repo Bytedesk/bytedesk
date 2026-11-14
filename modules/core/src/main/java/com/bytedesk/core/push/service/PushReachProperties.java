@@ -32,6 +32,12 @@ public class PushReachProperties {
     /** 会话转接/邀请协助推送 */
     private final Reach transferInvite = new Reach();
 
+    /**
+     * WebRTC 音视频来电推送（规划 2026-11-07-weiyu-background-webrtc-call-alert-plan §6.1）：
+     * 默认 false（灰度开启；不沿用 chat 的「离线才推」在线门控，详见 webrtcCall 推送链路注释）。
+     */
+    private final Reach webrtcCall = new Reach();
+
     /** 节流窗口（秒），0=不节流 */
     private long throttleSeconds = 60L;
 

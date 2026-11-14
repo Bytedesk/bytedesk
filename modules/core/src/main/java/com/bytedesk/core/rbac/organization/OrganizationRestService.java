@@ -44,6 +44,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.organization.event.OrganizationAdminTransferEvent;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserService;
+import com.bytedesk.core.jobtitle.JobTitleRestService;
 import com.bytedesk.core.member.MemberRestService;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -72,6 +73,9 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
 
     /** 同步事件发布器：AFTER_COMMIT 事件必须在事务内同步发布，不能走 @Async 的 BytedeskEventPublisher */
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    /** 职务字典初始化：新组织创建事务内初始化默认职务 */
+    private final JobTitleRestService jobTitleRestService;
 
     /** 延迟注入避免循环依赖：MemberRestService 依赖 OrganizationRestService */
     private final ObjectProvider<MemberRestService> memberRestServiceProvider;
@@ -291,6 +295,8 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (savedOrganization == null) {
             throw CommonI18nExceptions.createFailed();
         }
+        // 新组织默认职务初始化：同一事务，失败则整次组织创建回滚
+        jobTitleRestService.initDefaultJobTitles(savedOrganization.getUid());
         user.setCurrentOrganization(savedOrganization);
         userService.addRoleAdmin(user);
         //
@@ -355,6 +361,8 @@ public class OrganizationRestService extends BaseRestService<OrganizationEntity,
         if (savedOrganization == null) {
             throw CommonI18nExceptions.createFailed();
         }
+        // 新组织默认职务初始化：同一事务，失败则整次组织创建回滚
+        jobTitleRestService.initDefaultJobTitles(savedOrganization.getUid());
         if (savedOrganization.getUser() != null) {
             savedOrganization.getUser().setCurrentOrganization(savedOrganization);
             userService.addRoleAdmin(savedOrganization.getUser());

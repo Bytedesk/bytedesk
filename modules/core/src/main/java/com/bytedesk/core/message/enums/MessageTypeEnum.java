@@ -121,6 +121,8 @@ public enum MessageTypeEnum {
     // ROBOT_ANSWER, // 机器人答案：非流式回答，直接使用 ROBOT 消息类型
     // 
     ARTICLE, // 文章
+    POST, // 论坛群帖子（根帖内容记录）
+    POST_COMMENT, // 论坛群评论（帖子/评论的回复）
     BLOG, // 博客
     // 
     PAYMENT, // 支付

@@ -17,5 +17,6 @@ public enum TagTypeEnum {
     THREAD,
     VISITOR,
     CUSTOMER,
-    TICKET
+    TICKET,
+    ROUTE
 }

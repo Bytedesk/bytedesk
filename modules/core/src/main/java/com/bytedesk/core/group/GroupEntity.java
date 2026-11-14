@@ -16,10 +16,13 @@ package com.bytedesk.core.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import com.bytedesk.core.base.BaseEntity;
 import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.member.MemberEntity;
 
@@ -120,6 +123,27 @@ public class GroupEntity extends BaseEntity {
     // @Builder.Default
     // @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     // private List<RobotEntity> robots = new ArrayList<>();
+
+    /**
+     * UIDs of robots added to this group.
+     * Stored as CSV string to avoid core -> ai module dependency (RobotEntity lives in ai).
+     */
+    @Builder.Default
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "robot_uids", length = BytedeskConsts.COLUMN_EXTRA_LENGTH)
+    private List<String> robotUids = new ArrayList<>();
+
+    // 添加群机器人
+    public void addRobot(String robotUid) {
+        if (StringUtils.hasText(robotUid) && !robotUids.contains(robotUid)) {
+            robotUids.add(robotUid);
+        }
+    }
+
+    // 移除群机器人
+    public void removeRobot(String robotUid) {
+        robotUids.remove(robotUid);
+    }
 
     /**
      * User who created the group

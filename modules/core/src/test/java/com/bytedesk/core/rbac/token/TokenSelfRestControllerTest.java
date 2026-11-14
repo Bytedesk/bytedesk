@@ -5,8 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +21,6 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserRepository;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.BdDateUtils;
-import com.bytedesk.core.utils.JwtUtils;
-
 import jakarta.servlet.http.HttpServletRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,7 +76,6 @@ class TokenSelfRestControllerTest {
         return user;
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void querySelfSessionsReturnsPageData() {
         when(authService.getCurrentUser()).thenReturn(currentUser());
@@ -130,7 +125,6 @@ class TokenSelfRestControllerTest {
         assertEquals(400, oversizePage.getStatusCode().value());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     void revokeSelfSessionReturnsSanitizedDetail() {
         when(authService.getCurrentUser()).thenReturn(currentUser());

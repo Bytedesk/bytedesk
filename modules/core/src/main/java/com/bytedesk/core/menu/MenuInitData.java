@@ -156,13 +156,17 @@ public final class MenuInitData {
         }
 
         public static List<MenuSeed> desktopMenus() {
+                // 与 frontend/apps/desktop useDashboardRoutes 侧边栏菜单及顺序保持一致
                 List<MenuSeed> seeds = new ArrayList<>();
                 seeds.add(MenuSeed.root("/chat", "chat", "message", "menu.dashboard.chat"));
                 seeds.add(MenuSeed.root("/ticket", "ticket", "inbox", "menu.dashboard.ticket"));
-                seeds.add(MenuSeed.root("/data", "data", "lineChart", "menu.dashboard.data"));
                 seeds.add(MenuSeed.root("/task", "calendar", "schedule", "menu.dashboard.calendar"));
+                // 文档/质检为 IS_DEBUG 调试菜单，前端仍会按 IS_DEBUG 控制显示
+                seeds.add(MenuSeed.root("/document", "document", "file", "menu.dashboard.document"));
                 seeds.add(MenuSeed.root("/callcenter", "callcenter", "phone", "menu.dashboard.callcenter"));
+                seeds.add(MenuSeed.root("/quality", "quality", "safetyCertificate", "menu.dashboard.quality"));
                 seeds.add(MenuSeed.root("/contact", "contact", "contacts", "menu.dashboard.contact"));
+                seeds.add(MenuSeed.root("/data", "data", "lineChart", "menu.dashboard.data"));
                 seeds.add(MenuSeed.root("/setting", "mine", "setting", "menu.dashboard.mine"));
                 return seeds;
         }

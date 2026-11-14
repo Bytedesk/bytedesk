@@ -23,6 +23,7 @@ import com.bytedesk.core.config.properties.BytedeskProperties;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.enums.PermissionEnum;
 import com.bytedesk.core.exception.NotFoundException;
+import com.bytedesk.core.jobtitle.JobTitleRestService;
 import com.bytedesk.core.rbac.authority.AuthorityRestService;
 // import com.bytedesk.core.rbac.authority.AuthorityInitializer;
 import com.bytedesk.core.rbac.role.RoleInitializer;
@@ -41,6 +42,8 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
     private final RoleInitializer roleInitializer;
 
     private final UserInitializer userInitializer;
+
+    private final JobTitleRestService jobTitleRestService;
 
     private final OrganizationRepository organizationRepository;
 
@@ -94,6 +97,8 @@ public class OrganizationInitializer implements SmartInitializingSingleton {
             //
            OrganizationEntity savedOrganization = organizationRestService.save(organization);
             if (savedOrganization != null) {
+                // 首次创建默认组织：同一事务初始化默认职务
+                jobTitleRestService.initDefaultJobTitles(savedOrganization.getUid());
                 user.setCurrentOrganization(savedOrganization);
                 user = userService.addRoleSuper(user);
             } else {

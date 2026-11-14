@@ -33,7 +33,11 @@ public class MessageEntityListener {
         MessageEntity clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageCreateEvent(clonedMessage);
+        if (message.getThread() != null && message.getThread().getTagRoutingEvaluated() != null) {
+            com.bytedesk.core.utils.AfterCommit.run(() -> bytedeskEventPublisher.publishMessageCreateEvent(clonedMessage));
+        } else {
+            bytedeskEventPublisher.publishMessageCreateEvent(clonedMessage);
+        }
     }
 
     @PostUpdate
@@ -42,7 +46,11 @@ public class MessageEntityListener {
         MessageEntity clonedMessage = SerializationUtils.clone(message);
         // 
         BytedeskEventPublisher bytedeskEventPublisher = ApplicationContextHolder.getBean(BytedeskEventPublisher.class);
-        bytedeskEventPublisher.publishMessageUpdateEvent(clonedMessage);
+        if (message.getThread() != null && message.getThread().getTagRoutingEvaluated() != null) {
+            com.bytedesk.core.utils.AfterCommit.run(() -> bytedeskEventPublisher.publishMessageUpdateEvent(clonedMessage));
+        } else {
+            bytedeskEventPublisher.publishMessageUpdateEvent(clonedMessage);
+        }
     }
     
 }

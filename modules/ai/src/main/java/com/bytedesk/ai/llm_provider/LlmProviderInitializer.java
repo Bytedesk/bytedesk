@@ -80,7 +80,7 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
     }
 
     /**
-     * 平台级供应商初始化：缺失则按 providers.json 创建，已存在则同步 status
+     * 平台级供应商初始化：缺失则按 providers.json 创建，已存在则同步 status 和 modelListUrl
      */
     private void initPlatformProviders(Map<String, ProviderJson> providerJsonMap) {
         String level = LevelEnum.PLATFORM.name();
@@ -95,9 +95,14 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                 List<LlmProviderEntity> providerList = llmProviderRestService.findByType(providerType, level);
                 if (!providerList.isEmpty()) {
                     LlmProviderEntity providerEntity = providerList.get(0);
+                    boolean changed = false;
                     String status = providerJson.getStatus();
                     if (!providerEntity.getStatus().equals(status)) {
                         providerEntity.setStatus(status);
+                        changed = true;
+                    }
+                    changed |= syncModelListUrl(providerEntity, providerJson);
+                    if (changed) {
                         llmProviderRestService.save(providerEntity);
                     }
                 }
@@ -172,8 +177,13 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
                         created++;
                     } else {
                         LlmProviderEntity providerEntity = existing.get();
+                        boolean changed = false;
                         if (!Objects.equals(providerEntity.getStatus(), status)) {
                             providerEntity.setStatus(status);
+                            changed = true;
+                        }
+                        changed |= syncModelListUrl(providerEntity, providerJson);
+                        if (changed) {
                             llmProviderRestService.save(providerEntity);
                             updated++;
                         } else {
@@ -199,6 +209,25 @@ public class LlmProviderInitializer implements SmartInitializingSingleton {
         }
         log.info("llm provider organization init finished: created={}, updated={}, skipped={}, conflicts={}, elapsed {} ms",
                 created, updated, skipped, conflicts, System.currentTimeMillis() - startMillis);
+    }
+
+    /**
+     * 回填官方模型列表地址：数据库为空且providers.json配置了modelListUrl时才写入，
+     * 不覆盖用户手工维护的值。
+     */
+    private boolean syncModelListUrl(LlmProviderEntity providerEntity, ProviderJson providerJson) {
+        String modelListUrl = providerJson.getModelListUrl();
+        if (modelListUrl == null || modelListUrl.isBlank()) {
+            return false;
+        }
+        if (modelListUrl.equals(providerEntity.getModelListUrl())) {
+            return false;
+        }
+        if (providerEntity.getModelListUrl() != null && !providerEntity.getModelListUrl().isBlank()) {
+            return false;
+        }
+        providerEntity.setModelListUrl(modelListUrl);
+        return true;
     }
 
 }

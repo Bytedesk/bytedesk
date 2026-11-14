@@ -24,6 +24,7 @@ package com.bytedesk.core.group;
 // 项目群：项目群组，项目管理，任务分配管理、日报、周报等
 public enum GroupTypeEnum {
     NORMAL, // 普通群组
+    FORUM, // 论坛群组：消息以帖子形式组织，支持评论/回复/点赞
     TOPIC, // 话题群组
     CHANNEL, // 频道群组
     PROJECT; // 项目群组

@@ -31,6 +31,12 @@ cp .env.example .env
 ./stop.sh              # stop
 ./stop.sh down         # remove containers (volumes kept)
 
+# restart (equals docker restart, keeps container config; no args = restart all)
+./restart.sh freeswitch   # restart FreeSWITCH only
+./restart.sh call         # restart freeswitch + mrcp
+./restart.sh app          # restart bytedesk app only
+./restart.sh              # restart all (dependency order, app last)
+
 # middleware only (for local source development)
 ./start.sh middleware
 ./stop.sh middleware down
@@ -92,6 +98,8 @@ Note: redis and elasticsearch are core middleware always included; `<db>` defaul
 
 Stop: `./stop.sh [stop|down] [keywords...]` — the action keyword may appear anywhere; pass the same keywords used at start; `down` removes containers but keeps volumes.
 
+Restart: `./restart.sh [keywords...]` — same keywords as start.sh (plus `app` for the bytedesk app container only), restarts containers directly via `docker restart`; missing containers are skipped. Note: restart does not apply new `.env` changes; re-run `./start.sh` after editing configuration.
+
 ## File List
 
 All compose files and their per-component configs (`searxng/`, `grafana/`, `logstash/`, `prometheus.yml`, `ik-plugin-cache/`, `james/`) live in the [`compose/`](./compose/) folder:
@@ -124,7 +132,7 @@ All compose files and their per-component configs (`searxng/`, `grafana/`, `logs
 | compose/compose-gotenberg.yaml | gotenberg/gotenberg:8 | internal only (no host port) | File preview conversion sidecar; see [File Preview docs](../../../docs/docs/development/filepreview.md) |
 | compose/compose-james.yaml | apache/james:jpa-latest | 10025/10465/10587/10143/10993/10110/10995/18000 | [James mail server](./readme/readme.james.md) |
 
-Other files: `start.sh`/`stop.sh` (compose launcher), `watchdog.sh` (app watchdog, see [watchdog guide](./readme/readme.watchdog.md)), `.env` (secrets), `one/` (all-in-one deployment).
+Other files: `start.sh`/`stop.sh`/`restart.sh` (compose launcher), `watchdog.sh` (app watchdog, see [watchdog guide](./readme/readme.watchdog.md)), `.env` (secrets), `one/` (all-in-one deployment).
 
 ## Manual docker compose
 

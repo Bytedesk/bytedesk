@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.bytedesk.core.converter.StringListConverter;
 import com.bytedesk.core.enums.ChannelEnum;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
@@ -26,12 +28,14 @@ import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.thread.enums.ThreadTypeEnum;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
@@ -67,6 +71,19 @@ public class ThreadEntity extends AbstractThreadEntity {
 
     @Transient
     private String originalStatus;
+
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    @ToString.Exclude
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "routing_tag_snapshot", length = 1024, updatable = false)
+    private List<String> routingTagSnapshot;
+
+    @JsonIgnore
+    @JSONField(serialize = false, deserialize = false)
+    @ToString.Exclude
+    @Column(name = "tag_routing_evaluated")
+    private Boolean tagRoutingEvaluated;
 
     /**
      * Messages associated with this conversation thread
