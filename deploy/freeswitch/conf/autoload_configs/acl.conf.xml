@@ -47,7 +47,7 @@
     <list name="kamailio_only" default="deny">
       <node type="allow" cidr="127.0.0.0/8" />
       <node type="allow" cidr="::1/128" />
-      <node type="allow" cidr="192.168.0.196/32" />
+      <node type="allow" cidr="192.168.0.195/32" />
       <!-- If Kamailio forwards over a private network, add its private IP as /32 here. -->
     </list>
 
