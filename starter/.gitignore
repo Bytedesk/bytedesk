@@ -6,6 +6,7 @@ target/
 blog/
 helpcenter/
 uploads/
+data/
 
 ### STS ###
 .apt_generated

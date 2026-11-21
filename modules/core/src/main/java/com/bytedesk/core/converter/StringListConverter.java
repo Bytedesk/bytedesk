@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.util.StringUtils;
 
@@ -43,10 +44,14 @@ public class StringListConverter implements AttributeConverter<List<String>, Str
 
     @Override
     public List<String> convertToEntityAttribute(String joined) {
-        if (joined == null) {
+        // 空串/空白串对应空列表；"".split(",") 会得到 [""]，导致空列表被读成含一个空白元素
+        if (joined == null || joined.isEmpty()) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(Arrays.asList(joined.split(",")));
+        return Arrays.stream(joined.split(","))
+                .filter(s -> s != null && StringUtils.hasText(s))
+                .map(s -> s.trim())
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 }

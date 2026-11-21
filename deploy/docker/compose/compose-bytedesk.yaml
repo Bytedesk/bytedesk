@@ -186,6 +186,10 @@ services:
       # ===============================
       BYTEDESK_UPLOAD_DIR: /app/uploads
       BYTEDESK_UPLOAD_URL: ${BYTEDESK_UPLOAD_URL:-http://127.0.0.1:9003}
+      # Private archive storage; keep separate from the public upload volume.
+      BYTEDESK_DISK_ARCHIVE_PRIVATE_DIRECTORY: ${BYTEDESK_DISK_ARCHIVE_PRIVATE_DIRECTORY:-/app/data/disk-archive-private}
+      BYTEDESK_DISK_ARCHIVE_MAX_FILE_SIZE: ${BYTEDESK_DISK_ARCHIVE_MAX_FILE_SIZE:-20971520}
+      BYTEDESK_DISK_ARCHIVE_MAX_FILES_PER_ORG_MODULE: ${BYTEDESK_DISK_ARCHIVE_MAX_FILES_PER_ORG_MODULE:-100000}
       # Maximum file size in bytes; default is 10MB. 最大文件大小，单位字节。
       BYTEDESK_UPLOAD_SECURITY_MAX_FILE_SIZE: 10485760
       BYTEDESK_UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION: "true"
@@ -331,6 +335,20 @@ services:
       BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PUBLISHERS: 6
       BYTEDESK_WEBRTC_JANUS_VIDEO_ROOM_DEFAULT_PERMANENT: "false"
       BYTEDESK_WEBRTC_JANUS_AUDIO_BRIDGE_DEFAULT_PERMANENT: "false"
+      # ===============================
+      # Remote assist config（远程协助，企业版功能）
+      # enabled=false 时：desktop/remote 前端不显示远程按钮，后端 /api/v1/remote/** 拒绝（fail-closed）；
+      # ICE 凭证接口在 enterprise/remote，跨网络部署需 STUN/TURN，见 .env 的 remote 说明
+      # ===============================
+      BYTEDESK_REMOTE_ENABLED: ${BYTEDESK_REMOTE_ENABLED:-false}
+      # 邀请码有效期（分钟，默认 5）
+      BYTEDESK_REMOTE_INVITATION_TTL_MINUTES: ${BYTEDESK_REMOTE_INVITATION_TTL_MINUTES:-5}
+      # 单用户连接尝试上限（防刷，默认 10）
+      BYTEDESK_REMOTE_INVITATION_MAX_CONNECT_ATTEMPTS: ${BYTEDESK_REMOTE_INVITATION_MAX_CONNECT_ATTEMPTS:-10}
+      # 会话心跳间隔（毫秒，默认 1500）
+      BYTEDESK_REMOTE_SESSION_HEARTBEAT_INTERVAL_MS: ${BYTEDESK_REMOTE_SESSION_HEARTBEAT_INTERVAL_MS:-1500}
+      # 控制授权租约上限（毫秒，默认 5000）
+      BYTEDESK_REMOTE_SESSION_LEASE_MAX_MS: ${BYTEDESK_REMOTE_SESSION_LEASE_MAX_MS:-5000}
       # ===============================
       # Management endpoints
       # Current settings disable actuator web exposure by default and keep only the business port active. 当前配置默认关闭 actuator Web 暴露，仅保留业务端口。
@@ -539,14 +557,20 @@ services:
       WECHAT_PAY_ENABLED: "false"
       WECHAT_PAY_CERTPATH: ''
       # Aliyun AccessKey / 阿里云访问密钥（短信与 OSS 共用），获取 https://ram.console.aliyun.com/profile/access-keys
-      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
-      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
+      # 2026-11 统一 bytedesk.aliyun.* 前缀后环境变量同步改为 BYTEDESK_ALIYUN_* 命名
+      BYTEDESK_ALIYUN_ENABLED: ${BYTEDESK_ALIYUN_ENABLED:-false}
+      BYTEDESK_ALIYUN_REGION_ID: ${BYTEDESK_ALIYUN_REGION_ID:-cn-hangzhou}
+      BYTEDESK_ALIYUN_ACCESS_KEY_ID: ${BYTEDESK_ALIYUN_ACCESS_KEY_ID:-}
+      BYTEDESK_ALIYUN_ACCESS_KEY_SECRET: ${BYTEDESK_ALIYUN_ACCESS_KEY_SECRET:-}
+      BYTEDESK_ALIYUN_OSS_ENDPOINT: ${BYTEDESK_ALIYUN_OSS_ENDPOINT:-https://oss-cn-shenzhen.aliyuncs.com}
+      BYTEDESK_ALIYUN_OSS_BASE_URL: ${BYTEDESK_ALIYUN_OSS_BASE_URL:-https://bytedesk.oss-cn-shenzhen.aliyuncs.com}
+      BYTEDESK_ALIYUN_OSS_BUCKET_NAME: ${BYTEDESK_ALIYUN_OSS_BUCKET_NAME:-bytedesk}
       # Aliyun SMS sign/template / 阿里云短信签名与模板Code，在 .env 中配置
-      ALIYUN_SMS_SIGNNAME: ${ALIYUN_SMS_SIGNNAME:-}
-      ALIYUN_SMS_TEMPLATECODE: ${ALIYUN_SMS_TEMPLATECODE:-}
-      ALIYUN_SMS_DOMAIN: dysmsapi.aliyuncs.com
-      ALIYUN_SMS_VERSION: "2017-05-25"
-      ALIYUN_SMS_ACTION: SendSms
+      BYTEDESK_ALIYUN_SMS_SIGN_NAME: ${BYTEDESK_ALIYUN_SMS_SIGN_NAME:-}
+      BYTEDESK_ALIYUN_SMS_TEMPLATE_CODE: ${BYTEDESK_ALIYUN_SMS_TEMPLATE_CODE:-}
+      BYTEDESK_ALIYUN_SMS_DOMAIN: dysmsapi.aliyuncs.com
+      BYTEDESK_ALIYUN_SMS_VERSION: "2017-05-25"
+      BYTEDESK_ALIYUN_SMS_ACTION: SendSms
       SPRINGDOC_SHOW_ACTUATOR: "false"
       SPRINGDOC_SWAGGER_UI_ENABLED: "false"
       SPRINGDOC_SWAGGER_UI_PATH: /index.html
@@ -559,6 +583,7 @@ services:
       - 9885:9885
     volumes:
       - upload_data:/app/uploads
+      - disk_archive_data:/app/data/disk-archive-private
       - helpcenter_data:/app/helpcenter
       - blog_data:/app/blog
       - log_data:/app/logs
@@ -569,6 +594,8 @@ services:
 volumes:
   upload_data:
     name: bytedesk_upload_data
+  disk_archive_data:
+    name: bytedesk_disk_archive_data
   helpcenter_data:
     name: bytedesk_helpcenter_data
   blog_data:

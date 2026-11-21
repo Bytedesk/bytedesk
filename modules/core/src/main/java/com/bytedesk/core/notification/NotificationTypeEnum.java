@@ -20,7 +20,8 @@ public enum NotificationTypeEnum {
     TICKET,
     ANNOUNCEMENT,
     MAINTENANCE,
-    SECURITY;
+    SECURITY,
+    GROUP;
 
     public static NotificationTypeEnum fromValue(String value) {
         if (!StringUtils.hasText(value)) {

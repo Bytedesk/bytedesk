@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        企业网盘二期表结构（modules/disk）：
+        - bytedesk_disk_share：外链分享（随机不可猜 code、提取码摘要、有效期、范围、双计数双上限）
+        - bytedesk_disk_share_item：分享条目（文件/文件夹 uid 列表）
+        - bytedesk_disk_share_access：分享访问留痕（F39：访问人/时间/动作）
+        - bytedesk_disk_transfer_task：传输任务中心（F36/F7：分片上传任务、断点续传、秒传探测结果）
+        - bytedesk_disk_file 增加 content_md5 / last_access_at 两列（秒传定位与最近使用）
+        跨库兼容：仅标准标签；addColumn 幂等由 preConditions columnExists 保证。
+        列长度与实体注解对齐（uid 类 255、枚举短串 16-64、摘要 64、extra TEXT）。
+    -->
+
+    <changeSet id="261118-50-create-disk-share-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="bytedesk_disk_share"/></not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_share">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <!-- 分享码：随机不可猜，公开 URL 路径段 -->
+            <column name="share_code" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <!-- 提取码摘要（SHA-256 hex）；空表示无提取码 -->
+            <column name="code_hash" type="VARCHAR(64)"/>
+            <column name="share_name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <!-- scope: preview,download 逗号分隔 -->
+            <column name="scope" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <!-- 过期时间；NULL = 永久 -->
+            <column name="expire_at" type="timestamp"/>
+            <column name="status" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="view_count" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="max_view_count" type="BIGINT"/>
+            <column name="download_count" type="BIGINT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="max_download_count" type="BIGINT"/>
+            <!-- 提取码验证失败次数（防猜限速） -->
+            <column name="code_attempts" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="extra" type="TEXT"/>
+        </createTable>
+        <createIndex indexName="uk_disk_share_code" tableName="bytedesk_disk_share" unique="true">
+            <column name="share_code"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_share_org_user" tableName="bytedesk_disk_share">
+            <column name="org_uid"/>
+            <column name="user_uid"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-51-create-disk-share-item-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="bytedesk_disk_share_item"/></not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_share_item">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="share_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="node_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+        </createTable>
+        <createIndex indexName="idx_disk_share_item_share" tableName="bytedesk_disk_share_item">
+            <column name="share_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_share_item_node" tableName="bytedesk_disk_share_item">
+            <column name="node_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-52-create-disk-share-access-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="bytedesk_disk_share_access"/></not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_share_access">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="share_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <!-- 访问人标识：登录用户 uid 或匿名会话摘要，最小化采集 -->
+            <column name="visitor_key" type="VARCHAR(128)"/>
+            <column name="action" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <column name="result" type="VARCHAR(32)"/>
+            <column name="detail" type="TEXT"/>
+        </createTable>
+        <createIndex indexName="idx_disk_share_access_share" tableName="bytedesk_disk_share_access">
+            <column name="share_uid"/>
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-53-create-disk-transfer-task-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="bytedesk_disk_transfer_task"/></not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_transfer_task">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="task_type" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="space_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="parent_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="file_name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="file_size" type="BIGINT"><constraints nullable="false"/></column>
+            <column name="content_md5" type="VARCHAR(64)"/>
+            <column name="chunk_size" type="BIGINT"><constraints nullable="false"/></column>
+            <column name="total_chunks" type="INT"><constraints nullable="false"/></column>
+            <!-- 已接收分片号，逗号分隔（断点续传位图） -->
+            <column name="received_chunks" type="TEXT"/>
+            <column name="status" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <!-- 结果文件 uid（秒传/合并完成后指向 DiskFileEntity） -->
+            <column name="result_uid" type="VARCHAR(255)"/>
+            <column name="error_message" type="VARCHAR(512)"/>
+            <!-- 任务有效期；过期由清理任务回收分片与记录 -->
+            <column name="expire_at" type="timestamp"/>
+            <column name="extra" type="TEXT"/>
+        </createTable>
+        <createIndex indexName="idx_disk_transfer_user_status" tableName="bytedesk_disk_transfer_task">
+            <column name="user_uid"/>
+            <column name="status"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_transfer_expire" tableName="bytedesk_disk_transfer_task">
+            <column name="expire_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-54-add-disk-file-md5-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not><columnExists tableName="bytedesk_disk_file" columnName="content_md5"/></not>
+        </preConditions>
+        <addColumn tableName="bytedesk_disk_file">
+            <column name="content_md5" type="VARCHAR(64)"/>
+            <column name="last_access_at" type="timestamp"/>
+        </addColumn>
+        <createIndex indexName="idx_disk_file_md5" tableName="bytedesk_disk_file">
+            <column name="content_md5"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

@@ -68,28 +68,28 @@ public class SmsPushSendService {
     }
 
 
-    @Value("${aliyun.region.id:cn-hangzhou}")
+    @Value("${bytedesk.aliyun.region-id:cn-hangzhou}")
     private String regionId;
 
-    @Value("${aliyun.access.key.id:}")
+    @Value("${bytedesk.aliyun.access-key-id:}")
     private String accessKeyId;
 
-    @Value("${aliyun.access.key.secret:}")
+    @Value("${bytedesk.aliyun.access-key-secret:}")
     private String accessKeySecret;
 
-    @Value("${aliyun.sms.signname:}")
+    @Value("${bytedesk.aliyun.sms.sign-name:}")
     private String signName;
 
-    @Value("${aliyun.sms.templatecode:}")
+    @Value("${bytedesk.aliyun.sms.template-code:}")
     private String templateCode;
 
-    @Value("${aliyun.sms.domain:dysmsapi.aliyuncs.com}")
+    @Value("${bytedesk.aliyun.sms.domain:dysmsapi.aliyuncs.com}")
     private String smsDomain;
 
-    @Value("${aliyun.sms.version:2017-05-25}")
+    @Value("${bytedesk.aliyun.sms.version:2017-05-25}")
     private String smsVersion;
 
-    @Value("${aliyun.sms.action:SendSms}")
+    @Value("${bytedesk.aliyun.sms.action:SendSms}")
     private String smsAction;
 
     /**

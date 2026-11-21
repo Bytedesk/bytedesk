@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
 
 import com.bytedesk.core.group.GroupEntity;
 import com.bytedesk.core.group.GroupRepository;
-import com.bytedesk.core.group.GroupTypeEnum;
+import com.bytedesk.core.group.enums.GroupTypeEnum;
 import com.bytedesk.core.member.MemberEntity;
 import com.bytedesk.core.member.MemberRepository;
 import com.bytedesk.core.message.IMessageSendService;

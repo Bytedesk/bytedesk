@@ -89,6 +89,49 @@ public class SystemConfigConsts {
     /** 新访客咨询接待提醒模板 ID（sendNewVisitorMessage） */
     public static final String KEY_WECHAT_MP_NEW_VISITOR_TEMPLATE_ID = "wechat_mp.newVisitorTemplateId";
 
+    // ============ 文件上传（UPLOAD，upload.properties 可后台化） ============
+    // 管理后台 SuperDisk（upload.* / storage.*）DB 覆盖值 → properties（bytedesk.upload.* / bytedesk.storage.*）兜底
+    /** 本地上传目录（末尾不带 '/'），provider=local 时生效 */
+    public static final String KEY_UPLOAD_DIR = "upload.dir";
+    /** 本地上传文件的访问地址（服务器实际地址） */
+    public static final String KEY_UPLOAD_URL = "upload.url";
+
+    // ============ 上传安全（UPLOAD_SECURITY，bytedesk.upload.security.*） ============
+    /** 最大文件大小（字节） */
+    public static final String KEY_UPLOAD_SECURITY_MAX_FILE_SIZE = "upload.security.maxFileSize";
+    /** 是否启用图片内容验证 */
+    public static final String KEY_UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION = "upload.security.enableImageValidation";
+    /** 是否启用文件名过滤 */
+    public static final String KEY_UPLOAD_SECURITY_ENABLE_FILE_NAME_FILTER = "upload.security.enableFileNameFilter";
+    /** 是否强制重命名文件 */
+    public static final String KEY_UPLOAD_SECURITY_FORCE_RENAME = "upload.security.forceRename";
+    /** 文件名最大长度 */
+    public static final String KEY_UPLOAD_SECURITY_MAX_FILE_NAME_LENGTH = "upload.security.maxFileNameLength";
+    /** 是否记录上传日志 */
+    public static final String KEY_UPLOAD_SECURITY_ENABLE_UPLOAD_LOG = "upload.security.enableUploadLog";
+    /** 是否启用病毒扫描（预留接口） */
+    public static final String KEY_UPLOAD_SECURITY_ENABLE_VIRUS_SCAN = "upload.security.enableVirusScan";
+
+    // ============ 对象存储（STORAGE，bytedesk.storage.*，S3 兼容：MinIO/RustFS/OSS/COS 等） ============
+    /** 存储类型：local（本地磁盘）/ s3（S3 兼容对象存储） */
+    public static final String KEY_STORAGE_PROVIDER = "storage.provider";
+    /** S3 兼容服务地址（须能被应用和用户浏览器访问） */
+    public static final String KEY_STORAGE_ENDPOINT = "storage.endpoint";
+    /** S3 访问凭据 AccessKey */
+    public static final String KEY_STORAGE_ACCESS_KEY = "storage.accessKey";
+    /** S3 访问凭据 SecretKey；加密存储，保存后掩码显示，留空表示不修改 */
+    public static final String KEY_STORAGE_SECRET_KEY = "storage.secretKey";
+    /** 存储桶名称 */
+    public static final String KEY_STORAGE_BUCKET_NAME = "storage.bucketName";
+    /** 区域 */
+    public static final String KEY_STORAGE_REGION = "storage.region";
+    /** 是否启用 HTTPS（endpoint 为 https 时自动生效，此开关供客户端强制） */
+    public static final String KEY_STORAGE_SECURE = "storage.secure";
+    /** true：桶公开读+直链；false：跳过策略，使用有时限的预签名 URL */
+    public static final String KEY_STORAGE_PUBLIC_READ = "storage.publicRead";
+    /** 预签名 URL 有效期（天），上限 7 天，仅 public-read=false 时生效 */
+    public static final String KEY_STORAGE_PRESIGNED_EXPIRY_DAYS = "storage.presignedExpiryDays";
+
     private SystemConfigConsts() {
     }
 }

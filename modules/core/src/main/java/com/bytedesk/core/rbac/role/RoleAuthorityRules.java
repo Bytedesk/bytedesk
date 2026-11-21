@@ -201,6 +201,10 @@ public final class RoleAuthorityRules {
     public static final String TAG_DELETE = "TAG_DELETE";
     public static final String TAG_EXPORT = "TAG_EXPORT";
 
+    // disk (modules/disk)
+    // Keep as literals to avoid core -> disk module dependency.
+    public static final String DISK_READ = "DISK_READ";
+
     // jobtitle (modules/core) 职务字典
     public static final String JOBTITLE_READ = "JOBTITLE_READ";
     public static final String JOBTITLE_CREATE = "JOBTITLE_CREATE";
@@ -339,6 +343,9 @@ public final class RoleAuthorityRules {
             TAG_READ,
             TAG_UPDATE,
             TAG_DELETE,
+
+            // disk 网盘入口权限：目录级操作由 DiskPermissionEntity ACL 逐资源校验
+            DISK_READ,
 
             // jobtitle 职务字典：普通成员仅读（MemberDrawer 候选项）
             JOBTITLE_READ,

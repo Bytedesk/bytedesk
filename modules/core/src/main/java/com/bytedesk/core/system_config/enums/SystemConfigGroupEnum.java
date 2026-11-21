@@ -29,5 +29,11 @@ public enum SystemConfigGroupEnum {
     /** 推送：移动端推送凭据（阿里云 EMAS 应用级 appKey/appSecret）下发控制 */
     PUSH,
     /** 微信公众号：模板消息发送使用的公众号/模板 ID/跳转小程序等常量 */
-    WECHAT_MP
+    WECHAT_MP,
+    /** 文件上传：本地上传目录/访问地址（SuperDisk 上传配置 Tab） */
+    UPLOAD,
+    /** 上传安全：大小限制/校验开关（SuperDisk 上传安全 Tab） */
+    UPLOAD_SECURITY,
+    /** 对象存储：S3 兼容后端（MinIO/RustFS/OSS/COS 等）连接与凭据（SuperDisk 对象存储 Tab） */
+    STORAGE
 }

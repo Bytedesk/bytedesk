@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.bytedesk.core.config.properties.BytedeskProperties;
+import com.bytedesk.core.system_config.SystemConfigUploadApplier;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import lombok.RequiredArgsConstructor;
 
@@ -28,9 +29,17 @@ import lombok.RequiredArgsConstructor;
 public class UploadConfig {
 
     private final BytedeskProperties properties;
+
+    private final SystemConfigUploadApplier systemConfigUploadApplier;
     
     @Bean
     public Path uploadDir() {
+        // 启动时应用 SuperDisk 后台配置的 upload.dir 覆盖值（applier @PostConstruct 先于此 Bean 初始化）
+        try {
+            systemConfigUploadApplier.applyOverrides();
+        } catch (Exception e) {
+            // 覆盖应用失败回退 properties 静态配置，不阻断启动
+        }
         if (properties.getUploadDir().trim().length() == 0) {
         throw new UploadStorageException("上传目录未配置（bytedesk.uploadDir 不能为空）", 500);
         }

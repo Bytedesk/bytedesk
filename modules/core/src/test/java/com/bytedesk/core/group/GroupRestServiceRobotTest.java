@@ -22,6 +22,7 @@ import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.ObjectProvider;
 
+import com.bytedesk.core.group.apply.GroupMemberApplyService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.thread.ThreadRestService;
@@ -52,6 +53,12 @@ class GroupRestServiceRobotTest {
     @Mock
     private GroupRobotValidator validator;
 
+    @Mock
+    private GroupAccessService groupAccessService;
+
+    @Mock
+    private GroupMemberApplyService groupMemberApplyService;
+
     private GroupRestService groupRestService;
 
     private UserEntity owner;
@@ -68,7 +75,9 @@ class GroupRestServiceRobotTest {
                 uidUtils,
                 null, // memberRestService（本测试未用到）
                 threadRestService,
-                validatorProvider);
+                validatorProvider,
+                groupAccessService,
+                groupMemberApplyService);
         //
         owner = UserEntity.builder().uid("owner-1").username("owner").build();
         otherUser = UserEntity.builder().uid("user-2").username("other").build();

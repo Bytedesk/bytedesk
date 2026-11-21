@@ -79,10 +79,10 @@ public class EmailSendService {
      */
     private final ObjectProvider<PlatformEmailConfigProvider> platformEmailConfigProviderProvider;
 
-    @Value("${aliyun.access.key.id:}")
+    @Value("${bytedesk.aliyun.access-key-id:}")
     private String accessKeyId;
 
-    @Value("${aliyun.access.key.secret:}")
+    @Value("${bytedesk.aliyun.access-key-secret:}")
     private String accessKeySecret;
 
     private final JavaMailSender javaMailSender;

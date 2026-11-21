@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.group.GroupEntity;
 import com.bytedesk.core.group.GroupRepository;
-import com.bytedesk.core.group.GroupTypeEnum;
+import com.bytedesk.core.group.enums.GroupTypeEnum;
 import com.bytedesk.core.message.IMessageSendService;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessageProtobuf;

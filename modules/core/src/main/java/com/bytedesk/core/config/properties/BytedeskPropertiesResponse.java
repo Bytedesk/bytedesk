@@ -44,6 +44,8 @@ public class BytedeskPropertiesResponse implements Serializable {
     private Call call;
     /** 文件预览（Office 转 PDF）能力配置，供前端门控预览按钮显隐 */
     private Preview preview;
+    /** 远程协助能力配置，供前端门控远程按钮显隐（modules/remote 的 bytedesk.remote.*） */
+    private RemoteAssist remote;
     /** 平台客服（访客端纠纷介入通道）配置，供 visitor 工具栏按钮显隐与路由 */
     private PlatformService platformService;
 
@@ -215,6 +217,19 @@ public class BytedeskPropertiesResponse implements Serializable {
          * remote 模式 → gotenberg remote-url 已配置
          */
         private Boolean available = false;
+    }
+
+    /**
+     * 远程协助能力配置（modules/remote 的 bytedesk.remote.*）。
+     * 前端门控公式：license（企业/平台且有效） && remote.enabled；
+     * fail-closed：字段缺失时前端应视为 false（不显示远程按钮）。
+     * RemoteProperties 位于 modules/remote，modules/core 不依赖，经 Environment 读取。
+     */
+    @Getter
+    @Setter
+    public static class RemoteAssist {
+        /** 是否启用远程协助（bytedesk.remote.enabled，默认 false） */
+        private Boolean enabled = false;
     }
 
     @Getter

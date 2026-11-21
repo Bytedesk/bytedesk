@@ -1,0 +1,238 @@
+/*
+ * @Author: bytedesk.com
+ * @Date: 2025-01-16
+ * @Description: Bytedesk Remote Desktop Protocol - Message Protobuf Definition
+ *   Business Source License 1.1: https://github.com/Bytedesk/bytedesk/blob/main/LICENSE
+ *   contact: 270580156@qq.com
+ *   Copyright (c) 2025 by bytedesk.com, All Rights Reserved.
+ */
+package com.bytedesk.remote.protocol;
+
+import java.io.Serializable;
+import java.time.ZonedDateTime;
+
+import com.alibaba.fastjson2.JSON;
+import com.bytedesk.core.utils.BdDateUtils;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+/**
+ * Remote Control Protocol Message
+ * All fields correspond to desktop.proto message definition
+ *
+ * Message Flow:
+ * 1. Viewer sends SESSION_INIT to establish connection
+ * 2. Host responds with SESSION_INIT_ACK
+ * 3. Host streams SCREEN_FRAME messages continuously
+ * 4. Viewer sends CURSOR_MOVE, MOUSE_CLICK, KEY_EVENT messages
+ * 5. Either side sends SESSION_TERMINATE to end session
+ */
+@Data
+@Builder
+@Accessors(chain = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class RemoteMessageProto implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Unique message identifier
+     */
+    private String uid;
+
+    /**
+     * Message type - see RemoteMessageTypeEnum
+     */
+    private RemoteMessageTypeEnum type;
+
+    /**
+     * Session identifier
+     */
+    private String sessionId;
+
+    /**
+     * Device identifier (sender)
+     */
+    private String deviceUid;
+
+    /**
+     * User identifier (sender)
+     */
+    private String userUid;
+
+    /**
+     * Message payload (JSON or binary data)
+     * For SCREEN_FRAME: base64 encoded image data
+     * For input events: JSON event data
+     */
+    private String content;
+
+    /**
+     * Sequence number for ordering
+     */
+    private Long sequence;
+
+    /**
+     * Timestamp when message was created
+     */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private ZonedDateTime createdAt;
+
+    /**
+     * Additional metadata (optional)
+     */
+    private String extra;
+
+    /**
+     * Quality level for screen frames (LOW, MEDIUM, HIGH)
+     */
+    private RemoteQualityLevelEnum quality;
+
+    /**
+     * Message status (for acknowledgments)
+     */
+    private RemoteMessageStatusEnum status;
+
+    /**
+     * Get formatted creation time
+     */
+    @JsonIgnore
+    public String getCreatedAt() {
+        return BdDateUtils.formatDatetimeToString(createdAt);
+    }
+
+    /**
+     * Get original creation time
+     */
+    public ZonedDateTime getCreatedAtDateTime() {
+        return createdAt;
+    }
+
+    /**
+     * Get timestamp
+     */
+    public Long getTimestamp() {
+        return BdDateUtils.toTimestamp(this.createdAt);
+    }
+
+    /**
+     * Convert from JSON
+     */
+    public static RemoteMessageProto fromJson(String json) {
+        return JSON.parseObject(json, RemoteMessageProto.class);
+    }
+
+    /**
+     * Convert to JSON
+     */
+    public String toJson() {
+        return JSON.toJSONString(this);
+    }
+
+    /**
+     * Build screen frame message
+     */
+    public static RemoteMessageProto buildScreenFrame(
+            String sessionId,
+            String deviceUid,
+            String base64ImageData,
+            Long sequence,
+            RemoteQualityLevelEnum quality) {
+        return RemoteMessageProto.builder()
+                .uid(java.util.UUID.randomUUID().toString())
+                .type(RemoteMessageTypeEnum.SCREEN_FRAME)
+                .sessionId(sessionId)
+                .deviceUid(deviceUid)
+                .content(base64ImageData)
+                .sequence(sequence)
+                .createdAt(ZonedDateTime.now())
+                .quality(quality)
+                .status(RemoteMessageStatusEnum.SENT)
+                .build();
+    }
+
+    /**
+     * Build mouse event message
+     */
+    public static RemoteMessageProto buildMouseEvent(
+            String sessionId,
+            String deviceUid,
+            String eventData) {
+        return RemoteMessageProto.builder()
+                .uid(java.util.UUID.randomUUID().toString())
+                .type(RemoteMessageTypeEnum.MOUSE_EVENT)
+                .sessionId(sessionId)
+                .deviceUid(deviceUid)
+                .content(eventData)
+                .sequence(System.currentTimeMillis())
+                .createdAt(ZonedDateTime.now())
+                .status(RemoteMessageStatusEnum.SENT)
+                .build();
+    }
+
+    /**
+     * Build keyboard event message
+     */
+    public static RemoteMessageProto buildKeyboardEvent(
+            String sessionId,
+            String deviceUid,
+            String eventData) {
+        return RemoteMessageProto.builder()
+                .uid(java.util.UUID.randomUUID().toString())
+                .type(RemoteMessageTypeEnum.KEY_EVENT)
+                .sessionId(sessionId)
+                .deviceUid(deviceUid)
+                .content(eventData)
+                .sequence(System.currentTimeMillis())
+                .createdAt(ZonedDateTime.now())
+                .status(RemoteMessageStatusEnum.SENT)
+                .build();
+    }
+
+    /**
+     * Build session init message
+     */
+    public static RemoteMessageProto buildSessionInit(
+            String sessionId,
+            String deviceUid,
+            String userUid,
+            String extra) {
+        return RemoteMessageProto.builder()
+                .uid(java.util.UUID.randomUUID().toString())
+                .type(RemoteMessageTypeEnum.SESSION_INIT)
+                .sessionId(sessionId)
+                .deviceUid(deviceUid)
+                .userUid(userUid)
+                .extra(extra)
+                .sequence(0L)
+                .createdAt(ZonedDateTime.now())
+                .status(RemoteMessageStatusEnum.SENT)
+                .build();
+    }
+
+    /**
+     * Build session terminate message
+     */
+    public static RemoteMessageProto buildSessionTerminate(
+            String sessionId,
+            String deviceUid,
+            String reason) {
+        return RemoteMessageProto.builder()
+                .uid(java.util.UUID.randomUUID().toString())
+                .type(RemoteMessageTypeEnum.SESSION_TERMINATE)
+                .sessionId(sessionId)
+                .deviceUid(deviceUid)
+                .extra(reason)
+                .sequence(System.currentTimeMillis())
+                .createdAt(ZonedDateTime.now())
+                .status(RemoteMessageStatusEnum.SENT)
+                .build();
+    }
+}

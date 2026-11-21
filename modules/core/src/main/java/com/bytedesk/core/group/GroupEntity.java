@@ -23,6 +23,9 @@ import com.bytedesk.core.constant.AvatarConsts;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.converter.StringListConverter;
+import com.bytedesk.core.group.enums.GroupStatusEnum;
+import com.bytedesk.core.group.enums.GroupTypeEnum;
+import com.bytedesk.core.group.enums.GroupVisibilityEnum;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.member.MemberEntity;
 
@@ -99,6 +102,14 @@ public class GroupEntity extends BaseEntity {
     @Builder.Default
     @Column(name = "group_type")
     private String type = GroupTypeEnum.NORMAL.name();
+
+    /**
+     * Group visibility (PUBLIC: searchable and joinable within org,
+     * PRIVATE: visible to members only). Orthogonal to type.
+     */
+    @Builder.Default
+    @Column(name = "group_visibility")
+    private String visibility = GroupVisibilityEnum.PRIVATE.name();
 
     /**
      * Current status of the group (NORMAL, ARCHIVED, etc.)

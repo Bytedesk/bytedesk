@@ -1,0 +1,1 @@
+var e=[];for(let t=0;t<256;++t)e.push((t+256).toString(16).slice(1));function t(t,n=0){return(e[t[n+0]]+e[t[n+1]]+e[t[n+2]]+e[t[n+3]]+`-`+e[t[n+4]]+e[t[n+5]]+`-`+e[t[n+6]]+e[t[n+7]]+`-`+e[t[n+8]]+e[t[n+9]]+`-`+e[t[n+10]]+e[t[n+11]]+e[t[n+12]]+e[t[n+13]]+e[t[n+14]]+e[t[n+15]]).toLowerCase()}export{t};

@@ -21,7 +21,7 @@ See the [client guide](../../frontend/apps/remote/README.md) and [implementation
 
 Like `modules/core`, this module groups domain classes by feature rather than by technical layer. Entities, repositories, services, controllers, DTOs and enums for a feature share one package:
 
-- [`device`](src/main/java/com/bytedesk/remote/device/): device records, repository, registration request and device management skeletons.
+- [`device`](src/main/java/com/bytedesk/remote/device/): device records, repository and registration request.
 - [`session`](src/main/java/com/bytedesk/remote/session/): session lifecycle, participant APIs, signaling/ICE, requests/responses and session enums.
 - [`audit`](src/main/java/com/bytedesk/remote/audit/): audit records, repository and audit service skeleton.
 - `config`, `controller`, `protocol`, `websocket`: module health configuration, frontend page routing and legacy transport concerns; WebSocket configuration and controller are colocated.

@@ -577,6 +577,14 @@ public class GlobalExceptionHandler {
         if (I18Consts.I18N_ORG_UID_REQUIRED.equals(normalizedMessage)) {
             return HttpStatus.BAD_REQUEST.value();
         }
+        if (normalizedMessage != null) {
+            // 剥离 i18n.withArgs 追加的参数后缀后判定 key 归属
+            int separatorIndex = normalizedMessage.indexOf(I18Consts.I18N_ARG_SEPARATOR);
+            String key = separatorIndex >= 0 ? normalizedMessage.substring(0, separatorIndex) : normalizedMessage;
+            if (key.startsWith("i18n.disk.") && key.endsWith(".forbidden")) {
+                return HttpStatus.FORBIDDEN.value();
+            }
+        }
         return null;
     }
 

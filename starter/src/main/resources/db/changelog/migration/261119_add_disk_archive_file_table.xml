@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="261119-archive-file-table" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="bytedesk_disk_archive_file"/></not></preConditions>
+        <createTable tableName="bytedesk_disk_archive_file">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"/>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="user_uid" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="module" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="original_name" type="VARCHAR(255)"><constraints nullable="false"/></column>
+            <column name="content_type" type="VARCHAR(128)"><constraints nullable="false"/></column>
+            <column name="file_size" type="BIGINT"><constraints nullable="false"/></column>
+            <column name="storage_backend" type="VARCHAR(32)"><constraints nullable="false"/></column>
+            <column name="storage_key" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="upload_state" type="VARCHAR(16)"><constraints nullable="false"/></column>
+            <column name="upload_request_id" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="request_key" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="contract_number" type="VARCHAR(200)"/>
+            <column name="counterparty" type="VARCHAR(255)"/>
+            <column name="invoice_number" type="VARCHAR(200)"/>
+            <column name="amount" type="DECIMAL(19,2)"/>
+            <column name="currency" type="VARCHAR(3)"/>
+            <column name="signing_date" type="DATE"/>
+            <column name="invoice_date" type="DATE"/>
+            <column name="remark" type="VARCHAR(2000)"/>
+            <column name="storage_cleared" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="deleted_at" type="timestamp"/>
+            <column name="deleted_by" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="261119-archive-module-index" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><indexExists tableName="bytedesk_disk_archive_file" indexName="idx_daf_module"/></not></preConditions>
+        <createIndex tableName="bytedesk_disk_archive_file" indexName="idx_daf_module">
+            <column name="org_uid"/><column name="module"/><column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="261119-archive-recent-index" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><indexExists tableName="bytedesk_disk_archive_file" indexName="idx_daf_recent"/></not></preConditions>
+        <createIndex tableName="bytedesk_disk_archive_file" indexName="idx_daf_recent">
+            <column name="org_uid"/><column name="module"/><column name="created_at"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="261119-archive-request-index" author="copilot">
+        <preConditions onFail="MARK_RAN"><not><indexExists tableName="bytedesk_disk_archive_file" indexName="uk_daf_request"/></not></preConditions>
+        <createIndex tableName="bytedesk_disk_archive_file" indexName="uk_daf_request" unique="true">
+            <column name="request_key"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -34,6 +34,7 @@ import com.bytedesk.core.enums.LevelEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.system_config.enums.SystemConfigKeyEnum;
+import com.bytedesk.core.system_config.enums.SystemConfigGroupEnum;
 import com.bytedesk.core.system_config.utils.PlatformSecretUtils;
 import com.bytedesk.core.uid.UidUtils;
 
@@ -63,6 +64,8 @@ public class SystemConfigRestService {
     private final AuthService authService;
 
     private final CacheManager cacheManager;
+
+    private final SystemConfigUploadApplier systemConfigUploadApplier;
 
     /**
      * 查询全量配置清单：由 SystemConfigKeyEnum 合成 + DB 覆盖值叠加（含默认值与来源）
@@ -183,6 +186,8 @@ public class SystemConfigRestService {
                 validateValueType(keyEnum, value);
                 // 平台客服 org/workgroup uid：基础格式校验（长度<=64，字符集 [a-zA-Z0-9_-]），防注入
                 validatePlatformServiceUid(keyEnum, value);
+                // 存储类型 provider：仅允许 local / s3，防拼写错误导致静默回退本地
+                validateStorageProvider(keyEnum, value);
 
                 upsertOverride(keyEnum, existing, value, orgUid, user);
             } else {
@@ -200,6 +205,25 @@ public class SystemConfigRestService {
         log.info("System config saved, keys: {}",
                 items.stream().map(item -> item.getKey())
                         .collect(Collectors.joining(",")));
+
+        // 文件上传/对象存储类配置保存后立即应用到运行时 Bean（免重启热更新）。
+        // 应用失败不影响保存结果（覆盖值已入库，下次启动会重新应用）
+        try {
+            boolean containsUploadKeys = items.stream().anyMatch(item -> {
+                SystemConfigKeyEnum keyEnum = SystemConfigKeyEnum.fromKey(item.getKey());
+                if (keyEnum == null) {
+                    return false;
+                }
+                return SystemConfigGroupEnum.UPLOAD.equals(keyEnum.getGroup())
+                        || SystemConfigGroupEnum.UPLOAD_SECURITY.equals(keyEnum.getGroup())
+                        || SystemConfigGroupEnum.STORAGE.equals(keyEnum.getGroup());
+            });
+            if (containsUploadKeys) {
+                systemConfigUploadApplier.applyOverrides();
+            }
+        } catch (Exception e) {
+            log.warn("Apply upload/storage config after save failed: {}", e.getMessage());
+        }
 
         return queryAll();
     }
@@ -265,6 +289,11 @@ public class SystemConfigRestService {
      * 读取单个 key 的静态默认值（来自 BytedeskProperties.Custom 或代码常量）
      */
     private String getDefaultValue(SystemConfigKeyEnum keyEnum) {
+        // 文件上传/对象存储：默认值来自 applier 启动时快照的 properties 静态值
+        String uploadValue = systemConfigUploadApplier.getDefaultValue(keyEnum);
+        if (uploadValue != null) {
+            return uploadValue;
+        }
         // 平台客服：静态默认值为代码常量，不新增 properties 键
         switch (keyEnum) {
             case PLATFORM_SERVICE_ENABLED:
@@ -377,6 +406,19 @@ public class SystemConfigRestService {
     }
 
     /**
+     * 存储类型 provider 校验：仅允许 local / s3（忽略大小写）
+     */
+    private void validateStorageProvider(SystemConfigKeyEnum keyEnum, String value) {
+        if (!SystemConfigKeyEnum.STORAGE_PROVIDER.equals(keyEnum)) {
+            return;
+        }
+        if (!"local".equalsIgnoreCase(value) && !"s3".equalsIgnoreCase(value)) {
+            throw new IllegalArgumentException(
+                    "invalid value for key " + keyEnum.getKey() + ": only 'local' or 's3' allowed");
+        }
+    }
+
+    /**
      * 超级管理员校验（兜底，Controller 层 @PreAuthorize 为主）
      */
     private void requireSuperUser() {
@@ -386,12 +428,13 @@ public class SystemConfigRestService {
         }
     }
     /**
-     * 是否为敏感（加密存储/掩码回显）key：目前为推送 appSecret 类。
+     * 是否为敏感（加密存储/掩码回显）key：推送 appSecret 类 + 对象存储 secretKey。
      * 敏感 key 无静态默认值，空值/掩码提交均表示「保留原值不修改」。
      */
     private boolean isSecretKey(SystemConfigKeyEnum keyEnum) {
         return SystemConfigKeyEnum.PUSH_ALIYUN_ANDROID_APP_SECRET.equals(keyEnum)
-                || SystemConfigKeyEnum.PUSH_ALIYUN_IOS_APP_SECRET.equals(keyEnum);
+                || SystemConfigKeyEnum.PUSH_ALIYUN_IOS_APP_SECRET.equals(keyEnum)
+                || SystemConfigKeyEnum.STORAGE_SECRET_KEY.equals(keyEnum);
     }
 
     /**

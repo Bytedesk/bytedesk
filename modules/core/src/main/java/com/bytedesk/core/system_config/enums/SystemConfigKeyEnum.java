@@ -268,6 +268,138 @@ public enum SystemConfigKeyEnum {
             "新访客接待提醒模板 ID",
             "新访客咨询提醒客服接待的模板 ID，在公众号后台模板库中获取",
             16),
+
+    // ============ 文件上传（UPLOAD） ============
+    UPLOAD_DIR(
+            SystemConfigConsts.KEY_UPLOAD_DIR,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.UPLOAD,
+            "本地上传目录",
+            "本地磁盘存储目录（相对或绝对路径，末尾不要带 '/'），仅存储类型为「本地磁盘」时生效；修改后新文件写入新目录，历史文件不迁移",
+            1),
+    UPLOAD_URL(
+            SystemConfigConsts.KEY_UPLOAD_URL,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.UPLOAD,
+            "上传文件访问地址",
+            "本地上传文件的访问地址（服务器实际地址，如 http://192.168.0.194:9003），用于拼接文件下载 URL",
+            2),
+
+    // ============ 上传安全（UPLOAD_SECURITY） ============
+    UPLOAD_SECURITY_MAX_FILE_SIZE(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_MAX_FILE_SIZE,
+            SystemConfigValueTypeEnum.INTEGER,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "最大文件大小（字节）",
+            "允许上传的最大文件大小，单位字节（如 100MB = 104857600）；同时受 multipart 限制约束，实际生效值为两者较小值",
+            1),
+    UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_ENABLE_IMAGE_VALIDATION,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "启用图片内容验证",
+            "开启后对图片文件做内容校验，拦截损坏或伪造扩展名的图片",
+            2),
+    UPLOAD_SECURITY_ENABLE_FILE_NAME_FILTER(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_ENABLE_FILE_NAME_FILTER,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "启用文件名过滤",
+            "开启后对上传文件名做危险字符过滤",
+            3),
+    UPLOAD_SECURITY_FORCE_RENAME(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_FORCE_RENAME,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "强制重命名文件",
+            "开启后上传文件统一按时间戳重命名，避免重名覆盖与特殊字符问题",
+            4),
+    UPLOAD_SECURITY_MAX_FILE_NAME_LENGTH(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_MAX_FILE_NAME_LENGTH,
+            SystemConfigValueTypeEnum.INTEGER,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "文件名最大长度",
+            "上传文件名的最大字符长度",
+            5),
+    UPLOAD_SECURITY_ENABLE_UPLOAD_LOG(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_ENABLE_UPLOAD_LOG,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "记录上传日志",
+            "开启后记录文件上传日志，用于审计追溯",
+            6),
+    UPLOAD_SECURITY_ENABLE_VIRUS_SCAN(
+            SystemConfigConsts.KEY_UPLOAD_SECURITY_ENABLE_VIRUS_SCAN,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.UPLOAD_SECURITY,
+            "启用病毒扫描（预留）",
+            "预留接口，当前版本开启后不会实际扫描",
+            7),
+
+    // ============ 对象存储（STORAGE，企业版 S3 兼容） ============
+    STORAGE_PROVIDER(
+            SystemConfigConsts.KEY_STORAGE_PROVIDER,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "存储类型",
+            "local：本地磁盘（社区版默认）；s3：S3 兼容对象存储（MinIO/RustFS/阿里云 OSS/腾讯云 COS 等，企业版功能）。切换不会自动迁移历史文件",
+            1),
+    STORAGE_ENDPOINT(
+            SystemConfigConsts.KEY_STORAGE_ENDPOINT,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "服务地址 Endpoint",
+            "S3 兼容服务地址，须同时能被应用和用户浏览器访问，如 http://127.0.0.1:19000",
+            2),
+    STORAGE_ACCESS_KEY(
+            SystemConfigConsts.KEY_STORAGE_ACCESS_KEY,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "AccessKey",
+            "对象存储访问凭据 AccessKey（部分后端为 Username）",
+            3),
+    STORAGE_SECRET_KEY(
+            SystemConfigConsts.KEY_STORAGE_SECRET_KEY,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "SecretKey",
+            "对象存储访问凭据 SecretKey（部分后端为 Password）；加密存储，保存后掩码显示，留空表示不修改",
+            4),
+    STORAGE_BUCKET_NAME(
+            SystemConfigConsts.KEY_STORAGE_BUCKET_NAME,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "存储桶 Bucket",
+            "存储桶名称，不存在时启动/生效时自动创建",
+            5),
+    STORAGE_REGION(
+            SystemConfigConsts.KEY_STORAGE_REGION,
+            SystemConfigValueTypeEnum.STRING,
+            SystemConfigGroupEnum.STORAGE,
+            "区域 Region",
+            "对象存储区域，如 us-east-1",
+            6),
+    STORAGE_SECURE(
+            SystemConfigConsts.KEY_STORAGE_SECURE,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.STORAGE,
+            "启用 HTTPS",
+            "endpoint 为 https:// 时自动走 HTTPS，此开关供 S3 客户端强制会话加密",
+            7),
+    STORAGE_PUBLIC_READ(
+            SystemConfigConsts.KEY_STORAGE_PUBLIC_READ,
+            SystemConfigValueTypeEnum.BOOLEAN,
+            SystemConfigGroupEnum.STORAGE,
+            "桶公开读",
+            "true：设置桶公开读策略并使用直链；false：跳过策略，使用有时限的预签名 URL。改为 false 不会撤销存储端已有的公开读策略",
+            8),
+    STORAGE_PRESIGNED_EXPIRY_DAYS(
+            SystemConfigConsts.KEY_STORAGE_PRESIGNED_EXPIRY_DAYS,
+            SystemConfigValueTypeEnum.INTEGER,
+            SystemConfigGroupEnum.STORAGE,
+            "预签名 URL 有效期（天）",
+            "仅「桶公开读」关闭时生效，SigV4 协议上限 7 天，超出自动截断为 7",
+            9),
     ;
 
     private final String key;

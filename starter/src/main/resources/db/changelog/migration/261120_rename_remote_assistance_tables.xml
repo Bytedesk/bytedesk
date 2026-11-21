@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="261120-rename-remote-device" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_desktop_device"/>
+            <not>
+                <tableExists tableName="bytedesk_remote_device"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_desktop_device" newTableName="bytedesk_remote_device"/>
+    </changeSet>
+    <changeSet id="261120-rename-remote-session" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_desktop_session"/>
+            <not>
+                <tableExists tableName="bytedesk_remote_session"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_desktop_session" newTableName="bytedesk_remote_session"/>
+    </changeSet>
+    <changeSet id="261120-rename-remote-audit-log" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_desktop_audit_log"/>
+            <not>
+                <tableExists tableName="bytedesk_remote_audit_log"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_desktop_audit_log" newTableName="bytedesk_remote_audit_log"/>
+    </changeSet>
+    <changeSet id="261120-rename-remote-invitation" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_desktop_invitation"/>
+            <not>
+                <tableExists tableName="bytedesk_remote_invitation"/>
+            </not>
+        </preConditions>
+        <renameTable oldTableName="bytedesk_desktop_invitation" newTableName="bytedesk_remote_invitation"/>
+    </changeSet>
+</databaseChangeLog>

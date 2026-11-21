@@ -70,8 +70,20 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
 
         return ResponseEntity.ok(JsonResult.success(page));
     }
+
+    @Operation(summary = "Search Public Groups", description = "Search public groups in current org (summary only, with joined/pendingApply flags)")
+    @ApiResponse(responseCode = "200", description = "Query successful",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = GroupResponse.class)))
+    @GetMapping("/query/public")
+    public ResponseEntity<?> queryPublic(GroupRequest request) {
+
+        Page<GroupResponse> page = groupRestService.queryPublic(request);
+
+        return ResponseEntity.ok(JsonResult.success(page));
+    }
     
-    @Operation(summary = "Query Group by UID", description = "Retrieve group details by UID")
+    @Operation(summary = "Query Group by UID", description = "Retrieve group details by UID (private groups visible to members only)")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
@@ -79,7 +91,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(GroupRequest request) {
         
-        GroupResponse group = groupRestService.queryByUid(request);
+        GroupResponse group = groupRestService.queryGroupDetail(request);
         
         return ResponseEntity.ok(JsonResult.success(group));
     }
@@ -151,6 +163,32 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     public ResponseEntity<?> updateGroupTopTip(@RequestBody GroupRequest request) {
         
         GroupResponse group = groupRestService.updateGroupTopTip(request);
+        
+        return ResponseEntity.ok(JsonResult.success(group));
+    }
+
+    @Operation(summary = "Update Group Visibility", description = "Switch group between PUBLIC and PRIVATE (group owner/admin only)")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = GroupResponse.class)))
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group visibility")
+    @PostMapping("/update/visibility")
+    public ResponseEntity<?> updateVisibility(@RequestBody GroupRequest request) {
+        
+        GroupResponse group = groupRestService.updateVisibility(request);
+        
+        return ResponseEntity.ok(JsonResult.success(group));
+    }
+
+    @Operation(summary = "Update Group Join Policy", description = "Toggle needApproval for public groups (group owner/admin only)")
+    @ApiResponse(responseCode = "200", description = "Updated successfully",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = GroupResponse.class)))
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group join policy")
+    @PostMapping("/update/joinPolicy")
+    public ResponseEntity<?> updateJoinPolicy(@RequestBody GroupRequest request) {
+        
+        GroupResponse group = groupRestService.updateJoinPolicy(request);
         
         return ResponseEntity.ok(JsonResult.success(group));
     }

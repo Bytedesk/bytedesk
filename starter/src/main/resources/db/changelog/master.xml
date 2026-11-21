@@ -23,6 +23,12 @@
     <include file="db/changelog/migration/261109_add_webrtc_expires_at.xml" />
     <include file="db/changelog/migration/261112_add_jobtitle_table.xml" />
     <include file="db/changelog/migration/261112_add_remote_assistance_tables.xml" />
+    <include file="db/changelog/migration/261119_add_remote_invitations.xml" />
+    <include file="db/changelog/migration/261120_rename_remote_assistance_tables.xml" />
     <include file="db/changelog/migration/261113_add_workgroup_tag_routing.xml" />
+    <include file="db/changelog/migration/261116_add_group_visibility_and_apply.xml" />
+    <include file="db/changelog/migration/261118_add_disk_tables.xml" />
+    <include file="db/changelog/migration/261118_add_disk_phase2_tables.xml" />
+    <include file="db/changelog/migration/261119_add_disk_archive_file_table.xml" />
 
 </databaseChangeLog>

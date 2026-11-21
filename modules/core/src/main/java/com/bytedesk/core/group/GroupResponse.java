@@ -17,6 +17,8 @@ import java.util.List;
 
 // import com.bytedesk.ai.robot.RobotProtobuf;
 import com.bytedesk.core.base.BaseResponse;
+import com.bytedesk.core.group.enums.GroupStatusEnum;
+import com.bytedesk.core.group.enums.GroupTypeEnum;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.member.MemberProtobuf;
 
@@ -53,6 +55,18 @@ public class GroupResponse extends BaseResponse {
     private GroupStatusEnum status;
 
     private Boolean isExternal;
+
+    /** 群可见性：PUBLIC / PRIVATE */
+    private String visibility;
+
+    /** 公开群加入是否需要审批 */
+    private Boolean needApproval;
+
+    /** 当前请求用户是否已是成员（公开搜索列表用） */
+    private Boolean joined;
+
+    /** 当前请求用户是否有待审批申请（公开搜索列表用） */
+    private Boolean pendingApply;
 
     // 替代直接返回所有成员列表，增加成员计数
     private Integer memberCount;

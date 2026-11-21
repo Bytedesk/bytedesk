@@ -225,7 +225,7 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
     public void markConnected(String userUid, String orgUid, String clientId, String deviceUid, String protocol, String channel, String ip, String userAgent, Integer ttlSeconds) {
         long now = System.currentTimeMillis();
         String resolvedOrgUid = resolveOrgUid(userUid, orgUid);
-        ConnectionEntity entity = fetchConnection(clientId, () -> ConnectionEntity.builder()
+        ConnectionEntity entity = fetchConnectionForUpdate(clientId, () -> ConnectionEntity.builder()
             .uid(uidUtils.getUid())
             .userUid(userUid)
             .orgUid(resolvedOrgUid)
@@ -331,6 +331,10 @@ public class ConnectionRestService extends BaseRestServiceWithExport<ConnectionE
 
     private ConnectionEntity fetchConnection(String clientId, Supplier<ConnectionEntity> creator) {
         return connectionRepository.findByClientId(clientId).orElseGet(creator);
+    }
+
+    private ConnectionEntity fetchConnectionForUpdate(String clientId, Supplier<ConnectionEntity> creator) {
+        return connectionRepository.findByClientIdForUpdate(clientId).orElseGet(creator);
     }
 
     private void applyConnectedState(ConnectionEntity entity, String protocol, Integer ttlSeconds, long now) {

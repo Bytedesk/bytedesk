@@ -8,4 +8,4 @@
 - UploadRepository、UploadSpecification、UploadRestController、UploadRestControllerVisitor、UploadRestService 提供持久化、条件过滤、管理端接口、访客上传接口与上传编排能力。
 - UploadConfig、UploadSecurityConfig、UploadSecurityLogger 定义运行配置和上传安全行为。
 - UploadWatermarkService、UploadInitializer、UploadPermissions、UploadEntityListener、UploadEventListener 与 event 子包负责水印处理、初始化数据、权限元数据以及创建、处理、更新生命周期事件。
-- aliyun、minio、tencent、storage、watermark 子包封装了具体存储和处理集成。
+- storage、watermark 子包封装了具体存储抽象和处理集成；阿里云 OSS、腾讯云 COS、MinIO/S3 对象存储已迁至 enterprise/core（企业版功能）。

@@ -20,7 +20,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.core.base.BaseSpecification;
+import com.bytedesk.core.group.enums.GroupStatusEnum;
+import com.bytedesk.core.group.enums.GroupVisibilityEnum;
 import com.bytedesk.core.rbac.auth.AuthService;
+
 import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +47,17 @@ public class GroupSpecification extends BaseSpecification<GroupEntity, GroupRequ
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(root.get("name"), "%" + searchText + "%"),
                         criteriaBuilder.like(root.get("description"), "%" + searchText + "%")));
+            }
+            //
+            // 公开群搜索：仅 visibility=PUBLIC 且状态正常（规划 §4.2：包含已加入群，joined 标记由服务端计算）
+            if (Boolean.TRUE.equals(request.getPublicOnly())) {
+                predicates.add(criteriaBuilder.equal(root.get("visibility"),
+                        GroupVisibilityEnum.PUBLIC.name()));
+                predicates.add(criteriaBuilder.equal(root.get("status"),
+                        GroupStatusEnum.NORMAL.name()));
+                // publicOnly 与 userUid 成员过滤互斥：queryByUser 使用 userUid（我的群组），
+                // queryPublic 使用 publicOnly（公开群组，成员资格通过 joined 标记返回）
+                return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
             }
             //
             // 如果userUid不为空，则查询该用户所在的群组

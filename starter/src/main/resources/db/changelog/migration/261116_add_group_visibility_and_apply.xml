@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        群组公开/私有可见性 + 入群申请：
+        - bytedesk_team_groups 增加 group_visibility 列，存量 NULL 显式回填 PRIVATE 后加非空约束
+        - 新建 bytedesk_team_group_apply 表（单条当前申请模型 + attempt 轮次）
+        跨库兼容：仅使用 addColumn/createTable/createIndex 标准标签（MySQL/PostgreSQL/H2/Oracle/KingBase）；
+        addNotNullConstraint 对存量 NULL 先由 update 回填，再启用约束，并带 preConditions 兜底。
+    -->
+
+    <changeSet id="261116-1-group-add-visibility" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_team_groups"/>
+            <not>
+                <columnExists tableName="bytedesk_team_groups" columnName="group_visibility"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_team_groups">
+            <column name="group_visibility" type="varchar(32)" defaultValue="PRIVATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <!-- 存量 NULL 显式回填 PRIVATE（不能只依赖 defaultValue） -->
+    <changeSet id="261116-2-group-visibility-backfill" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_team_groups"/>
+            <columnExists tableName="bytedesk_team_groups" columnName="group_visibility"/>
+        </preConditions>
+        <update tableName="bytedesk_team_groups">
+            <column name="group_visibility" value="PRIVATE"/>
+            <where>group_visibility IS NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="261116-3-group-visibility-notnull" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_team_groups"/>
+            <columnExists tableName="bytedesk_team_groups" columnName="group_visibility"/>
+        </preConditions>
+        <addNotNullConstraint tableName="bytedesk_team_groups" columnName="group_visibility"
+            defaultNullValue="PRIVATE" columnDataType="varchar(32)"/>
+    </changeSet>
+
+    <changeSet id="261116-4-create-group-apply-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_team_group_apply"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_team_group_apply">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <!-- BaseEntity.userUid 与业务 user_uid 冗余列同名，实体 @Column(name="user_uid") 映射到该列 -->
+            <column name="user_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="group_uid" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="apply_status" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="attempt" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reason" type="VARCHAR(255)"/>
+            <column name="reject_reason" type="VARCHAR(255)"/>
+            <column name="handled_by_uid" type="VARCHAR(64)"/>
+            <column name="handled_at" type="timestamp"/>
+        </createTable>
+        <addUniqueConstraint tableName="bytedesk_team_group_apply"
+            constraintName="uk_group_apply_org_group_user"
+            columnNames="org_uid,group_uid,user_uid"/>
+        <createIndex indexName="idx_group_apply_group_status" tableName="bytedesk_team_group_apply">
+            <column name="org_uid"/>
+            <column name="group_uid"/>
+            <column name="apply_status"/>
+        </createIndex>
+        <createIndex indexName="idx_group_apply_user" tableName="bytedesk_team_group_apply">
+            <column name="org_uid"/>
+            <column name="user_uid"/>
+            <column name="apply_status"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bytedesk.core.base.BaseRequest;
-
+import com.bytedesk.core.group.enums.GroupStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,6 +49,12 @@ public class GroupRequest extends BaseRequest {
 
     private Boolean isExternal;
 
+    /** 群可见性：PUBLIC / PRIVATE（GroupVisibilityEnum.name()），非法值回退 PRIVATE */
+    private String visibility;
+
+    /** 公开群加入是否需要审批（仅 visibility=PUBLIC 时有意义） */
+    private Boolean needApproval;
+
     private GroupStatusEnum status;
 
     @Builder.Default
@@ -59,5 +65,8 @@ public class GroupRequest extends BaseRequest {
 
     @Builder.Default
     private List<String> robotUids = new ArrayList<>();
+
+    /** 公开群搜索模式（query/public 端点使用，服务端强制置 true） */
+    private Boolean publicOnly;
 
 }

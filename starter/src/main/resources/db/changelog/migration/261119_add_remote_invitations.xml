@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet id="261119-remote-invitation" author="copilot">
+        <!-- 该 changeset 已在部分环境执行过（索引随后拆分为独立 changeset），保留旧校验和避免启动校验失败 -->
+        <validCheckSum>9:2c65b0a16dabeb3aa2ff1f8719fbc89b</validCheckSum>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_desktop_invitation"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_desktop_invitation">
+            <column name="id" type="BIGINT" autoIncrement="true"><constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="VARCHAR(255)"><constraints nullable="false" unique="true"/></column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp"><constraints nullable="false"/></column>
+            <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false"><constraints nullable="false"/></column>
+            <column name="version" type="INT" defaultValueNumeric="0"><constraints nullable="false"/></column>
+            <column name="org_uid" type="VARCHAR(255)"/>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="code_hash" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="host_secret_hash" type="VARCHAR(64)"><constraints nullable="false"/></column>
+            <column name="expires_at" type="timestamp"/>
+            <column name="session_uid" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="261119-remote-invitation-expiry-index" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists tableName="bytedesk_desktop_invitation" indexName="idx_remote_invitation_expiry"/>
+            </not>
+        </preConditions>
+        <createIndex tableName="bytedesk_desktop_invitation" indexName="idx_remote_invitation_expiry"><column name="expires_at"/></createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        企业网盘一期表结构（modules/disk）：
+        - bytedesk_disk_space：空间（每组织一个共享空间 + 每成员一个个人空间）
+        - bytedesk_disk_file：文件/文件夹统一单表（type=FOLDER/FILE + parent_uid）
+        - bytedesk_disk_permission：目录级授权（MEMBER/DEPT）
+        - bytedesk_disk_log：关键操作留痕（授权变更、彻底删除）
+        跨库兼容：仅使用标准 createTable/createIndex 标签；BOOLEAN/BIGINT/VARCHAR/timestamp
+        由 Liquibase 按方言映射（MySQL/PostgreSQL/H2/Oracle/KingBase）。
+        active_key 为同级名称唯一键（org+space+parent+name 规范化），软删除时置 NULL，
+        单列唯一索引允许多个 NULL（已删除项），保证同级活跃名称唯一。
+
+        与 ddl-auto=update 的关系（参照 261112_add_jobtitle_table.xml 惯例）：
+        - 全新安装：Liquibase 先于 JPA 执行并建表（preConditions/tableExists 保证幂等），
+          随后 Hibernate 比对实体，一致则零 ALTER；列长度已与实体注解对齐（uid 类 255、
+          uploader 2048、extra/detail TEXT）。
+        - 升级路径：保留脚本作为 schema 版本历史；将来 ddl-auto 收紧为 validate/none
+          时，新表安装仍可仅靠 Liquibase 完成。
+    -->
+
+    <changeSet id="261118-10-create-disk-space-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_disk_space"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_space">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="space_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(512)"/>
+        </createTable>
+        <createIndex indexName="idx_disk_space_org_type" tableName="bytedesk_disk_space">
+            <column name="org_uid"/>
+            <column name="space_type"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_space_user" tableName="bytedesk_disk_space">
+            <column name="user_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-20-create-disk-file-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_disk_file"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_file">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_type" type="VARCHAR(64)"/>
+            <column name="node_type" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="space_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_uid" type="VARCHAR(255)"/>
+            <column name="active_key" type="VARCHAR(600)"/>
+            <column name="file_size" type="BIGINT"/>
+            <column name="storage_backend" type="VARCHAR(32)"/>
+            <column name="storage_key" type="VARCHAR(512)"/>
+            <column name="origin_parent_uid" type="VARCHAR(255)"/>
+            <column name="deleted_at" type="timestamp"/>
+            <column name="deleted_by" type="VARCHAR(255)"/>
+            <column name="extra" type="TEXT"/>
+            <column name="uploader" type="VARCHAR(2048)"/>
+        </createTable>
+        <createIndex indexName="uk_disk_file_active_key" tableName="bytedesk_disk_file" unique="true">
+            <column name="active_key"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_file_space_parent" tableName="bytedesk_disk_file">
+            <column name="space_uid"/>
+            <column name="parent_uid"/>
+            <column name="is_deleted"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_file_org_deleted" tableName="bytedesk_disk_file">
+            <column name="org_uid"/>
+            <column name="is_deleted"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-30-create-disk-permission-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_disk_permission"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_permission">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="space_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="folder_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_type" type="VARCHAR(16)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_name" type="VARCHAR(255)"/>
+            <column name="perms" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex indexName="idx_disk_perm_folder" tableName="bytedesk_disk_permission">
+            <column name="folder_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_perm_target" tableName="bytedesk_disk_permission">
+            <column name="target_type"/>
+            <column name="target_uid"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261118-40-create-disk-log-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_disk_log"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_disk_log">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="created_at" type="timestamp"/>
+            <column name="updated_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_deleted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="org_uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_uid" type="VARCHAR(255)"/>
+            <column name="level_type" type="VARCHAR(255)"/>
+            <column name="platform_type" type="VARCHAR(255)"/>
+            <column name="space_uid" type="VARCHAR(255)"/>
+            <column name="node_uid" type="VARCHAR(255)"/>
+            <column name="operator_uid" type="VARCHAR(255)"/>
+            <column name="action" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="result" type="VARCHAR(32)"/>
+            <column name="detail" type="TEXT"/>
+        </createTable>
+        <createIndex indexName="idx_disk_log_org_time" tableName="bytedesk_disk_log">
+            <column name="org_uid"/>
+            <column name="created_at"/>
+        </createIndex>
+        <createIndex indexName="idx_disk_log_node" tableName="bytedesk_disk_log">
+            <column name="node_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

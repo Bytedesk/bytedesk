@@ -38,6 +38,11 @@ public class MemberProtobuf implements Serializable {
 
     private String avatar;
 
+    /**
+     * 关联账号 UID（@提及协议的人类目标；区别于 uid 的 memberUid 含义）
+     */
+    private String userUid;
+
     @Builder.Default
     private String type = UserTypeEnum.MEMBER.name();
 }

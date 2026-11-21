@@ -35,7 +35,8 @@ public enum UploadTypeEnum {
     CUSTOMER, // 客户
     BLACK, // 黑名单
     WORKFLOW, // 工作流
-    ATTACHMENT; // 附件
+    ATTACHMENT, // 附件
+    DISK; // 企业网盘
 
     // 根据字符串查找对应的枚举常量
     public static UploadTypeEnum fromValue(String value) {

@@ -23,7 +23,7 @@ MVP 使用 P2P WebRTC 传屏、可靠有序 DataChannel 传键鼠输入，客服
 
 参考 `modules/core` 按功能聚合，而不是按 `entity/repository/service` 技术分层。同一功能的实体、仓库、服务、控制器、请求/响应 DTO 和枚举放在同一个包：
 
-- [`device`](src/main/java/com/bytedesk/remote/device/)：设备实体、仓库、注册请求及设备管理骨架。
+- [`device`](src/main/java/com/bytedesk/remote/device/)：设备实体、仓库与注册请求。
 - [`session`](src/main/java/com/bytedesk/remote/session/)：会话生命周期、参与方接口、信令/ICE、请求/响应和会话枚举。
 - [`audit`](src/main/java/com/bytedesk/remote/audit/)：审计实体、仓库及审计服务骨架。
 - `config`、`controller`、`protocol`、`websocket`：保留模块健康配置、前端页面路由与遗留传输协议；WebSocket 配置与控制器放在一起。

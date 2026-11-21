@@ -13,7 +13,6 @@
  */
 package com.bytedesk.core.upload;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,6 +29,7 @@ import javax.imageio.ImageIO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 
 import com.bytedesk.core.constant.I18Consts;
 import org.springframework.util.FileSystemUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bytedesk.core.base.BaseRestService;
@@ -51,7 +50,7 @@ import com.bytedesk.core.rbac.user.UserConvertUtils;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.uid.UidUtils;
-import com.bytedesk.core.upload.minio.UploadMinioService;
+import com.bytedesk.core.upload.storage.UploadObjectStorage;
 import com.bytedesk.core.upload.storage.UploadStorageException;
 import com.bytedesk.core.upload.storage.UploadStorageFileNotFoundException;
 import com.bytedesk.core.utils.BdDateUtils;
@@ -82,9 +81,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	private final UploadSecurityLogger uploadSecurityLogger;
 
 	// 可选依赖：水印服务（当 bytedesk.watermark.enabled=false 时不加载）
-	private final UploadWatermarkService uploadWatermarkService;
+	private final ObjectProvider<UploadWatermarkService> uploadWatermarkServiceProvider;
 
-	private final UploadMinioService uploadMinioService;
+	// 可选依赖：对象存储（企业版实现，社区版无实现时仅本地磁盘存储）。
+	// 持有 ObjectProvider 而非构造期解析实例，避免与 UploadObjectStorageService
+	// （其注入 UploadRestService）形成构造期循环依赖
+	private final ObjectProvider<UploadObjectStorage> uploadObjectStorageProvider;
 
 	public UploadRestService(Path uploadDir,
 			UidUtils uidUtils,
@@ -95,7 +97,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			UploadSecurityConfig uploadSecurityConfig,
 			UploadSecurityLogger uploadSecurityLogger,
 			ObjectProvider<UploadWatermarkService> uploadWatermarkServiceProvider,
-			ObjectProvider<UploadMinioService> uploadMinioServiceProvider) {
+			ObjectProvider<UploadObjectStorage> uploadObjectStorageProvider) {
 		this.uploadDir = uploadDir;
 		this.uidUtils = uidUtils;
 		this.modelMapper = modelMapper;
@@ -104,8 +106,20 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		this.authService = authService;
 		this.uploadSecurityConfig = uploadSecurityConfig;
 		this.uploadSecurityLogger = uploadSecurityLogger;
-		this.uploadWatermarkService = uploadWatermarkServiceProvider.getIfAvailable();
-		this.uploadMinioService = uploadMinioServiceProvider.getIfAvailable();
+		this.uploadWatermarkServiceProvider = uploadWatermarkServiceProvider;
+		this.uploadObjectStorageProvider = uploadObjectStorageProvider;
+	}
+
+	/**
+	 * 懒解析对象存储实现；出现循环依赖异常时按无实现处理，回落本地磁盘存储
+	 */
+	private UploadObjectStorage resolveObjectStorage() {
+		try {
+			return uploadObjectStorageProvider.getIfAvailable();
+		} catch (BeanCreationException e) {
+			log.warn("对象存储实现加载失败，回落本地磁盘存储: {}", e.getMessage());
+			return null;
+		}
 	}
 
 	@Override
@@ -261,6 +275,7 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			}
 
 			// 检查是否需要添加水印（水印服务可能未启用）
+			UploadWatermarkService uploadWatermarkService = uploadWatermarkServiceProvider.getIfAvailable();
 			if (uploadWatermarkService != null && uploadWatermarkService.shouldAddWatermark(file, request)) {
 				log.info("为图片添加水印: {}", fileName);
 				uploadWatermarkService.addWatermarkToFile(file, destinationFile, request);
@@ -286,8 +301,8 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	}
 
     // ========== 安全辅助方法 ========== 
-    // 文件类型白名单校验 - 使用配置化的安全策略
-    private boolean isAllowedFileType(String fileName, String contentType) {
+    // 文件类型白名单校验 - 使用配置化的安全策略（public 供企业版对象存储实现复用同一套校验规则）
+    public boolean isAllowedFileType(String fileName, String contentType) {
         String ext = getFileExt(fileName);
 
 		// 主动内容文件（尤其是 SVG）存在脚本执行风险，禁止通过上传链路直接落盘
@@ -311,16 +326,16 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
         return true;
     }
 
-    private boolean isImageFile(String fileName, String contentType) {
+    public boolean isImageFile(String fileName, String contentType) {
         return BdUploadUtils.isImageFile(fileName, contentType);
     }
 
-    private String getFileExt(String fileName) {
+    public String getFileExt(String fileName) {
         return BdUploadUtils.getFileExtension(fileName);
     }
 
     // 文件名过滤与重命名 - 使用配置化的安全策略
-    private String filterAndRenameFileName(String fileName) {
+    public String filterAndRenameFileName(String fileName) {
         if (fileName == null) fileName = "file";
         
         // 检查文件名长度
@@ -340,12 +355,12 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
     }
 
     // 文件大小校验
-    private boolean isFileSizeValid(long fileSize) {
+    public boolean isFileSizeValid(long fileSize) {
         return uploadSecurityConfig.isFileSizeValid(fileSize);
     }
 
     // 获取文件大小限制描述
-    private String getFileSizeDescription() {
+    public String getFileSizeDescription() {
         return uploadSecurityConfig.getMaxFileSizeDescription();
     }	public Stream<Path> loadAll() {
 		try {
@@ -366,11 +381,14 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 	 */
 	public Resource loadAsResource(UploadEntity upload) {
 		if (upload.getFileUrl() != null && !upload.getFileUrl().isEmpty()) {
-			// MinIO 直链（{endpoint}/{bucket}/{objectPath}）：经 MinIO 客户端下载到临时文件后返回资源，
+			// 对象存储直链（{endpoint}/{bucket}/{objectPath}）：经对象存储客户端下载到临时文件后返回资源，
 			// 否则本地存储逻辑无法识别该 URL，会回落到原始文件名导致 Invalid filename format
-			Resource minioResource = tryLoadFromMinio(upload.getFileUrl());
-			if (minioResource != null) {
-				return minioResource;
+			UploadObjectStorage objectStorage = resolveObjectStorage();
+			if (objectStorage != null) {
+				Resource objectResource = objectStorage.tryLoad(upload.getFileUrl());
+				if (objectResource != null) {
+					return objectResource;
+				}
 			}
 			// 从 fileUrl 中提取相对路径
 			String relativePath = extractRelativePathFromUrl(upload.getFileUrl());
@@ -380,75 +398,6 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 		}
 		// 如果 fileUrl 为空或提取失败，则使用 fileName
 		return loadAsResource(upload.getFileName());
-	}
-
-	/**
-	 * 尝试从 MinIO 加载文件资源：fileUrl 命中 {endpoint}/{bucket}/ 前缀时，
-	 * 经 MinIO 客户端鉴权下载到临时文件（不依赖桶公读策略）。
-	 * 未启用 MinIO、URL 不匹配或下载失败时返回 null，回落到本地存储查找。
-	 */
-	private Resource tryLoadFromMinio(String fileUrl) {
-		if (uploadMinioService == null || bytedeskProperties == null
-				|| !bytedeskProperties.isS3StorageEnabled()) {
-			return null;
-		}
-		String objectPath = extractMinioObjectPath(fileUrl);
-		if (!StringUtils.hasText(objectPath)) {
-			return null;
-		}
-		try {
-			String extension = BdUploadUtils.getFileExtension(objectPath);
-			String suffix = StringUtils.hasText(extension) ? "." + extension : ".tmp";
-			Path tempFile = Files.createTempFile("bytedesk-upload-minio-", suffix);
-			uploadMinioService.downloadObject(objectPath, tempFile);
-			tempFile.toFile().deleteOnExit();
-			log.info("Loaded MinIO object as resource: fileUrl={}, objectPath={}, tempFile={}",
-					fileUrl, objectPath, tempFile);
-			return new UrlResource(tempFile.toUri());
-		} catch (Exception e) {
-			log.warn("Failed to load MinIO object, fallback to local storage lookup. fileUrl={}, objectPath={}, reason={}",
-					fileUrl, objectPath, e.getMessage());
-			return null;
-		}
-	}
-
-	/**
-	 * 从 MinIO 直链 URL 提取对象路径：
-	 * http://127.0.0.1:19000/bytedesk/documents/xxx.xlsx → documents/xxx.xlsx
-	 */
-	private String extractMinioObjectPath(String fileUrl) {
-		String normalized = fileUrl == null ? null : fileUrl.trim();
-		String endpoint = trimTrailingSlash(bytedeskProperties.resolveStorageEndpoint());
-		String bucket = bytedeskProperties.resolveStorageBucketName() == null ? null
-				: bytedeskProperties.resolveStorageBucketName().trim();
-		if (normalized == null || normalized.isEmpty() || !StringUtils.hasText(endpoint) || !StringUtils.hasText(bucket)) {
-			return null;
-		}
-		String prefix = endpoint + "/" + bucket + "/";
-		if (!normalized.startsWith(prefix)) {
-			return null;
-		}
-		String objectPath = normalized.substring(prefix.length());
-		int queryIndex = objectPath.indexOf('?');
-		if (queryIndex >= 0) {
-			objectPath = objectPath.substring(0, queryIndex);
-		}
-		int fragmentIndex = objectPath.indexOf('#');
-		if (fragmentIndex >= 0) {
-			objectPath = objectPath.substring(0, fragmentIndex);
-		}
-		return StringUtils.hasText(objectPath) ? objectPath : null;
-	}
-
-	private String trimTrailingSlash(String value) {
-		if (value == null) {
-			return null;
-		}
-		String trimmed = value.trim();
-		while (trimmed.endsWith("/")) {
-			trimmed = trimmed.substring(0, trimmed.length() - 1);
-		}
-		return trimmed;
 	}
 
 	/**
@@ -653,13 +602,18 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 				request.setOrgUid(user.getOrgUid());
 			}
 
-			// 4. 存储文件并获取实际的文件URL
+			// 4. 存储文件并获取实际的文件URL（对象存储为可选依赖：社区版无实现时回落本地磁盘）
+			UploadObjectStorage uploadObjectStorage = resolveObjectStorage();
 			String fileUrl;
-			if (bytedeskProperties.isS3StorageEnabled()) {
-				log.info("S3 兼容对象存储已启用，使用对象存储保存文件");
-				fileUrl = storeToMinio(file, safeFileName, request);
+			if (uploadObjectStorage != null && uploadObjectStorage.isEnabled()) {
+				log.info("对象存储已启用，使用对象存储保存文件");
+				fileUrl = uploadObjectStorage.upload(file, safeFileName, request);
 			} else {
-				log.info("MinIO 未启用，使用本地文件系统存储文件");
+				if (uploadObjectStorage == null) {
+					log.info("对象存储未启用（社区版仅本地磁盘存储），使用本地文件系统存储文件");
+				} else {
+					log.info("对象存储未启用，使用本地文件系统存储文件");
+				}
 				fileUrl = store(file, safeFileName, request);
 			}
 			if (fileUrl == null || fileUrl.trim().isEmpty()) {
@@ -693,316 +647,5 @@ public class UploadRestService extends BaseRestService<UploadEntity, UploadReque
 			throw new UploadStorageException("文件上传失败: " + (e.getMessage() == null ? "系统内部错误" : e.getMessage()), 500, e);
 		}
 	}
-
-	// ==================== MinIO 存储方法 ====================
-
-	/**
-	 * 将文件存储到 MinIO
-	 * 
-	 * @param file MultipartFile 文件
-	 * @param fileName 文件名
-	 * @param request 上传请求
-	 * @return 文件访问URL
-	 */
-	public String storeToMinio(MultipartFile file, String fileName, UploadRequest request) {
-		// 检查 S3 兼容对象存储是否启用
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-
-		try {
-			if (file == null || file.isEmpty()) {
-				throw new UploadStorageException("空文件，无法上传", 400);
-			}
-
-			// 文件名再次过滤，防止绕过
-			fileName = filterAndRenameFileName(fileName);
-			
-			// 文件类型白名单校验
-			String contentType = file.getContentType();
-			if (!isAllowedFileType(fileName, contentType)) {
-				String ext = getFileExt(fileName);
-				String reason = (ext == null || ext.isEmpty()) ? "不支持的文件类型" : ("不支持的文件类型: ." + ext);
-				throw new UploadStorageException(reason, 415);
-			}
-			
-			// 文件大小限制
-			if (!isFileSizeValid(file.getSize())) {
-				throw new UploadStorageException("文件过大，最大支持" + getFileSizeDescription(), 413);
-			}
-			
-			// 图片内容校验
-			if (uploadSecurityConfig.isEnableImageValidation() && isImageFile(fileName, contentType)) {
-				try {
-					ImageIO.read(file.getInputStream());
-				} catch (Exception e) {
-					throw new UploadStorageException("图片内容校验失败（文件可能已损坏或伪造扩展名）", 422);
-				}
-			}
-
-			// 根据文件类型选择存储文件夹
-			String folder = getMinioFolderByFileType(file, request);
-			
-			// 上传到 MinIO
-			String fileUrl = uploadMinioService.uploadFile(file, fileName, folder);
-			
-			log.info("文件已成功上传到 MinIO: {}", fileUrl);
-			return fileUrl;
-
-		} catch (UploadStorageException e) {
-			log.error("上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw e;
-		} catch (Exception e) {
-			log.error("上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException("存储服务异常（MinIO）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()), 503, e);
-		}
-	}
-
-	/**
-	 * 将本地文件存储到 MinIO
-	 * 
-	 * @param localFilePath 本地文件路径
-	 * @param fileName 文件名
-	 * @param request 上传请求
-	 * @return 文件访问URL
-	 */
-	public String storeLocalFileToMinio(String localFilePath, String fileName, UploadRequest request) {
-		// 检查 S3 兼容对象存储是否启用
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-
-		try {
-			File localFile = new File(localFilePath);
-			if (!localFile.exists()) {
-				throw new UploadStorageException("本地文件不存在: " + localFilePath, 404);
-			}
-
-			// 根据文件类型选择存储文件夹
-			String folder = getMinioFolderByFileName(fileName, request);
-			
-			// 上传到 MinIO
-			String fileUrl = uploadMinioService.uploadFile(localFile, fileName, folder);
-			
-			log.info("本地文件已成功上传到 MinIO: {}", fileUrl);
-			return fileUrl;
-
-		} catch (UploadStorageException e) {
-			log.error("上传本地文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw e;
-		} catch (Exception e) {
-			log.error("上传本地文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException(
-				"存储服务异常（MinIO）: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
-				503,
-				e
-			);
-		}
-	}
-
-	/**
-	 * 从 URL 下载并存储到 MinIO
-	 * 
-	 * @param url 文件URL
-	 * @param fileName 文件名
-	 * @param request 上传请求
-	 * @return 文件访问URL
-	 */
-	public String storeUrlToMinio(String url, String fileName, UploadRequest request) {
-		// 检查 S3 兼容对象存储是否启用
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-
-		try {
-			// 根据文件类型选择存储文件夹
-			String folder = getMinioFolderByFileName(fileName, request);
-			
-			// 从 URL 下载并上传到 MinIO
-			String fileUrl = uploadMinioService.uploadFromUrl(url, fileName, folder);
-			
-			log.info("URL 文件已成功上传到 MinIO: {}", fileUrl);
-			return fileUrl;
-
-		} catch (UploadStorageException e) {
-			log.error("从 URL 上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw e;
-		} catch (Exception e) {
-			log.error("从 URL 上传文件到 MinIO 失败: {}", e.getMessage(), e);
-			throw new UploadStorageException(
-				"从URL下载并上传失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
-				400,
-				e
-			);
-		}
-	}
-
-	/**
-	 * 根据文件类型和请求信息确定 MinIO 存储文件夹
-	 * 
-	 * @param file MultipartFile 文件
-	 * @param request 上传请求
-	 * @return 存储文件夹路径
-	 */
-	private String getMinioFolderByFileType(MultipartFile file, UploadRequest request) {
-		String contentType = file.getContentType();
-		String fileName = file.getOriginalFilename();
-		
-		// 使用工具类根据文件类型获取文件夹
-		String folder = BdUploadUtils.getFileFolderByType(fileName, contentType);
-		
-		// 根据请求类型进行特殊处理
-		if (request != null && request.getKbType() != null) {
-			switch (request.getKbType().toLowerCase()) {
-				case "avatar":
-					return "avatars";
-				case "attachment":
-					return "attachments";
-				default:
-					break;
-			}
-		}
-		
-		return folder;
-	}
-
-	/**
-	 * 根据文件名确定 MinIO 存储文件夹
-	 * 
-	 * @param fileName 文件名
-	 * @param request 上传请求
-	 * @return 存储文件夹路径
-	 */
-	private String getMinioFolderByFileName(String fileName, UploadRequest request) {
-		// 使用工具类根据文件类型获取文件夹
-		String folder = BdUploadUtils.getFileFolderByType(fileName, null);
-		
-		// 根据请求类型进行特殊处理
-		if (request != null && request.getKbType() != null) {
-			switch (request.getKbType().toLowerCase()) {
-				case "avatar":
-					return "avatars";
-				case "attachment":
-					return "attachments";
-				case "image":
-					return "images";
-				case "audio":
-					return "audios";
-				case "video":
-					return "videos";
-				case "document":
-					return "documents";
-				default:
-					break;
-			}
-		}
-		
-		return folder;
-	}
-
-	/**
-	 * 删除 MinIO 中的文件
-	 * 
-	 * @param objectPath 对象路径
-	 */
-	public void deleteFromMinio(String objectPath) {
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-		
-		try {
-			uploadMinioService.deleteFile(objectPath);
-			log.info("成功删除 MinIO 文件: {}", objectPath);
-		} catch (Exception e) {
-			log.error("删除 MinIO 文件失败: {}", e.getMessage(), e);
-			throw new UploadStorageException(
-				"删除 MinIO 文件失败: " + (e.getMessage() == null ? "未知错误" : e.getMessage()),
-				503,
-				e
-			);
-		}
-	}
-
-	/**
-	 * 检查 MinIO 中文件是否存在
-	 * 
-	 * @param objectPath 对象路径
-	 * @return 是否存在
-	 */
-	public boolean fileExistsInMinio(String objectPath) {
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			return false;
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			return false;
-		}
-		
-		return uploadMinioService.fileExists(objectPath);
-	}
-
-	/**
-	 * 获取 MinIO 文件下载URL（预签名URL）
-	 * 
-	 * @param objectPath 对象路径
-	 * @param expiry 过期时间（秒）
-	 * @return 预签名URL
-	 */
-	public String getMinioDownloadUrl(String objectPath, int expiry) {
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-		
-		return uploadMinioService.getDownloadUrl(objectPath, expiry);
-	}
-
-	/**
-	 * 获取 MinIO 文件上传URL（预签名URL）
-	 * 
-	 * @param objectPath 对象路径
-	 * @param expiry 过期时间（秒）
-	 * @return 预签名URL
-	 */
-	public String getMinioUploadUrl(String objectPath, int expiry) {
-		if (!bytedeskProperties.isS3StorageEnabled()) {
-			throw new UploadStorageException("存储服务未启用（S3 对象存储）", 503);
-		}
-
-		// 检查 MinIO 服务是否可用
-		if (uploadMinioService == null) {
-			throw new UploadStorageException("存储服务不可用（MinIO 未初始化）", 503);
-		}
-		
-		return uploadMinioService.getUploadUrl(objectPath, expiry);
-	}
-
-	
-	
 
 }

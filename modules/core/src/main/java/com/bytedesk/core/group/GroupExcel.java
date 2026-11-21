@@ -43,6 +43,10 @@ public class GroupExcel {
     @ColumnWidth(15)
     private String type;
 
+    @ExcelProperty(value = "群组可见性")
+    @ColumnWidth(15)
+    private String visibility;
+
     @ExcelProperty(value = "群组状态")
     @ColumnWidth(15)
     private String status;

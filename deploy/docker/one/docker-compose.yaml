@@ -257,6 +257,10 @@ services:
       SPRING_CACHE_REDIS_KEY_PREFIX: "bytedeskim:cache:"
       # Upload config
       BYTEDESK_UPLOAD_DIR: /app/uploads
+      # Private archive storage; keep separate from the public upload volume.
+      BYTEDESK_DISK_ARCHIVE_PRIVATE_DIRECTORY: ${BYTEDESK_DISK_ARCHIVE_PRIVATE_DIRECTORY:-/app/data/disk-archive-private}
+      BYTEDESK_DISK_ARCHIVE_MAX_FILE_SIZE: ${BYTEDESK_DISK_ARCHIVE_MAX_FILE_SIZE:-20971520}
+      BYTEDESK_DISK_ARCHIVE_MAX_FILES_PER_ORG_MODULE: ${BYTEDESK_DISK_ARCHIVE_MAX_FILES_PER_ORG_MODULE:-100000}
       # 上传文件的访问地址，请修改为服务器实际的地址
       BYTEDESK_UPLOAD_URL: http://127.0.0.1:9003
       # 文件上传安全配置
@@ -550,12 +554,18 @@ services:
       WECHAT_PAY_ENABLED: "false"
       WECHAT_PAY_CERTPATH: ''
       # 阿里云访问密钥（短信与 OSS 共用），获取 https://ram.console.aliyun.com/profile/access-keys
-      ALIYUN_ACCESS_KEY_ID: ${ALIYUN_ACCESS_KEY_ID:-}
-      ALIYUN_ACCESS_KEY_SECRET: ${ALIYUN_ACCESS_KEY_SECRET:-}
+      # 2026-11 统一 bytedesk.aliyun.* 前缀后环境变量同步改为 BYTEDESK_ALIYUN_* 命名
+      BYTEDESK_ALIYUN_ENABLED: ${BYTEDESK_ALIYUN_ENABLED:-false}
+      BYTEDESK_ALIYUN_REGION_ID: ${BYTEDESK_ALIYUN_REGION_ID:-cn-hangzhou}
+      BYTEDESK_ALIYUN_ACCESS_KEY_ID: ${BYTEDESK_ALIYUN_ACCESS_KEY_ID:-}
+      BYTEDESK_ALIYUN_ACCESS_KEY_SECRET: ${BYTEDESK_ALIYUN_ACCESS_KEY_SECRET:-}
+      BYTEDESK_ALIYUN_OSS_ENDPOINT: ${BYTEDESK_ALIYUN_OSS_ENDPOINT:-https://oss-cn-shenzhen.aliyuncs.com}
+      BYTEDESK_ALIYUN_OSS_BASE_URL: ${BYTEDESK_ALIYUN_OSS_BASE_URL:-https://bytedesk.oss-cn-shenzhen.aliyuncs.com}
+      BYTEDESK_ALIYUN_OSS_BUCKET_NAME: ${BYTEDESK_ALIYUN_OSS_BUCKET_NAME:-bytedesk}
       # 阿里云短信服务的签名，可以在控制台找到，如是中文，请转为Unicode
-      ALIYUN_SMS_SIGNNAME: ${ALIYUN_SMS_SIGNNAME:-}
+      BYTEDESK_ALIYUN_SMS_SIGN_NAME: ${BYTEDESK_ALIYUN_SMS_SIGN_NAME:-}
       #阿里云短信服务的模板Code，可以在控制台找到
-      ALIYUN_SMS_TEMPLATECODE: ${ALIYUN_SMS_TEMPLATECODE:-}
+      BYTEDESK_ALIYUN_SMS_TEMPLATE_CODE: ${BYTEDESK_ALIYUN_SMS_TEMPLATE_CODE:-}
       # Artemis JMS 配置
       SPRING_ARTEMIS_MODE: embedded
       # SPRING_ARTEMIS_MODE: native
@@ -591,6 +601,7 @@ services:
       - 9885:9885
     volumes:
       - upload_data:/app/uploads
+      - disk_archive_data:/app/data/disk-archive-private
       - helpcenter_data:/app/helpcenter
       - blog_data:/app/blog
     networks:
@@ -605,12 +616,15 @@ volumes:
     name: bytedesk_elasticsearch_data
   upload_data:
     name: bytedesk_upload_data
+  disk_archive_data:
+    name: bytedesk_disk_archive_data
   helpcenter_data:
     name: bytedesk_helpcenter_data
   blog_data:
     name: bytedesk_blog_data
   artemis_data:
-    name: bytedesk_artemis_data  minio_data:
+    name: bytedesk_artemis_data
+  minio_data:
     name: bytedesk_minio_data
 
 networks:

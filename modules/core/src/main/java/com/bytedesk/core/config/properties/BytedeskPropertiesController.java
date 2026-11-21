@@ -80,6 +80,12 @@ public class BytedeskPropertiesController {
         // PreviewConvertProperties 位于 enterprise/core，modules/core 不依赖，故按 bndEnabled 同款 Environment 读取。
         bytedeskPropertiesResponse.setPreview(buildPreviewConfig());
 
+        // 远程协助能力下发：modules/remote 的 bytedesk.remote.enabled，
+        // desktop/remote 前端据此门控远程按钮显隐（fail-closed：缺失视为关闭）。
+        BytedeskPropertiesResponse.RemoteAssist remoteAssist = new BytedeskPropertiesResponse.RemoteAssist();
+        remoteAssist.setEnabled(environment.getProperty("bytedesk.remote.enabled", Boolean.class, false));
+        bytedeskPropertiesResponse.setRemote(remoteAssist);
+
         // 仅下发服务端验签后的明文 license 摘要（edition/expiryDate/valid/userType 等），供前端门控直接读取，无需验签/解密。
         String licenseKey = BytedeskProperties.getInstance().getLicenseKey();
         if (StringUtils.hasText(licenseKey)) {

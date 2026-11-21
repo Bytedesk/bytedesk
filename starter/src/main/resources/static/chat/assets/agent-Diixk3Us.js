@@ -1,0 +1,1 @@
+import{S as e,ut as t}from"./configUtils-JgCjtiD_.js";async function n(n,r){return e(`/visitor/api/v1/agent/query/uid`,{method:`GET`,params:{uid:n,orgUid:r,channel:t},silentErrorNotification:!0})}export{n as t};

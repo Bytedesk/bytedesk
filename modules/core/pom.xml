@@ -293,41 +293,7 @@
 			<version>5.1.1</version>
 		</dependency>
 
-		<!-- 上传图片到阿里云OSS -->
-		<!-- https://mvnrepository.com/artifact/com.aliyun.oss/aliyun-sdk-oss -->
-		<dependency>
-			<groupId>com.aliyun.oss</groupId>
-			<artifactId>aliyun-sdk-oss</artifactId>
-			<version>3.17.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!--腾讯云对象存储-->
-		<!-- https://mvnrepository.com/artifact/com.qcloud/cos_api -->
-		<dependency>
-			<groupId>com.qcloud</groupId>
-			<artifactId>cos_api</artifactId>
-			<version>5.6.205</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<!-- MinIO 对象存储 -->
-		<!-- https://mvnrepository.com/artifact/io.minio/minio -->
-		<dependency>
-			<groupId>io.minio</groupId>
-			<artifactId>minio</artifactId>
-			<version>8.6.0</version>
-		</dependency>
+		<!-- 对象存储 SDK（minio/aliyun-oss/cos_api）已迁至 enterprise/core，社区版仅本地磁盘存储 -->
 
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>

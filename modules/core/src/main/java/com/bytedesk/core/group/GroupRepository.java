@@ -14,7 +14,9 @@
  */
 package com.bytedesk.core.group;
 
+import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -24,4 +26,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public interface GroupRepository extends JpaRepository<GroupEntity, Long>, JpaSpecificationExecutor<GroupEntity> {
 
     Optional<GroupEntity> findByUid(String uid);
+
+    /** 当前用户为群主的群（管理端申请列表用） */
+    List<GroupEntity> findByCreator_UidAndDeletedFalse(String creatorUserUid);
+
+    /** 当前用户为管理员的群（管理端申请列表用） */
+    List<GroupEntity> findByAdmins_UidAndDeletedFalse(String adminUserUid);
 }

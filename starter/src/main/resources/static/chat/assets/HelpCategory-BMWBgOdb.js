@@ -1,0 +1,1 @@
+import{a as e}from"./intl-vendor-B8vxmnSE.js";var t=e(),n=()=>(0,t.jsx)(`div`,{children:`HelpCategory`});export{n as default};

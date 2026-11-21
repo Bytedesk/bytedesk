@@ -13,7 +13,7 @@ package com.bytedesk.core.system_config.sms;
 
 /**
  * 平台短信配置快照（已解密，仅在后端内存中使用，不回显前端）
- * 用于平台验证码/系统短信发送链路，替代 properties 中的 aliyun.sms.* 静态配置
+ * 用于平台验证码/系统短信发送链路，替代 properties 中的 bytedesk.aliyun.sms.* 静态配置
  */
 public record PlatformSmsConfig(
         boolean enabled,

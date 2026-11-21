@@ -553,6 +553,23 @@ public class PageRouteController {
 	}
 
 	/**
+	 * remote
+	 * 远程协助/远程控制
+	 * http://127.0.0.1:9003/remote
+	 */
+	@GetMapping({ 
+		"/remote", 
+		"/remote/", 
+		"/remote/{path:[^\\.]*}",
+		"/remote/{path:[^\\.]*}/{path2:[^\\.]*}",
+		"/remote/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}",
+		"/remote/{path:[^\\.]*}/{path2:[^\\.]*}/{path3:[^\\.]*}/{path4:[^\\.]*}",
+	})
+	public String remote() {
+		return "forward:/remote/index.html";
+	}
+
+	/**
 	 * office
 	 * 微语文档 web 版（frontend/office 构建产物，见 frontend/office/cicd/scripts/build-open.sh）
 	 * http://127.0.0.1:9003/office
