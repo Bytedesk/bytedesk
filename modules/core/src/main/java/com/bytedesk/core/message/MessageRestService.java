@@ -30,6 +30,7 @@ import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import com.bytedesk.core.base.BaseRestService;
+import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.exception.CommonI18nExceptions;
 import com.bytedesk.core.exception.ResourceI18nExceptions;
@@ -85,7 +86,28 @@ public class MessageRestService extends BaseRestService<MessageEntity, MessageRe
         if (!optional.isPresent()) {
             throw ResourceI18nExceptions.messageNotFound();
         }
-        return convertToResponse(optional.get());
+        MessageEntity message = optional.get();
+        validateOrgAccess(message.getOrgUid());
+        return convertToResponse(message);
+    }
+
+    // 组织隔离校验：按 uid 直查绕过了 Specification 的 orgUid 过滤，
+    // 需在此显式校验资源所属组织，防止跨组织越权读取（IDOR/BOLA）。
+    private void validateOrgAccess(String resourceOrgUid) {
+        if (!StringUtils.hasText(resourceOrgUid)) {
+            return;
+        }
+        UserEntity user = authService.getUser();
+        if (user == null || user.isSuperUser()) {
+            return;
+        }
+        String userOrgUid = user.getOrgUid();
+        if (BytedeskConsts.DEFAULT_ORGANIZATION_UID.equals(userOrgUid)) {
+            return;
+        }
+        if (StringUtils.hasText(userOrgUid) && !userOrgUid.equals(resourceOrgUid)) {
+            throw new IllegalArgumentException(I18Consts.I18N_ORGANIZATION_ACCESS_DENIED);
+        }
     }
 
     // 不能使用 @Cacheable 注解，否则会无法更新已读状态
