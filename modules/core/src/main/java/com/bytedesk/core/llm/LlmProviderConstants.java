@@ -44,7 +44,7 @@ public class LlmProviderConstants {
     public static final String GROQ = "groq";
     public static final String ANTHROPIC = "anthropic";
     // Anthropic Claude 默认模型
-    public static final String ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-4-5";
+    public static final String ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-5-5";
     public static final String OPENAI = "openai";
     public static final String GEMINI = "gemini";
     public static final String AIHUBMIX = "aihubmix";
