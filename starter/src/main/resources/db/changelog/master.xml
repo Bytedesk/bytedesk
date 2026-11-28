@@ -44,4 +44,8 @@
     <!-- 呼叫中心餐厅定制规划 §2.2B：企业版餐厅模块表 + 分机设置业务场景列 -->
     <include file="db/changelog/migration/261126_add_call_restaurant_tables.xml" />
 
+    <!-- 存量升级库修复：加宽 bytedesk_ai_tool 中实体已声明为 TEXT 但仍为 varchar(255) 的列，
+         修复启动同步 @Tool 描述时报 1406 Data too long for column 'description' 导致启动失败 -->
+    <include file="db/changelog/migration/261128_widen_ai_tool_text_columns.xml" />
+
 </databaseChangeLog>

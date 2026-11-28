@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        加宽 bytedesk_ai_tool 中实体声明为 TEXT、但存量库仍为 varchar(255) 的列。
+
+        背景：
+        - ToolEntity 中 description / endpoint / input_schema / output_schema / system_prompt /
+          intent_keywords / allowed_methods / metadata 均为 columnDefinition=TEXT；
+        - 存量升级库的这些列由早期实体（未显式声明长度，JPA 默认 varchar(255)）创建，
+          Hibernate ddl-auto=update 只增列不改类型，存量库仍为 varchar(255)；
+        - 启动时 ToolRegistrySyncService.syncAnnotatedTools 会把 @Tool 注解的 description
+          （最长约 160 字符，含中文/标点时按字节计更长）同步写入 bytedesk_ai_tool，
+          MySQL 报错 1406 "Data too long for column 'description'"，
+          导致 ToolInitializer 失败、ApplicationContext 启动失败。
+
+        说明：
+        - newDataType=clob 由 Liquibase 按数据库自动映射方言类型：
+          MySQL/MariaDB -> LONGTEXT，PostgreSQL/Kingbase -> TEXT，H2/Oracle -> CLOB；
+        - 全新数据库中 Liquibase 先于 JPA 执行，表尚不存在时 MARK_RAN 跳过，
+          随后 Hibernate 按实体定义直接创建 TEXT 列，无需本迁移；
+        - 每个列独立 changeSet，并分别校验 tableExists + columnExists：
+          某列在特定部署中缺失时仅跳过该列，不影响其余列加宽；
+        - 仅加宽类型，不改动数据，幂等安全。
+    -->
+
+    <changeSet id="261128-1-widen-ai-tool-description-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="description" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.description 由 varchar(255) 加宽为大字段类型，修复启动同步 @Tool 描述时报 Data too long for column 'description' 的问题。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="description" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-2-widen-ai-tool-endpoint-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="endpoint" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.endpoint 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="endpoint" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-3-widen-ai-tool-input-schema-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="input_schema" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.input_schema 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="input_schema" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-4-widen-ai-tool-output-schema-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="output_schema" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.output_schema 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="output_schema" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-5-widen-ai-tool-system-prompt-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="system_prompt" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.system_prompt 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="system_prompt" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-6-widen-ai-tool-intent-keywords-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="intent_keywords" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.intent_keywords 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="intent_keywords" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-7-widen-ai-tool-allowed-methods-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="allowed_methods" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.allowed_methods 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="allowed_methods" newDataType="clob" />
+    </changeSet>
+
+    <changeSet id="261128-8-widen-ai-tool-metadata-to-clob" author="copilot">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <tableExists tableName="bytedesk_ai_tool" />
+            <columnExists tableName="bytedesk_ai_tool" columnName="metadata" />
+        </preConditions>
+        <comment>将 bytedesk_ai_tool.metadata 由 varchar(255) 加宽为大字段类型。</comment>
+        <modifyDataType tableName="bytedesk_ai_tool" columnName="metadata" newDataType="clob" />
+    </changeSet>
+
+</databaseChangeLog>

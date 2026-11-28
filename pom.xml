@@ -140,6 +140,17 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--
+                JDK 23+ (JDK-8306819) 不再默认运行 classpath 上隐式发现的注解处理器，
+                导致 Lombok 的 @Slf4j / @Data 等静默失效。显式开启注解处理，保证使用 JDK 21 及以上版本均可正常编译。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <proc>full</proc>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
