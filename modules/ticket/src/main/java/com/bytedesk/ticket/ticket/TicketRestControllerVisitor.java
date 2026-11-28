@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
@@ -43,6 +45,7 @@ public class TicketRestControllerVisitor {
     private final TicketService ticketService;
 
     // query by visitor uid
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_VISITOR_UID, description = "query by visitor uid ticket")
     @GetMapping("/query")
     public ResponseEntity<?> queryByVisitorUid(TicketRequest request) {
 
@@ -51,6 +54,7 @@ public class TicketRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TicketRequest request) {
 
@@ -81,6 +85,7 @@ public class TicketRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/activity")
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
 
@@ -93,6 +98,7 @@ public class TicketRestControllerVisitor {
      * 访客端查询当前流程实例的活动任务和可执行操作。
      * 仅当访客是工单报告人时才返回可操作的验证动作（COMPLETE_VERIFIED / COMPLETE_REJECTED）。
      */
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/workflow/actions")
     public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
 
@@ -110,6 +116,7 @@ public class TicketRestControllerVisitor {
      * 访客端按当前 Flowable 活动任务执行流程动作。
      * 仅当访客是工单报告人时允许执行验证操作。
      */
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @BlackIpFilter(title = "black", action = "ticket-workflow-action")
     @BlackUserFilter(title = "black", action = "ticket-workflow-action")
     @PostMapping("/workflow/action")
@@ -142,5 +149,4 @@ public class TicketRestControllerVisitor {
                 .orElse(false);
     }
 
-    
 }

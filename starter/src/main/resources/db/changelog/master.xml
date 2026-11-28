@@ -9,9 +9,10 @@
         4.9.9 及之前的迁移脚本已移除，全新安装的表结构由 Hibernate ddl-auto=update
         依据实体生成。
 
-        保留例外：SPRING_AI_CHAT_MEMORY 由 Spring AI JDBC 管理（无 JPA 实体），
-        且 spring.ai.chat.memory.repository.jdbc.initialize-schema=never，
-        必须由 Liquibase 建表。
+        保留例外：SPRING_AI_CHAT_MEMORY 与 AI_SESSION* 由 Spring AI JDBC 管理（无 JPA 实体），
+        且 spring.ai.session.repository.jdbc.initialize-schema=never，
+        必须由 Liquibase 建表。SPRING_AI_CHAT_MEMORY 已被 AI_SESSION* 取代（ChatMemory
+        废弃迁移），旧表保留供回滚参考，不再写入。
     -->
     <include file="db/changelog/migration/260810_add_spring_ai_chat_memory_table.xml" />
     <include file="db/changelog/migration/261031_add_assistant_hilt_tables.xml" />
@@ -30,5 +31,17 @@
     <include file="db/changelog/migration/261118_add_disk_tables.xml" />
     <include file="db/changelog/migration/261118_add_disk_phase2_tables.xml" />
     <include file="db/changelog/migration/261119_add_disk_archive_file_table.xml" />
+
+    <include file="db/changelog/migration/261123_add_airline_demo_tables.xml" />
+    <!-- Spring AI 2.1.0 Session 表（ChatMemory 升级替代，AI_SESSION/AI_SESSION_INDEX/AI_SESSION_EVENT） -->
+    <include file="db/changelog/migration/261124_add_spring_ai_session_tables.xml" />
+
+    <!-- 访客机器人订单查询规划 §4.4：logistics 表扩展订单物流字段 -->
+    <include file="db/changelog/migration/261125_add_logistics_order_columns.xml" />
+
+    <!-- 呼叫中心餐厅定制规划 §2.2A：预约单改造（appointment 列 + 变更日志表） -->
+    <include file="db/changelog/migration/261126_add_call_appointment_columns.xml" />
+    <!-- 呼叫中心餐厅定制规划 §2.2B：企业版餐厅模块表 + 分机设置业务场景列 -->
+    <include file="db/changelog/migration/261126_add_call_restaurant_tables.xml" />
 
 </databaseChangeLog>

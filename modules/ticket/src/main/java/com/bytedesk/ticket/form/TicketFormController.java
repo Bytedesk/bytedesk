@@ -22,10 +22,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.bytedesk.core.utils.JsonResult;
-
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 工单表单管理接口
@@ -52,6 +54,8 @@ public class TicketFormController {
 
     private final TicketFormService formService;
 
+    @PreAuthorize(TicketFormPermissions.HAS_TICKET_FORM_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/task/{taskId}")
     @Operation(summary = "获取任务表单")
     public ResponseEntity<JsonResult<TaskFormData>> getTaskForm(@PathVariable String taskId) {
@@ -59,6 +63,8 @@ public class TicketFormController {
         return ResponseEntity.ok(JsonResult.success(formData));
     }
 
+    @PreAuthorize(TicketFormPermissions.HAS_TICKET_FORM_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/task/{taskId}/properties")
     @Operation(summary = "获取表单属性")
     public ResponseEntity<JsonResult<List<FormProperty>>> getFormProperties(@PathVariable String taskId) {
@@ -66,6 +72,8 @@ public class TicketFormController {
         return ResponseEntity.ok(JsonResult.success(properties));
     }
 
+    @PreAuthorize(TicketFormPermissions.HAS_TICKET_FORM_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_UPDATE, description = "update ticket")
     @PostMapping("/task/{taskId}/submit")
     @Operation(summary = "提交任务表单")
     public ResponseEntity<JsonResult<Boolean>> submitTaskForm(
@@ -75,6 +83,8 @@ public class TicketFormController {
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(TicketFormPermissions.HAS_TICKET_FORM_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_CREATE, description = "create ticket")
     @PostMapping("/task/{taskId}/save")
     @Operation(summary = "保存表单数据")
     public ResponseEntity<JsonResult<Boolean>> saveFormData(

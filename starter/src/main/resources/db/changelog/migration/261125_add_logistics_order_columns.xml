@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        访客机器人订单查询规划 §4.4（docs/plans/2026-11-25-visitor-robot-order-query-plan.md）：
+        bytedesk_core_logistics 扩展订单物流建模字段。
+
+        跨库兼容：仅使用标准 addColumn 标签（MySQL/PostgreSQL/H2/Oracle/KingBase 由
+        Liquibase 按方言映射 varchar/clob）；不使用 MySQL 专有语法。
+
+        与 ddl-auto=update 的关系（参照 261112_add_jobtitle_table.xml 惯例）：
+        全新安装由 Hibernate 比对实体自动补列；本脚本保证升级路径与 schema 版本历史。
+        既有 name/description/type 分类语义保留不动（规划推荐值 Q6）。
+    -->
+
+    <changeSet id="261125-10-logistics-order-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_core_logistics"/>
+            <not>
+                <columnExists tableName="bytedesk_core_logistics" columnName="order_uid"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_core_logistics">
+            <column name="order_uid" type="java.sql.Types.VARCHAR(128)"/>
+            <column name="visitor_uid" type="java.sql.Types.VARCHAR(128)"/>
+            <column name="shop_uid" type="java.sql.Types.VARCHAR(128)"/>
+            <column name="carrier" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="tracking_no" type="java.sql.Types.VARCHAR(128)"/>
+            <column name="logistics_status" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="logistics_status_text" type="java.sql.Types.VARCHAR(128)"/>
+            <column name="logistics_events" type="clob"/>
+            <column name="estimated_delivery_time" type="java.sql.Types.VARCHAR(64)"/>
+        </addColumn>
+        <createIndex indexName="idx_logistics_order" tableName="bytedesk_core_logistics">
+            <column name="order_uid"/>
+        </createIndex>
+        <createIndex indexName="idx_logistics_visitor" tableName="bytedesk_core_logistics">
+            <column name="visitor_uid"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

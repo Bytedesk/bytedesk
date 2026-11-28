@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -50,6 +52,7 @@ public class UploadRestControllerVisitor {
     private final UploadSecurityConfig uploadSecurityConfig;
 
     // 文件上传
+    @ActionAnnotation(title = I18Consts.I18N_UPLOAD, action = I18Consts.I18N_ACTION_CREATE, description = "create upload")
     @BlackIpFilter(title = "black", action = "upload")
     @BlackUserFilter(title = "black", action = "upload")
     @Operation(summary = "Upload File", description = "Upload file anonymously")

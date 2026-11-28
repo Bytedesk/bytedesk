@@ -27,6 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.rbac.role.RolePermissions;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 灰度发布控制器
@@ -43,6 +48,9 @@ public class GrayReleaseController {
     /**
      * 初始化功能的灰度发布
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Initialize Feature", description = "Initialize a feature for gray release")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_INIT, description = "init gray release")
     @PostMapping("/features/{feature}/init")
     public ResponseEntity<?> initializeFeature(@PathVariable String feature) {
         GrayReleaseFeature grayFeature = GrayReleaseFeature.getByCode(feature);
@@ -57,6 +65,9 @@ public class GrayReleaseController {
     /**
      * 调整灰度比例
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Adjust Rollout Percentage", description = "Adjust the rollout percentage of a feature")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_UPDATE, description = "update gray release")
     @PutMapping("/features/{feature}/rollout")
     public ResponseEntity<?> adjustRollout(
             @PathVariable String feature,
@@ -73,6 +84,9 @@ public class GrayReleaseController {
     /**
      * 暂停灰度发布
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Pause Rollout", description = "Pause the rollout of a feature")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update status of gray release")
     @PostMapping("/features/{feature}/pause")
     public ResponseEntity<?> pauseRollout(@PathVariable String feature) {
         grayReleaseService.pauseRollout(feature);
@@ -82,6 +96,9 @@ public class GrayReleaseController {
     /**
      * 恢复灰度发布
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Resume Rollout", description = "Resume the rollout of a feature")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update status of gray release")
     @PostMapping("/features/{feature}/resume")
     public ResponseEntity<?> resumeRollout(@PathVariable String feature) {
         grayReleaseService.resumeRollout(feature);
@@ -91,6 +108,9 @@ public class GrayReleaseController {
     /**
      * 完成灰度发布
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Complete Rollout", description = "Complete the rollout and release the feature to all users")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_UPDATE, description = "update gray release")
     @PostMapping("/features/{feature}/complete")
     public ResponseEntity<?> completeRollout(@PathVariable String feature) {
         grayReleaseService.completeRollout(feature);
@@ -100,6 +120,9 @@ public class GrayReleaseController {
     /**
      * 添加白名单用户
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Add User to Whitelist", description = "Add a user to the gray release whitelist")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_CREATE, description = "create gray release")
     @PostMapping("/features/{feature}/whitelist/{userUid}")
     public ResponseEntity<?> addToWhitelist(
             @PathVariable String feature,
@@ -111,6 +134,9 @@ public class GrayReleaseController {
     /**
      * 获取功能状态
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Get Feature Status", description = "Retrieve the rollout status of a feature")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query gray release")
     @GetMapping("/features/{feature}")
     public ResponseEntity<GrayReleaseStatus> getFeatureStatus(
             @PathVariable String feature) {
@@ -120,6 +146,9 @@ public class GrayReleaseController {
     /**
      * 获取功能统计数据
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @Operation(summary = "Get Gray Release Statistics", description = "Retrieve gray release statistics")
+    @ActionAnnotation(title = I18Consts.I18N_GRAY_RELEASE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query gray release")
     @GetMapping("/features/{feature}/stats")
     public ResponseEntity<GrayReleaseFeatureStatistics> getStats(
             @PathVariable String feature,

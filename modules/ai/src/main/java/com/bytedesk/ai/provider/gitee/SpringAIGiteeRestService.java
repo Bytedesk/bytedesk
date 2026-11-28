@@ -17,13 +17,11 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,15 +57,13 @@ public class SpringAIGiteeRestService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Content-Type", "application/json");
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-
             // 发送HTTP GET请求（匿名访问）
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.exchange(
-                    modelsUrl,
-                    HttpMethod.GET,
-                    entity,
-                    String.class);
+            RestClient restClient = RestClient.create();
+            ResponseEntity<String> response = restClient.get()
+                    .uri(modelsUrl)
+                    .headers(h -> h.addAll(headers))
+                    .retrieve()
+                    .toEntity(String.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 // 解析JSON响应

@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -94,6 +93,7 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
         return ResponseEntity.ok(JsonResult.success(participant));
     }
 
+    @PreAuthorize(ParticipantPermissions.HAS_PARTICIPANT_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_CREATE, description = "record joining a meeting")
     @Operation(summary = "Join Meeting", description = "Record current user joining a meeting room (creates a participant session row with joinedAt)")
     @PostMapping("/join")
@@ -108,6 +108,7 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
         }
     }
 
+    @PreAuthorize(ParticipantPermissions.HAS_PARTICIPANT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_UPDATE, description = "record leaving a meeting")
     @Operation(summary = "Leave Meeting", description = "Record current user leaving a meeting room (sets leftAt, duration and status=LEFT; idempotent)")
     @PostMapping("/leave")
@@ -121,6 +122,7 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
         }
     }
 
+    @PreAuthorize(ParticipantPermissions.HAS_PARTICIPANT_READ)
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query participants by roomUid")
     @Operation(summary = "Query Participants by Room", description = "Retrieve all participant session records of a meeting room")
     @GetMapping("/query/room")
@@ -131,6 +133,7 @@ public class ParticipantRestController extends BaseRestController<ParticipantReq
         return ResponseEntity.ok(JsonResult.success(participants));
     }
 
+    @PreAuthorize(ParticipantPermissions.HAS_PARTICIPANT_READ)
     @ActionAnnotation(title = I18Consts.I18N_PARTICIPANT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query participants by callUid")
     @Operation(summary = "Query Participants by Call", description = "Retrieve all join/leave participant records of a webrtc call (visitor service / member call)")
     @GetMapping("/query/call")

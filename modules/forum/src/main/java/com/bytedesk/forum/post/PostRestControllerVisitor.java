@@ -1,5 +1,8 @@
 package com.bytedesk.forum.post;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ public class PostRestControllerVisitor {
     /**
      * 获取话题列表（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query post")
     @GetMapping
     public ResponseEntity<Page<PostEntity>> getPosts(Pageable pageable) {
         return ResponseEntity.ok(postService.getPosts(pageable));
@@ -28,6 +32,7 @@ public class PostRestControllerVisitor {
     /**
      * 获取话题详情（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query post")
     @GetMapping("/{postId}")
     public ResponseEntity<PostEntity> getPost(@PathVariable Long postId) {
         return ResponseEntity.ok(postService.getPost(postId));
@@ -36,6 +41,7 @@ public class PostRestControllerVisitor {
     /**
      * 按分类获取话题列表（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query post")
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<PostEntity>> getPostsByCategory(
             @PathVariable Long categoryId,
@@ -46,6 +52,7 @@ public class PostRestControllerVisitor {
     /**
      * 按用户获取话题列表（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query post")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PostEntity>> getPostsByUser(
             @PathVariable Long userId,
@@ -56,6 +63,7 @@ public class PostRestControllerVisitor {
     /**
      * 增加浏览次数（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_UPDATE, description = "update post")
     @PostMapping("/{postId}/view")
     public ResponseEntity<Void> incrementViewCount(@PathVariable Long postId) {
         postService.incrementViewCount(postId);
@@ -65,6 +73,7 @@ public class PostRestControllerVisitor {
     /**
      * 搜索话题（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_SEARCH, description = "search post")
     @PostMapping("/search")
     public ResponseEntity<Page<PostEntity>> searchPosts(
             @RequestBody PostSearchCriteria criteria,
@@ -75,6 +84,7 @@ public class PostRestControllerVisitor {
     /**
      * 全文搜索（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_SEARCH, description = "search post")
     @GetMapping("/search/fulltext")
     public ResponseEntity<Page<PostEntity>> fullTextSearch(
             @RequestParam String keyword,
@@ -85,6 +95,7 @@ public class PostRestControllerVisitor {
     /**
      * 按分类全文搜索（匿名访问）
      */
+    @ActionAnnotation(title = I18Consts.I18N_POST, action = I18Consts.I18N_ACTION_SEARCH, description = "search post")
     @GetMapping("/search/fulltext/category/{categoryId}")
     public ResponseEntity<Page<PostEntity>> fullTextSearchByCategory(
             @RequestParam String keyword,

@@ -21,10 +21,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.thread.ThreadRequest;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.thread.dto.ThreadHistoryActivityResponse;
-
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/thread/process")
@@ -36,6 +39,9 @@ public class ThreadProcessController {
     /**
      * 查询会话活动历史
      */
+    @PreAuthorize(ThreadProcessPermissions.HAS_THREAD_PROCESS_READ)
+    @Operation(summary = "Query Thread Activity History", description = "Retrieve the activity history of a thread")
+    @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query thread")
     @GetMapping("/history/activity")
     public ResponseEntity<?> queryThreadActivityHistory(ThreadRequest request) {
 

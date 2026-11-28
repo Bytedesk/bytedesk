@@ -15,15 +15,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.MessageEntity;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.content.TextContent;
 import com.bytedesk.core.message.content.UrlPreview;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.url.UrlPermissions;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @AllArgsConstructor
@@ -35,6 +39,8 @@ public class UrlPreviewRestControllerAgent {
     private final UrlPreviewService urlPreviewService;
     private final MessageRepository messageRepository;
 
+    @PreAuthorize(UrlPermissions.HAS_URL_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_CREATE, description = "create message")
     @Operation(summary = "写回URL预览到消息内容", description = "仅客服端调用；若已存在则不重复写入")
     @PostMapping("/preview/cache")
     public ResponseEntity<?> cachePreview(@RequestBody UrlPreviewWritebackRequest request) {

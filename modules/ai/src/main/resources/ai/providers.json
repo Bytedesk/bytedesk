@@ -84,13 +84,6 @@
         "webUrl": "https://openai.com/",
         "status": "PRODUCTION"
     },
-    "coze": {
-        "nickname": "Coze",
-        "logo": "coze.png",
-        "baseUrl": "https://api.coze.cn",
-        "webUrl": "https://www.coze.cn/",
-        "status": "PRODUCTION"
-    },
     "dify": {
         "nickname": "Dify",
         "logo": "dify.png",

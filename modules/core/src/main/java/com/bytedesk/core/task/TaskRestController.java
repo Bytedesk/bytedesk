@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -130,6 +129,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         );
     }
 
+    @PreAuthorize(TaskPermissions.HAS_TASK_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_LIKE, description = "like task")
     @Operation(summary = "Like Task", description = "Like a task (idempotent)")
     @PostMapping("/like")
@@ -138,6 +138,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
+    @PreAuthorize(TaskPermissions.HAS_TASK_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_UNLIKE, description = "unlike task")
     @Operation(summary = "Unlike Task", description = "Cancel like for a task (idempotent)")
     @PostMapping("/unlike")
@@ -146,6 +147,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
+    @PreAuthorize(TaskPermissions.HAS_TASK_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_FAVORITE, description = "favorite task")
     @Operation(summary = "Favorite Task", description = "Favorite/collect a task (idempotent)")
     @PostMapping("/favorite")
@@ -154,6 +156,7 @@ public class TaskRestController extends BaseRestController<TaskRequest, TaskRest
         return ResponseEntity.ok(JsonResult.success(task));
     }
 
+    @PreAuthorize(TaskPermissions.HAS_TASK_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_TASK, action = I18Consts.I18N_ACTION_UNFAVORITE, description = "unfavorite task")
     @Operation(summary = "Unfavorite Task", description = "Cancel favorite/collect for a task (idempotent)")
     @PostMapping("/unfavorite")

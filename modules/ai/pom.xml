@@ -170,10 +170,11 @@
 			<version>${elasticsearch.version}</version>
 		</dependency>
 
-		<!-- https://docs.spring.io/spring-ai/reference/api/chat-memory.html -->
+		<!-- https://docs.spring.io/spring-ai/reference/api/session.html -->
+		<!-- 取代已废弃的 spring-ai-starter-model-chat-memory-repository-jdbc（ChatMemory/MessageWindowChatMemory 已废弃） -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+			<artifactId>spring-ai-starter-model-session-jdbc</artifactId>
 			<version>${spring-ai.version}</version>
 		</dependency>
 
@@ -182,11 +183,11 @@
 		<!-- 与 spring-ai-starter-mcp-client 已同步迁移到 enterprise/ai/pom.xml -->
 
 		<!-- https://github.com/spring-ai-community/spring-ai-agent-utils -->
-		<!-- Source: https://mvnrepository.com/artifact/org.springaicommunity/spring-ai-agent-utils -->
+		<!-- https://mvnrepository.com/artifact/org.springaicommunity/spring-ai-agent-utils -->
 		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>
-			<version>0.10.0</version>
+			<version>0.14.0</version>
 		</dependency>
 
 		<!-- ///////////////////////////////////////////////////////////////////////////// -->

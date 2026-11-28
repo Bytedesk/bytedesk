@@ -29,7 +29,6 @@ import com.bytedesk.core.utils.JsonResult;
 
 import com.bytedesk.core.server.ServerEntity;
 import com.bytedesk.core.server.ServerRestService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * REST controller for server metrics operations
@@ -67,6 +67,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query server metrics by user")
     @Operation(summary = "Query Server Metrics by User", description = "Retrieve server metrics for the current user")
     @Override
@@ -78,6 +79,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics by uid")
     @Operation(summary = "Query Server Metrics by UID", description = "Retrieve a specific server metrics by its unique identifier")
     @Override
@@ -89,6 +91,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_CREATE, description = "create server metrics")
     @Operation(summary = "Create Server Metrics", description = "Create a new server metrics record")
     @Override
@@ -100,6 +103,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_UPDATE, description = "update server metrics")
     @Operation(summary = "Update Server Metrics", description = "Update an existing server metrics record")
     @Override
@@ -111,6 +115,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success(metrics));
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_DELETE, description = "delete server metrics")
     @Operation(summary = "Delete Server Metrics", description = "Delete a server metrics record")
     @Override
@@ -122,6 +127,7 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_EXPORT, description = "export server metrics")
     @Operation(summary = "Export Server Metrics", description = "Export server metrics to Excel format")
     @Override
@@ -138,6 +144,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param endTime end time (ISO format: yyyy-MM-ddTHH:mm:ssZ)
      * @return list of metrics
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Metrics History", description = "Retrieve historical server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/history/{serverUid}")
     public ResponseEntity<List<ServerMetricsEntity>> getMetricsHistory(
             @PathVariable String serverUid,
@@ -153,6 +162,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param serverUid server UID
      * @return latest metrics
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Latest Metrics", description = "Retrieve the latest server metrics")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/latest/{serverUid}")
     public ResponseEntity<ServerMetricsEntity> getLatestMetrics(@PathVariable String serverUid) {
         log.info("Getting latest metrics for server UID: {}", serverUid);
@@ -169,6 +181,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param endTime end time
      * @return average metrics
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Average Metrics", description = "Retrieve average server metrics over a time range")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/average/{serverUid}")
     public ResponseEntity<ServerMetricsRestService.ServerMetricsAverage> getAverageMetrics(
             @PathVariable String serverUid,
@@ -188,6 +203,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param endTime end time
      * @return peak metrics
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Peak Metrics", description = "Retrieve peak server metrics over a time range")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/peak/{serverUid}")
     public ResponseEntity<ServerMetricsRestService.ServerMetricsPeak> getPeakMetrics(
             @PathVariable String serverUid,
@@ -209,6 +227,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param endTime end time
      * @return list of metrics with high usage
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Find High Usage Metrics", description = "Find server metrics exceeding usage thresholds")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query server metrics")
     @GetMapping("/high-usage")
     public ResponseEntity<List<ServerMetricsEntity>> findHighUsageMetrics(
             @RequestParam(defaultValue = "80.0") Double cpuThreshold,
@@ -230,6 +251,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param serverUid server UID
      * @return metrics count
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Metrics Count", description = "Count server metrics records")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/count/{serverUid}")
     public ResponseEntity<Long> getMetricsCount(@PathVariable String serverUid) {
         log.info("Getting metrics count for server UID: {}", serverUid);
@@ -243,6 +267,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param retentionDays number of days to retain (default: 30)
      * @return number of deleted records
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_DELETE)
+    @Operation(summary = "Cleanup Old Metrics", description = "Delete server metrics older than the retention period")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_DELETE, description = "delete server metrics")
     @DeleteMapping("/cleanup")
     public ResponseEntity<Integer> cleanupOldMetrics(@RequestParam(defaultValue = "30") Integer retentionDays) {
         log.info("Cleaning up old metrics data with {} days retention", retentionDays);
@@ -257,6 +284,9 @@ public class ServerMetricsRestController extends BaseRestController<ServerMetric
      * @param endTime end time
      * @return list of metrics for current server
      */
+    @PreAuthorize(ServerMetricsPermissions.HAS_SERVER_METRICS_READ)
+    @Operation(summary = "Get Current Server Metrics History", description = "Retrieve metrics history of the current server")
+    @ActionAnnotation(title = I18Consts.I18N_SERVER_METRICS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server metrics")
     @GetMapping("/current/history")
     public ResponseEntity<List<ServerMetricsEntity>> getCurrentServerMetricsHistory(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) ZonedDateTime startTime,

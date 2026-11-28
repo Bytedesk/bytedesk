@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +24,7 @@ public class UrlPreviewRestControllerVisitor {
 
     private final UrlPreviewService urlPreviewService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query message")
     @Operation(summary = "解析URL预览信息", description = "抓取网页并解析 OpenGraph / title / description / image 等")
     @GetMapping("/preview")
     public ResponseEntity<?> preview(@RequestParam("url") String url) {

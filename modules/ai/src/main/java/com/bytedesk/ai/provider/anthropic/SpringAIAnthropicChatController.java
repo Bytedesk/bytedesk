@@ -241,7 +241,6 @@ public class SpringAIAnthropicChatController {
                             message,
                             AnthropicChatOptions.builder()
                                     .model("claude-sonnet-4-5")
-                                    .temperature(0.7)
                                     .maxTokens(4096)
                                     .build()));
 

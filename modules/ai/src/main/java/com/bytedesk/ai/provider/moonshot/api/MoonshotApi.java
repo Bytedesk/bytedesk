@@ -27,14 +27,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.ChatModelDescription;
 import org.springframework.ai.model.SimpleApiKey;
-import org.springframework.ai.retry.RetryUtils;
+import org.springframework.ai.retry.NonTransientAiException;
+import org.springframework.ai.retry.TransientAiException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -43,6 +45,7 @@ import reactor.core.publisher.Mono;
 import static com.bytedesk.ai.provider.moonshot.api.MoonshotConstants.DEFAULT_BASE_URL;
 import static com.bytedesk.ai.provider.moonshot.api.MoonshotConstants.DEFAULT_COMPLETIONS_PATH;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -105,11 +108,11 @@ public class MoonshotApi {
 	 * @param completionsPath the path to the chat completions endpoint.
 	 * @param restClientBuilder RestClient builder.
 	 * @param webClientBuilder WebClient builder.
-	 * @param responseErrorHandler Response error handler.
+	 * @param responseErrorHandler the error handler to invoke for error responses.
 	 */
 	public MoonshotApi(String baseUrl, ApiKey apiKey, MultiValueMap<String, String> headers, String completionsPath,
 			RestClient.Builder restClientBuilder, WebClient.Builder webClientBuilder,
-			ResponseErrorHandler responseErrorHandler) {
+			RestClient.ResponseSpec.ErrorHandler responseErrorHandler) {
 
 		Assert.hasText(completionsPath, "Completions Path must not be null");
 		Assert.notNull(headers, "Headers must not be null");
@@ -123,7 +126,7 @@ public class MoonshotApi {
 		};
 		this.restClient = restClientBuilder.baseUrl(baseUrl)
 				.defaultHeaders(finalHeaders)
-				.defaultStatusHandler(responseErrorHandler)
+				.defaultStatusHandler(status -> status != null && status.isError(), responseErrorHandler)
 				.build();
 
 		this.webClient = webClientBuilder
@@ -700,7 +703,20 @@ public class MoonshotApi {
 
 		private WebClient.Builder webClientBuilder = WebClient.builder();
 
-		private ResponseErrorHandler responseErrorHandler = RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER;
+		// Mirrors RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER semantics: 4xx errors are
+		// non-transient (no retry), other errors are transient (retryable).
+		private RestClient.ResponseSpec.ErrorHandler responseErrorHandler = (request, response) -> {
+			HttpStatusCode statusCode = response.getStatusCode();
+			if (!statusCode.isError()) {
+				return;
+			}
+			String body = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
+			String message = "%s - %s".formatted(statusCode.value(), body);
+			if (statusCode.is4xxClientError()) {
+				throw new NonTransientAiException(message);
+			}
+			throw new TransientAiException(message);
+		};
 
 		public Builder baseUrl(String baseUrl) {
 			Assert.hasText(baseUrl, "baseUrl cannot be null or empty");
@@ -744,7 +760,7 @@ public class MoonshotApi {
 			return this;
 		}
 
-		public Builder responseErrorHandler(ResponseErrorHandler responseErrorHandler) {
+		public Builder responseErrorHandler(RestClient.ResponseSpec.ErrorHandler responseErrorHandler) {
 			Assert.notNull(responseErrorHandler, "responseErrorHandler cannot be null");
 			this.responseErrorHandler = responseErrorHandler;
 			return this;

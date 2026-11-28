@@ -14,7 +14,7 @@
 	<version>${revision}</version>
 
 	<name>bytedesk-module-webrtc</name>
-	<description>https://ai.bytedesk.com</description>
+	<description>https://www.bytedesk.com</description>
 
 	<properties>
 		<!-- <wicket.version>10.8.0</wicket.version>

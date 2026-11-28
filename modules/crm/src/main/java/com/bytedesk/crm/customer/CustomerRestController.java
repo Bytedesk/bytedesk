@@ -21,8 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -31,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Tag(name = "Customer Management", description = "Customer management APIs")
 @RestController
@@ -41,6 +43,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
 
     private final CustomerRestService customerRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query customer")
     @Operation(summary = "Query Customers by Organization", description = "Retrieve customer list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -54,6 +57,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query customer")
     @Operation(summary = "Query Customers by User", description = "Retrieve customer list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -66,6 +70,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query customer")
     @Operation(summary = "Query Customer by UID", description = "Retrieve customer details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -77,12 +82,13 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
 
         return ResponseEntity.ok(JsonResult.success(response));
     }
-
     // query/visitorUid
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_QUERY_VISITOR_UID, description = "query customer by visitor uid")
     @Operation(summary = "Query Customers by Visitor UID", description = "Retrieve customer list by visitor UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = CustomerResponse.class)))
+    @PreAuthorize(CustomerPermissions.HAS_CUSTOMER_READ)
     @GetMapping("/query/visitorUid")
     public ResponseEntity<?> queryByVisitorUid(CustomerRequest request) {
         
@@ -91,6 +97,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_CREATE, description = "create customer")
     @Operation(summary = "Create Customer", description = "Create a new customer")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -103,6 +110,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_UPDATE, description = "update customer")
     @Operation(summary = "Update Customer", description = "Update customer information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
@@ -115,6 +123,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_DELETE, description = "delete customer")
     @Operation(summary = "Delete Customer", description = "Delete the specified customer")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
@@ -125,6 +134,7 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
         return ResponseEntity.ok(JsonResult.success(request.getUid()));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CUSTOMER, action = I18Consts.I18N_ACTION_EXPORT, description = "export customer")
     @Operation(summary = "Export Customers", description = "Export customer data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
@@ -138,6 +148,5 @@ public class CustomerRestController extends BaseRestController<CustomerRequest, 
             "customer"
         );
     }
-    
     
 }

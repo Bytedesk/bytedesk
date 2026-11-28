@@ -41,9 +41,6 @@ public class SpringAIMinimaxChatConfig {
     @Value("${spring.ai.minimax.chat.options.model:${spring.ai.minimax.chat.model:${spring.ai.anthropic.chat.model:${spring.ai.anthropic.chat.options.model:MiniMax-M3}}}}")
     private String model;
 
-    @Value("${spring.ai.minimax.chat.options.temperature:${spring.ai.anthropic.chat.options.temperature:0.7}}")
-    private Double temperature;
-
     @Value("${spring.ai.minimax.chat.options.max-tokens:${spring.ai.anthropic.chat.options.max-tokens:4096}}")
     private Integer maxTokens;
 
@@ -53,7 +50,6 @@ public class SpringAIMinimaxChatConfig {
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
                 .model(model)
-                .temperature(temperature)
                 .maxTokens(maxTokens)
                 .build();
     }

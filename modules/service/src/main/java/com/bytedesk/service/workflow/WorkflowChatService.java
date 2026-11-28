@@ -20,7 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.alibaba.fastjson2.JSON;
@@ -61,7 +61,7 @@ public class WorkflowChatService {
 
     private final ThreadRestService threadRestService;
     private final MessageRestService messageRestService;
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     private final WorkflowVariableService workflowVariableService;
     private final WorkflowLogRepository workflowLogRepository;
 
@@ -970,7 +970,13 @@ public class WorkflowChatService {
         HttpEntity<String> requestEntity = buildHttpEntity(httpMethod, headers, body);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(requestUri, httpMethod, requestEntity, String.class);
+            RestClient.RequestBodySpec requestSpec = restClient.method(httpMethod)
+                    .uri(requestUri)
+                    .headers(h -> h.addAll(requestEntity.getHeaders()));
+            if (requestEntity.getBody() != null) {
+                requestSpec.body(requestEntity.getBody());
+            }
+            ResponseEntity<String> response = requestSpec.retrieve().toEntity(String.class);
             Object parsedResponse = parseHttpResponseBody(response.getBody(), data.getString("responseType"));
             persistHttpContextVariables(workflow, node, response, parsedResponse, contextVariables);
             log.debug("Executed workflow http node, workflowUid={}, threadUid={}, nodeId={}, statusCode={}",

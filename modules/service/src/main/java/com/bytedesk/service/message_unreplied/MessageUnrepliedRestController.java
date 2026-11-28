@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,6 +44,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
 
     private final MessageUnrepliedRestService messageUnrepliedService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query message unreplied")
     @Operation(summary = "Query Unreplied Messages by Organization", description = "Retrieve unreplied message list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -56,6 +59,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplieds));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query message unreplied")
     @Operation(summary = "Query Unreplied Messages by User", description = "Retrieve unreplied message list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -70,6 +74,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplieds));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_CREATE, description = "create message unreplied")
     @Operation(summary = "Create Unreplied Message", description = "Create a new unreplied message")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -84,6 +89,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplied));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_UPDATE, description = "update message unreplied")
     @Operation(summary = "Update Unreplied Message", description = "Update unreplied message information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
@@ -98,6 +104,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success(message_unreplied));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_DELETE, description = "delete message unreplied")
     @Operation(summary = "Delete Unreplied Message", description = "Delete the specified unreplied message")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
@@ -110,6 +117,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_EXPORT, description = "export message unreplied")
     @Operation(summary = "Export Unreplied Messages", description = "Export unreplied message data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @GetMapping("/export")
@@ -120,6 +128,7 @@ public class MessageUnrepliedRestController extends BaseRestController<MessageUn
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREPLIED, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query message unreplied")
     @Operation(summary = "Query Unreplied Message by UID", description = "Retrieve unreplied message details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 

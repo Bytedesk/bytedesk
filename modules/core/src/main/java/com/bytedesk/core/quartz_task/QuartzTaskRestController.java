@@ -26,11 +26,11 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/quartz_task")
@@ -129,6 +129,8 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         );
     }
 
+    @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute quartz task")
     @Operation(summary = "Start Job", description = "Start a Quartz job")
     @PostMapping("/startJob")
     public ResponseEntity<?> startJob(@RequestBody QuartzTaskRequest request) {
@@ -136,6 +138,8 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update status of quartz task")
     @Operation(summary = "Pause Job", description = "Pause a running Quartz job")
     @PostMapping("/pauseJob")
     public ResponseEntity<?> pauseJob(@RequestBody QuartzTaskRequest request) {
@@ -143,6 +147,8 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update status of quartz task")
     @Operation(summary = "Resume Job", description = "Resume a paused Quartz job")
     @PostMapping("/resumeJob")
     public ResponseEntity<?> resumeJob(@RequestBody QuartzTaskRequest request) {
@@ -150,6 +156,8 @@ public class QuartzTaskRestController extends BaseRestController<QuartzTaskReque
         return ResponseEntity.ok(JsonResult.success(request));
     }
 
+    @PreAuthorize(QuartzTaskPermissions.HAS_QUARTZ_TASK_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_QUARTZ_TASK, action = I18Consts.I18N_ACTION_DELETE, description = "delete quartz task")
     @Operation(summary = "Delete Job", description = "Remove a job from the Quartz scheduler")
     @PostMapping("/deleteJob")
     public ResponseEntity<?> deleteJob(@RequestBody QuartzTaskRequest request) {

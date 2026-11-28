@@ -73,9 +73,39 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
     private final AcceptEncodingIdentityRestClientCustomizer acceptEncodingIdentityRestClientCustomizer;
 
     /**
+     * 模型默认 options：仅模型参数，不含 toolCallbacks / toolContext。
+     *
+     * <p>Spring AI 合并 ChatOptions 时对 toolCallbacks 是 addAll 拼接而非覆盖，模型默认与 prompt 运行时
+     * 各带一份会让同一工具被发送两份，DeepSeek 直接拒绝（400 "Tool names must be unique"）。
+     * 工具回调与请求级 toolContext（visitorUid/threadUid 等）统一只由 prompt options 随请求传入。</p>
+     */
+    private DeepSeekChatOptions createModelOnlyOptions(RobotLlm llm) {
+        if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
+            return null;
+        }
+        try {
+            return DeepSeekChatOptions.builder()
+                    .model(llm.getTextModel())
+                    .temperature(llm.getTemperature())
+                    .maxTokens(llm.getMaxTokens())
+                    .topP(llm.getTopP())
+                    .build();
+        } catch (Exception e) {
+            log.error("Error creating Deepseek model options for model {}", llm.getTextModel(), e);
+            return null;
+        }
+    }
+
+    /**
      * 根据机器人配置创建 DeepSeek chat options。
      */
     private DeepSeekChatOptions createDeepseekOptions(RobotLlm llm) {
+        return createDeepseekOptions(llm, null, null);
+    }
+
+    /** 带访客身份的 options 构建（规划 2026-11-25 §4.1）：visitorUid 写入 toolContext。 */
+    private DeepSeekChatOptions createDeepseekOptions(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -85,19 +115,13 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
                     .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
-                    .build(), llm);
+                    .build(), llm, robot, messageProtobufQuery);
         } catch (Exception e) {
             log.error("Error creating Deepseek options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
 
-    /**
-     * 根据机器人配置创建动态的DeepSeekChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的DeepSeekChatModel
-     */
     private DeepSeekChatModel createDeepseekChatModel(RobotLlm llm) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
@@ -119,7 +143,8 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
         try {
             log.info("Creating dynamic Deepseek chat model with provider: {} ({})", provider.getType(),
                     provider.getUid());
-            DeepSeekChatOptions options = createDeepseekOptions(llm);
+            // 模型默认 options 只携带模型参数（见 createModelOnlyOptions）：工具回调与 toolContext 由 prompt options 随请求传入
+            DeepSeekChatOptions options = createModelOnlyOptions(llm);
             if (options == null) {
                 log.warn("Failed to create Deepseek options, using default chat model");
                 return defaultChatModel;
@@ -212,7 +237,7 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             return;
         }
 
-        // 获取适当的模型实例
+        // 获取适当的模型实例（SSE 异步跨线程：visitorUid 经 prompt options 的 toolContext 显式传递）
         DeepSeekChatModel chatModel = createDeepseekChatModel(llm);
 
         if (chatModel == null) {
@@ -233,9 +258,16 @@ public class SpringAIDeepseekService extends BaseSpringAIService {
             sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter,
                     I18Consts.I18N_THINKING);
 
-            var chatClient = createChatClient(chatModel, prompt, robot);
+            // 身份 options 仅作为 model 默认值时会被 runtime options 覆盖，须随 prompt 显式传递
+            Prompt requestPrompt = prompt;
+            DeepSeekChatOptions sseCustomOptions = createDeepseekOptions(llm, robot, messageProtobufQuery);
+            if (sseCustomOptions != null) {
+                requestPrompt = processPromptWithOptions(prompt, sseCustomOptions);
+            }
+
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
             String conversationId = extractConversationId(messageProtobufQuery);
-            invokePromptStream(chatClient, prompt, conversationId).subscribe(
+            invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                     response -> {
                         try {
                             if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {

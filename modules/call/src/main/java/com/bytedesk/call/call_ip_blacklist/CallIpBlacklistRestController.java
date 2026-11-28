@@ -14,7 +14,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,6 +38,7 @@ public class CallIpBlacklistRestController extends BaseRestController<CallIpBlac
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(CallIpBlacklistPermissions.HAS_CALL_IP_BLACKLIST_READ)
     @ActionAnnotation(title = I18Consts.I18N_CALL_IP_BLACKLIST, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query call ip blacklist by user")
     @Operation(summary = "Query call ip blacklist by user")
     @GetMapping({ "/query", "/query/user" })
@@ -48,6 +48,7 @@ public class CallIpBlacklistRestController extends BaseRestController<CallIpBlac
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(CallIpBlacklistPermissions.HAS_CALL_IP_BLACKLIST_READ)
     @ActionAnnotation(title = I18Consts.I18N_CALL_IP_BLACKLIST, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query call ip blacklist by uid")
     @Operation(summary = "Query call ip blacklist by uid")
     @GetMapping("/query/uid")

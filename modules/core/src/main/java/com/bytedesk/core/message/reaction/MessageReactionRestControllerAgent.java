@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -20,10 +22,12 @@ import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.utils.ConvertUtils;
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.message.MessagePermissions;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @AllArgsConstructor
@@ -36,6 +40,8 @@ public class MessageReactionRestControllerAgent {
     private final AuthService authService;
     private final IMessageSendService messageSendService;
 
+    @PreAuthorize(MessagePermissions.HAS_MESSAGE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_TOGGLE, description = "toggle message")
     @Operation(summary = "切换消息表情回复", description = "同一用户对同一 emoji：已点则取消，未点则添加")
     @PostMapping("/toggle")
     public ResponseEntity<?> toggle(@RequestBody MessageReactionToggleRequest request) {

@@ -17,4 +17,24 @@ import com.bytedesk.core.base.BasePermissions;
 
 public class MomentPermissions extends BasePermissions {
 
+    // 模块前缀
+    public static final String MOMENT_PREFIX = "MOMENT_";
+
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "MOMENT";
+
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String MOMENT_READ = "MOMENT_READ";
+    public static final String MOMENT_CREATE = "MOMENT_CREATE";
+    public static final String MOMENT_UPDATE = "MOMENT_UPDATE";
+    public static final String MOMENT_DELETE = "MOMENT_DELETE";
+    public static final String MOMENT_EXPORT = "MOMENT_EXPORT";
+
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_MOMENT_READ = "hasAuthority('" + MOMENT_READ + "')";
+    public static final String HAS_MOMENT_CREATE = "hasAuthority('" + MOMENT_CREATE + "')";
+    public static final String HAS_MOMENT_UPDATE = "hasAuthority('" + MOMENT_UPDATE + "')";
+    public static final String HAS_MOMENT_DELETE = "hasAuthority('" + MOMENT_DELETE + "')";
+    public static final String HAS_MOMENT_EXPORT = "hasAuthority('" + MOMENT_EXPORT + "')";
+
 }

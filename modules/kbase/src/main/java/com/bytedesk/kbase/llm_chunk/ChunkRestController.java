@@ -31,6 +31,7 @@ import com.bytedesk.kbase.llm_chunk.elastic.ChunkElasticService;
 import com.bytedesk.kbase.llm_chunk.vector.ChunkVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/llm/chunk")
@@ -49,6 +50,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         this.chunkElasticService = chunkElasticService;
     }
 
+    @Operation(summary = "Query Chunks by Organization", description = "Retrieve chunks for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
     @GetMapping("/query/org")
     @Override
@@ -59,6 +62,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
+    @Operation(summary = "Query Chunks by User", description = "Retrieve chunks for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
     @GetMapping({ "/query", "/query/user" })
     @Override
@@ -69,6 +74,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunks));
     }
 
+    @Operation(summary = "Query Chunks by UID", description = "Retrieve a specific chunk entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
     @Override
     public ResponseEntity<?> queryByUid(ChunkRequest request) {
@@ -76,6 +83,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
+    @Operation(summary = "Create Chunks", description = "Create a new chunk entry")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_CREATE, description = "create chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_CREATE)
     @PostMapping("/create")
@@ -87,6 +95,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
+    @Operation(summary = "Update Chunks", description = "Update an existing chunk entry")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE, description = "update chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     @PostMapping("/update")
@@ -98,6 +107,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
+    @Operation(summary = "Delete Chunks", description = "Delete a chunk entry")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE, description = "delete chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_DELETE)
     @PostMapping("/delete")
@@ -110,6 +120,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // deleteAll
+    @Operation(summary = "Delete All", description = "Delete all chunks entries")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all chunk")
     @PostMapping("/deleteAll")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_DELETE)
     public ResponseEntity<?> deleteAll(@RequestBody ChunkRequest request) {
@@ -120,6 +132,8 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // enable/disable chunk
+    @Operation(summary = "Enable / Disable", description = "Enable or disable chunk entries")
+    @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_ENABLE, description = "enable chunk")
     @PostMapping("/enable")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
     public ResponseEntity<?> enable(@RequestBody ChunkRequest request) {
@@ -129,6 +143,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(chunk));
     }
 
+    @Operation(summary = "Export Chunks", description = "Export chunks to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_EXPORT, description = "export chunk")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_EXPORT)
     @GetMapping("/export")
@@ -145,6 +160,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch index
+    @Operation(summary = "Update Elastic Index", description = "Update the elastic search index")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update chunk index")
     @PostMapping("/updateIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -156,6 +172,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete elasticsearch index
+    @Operation(summary = "Delete Elastic Index", description = "Delete the elastic search index")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete chunk elastic index")
     @PostMapping("/deleteIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -165,6 +182,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync elasticsearch index status
+    @Operation(summary = "Sync Elastic Index Status", description = "Synchronize elastic index status")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync chunk elastic status")
     @PostMapping("/syncIndexStatus")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -174,6 +192,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync elasticsearch index status by kbUid
+    @Operation(summary = "Sync Elastic Index Status by KB", description = "Synchronize elastic index status by knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync chunk elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -183,6 +202,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete all elasticsearch index by kbUid
+    @Operation(summary = "Delete All Elastic Index by KB", description = "Delete all elastic indexes of a knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete chunk elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -192,6 +212,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch vector index
+    @Operation(summary = "Update Vector Index", description = "Update the vector index")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update chunk vector index")
     @PostMapping("/updateVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -205,6 +226,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete vector index
+    @Operation(summary = "Delete Vector Index", description = "Delete the vector index")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete chunk vector index")
     @PostMapping("/deleteVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -217,6 +239,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync vector status
+    @Operation(summary = "Sync Vector Index Status", description = "Synchronize vector index status")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync chunk vector status")
     @PostMapping("/syncVectorStatus")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -228,6 +251,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
+    @Operation(summary = "Query Elastic Document by UID", description = "Retrieve the elastic document of an entry")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query chunk elastic by uid")
     @PostMapping("/queryElasticByUid")
@@ -236,6 +260,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @Operation(summary = "Query Vector Document by UID", description = "Retrieve the vector document of an entry")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_READ)
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query chunk vector by uid")
     @PostMapping("/queryVectorByUid")
@@ -248,6 +273,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // sync vector status by kbUid
+    @Operation(summary = "Sync Vector Index Status by KB", description = "Synchronize vector index status by knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync chunk vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -260,6 +286,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch all index
+    @Operation(summary = "Update All Elastic Indexes", description = "Update all elastic indexes")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all chunk index")
     @PostMapping("/updateAllIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -271,6 +298,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // update elasticsearch all vector index
+    @Operation(summary = "Update All Vector Indexes", description = "Update all vector indexes")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all chunk vector index")
     @PostMapping("/updateAllVectorIndex")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)
@@ -285,6 +313,7 @@ public class ChunkRestController extends BaseRestController<ChunkRequest, ChunkR
     }
 
     // delete all vector index by kbUid
+    @Operation(summary = "Delete All Vector Indexes by KB", description = "Delete all vector indexes of a knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_CHUNK, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete chunk vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     @PreAuthorize(ChunkPermissions.HAS_CHUNK_UPDATE)

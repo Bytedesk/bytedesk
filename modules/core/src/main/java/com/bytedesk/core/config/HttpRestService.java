@@ -15,8 +15,8 @@ package com.bytedesk.core.config;
 
 import org.springframework.stereotype.Service;
 import org.springframework.context.annotation.Description;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import com.bytedesk.core.exception.HttpRestAccessException;
 
@@ -26,14 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @AllArgsConstructor
-@Description("HTTP REST Service - Service for making HTTP GET and POST requests using RestTemplate")
+@Description("HTTP REST Service - Service for making HTTP GET and POST requests using RestClient")
 public class HttpRestService {
     
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
 
     public String httpGet(String url) {
         try {
-            return restTemplate.getForObject(url, String.class);
+            return restClient.get().uri(url).retrieve().body(String.class);
         } catch (RestClientException e) {
             log.warn("HTTP GET {} failed: {}", url, e.getMessage());
             throw new HttpRestAccessException(url, "GET", e);
@@ -42,7 +42,7 @@ public class HttpRestService {
 
     public String httpPost(String url, String requestBody) {
         try {
-            return restTemplate.postForObject(url, requestBody, String.class);
+            return restClient.post().uri(url).body(requestBody).retrieve().body(String.class);
         } catch (RestClientException e) {
             log.warn("HTTP POST {} failed: {}", url, e.getMessage());
             throw new HttpRestAccessException(url, "POST", e);

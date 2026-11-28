@@ -28,11 +28,11 @@ import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlConfig;
 import com.bytedesk.kbase.llm_website.crawl.WebsiteCrawlTask;
 import com.bytedesk.core.annotation.ActionAnnotation;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/llm/website")
@@ -43,6 +43,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     private final WebsiteRestService websiteRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query website")
     @Operation(summary = "Query Websites by Organization", description = "Query the list of websites for the organization")
     @GetMapping("/query/org")
     @Override
@@ -53,6 +54,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query website")
     @Operation(summary = "Query Websites by User", description = "Query the list of websites for the user")
     @GetMapping({ "/query", "/query/user" })
     @Override
@@ -63,6 +66,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(websites));
     }
 
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_CREATE, description = "create website")
     @Operation(summary = "Create Website", description = "Create a new website")
     @PostMapping("/create")
@@ -74,6 +78,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_UPDATE, description = "update website")
     @Operation(summary = "Update Website", description = "Update the existing website")
     @PostMapping("/update")
@@ -85,6 +90,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_DELETE, description = "delete website")
     @Operation(summary = "Delete Website", description = "Delete the specified website")
     @PostMapping("/delete")
@@ -97,6 +103,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
 
     // deleteAll
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_DELETE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all website")
     @PostMapping("/deleteAll")
     @Operation(summary = "Delete All Websites", description = "Delete all websites")
     public ResponseEntity<?> deleteAll(@RequestBody WebsiteRequest request) {
@@ -107,6 +115,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     }
 
     // enable/disable website
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_ENABLE, description = "enable website")
     @PostMapping("/enable")
     @Operation(summary = "Enable or Disable Website", description = "Enable or disable the website")
     public ResponseEntity<?> enable(@RequestBody WebsiteRequest request) {
@@ -116,6 +126,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         return ResponseEntity.ok(JsonResult.success(website));
     }
 
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_EXPORT, description = "export website")
     @Operation(summary = "Export Websites", description = "Export website data")
     @Override
@@ -131,6 +142,7 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         );
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query website")
     @Operation(summary = "Query Website by UID", description = "Query the specific website by UID")
     @Override
     public ResponseEntity<?> queryByUid(WebsiteRequest request) {
@@ -140,6 +152,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
     
     // ==================== 网站抓取相关API ====================
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_SYNC, description = "sync website")
     @PostMapping("/crawl/start")
     @Operation(summary = "Start Full-Site Crawl", description = "Start a full-site crawl using the specified configuration")
     public ResponseEntity<?> startCrawl(@RequestBody WebsiteCrawlRequest request) {
@@ -152,6 +166,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_SYNC, description = "sync website")
     @PostMapping("/crawl/start/fast")
     @Operation(summary = "Start Fast Crawl", description = "Start crawling with a fast configuration using fewer pages and lower depth")
     public ResponseEntity<?> startFastCrawl(@RequestBody WebsiteCrawlRequest request) {
@@ -163,6 +179,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_SYNC, description = "sync website")
     @PostMapping("/crawl/start/deep")
     @Operation(summary = "Start Deep Crawl", description = "Start crawling with a deep configuration using more pages and greater depth")
     public ResponseEntity<?> startDeepCrawl(@RequestBody WebsiteCrawlRequest request) {
@@ -174,6 +192,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_UPDATE_STATUS, description = "update status of website")
     @PostMapping("/crawl/stop")
     @Operation(summary = "Stop Crawl", description = "Stop the running crawl task")
     public ResponseEntity<?> stopCrawl(@RequestBody WebsiteCrawlRequest request) {
@@ -189,6 +209,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query website")
     @GetMapping("/crawl/tasks/{websiteUid}")
     @Operation(summary = "Get Crawl Task List", description = "Get all crawl tasks for the specified website")
     public ResponseEntity<?> getCrawlTasks(@PathVariable String websiteUid) {
@@ -200,6 +222,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query website")
     @GetMapping("/crawl/task/status/{taskId}")
     @Operation(summary = "Get Crawl Task Status", description = "Get the real-time status of the specified task")
     public ResponseEntity<?> getCrawlTaskStatus(@PathVariable String taskId) {
@@ -211,6 +235,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query website")
     @GetMapping("/crawl/sitemap/{websiteUid}")
     @Operation(summary = "Parse Sitemap", description = "Parse the website sitemap.xml and retrieve the URL list")
     public ResponseEntity<?> parseSitemap(@PathVariable String websiteUid) {
@@ -222,6 +248,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_UPDATE, description = "update website")
     @PostMapping("/crawl/config")
     @Operation(summary = "Update Crawl Configuration", description = "Update the crawl configuration for the website")
     public ResponseEntity<?> updateCrawlConfig(@RequestBody WebsiteCrawlConfigRequest request) {
@@ -234,6 +262,8 @@ public class WebsiteRestController extends BaseRestController<WebsiteRequest, We
         }
     }
     
+    @PreAuthorize(WebsitePermissions.HAS_WEBSITE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WEBSITE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query website")
     @GetMapping("/crawl/config/{websiteUid}")
     @Operation(summary = "Get Crawl Configuration", description = "Get the crawl configuration for the website")
     public ResponseEntity<?> getCrawlConfig(@PathVariable String websiteUid) {

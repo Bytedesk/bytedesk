@@ -504,6 +504,9 @@ services:
       SPRING_AI_MODEL_AUDIO_TRANSCRIPTION: none
       # 默认重排序模型
       SPRING_AI_MODEL_RERANK: zhipuai
+      SPRING_AI_MODEL_MODERATION: none
+      # 决策模型（Spring AI 2.1.0 新增，默认开启会与自定义 OllamaApi 冲突，显式禁用）
+      SPRING_AI_MODEL_DECISION: none
       # ollama
       SPRING_AI_OLLAMA_BASE_URL: http://host.docker.internal:11434
       SPRING_AI_OLLAMA_CHAT_ENABLED: "false"

@@ -15,7 +15,7 @@ package com.bytedesk.voc.comment;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,6 +41,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
 
     private final VocCommentRestService commentRestService;
 
+    @PreAuthorize(VocCommentPermissions.HAS_VOC_COMMENT_READ)
     @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query comment by org")
     @Operation(summary = "Query VocComments by Organization", description = "Retrieve comments for the current organization")
     @GetMapping("/query/org")
@@ -53,6 +53,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @PreAuthorize(VocCommentPermissions.HAS_VOC_COMMENT_READ)
     @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query comment by user")
     @Operation(summary = "Query VocComments by User", description = "Retrieve comments for the current user")
     @GetMapping({ "/query", "/query/user" })
@@ -64,6 +65,7 @@ public class VocCommentRestController extends BaseRestController<VocCommentReque
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @PreAuthorize(VocCommentPermissions.HAS_VOC_COMMENT_READ)
     @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query comment by uid")
     @Operation(summary = "Query VocComment by UID", description = "Retrieve a specific comment by its unique identifier")
     @GetMapping("/query/uid")

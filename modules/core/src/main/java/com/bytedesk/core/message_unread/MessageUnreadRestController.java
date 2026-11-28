@@ -22,12 +22,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/message/unread")
@@ -37,6 +39,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
 
     private final MessageUnreadRestService messageUnreadRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query message unread")
     @Override
     @Operation(summary = "Query Unread Messages by Organization")
     public ResponseEntity<?> queryByOrg(MessageUnreadRequest request) {
@@ -46,6 +49,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query message unread")
     @Override
     @Operation(summary = "Query Unread Messages by User")
     public ResponseEntity<?> queryByUser(MessageUnreadRequest request) {
@@ -55,6 +59,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("get unread messages success", messagePage));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query message unread")
     @Override
     @Operation(summary = "Query Unread Message by User ID")
     public ResponseEntity<?> queryByUid(MessageUnreadRequest request) {
@@ -64,6 +69,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("get unread message success", messageUnread));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_CREATE, description = "create message unread")
     @Override
     @Operation(summary = "Create Unread Message")
     public ResponseEntity<?> create(MessageUnreadRequest request) {
@@ -73,6 +79,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("create unread message success", messageUnread));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_UPDATE, description = "update message unread")
     @Override
     @Operation(summary = "Update Unread Message")
     public ResponseEntity<?> update(MessageUnreadRequest request) {
@@ -82,6 +89,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("update unread message success", messageUnread));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_DELETE, description = "delete message unread")
     @Override
     @Operation(summary = "Delete Unread Message")
     public ResponseEntity<?> delete(MessageUnreadRequest request) {
@@ -91,6 +99,7 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("delete unread message success"));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_EXPORT, description = "export message unread")
     @Override
     @Operation(summary = "Export Unread Messages")
     public Object export(MessageUnreadRequest request, HttpServletResponse response) {
@@ -101,6 +110,8 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     // 获取未读消息数
+    @PreAuthorize(MessageUnreadPermissions.HAS_MESSAGE_UNREAD_READ)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_QUERY_UNREAD_COUNT, description = "query unread count of message unread")
     @GetMapping("/count")
     @Operation(summary = "Get Total Unread Message Count")
     public ResponseEntity<?> getMessageUnreadCount(MessageUnreadRequest request) {
@@ -111,6 +122,8 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
     }
 
     // 清空当前用户所有未读消息
+    @PreAuthorize(MessageUnreadPermissions.HAS_MESSAGE_UNREAD_READ)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_UNREAD, action = I18Consts.I18N_ACTION_UPDATE_UNREAD, description = "update unread count of message unread")
     @PostMapping("/clear")
     @Operation(summary = "Clear All Unread Messages for Current User")
     public ResponseEntity<?> clearMessageUnread(@RequestBody MessageUnreadRequest request) {
@@ -122,5 +135,4 @@ public class MessageUnreadRestController extends BaseRestController<MessageUnrea
         return ResponseEntity.ok(JsonResult.success("clear unread messages count success", count));
     }
     
-
 }

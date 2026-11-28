@@ -13,6 +13,8 @@
  */
 package com.bytedesk.ai.robot;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -58,7 +62,6 @@ public class RobotController {
         this.objectMapper = objectMapper;
     }
 
-
     private final ChatModel primaryChatModel;
     
     private final ObjectMapper objectMapper;
@@ -67,6 +70,9 @@ public class RobotController {
      * OpenAI兼容的chat/completions接口
      * 完全兼容OpenAI API格式，支持流式和非流式响应
      */
+    @PreAuthorize(RobotPermissions.HAS_ROBOT_UPDATE)
+    @Operation(summary = "Chat Completions", description = "Process chat completions request")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_SEND, description = "send robot")
     @PostMapping("/chat/completions")
     public ResponseEntity<?> chatCompletions(@RequestBody OpenAIChatCompletionRequest request) {
         log.info("Chat completions request: model={}, messages={}, stream={}", 

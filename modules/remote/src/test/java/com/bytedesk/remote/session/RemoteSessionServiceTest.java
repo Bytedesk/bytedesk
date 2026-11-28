@@ -199,6 +199,31 @@ class RemoteSessionServiceTest {
                 && "visitor".equals(a.actorUid())));
     }
 
+    @Test
+    void androidAndIosHostsCanJoinDeviceInvitation() {
+        // osType 白名单已放宽：移动端（android/ios）以仅查看被控身份加入
+        var hostSecret = "h".repeat(43);
+        byte[] digest;
+        try {
+            digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(hostSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+        var hash = java.util.HexFormat.of().formatHex(digest);
+        var invitation = RemoteInvitationEntity.builder().userUid("host").hostSecretHash(hash).build();
+        var response = service.inviteDevice(user("agent", "org"), invitation);
+        var captured = ArgumentCaptor.forClass(RemoteSessionEntity.class);
+        verify(sessions).save(captured.capture());
+        var entity = captured.getValue();
+        when(sessions.lockByUid(response.uid())).thenReturn(Optional.of(entity));
+        var android = service.join(response.uid(),
+                new RemoteDeviceRegisterRequest(hostSecret, "Pixel 8", "android"));
+        assertNotNull(android.hostToken());
+        assertEquals(RemoteSessionStatusEnum.CONNECTING, entity.getStatus());
+        assertFalse(android.session().controlGranted());
+    }
+
     private record Joined(String uid, String token, RemoteSessionEntity entity) {}
 
     private Joined joinedSession() {

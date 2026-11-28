@@ -136,6 +136,14 @@ public class ZhipuaiService extends BaseSpringAIService {
      * （按 llm.thinking 显式 enabled/disabled，与旧直调路径行为一致）。
      */
     private ZhipuaiChatOptions createZhipuaiOptions(RobotLlm llm) {
+        return createZhipuaiOptions(llm, null, null);
+    }
+
+    /**
+     * 带访客身份的 options 构建（规划 2026-11-25 §4.1）：visitorUid 写入 toolContext。
+     */
+    private ZhipuaiChatOptions createZhipuaiOptions(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -146,7 +154,7 @@ public class ZhipuaiService extends BaseSpringAIService {
                     .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
                     .enableThinking(Boolean.TRUE.equals(llm.getThinking()))
-                    .build(), llm);
+                    .build(), llm, robot, messageProtobufQuery);
         } catch (Exception e) {
             log.error("Error creating Zhipuai options for model {}", llm.getTextModel(), e);
             return null;
@@ -158,6 +166,12 @@ public class ZhipuaiService extends BaseSpringAIService {
      * provider 缺失 / apiKey 缺失 / options 构建失败时回退 bytedeskZhipuaiChatModel Bean（全局配置）。
      */
     private ChatModel createZhipuaiChatModel(RobotLlm llm) {
+        return createZhipuaiChatModel(llm, null, null);
+    }
+
+    /** 带访客身份的动态 ChatModel 构建：options 内 toolContext 携带 visitorUid。 */
+    private ChatModel createZhipuaiChatModel(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextProviderUid())) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
             return defaultChatModel;
@@ -174,7 +188,7 @@ public class ZhipuaiService extends BaseSpringAIService {
             return defaultChatModel;
         }
         try {
-            ZhipuaiChatOptions options = createZhipuaiOptions(llm);
+            ZhipuaiChatOptions options = createZhipuaiOptions(llm, robot, messageProtobufQuery);
             if (options == null) {
                 log.warn("Failed to create Zhipuai options, using default chat model");
                 return defaultChatModel;
@@ -418,7 +432,8 @@ public class ZhipuaiService extends BaseSpringAIService {
         }
         String model = getModel(robot);
 
-        ChatModel chatModel = createZhipuaiChatModel(llm);
+        // SSE 异步跨线程：visitorUid 经 options toolContext 显式传递（规划 2026-11-25 §4.1）
+        ChatModel chatModel = createZhipuaiChatModel(llm, robot, messageProtobufQuery);
         if (chatModel == null) {
             sseMessageHelper.handleSseError(new IllegalStateException("No available Zhipuai chat model"),
                     messageProtobufQuery, messageProtobufReply, emitter);
@@ -437,6 +452,10 @@ public class ZhipuaiService extends BaseSpringAIService {
             // 多模态 enrich：媒体消息时替换最后一条用户消息为原始内容 JSON，
             // 由 ZhipuaiChatModel.toMessages → ZhipuaiContentParser 解析（等价旧「覆盖用户消息」逻辑）
             Prompt effectivePrompt = enrichPromptMedia(prompt, messageProtobufQuery);
+            ZhipuaiChatOptions sseCustomOptions = createZhipuaiOptions(llm, robot, messageProtobufQuery);
+            if (sseCustomOptions != null) {
+                effectivePrompt = processPromptWithOptions(effectivePrompt, sseCustomOptions);
+            }
 
             var chatClient = createChatClient(chatModel, effectivePrompt, robot);
             // SSE 异步跨线程，conversationId 显式传递（不走 ThreadLocal）

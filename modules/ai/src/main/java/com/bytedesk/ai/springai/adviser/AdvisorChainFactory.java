@@ -12,13 +12,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
@@ -39,18 +38,18 @@ import lombok.extern.slf4j.Slf4j;
  *   <li><b>SafeGuard</b>：内容安全/敏感词拦截（LLM 层拦截，命中即短路，不转发）</li>
  *   <li><b>ReReading</b>：Re2 输入增强（response 透传）</li>
  *   <li><b>Logging</b>：请求/响应日志（仅 debug 模式）</li>
- *   <li><b>Memory</b>：多轮对话记忆（order &gt; ToolCallingAdvisor 默认 +1000，避开 tool 循环）</li>
+ *   <li><b>Memory</b>：多轮对话记忆（SessionMemoryAdvisor，order &gt; ToolCallingAdvisor 默认 +300，避开 tool 循环）</li>
  * </ul>
  *
- * <p>所有依赖均为可选（{@link ObjectProvider}），社区版缺 TabooService / ChatMemoryRepository 时安全降级。</p>
+ * <p>所有依赖均为可选（{@link ObjectProvider}），社区版缺 TabooService / SessionService 时安全降级。</p>
  *
  * <p><b>Advisor 执行顺序（order 升序，请求侧小的先执行）</b>：</p>
  * <pre>
  *   HIGHEST_PRECEDENCE            SafeGuardAdvisor          敏感词拦截，命中即短路
  *   HIGHEST_PRECEDENCE + 100      ReReadingAdvisor          Re2 输入增强（可选）
  *   HIGHEST_PRECEDENCE + 200      SimpleLoggerAdvisor       请求/响应日志（仅 debug）
- *   HIGHEST_PRECEDENCE + 1000     ToolCallingAdvisor        框架自动注册（有 tools 时），不可手动 new
- *   HIGHEST_PRECEDENCE + 1100     MessageChatMemoryAdvisor  多轮记忆（须在 tool 循环外侧）
+ *   HIGHEST_PRECEDENCE + 300      ToolCallingAdvisor        框架自动注册（有 tools 时），不可手动 new
+ *   HIGHEST_PRECEDENCE + 1100     SessionMemoryAdvisor      多轮记忆（须在 tool 循环外侧）
  * </pre>
  */
 @Slf4j
@@ -59,7 +58,7 @@ public class AdvisorChainFactory {
 
     private final TabooService tabooService;
     private final BytedeskProperties bytedeskProperties;
-    private final ChatMemoryRepository chatMemoryRepository;
+    private final SessionService sessionService;
 
     // 敏感词缓存（按 orgUid 隔离，5min TTL），避免每请求查库。
     // 复用 TabooFilterHelper 的 CacheEntry 缓存模式（enterprise/kbase）。
@@ -69,10 +68,10 @@ public class AdvisorChainFactory {
     public AdvisorChainFactory(
             ObjectProvider<TabooService> tabooServiceProvider,
             ObjectProvider<BytedeskProperties> bytedeskPropertiesProvider,
-            ObjectProvider<ChatMemoryRepository> chatMemoryRepositoryProvider) {
+            ObjectProvider<SessionService> sessionServiceProvider) {
         this.tabooService = tabooServiceProvider.getIfAvailable();
         this.bytedeskProperties = bytedeskPropertiesProvider.getIfAvailable();
-        this.chatMemoryRepository = chatMemoryRepositoryProvider.getIfAvailable();
+        this.sessionService = sessionServiceProvider.getIfAvailable();
     }
 
     /**
@@ -115,18 +114,18 @@ public class AdvisorChainFactory {
             advisors.add(loggerAdvisor);
         }
 
-        // ---- Memory：多轮对话记忆 ----
-        // order 设为 HIGHEST_PRECEDENCE + 1100（> ToolCallingAdvisor 默认 +1000），确保位于 tool 循环外侧，
-        // 避免每次 tool 迭代重复持久化中间消息污染记忆（见规划 §2.2）。
-        // memoryEnabled 默认 false（2026-09-14 改为 opt-in，Liquibase 260914 存量对齐）；chatMemoryRepository 不可用时安全降级（社区版无 JDBC starter）。
-        if (Boolean.TRUE.equals(llm.getMemoryEnabled()) && chatMemoryRepository != null) {
+        // ---- Memory：多轮对话记忆（Spring AI 2.1.0 SessionMemoryAdvisor）----
+        // order 保持 HIGHEST_PRECEDENCE + 1100（> ToolCallingAdvisor 默认 +300），确保位于 tool 循环外侧，
+        // 避免每次 tool 迭代重复持久化中间消息污染记忆（与旧 MessageChatMemoryAdvisor 迁移前的行为一致）。
+        // memoryEnabled 默认 false（2026-09-14 改为 opt-in，Liquibase 260914 存量对齐）；sessionService 不可用时安全降级（社区版无 session-jdbc starter）。
+        // 窗口语义：EventFilter.lastN(n) 为 turn-aware 窗口（切口向前对齐到 UserMessage 起始的完整轮次），
+        // 与旧 MessageWindowChatMemory.maxMessages 行为等价；maxMessages 默认 10 与旧 contextMsgCount 兜底一致。
+        // 持久化：SessionService → AI_SESSION / AI_SESSION_EVENT（取代旧 SPRING_AI_CHAT_MEMORY 表，旧表保留不再写入）。
+        if (Boolean.TRUE.equals(llm.getMemoryEnabled()) && sessionService != null) {
             int maxMessages = llm.getContextMsgCount() != null && llm.getContextMsgCount() > 0
                     ? llm.getContextMsgCount() : 10;
-            ChatMemory chatMemory = MessageWindowChatMemory.builder()
-                    .chatMemoryRepository(chatMemoryRepository)
-                    .maxMessages(maxMessages)
-                    .build();
-            advisors.add(MessageChatMemoryAdvisor.builder(chatMemory)
+            advisors.add(SessionMemoryAdvisor.builder(sessionService)
+                    .eventFilter(EventFilter.lastN(maxMessages))
                     .order(Ordered.HIGHEST_PRECEDENCE + 1100)
                     .build());
         }

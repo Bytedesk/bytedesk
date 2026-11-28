@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +41,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
 
     private final DepartmentRestService departmentRestService;
 
+    @Operation(summary = "Query Departments by Organization", description = "Retrieve departments for the current organization")
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query department by org")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
@@ -52,6 +53,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
+    @Operation(summary = "Query Departments by User", description = "Retrieve departments for the current user")
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query department by user")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ)
     @Override
@@ -63,6 +65,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(departmentPage));
     }
 
+    @Operation(summary = "Query Departments by UID", description = "Retrieve a specific department entry by its unique identifier")
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query department by uid")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_READ_OR_TICKET_READ)
     @Override
@@ -74,6 +77,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok(JsonResult.success(department));
     }
 
+    @Operation(summary = "Create Departments", description = "Create a new department entry")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create department")
     @Override
@@ -85,6 +89,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
+    @Operation(summary = "Update Departments", description = "Update an existing department entry")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update department")
     @Override
@@ -96,6 +101,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         return ResponseEntity.ok().body(JsonResult.success(department));
     }
 
+    @Operation(summary = "Delete Departments", description = "Delete a department entry")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete department")
     @Override
@@ -112,6 +118,7 @@ public class DepartmentRestController extends BaseRestController<DepartmentReque
         }
     }
 
+    @Operation(summary = "Export Departments", description = "Export departments to Excel format")
     @PreAuthorize(DepartmentPermissions.HAS_DEPARTMENT_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_DEPARTMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export department")
     @GetMapping("/export")

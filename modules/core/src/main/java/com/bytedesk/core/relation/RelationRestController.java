@@ -15,7 +15,7 @@ package com.bytedesk.core.relation;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +26,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,6 +51,7 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
         return ResponseEntity.ok(JsonResult.success(relations));
     }
 
+    @PreAuthorize(RelationPermissions.HAS_RELATION_READ)
     @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query relation by user")
     @Operation(summary = "Query Relations by User", description = "Retrieve relations for the current user")
     @Override
@@ -63,6 +63,7 @@ public class RelationRestController extends BaseRestController<RelationRequest, 
         return ResponseEntity.ok(JsonResult.success(relations));
     }
 
+    @PreAuthorize(RelationPermissions.HAS_RELATION_READ)
     @ActionAnnotation(title = I18Consts.I18N_RELATION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query relation by uid")
     @Operation(summary = "Query Relation by UID", description = "Retrieve a specific relation by its unique identifier")
     @Override

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.push.service.PushSendService;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
@@ -41,6 +43,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
     
     private final PushSendService pushSendService;
 
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query push")
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "Query Push Notifications by Organization", description = "Retrieve push notifications for the current organization (Admin only)")
     @Override
@@ -51,6 +54,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query push")
     @Operation(summary = "Query Push Notifications by User", description = "Retrieve push notifications for the current user")
     @Override
     public ResponseEntity<?> queryByUser(PushRequest request) {
@@ -60,6 +64,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_CREATE, description = "create push")
     @Operation(summary = "Create Push Notification", description = "Create and send a new push notification")
     @Override
     public ResponseEntity<?> create(PushRequest request) {
@@ -67,6 +72,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
         return ResponseEntity.ok(JsonResult.success(pushRestService.create(request)));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_UPDATE, description = "update push")
     @Operation(summary = "Update Push Notification", description = "Update an existing push notification")
     @Override
     public ResponseEntity<?> update(PushRequest request) {
@@ -74,6 +80,7 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
         return ResponseEntity.ok(JsonResult.success(pushRestService.update(request)));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_DELETE, description = "delete push")
     @Operation(summary = "Delete Push Notification", description = "Delete a push notification")
     @Override
     public ResponseEntity<?> delete(PushRequest request) {
@@ -91,17 +98,20 @@ public class PushRestController extends BaseRestController<PushRequest, PushRest
         return ResponseEntity.ok(JsonResult.success(pushSendService.resend(request)));
     }
 
+    @Operation(summary = "Export Push Records", description = "Export push records to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_EXPORT, description = "export push")
     @Override
     public Object export(PushRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Query Push Records by UID", description = "Retrieve a specific push record entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_PUSH, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query push")
     @Override
     public ResponseEntity<?> queryByUid(PushRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
-    
     
 }

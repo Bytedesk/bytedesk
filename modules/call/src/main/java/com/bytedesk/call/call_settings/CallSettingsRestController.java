@@ -14,7 +14,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -84,6 +83,7 @@ public class CallSettingsRestController extends BaseRestController<CallSettingsR
         return ResponseEntity.ok(JsonResult.success(callSettingsRestService.update(request)));
     }
 
+    @PreAuthorize(CallSettingsPermissions.HAS_CALL_SETTINGS_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_CALL_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update call settings signed in state")
     @Operation(summary = "Update call settings signed in state")
     @PostMapping("/update/signed-in")

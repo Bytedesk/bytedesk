@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -24,6 +26,7 @@ public class FormResultRestControllerVisitor {
 
 	private final FormResultRestService formResultRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_FORM, action = I18Consts.I18N_ACTION_CREATE, description = "create form")
 	@BlackIpFilter(title = "black", action = "form-result-create")
 	@BlackUserFilter(title = "black", action = "form-result-create")
 	@Operation(summary = "访客提交表单结果", description = "未登录访客提交表单结果")

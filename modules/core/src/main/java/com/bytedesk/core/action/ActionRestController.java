@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
@@ -54,6 +55,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
 
     private final MessageSource messageSource;
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query action log")
     @Operation(summary = "Query Action Logs by Organization", description = "Retrieve action logs for the current organization")
     @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
@@ -64,6 +66,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query action log")
     @Operation(summary = "Query Action Logs by User", description = "Retrieve action logs for the current user")
     @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
@@ -74,6 +77,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query action log")
     @Operation(summary = "Query Action Log by UID", description = "Retrieve a specific action log by its unique identifier")
     @PreAuthorize(ActionPermissions.HAS_ACTION_READ)
     @Override
@@ -84,6 +88,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
         return ResponseEntity.ok(JsonResult.success(action));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_CREATE, description = "create action log")
     @Operation(summary = "Create Action Log", description = "Create a new action log entry")
     @PreAuthorize(ActionPermissions.HAS_ACTION_CREATE)
     @Override
@@ -94,6 +99,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
         return ResponseEntity.ok(JsonResult.success(action));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_UPDATE, description = "update action log")
     @Operation(summary = "Update Action Log", description = "Update an existing action log entry")
     @PreAuthorize(ActionPermissions.HAS_ACTION_UPDATE)
     @Override
@@ -104,6 +110,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
         return ResponseEntity.ok(JsonResult.success(action));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_DELETE, description = "delete action log")
     @Operation(summary = "Delete Action Log", description = "Delete an action log entry")
     @PreAuthorize(ActionPermissions.HAS_ACTION_DELETE)
     @Override
@@ -122,6 +129,7 @@ public class ActionRestController extends BaseRestController<ActionRequest, Acti
      * @param response HTTP响应
      * @return 导出结果
      */
+    @ActionAnnotation(title = I18Consts.I18N_ACTION_LOG, action = I18Consts.I18N_ACTION_EXPORT, description = "export action log")
     @Operation(summary = "Export Action Logs", description = "Export action logs to Excel format")
     @PreAuthorize(ActionPermissions.HAS_ACTION_EXPORT)
     @GetMapping("/export")

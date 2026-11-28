@@ -20,10 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/robot/message")
@@ -33,6 +36,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
 
     private final RobotMessageRestService robotMessageRestService;
 
+    @Operation(summary = "Query Robot Messages by Organization", description = "Retrieve robot messages for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query robot message")
     @Override
     public ResponseEntity<?> queryByOrg(RobotMessageRequest request) {
         
@@ -41,6 +46,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Robot Messages by User", description = "Retrieve robot messages for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query robot message")
     @Override
     public ResponseEntity<?> queryByUser(RobotMessageRequest request) {
         
@@ -49,6 +56,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Robot Messages by UID", description = "Retrieve a specific robot message entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query robot message")
     @Override
     public ResponseEntity<?> queryByUid(RobotMessageRequest request) {
         
@@ -57,6 +66,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Create Robot Messages", description = "Create a new robot message entry")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_CREATE, description = "create robot message")
     @Override
     public ResponseEntity<?> create(RobotMessageRequest request) {
         
@@ -65,6 +76,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Robot Messages", description = "Update an existing robot message entry")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update robot message")
     @Override
     public ResponseEntity<?> update(RobotMessageRequest request) {
         
@@ -73,6 +86,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Robot Messages", description = "Delete a robot message entry")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_DELETE, description = "delete robot message")
     @Override
     public ResponseEntity<?> delete(RobotMessageRequest request) {
         
@@ -81,6 +96,8 @@ public class RobotMessageRestController extends BaseRestController<RobotMessageR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Robot Messages", description = "Export robot messages to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_MESSAGE, action = I18Consts.I18N_ACTION_EXPORT, description = "export robot message")
     @Override
     public Object export(RobotMessageRequest request, HttpServletResponse response) {
         return exportTemplate(

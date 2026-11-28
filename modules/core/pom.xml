@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-core</artifactId>
 
 	<name>bytedesk-module-core</name>
-	<description>https://ai.bytedesk.com</description>
+	<description>https://www.bytedesk.com</description>
 
 	<properties>
 		<jsonwebtoken.version>0.12.5</jsonwebtoken.version>

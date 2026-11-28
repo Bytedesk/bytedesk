@@ -30,12 +30,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.read.listener.PageReadListener;
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 黑名单管理接口
@@ -57,6 +59,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 分页黑名单列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query black")
     @Operation(summary = "Query Blacklist by Organization", description = "Return the blacklist for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(BlackRequest request) {
@@ -72,6 +75,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 分页黑名单列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query black")
     @Operation(summary = "Query Blacklist by User", description = "Return the blacklist for the current user")
     @Override
     public ResponseEntity<?> queryByUser(BlackRequest request) {
@@ -87,6 +91,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 黑名单详情
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query black")
     @Operation(summary = "Query Blacklist by UID", description = "Query the blacklist entry by unique identifier")
     @Override
     public ResponseEntity<?> queryByUid(BlackRequest request) {
@@ -100,6 +105,8 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 查询请求
      * @return 黑名单详情
      */
+    @PreAuthorize(BlackPermissions.HAS_BLACK_READ)
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query black")
     @Operation(summary = "Check Whether blackUid Exists in Blacklist", description = "Check whether the current blackUid exists in the blacklist")
     @GetMapping("/exists/blackUid")
     public ResponseEntity<?> existsByBlackUid(BlackRequest request) {
@@ -110,8 +117,9 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
         }
         return ResponseEntity.ok(JsonResult.success(false));
     }
-
     // unblock/BlackUid
+    @PreAuthorize(BlackPermissions.HAS_BLACK_DELETE)
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_DELETE, description = "delete black")
     @Operation(summary = "Unblock from Blacklist", description = "Remove the specified blacklist entry")
     @PostMapping("/unblock/blackUid")
     public ResponseEntity<?> unblockByBlackUid(@RequestBody BlackRequest request) {
@@ -127,6 +135,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 创建请求
      * @return 创建的黑名单
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_CREATE, description = "create black")
     @Operation(summary = "Create Blacklist Entry", description = "Create a new blacklist record")
     @Override
     public ResponseEntity<?> create(BlackRequest request) {
@@ -142,6 +151,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 更新请求
      * @return 更新后的黑名单
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_UPDATE, description = "update black")
     @Operation(summary = "Update Blacklist Entry", description = "Update an existing blacklist record")
     @Override
     public ResponseEntity<?> update(BlackRequest request) {
@@ -157,6 +167,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param request 删除请求
      * @return 删除结果
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_DELETE, description = "delete black")
     @Operation(summary = "Delete Blacklist Entry", description = "Delete the specified blacklist record")
     @Override
     public ResponseEntity<?> delete(BlackRequest request) {
@@ -173,6 +184,7 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
      * @param response HTTP响应
      * @return 导出结果
      */
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_EXPORT, description = "export black")
     @Operation(summary = "Export Blacklist", description = "Export blacklist data to Excel")
     @Override
     public Object export(BlackRequest request, HttpServletResponse response) {
@@ -186,6 +198,8 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
         );
     }
 
+    @PreAuthorize(BlackPermissions.HAS_BLACK_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_BLACK, action = I18Consts.I18N_ACTION_IMPORT, description = "import black")
     @Operation(summary = "Import Blacklist", description = "Import blacklist data from Excel")
     @PostMapping("/import")
     public ResponseEntity<?> importExcel(@RequestPart("file") MultipartFile file,
@@ -203,5 +217,4 @@ public class BlackRestController extends BaseRestController<BlackRequest, BlackR
         }
     }
     
-
 }

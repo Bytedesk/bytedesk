@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,6 +91,7 @@ public class RoomRestController extends BaseRestController<RoomRequest, RoomRest
         return ResponseEntity.ok(JsonResult.success(room));
     }
 
+    @PreAuthorize(RoomPermissions.HAS_ROOM_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_ROOM, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "join room by inviteUid")
     @Operation(summary = "Join Room", description = "Join a conference room by inviteUid with the current logged-in user info")
     @PostMapping("/join")

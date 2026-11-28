@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.BdDateUtils;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +35,7 @@ public class ChatMemoryRestController {
 
     private final ChatMemoryRestService chatMemoryRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MEMORY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query chat memory")
     @Operation(summary = "Query ChatMemory Records (paginated)")
     @PreAuthorize(ChatMemoryPermissions.HAS_CHAT_MEMORY_READ)
     @GetMapping("/query/org")
@@ -64,6 +67,7 @@ public class ChatMemoryRestController {
         return ResponseEntity.ok(JsonResult.success(data));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MEMORY, action = I18Consts.I18N_ACTION_DELETE, description = "delete chat memory")
     @Operation(summary = "Delete ChatMemory by conversationId")
     @PreAuthorize(ChatMemoryPermissions.HAS_CHAT_MEMORY_DELETE)
     @PostMapping("/delete")

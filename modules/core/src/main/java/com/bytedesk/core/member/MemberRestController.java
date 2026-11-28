@@ -82,6 +82,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
         return ResponseEntity.ok(JsonResult.success(memberResponse));
     }
 
+    @Operation(summary = "Count Members by Organization", description = "Count members for the current organization")
     @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "count members by organization")
     @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @GetMapping("/count/org")
@@ -90,6 +91,7 @@ public class MemberRestController extends BaseRestControllerOverride<MemberReque
         return ResponseEntity.ok(JsonResult.success(count));
     }
 
+    @Operation(summary = "Count Unassigned Members by Organization", description = "Count members not assigned to any department")
     @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "count unassigned members by organization")
     @PreAuthorize(MemberPermissions.HAS_MEMBER_READ)
     @GetMapping("/count/unassigned/org")

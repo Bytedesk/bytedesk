@@ -13,7 +13,7 @@
 	<artifactId>bytedesk-module-kbase</artifactId>
 
 	<name>bytedesk-module-kbase</name>
-	<description>https://ai.bytedesk.com</description>
+	<description>https://www.bytedesk.com</description>
 
 	<properties>
 	</properties>
@@ -59,6 +59,7 @@
 		<!-- https://tika.apache.org/3.2.1/formats.html -->
 		<!-- read other file types, such as doc, docx, xls, xlsx, ppt, pptx, epub, odt, rtf, txt,
 		pdf, html, htm, xml, etc. -->
+		<!-- https://tika.apache.org/docs/4.2.x/index.html -->
 		<!--
 		https://mvnrepository.com/artifact/org.springframework.ai/spring-ai-tika-document-reader -->
 		<!-- https://mvnrepository.com/artifact/org.apache.tika/tika-core -->

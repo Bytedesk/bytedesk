@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -38,6 +40,7 @@ public class MessageBizRestControllerVisitor {
     private final MessageRepository messageRepository;
     private final IMessageSendService messageSendService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update message")
     @Operation(summary = "更新商品/订单消息", description = "更新原商品或订单消息 content，并广播补丁消息通知其他端刷新")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody MessageBizUpdateRequest request) {

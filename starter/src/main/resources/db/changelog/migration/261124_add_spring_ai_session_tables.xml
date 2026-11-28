@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Spring AI 2.1.0 Session 持久化表（ChatMemory 升级替代）。
+        对应 spring-ai-starter-model-session-jdbc + BytedeskSessionRepositoryConfig。
+
+        注意：
+        1. 同时关闭 Spring AI 自动 schema 初始化（spring.ai.session.repository.jdbc.initialize-schema=never），
+           由本 Liquibase 脚本统一建表，避免多环境启动时 schema 行为不一致。
+        2. 列定义与 Spring AI 2.1.0 内置 schema-mysql.sql / schema-postgresql.sql 对齐：
+           - id/session_id      VARCHAR(255)（bytedesk 用 threadTopic 如 org/robot/{uid}/{uid} 作为 sessionId）
+           - created_at/expires_at/timestamp  TIMESTAMP（Liquibase 对 timestamp 保留字列自动加引号）
+           - metadata/payload/message_content  clob（MySQL LONGTEXT / PG TEXT / Oracle CLOB）
+           - seq                 BIGINT + autoIncrement（MySQL AUTO_INCREMENT / PG&Oracle IDENTITY）
+           - synthetic           BOOLEAN（MySQL TINYINT(1)，Liquibase 按方言转换）
+        3. 索引与官方 schema 对齐：idx_ai_session_expires_at、
+           idx_ai_session_index_name_value、idx_ai_session_event_session_seq、
+           idx_ai_session_event_session_type_seq
+        4. 旧表 SPRING_AI_CHAT_MEMORY 保留不动（升级后记忆重置一次，旧表仅供回滚/查询）。
+        5. 跨库兼容：仅用标准 createTable/createIndex 标签，无原生 SQL。
+    -->
+    <changeSet id="261124-2-create-ai-session-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="AI_SESSION"/>
+            </not>
+        </preConditions>
+        <createTable tableName="AI_SESSION">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expires_at" type="TIMESTAMP"/>
+            <column name="metadata" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="event_version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="AI_SESSION" indexName="idx_ai_session_expires_at">
+            <column name="expires_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261124-4-create-ai-session-index-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="AI_SESSION_INDEX"/>
+            </not>
+        </preConditions>
+        <createTable tableName="AI_SESSION_INDEX">
+            <column name="session_id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="attr_name" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="attr_value" type="VARCHAR(512)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="AI_SESSION_INDEX" baseColumnNames="session_id"
+            referencedTableName="AI_SESSION" referencedColumnNames="id"
+            constraintName="fk_ai_session_index_session" onDelete="CASCADE"/>
+        <createIndex tableName="AI_SESSION_INDEX" indexName="idx_ai_session_index_name_value">
+            <column name="attr_name"/>
+            <column name="attr_value"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="261124-6-create-ai-session-event-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="AI_SESSION_EVENT"/>
+            </not>
+        </preConditions>
+        <createTable tableName="AI_SESSION_EVENT">
+            <column name="seq" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" unique="true" uniqueConstraintName="uq_ai_session_event_seq"/>
+            </column>
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="session_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timestamp" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <!-- EventType.MAX_NAME_LENGTH -->
+            <column name="event_type" type="VARCHAR(64)" defaultValue="MESSAGE">
+                <constraints nullable="false"/>
+            </column>
+            <!-- 非消息事件为 NULL -->
+            <column name="message_type" type="VARCHAR(20)"/>
+            <column name="message_content" type="clob"/>
+            <column name="payload" type="clob">
+                <constraints nullable="false"/>
+            </column>
+            <column name="synthetic" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="metadata" type="clob">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="AI_SESSION_EVENT" baseColumnNames="session_id"
+            referencedTableName="AI_SESSION" referencedColumnNames="id"
+            constraintName="fk_ai_session_event_session" onDelete="CASCADE"/>
+        <createIndex tableName="AI_SESSION_EVENT" indexName="idx_ai_session_event_session_seq">
+            <column name="session_id"/>
+            <column name="seq"/>
+        </createIndex>
+        <!-- 每次读取 active view 都会查最新 compaction boundary -->
+        <createIndex tableName="AI_SESSION_EVENT" indexName="idx_ai_session_event_session_type_seq">
+            <column name="session_id"/>
+            <column name="event_type"/>
+            <column name="seq"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

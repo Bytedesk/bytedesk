@@ -26,7 +26,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -42,6 +41,8 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         this.kbaseTranslationRestService = kbaseTranslationRestService;
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TRANSLATION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query translation")
     @Operation(summary = "Query translations by organization")
     @GetMapping("/query/org")
     @Override
@@ -50,6 +51,8 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TRANSLATION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query translation")
     @Operation(summary = "Query translations by user")
     @GetMapping({ "/query", "/query/user" })
     @Override
@@ -58,6 +61,8 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TRANSLATION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query translation")
     @Operation(summary = "Query translation by UID")
     @GetMapping("/query/uid")
     @Override
@@ -66,6 +71,7 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_CREATE, description = "create kbase translation")
     @Operation(summary = "Create translation")
     @PostMapping("/create")
@@ -75,6 +81,7 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_UPDATE, description = "update kbase translation")
     @Operation(summary = "Update translation")
     @PostMapping("/update")
@@ -84,6 +91,7 @@ public class KbaseTranslationRestController extends BaseRestController<KbaseTran
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(KbaseTranslationPermissions.HAS_KBASE_TRANSLATION_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_KBASE, action = I18Consts.I18N_ACTION_DELETE, description = "delete kbase translation")
     @Operation(summary = "Delete translation")
     @PostMapping("/delete")

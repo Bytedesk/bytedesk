@@ -45,6 +45,8 @@ SPRING_AI_MODEL_EMBEDDING=zhipuai
 SPRING_AI_DASHSCOPE_API_KEY=your-key
 SPRING_AI_MODEL_AUDIO_SPEECH=dashscope
 SPRING_AI_MODEL_AUDIO_TRANSCRIPTION=dashscope
+# 决策模型（Spring AI 2.1.0 新增，默认开启会与自定义 OllamaApi 冲突，保持 none）
+# SPRING_AI_MODEL_DECISION=none
 ```
 
 完整模型选择项见 `compose/compose-bytedesk.yaml` 的 AI provider 段落注释。

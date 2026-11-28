@@ -16,7 +16,6 @@ spring.ai.anthropic.chat.enabled=true
 spring.ai.anthropic.base-url=https://api.anthropic.com
 spring.ai.anthropic.api-key=sk-ant-xxx
 spring.ai.anthropic.chat.options.model=claude-sonnet-4-5
-spring.ai.anthropic.chat.options.temperature=0.7
 spring.ai.anthropic.chat.options.max-tokens=4096
 ```
 

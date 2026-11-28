@@ -1,6 +1,7 @@
 package com.bytedesk.ticket.ticket;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +26,7 @@ import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.rbac.user.UserTypeEnum;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.thread.ThreadRestService;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.core.upload.UploadRestService;
@@ -45,6 +47,122 @@ class TicketRestServiceVisibilityTest {
         @AfterEach
         void clearSecurityContext() {
                 SecurityContextHolder.clearContext();
+        }
+
+        @Test
+        void crossOrgUserCanNotQueryTicketByUid() {
+                AuthService authService = mock(AuthService.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newServiceWithRepository(authService,
+                                mock(TicketSettingsRestService.class), memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("cross-org-user");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("cross-org-user", "org-target"))
+                                .thenReturn(Optional.empty());
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("cross-org-ticket")
+                                .orgUid("org-target")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("other-user")
+                                .build();
+                when(ticketRepository.findByUid("cross-org-ticket")).thenReturn(Optional.of(ticket));
+
+                TicketRequest request = new TicketRequest();
+                request.setUid("cross-org-ticket");
+                request.setOrgUid("org-target");
+
+                assertThatThrownBy(() -> service.queryByUid(request))
+                                .isInstanceOf(NotFoundException.class);
+        }
+
+        @Test
+        void crossOrgUserCanNotUpdateTicket() {
+                AuthService authService = mock(AuthService.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newServiceWithRepository(authService,
+                                mock(TicketSettingsRestService.class), memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("cross-org-user");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("cross-org-user", "org-target"))
+                                .thenReturn(Optional.empty());
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("cross-org-ticket")
+                                .orgUid("org-target")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("other-user")
+                                .build();
+                when(ticketRepository.findByUid("cross-org-ticket")).thenReturn(Optional.of(ticket));
+
+                TicketRequest request = new TicketRequest();
+                request.setUid("cross-org-ticket");
+                request.setOrgUid("org-target");
+                request.setTitle("tampered");
+
+                assertThatThrownBy(() -> service.update(request))
+                                .isInstanceOf(NotFoundException.class);
+        }
+
+        @Test
+        void crossOrgUserCanNotDeleteTicket() {
+                AuthService authService = mock(AuthService.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newServiceWithRepository(authService,
+                                mock(TicketSettingsRestService.class), memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("cross-org-user");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("cross-org-user", "org-target"))
+                                .thenReturn(Optional.empty());
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("cross-org-ticket")
+                                .orgUid("org-target")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("other-user")
+                                .build();
+                when(ticketRepository.findByUid("cross-org-ticket")).thenReturn(Optional.of(ticket));
+
+                TicketRequest request = new TicketRequest();
+                request.setUid("cross-org-ticket");
+                request.setOrgUid("org-target");
+
+                assertThatThrownBy(() -> service.delete(request))
+                                .isInstanceOf(NotFoundException.class);
+        }
+
+        @Test
+        void crossOrgUserCanNotQueryTicketCardWithoutTargetOrgMatch() {
+                AuthService authService = mock(AuthService.class);
+                TicketRepository ticketRepository = mock(TicketRepository.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
+                TicketRestService service = newServiceWithRepository(authService,
+                                mock(TicketSettingsRestService.class), memberRepository, ticketRepository);
+
+                UserEntity currentUser = buildUser("cross-org-user");
+                when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("cross-org-user", "org-target"))
+                                .thenReturn(Optional.empty());
+
+                TicketEntity ticket = TicketEntity.builder()
+                                .uid("cross-org-ticket")
+                                .orgUid("org-target")
+                                .type(TicketTypeEnum.EXTERNAL.name())
+                                .userUid("other-user")
+                                .build();
+                when(ticketRepository.findByUid("cross-org-ticket")).thenReturn(Optional.of(ticket));
+
+                TicketRequest request = new TicketRequest();
+                request.setUid("cross-org-ticket");
+
+                assertThatThrownBy(() -> service.queryByUidForCard(request))
+                                .isInstanceOf(NotFoundException.class);
         }
 
         // ==================== 工单卡片分享只读豁免（canViewTicketViaSharedCard） ====================
@@ -702,8 +820,9 @@ class TicketRestServiceVisibilityTest {
         void canViewTicketForOrgAdminOnAdminChannel() {
                 // admin 管理后台渠道（channel=WEB_ADMIN）：组织管理员保留全见特权
                 AuthService authService = mock(AuthService.class);
+                MemberRepository memberRepository = mock(MemberRepository.class);
                 TicketRestService service = newService(authService, mock(TicketSettingsRestService.class),
-                                mock(MemberRepository.class));
+                                memberRepository);
 
                 UserEntity currentUser = buildUser("user-admin-2");
                 com.bytedesk.core.rbac.role.RoleEntity adminRole = com.bytedesk.core.rbac.role.RoleEntity.builder()
@@ -712,6 +831,8 @@ class TicketRestServiceVisibilityTest {
                                 .build();
                 currentUser.setCurrentRoles(new java.util.LinkedHashSet<>(java.util.List.of(adminRole)));
                 when(authService.getUser()).thenReturn(currentUser);
+                when(memberRepository.findByUser_UidAndOrgUidAndDeletedFalse("user-admin-2", "org-1"))
+                                .thenReturn(Optional.of(buildMember(currentUser, "dept-design")));
 
                 TicketEntity ticket = TicketEntity.builder()
                                 .uid("ticket-13")

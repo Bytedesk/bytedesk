@@ -61,6 +61,15 @@ public final class RoleAuthorityRules {
     public static final String USER_READ = "USER_READ";
     public static final String USER_UPDATE = "USER_UPDATE";
 
+    // connection (modules/core) 在线状态/连接查询（桌面端 presence 接口）
+    public static final String CONNECTION_READ = "CONNECTION_READ";
+
+    // black (modules/core) 黑名单（桌面端登录/会话前黑名单校验接口）
+    public static final String BLACK_READ = "BLACK_READ";
+    public static final String BLACK_CREATE = "BLACK_CREATE";
+    public static final String BLACK_UPDATE = "BLACK_UPDATE";
+    public static final String BLACK_DELETE = "BLACK_DELETE";
+
     public static final String MESSAGE_READ = "MESSAGE_READ";
     public static final String MESSAGE_CREATE = "MESSAGE_CREATE";
 
@@ -211,6 +220,95 @@ public final class RoleAuthorityRules {
     public static final String JOBTITLE_UPDATE = "JOBTITLE_UPDATE";
     public static final String JOBTITLE_DELETE = "JOBTITLE_DELETE";
 
+    // message (modules/core) 普通成员可更新/已读消息
+    public static final String MESSAGE_UPDATE = "MESSAGE_UPDATE";
+    public static final String MESSAGE_UNREAD_READ = "MESSAGE_UNREAD_READ";
+
+    // topic_subscription (modules/core)
+    public static final String TOPIC_SUBSCRIPTION_CREATE = "TOPIC_SUBSCRIPTION_CREATE";
+    public static final String TOPIC_SUBSCRIPTION_DELETE = "TOPIC_SUBSCRIPTION_DELETE";
+
+    // upload / url (modules/core)
+    public static final String UPLOAD_READ = "UPLOAD_READ";
+    public static final String UPLOAD_CREATE = "UPLOAD_CREATE";
+    public static final String URL_CREATE = "URL_CREATE";
+
+    // moment / relation (modules/core)
+    public static final String MOMENT_READ = "MOMENT_READ";
+    public static final String RELATION_READ = "RELATION_READ";
+
+    // group apply / group forum (modules/core)
+    public static final String GROUP_MEMBER_APPLY_READ = "GROUP_MEMBER_APPLY_READ";
+    public static final String GROUP_MEMBER_APPLY_CREATE = "GROUP_MEMBER_APPLY_CREATE";
+    public static final String GROUP_MEMBER_APPLY_UPDATE = "GROUP_MEMBER_APPLY_UPDATE";
+    public static final String GROUP_FORUM_READ = "GROUP_FORUM_READ";
+    public static final String GROUP_FORUM_CREATE = "GROUP_FORUM_CREATE";
+    public static final String GROUP_FORUM_UPDATE = "GROUP_FORUM_UPDATE";
+    public static final String GROUP_FORUM_DELETE = "GROUP_FORUM_DELETE";
+
+    // group robot execution (modules/ai)
+    public static final String GROUP_ROBOT_EXECUTION_READ = "GROUP_ROBOT_EXECUTION_READ";
+    public static final String GROUP_ROBOT_EXECUTION_UPDATE = "GROUP_ROBOT_EXECUTION_UPDATE";
+
+    // llm provider / ollama (modules/ai) 只读：模型列表/配置查询
+    public static final String LLM_PROVIDER_READ = "LLM_PROVIDER_READ";
+    public static final String OLLAMA4J_READ = "OLLAMA4J_READ";
+
+    // disk (modules/disk) 网盘文件读写，目录级仍由 DiskPermissionEntity ACL 校验
+    public static final String DISK_CREATE = "DISK_CREATE";
+    public static final String DISK_UPDATE = "DISK_UPDATE";
+    public static final String DISK_DELETE = "DISK_DELETE";
+    public static final String DISK_FILE_READ = "DISK_FILE_READ";
+    public static final String DISK_FILE_CREATE = "DISK_FILE_CREATE";
+    public static final String DISK_FILE_UPDATE = "DISK_FILE_UPDATE";
+    public static final String DISK_FILE_DELETE = "DISK_FILE_DELETE";
+    public static final String DISK_FILE_EXPORT = "DISK_FILE_EXPORT";
+    public static final String DISK_STATISTIC_READ = "DISK_STATISTIC_READ";
+
+    // forum post (modules/forum)
+    public static final String POST_READ = "POST_READ";
+    public static final String POST_CREATE = "POST_CREATE";
+    public static final String POST_UPDATE = "POST_UPDATE";
+
+    // kbase translation (modules/kbase)
+    public static final String KBASE_TRANSLATION_READ = "KBASE_TRANSLATION_READ";
+    public static final String KBASE_TRANSLATION_CREATE = "KBASE_TRANSLATION_CREATE";
+    public static final String KBASE_TRANSLATION_UPDATE = "KBASE_TRANSLATION_UPDATE";
+    public static final String KBASE_TRANSLATION_DELETE = "KBASE_TRANSLATION_DELETE";
+
+    // webpage / website (modules/kbase) 只读入口
+    public static final String WEBPAGE_READ = "WEBPAGE_READ";
+    public static final String WEBSITE_READ = "WEBSITE_READ";
+
+    // ticket settings / form / process (modules/ticket)
+    public static final String TICKET_SETTINGS_READ = "TICKET_SETTINGS_READ";
+    public static final String TICKET_SETTINGS_UPDATE = "TICKET_SETTINGS_UPDATE";
+    public static final String TICKET_FORM_READ = "TICKET_FORM_READ";
+    public static final String TICKET_FORM_CREATE = "TICKET_FORM_CREATE";
+    public static final String TICKET_FORM_UPDATE = "TICKET_FORM_UPDATE";
+    public static final String THREAD_PROCESS_READ = "THREAD_PROCESS_READ";
+    public static final String PROCESS_READ = "PROCESS_READ";
+    public static final String PROCESS_CREATE = "PROCESS_CREATE";
+    public static final String PROCESS_UPDATE = "PROCESS_UPDATE";
+    public static final String WORKFLOW_READ = "WORKFLOW_READ";
+
+    // remote (modules/remote) 远程协助
+    public static final String REMOTE_READ = "REMOTE_READ";
+    public static final String REMOTE_CREATE = "REMOTE_CREATE";
+    public static final String REMOTE_UPDATE = "REMOTE_UPDATE";
+
+    // voc (modules/voc)
+    public static final String FEEDBACK_READ = "FEEDBACK_READ";
+    public static final String VOC_COMMENT_READ = "VOC_COMMENT_READ";
+
+    // organization apply (modules/core)
+    public static final String ORGANIZATION_APPLY_CREATE = "ORGANIZATION_APPLY_CREATE";
+    public static final String ORGANIZATION_APPLY_UPDATE = "ORGANIZATION_APPLY_UPDATE";
+
+    // customer (modules/crm) 只读
+    public static final String CUSTOMER_READ = "CUSTOMER_READ";
+
+
     // visitor (modules/service)
     public static final String VISITOR_READ = "VISITOR_READ";
     public static final String VISITOR_CREATE = "VISITOR_CREATE";
@@ -263,6 +361,13 @@ public final class RoleAuthorityRules {
     public static final Set<String> DEFAULT_ROLE_USER_AUTHORITY_VALUES = Set.of(
             USER_READ,
             USER_UPDATE,
+            // connection 在线状态查询（桌面端 presence 接口）
+            CONNECTION_READ,
+            // black 黑名单增删改查（普通成员可管理黑名单）
+            BLACK_READ,
+            BLACK_CREATE,
+            BLACK_UPDATE,
+            BLACK_DELETE,
             //
             MESSAGE_READ,
             MESSAGE_CREATE,
@@ -360,7 +465,95 @@ public final class RoleAuthorityRules {
             TICKET_COMMENT_READ,
             TICKET_COMMENT_CREATE,
             TICKET_COMMENT_UPDATE,
-            TICKET_COMMENT_DELETE
+            TICKET_COMMENT_DELETE,
+
+            // message update / unread
+            MESSAGE_UPDATE,
+            MESSAGE_UNREAD_READ,
+
+            // topic subscription
+            TOPIC_SUBSCRIPTION_CREATE,
+            TOPIC_SUBSCRIPTION_DELETE,
+
+            // upload / url
+            UPLOAD_READ,
+            UPLOAD_CREATE,
+            URL_CREATE,
+
+            // moment / relation
+            MOMENT_READ,
+            RELATION_READ,
+
+            // group apply / group forum
+            GROUP_MEMBER_APPLY_READ,
+            GROUP_MEMBER_APPLY_CREATE,
+            GROUP_MEMBER_APPLY_UPDATE,
+            GROUP_FORUM_READ,
+            GROUP_FORUM_CREATE,
+            GROUP_FORUM_UPDATE,
+            GROUP_FORUM_DELETE,
+
+            // group robot execution
+            GROUP_ROBOT_EXECUTION_READ,
+            GROUP_ROBOT_EXECUTION_UPDATE,
+
+            // llm provider / ollama 只读
+            LLM_PROVIDER_READ,
+            OLLAMA4J_READ,
+
+            // disk 网盘：入口+文件级读写，目录级仍由 ACL 校验
+            DISK_CREATE,
+            DISK_UPDATE,
+            DISK_DELETE,
+            DISK_FILE_READ,
+            DISK_FILE_CREATE,
+            DISK_FILE_UPDATE,
+            DISK_FILE_DELETE,
+            DISK_FILE_EXPORT,
+            DISK_STATISTIC_READ,
+
+            // forum post
+            POST_READ,
+            POST_CREATE,
+            POST_UPDATE,
+
+            // kbase translation
+            KBASE_TRANSLATION_READ,
+            KBASE_TRANSLATION_CREATE,
+            KBASE_TRANSLATION_UPDATE,
+            KBASE_TRANSLATION_DELETE,
+
+            // webpage / website 只读
+            WEBPAGE_READ,
+            WEBSITE_READ,
+
+            // ticket settings / form / process 只读+表单提交
+            TICKET_SETTINGS_READ,
+            TICKET_SETTINGS_UPDATE,
+            TICKET_FORM_READ,
+            TICKET_FORM_CREATE,
+            TICKET_FORM_UPDATE,
+            THREAD_PROCESS_READ,
+            PROCESS_READ,
+            PROCESS_CREATE,
+            PROCESS_UPDATE,
+            WORKFLOW_READ,
+
+            // remote 远程协助
+            REMOTE_READ,
+            REMOTE_CREATE,
+            REMOTE_UPDATE,
+
+            // voc
+            FEEDBACK_READ,
+            VOC_COMMENT_READ,
+
+            // organization apply
+            ORGANIZATION_APPLY_CREATE,
+            ORGANIZATION_APPLY_UPDATE,
+
+            // customer 只读
+            CUSTOMER_READ
     );
 
     /**

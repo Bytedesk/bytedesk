@@ -15,7 +15,6 @@ package com.bytedesk.core.menu;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +26,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,6 +40,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
 
     private final MenuRestService menuRestService;
 
+    // @PreAuthorize(MenuPermissions.HAS_MENU_READ)
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query menu by org")
     @Operation(summary = "Query Menus by Organization", description = "Retrieve menus for the current organization")
     @Override
@@ -53,6 +52,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
         return ResponseEntity.ok(JsonResult.success(menus));
     }
 
+    // @PreAuthorize(MenuPermissions.HAS_MENU_READ)
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query menu by user")
     @Operation(summary = "Query Menus by User", description = "Retrieve menus for the current user")
     @Override
@@ -64,6 +64,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
         return ResponseEntity.ok(JsonResult.success(menus));
     }
 
+    // @PreAuthorize(MenuPermissions.HAS_MENU_READ)
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query menu by uid")
     @Operation(summary = "Query Menu by UID", description = "Retrieve a specific menu by its unique identifier")
     @Override
@@ -78,7 +79,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_CREATE, description = "create menu")
     @Operation(summary = "Create Menu", description = "Create a new menu")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_CREATE')")
+    // @PreAuthorize(MenuPermissions.HAS_MENU_CREATE)
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody MenuRequest request) {
         
@@ -90,7 +91,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_UPDATE, description = "update menu")
     @Operation(summary = "Update Menu", description = "Update an existing menu")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_UPDATE')")
+    // @PreAuthorize(MenuPermissions.HAS_MENU_UPDATE)
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody MenuRequest request) {
         
@@ -102,7 +103,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_DELETE, description = "delete menu")
     @Operation(summary = "Delete Menu", description = "Delete a menu")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_DELETE')")
+    // @PreAuthorize(MenuPermissions.HAS_MENU_DELETE)
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody MenuRequest request) {
         
@@ -114,7 +115,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_EXPORT, description = "export menu")
     @Operation(summary = "Export Menus", description = "Export menus to Excel format")
     @Override
-    // @PreAuthorize("hasAuthority('TAG_EXPORT')")
+    // @PreAuthorize(MenuPermissions.HAS_MENU_EXPORT)
     @GetMapping("/export")
     public Object export(MenuRequest request, HttpServletResponse response) {
         return exportTemplate(
@@ -127,6 +128,7 @@ public class MenuRestController extends BaseRestController<MenuRequest, MenuRest
         );
     }
 
+    // @PreAuthorize(MenuPermissions.HAS_MENU_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_MENU, action = I18Consts.I18N_ACTION_RESET, description = "reset menu")
     @Operation(summary = "Reset Menus", description = "Reset menus to default data")
     @PostMapping("/reset")

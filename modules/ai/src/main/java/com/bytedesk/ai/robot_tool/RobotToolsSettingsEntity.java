@@ -42,17 +42,9 @@ public class RobotToolsSettingsEntity extends BaseEntity {
     @Column(name = "is_tools_enabled")
     private Boolean enabled = false;
 
-    @Builder.Default
-    @Column(name = "invocation_mode")
-    private String invocationMode = ToolInvocationMode.AUTO.name();
-
-    @Builder.Default
-    @Column(name = "tool_choice")
-    private String toolChoice = ToolChoice.AUTO.name();
-
-    @Builder.Default
-    @Column(name = "max_tool_invocations")
-    private Integer maxToolInvocations = 3;
+    // 工具选择模式（tool_choice）与单轮最大工具调用次数（max_tool_invocations）已下线：
+    // 工具调用统一使用 auto 模式，由模型自行决定是否调用；单轮上限由 BaseSpringAIService 固定兜底。
+    // 数据库列暂时保留（历史数据），Java 侧不再映射。
 
     @Builder.Default
     @Column(name = "intent_recognition_enabled")
@@ -63,12 +55,6 @@ public class RobotToolsSettingsEntity extends BaseEntity {
 
     @Column(name = "intent_provider")
     private String intentProviderUid;
-
-    @Column(name = "tool_model")
-    private String toolModel;
-
-    @Column(name = "tool_provider")
-    private String toolProviderUid;
 
     @Builder.Default
     @Column(name = "intent_timeout_ms")

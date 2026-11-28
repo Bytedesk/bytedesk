@@ -21,18 +21,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SafeGuardAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
+import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.toolsearch.ToolSearchToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.session.DefaultSessionService;
+import org.springframework.ai.session.EventFilter;
+import org.springframework.ai.session.InMemorySessionRepository;
+import org.springframework.ai.session.SessionService;
+import org.springframework.ai.session.advisor.SessionMemoryAdvisor;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
@@ -114,24 +117,26 @@ public class AdviserTestService {
 	private final VectorStore vectorStore;
 
 	/**
-	 * 共享的会话记忆存储（单例）。
+	 * 共享的会话记忆服务（单例，进程内存储）。
 	 * <p>
-	 * 关键点：{@link MessageWindowChatMemory} 的历史消息保存在其内部 repository 中。
+	 * 关键点：{@link SessionService} 的会话日志保存在其内部 repository 中。
 	 * 必须在类初始化时创建一次、所有请求共享同一个实例，
 	 * 才能让同一 {@code conversationId} 的多轮消息跨请求被记住。
 	 * </p>
 	 * <p>
-	 * 若在请求方法内 {@code new} 一个新的 {@link ChatMemory}（如原先的写法），
+	 * 若在请求方法内 {@code new} 一个新的 {@link SessionService}（如原先的写法），
 	 * 每次请求都会得到一个全新的空仓库，第 N 次请求读不到前 N-1 次写入的历史，
 	 * 表现为"多轮记忆失效"（第二次请求不记得第一次说过的话）。
 	 * </p>
 	 * <p>
-	 * 默认使用进程内存储（基于 {@code ConcurrentHashMap}，线程安全，可安全共享），
-	 * 应用重启后丢失；生产环境建议替换为持久化的 {@code ChatMemoryRepository}
-	 * （JDBC / Redis 等），并以 {@code @Bean} 形式注入。
+	 * 默认使用进程内存储（线程安全，可安全共享），应用重启后丢失；
+	 * 生产环境建议使用持久化 SessionRepository（JDBC：AI_SESSION 三表等），
+	 * 并以 {@code @Bean} 形式注入。
 	 * </p>
 	 */
-	private final ChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(20).build();
+	private final SessionService chatMemory = DefaultSessionService.builder()
+		.sessionRepository(InMemorySessionRepository.builder().build())
+		.build();
 
 	public AdviserTestService(
 			@Qualifier("deepseekChatModel") ObjectProvider<ChatModel> deepseekChatModelProvider,
@@ -207,7 +212,7 @@ public class AdviserTestService {
 	// ============================================================
 
 	/**
-	 * 演示 {@link MessageChatMemoryAdvisor} + {@link MessageWindowChatMemory}，
+	 * 演示 {@link SessionMemoryAdvisor}（Spring AI 2.1.0 取代旧 MessageChatMemoryAdvisor），
 	 * 使用 {@code conversationId} 区分不同会话，演示跨请求的多轮记忆。
 	 */
 	public Map<String, Object> memory(String message, String conversationId) {
@@ -215,18 +220,19 @@ public class AdviserTestService {
 
 		// 复用类级别的单例 chatMemory：同一 conversationId 的历史才能跨请求被读取
 		ChatClient chatClient = ChatClient.builder(chatModel)
-			.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory)
+			.defaultAdvisors(SessionMemoryAdvisor.builder(chatMemory)
+				.eventFilter(EventFilter.lastN(20))
 				.order(Ordered.HIGHEST_PRECEDENCE + 1000)
 				.build())
 			.build();
 
 		String content = chatClient.prompt()
 			.user(message)
-			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+			.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, conversationId))
 			.call()
 			.content();
 
-		Map<String, Object> result = buildResult("MessageChatMemoryAdvisor", message, content);
+		Map<String, Object> result = buildResult("SessionMemoryAdvisor", message, content);
 		result.put("conversationId", conversationId);
 		result.put("hint", "同一 conversationId 内的消息会被记住，换一个 conversationId 即开启全新会话");
 		return result;
@@ -364,7 +370,7 @@ public class AdviserTestService {
 	 *   <li>{@link SafeGuardAdvisor}（HIGHEST_PRECEDENCE，最先拦截敏感词）</li>
 	 *   <li>{@link ReReadingAdvisor}（order=0，增强输入）</li>
 	 *   <li>{@link MyLoggingAdvisor}（order=1，打印明细）</li>
-	 *   <li>{@link MessageChatMemoryAdvisor}（靠后，注入历史记忆）</li>
+	 *   <li>{@link SessionMemoryAdvisor}（靠后，注入历史记忆）</li>
 	 * </ol>
 	 */
 	public Map<String, Object> chain(String message, String conversationId) {
@@ -378,12 +384,12 @@ public class AdviserTestService {
 
 		ChatClient chatClient = ChatClient.builder(chatModel)
 			.defaultAdvisors(safeGuardAdvisor, new ReReadingAdvisor(), MyLoggingAdvisor.builder().order(1).build(),
-					MessageChatMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
+					SessionMemoryAdvisor.builder(chatMemory).order(Ordered.HIGHEST_PRECEDENCE + 1000).build())
 			.build();
 
 		String content = chatClient.prompt()
 			.user(message)
-			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+			.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, conversationId))
 			.call()
 			.content();
 
@@ -391,7 +397,7 @@ public class AdviserTestService {
 				content);
 		result.put("chain",
 				List.of("SafeGuardAdvisor(HIGHEST_PRECEDENCE)", "ReReadingAdvisor(order=0)", "MyLoggingAdvisor(order=1)",
-						"MessageChatMemoryAdvisor(HIGHEST_PRECEDENCE+1000)"));
+						"SessionMemoryAdvisor(HIGHEST_PRECEDENCE+1000)"));
 		result.put("conversationId", conversationId);
 		return result;
 	}
@@ -487,8 +493,8 @@ public class AdviserTestService {
 	 * 演示 {@link VectorStoreChatMemoryAdvisor}：把对话历史存入向量库，
 	 * 每轮对话时按语义相似度召回相关历史，适合超长对话 / 跨会话记忆。
 	 *
-	 * <p>对比 {@link #memory(String, String)} 使用的 {@link MessageChatMemoryAdvisor}：
-	 * 后者把全部历史按窗口（maxMessages）保留；前者按语义检索只召回相关片段。</p>
+	 * <p>对比 {@link #memory(String, String)} 使用的 {@link SessionMemoryAdvisor}：
+	 * 后者把全部历史按窗口（EventFilter.lastN）保留；前者按语义检索只召回相关片段。</p>
 	 *
 	 * <p>对应 Spring AI 文档 retrieval-augmented-generation.adoc 中提到的
 	 * VectorStoreChatMemoryAdvisor（同样来自 spring-ai-vector-store-advisor）。</p>
@@ -515,7 +521,7 @@ public class AdviserTestService {
 
 		String content = chatClient.prompt()
 			.user(message)
-			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+			.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, conversationId))
 			.call()
 			.content();
 
@@ -696,7 +702,7 @@ public class AdviserTestService {
 		// 必须提供 chat_memory_conversation_id，否则 initializeSession 抛 IllegalArgumentException。
 		String content = chatClient.prompt()
 			.user(message)
-			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, "tool-search-demo"))
+			.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, "tool-search-demo"))
 			.call()
 			.content();
 
@@ -710,11 +716,11 @@ public class AdviserTestService {
 	}
 
 	// ============================================================
-	// 14. VectorStoreChatMemory vs MessageChatMemory 对比演示
+	// 14. VectorStoreChatMemory vs SessionMemory 对比演示
 	// ============================================================
 
 	/**
-	 * 对比 {@link MessageChatMemoryAdvisor}（窗口模式，最近 N 条）与
+	 * 对比 {@link SessionMemoryAdvisor}（窗口模式，最近 N 条）与
 	 * {@link VectorStoreChatMemoryAdvisor}（语义检索 Top-K）两种记忆模式。
 	 *
 	 * <p>用同一段输入分别走两种记忆 Advisor，返回各自的回复，便于直观对比：</p>
@@ -733,26 +739,27 @@ public class AdviserTestService {
 		log.info("[advisor] vector-memory-compare request: conversationId={}, message={}", conversationId, message);
 
 		Map<String, Object> result = new HashMap<>();
-		result.put("advisor", "VectorStoreChatMemory vs MessageChatMemory (compare)");
+		result.put("advisor", "VectorStoreChatMemory vs SessionMemory (compare)");
 		result.put("message", message);
 		result.put("conversationId", conversationId);
 		result.put("timestamp", System.currentTimeMillis());
 
-		// 1) 窗口记忆：MessageChatMemoryAdvisor（最近 20 条）
+		// 1) 窗口记忆：SessionMemoryAdvisor + EventFilter.lastN（最近 20 条，turn-aware）
 		ChatClient windowClient = ChatClient.builder(chatModel)
-			.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory)
+			.defaultAdvisors(SessionMemoryAdvisor.builder(chatMemory)
+				.eventFilter(EventFilter.lastN(20))
 				.order(Ordered.HIGHEST_PRECEDENCE + 1000)
 				.build())
 			.build();
 		String windowContent = windowClient.prompt()
 			.user(message)
-			.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+			.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, conversationId))
 			.call()
 			.content();
 		Map<String, Object> window = new HashMap<>();
-		window.put("mode", "MessageChatMemoryAdvisor (window=20)");
+		window.put("mode", "SessionMemoryAdvisor (lastN=20)");
 		window.put("response", windowContent);
-		window.put("persist", "JVM 内存，重启丢失（生产建议替换为 JDBC/Redis repository）");
+		window.put("persist", "JVM 内存，重启丢失（生产建议使用 JDBC SessionRepository：AI_SESSION 三表）");
 		window.put("available", true);
 		result.put("window", window);
 
@@ -771,7 +778,7 @@ public class AdviserTestService {
 			ChatClient vectorClient = ChatClient.builder(chatModel).defaultAdvisors(vectorAdvisor).build();
 			String vectorContent = vectorClient.prompt()
 				.user(message)
-				.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+				.advisors(a -> a.param(MemoryAdvisor.CONVERSATION_ID, conversationId))
 				.call()
 				.content();
 			vector.put("mode", "VectorStoreChatMemoryAdvisor (semantic top-K)");

@@ -66,6 +66,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Categories by UID", description = "Retrieve a specific categorie entry by its unique identifier")
     @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query category by uid")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_READ)
     @Override
@@ -113,6 +114,7 @@ public class CategoryRestController extends BaseRestController<CategoryRequest, 
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @Operation(summary = "Export Categories", description = "Export categories to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_CATEGORY, action = I18Consts.I18N_ACTION_EXPORT, description = "export category")
     @PreAuthorize(CategoryPermissions.HAS_CATEGORY_EXPORT)
     @GetMapping("/export")

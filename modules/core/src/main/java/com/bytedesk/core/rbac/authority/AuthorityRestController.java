@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -30,6 +32,7 @@ import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.Map;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/authority")
@@ -40,6 +43,8 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     private final AuthorityRestService authorityRestService;
 
     // @PreAuthorize(AuthorityPermissions.HAS_AUTHORITY_READ)
+    @Operation(summary = "Query Authentication by Organization", description = "Retrieve authentication for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query authority")
     @Override
     public ResponseEntity<?> queryByOrg(AuthorityRequest request) {
 
@@ -48,6 +53,8 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         return ResponseEntity.ok(JsonResult.success(authorities));
     }
 
+    @Operation(summary = "Query Authentication by User", description = "Retrieve authentication for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query authority")
     @Override
     public ResponseEntity<?> queryByUser(AuthorityRequest request) {
 
@@ -56,6 +63,8 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         return ResponseEntity.ok(JsonResult.success(authorities));
     }
 
+    @Operation(summary = "Query Authentication by UID", description = "Retrieve a specific authentication entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query authority")
     @Override
     public ResponseEntity<?> queryByUid(AuthorityRequest request) {
         
@@ -72,8 +81,10 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
     //     AuthorityResponse authority = authorityRestService.create(request);
 
     //     return ResponseEntity.ok(JsonResult.success(authority));
+    @Operation(summary = "Update Authentication", description = "Update an existing authentication entry")
     // }
 
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_UPDATE, description = "update authority")
     @Override
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> update(AuthorityRequest request) {
@@ -83,6 +94,8 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         return ResponseEntity.ok(JsonResult.success(authority));
     }
 
+    @Operation(summary = "Delete Authentication", description = "Delete a authentication entry")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_DELETE, description = "delete authority")
     @Override
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> delete(AuthorityRequest request) {
@@ -92,12 +105,16 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Authentication", description = "Export authentication to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_EXPORT, description = "export authority")
     @Override
     public Object export(AuthorityRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Reset Authority Levels", description = "Reset authority levels to defaults")
+    @ActionAnnotation(title = I18Consts.I18N_AUTHORITY, action = I18Consts.I18N_ACTION_AUTHORITIES_RESET_LEVEL, description = "reset authority levels authority")
     @PostMapping("/reset/level")
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> resetAuthorityLevels(@RequestBody(required = false) AuthorityRequest request) {
@@ -107,5 +124,4 @@ public class AuthorityRestController extends BaseRestController<AuthorityRequest
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
-    
 }

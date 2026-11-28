@@ -18,7 +18,7 @@ StreamAdvisor 处理流式调用。
 Spring AI 里常见的 advisor 用途大概有这几类：
 
 1. 记忆管理
-MessageChatMemoryAdvisor 会在请求前把历史消息读出来塞进 prompt，请求后再把新的用户消息和助手回复写回 memory。
+SessionMemoryAdvisor（Spring AI 2.1.0，取代已废弃的 MessageChatMemoryAdvisor）会在请求前把会话历史读出来塞进 prompt，请求后再把新的用户消息和助手回复写回 SessionService。
 VectorStoreChatMemoryAdvisor 则是把长期记忆从向量库中检索出来，拼到 system prompt 里。
 
 2. RAG 检索增强

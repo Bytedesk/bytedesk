@@ -15,7 +15,7 @@ package com.bytedesk.core.server;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,6 +53,7 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
         return ResponseEntity.ok(JsonResult.success(servers));
     }
 
+    @PreAuthorize(ServerPermissions.HAS_SERVER_READ)
     @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query server by user")
     @Operation(summary = "Query Servers by User", description = "Retrieve servers for the current user")
     @Override
@@ -65,6 +65,7 @@ public class ServerRestController extends BaseRestController<ServerRequest, Serv
         return ResponseEntity.ok(JsonResult.success(servers));
     }
 
+    @PreAuthorize(ServerPermissions.HAS_SERVER_READ)
     @ActionAnnotation(title = I18Consts.I18N_SERVER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query server by uid")
     @Operation(summary = "Query Server by UID", description = "Retrieve a specific server by its unique identifier")
     @Override

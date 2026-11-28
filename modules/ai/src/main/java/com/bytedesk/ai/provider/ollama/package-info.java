@@ -12,6 +12,11 @@
  *   <li>{@link com.bytedesk.ai.springai.providers.ollama.OllamaApi} - 与 Ollama API 交互的底层接口</li>
  * </ul>
  * 
+ * <p>决策模型演示（Spring AI DecisionModel + d1-omni）：</p>
+ * <p>本包提供 <code>/ollama/decision/**</code> 演示接口，覆盖 yes/no、choice、score 三类问题，
+ * text/fields/conversation 三种输入以及运行时模型选项。测试方法、真实响应与实测经验见
+ * <a href="readme.decision.zh.html">readme.decision.zh.md</a> / <a href="readme.decision.html">readme.decision.md</a>。</p>
+ * 
  * <p>使用方法：</p>
  * <p>通过在应用配置中设置 spring.ai.ollama.chat.enabled=true 启用Ollama AI 服务。
  * 服务支持动态配置模型参数，包括温度(temperature)、top-p值等，可以根据不同机器人配置动态调整模型行为。</p>

@@ -82,6 +82,12 @@ public class SpringAICustomService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createDynamicOptions(RobotLlm llm) {
+        return createDynamicOptions(llm, null, null);
+    }
+
+    /** 带访客身份的 options 构建（规划 2026-11-25 §4.1）：visitorUid 写入 toolContext。 */
+    private OpenAiChatOptions createDynamicOptions(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -91,20 +97,20 @@ public class SpringAICustomService extends BaseSpringAIService {
                     .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
-                        .build(), llm);
+                        .build(), llm, robot, messageProtobufQuery);
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
 
-    /**
-     * 根据机器人配置创建动态的OpenAiChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OpenAiChatModel
-     */
     private OpenAiChatModel createChatModel(RobotLlm llm) {
+        return createChatModel(llm, null, null);
+    }
+
+    /** 带访客身份的动态 ChatModel 构建：options 内 toolContext 携带 visitorUid。 */
+    private OpenAiChatModel createChatModel(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextProviderUid())) {
             log.warn("RobotLlm is null or textProviderUid is empty");
             return defaultChatModel;
@@ -120,7 +126,7 @@ public class SpringAICustomService extends BaseSpringAIService {
 
         try {
             // 创建选项
-            OpenAiChatOptions options = createDynamicOptions(llm);
+            OpenAiChatOptions options = createDynamicOptions(llm, robot, messageProtobufQuery);
             if (options == null) {
                 log.warn("Failed to create dynamic options for provider {}, using default chat model",
                         provider.getType());
@@ -299,8 +305,8 @@ public class SpringAICustomService extends BaseSpringAIService {
             return;
         }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = createChatModel(llm);
+        // 获取适当的模型实例（SSE 异步跨线程：visitorUid 经 options toolContext 显式传递）
+        OpenAiChatModel chatModel = createChatModel(llm, robot, messageProtobufQuery);
         if (chatModel == null) {
             sseMessageHelper.handleSseError(new RuntimeException(providerName + " service not available"),
                     messageProtobufQuery,
@@ -313,7 +319,7 @@ public class SpringAICustomService extends BaseSpringAIService {
                 I18Consts.I18N_THINKING);
 
         Prompt requestPrompt = prompt;
-        OpenAiChatOptions customOptions = createDynamicOptions(llm);
+        OpenAiChatOptions customOptions = createDynamicOptions(llm, robot, messageProtobufQuery);
         if (customOptions != null) {
             requestPrompt = processPromptWithOptions(prompt, customOptions);
         }

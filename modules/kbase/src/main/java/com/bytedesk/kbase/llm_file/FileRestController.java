@@ -44,6 +44,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
 
     private final FileRestService fileRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_FILE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query file")
     @Operation(summary = "Query Files by Organization", description = "Query the list of files by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -58,6 +59,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         return ResponseEntity.ok(JsonResult.success(files));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_FILE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query file")
     @Operation(summary = "Query Files by User", description = "Query the list of files by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -115,6 +117,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_FILE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all file")
     @Operation(summary = "Delete All Files", description = "Delete all files")
     @ApiResponse(responseCode = "200", description = "Deletion successful")
     @PostMapping("/deleteAll")
@@ -126,6 +129,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_FILE, action = I18Consts.I18N_ACTION_ENABLE, description = "enable file")
     @Operation(summary = "Enable File", description = "Enable or disable the file")
     @ApiResponse(responseCode = "200", description = "Operation successful",
         content = @Content(mediaType = "application/json", 
@@ -156,6 +160,7 @@ public class FileRestController extends BaseRestController<FileRequest, FileRest
         );
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_FILE, action = I18Consts.I18N_ACTION_UPDATE, description = "update file")
     @Operation(summary = "Re-chunk File", description = "Re-split the file into chunks")
     @ApiResponse(responseCode = "200", description = "Re-chunk successful",
         content = @Content(mediaType = "application/json", 

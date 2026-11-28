@@ -15,7 +15,7 @@ package com.bytedesk.kbase.material;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +26,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,6 +51,7 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
         return ResponseEntity.ok(JsonResult.success(materials));
     }
 
+    @PreAuthorize(MaterialPermissions.HAS_MATERIAL_READ)
     @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query material by user")
     @Operation(summary = "Query Materials by User", description = "Retrieve material list for the user")
     @Override
@@ -63,6 +63,7 @@ public class MaterialRestController extends BaseRestController<MaterialRequest, 
         return ResponseEntity.ok(JsonResult.success(materials));
     }
 
+    @PreAuthorize(MaterialPermissions.HAS_MATERIAL_READ)
     @ActionAnnotation(title = I18Consts.I18N_MATERIAL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query material by uid")
     @Operation(summary = "Query Material by UID", description = "Retrieve material details by UID")
     @Override

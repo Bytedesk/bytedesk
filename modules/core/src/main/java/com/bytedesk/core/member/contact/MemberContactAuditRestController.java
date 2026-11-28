@@ -17,12 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.rbac.role.RolePermissions;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Slf4j
 @RestController
@@ -36,6 +39,8 @@ public class MemberContactAuditRestController {
      * 只读盘点 Member 与关联 User 的联系方式不一致清单（dry-run，不修改数据）。
      * 建议先调用本接口确认清单，再按 memberUid 调用 /fix。
      */
+    @Operation(summary = "Audit Member Contact", description = "Audit member contact information")
+    @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_UPDATE, description = "update member")
     @PostMapping("/audit")
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> audit() {
@@ -47,6 +52,8 @@ public class MemberContactAuditRestController {
      * 按确认清单修复：仅覆盖 User 侧非空值，User 侧为空的字段跳过不清空；
      * 每条输出 before/after 审计日志。
      */
+    @Operation(summary = "Fix Member Contact", description = "Fix inconsistent member contact records")
+    @ActionAnnotation(title = I18Consts.I18N_MEMBER, action = I18Consts.I18N_ACTION_UPDATE, description = "update member")
     @PostMapping("/fix")
     @PreAuthorize(RolePermissions.ROLE_SUPER)
     public ResponseEntity<?> fix(@RequestBody MemberContactFixRequest request) {

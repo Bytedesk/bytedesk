@@ -69,6 +69,12 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
      * @return 根据机器人配置创建的选项
      */
     private OpenAiChatOptions createOpenaiOptions(RobotLlm llm) {
+        return createOpenaiOptions(llm, null, null);
+    }
+
+    /** 带访客身份的 options 构建（规划 2026-11-25 §4.1）：visitorUid 写入 toolContext。 */
+    private OpenAiChatOptions createOpenaiOptions(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || !StringUtils.hasText(llm.getTextModel())) {
             return null;
         }
@@ -78,20 +84,20 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
                     .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
                     .topP(llm.getTopP())
-                        .build(), llm);
+                        .build(), llm, robot, messageProtobufQuery);
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);
             return null;
         }
     }
 
-    /**
-     * 根据机器人配置创建动态的OpenAiChatModel
-     * 
-     * @param llm 机器人LLM配置
-     * @return 配置了特定模型的OpenAiChatModel
-     */
     private OpenAiChatModel createOpenaiChatModel(RobotLlm llm) {
+        return createOpenaiChatModel(llm, null, null);
+    }
+
+    /** 带访客身份的动态 ChatModel 构建：options 内 toolContext 携带 visitorUid。 */
+    private OpenAiChatModel createOpenaiChatModel(RobotLlm llm, RobotProtobuf robot,
+            MessageProtobuf messageProtobufQuery) {
         if (llm == null || llm.getTextProviderUid() == null) {
             log.warn("RobotLlm or textProviderUid is null, using default chat model");
             return defaultChatModel;
@@ -111,7 +117,7 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
 
         try {
             log.info("Creating dynamic OpenAI chat model with provider: {} ({})", provider.getType(), provider.getUid());
-            OpenAiChatOptions options = createOpenaiOptions(llm);
+            OpenAiChatOptions options = createOpenaiOptions(llm, robot, messageProtobufQuery);
             if (options == null) {
                 log.warn("Failed to create OpenAI options, using default chat model");
                 return defaultChatModel;
@@ -258,8 +264,8 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             return;
         }
 
-        // 获取适当的模型实例
-        OpenAiChatModel chatModel = createOpenaiChatModel(llm);
+        // 获取适当的模型实例（SSE 异步跨线程：visitorUid 经 options toolContext 显式传递）
+        OpenAiChatModel chatModel = createOpenaiChatModel(llm, robot, messageProtobufQuery);
 
         if (chatModel == null) {
             log.error("Failed to create OpenAI chat model and no default chat model available");
@@ -278,9 +284,16 @@ public class SpringAIOpenaiService extends BaseSpringAIService {
             // 发送初始消息，告知用户请求已收到，正在处理
             sseMessageHelper.sendStreamStartMessage(messageProtobufQuery, messageProtobufReply, emitter, I18Consts.I18N_THINKING);
 
-            var chatClient = createChatClient(chatModel, prompt, robot);
+            // 身份 options 仅作为 model 默认值时会被 runtime options 覆盖，须随 prompt 显式传递
+            Prompt requestPrompt = prompt;
+            OpenAiChatOptions sseCustomOptions = createOpenaiOptions(llm, robot, messageProtobufQuery);
+            if (sseCustomOptions != null) {
+                requestPrompt = processPromptWithOptions(prompt, sseCustomOptions);
+            }
+
+            var chatClient = createChatClient(chatModel, requestPrompt, robot);
             String conversationId = extractConversationId(messageProtobufQuery);
-            invokePromptStream(chatClient, prompt, conversationId).subscribe(
+            invokePromptStream(chatClient, requestPrompt, conversationId).subscribe(
                     response -> {
                         try {
                             if (response != null && !sseMessageHelper.isEmitterCompleted(emitter)) {

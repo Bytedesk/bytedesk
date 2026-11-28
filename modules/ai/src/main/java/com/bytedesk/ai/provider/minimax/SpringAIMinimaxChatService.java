@@ -70,9 +70,7 @@ public class SpringAIMinimaxChatService extends BaseSpringAIService {
         try {
                 return applyRobotToolCallbacks(AnthropicChatOptions.builder()
                     .model(llm.getTextModel())
-                    .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
-                    .topP(llm.getTopP())
                         .build(), llm);
         } catch (Exception e) {
             log.error("Error creating Minimax options for model {}", llm.getTextModel(), e);

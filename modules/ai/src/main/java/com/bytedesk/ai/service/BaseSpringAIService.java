@@ -3,14 +3,13 @@ package com.bytedesk.ai.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.client.advisor.api.MemoryAdvisor;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -35,11 +34,6 @@ import com.bytedesk.ai.provider.aliyun.dashscope.tool.DashScopeToolService;
 import com.bytedesk.ai.provider.zhipuai.tool.ZhipuaiToolService;
 import com.bytedesk.ai.robot.RobotRestService;
 import com.bytedesk.ai.robot_message.RobotMessageCache;
-import com.bytedesk.ai.service.agent.AgentCannedResponseMatch;
-import com.bytedesk.ai.service.agent.AgentCannedResponseRequest;
-import com.bytedesk.ai.service.agent.AgentCannedResponseResolver;
-import com.bytedesk.ai.service.agent.AgentCannedResponseTraceContext;
-import com.bytedesk.ai.service.agent.AgentResponseTimingContext;
 import com.bytedesk.ai.springai.adviser.AdvisorChainFactory;
 import com.bytedesk.ai.springai.adviser.RagQueryRewriteHelper;
 import com.bytedesk.ai.springai.config.ChatClientBuilderFactory;
@@ -53,6 +47,7 @@ import com.bytedesk.core.message.MessageRestService;
 import com.bytedesk.core.message.content.RobotContent;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
 import com.bytedesk.core.thread.ThreadRestService;
+import com.bytedesk.core.topic.TopicUtils;
 import com.bytedesk.core.uid.UidUtils;
 import com.bytedesk.kbase.llm_faq.FaqProtobuf;
 import com.bytedesk.ai.robot.RobotLlm;
@@ -62,6 +57,12 @@ import reactor.core.publisher.Flux;
 
 @Slf4j
 public abstract class BaseSpringAIService implements SpringAIService {
+
+    /**
+     * 单轮请求内工具调用总次数上限（固定兜底值）。
+     * 原"单轮最大工具调用次数"设置项已下线，统一使用该值防止模型在同一轮内无限循环调用工具。
+     */
+    protected static final int DEFAULT_MAX_TOOL_INVOCATIONS = 3;
 
     protected IMessageSendService messageSendService;
 
@@ -91,12 +92,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected ChatClientInfoService chatClientInfoService;
 
-    protected AgentCannedResponseResolver agentCannedResponseResolver;
-
-    protected AgentCannedResponseTraceContext agentCannedResponseTraceContext;
-
-    protected AgentResponseTimingContext agentResponseTimingContext;
-
     protected RobotToolCallbackResolver robotToolCallbackResolver;
 
     protected DashScopeToolService dashScopeToolService;
@@ -108,8 +103,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
     protected ProviderToolServiceDispatcher providerToolServiceDispatcher;
 
     protected ReasoningContentHelper reasoningContentHelper;
-
-    protected CannedResponseEvidenceHelper cannedResponseEvidenceHelper;
 
     // Spring AI Advisor 链组装工厂（阶段2/3 横切关注点）。
     // 集中管理 SafeGuard / ReReading / Logging / Memory，从基类抽取以精简实现。
@@ -149,16 +142,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
             SseMessageHelper sseMessageHelper,
             ObjectProvider<ChatClientBuilderFactory> chatClientBuilderFactoryProvider,
             ObjectProvider<ChatClientInfoService> chatClientInfoServiceProvider,
-            ObjectProvider<AgentCannedResponseResolver> agentCannedResponseResolverProvider,
-            ObjectProvider<AgentCannedResponseTraceContext> agentCannedResponseTraceContextProvider,
-            ObjectProvider<AgentResponseTimingContext> agentResponseTimingContextProvider,
             ObjectProvider<RobotToolCallbackResolver> robotToolCallbackResolverProvider,
             ObjectProvider<DashScopeToolService> dashScopeToolServiceProvider,
             ObjectProvider<ZhipuaiToolService> zhipuaiToolServiceProvider,
             ObjectProvider<LlmProviderRestService> llmProviderRestServiceProvider,
             ObjectProvider<ProviderToolServiceDispatcher> providerToolServiceDispatcherProvider,
             ObjectProvider<ReasoningContentHelper> reasoningContentHelperProvider,
-            ObjectProvider<CannedResponseEvidenceHelper> cannedResponseEvidenceHelperProvider,
             ObjectProvider<AdvisorChainFactory> advisorChainFactoryProvider,
             ObjectProvider<RagQueryRewriteHelper> ragQueryRewriteHelperProvider) {
         this.messageSendService = messageSendService;
@@ -175,16 +164,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
         this.sseMessageHelper = sseMessageHelper;
         this.chatClientBuilderFactory = chatClientBuilderFactoryProvider.getIfAvailable();
         this.chatClientInfoService = chatClientInfoServiceProvider.getIfAvailable();
-        this.agentCannedResponseResolver = agentCannedResponseResolverProvider.getIfAvailable();
-        this.agentCannedResponseTraceContext = agentCannedResponseTraceContextProvider.getIfAvailable();
-        this.agentResponseTimingContext = agentResponseTimingContextProvider.getIfAvailable();
         this.robotToolCallbackResolver = robotToolCallbackResolverProvider.getIfAvailable();
         this.dashScopeToolService = dashScopeToolServiceProvider.getIfAvailable();
         this.zhipuaiToolService = zhipuaiToolServiceProvider.getIfAvailable();
         this.llmProviderRestService = llmProviderRestServiceProvider.getIfAvailable();
         this.providerToolServiceDispatcher = providerToolServiceDispatcherProvider.getIfAvailable();
         this.reasoningContentHelper = reasoningContentHelperProvider.getIfAvailable();
-        this.cannedResponseEvidenceHelper = cannedResponseEvidenceHelperProvider.getIfAvailable();
         this.advisorChainFactory = advisorChainFactoryProvider.getIfAvailable();
         this.ragQueryRewriteHelper = ragQueryRewriteHelperProvider.getIfAvailable();
     }
@@ -244,14 +229,32 @@ public abstract class BaseSpringAIService implements SpringAIService {
         return promptHelper != null ? promptHelper.flattenPromptText(prompt) : null;
     }
 
-    @SuppressWarnings("unchecked")
     protected <T extends ToolCallingChatOptions> T applyRobotToolCallbacks(T options, RobotLlm llm) {
+        return applyRobotToolCallbacks(options, llm, null, null);
+    }
+
+    /**
+     * 带访客身份的回调注入重载（规划 2026-11-25 §4.1）。
+     *
+     * <p>从 {@code robot.orgUid} 与 {@code messageProtobufQuery.thread.topic}（客服类 4 段
+     * topic 末段）解析访客业务标识，写入 toolContext {@code visitorUid}，供受控订单/物流
+     * 工具做服务端作用域校验。SSE 是 reactor 异步线程，不能用 ThreadLocal，随 ChatOptions
+     * 显式传递。topic 末段只是"待验证候选"：工具侧必须经 OrderVisitorScopeResolver 与
+     * VisitorEntity 匹配后才生效（规划 3.1）。</p>
+     *
+     * <p>请求归属键 {@code robotUid/orgUid/threadUid/messageUid} 与
+     * {@link #withProviderToolRuntimeContext} 口径一致，同样必须写入 toolContext：普通 Spring AI
+     * 回调链路只读 toolContext，不读 provider-native 的 ThreadLocal，缺失时受控工具会因
+     * orgUid 为空而失败关闭。</p>
+     */
+    protected <T extends ToolCallingChatOptions> T applyRobotToolCallbacks(T options, RobotLlm llm,
+            RobotProtobuf robot, MessageProtobuf messageProtobufQuery) {
         if (options == null || llm == null || robotToolCallbackResolver == null) {
             return options;
         }
 
         List<ToolCallback> toolCallbacks = robotToolCallbackResolver.resolveToolCallbacks(
-                llm.getTools(), llm.getMaxToolInvocations());
+                llm.getTools(), DEFAULT_MAX_TOOL_INVOCATIONS);
         if (toolCallbacks.isEmpty()) {
             return options;
         }
@@ -264,47 +267,46 @@ public abstract class BaseSpringAIService implements SpringAIService {
         if (StringUtils.hasText(llm.getTextModel())) {
             builder.toolContext("model", llm.getTextModel());
         }
-        if (StringUtils.hasText(llm.getToolChoice())) {
-            // 兼容保留：toolContext 供既有工具/审计读取
-            builder.toolContext("toolChoice", llm.getToolChoice());
+        // 工具选择模式固定 auto：不再向 toolContext / provider ChatOptions 写入 toolChoice，
+        // 各 provider 保持默认 auto 行为，由模型自行决定是否调用工具。
+        // 便于审计记录追溯本次请求的上限配置（实际拦截在 AuditedToolCallback 内）
+        builder.toolContext("maxToolInvocations", DEFAULT_MAX_TOOL_INVOCATIONS);
+        if (robot != null) {
+            if (StringUtils.hasText(robot.getUid())) {
+                builder.toolContext("robotUid", robot.getUid());
+            }
+            if (StringUtils.hasText(robot.getOrgUid())) {
+                builder.toolContext("orgUid", robot.getOrgUid());
+            }
         }
-        if (llm.getMaxToolInvocations() != null && llm.getMaxToolInvocations() > 0) {
-            // 便于审计记录追溯本次请求的上限配置（实际拦截在 AuditedToolCallback 内）
-            builder.toolContext("maxToolInvocations", llm.getMaxToolInvocations());
+        if (messageProtobufQuery != null) {
+            if (StringUtils.hasText(messageProtobufQuery.getUid())) {
+                builder.toolContext("messageUid", messageProtobufQuery.getUid());
+            }
+            if (messageProtobufQuery.getThread() != null
+                    && StringUtils.hasText(messageProtobufQuery.getThread().getUid())) {
+                builder.toolContext("threadUid", messageProtobufQuery.getThread().getUid());
+            }
         }
+        String visitorUid = extractVisitorUidFromMessage(robot, messageProtobufQuery);
+        if (StringUtils.hasText(visitorUid)) {
+            // 访客候选标识：工具侧须再与服务端 VisitorEntity 匹配验证
+            builder.toolContext("visitorUid", visitorUid);
+        }
+        // 各 options 实现的 mutate() 均返回构建同一具体类型的 Builder，
+        // 运行时类型与入参 T 一致；接口 build() 声明返回基类型，编译器无法证明，需抑制告警
+        @SuppressWarnings("unchecked")
         T built = (T) builder.build();
-        applyProviderToolChoice(built, llm.getToolChoice());
         return built;
     }
 
-    /**
-     * 工具选择模式写入 provider 请求参数（规划 G8 修复）。
-     *
-     * <p>此前 toolChoice 只写入 toolContext（执行时传给工具的元数据），对模型请求无效；
-     * 现补充写入各 provider ChatOptions 的 toolChoice 字段，由 ChatModel 透传至 API
-     * （DashScope GenerationParam.toolChoice / zai toolChoice，取值 auto/none/required）。</p>
-     *
-     * <p>DeepSeekChatOptions（Spring AI 官方）暂无 toolChoice 字段，保持默认 auto 行为。</p>
-     */
-    private void applyProviderToolChoice(ToolCallingChatOptions options, String toolChoice) {
-        if (options == null || !StringUtils.hasText(toolChoice)) {
-            return;
+    /** 提取访客候选 visitorUid：orgUid 缺失或 topic 非客服 4 段形态时返回 null。 */
+    private String extractVisitorUidFromMessage(RobotProtobuf robot, MessageProtobuf messageProtobufQuery) {
+        if (robot == null || !StringUtils.hasText(robot.getOrgUid())
+                || messageProtobufQuery == null || messageProtobufQuery.getThread() == null) {
+            return null;
         }
-        String providerToolChoice = toProviderToolChoice(toolChoice);
-        if (options instanceof com.bytedesk.ai.provider.aliyun.dashscope.chat.DashScopeChatOptions dashScopeOptions) {
-            dashScopeOptions.setToolChoice(providerToolChoice);
-        } else if (options instanceof com.bytedesk.ai.provider.zhipuai.chat.ZhipuaiChatOptions zhipuaiOptions) {
-            zhipuaiOptions.setToolChoice(providerToolChoice);
-        }
-    }
-
-    /** AUTO/NONE/REQUIRED（ToolChoice 枚举名）→ provider 取值 auto/none/required。 */
-    private String toProviderToolChoice(String toolChoice) {
-        return switch (toolChoice.trim().toUpperCase()) {
-            case "NONE" -> "none";
-            case "REQUIRED" -> "required";
-            default -> "auto";
-        };
+        return TopicUtils.getVisitorUidFromThreadTopic(messageProtobufQuery.getThread().getTopic());
     }
 
     protected String extractReasoningContent(Generation generation, AssistantMessage assistantMessage) {
@@ -679,6 +681,12 @@ public abstract class BaseSpringAIService implements SpringAIService {
                     && StringUtils.hasText(messageProtobufQuery.getThread().getUid())) {
                 context.put("threadUid", messageProtobufQuery.getThread().getUid());
             }
+            // 访客候选标识（规划 2026-11-25 §4.1）：客服 4 段 topic 末段；工具侧须再验证
+            String visitorUid = TopicUtils.getVisitorUidFromThreadTopic(
+                    messageProtobufQuery.getThread() != null ? messageProtobufQuery.getThread().getTopic() : null);
+            if (StringUtils.hasText(visitorUid)) {
+                context.put("visitorUid", visitorUid);
+            }
         }
 
         providerToolRuntimeContextHolder.set(Collections.unmodifiableMap(context));
@@ -855,7 +863,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
             ? chatClientBuilderFactory.builder(chatModel)
             : ChatClient.builder(chatModel);
         if (prompt != null && prompt.getOptions() != null) {
-            builder = builder.defaultOptions(prompt.getOptions().mutate());
+            builder = builder.defaultOptions(defaultOptionsBuilderWithoutToolCallbacks(prompt.getOptions()));
         }
         // 注入 Advisor 链（根据 RobotProtobuf 配置，robot=null 时返回空 list，完全向后兼容）
         List<Advisor> advisors = buildAdvisorChain(robot);
@@ -881,6 +889,28 @@ public abstract class BaseSpringAIService implements SpringAIService {
             return Collections.emptyList();
         }
         return advisorChainFactory.buildAdvisorChain(robot);
+    }
+
+    /**
+     * 由 prompt options 派生 ChatClient 的 defaultOptions Builder，但去掉 toolCallbacks（其余字段原样保留）。
+     *
+     * <p>Spring AI 合并 ChatOptions 时对 {@code toolCallbacks} 是 {@code addAll} 拼接而非覆盖：
+     * 运行时 prompt options 与 defaultOptions 各带一份回调，合并后同一工具会被发送两份。
+     * DeepSeek 等严格校验的 provider 会直接拒绝（{@code 400 "Tool names must be unique"}）。
+     * 工具回调统一只由 prompt options（随请求携带 toolContext）提供，defaultOptions 不再重复携带。</p>
+     */
+    private static ChatOptions.Builder<?> defaultOptionsBuilderWithoutToolCallbacks(ChatOptions options) {
+        if (options instanceof ToolCallingChatOptions toolCallingOptions
+                && toolCallingOptions.getToolCallbacks() != null
+                && !toolCallingOptions.getToolCallbacks().isEmpty()) {
+            try {
+                return toolCallingOptions.mutate().toolCallbacks(Collections.emptyList());
+            } catch (RuntimeException ex) {
+                // 极端 provider 的 Builder 不支持置空回调时退回原 options，不阻断对话
+                log.debug("Failed to strip toolCallbacks from default options: {}", ex.getMessage());
+            }
+        }
+        return options.mutate();
     }
 
     // ===== 阶段4：RAG Query 增强（KB 检索前改写/扩展 query，不替代 KB 搜索）=====
@@ -992,7 +1022,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
     /**
      * 同步调用并可选地传入 conversationId（用于 Memory Advisor 的会话隔离）。
      *
-     * <p>conversationId 为空时自动兜底为一次性随机 ID：当 advisor 链包含 MessageChatMemoryAdvisor
+     * <p>conversationId 为空时自动兜底为一次性随机 ID：当 advisor 链包含 SessionMemoryAdvisor
      * （robot.llm.memoryEnabled=true）时，Spring AI 要求 CONVERSATION_ID 非空，否则 Assert 直接抛
      * IllegalArgumentException 导致整个请求失败（2026-09-14 子租户 robot_agent 同步任务报错根因）。
      * 一次性随机 ID 语义等同“无记忆”：读取历史为空、不与其他会话串扰。</p>
@@ -1003,7 +1033,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(chatClient, "ChatClient must not be null");
         var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
         request = request.advisors(
-                a -> a.param(ChatMemory.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
+                a -> a.param(MemoryAdvisor.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
         return request.call().chatResponse();
     }
 
@@ -1025,14 +1055,14 @@ public abstract class BaseSpringAIService implements SpringAIService {
         Assert.notNull(chatClient, "ChatClient must not be null");
         var request = prompt != null ? chatClient.prompt(prompt) : chatClient.prompt();
         request = request.advisors(
-                a -> a.param(ChatMemory.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
+                a -> a.param(MemoryAdvisor.CONVERSATION_ID, resolveConversationIdOrDefault(conversationId)));
         return request.stream().chatResponse();
     }
 
     /**
      * conversationId 为空时的兜底：生成一次性随机会话 ID。
      *
-     * <p>MessageChatMemoryAdvisor 处于 advisor 链时要求 CONVERSATION_ID 非空；一次性随机 ID 读取历史为空、
+     * <p>SessionMemoryAdvisor 处于 advisor 链时要求 CONVERSATION_ID 非空；一次性随机 ID 读取历史为空、
      * 不与其他会话串扰（仅在记忆表落当前请求的两条记录）。</p>
      */
     private static String resolveConversationIdOrDefault(String conversationId) {
@@ -1054,21 +1084,7 @@ public abstract class BaseSpringAIService implements SpringAIService {
 
     protected String resolveDefaultAnswer(String query, RobotProtobuf robot, MessageProtobuf messageProtobufQuery,
             MessageProtobuf messageProtobufReply, boolean streaming, String defaultAnswer) {
-        if (agentCannedResponseResolver == null) {
-            return defaultAnswer;
-        }
-        Map<String, String> evidenceFields = buildCannedResponseEvidenceFields(query, messageProtobufQuery,
-                defaultAnswer);
-        AgentCannedResponseMatch match = agentCannedResponseResolver.resolve(
-                new AgentCannedResponseRequest(query, robot, messageProtobufQuery, evidenceFields, streaming,
-                        defaultAnswer));
-        if (match == null || !StringUtils.hasText(match.answer())) {
-            return defaultAnswer;
-        }
-        if (agentCannedResponseTraceContext != null && messageProtobufReply != null) {
-            agentCannedResponseTraceContext.store(messageProtobufReply.getUid(), match.cannedResponseUid());
-        }
-        return match.answer();
+        return defaultAnswer;
     }
 
     protected String resolveRobotDefaultReply(RobotProtobuf robot) {
@@ -1078,18 +1094,6 @@ public abstract class BaseSpringAIService implements SpringAIService {
         // 将 i18n key（如 "i18n.robot.noreply"）解析为本地化文本，避免 key 直接泄漏给前端
         // return I18nTextResolver.resolveIfKey(reply);
         return reply;
-    }
-
-    protected Map<String, String> buildCannedResponseEvidenceFields(String query, MessageProtobuf messageProtobufQuery,
-            String defaultAnswer) {
-        if (cannedResponseEvidenceHelper == null) {
-            Map<String, String> fallback = new LinkedHashMap<>();
-            if (query != null) {
-                fallback.put("query", query);
-            }
-            return fallback;
-        }
-        return cannedResponseEvidenceHelper.buildEvidenceFields(query, messageProtobufQuery, defaultAnswer);
     }
 
     @FunctionalInterface

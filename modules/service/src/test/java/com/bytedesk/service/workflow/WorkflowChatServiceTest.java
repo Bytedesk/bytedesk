@@ -34,7 +34,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
@@ -70,7 +70,16 @@ class WorkflowChatServiceTest {
   private MessageRestService messageRestService;
 
   @Mock
-  private RestTemplate restTemplate;
+  private RestClient restClient;
+
+  @Mock
+  private RestClient.RequestBodyUriSpec requestBodyUriSpec;
+
+  @Mock
+  private RestClient.RequestBodySpec requestBodySpec;
+
+  @Mock
+  private RestClient.ResponseSpec responseSpec;
 
   @Mock
   private WorkflowVariableService workflowVariableService;
@@ -94,15 +103,19 @@ class WorkflowChatServiceTest {
     workflowChatService = new WorkflowChatService(
       threadRestService,
       messageRestService,
-      restTemplate,
+      restClient,
       workflowVariableService,
       workflowLogRepository);
     when(threadRestService.save(any(ThreadEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(messageRestService.save(any(MessageEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(workflowLogRepository.save(any(WorkflowLogEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
     when(workflowVariableService.getVariables(anyString())).thenReturn(new HashMap<>());
-    lenient().when(restTemplate.exchange(any(URI.class), any(HttpMethod.class), any(), eq(String.class)))
-      .thenReturn(ResponseEntity.ok("{}"));
+    lenient().when(restClient.method(any(HttpMethod.class))).thenReturn(requestBodyUriSpec);
+    lenient().when(requestBodyUriSpec.uri(any(URI.class))).thenReturn(requestBodySpec);
+    lenient().when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
+    lenient().when(requestBodySpec.body(any(Object.class))).thenReturn(requestBodySpec);
+    lenient().when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+    lenient().when(responseSpec.toEntity(String.class)).thenReturn(ResponseEntity.ok("{}"));
   }
 
   @Test
@@ -277,7 +290,7 @@ class WorkflowChatServiceTest {
     existingVariables.put("orderId", "order-1001");
     existingVariables.put("token", "token-abc");
     when(workflowVariableService.getVariables("wf-1")).thenReturn(existingVariables);
-    when(restTemplate.exchange(any(URI.class), any(HttpMethod.class), any(), eq(String.class)))
+    when(responseSpec.toEntity(String.class))
         .thenReturn(ResponseEntity.ok("{\"data\":{\"status\":\"SHIPPED\"}}"));
 
     MessageProtobuf message = workflowChatService.createStartMessage(workflow, thread);
@@ -286,7 +299,8 @@ class WorkflowChatServiceTest {
     assertThat(message.getContent()).isEqualTo("订单状态：SHIPPED");
 
     ArgumentCaptor<URI> uriCaptor = ArgumentCaptor.forClass(URI.class);
-    verify(restTemplate).exchange(uriCaptor.capture(), eq(HttpMethod.GET), any(), eq(String.class));
+    verify(restClient).method(HttpMethod.GET);
+    verify(requestBodyUriSpec).uri(uriCaptor.capture());
     assertThat(uriCaptor.getValue().toString())
         .isEqualTo("https://api.example.com/orders/order-1001?visitorUid=visitor-1");
 

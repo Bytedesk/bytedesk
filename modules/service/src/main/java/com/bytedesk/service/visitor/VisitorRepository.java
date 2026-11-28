@@ -25,5 +25,11 @@ public interface VisitorRepository extends JpaRepository<VisitorEntity, Long>, J
 
     Optional<VisitorEntity> findByVisitorUidAndOrgUidAndDeleted(String visitorUid, String orgUid, Boolean deleted);
 
+    /** 访客订单查询身份确认（规划 2026-11-25 §3.1 第二级）：按手机号在组织内匹配，返回全部命中供多命中校验。 */
+    java.util.List<VisitorEntity> findAllByMobileAndOrgUidAndDeleted(String mobile, String orgUid, Boolean deleted);
+
+    /** 访客订单查询身份确认（规划 2026-11-25 §3.1 第二级）：按邮箱在组织内匹配，返回全部命中供多命中校验。 */
+    java.util.List<VisitorEntity> findAllByEmailAndOrgUidAndDeleted(String email, String orgUid, Boolean deleted);
+
     List<VisitorEntity> findByStatusAndDeleted(String status, Boolean deleted);
 }

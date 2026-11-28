@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,12 +36,15 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
 
     private final ClipboardRestService clipboardService;
 
+    @Operation(summary = "Query Clipboard Items by Organization", description = "Retrieve clipboard items for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query clipboard")
     @Override
     public ResponseEntity<?> queryByOrg(ClipboardRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByOrg'");
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query clipboard")
     @Operation(summary = "Query Clipboard by User", description = "Retrieve clipboard items for the current user")
     @Override
     public ResponseEntity<?> queryByUser(ClipboardRequest request) {
@@ -49,6 +54,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_CREATE, description = "create clipboard")
     @Operation(summary = "Create Clipboard Item", description = "Create a new clipboard item")
     @Override
     public ResponseEntity<?> create(ClipboardRequest request) {
@@ -58,6 +64,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_UPDATE, description = "update clipboard")
     @Operation(summary = "Update Clipboard Item", description = "Update an existing clipboard item")
     @Override
     public ResponseEntity<?> update(ClipboardRequest request) {
@@ -67,6 +74,7 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_DELETE, description = "delete clipboard")
     @Operation(summary = "Delete Clipboard Item", description = "Delete a clipboard item")
     @Override
     public ResponseEntity<?> delete(ClipboardRequest request) {
@@ -76,12 +84,16 @@ public class ClipboardRestController extends BaseRestController<ClipboardRequest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Clipboard Items", description = "Export clipboard items to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_EXPORT, description = "export clipboard")
     @Override
     public Object export(ClipboardRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Query Clipboard Items by UID", description = "Retrieve a specific clipboard item entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_CLIPBOARD, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query clipboard")
     @Override
     public ResponseEntity<?> queryByUid(ClipboardRequest request) {
         // TODO Auto-generated method stub

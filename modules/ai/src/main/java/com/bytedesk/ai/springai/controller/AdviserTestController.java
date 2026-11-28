@@ -316,7 +316,7 @@ public class AdviserTestController {
 	 * <p>演示 {@code VectorStoreChatMemoryAdvisor}：把对话历史存入向量库，
 	 * 每轮对话按语义相似度召回相关历史，适合超长对话与跨会话记忆。</p>
 	 *
-	 * <p>对比 {@code /memory} 使用的 {@code MessageChatMemoryAdvisor}（按窗口保留全部历史），
+	 * <p>对比 {@code /memory} 使用的 {@code SessionMemoryAdvisor}（按窗口保留全部历史），
 	 * 本 Advisor 只召回语义相关的历史片段。需要运行环境配置了 VectorStore。</p>
 	 *
 	 * <p>调用示例（同一 conversationId 内多轮）：</p>
@@ -435,11 +435,11 @@ public class AdviserTestController {
 	}
 
 	// ============================================================
-	// 14. VectorStoreChatMemory vs MessageChatMemory 对比演示
+	// 14. VectorStoreChatMemory vs SessionMemory 对比演示
 	// ============================================================
 
 	/**
-	 * <p>对比 {@code MessageChatMemoryAdvisor}（窗口模式，最近 N 条）与
+	 * <p>对比 {@code SessionMemoryAdvisor}（窗口模式，最近 N 条）与
 	 * {@code VectorStoreChatMemoryAdvisor}（语义检索 Top-K）两种记忆模式。</p>
 	 *
 	 * <p>用同一段输入分别走两种记忆 Advisor，返回各自的回复，便于直观对比窗口记忆与语义记忆的差异。

@@ -13,7 +13,6 @@
  */
 package com.bytedesk.kbase.llm_file;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,10 +35,12 @@ import org.springframework.ai.reader.tika.TikaDocumentReader;
 // import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.ocr.TesseractOCRConfig;
+import org.apache.tika.parser.pdf.OcrConfig;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
 
@@ -234,7 +235,7 @@ public class FileService {
 	 */
 	public List<Document> readByTikaWithOcr(Resource resource, String ocrLanguage) {
 		List<Document> docs = new ArrayList<>();
-		try (InputStream is = resource.getInputStream()) {
+		try (TikaInputStream tis = TikaInputStream.get(resource.getInputStream())) {
 			AutoDetectParser parser = new AutoDetectParser();
 			ParseContext context = new ParseContext();
 
@@ -249,12 +250,14 @@ public class FileService {
 			// 针对 PDF：开启 OCR 与内嵌图像提取
 			PDFParserConfig pdfConfig = new PDFParserConfig();
 			pdfConfig.setExtractInlineImages(true);
-			pdfConfig.setOcrStrategy(PDFParserConfig.OCR_STRATEGY.OCR_AND_TEXT_EXTRACTION);
+			OcrConfig ocrConfig = new OcrConfig();
+			ocrConfig.setStrategy(OcrConfig.Strategy.OCR_AND_TEXT_EXTRACTION);
+			pdfConfig.setOcr(ocrConfig);
 			context.set(PDFParserConfig.class, pdfConfig);
 
 			BodyContentHandler handler = new BodyContentHandler(-1);
 			Metadata metadata = new Metadata();
-			parser.parse(is, handler, metadata, context);
+			parser.parse(tis, handler, metadata, context);
 
 			String content = handler.toString();
 			Map<String, Object> meta = new HashMap<>();

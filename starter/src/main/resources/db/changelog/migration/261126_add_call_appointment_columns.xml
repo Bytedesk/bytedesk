@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        呼叫中心餐厅定制规划 §2.2A（docs/plans/2026-11-26-callcenter-restaurant-ai-receptionist-plan.md）：
+        bytedesk_call_appointment 从“tag 复制体”改造为预约单。
+
+        跨库兼容：仅使用标准 addColumn / createTable / createIndex 标签；大文本统一 clob。
+        与 ddl-auto=update 的关系（参照 261125_add_logistics_order_columns.xml 惯例）：
+        preConditions onFail="MARK_RAN" 保证幂等；已被 ddl-auto 建过列/表的环境跳过。
+        既有 name / description / appointment_type 列保留不动（赋予预约语义，不删不改）。
+    -->
+
+    <changeSet id="261126-10-appointment-reservation-columns" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_appointment"/>
+            <not>
+                <columnExists tableName="bytedesk_call_appointment" columnName="reservation_date"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="bytedesk_call_appointment">
+            <column name="appointment_status" type="java.sql.Types.VARCHAR(32)">
+                <constraints nullable="false"/></column>
+            <column name="appointment_source" type="java.sql.Types.VARCHAR(32)">
+                <constraints nullable="false"/></column>
+            <column name="customer_name" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="mobile" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="party_size" type="java.sql.Types.INTEGER"/>
+            <column name="reservation_date" type="java.sql.Types.DATE"/>
+            <column name="shift_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="estimated_arrival" type="java.sql.Types.TIME"/>
+            <column name="restaurant_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="area_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="area_preference" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="table_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="special_requests" type="clob"/>
+            <column name="ai_handled" type="java.sql.Types.BOOLEAN"/>
+            <column name="call_uuid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="thread_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="avg_price_snapshot" type="java.sql.Types.DOUBLE"/>
+            <column name="deposit_amount" type="java.sql.Types.DOUBLE"/>
+            <column name="checkin_at" type="java.sql.Types.TIMESTAMP"/>
+            <column name="cancel_reason" type="java.sql.Types.VARCHAR(255)"/>
+        </addColumn>
+        <createIndex indexName="idx_appointment_restaurant_date" tableName="bytedesk_call_appointment">
+            <column name="restaurant_uid"/>
+            <column name="reservation_date"/>
+        </createIndex>
+        <createIndex indexName="idx_appointment_mobile" tableName="bytedesk_call_appointment">
+            <column name="mobile"/>
+        </createIndex>
+        <createIndex indexName="idx_appointment_call" tableName="bytedesk_call_appointment">
+            <column name="call_uuid"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- 已有行补默认值（新列 NOT NULL 需要）；跨库：SET 列名不加表别名 -->
+    <changeSet id="261126-20-appointment-backfill-defaults" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_appointment"/>
+            <columnExists tableName="bytedesk_call_appointment" columnName="appointment_status"/>
+        </preConditions>
+        <update tableName="bytedesk_call_appointment">
+            <column name="appointment_status" value="CONFIRMED"/>
+            <where>appointment_status IS NULL</where>
+        </update>
+        <update tableName="bytedesk_call_appointment">
+            <column name="appointment_source" value="HUMAN_INBOUND"/>
+            <where>appointment_source IS NULL</where>
+        </update>
+        <update tableName="bytedesk_call_appointment">
+            <column name="party_size" valueNumeric="1"/>
+            <where>party_size IS NULL</where>
+        </update>
+        <update tableName="bytedesk_call_appointment">
+            <column name="ai_handled" valueBoolean="false"/>
+            <where>ai_handled IS NULL</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="261126-30-appointment-log-table" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="bytedesk_call_appointment_log"/>
+            </not>
+        </preConditions>
+        <createTable tableName="bytedesk_call_appointment_log">
+            <column name="id" type="java.sql.Types.BIGINT">
+                <constraints primaryKey="true" nullable="false"/></column>
+            <column name="uuid" type="java.sql.Types.VARCHAR(64)">
+                <constraints nullable="false"/></column>
+            <column name="version" type="java.sql.Types.BIGINT">
+                <constraints nullable="false"/></column>
+            <column name="created_at" type="java.sql.Types.TIMESTAMP"/>
+            <column name="updated_at" type="java.sql.Types.TIMESTAMP"/>
+            <column name="is_deleted" type="java.sql.Types.BOOLEAN">
+                <constraints nullable="false"/></column>
+            <column name="org_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="user_uid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="level_type" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="platform_type" type="java.sql.Types.VARCHAR(32)"/>
+            <column name="appointment_uid" type="java.sql.Types.VARCHAR(64)">
+                <constraints nullable="false"/></column>
+            <column name="log_action" type="java.sql.Types.VARCHAR(32)">
+                <constraints nullable="false"/></column>
+            <column name="operator_type" type="java.sql.Types.VARCHAR(16)"/>
+            <column name="call_uuid" type="java.sql.Types.VARCHAR(64)"/>
+            <column name="before_json" type="clob"/>
+            <column name="after_json" type="clob"/>
+            <column name="remark" type="java.sql.Types.VARCHAR(512)"/>
+        </createTable>
+        <createIndex indexName="idx_appointment_log_appt" tableName="bytedesk_call_appointment_log">
+            <column name="appointment_uid"/>
+        </createIndex>
+        <addUniqueConstraint tableName="bytedesk_call_appointment_log" columnNames="uuid"
+                            constraintName="uk_appointment_log_uuid"/>
+    </changeSet>
+
+    <!--
+        修复：BaseEntity 主键为 @GeneratedValue(IDENTITY)，而上方建表语句的 id 列未声明自增，
+        插入时会报 "null value in column \"id\" violates not-null constraint"（PostgreSQL）。
+        使用 Liquibase 标签 addAutoIncrement，由各数据库方言生成对应 DDL：
+        - mysql/mariadb：AUTO_INCREMENT
+        - postgresql/kingbase：IDENTITY / SEQUENCE（按方言）
+        - h2：IDENTITY
+        - oracle：IDENTITY 或 SEQUENCE+TRIGGER（按方言）
+        preConditions 仅校验表与列存在，表尚未创建的环境可安全跳过。
+    -->
+    <changeSet id="261126-31-fix-call_appointment_log-id-autoincrement" author="copilot">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="bytedesk_call_appointment_log"/>
+            <columnExists tableName="bytedesk_call_appointment_log" columnName="id"/>
+        </preConditions>
+        <addAutoIncrement tableName="bytedesk_call_appointment_log" columnName="id" columnDataType="java.sql.Types.BIGINT"/>
+    </changeSet>
+
+</databaseChangeLog>

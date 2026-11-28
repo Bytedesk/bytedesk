@@ -38,7 +38,6 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.thread.ThreadRequest;
 import com.bytedesk.core.thread.ThreadResponseSimple;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -128,6 +127,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
     @ApiResponse(responseCode = "200", description = "Accepted successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = ThreadResponseSimple.class)))
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_ACCEPT, description = "accept thread")
     @PostMapping("/accept")
     public ResponseEntity<?> acceptByAgent(@RequestBody ThreadRequest request) {
@@ -265,6 +265,7 @@ public class AgentRestController extends BaseRestController<AgentRequest, AgentR
         );
     }
 
+    @PreAuthorize(AgentPermissions.HAS_AGENT_UPDATE)
     @BlackIpFilter(title = "black", action = "sendAgentSseMessage")
     @BlackUserFilter(title = "black", action = "sendAgentSseMessage")
     @TabooJsonFilter(title = "敏感词", action = "sendAgentSseMessage")

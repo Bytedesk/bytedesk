@@ -28,8 +28,9 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.kbase.llm_webpage.elastic.WebpageElasticService;
 import com.bytedesk.kbase.llm_webpage.vector.WebpageVectorService;
-
 import jakarta.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/v1/llm/webpage")
@@ -49,6 +50,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Webpages by Organization", description = "Retrieve webpages for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query webpage")
     @GetMapping("/query/org")
     @Override
     public ResponseEntity<?> queryByOrg(WebpageRequest request) {
@@ -58,6 +61,9 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpages));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_READ)
+    @Operation(summary = "Query Webpages by User", description = "Retrieve webpages for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query webpage")
     @GetMapping({ "/query", "/query/user" })
     @Override
     public ResponseEntity<?> queryByUser(WebpageRequest request) {
@@ -73,6 +79,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     //     throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     // }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_CREATE)
+    @Operation(summary = "Create Webpages", description = "Create a new webpage entry")
     @PostMapping("/create")
     @Override
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_CREATE, description = "create webpage")
@@ -83,6 +91,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Update Webpages", description = "Update an existing webpage entry")
     @PostMapping("/update")
     @Override
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update webpage")
@@ -93,6 +103,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete Webpages", description = "Delete a webpage entry")
     @PostMapping("/delete")
     @Override
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE, description = "delete webpage")
@@ -104,6 +116,9 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // deleteAll
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete All", description = "Delete all webpages entries")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all webpage")
     @PostMapping("/deleteAll")
     public ResponseEntity<?> deleteAll(@RequestBody WebpageRequest request) {
 
@@ -113,6 +128,9 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // enable/disable webpage
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Enable / Disable", description = "Enable or disable webpage entries")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_ENABLE, description = "enable webpage")
     @PostMapping("/enable")
     public ResponseEntity<?> enable(@RequestBody WebpageRequest request) {
 
@@ -122,6 +140,9 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // crawl webpage content
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Crawl Content", description = "Crawl the content of a webpage")
+    @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_SYNC, description = "sync webpage")
     @PostMapping("/crawl")
     public ResponseEntity<?> crawlContent(@RequestBody WebpageRequest request) {
 
@@ -130,6 +151,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(webpage));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_EXPORT)
+    @Operation(summary = "Export Webpages", description = "Export webpages to Excel format")
     @GetMapping("/export")
     @Override
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_EXPORT, description = "export webpage")
@@ -145,6 +168,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Update Elastic Index", description = "Update the elastic search index")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update webpage index")
     @PostMapping("/updateIndex")
     public ResponseEntity<?> updateIndex(@RequestBody WebpageRequest request) {
@@ -155,6 +180,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete elasticsearch index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete Elastic Index", description = "Delete the elastic search index")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete webpage elastic index")
     @PostMapping("/deleteIndex")
     public ResponseEntity<?> deleteIndex(@RequestBody WebpageRequest request) {
@@ -163,6 +190,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync elasticsearch index status
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Sync Elastic Index Status", description = "Synchronize elastic index status")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync webpage elastic status")
     @PostMapping("/syncIndexStatus")
     public ResponseEntity<?> syncIndexStatus(@RequestBody WebpageRequest request) {
@@ -171,6 +200,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync elasticsearch index status by kbUid
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Sync Elastic Index Status by KB", description = "Synchronize elastic index status by knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync webpage elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
     public ResponseEntity<?> syncIndexStatusByKbUid(@RequestBody WebpageRequest request) {
@@ -179,6 +210,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete all elasticsearch index by kbUid
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete All Elastic Index by KB", description = "Delete all elastic indexes of a knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete webpage elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
     public ResponseEntity<?> deleteAllIndexByKbUid(@RequestBody WebpageRequest request) {
@@ -187,6 +220,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch vector index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Update Vector Index", description = "Update the vector index")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update webpage vector index")
     @PostMapping("/updateVectorIndex")
     public ResponseEntity<?> updateVectorIndex(@RequestBody WebpageRequest request) {
@@ -199,6 +234,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete vector index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete Vector Index", description = "Delete the vector index")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete webpage vector index")
     @PostMapping("/deleteVectorIndex")
     public ResponseEntity<?> deleteVectorIndex(@RequestBody WebpageRequest request) {
@@ -210,6 +247,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync vector status
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Sync Vector Index Status", description = "Synchronize vector index status")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync webpage vector status")
     @PostMapping("/syncVectorStatus")
     public ResponseEntity<?> syncVectorStatus(@RequestBody WebpageRequest request) {
@@ -220,6 +259,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_READ)
+    @Operation(summary = "Query Elastic Document by UID", description = "Retrieve the elastic document of an entry")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query webpage elastic by uid")
     @PostMapping("/queryElasticByUid")
     public ResponseEntity<?> queryElasticByUid(@RequestBody WebpageRequest request) {
@@ -227,6 +268,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_READ)
+    @Operation(summary = "Query Vector Document by UID", description = "Retrieve the vector document of an entry")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query webpage vector by uid")
     @PostMapping("/queryVectorByUid")
     public ResponseEntity<?> queryVectorByUid(@RequestBody WebpageRequest request) {
@@ -238,6 +281,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // sync vector status by kbUid
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Sync Vector Index Status by KB", description = "Synchronize vector index status by knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync webpage vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
     public ResponseEntity<?> syncVectorStatusByKbUid(@RequestBody WebpageRequest request) {
@@ -249,6 +294,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch all index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Update All Elastic Indexes", description = "Update all elastic indexes")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all webpage index")
     @PostMapping("/updateAllIndex")
     public ResponseEntity<?> updateAllIndex(@RequestBody WebpageRequest request) {
@@ -259,6 +306,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // update elasticsearch all vector index
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_UPDATE)
+    @Operation(summary = "Update All Vector Indexes", description = "Update all vector indexes")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all webpage vector index")
     @PostMapping("/updateAllVectorIndex")
     public ResponseEntity<?> updateAllVectorIndex(@RequestBody WebpageRequest request) {
@@ -271,6 +320,8 @@ public class WebpageRestController extends BaseRestController<WebpageRequest, We
     }
 
     // delete all vector index by kbUid
+    @PreAuthorize(WebpagePermissions.HAS_WEBPAGE_DELETE)
+    @Operation(summary = "Delete All Vector Indexes by KB", description = "Delete all vector indexes of a knowledge base")
     @ActionAnnotation(title = I18Consts.I18N_WEBPAGE, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete webpage vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")
     public ResponseEntity<?> deleteAllVectorIndexByKbUid(@RequestBody WebpageRequest request) {

@@ -40,7 +40,6 @@ import com.bytedesk.ai.robot_tool.RobotToolConfig;
 import com.bytedesk.ai.robot_tool.RobotToolIntentContext;
 import com.bytedesk.ai.robot_tool.RobotToolIntentResolver;
 import com.bytedesk.ai.robot_tool.RobotToolsSettingsEntity;
-import com.bytedesk.ai.robot_tool.ToolChoice;
 import com.bytedesk.core.constant.BytedeskConsts;
 import com.bytedesk.core.utils.ApplicationContextHolder;
 // import com.bytedesk.core.message.MessageExtra;
@@ -100,14 +99,8 @@ public class ConvertAiUtils {
 
         llm.setTools(new ArrayList<>(mergedTools));
         llm.setToolIntentContext(resolveToolIntentContext(entity, toolsSettings));
-
-        if (StringUtils.hasText(toolsSettings.getToolChoice())) {
-            llm.setToolChoice(normalizeToolChoice(toolsSettings.getToolChoice()));
-        }
-        // 单轮工具调用次数上限（规划 G9）：@Transient 运行时字段，不落库
-        if (toolsSettings.getMaxToolInvocations() != null) {
-            llm.setMaxToolInvocations(toolsSettings.getMaxToolInvocations());
-        }
+        // 工具选择模式固定为 auto（由 RobotLlm.toolChoice 默认值提供），不再从 toolsSettings 读取；
+        // 单轮工具调用次数上限由 BaseSpringAIService 固定兜底。
     }
 
     private static RobotToolIntentContext resolveToolIntentContext(RobotEntity entity,
@@ -130,9 +123,24 @@ public class ConvertAiUtils {
         return toolConfigs != null ? toolConfigs : List.of();
     }
 
+    /**
+     * 解析工具配置对应的「运行时工具名」列表，即 Spring AI
+     * {@code ToolCallback.getToolDefinition().name()} 的口径（{@code @Tool(name=...)}，缺省为方法名）。
+     *
+     * <p>注册表同步的内置工具（CLASS 绑定）{@code name} 为 {@code @Tool} 名（snake_case），
+     * {@code methodName} 为 Java 方法名（camelCase），二者通常不同；下游
+     * {@code RobotToolCallbackResolverImpl} 按运行时名精确匹配，若此处返回 methodName 会导致
+     * 工具被静默丢弃（日志 {@code Requested robot tools are not available}），模型收不到任何工具。</p>
+     *
+     * <p>取值优先级：注册表 {@code name} → {@code key} → 按绑定类型回退（自定义工具 / 历史数据）。</p>
+     */
     private static List<String> resolveToolNames(RobotToolConfig toolConfig) {
         if (toolConfig == null || Boolean.FALSE.equals(toolConfig.getEnabled())) {
             return List.of();
+        }
+
+        if (StringUtils.hasText(toolConfig.getName())) {
+            return List.of(toolConfig.getName().trim());
         }
 
         String bindingType = toolConfig.getBindingType();
@@ -161,8 +169,10 @@ public class ConvertAiUtils {
             Class<?> toolClass = Class.forName(toolConfig.getClassName().trim());
             List<String> toolNames = new ArrayList<>();
             for (Method method : toolClass.getMethods()) {
-                if (AnnotationUtils.findAnnotation(method, Tool.class) != null) {
-                    toolNames.add(method.getName());
+                Tool tool = AnnotationUtils.findAnnotation(method, Tool.class);
+                if (tool != null) {
+                    // 运行时工具名 = @Tool.name（缺省为方法名），与 ToolCallback 定义保持一致
+                    toolNames.add(StringUtils.hasText(tool.name()) ? tool.name() : method.getName());
                 }
             }
             return toolNames.isEmpty() ? fallbackToolName(toolConfig) : toolNames;
@@ -198,10 +208,6 @@ public class ConvertAiUtils {
             }
         }
         return null;
-    }
-
-    private static String normalizeToolChoice(String toolChoice) {
-        return ToolChoice.normalize(toolChoice);
     }
 
     public static String convertToRobotProtobufString(RobotEntity entity) {

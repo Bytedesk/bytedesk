@@ -20,11 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/todo/list")
@@ -33,6 +36,8 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
 
     private final ProjectTodoRestService todoService;
 
+    @Operation(summary = "Query Project Todos by Organization", description = "Retrieve project todos for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query project todo")
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Override
     public ResponseEntity<?> queryByOrg(ProjectTodoRequest request) {
@@ -42,6 +47,8 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
         return ResponseEntity.ok(JsonResult.success(todos));
     }
 
+    @Operation(summary = "Query Project Todos by User", description = "Retrieve project todos for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query project todo")
     @Override
     public ResponseEntity<?> queryByUser(ProjectTodoRequest request) {
         
@@ -50,6 +57,8 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
         return ResponseEntity.ok(JsonResult.success(todos));
     }
 
+    @Operation(summary = "Create Project Todos", description = "Create a new project todo entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_CREATE, description = "create project todo")
     @Override
     public ResponseEntity<?> create(ProjectTodoRequest request) {
         
@@ -58,6 +67,8 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
         return ResponseEntity.ok(JsonResult.success(todo));
     }
 
+    @Operation(summary = "Update Project Todos", description = "Update an existing project todo entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_UPDATE, description = "update project todo")
     @Override
     public ResponseEntity<?> update(ProjectTodoRequest request) {
         
@@ -66,6 +77,8 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
         return ResponseEntity.ok(JsonResult.success(todo));
     }
 
+    @Operation(summary = "Delete Project Todos", description = "Delete a project todo entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_DELETE, description = "delete project todo")
     @Override
     public ResponseEntity<?> delete(ProjectTodoRequest request) {
         
@@ -74,12 +87,16 @@ public class ProjectTodoRestController extends BaseRestController<ProjectTodoReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Project Todos", description = "Export project todos to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_EXPORT, description = "export project todo")
     @Override
     public Object export(ProjectTodoRequest request, HttpServletResponse response) {
         // TODOLIST Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Query Project Todos by UID", description = "Retrieve a specific project todo entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_PROJECT_TODO, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query project todo")
     @Override
     public ResponseEntity<?> queryByUid(ProjectTodoRequest request) {
         // TODOLIST Auto-generated method stub

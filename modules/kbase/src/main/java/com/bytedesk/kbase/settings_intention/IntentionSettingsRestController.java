@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +37,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
     private final IntentionSettingsRestService intentionSettingsService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query settings")
     @Operation(summary = "Query Intention Settings by Organization", description = "Retrieve intention settings list for the organization")
     @Override
     public ResponseEntity<?> queryByOrg(IntentionSettingsRequest request) {
@@ -44,6 +47,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query settings")
     @Operation(summary = "Query Intention Settings by User", description = "Retrieve intention settings list for the user")
     @Override
     public ResponseEntity<?> queryByUser(IntentionSettingsRequest request) {
@@ -53,6 +57,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create settings")
     @Operation(summary = "Create Intention Settings", description = "Create new intention settings")
     @Override
     public ResponseEntity<?> create(IntentionSettingsRequest request) {
@@ -62,6 +67,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update settings")
     @Operation(summary = "Update Intention Settings", description = "Update existing intention settings")
     @Override
     public ResponseEntity<?> update(IntentionSettingsRequest request) {
@@ -71,6 +77,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success(intentionSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete settings")
     @Operation(summary = "Delete Intention Settings", description = "Delete the specified intention settings")
     @Override
     public ResponseEntity<?> delete(IntentionSettingsRequest request) {
@@ -80,6 +87,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_EXPORT, description = "export settings")
     @Operation(summary = "Export Intention Settings", description = "Export intention settings data")
     @Override
     public Object export(IntentionSettingsRequest request, HttpServletResponse response) {
@@ -87,6 +95,7 @@ public class IntentionSettingsRestController extends BaseRestController<Intentio
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query settings")
     @Operation(summary = "Query Intention Settings by UID", description = "Retrieve intention settings details by UID")
     @Override
     public ResponseEntity<?> queryByUid(IntentionSettingsRequest request) {

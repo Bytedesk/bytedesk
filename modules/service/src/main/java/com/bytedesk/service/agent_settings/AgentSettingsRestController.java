@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +31,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
 
     private final AgentSettingsRestService agentSettingsRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent settings")
     @Operation(summary = "Query Agent Settings by Organization", description = "Retrieve agent settings list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
@@ -40,6 +43,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent settings")
     @Operation(summary = "Query Agent Settings by User", description = "Retrieve agent settings list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
@@ -64,6 +68,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent settings")
     @Operation(summary = "Query Agent Settings by UID", description = "Retrieve agent settings details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
@@ -75,6 +80,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create agent settings")
     @Operation(summary = "Create Agent Settings", description = "Create new agent settings")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
@@ -89,6 +95,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent settings")
     @Operation(summary = "Update Agent Settings", description = "Update agent settings information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = AgentSettingsResponse.class)))
@@ -100,6 +107,7 @@ public class AgentSettingsRestController extends BaseRestController<AgentSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_AGENT_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent settings")
     @Operation(summary = "Delete Agent Settings", description = "Delete the specified agent settings")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")

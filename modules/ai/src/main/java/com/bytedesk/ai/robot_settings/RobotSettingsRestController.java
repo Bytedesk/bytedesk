@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
 
     private final RobotSettingsRestService robotSettingsRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query robot settings")
     @Operation(summary = "Query Robot Settings by Organization", description = "Query the list of robot settings by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
@@ -35,6 +38,7 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query robot settings")
     @Operation(summary = "Query Robot Settings by UID", description = "Query robot settings details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
@@ -44,6 +48,7 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create robot settings")
     @Operation(summary = "Create Robot Settings", description = "Create new robot settings")
     @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
@@ -56,6 +61,7 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update robot settings")
     @Operation(summary = "Update Robot Settings", description = "Update robot settings information")
     @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = RobotSettingsResponse.class)))
@@ -65,6 +71,7 @@ public class RobotSettingsRestController extends BaseRestController<RobotSetting
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete robot settings")
     @Operation(summary = "Delete Robot Settings", description = "Delete the specified robot settings")
     @ApiResponse(responseCode = "200", description = "Deletion successful")
     @Override

@@ -9,16 +9,11 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.bytedesk.ai.robot.RobotConsts;
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.service.agent.AgentGuidancePromptRequest;
-import com.bytedesk.ai.service.agent.AgentGuidancePromptResolution;
-import com.bytedesk.ai.service.agent.AgentGuidancePromptResolver;
-import com.bytedesk.ai.service.agent.AgentGuidanceTraceRecorder;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -37,22 +32,8 @@ public class PromptHelper {
 
     private final MessageRestService messageRestService;
 
-    private final ObjectProvider<AgentGuidancePromptResolver> agentGuidancePromptResolverProvider;
-
-    private final ObjectProvider<AgentGuidanceTraceRecorder> agentGuidanceTraceRecorderProvider;
-
     public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {
-        AgentGuidancePromptResolution guidanceResolution = resolveGuidance(query, context, robot, messageProtobufQuery,
-                true);
-        List<Message> messages = buildMessagesForSse(query, context, robot, messageProtobufQuery,
-                guidanceResolution.systemPrompt());
-        recordGuidanceTrace(query, context, robot, messageProtobufQuery, true, guidanceResolution, messages);
-        return messages;
-    }
-
-    public List<Message> buildMessagesForSse(String query, String context, RobotProtobuf robot,
-            MessageProtobuf messageProtobufQuery, String guidanceSystemPrompt) {
         // Spring AI 的 SystemMessage/UserMessage 不允许 null 内容，否则抛 IllegalArgumentException
         query = query != null ? query : "";
         // 添加空值检查
@@ -60,7 +41,7 @@ public class PromptHelper {
             log.warn("robot.getLlm() 为 null,使用默认系统提示词, robotUid={}", robot.getUid());
             List<Message> messages = new ArrayList<>();
             messages.add(new SystemMessage(RobotConsts.resolveDefaultLlmPrompt()));
-            addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
+            addSupplementalSystemMessages(messages, context);
             messages.add(new UserMessage(query));
             return messages;
         }
@@ -75,7 +56,7 @@ public class PromptHelper {
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
-        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
+        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 SessionMemoryAdvisor 注入记忆
         // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
         // 判空口径与 AdvisorChainFactory 保持一致（Boolean.TRUE.equals）：NULL 视为关闭记忆走手动注入，
         // 否则存量 NULL 行会既无 advisor 又无手动历史（2026-09-14 默认值改 false 后对齐）。
@@ -96,7 +77,7 @@ public class PromptHelper {
             }
         }
 
-        addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
+        addSupplementalSystemMessages(messages, context);
 
         messages.add(new UserMessage(query));
         return messages;
@@ -104,16 +85,6 @@ public class PromptHelper {
 
     public List<Message> buildMessagesForSync(String query, String context, RobotProtobuf robot,
             MessageProtobuf messageProtobufQuery) {
-        AgentGuidancePromptResolution guidanceResolution = resolveGuidance(query, context, robot, messageProtobufQuery,
-                false);
-        List<Message> messages = buildMessagesForSync(query, context, robot, messageProtobufQuery,
-                guidanceResolution.systemPrompt());
-        recordGuidanceTrace(query, context, robot, messageProtobufQuery, false, guidanceResolution, messages);
-        return messages;
-    }
-
-    public List<Message> buildMessagesForSync(String query, String context, RobotProtobuf robot,
-            MessageProtobuf messageProtobufQuery, String guidanceSystemPrompt) {
         // Spring AI 的 SystemMessage/UserMessage 不允许 null 内容，否则抛 IllegalArgumentException
         query = query != null ? query : "";
         // 添加空值检查
@@ -121,7 +92,7 @@ public class PromptHelper {
             log.warn("robot.getLlm() 为 null,使用默认系统提示词, robotUid={}", robot.getUid());
             List<Message> messages = new ArrayList<>();
             messages.add(new SystemMessage(RobotConsts.resolveDefaultLlmPrompt()));
-            addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
+            addSupplementalSystemMessages(messages, context);
             messages.add(new UserMessage(query));
             return messages;
         }
@@ -136,7 +107,7 @@ public class PromptHelper {
         messages.add(new SystemMessage(systemPrompt));
 
         // 兼容历史数据：llm_context_msg_count 可能为 null（@Builder.Default 仅对 builder 生效，JPA 直读数据库时字段为 null）
-        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 MessageChatMemoryAdvisor 注入记忆
+        // 双历史互斥（2026-09-04 规划 §4.6 选项1）：memoryEnabled=true 时由 SessionMemoryAdvisor 注入记忆
         // （窗口同样取 contextMsgCount，见 AdvisorChainFactory），此处跳过手动注入，避免消息表历史+记忆表历史双份叠加。
         // 判空口径与 AdvisorChainFactory 保持一致（Boolean.TRUE.equals）：NULL 视为关闭记忆走手动注入，
         // 否则存量 NULL 行会既无 advisor 又无手动历史（2026-09-14 默认值改 false 后对齐）。
@@ -157,43 +128,16 @@ public class PromptHelper {
             }
         }
 
-        addSupplementalSystemMessages(messages, guidanceSystemPrompt, context);
+        addSupplementalSystemMessages(messages, context);
 
         messages.add(new UserMessage(query));
         return messages;
     }
 
-    private void addSupplementalSystemMessages(List<Message> messages, String guidanceSystemPrompt, String context) {
-        if (StringUtils.hasText(guidanceSystemPrompt)) {
-            messages.add(new SystemMessage(guidanceSystemPrompt));
-        }
+    private void addSupplementalSystemMessages(List<Message> messages, String context) {
         if (StringUtils.hasText(context)) {
             messages.add(new SystemMessage(I18Consts.I18N_SEARCH_RESULT_PREFIX + context));
         }
-    }
-
-    private AgentGuidancePromptResolution resolveGuidance(String query, String context, RobotProtobuf robot,
-            MessageProtobuf messageProtobufQuery, boolean streaming) {
-        AgentGuidancePromptResolver resolver = agentGuidancePromptResolverProvider.getIfAvailable();
-        if (resolver == null) {
-            return AgentGuidancePromptResolution.empty();
-        }
-        AgentGuidancePromptResolution resolution = resolver.resolve(
-                new AgentGuidancePromptRequest(query, context, robot, messageProtobufQuery, streaming));
-        return resolution != null ? resolution : AgentGuidancePromptResolution.empty();
-    }
-
-    private void recordGuidanceTrace(String query, String context, RobotProtobuf robot,
-            MessageProtobuf messageProtobufQuery, boolean streaming,
-            AgentGuidancePromptResolution guidanceResolution, List<Message> messages) {
-        AgentGuidanceTraceRecorder recorder = agentGuidanceTraceRecorderProvider.getIfAvailable();
-        if (recorder == null || guidanceResolution == null) {
-            return;
-        }
-        recorder.recordPromptBuild(
-                new AgentGuidancePromptRequest(query, context, robot, messageProtobufQuery, streaming),
-                guidanceResolution,
-                extractFullPromptContent(messages));
     }
 
     public Prompt toPrompt(List<Message> messages) {

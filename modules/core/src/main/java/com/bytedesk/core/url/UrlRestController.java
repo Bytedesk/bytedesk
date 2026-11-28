@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +36,7 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
 
     private final UrlRestService urlRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query url")
     @Operation(summary = "Query URLs by Organization", description = "Retrieve URLs for the current organization")
     @Override
     public ResponseEntity<?> queryByOrg(UrlRequest request) {
@@ -43,6 +46,7 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
         return ResponseEntity.ok(JsonResult.success(urls));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query url")
     @Operation(summary = "Query URLs by User", description = "Retrieve URLs for the current user")
     @Override
     public ResponseEntity<?> queryByUser(UrlRequest request) {
@@ -52,6 +56,7 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
         return ResponseEntity.ok(JsonResult.success(urls));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_CREATE, description = "create url")
     @Operation(summary = "Create URL", description = "Create a new URL entry")
     @Override
     public ResponseEntity<?> create(UrlRequest request) {
@@ -61,6 +66,7 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
         return ResponseEntity.ok(JsonResult.success(url));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_UPDATE, description = "update url")
     @Operation(summary = "Update URL", description = "Update an existing URL entry")
     @Override
     public ResponseEntity<?> update(UrlRequest request) {
@@ -70,6 +76,7 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
         return ResponseEntity.ok(JsonResult.success(url));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_DELETE, description = "delete url")
     @Operation(summary = "Delete URL", description = "Delete a URL entry")
     @Override
     public ResponseEntity<?> delete(UrlRequest request) {
@@ -79,12 +86,16 @@ public class UrlRestController extends BaseRestController<UrlRequest, UrlRestSer
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Urls", description = "Export urls to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_EXPORT, description = "export url")
     @Override
     public Object export(UrlRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Query Urls by UID", description = "Retrieve a specific url entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_URL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query url")
     @Override
     public ResponseEntity<?> queryByUid(UrlRequest request) {
         // TODO Auto-generated method stub

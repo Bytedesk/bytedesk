@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,7 +38,6 @@ import com.bytedesk.core.rbac.user.UserProtobuf;
 import com.bytedesk.core.thread.enums.ThreadCloseTypeEnum;
 import com.bytedesk.core.thread.enums.ThreadProcessStatusEnum;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -476,6 +475,7 @@ public class ThreadRestController extends BaseRestController<ThreadRequest, Thre
         return ResponseEntity.ok(JsonResult.success("delete thread success"));
     }
 
+    @PreAuthorize(ThreadPermissions.HAS_THREAD_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_THREAD, action = I18Consts.I18N_ACTION_UPDATE, description = "restore thread")
     @Operation(summary = "Restore Thread", description = "Restore the specified soft-deleted thread")
     @Override

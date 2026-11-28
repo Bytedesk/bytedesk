@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +30,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,6 +44,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
 
     private final ConnectionRestService connectionRestService;
 
+    @PreAuthorize(ConnectionPermissions.HAS_CONNECTION_READ)
     @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query connection by org")
     @Operation(summary = "Query Connections by Organization", description = "Retrieve connections for the current organization")
     @Override
@@ -56,6 +56,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
+    @PreAuthorize(ConnectionPermissions.HAS_CONNECTION_READ)
     @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query connection by user")
     @Operation(summary = "Query Connections by User", description = "Retrieve connections for the current user")
     @Override
@@ -67,6 +68,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
         return ResponseEntity.ok(JsonResult.success(connections));
     }
 
+    @PreAuthorize(ConnectionPermissions.HAS_CONNECTION_READ)
     @ActionAnnotation(title = I18Consts.I18N_CONNECTION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query connection by uid")
     @Operation(summary = "Query Connection by UID", description = "Retrieve a specific connection by its unique identifier")
     @Override
@@ -131,6 +133,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     }
 
     // @ActionAnnotation(title = "Connection", action = "Query", description = "presence by user")
+    @PreAuthorize(ConnectionPermissions.HAS_CONNECTION_READ)
     @Operation(summary = "Get Presence", description = "Get user's online presence and active connection count")
     @GetMapping("/presence/{userUid}")
     public ResponseEntity<?> getPresence(@PathVariable("userUid") String userUid) {
@@ -141,6 +144,7 @@ public class ConnectionRestController extends BaseRestController<ConnectionReque
     }
 
     // @ActionAnnotation(title = "Connection", action = "Query", description = "active connections by user")
+    @PreAuthorize(ConnectionPermissions.HAS_CONNECTION_READ)
     @Operation(summary = "List Active Connections", description = "List user's active (non-expired) connections")
     @GetMapping("/presence/{userUid}/list")
     public ResponseEntity<?> listActiveConnections(@PathVariable("userUid") String userUid) {

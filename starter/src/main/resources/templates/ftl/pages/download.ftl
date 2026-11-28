@@ -45,8 +45,11 @@ Listed course START -->
 						<img src="/assets/images/element/data-science.svg" alt="<@t key='alt.download.windowsIcon'>Windows客户端下载图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu.exe" class="stretched-link" target="_blank"><@t key="page.download.windows">Windows客户端</@t></a></h5>
-					<#--  <span class="mb-0">即将开放下载.</span>  -->
+					<h5 class="mb-1"><@t key="page.download.windows">Windows客户端</@t></h5>
+					<div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
+						<a href="https://www.weiyuai.cn/download/weiyu.exe" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.windows.x64">x64 安装包</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-arm64.exe" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.windows.arm64">arm64 安装包</@t></a>
+					</div>
 				</div>
 			</div>
 
@@ -58,9 +61,12 @@ Listed course START -->
 						<img src="/assets/images/element/online.svg" alt="<@t key='alt.download.macIcon'>Mac客户端下载图标</@t>">
 					</div>
 					<!-- Title -->
-						<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-universal.dmg" target="_blank"><@t key="page.download.mac">Mac 客户端(Electron)</@t></a></h5>
-						<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-qt-mac.dmg" target="_blank"><@t key="page.download.macQt">Mac 客户端(Qt 开发中)</@t></a></h5>
-						<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-flutter-macos.dmg" target="_blank"><@t key="page.download.macFlutter">Mac 客户端(Flutter 开发中)</@t></a></h5>
+					<h5 class="mb-1"><@t key="page.download.mac">Mac 客户端</@t></h5>
+					<div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
+						<a href="https://www.weiyuai.cn/download/weiyu-universal.dmg" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.mac.electron">Electron 版</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-qt-mac.dmg" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.mac.qt">Qt (开发中)</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-flutter-macos.dmg" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.mac.flutter">Flutter (开发中)</@t></a>
+					</div>
 					<#--  <span class="mb-0">即将开放下载.</span>  -->
 				</div>
 			</div>
@@ -72,9 +78,13 @@ Listed course START -->
 					<img src="/assets/images/element/coding.svg" alt="<@t key='alt.download.linuxIcon'>Linux客户端下载图标</@t>">
 				</div>
 				<!-- Title -->
-					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" target="_blank"><@t key="page.download.linux">Linux客户端</@t></a></h5>
-					<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" target="_blank">AppImage (x86_64)</a></h5>
-					<h5 class="mb-0"><a href="https://www.weiyuai.cn/download/weiyu-arm64.AppImage" target="_blank">AppImage (arm64)</a></h5>
+					<h5 class="mb-1"><@t key="page.download.linux">Linux客户端</@t></h5>
+					<div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
+						<a href="https://www.weiyuai.cn/download/weiyu-x86_64.AppImage" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.linux.appimage.x86_64">AppImage (x86_64)</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-arm64.AppImage" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.linux.appimage.arm64">AppImage (arm64)</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-x64.tar.gz" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.linux.tar.x64">tar.gz (x64)</@t></a>
+						<a href="https://www.weiyuai.cn/download/weiyu-arm64.tar.gz" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.linux.tar.arm64">tar.gz (arm64)</@t></a>
+					</div>
 				<#--  <span class="mb-0">即将开放下载.</span>  -->
 			</div>
 		</div>
@@ -209,6 +219,24 @@ Other Software START -->
 					<a href="/assets/qr/qr_softphone.png" target="_blank">
 						<img src="/assets/qr/qr_softphone.png" style="height: 100px" alt="<@t key='alt.download.softphoneQR'>微语软电话下载二维码</@t>"/>
 					</a>
+				</div>
+			</div>
+
+			<!-- Item: Remote 微语远程 -->
+			<div class="col-sm-6 col-md-4 col-xl-3">
+				<div class="bg-primary bg-opacity-10 rounded-3 text-center p-3 position-relative btn-transition">
+					<!-- Image -->
+					<div class="icon-xl bg-body mx-auto rounded-circle mb-3">
+						<img src="/assets/images/element/help.svg" alt="<@t key='alt.download.remoteIcon'>微语远程下载图标</@t>">
+					</div>
+					<!-- Title -->
+					<h5 class="mb-1"><a href="https://www.weiyuai.cn/download/remote/" class="stretched-link" target="_blank"><@t key="page.download.remote">微语远程 - 远程协助</@t></a></h5>
+					<p class="mb-1 small text-body"><@t key="page.download.remote.desc">远程协助客户解决问题，支持 Mac/Windows/Linux</@t></p>
+					<div class="mt-2 d-flex flex-wrap justify-content-center gap-2">
+						<a href="https://www.weiyuai.cn/download/remote/bytedesk-remote-universal.dmg" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.remote.mac">Mac 下载</@t></a>
+						<a href="https://www.weiyuai.cn/download/remote/bytedesk-remote-x64.exe" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.remote.win">Windows 下载</@t></a>
+						<a href="https://www.weiyuai.cn/download/remote/bytedesk-remote-x86_64.AppImage" target="_blank" class="btn btn-sm btn-outline-primary"><@t key="page.download.remote.linux">Linux 下载</@t></a>
+					</div>
 				</div>
 			</div>
 

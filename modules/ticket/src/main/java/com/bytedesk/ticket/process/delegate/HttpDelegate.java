@@ -10,13 +10,12 @@ package com.bytedesk.ticket.process.delegate;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class HttpDelegate implements JavaDelegate {
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
 
     @Override
     public void execute(DelegateExecution execution) {
@@ -77,13 +76,14 @@ public class HttpDelegate implements JavaDelegate {
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
             HttpMethod httpMethod = HttpMethod.valueOf(method.toUpperCase());
-            HttpEntity<String> requestEntity = new HttpEntity<>(body, httpHeaders);
 
-            ResponseEntity<String> response = restTemplate.exchange(
-                    uriBuilder.build().toUri(),
-                    httpMethod,
-                    requestEntity,
-                    String.class);
+            RestClient.RequestBodySpec requestSpec = restClient.method(httpMethod)
+                    .uri(uriBuilder.build().toUri())
+                    .headers(h -> h.addAll(httpHeaders));
+            if (body != null) {
+                requestSpec.body(body);
+            }
+            ResponseEntity<String> response = requestSpec.retrieve().toEntity(String.class);
 
             String responseBody = response.getBody() != null ? response.getBody() : "{}";
             execution.setVariable(responseVariable, responseBody);

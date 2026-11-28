@@ -20,9 +20,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
 
 /**
  * Gitee AI REST API 控制器
@@ -41,6 +44,8 @@ public class SpringAIGiteeRestController {
      * GET http://127.0.0.1:9003/gitee/api/v1/models
      * 注意：此接口可以匿名访问，无需 API Key，返回强类型的 GiteeModel 对象
      */
+    @Operation(summary = "Get Available Models", description = "Retrieve the list of available models")
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query llm provider")
     @GetMapping("/models")
     public ResponseEntity<?> getModels(GiteeRequest request) {
         log.info("Getting Gitee AI structured models list (anonymous access)");

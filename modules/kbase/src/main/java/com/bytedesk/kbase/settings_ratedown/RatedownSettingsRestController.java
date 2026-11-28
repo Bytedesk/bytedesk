@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -36,6 +38,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
 
     private final RatedownSettingsRestService ratedownSettingService;
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query settings")
     @PreAuthorize(RolePermissions.ROLE_ADMIN)
     @Operation(summary = "Query Fallback Settings by Organization", description = "Allow administrators to query the organization's fallback settings list")
     @Override
@@ -46,6 +49,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query settings")
     @Operation(summary = "Query Fallback Settings by User", description = "Query the user's fallback settings list")
     @Override
     public ResponseEntity<?> queryByUser(RatedownSettingsRequest request) {
@@ -55,6 +59,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSettings));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create settings")
     @Operation(summary = "Create Fallback Settings", description = "Create new fallback settings")
     @Override
     public ResponseEntity<?> create(RatedownSettingsRequest request) {
@@ -64,6 +69,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSetting));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update settings")
     @Operation(summary = "Update Fallback Settings", description = "Update the existing fallback settings")
     @Override
     public ResponseEntity<?> update(RatedownSettingsRequest request) {
@@ -73,6 +79,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success(ratedownSetting));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete settings")
     @Operation(summary = "Delete Fallback Settings", description = "Delete the specified fallback settings")
     @Override
     public ResponseEntity<?> delete(RatedownSettingsRequest request) {
@@ -82,6 +89,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_EXPORT, description = "export settings")
     @Operation(summary = "Export Fallback Settings", description = "Export fallback settings data")
     @Override
     public Object export(RatedownSettingsRequest request, HttpServletResponse response) {
@@ -89,6 +97,7 @@ public class RatedownSettingsRestController extends BaseRestController<RatedownS
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query settings")
     @Operation(summary = "Query Fallback Settings by UID", description = "Query the specific fallback settings by UID")
     @Override
     public ResponseEntity<?> queryByUid(RatedownSettingsRequest request) {

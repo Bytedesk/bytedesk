@@ -26,7 +26,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -35,6 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Tag(name = "Workflow Management", description = "Workflow management APIs for process automation and task management")
 @Description("Workflow Management Controller - Business process automation and workflow management APIs")
@@ -47,10 +47,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     
     private final WorkflowService workflowService;
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workflow")
     @Operation(summary = "Query Workflows by Organization", description = "Retrieve workflow list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_READ)
     @Override
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(WorkflowRequest request) {
@@ -60,10 +62,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workflow")
     @Operation(summary = "Query Workflows by User", description = "Retrieve workflow list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_READ)
     @Override
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(WorkflowRequest request) {
@@ -73,10 +77,12 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow")
     @Operation(summary = "Query Workflow by UID", description = "Retrieve workflow details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_READ)
     @Override
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(WorkflowRequest request) {
@@ -86,20 +92,24 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow")
     @Operation(summary = "Query IVR Demo Template Options", description = "Retrieve IVR demo template names and descriptions from server-side defaults")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = WorkflowTemplateOptionResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_READ)
     @GetMapping("/template/chat/demo")
     public ResponseEntity<?> queryChatDemoTemplateOptions() {
 
         return ResponseEntity.ok(JsonResult.success(workflowRestService.queryChatDemoTemplateOptions()));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow")
     @Operation(summary = "Query IVR Demo Template Options", description = "Retrieve IVR demo template names and descriptions from server-side defaults")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = WorkflowTemplateOptionResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_READ)
     @GetMapping("/template/ivr/demo")
     public ResponseEntity<?> queryIvrDemoTemplateOptions() {
 
@@ -110,6 +120,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow")
     @Override
     @PostMapping("/create")
@@ -124,6 +135,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_UPDATE, description = "update workflow")
     @Override
     @PostMapping("/update")
@@ -134,6 +146,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_DELETE)
     @Operation(summary = "Delete Workflow", description = "Delete the specified workflow")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow")
@@ -150,6 +163,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     @ApiResponse(responseCode = "200", description = "Reset successfully",
         content = @Content(mediaType = "application/json",
         schema = @Schema(implementation = WorkflowResponse.class)))
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_RESET, description = "reset workflow")
     @PostMapping("/reset")
     public ResponseEntity<?> reset(@RequestBody WorkflowRequest request) {
@@ -159,6 +173,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
         return ResponseEntity.ok(JsonResult.success(workflow));
     }
 
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_EXPORT)
     @Operation(summary = "Export Workflows", description = "Export workflow data")
     @ApiResponse(responseCode = "200", description = "Export successful")        
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_EXPORT, description = "export workflow")
@@ -176,6 +191,7 @@ public class WorkflowRestController extends BaseRestController<WorkflowRequest, 
     }
 
     // 执行工作流
+    @PreAuthorize(WorkflowPermissions.HAS_WORKFLOW_UPDATE)
     @Operation(summary = "Execute Workflow", description = "Execute the specified workflow")
     @ApiResponse(responseCode = "200", description = "Executed successfully")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute workflow")

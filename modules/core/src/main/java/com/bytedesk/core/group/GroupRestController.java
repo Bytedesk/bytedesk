@@ -27,7 +27,6 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.member.MemberProtobuf;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -36,6 +35,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @AllArgsConstructor
@@ -45,10 +45,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     
     private final GroupRestService groupRestService;
     
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query group")
     @Operation(summary = "Query Groups by Organization", description = "Retrieve group list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
     @Override
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(GroupRequest request) {
@@ -58,10 +60,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query group")
     @Operation(summary = "Query Groups by User", description = "Retrieve group list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
     @Override
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(GroupRequest request) {
@@ -71,10 +75,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query group")
     @Operation(summary = "Search Public Groups", description = "Search public groups in current org (summary only, with joined/pendingApply flags)")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
     @GetMapping("/query/public")
     public ResponseEntity<?> queryPublic(GroupRequest request) {
 
@@ -83,10 +89,12 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(page));
     }
     
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query group")
     @Operation(summary = "Query Group by UID", description = "Retrieve group details by UID (private groups visible to members only)")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
     @Override
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(GroupRequest request) {
@@ -96,15 +104,17 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
     
-    @Operation(summary = "Query Group Members", description = "Retrieve group members with pagination")
-    @ApiResponse(responseCode = "200", description = "Query successful",
-        content = @Content(mediaType = "application/json", 
-        schema = @Schema(implementation = MemberProtobuf.class)))
     /**
      * 分页查询群组成员
      * @param request 包含群组uid和分页参数
      * @return 成员列表分页结果
      */
+    @Operation(summary = "Query Group Members", description = "Retrieve members of a group")
+    @ApiResponse(responseCode = "200", description = "Query successful",
+        content = @Content(mediaType = "application/json", 
+        schema = @Schema(implementation = MemberProtobuf.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query group")
     @GetMapping("/query/members")
     public ResponseEntity<?> queryMembers(GroupRequest request) {
         
@@ -117,6 +127,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_CREATE, description = "create group")
     @Override
     @PostMapping("/create")
@@ -131,6 +142,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group")
     @Override
     @PostMapping("/update")
@@ -141,11 +153,13 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group")
     @Operation(summary = "Update Group Name", description = "Update the group name")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     // update/name
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @PostMapping("/update/name")
     public ResponseEntity<?> updateGroupName(@RequestBody GroupRequest request) {
         
@@ -154,11 +168,13 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group")
     @Operation(summary = "Update Group Top Tip", description = "Update the group top-tip information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
     // update/topTip
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @PostMapping("/update/topTip")
     public ResponseEntity<?> updateGroupTopTip(@RequestBody GroupRequest request) {
         
@@ -171,6 +187,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group visibility")
     @PostMapping("/update/visibility")
     public ResponseEntity<?> updateVisibility(@RequestBody GroupRequest request) {
@@ -184,6 +201,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "update group join policy")
     @PostMapping("/update/joinPolicy")
     public ResponseEntity<?> updateJoinPolicy(@RequestBody GroupRequest request) {
@@ -197,6 +215,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Added successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "add robots to group")
     @PostMapping("/robot/add")
     public ResponseEntity<?> addRobots(@RequestBody GroupRequest request) {
@@ -210,6 +229,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Removed successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_REMOVE, description = "remove robots from group")
     @PostMapping("/robot/remove")
     public ResponseEntity<?> removeRobots(@RequestBody GroupRequest request) {
@@ -219,6 +239,8 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
+    @PreAuthorize(GroupPermissions.HAS_GROUP_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query group")
     @Operation(summary = "Query Robot Uids", description = "Query robot uids of the group")
     @ApiResponse(responseCode = "200", description = "Query successfully")
     @GetMapping("/robot/query")
@@ -231,6 +253,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Invited successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_INVITE, description = "invite members to group")
     @PostMapping("/invite")
     public ResponseEntity<?> inviteMembers(@RequestBody GroupRequest request) {
@@ -244,6 +267,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Joined successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_JOIN, description = "join group")
     @PostMapping("/join")
     public ResponseEntity<?> joinGroup(@RequestBody GroupRequest request) {
@@ -257,6 +281,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Removed successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_REMOVE, description = "remove members from group")
     @PostMapping("/remove")
     public ResponseEntity<?> removeMembers(@RequestBody GroupRequest request) {
@@ -270,6 +295,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
     @ApiResponse(responseCode = "200", description = "Left successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = GroupResponse.class)))
+    @PreAuthorize(GroupPermissions.HAS_GROUP_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_LEAVE, description = "leave group")
     @PostMapping("/leave")
     public ResponseEntity<?> leaveGroup(@RequestBody GroupRequest request) {
@@ -279,6 +305,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success(group));
     }
 
+    @PreAuthorize(GroupPermissions.HAS_GROUP_DELETE)
     @Operation(summary = "Dismiss Group", description = "Dismiss the specified group")
     @ApiResponse(responseCode = "200", description = "Dismissed successfully")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DISMISS, description = "dismiss group")
@@ -290,6 +317,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(GroupPermissions.HAS_GROUP_DELETE)
     @Operation(summary = "Delete Group", description = "Delete the specified group")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DELETE, description = "delete group")
@@ -302,6 +330,7 @@ public class GroupRestController extends BaseRestController<GroupRequest, GroupR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(GroupPermissions.HAS_GROUP_EXPORT)
     @Operation(summary = "Export Groups", description = "Export group data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_EXPORT, description = "export group")

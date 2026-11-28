@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.annotation.BlackIpFilter;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.annotation.BlackUserFilter;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -37,6 +39,7 @@ public class MessageLeaveRestControllerVisitor {
 
     private final MessageLeaveRestService messageLeaveRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_CREATE, description = "create message leave")
     @BlackIpFilter(title = "black", action = "leave-msg-create")
     @BlackUserFilter(title = "black", action = "leave-msg-create")
     @PostMapping("/create")
@@ -48,6 +51,7 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query message leave")
     @GetMapping("/query")
     @Operation(summary = "查询留言消息")
     public ResponseEntity<?> query(MessageLeaveRequest request) {
@@ -68,6 +72,7 @@ public class MessageLeaveRestControllerVisitor {
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE_LEAVE, action = I18Consts.I18N_ACTION_REJECT, description = "reject message leave")
     @BlackIpFilter(title = "black", action = "leave-msg-reject")
     @BlackUserFilter(title = "black", action = "leave-msg-reject")
     @PostMapping("/reject")

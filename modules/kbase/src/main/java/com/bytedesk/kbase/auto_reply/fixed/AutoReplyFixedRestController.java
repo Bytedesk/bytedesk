@@ -148,11 +148,12 @@ public class AutoReplyFixedRestController extends BaseRestController<AutoReplyFi
         );
     }
 
+    @Operation(summary = "Query Fixed Auto Replies by UID", description = "Retrieve a specific fixed auto replie entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_FIXED, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query auto reply fixed")
     @Override
     public ResponseEntity<?> queryByUid(AutoReplyFixedRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-    
 }

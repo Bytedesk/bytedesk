@@ -30,7 +30,6 @@ import com.bytedesk.core.exception.NotLoginException;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,6 +48,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
 
     private final AuthService authService;
 
+    @Operation(summary = "Query Processes by Organization", description = "Retrieve processes for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query process")
     @Override
     public ResponseEntity<?> queryByOrg(ProcessRequest request) {
         
@@ -57,6 +58,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(process));
     }
 
+    @Operation(summary = "Query Processes by User", description = "Retrieve processes for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query process")
     @Override
     public ResponseEntity<?> queryByUser(ProcessRequest request) {
         
@@ -65,6 +68,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(process));
     }
 
+    @Operation(summary = "Query Processes by UID", description = "Retrieve a specific processe entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query process")
     @Override
     public ResponseEntity<?> queryByUid(ProcessRequest request) {
         
@@ -73,6 +78,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(process));
     }
 
+    @Operation(summary = "Create Processes", description = "Create a new processe entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_CREATE, description = "create process")
     @Override
     public ResponseEntity<?> create(ProcessRequest request) {
         
@@ -81,6 +88,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(process));
     }
 
+    @Operation(summary = "Update Processes", description = "Update an existing processe entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_UPDATE, description = "update process")
     @Override
     public ResponseEntity<?> update(ProcessRequest request) {
         
@@ -89,6 +98,8 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         return ResponseEntity.ok(JsonResult.success(process));
     }
 
+    @Operation(summary = "Delete Processes", description = "Delete a processe entry")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_DELETE, description = "delete process")
     @Override
     public ResponseEntity<?> delete(ProcessRequest request) {
         
@@ -98,6 +109,9 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     // 查询流程定义列表
+    @PreAuthorize(ProcessPermissions.HAS_PROCESS_READ)
+    @Operation(summary = "Query Process Deployments", description = "Retrieve deployed process definitions")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query process")
     @GetMapping("/query/deployments")
     public ResponseEntity<?> queryProcesses(ProcessRequest request) {
 
@@ -107,6 +121,9 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     // 部署流程
+    @PreAuthorize(ProcessPermissions.HAS_PROCESS_CREATE)
+    @Operation(summary = "Deploy Process", description = "Deploy a process definition")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_CREATE, description = "create process")
     @PostMapping("/deploy")
     public ResponseEntity<?> deployProcess(@RequestBody ProcessRequest request) {
 
@@ -116,6 +133,9 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     // 校验流程结构和业务语义配置
+    @PreAuthorize(ProcessPermissions.HAS_PROCESS_UPDATE)
+    @Operation(summary = "Validate Process", description = "Validate a process definition XML")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query process")
     @PostMapping("/validate")
     public ResponseEntity<?> validateProcess(@RequestBody ProcessRequest request) {
 
@@ -125,6 +145,9 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     // 取消部署流程
+    @PreAuthorize(ProcessPermissions.HAS_PROCESS_UPDATE)
+    @Operation(summary = "Undeploy Process", description = "Remove a deployed process definition")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_DELETE, description = "delete process")
     @PostMapping("/undeploy")
     public ResponseEntity<?> undeployProcess(@RequestBody ProcessRequest request) {
 
@@ -134,6 +157,9 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
     }
 
     // 重置流程为默认内容
+    @PreAuthorize(ProcessPermissions.HAS_PROCESS_UPDATE)
+    @Operation(summary = "Reset Process", description = "Reset the ticket process to defaults")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_RESET, description = "reset process")
     @PostMapping("/reset")
     public ResponseEntity<?> resetProcess(@RequestBody ProcessRequest request) {
 
@@ -195,12 +221,12 @@ public class ProcessRestController extends BaseRestController<ProcessRequest, Pr
         throw new RuntimeException("no permission to operate on organization " + requestedOrgUid);
     }
 
+    @Operation(summary = "Export Processes", description = "Export processes to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_PROCESS, action = I18Consts.I18N_ACTION_EXPORT, description = "export process")
     @Override
     public Object export(ProcessRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    
-    
 }

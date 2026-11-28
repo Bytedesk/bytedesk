@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,6 +42,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
 
     private final LlmModelRestService llmModelRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query llm model")
     @Operation(summary = "Query LLM Models by Organization", description = "Retrieve LLM model list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -52,6 +55,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query llm model")
     @Operation(summary = "Query LLM Models by User", description = "Retrieve LLM model list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -64,6 +68,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query llm model")
     @Operation(summary = "Query LLM Model by UID", description = "Retrieve LLM model details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -76,6 +81,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_CREATE, description = "create llm model")
     @Operation(summary = "Create LLM Model", description = "Create a new LLM model")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -88,6 +94,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_UPDATE, description = "update llm model")
     @Operation(summary = "Update LLM Model", description = "Update LLM model information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
@@ -100,6 +107,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_DELETE, description = "delete llm model")
     @Operation(summary = "Delete LLM Model", description = "Delete the specified LLM model")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
@@ -110,6 +118,7 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_MODEL, action = I18Consts.I18N_ACTION_EXPORT, description = "export llm model")
     @Operation(summary = "Export LLM Models", description = "Export LLM model data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
@@ -118,5 +127,4 @@ public class LlmModelRestController extends BaseRestController<LlmModelRequest, 
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
-    
 }

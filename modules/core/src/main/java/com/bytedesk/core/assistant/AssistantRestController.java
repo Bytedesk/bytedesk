@@ -20,10 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,6 +37,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
 
     private final AssistantRestService assistantRestService;
 
+    @Operation(summary = "Query Assistants by Organization", description = "Retrieve assistants for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query assistant")
     @Override
     public ResponseEntity<?> queryByOrg(AssistantRequest request) {
         
@@ -42,6 +47,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success(assistantPage));
     }
 
+    @Operation(summary = "Query Assistants by User", description = "Retrieve assistants for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query assistant")
     @Override
     public ResponseEntity<?> queryByUser(AssistantRequest request) {
         
@@ -50,6 +57,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success(assistantPage));
     }
 
+    @Operation(summary = "Query Assistants by UID", description = "Retrieve a specific assistant entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query assistant")
     @Override
     public ResponseEntity<?> queryByUid(AssistantRequest request) {
         
@@ -58,6 +67,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
 
+    @Operation(summary = "Create Assistants", description = "Create a new assistant entry")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_CREATE, description = "create assistant")
     @Override
     public ResponseEntity<?> create(AssistantRequest request) {
         
@@ -66,6 +77,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
 
+    @Operation(summary = "Update Assistants", description = "Update an existing assistant entry")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_UPDATE, description = "update assistant")
     @Override
     public ResponseEntity<?> update(AssistantRequest request) {
         
@@ -74,6 +87,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success(assistantResponse));
     }
 
+    @Operation(summary = "Delete Assistants", description = "Delete a assistant entry")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_DELETE, description = "delete assistant")
     @Override
     public ResponseEntity<?> delete(AssistantRequest request) {
        
@@ -82,6 +97,8 @@ public class AssistantRestController extends BaseRestController<AssistantRequest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Assistants", description = "Export assistants to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_ASSISTANT, action = I18Consts.I18N_ACTION_EXPORT, description = "export assistant")
     @Override
     public Object export(AssistantRequest request, HttpServletResponse response) {
         // TODO Auto-generated method stub

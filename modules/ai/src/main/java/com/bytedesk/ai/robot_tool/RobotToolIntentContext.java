@@ -7,8 +7,6 @@ public record RobotToolIntentContext(
         Boolean intentRecognitionEnabled,
         String intentProvider,
         String intentModel,
-    String toolProvider,
-    String toolModel,
         Integer intentTimeoutMs,
         List<ResolvedRobotToolIntent> tools) implements Serializable {
 
@@ -17,6 +15,6 @@ public record RobotToolIntentContext(
     }
 
     public static RobotToolIntentContext empty() {
-        return new RobotToolIntentContext(false, null, null, null, null, null, List.of());
+        return new RobotToolIntentContext(false, null, null, null, List.of());
     }
 }

@@ -40,14 +40,14 @@ public interface RobotToolCallbackResolver {
 	List<ToolCallback> resolveToolCallbacks(List<String> requestedToolNames);
 
 	/**
-	 * 解析工具回调并应用单轮请求工具调用次数上限（规划 G9）。
+	 * 解析工具回调并应用单轮请求工具调用次数上限。
 	 *
 	 * <p>企业版实现会在同一请求的全部回调间共享一个计数器，超出上限的调用
 	 * 不再执行并返回终止提示；社区版/默认实现忽略上限，行为与
 	 * {@link #resolveToolCallbacks(List)} 一致。</p>
 	 *
 	 * @param requestedToolNames 机器人配置的工具名
-	 * @param maxToolInvocations 单轮请求内工具调用总次数上限；null 或 <=0 表示不限制
+	 * @param maxToolInvocations 单轮请求内工具调用总次数上限（由 BaseSpringAIService 固定提供）；null 或 <=0 表示不限制
 	 * @return 解析出的工具回调列表；无可用工具时返回空列表
 	 */
 	default List<ToolCallback> resolveToolCallbacks(List<String> requestedToolNames, Integer maxToolInvocations) {

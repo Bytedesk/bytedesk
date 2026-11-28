@@ -17,4 +17,24 @@ import com.bytedesk.core.base.BasePermissions;
 
 public class RelationPermissions extends BasePermissions {
 
+    // 模块前缀
+    public static final String RELATION_PREFIX = "RELATION_";
+
+    // 模块名称，用于权限检查
+    public static final String MODULE_NAME = "RELATION";
+
+    // 统一权限（不再在权限字符串中编码层级）
+    public static final String RELATION_READ = "RELATION_READ";
+    public static final String RELATION_CREATE = "RELATION_CREATE";
+    public static final String RELATION_UPDATE = "RELATION_UPDATE";
+    public static final String RELATION_DELETE = "RELATION_DELETE";
+    public static final String RELATION_EXPORT = "RELATION_EXPORT";
+
+    // PreAuthorize 表达式（兼容：ConvertUtils 会为新旧权限互相补齐别名）
+    public static final String HAS_RELATION_READ = "hasAuthority('" + RELATION_READ + "')";
+    public static final String HAS_RELATION_CREATE = "hasAuthority('" + RELATION_CREATE + "')";
+    public static final String HAS_RELATION_UPDATE = "hasAuthority('" + RELATION_UPDATE + "')";
+    public static final String HAS_RELATION_DELETE = "hasAuthority('" + RELATION_DELETE + "')";
+    public static final String HAS_RELATION_EXPORT = "hasAuthority('" + RELATION_EXPORT + "')";
+
 }

@@ -20,6 +20,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/quickbutton")
@@ -28,6 +29,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
 
     private final QuickButtonRestService quickButtonRestService;
 
+    @Operation(summary = "Query Quick Buttons by Organization", description = "Retrieve quick buttons for the current organization")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_READ)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query quick button by org")
     @Override
@@ -37,6 +39,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Quick Buttons by User", description = "Retrieve quick buttons for the current user")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_READ)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query quick button by user")
     @Override
@@ -46,6 +49,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Create Quick Buttons", description = "Create a new quick button entry")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_CREATE, description = "create quick button")
     @Override
@@ -55,6 +59,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Quick Buttons", description = "Update an existing quick button entry")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_UPDATE, description = "update quick button")
     @Override
@@ -64,6 +69,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Quick Buttons", description = "Delete a quick button entry")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_DELETE, description = "delete quick button")
     @Override
@@ -73,6 +79,7 @@ public class QuickButtonRestController extends BaseRestController<QuickButtonReq
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
 
+    @Operation(summary = "Enable / Disable", description = "Enable or disable quick button entries")
     @PreAuthorize(QuickButtonPermissions.HAS_QUICK_BUTTON_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_BUTTON, action = I18Consts.I18N_ACTION_ENABLE, description = "enable quick button")
     @PostMapping("/enable")

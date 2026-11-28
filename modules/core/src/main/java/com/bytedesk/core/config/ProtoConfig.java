@@ -18,9 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.Collections;
+import org.springframework.web.client.RestClient;
 
 /**
  * @author bytedesk.com on 2019-08-01
@@ -42,8 +40,12 @@ public class ProtoConfig {
      * protobuf 反序列化
      */
     @Bean
-    RestTemplate protobufRestTemplate(ProtobufHttpMessageConverter protobufHttpMessageConverter) {
-        return new RestTemplate(Collections.singletonList(protobufHttpMessageConverter));
+    RestClient protobufRestClient(ProtobufHttpMessageConverter protobufHttpMessageConverter) {
+        return RestClient.builder()
+                .configureMessageConverters(converters -> converters
+                        .disableDefaults()
+                        .addCustomConverter(protobufHttpMessageConverter))
+                .build();
     }
 
 }

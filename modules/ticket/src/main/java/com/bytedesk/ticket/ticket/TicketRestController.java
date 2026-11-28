@@ -25,6 +25,7 @@ import com.bytedesk.core.annotation.Idempotent;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.exception.NotFoundException;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.ticket.ticket.assignment.TicketAssignmentLogEntity;
 import com.bytedesk.ticket.ticket.assignment.TicketAssignmentLogRepository;
@@ -37,6 +38,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Slf4j
 @RestController
@@ -50,6 +52,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     private final MessageSource messageSource;
 
+    @Operation(summary = "Query Tickets by Organization", description = "Retrieve tickets for the current organization")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org")
     @GetMapping("/query/org")
@@ -61,6 +64,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Tickets by Organization for Workbench", description = "Retrieve tickets for the current organization with workbench visibility")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query ticket by org for workbench, admin visibility restricted")
     @GetMapping("/query/workbench/org")
@@ -71,6 +75,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Tickets by User", description = "Retrieve tickets for the current user")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query ticket by user")
     @GetMapping({ "/query", "/query/user" })
@@ -82,6 +87,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Tickets by UID", description = "Retrieve a specific ticket entry by its unique identifier")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket by uid")
     @GetMapping("/query/uid")
@@ -93,6 +99,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Query Ticket by UID for Card", description = "Retrieve ticket details for the ticket card drawer")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket by uid for ticket card drawer")
     @GetMapping("/query/uid/card")
@@ -103,6 +110,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Query by Thread Topic", description = "Retrieve entries by thread topic")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_TOPIC, description = "query ticket by topic")
     @GetMapping("/query/thread/topic")
@@ -113,6 +121,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query by Thread UID", description = "Retrieve entries by thread unique identifier")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_THREAD_UID, description = "query ticket by thread uid")
     @GetMapping("/query/thread/uid")
@@ -123,6 +132,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(ticket));
     }
 
+    @Operation(summary = "Query by Visitor Thread UID", description = "Retrieve entries by visitor thread unique identifier")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_VISITOR_THREAD_UID, description = "query ticket by visitor thread uid")
     @GetMapping("/query/visitor/thread/uid")
@@ -133,6 +143,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query by Visitor Thread Topic", description = "Retrieve entries by visitor thread topic")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_BY_VISITOR_THREAD_TOPIC, description = "query ticket by visitor thread topic")
     @GetMapping("/query/visitor/thread/topic")
@@ -143,16 +154,21 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @Operation(summary = "Query Ticket Assignment Log", description = "Retrieve the assignment log of a ticket")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query assignment log by ticket uid")
     @GetMapping("/query/assignment-log")
     public ResponseEntity<?> queryAssignmentLog(@RequestParam String ticketUid) {
 
+        TicketEntity ticket = ticketRestService.findByUid(ticketUid)
+                .orElseThrow(() -> new NotFoundException("ticket not found"));
+        ticketRestService.assertTicketVisible(ticket);
         List<TicketAssignmentLogEntity> logs = assignmentLogRepository.findByTicketUidOrderByCreatedAtDesc(ticketUid);
 
         return ResponseEntity.ok(JsonResult.success(logs));
     }
 
+    @Operation(summary = "Create Tickets", description = "Create a new ticket entry")
     @PreAuthorize(TicketPermissions.HAS_TICKET_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_CREATE, description = "create ticket")
     @PostMapping("/create")
@@ -165,6 +181,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Update Tickets", description = "Update an existing ticket entry")
     @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_UPDATE, description = "update ticket")
     @PostMapping("/update")
@@ -176,6 +193,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Delete Tickets", description = "Delete a ticket entry")
     @PreAuthorize(TicketPermissions.HAS_TICKET_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_DELETE, description = "delete ticket")
     @PostMapping("/delete")
@@ -189,6 +207,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
     // https://github.com/alibaba/easyexcel
     // https://easyexcel.opensource.alibaba.com/docs/current/
+    @Operation(summary = "Export Tickets", description = "Export tickets to Excel format")
     @PreAuthorize(TicketPermissions.HAS_TICKET_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXPORT, description = "export ticket")
     @GetMapping("/export")
@@ -238,6 +257,7 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
         return messageSource.getMessage(key, null, enumValue, locale);
     }
 
+    @Operation(summary = "Count Tickets by Status", description = "Count tickets grouped by status")
     @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
     @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_COUNT_STATUS, description = "count ticket by status")
     @GetMapping("/count/status")
@@ -247,6 +267,5 @@ public class TicketRestController extends BaseRestController<TicketRequest, Tick
 
         return ResponseEntity.ok(JsonResult.success(counts));
     }
-
 
 }

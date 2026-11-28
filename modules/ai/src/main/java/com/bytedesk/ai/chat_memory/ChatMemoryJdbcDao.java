@@ -1,8 +1,8 @@
 /*
  * @Author: jackning 270580156@qq.com
  * @Date: 2026-08-11
- * @Description: ChatMemory 只读查询 DAO（原生 JdbcTemplate）。
- *   查询 SPRING_AI_CHAT_MEMORY 表。
+ * @Description: Spring AI Session 会话日志只读查询 DAO（原生 JdbcTemplate）。
+ *   查询 AI_SESSION_EVENT 表（Spring AI 2.1.0 Session 持久化，取代旧 SPRING_AI_CHAT_MEMORY）。
  *   排序：sortBy 采用固定白名单映射，避免 SQL 注入。
  */
 package com.bytedesk.ai.chat_memory;
@@ -26,37 +26,45 @@ import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * ChatMemory 只读查询 DAO。
+ * Spring AI Session 会话日志只读查询 DAO。
  *
- * <p>复用主库 DataSource。支持分页 + 按 conversationId/type/content 过滤。</p>
+ * <p>复用主库 DataSource。支持分页 + 按 conversationId/type/content 过滤。
+ * 删除按会话删 AI_SESSION（外键 ON DELETE CASCADE 级联清空 AI_SESSION_EVENT）。</p>
  *
  * <p>排序字段采用固定白名单映射，禁止直接拼接前端传入值，避免 SQL 注入。</p>
+ *
+ * <p>旧表 SPRING_AI_CHAT_MEMORY 已废弃不再写入（ChatMemory 迁移到 Session API），
+ * 本 DAO 已切换到新表。</p>
  */
 @Slf4j
 @Repository
 public class ChatMemoryJdbcDao {
 
     /**
-     * Spring AI 官方 JDBC ChatMemory 表名。
+     * Spring AI 2.1.0 Session 事件表（取代旧 SPRING_AI_CHAT_MEMORY）。
      */
-    public static final String TABLE_NAME = "SPRING_AI_CHAT_MEMORY";
+    public static final String TABLE_NAME = "AI_SESSION_EVENT";
+
+    /**
+     * Spring AI 2.1.0 Session 主表（删除会话时级联清空事件）。
+     */
+    public static final String SESSION_TABLE_NAME = "AI_SESSION";
 
     /**
      * 排序字段白名单：前端 sortBy 值 -> 数据库列名。
-     * 未知字段回退到 sequence_id，避免拼接任意字符串造成 SQL 注入。
+     * 未知字段回退到 seq，避免拼接任意字符串造成 SQL 注入。
      */
     private static final Map<String, String> SORT_COLUMNS = Map.of(
-            "conversationId", "conversation_id",
-            "type", "type",
+            "conversationId", "session_id",
+            "type", "message_type",
             "timestamp", "timestamp",
-            "sequenceId", "sequence_id");
+            "sequenceId", "seq");
 
     private final JdbcTemplate jdbcTemplate;
 
     /**
      * timestamp 列在 SQL 中的转义形式，通过 DataSource 元数据自动探测：
      * PostgreSQL/Kingbase 用双引号，MySQL/MariaDB 用反引号。
-     * 与 BytedeskChatMemoryRepository.resolveTimestampColumn() 保持一致。
      */
     private final String timestampColumn;
 
@@ -93,35 +101,44 @@ public class ChatMemoryJdbcDao {
     }
 
     /**
-     * 分页查询 ChatMemory（支持过滤）。
+     * 拼接公共过滤条件（findPage/count 共用）。
+     */
+    private void appendFilters(StringBuilder sql, List<Object> params, ChatMemoryRequest request) {
+        if (StringUtils.hasText(request.getConversationId())) {
+            sql.append(" AND session_id LIKE ?");
+            params.add("%" + request.getConversationId() + "%");
+        }
+        if (StringUtils.hasText(request.getType())) {
+            sql.append(" AND message_type = ?");
+            params.add(request.getType());
+        }
+        if (StringUtils.hasText(request.getContent())) {
+            sql.append(" AND message_content LIKE ?");
+            params.add("%" + request.getContent() + "%");
+        }
+    }
+
+    /**
+     * 分页查询会话日志（支持过滤）。
+     *
+     * <p>只返回 MESSAGE 事件；列映射：conversationId→session_id、content→message_content、
+     * type→message_type、sequenceId→seq。</p>
      *
      * @param request 过滤 + 分页参数
      * @return 当前页记录列表
      */
     public List<ChatMemoryRecord> findPage(ChatMemoryRequest request) {
-        StringBuilder sql = new StringBuilder("SELECT conversation_id, content, type, ")
+        StringBuilder sql = new StringBuilder("SELECT session_id, message_content, message_type, ")
             .append(timestampColumn)
-            .append(", sequence_id FROM ")
+            .append(", seq FROM ")
             .append(TABLE_NAME)
-            .append(" WHERE 1=1");
+            .append(" WHERE event_type = 'MESSAGE'");
         List<Object> params = new ArrayList<>();
+        appendFilters(sql, params, request);
 
-        if (StringUtils.hasText(request.getConversationId())) {
-            sql.append(" AND conversation_id LIKE ?");
-            params.add("%" + request.getConversationId() + "%");
-        }
-        if (StringUtils.hasText(request.getType())) {
-            sql.append(" AND type = ?");
-            params.add(request.getType());
-        }
-        if (StringUtils.hasText(request.getContent())) {
-            sql.append(" AND content LIKE ?");
-            params.add("%" + request.getContent() + "%");
-        }
-
-        // 排序：白名单映射，未知字段回退到 sequence_id（默认按 sequence_id 降序，最新消息在前）
+        // 排序：白名单映射，未知字段回退到 seq（默认按 seq 降序，最新消息在前）
         String sortByKey = StringUtils.hasText(request.getSortBy()) ? request.getSortBy() : "sequenceId";
-        String sortColumn = SORT_COLUMNS.getOrDefault(sortByKey, "sequence_id");
+        String sortColumn = SORT_COLUMNS.getOrDefault(sortByKey, "seq");
         // timestamp 需用引号包裹
         if ("timestamp".equals(sortColumn)) {
             sortColumn = timestampColumn;
@@ -143,21 +160,11 @@ public class ChatMemoryJdbcDao {
      * 统计满足过滤条件的记录总数。
      */
     public long count(ChatMemoryRequest request) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM ").append(TABLE_NAME).append(" WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM ")
+            .append(TABLE_NAME)
+            .append(" WHERE event_type = 'MESSAGE'");
         List<Object> params = new ArrayList<>();
-
-        if (StringUtils.hasText(request.getConversationId())) {
-            sql.append(" AND conversation_id LIKE ?");
-            params.add("%" + request.getConversationId() + "%");
-        }
-        if (StringUtils.hasText(request.getType())) {
-            sql.append(" AND type = ?");
-            params.add(request.getType());
-        }
-        if (StringUtils.hasText(request.getContent())) {
-            sql.append(" AND content LIKE ?");
-            params.add("%" + request.getContent() + "%");
-        }
+        appendFilters(sql, params, request);
 
         Long count = jdbcTemplate.queryForObject(sql.toString(), Long.class, params.toArray());
         return count != null ? count : 0L;
@@ -165,12 +172,15 @@ public class ChatMemoryJdbcDao {
 
     /**
      * 删除指定会话的所有记忆记录。
+     *
+     * <p>删 AI_SESSION 主表行，AI_SESSION_EVENT/AI_SESSION_INDEX 经外键
+     * ON DELETE CASCADE 级联清空。</p>
      */
     public void deleteByConversationId(String conversationId) {
         if (!StringUtils.hasText(conversationId)) {
             throw new IllegalArgumentException("conversationId is required");
         }
-        jdbcTemplate.update("DELETE FROM " + TABLE_NAME + " WHERE conversation_id = ?", conversationId);
+        jdbcTemplate.update("DELETE FROM " + SESSION_TABLE_NAME + " WHERE id = ?", conversationId);
     }
 
     /**
@@ -190,11 +200,11 @@ public class ChatMemoryJdbcDao {
                     ? LocalDateTime.ofInstant(ts.toInstant(), BdDateUtils.getDisplayZoneId())
                     : null;
             return ChatMemoryRecord.builder()
-                    .conversationId(rs.getString("conversation_id"))
-                    .content(rs.getString("content"))
-                    .type(rs.getString("type"))
+                    .conversationId(rs.getString("session_id"))
+                    .content(rs.getString("message_content"))
+                    .type(rs.getString("message_type"))
                     .timestamp(timestamp)
-                    .sequenceId(rs.getLong("sequence_id"))
+                    .sequenceId(rs.getLong("seq"))
                     .build();
         }
     }

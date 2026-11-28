@@ -12,6 +12,9 @@ import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import io.swagger.v3.oas.annotations.Operation;
+import com.bytedesk.core.constant.I18Consts;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
@@ -29,39 +32,59 @@ public class DiskArchiveRestController {
         response.setHeader("X-Content-Type-Options", "nosniff");
     }
 
+    @Operation(summary = "Get Archive Capabilities", description = "Retrieve archive capabilities per module")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query archive capabilities")
     @GetMapping("/capabilities")
     public ResponseEntity<?> capabilities(@org.springframework.web.bind.annotation.RequestParam String module) {
         return ok(archives.capabilities(module));
     }
 
+    @Operation(summary = "Query Archives", description = "Retrieve archives with filters")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query archives")
     @GetMapping("/query")
     public ResponseEntity<?> query(DiskArchiveRequest request) { return ok(archives.query(request, false)); }
 
+    @Operation(summary = "Query Recycle Archives", description = "Retrieve archives in the recycle bin")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query recycle archives")
     @GetMapping("/query/recycle")
     public ResponseEntity<?> recycle(DiskArchiveRequest request) { return ok(archives.query(request, true)); }
 
+    @Operation(summary = "Get Archive Detail", description = "Retrieve an archive by its identifier")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query archive by uid")
     @GetMapping("/query/uid")
     public ResponseEntity<?> detail(@RequestParam String uid) { return ok(archives.detail(uid)); }
 
+    @Operation(summary = "Upload Archive", description = "Upload a file to the archive library")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_CREATE, description = "upload archive")
     @PostMapping("/create")
     public ResponseEntity<?> upload(@RequestParam("file") MultipartFile content, DiskArchiveRequest request) {
         return ok(archives.upload(content, request));
     }
 
+    @Operation(summary = "Update Archive", description = "Update an existing archive entry")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_UPDATE, description = "update archive")
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody DiskArchiveRequest request) { return ok(archives.update(request)); }
 
+    @Operation(summary = "Delete Archive", description = "Delete an archive entry")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_DELETE, description = "delete archive")
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody DiskArchiveRequest request) { return ok(archives.delete(request)); }
 
+    @Operation(summary = "Restore Archive", description = "Restore a deleted archive entry")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_UPDATE, description = "restore archive")
     @PostMapping("/restore")
     public ResponseEntity<?> restore(@RequestBody DiskArchiveRequest request) { return ok(archives.restore(request)); }
 
+    @Operation(summary = "Preview Archive File", description = "Preview an archive file in browser")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "preview archive file")
     @GetMapping("/file/preview")
     public void preview(@RequestParam String uid, HttpServletResponse response) throws IOException {
         archives.download(uid, true, response);
     }
 
+    @Operation(summary = "Download Archive File", description = "Download an archive file")
+    @ActionAnnotation(title = I18Consts.I18N_DISK, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "download archive file")
     @GetMapping("/file/download")
     public void download(@RequestParam String uid, HttpServletResponse response) throws IOException {
         archives.download(uid, false, response);

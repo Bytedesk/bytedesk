@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.2</version>
+        <version>4.2.0</version>
     </parent>
 
     <groupId>com.bytedesk</groupId>
@@ -38,12 +38,15 @@
         <!-- <redisson.version>4.1.0</redisson.version> -->
         <springdoc.version>3.0.3</springdoc.version>
         <spring-retry.version>2.0.13</spring-retry.version>
-        <spring-ai.version>2.0.2</spring-ai.version>
-        <dashscope-sdk-java.version>2.23.2</dashscope-sdk-java.version>
+        <!-- Fixes the server-initiated WebSocket close-handshake regression in 4.2.19. -->
+        <netty.version>4.2.20.Final</netty.version>
+        <spring-ai.version>2.1.0</spring-ai.version>
+        <dashscope-sdk-java.version>2.23.7</dashscope-sdk-java.version>
         <jspecify.version>1.0.0</jspecify.version>
         <!-- <agentscope.version>2.0.0</agentscope.version> -->
         <fastjson2.version>2.0.61</fastjson2.version>
-        <revision>5.3.0</revision>
+        <httpclient5.version>5.6.5</httpclient5.version>
+        <revision>5.4.0</revision>
     </properties>
 
     <dependencies>

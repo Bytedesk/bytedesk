@@ -223,6 +223,33 @@ public class TopicUtils {
         return topicArr[2];
     }
 
+    /**
+     * 从客服类 4 段 topic 中解析访客业务标识 visitorUid。
+     *
+     * <p>仅接受 {@code org/robot|agent|workgroup|unified/{x}/{visitorUid}} 形态；
+     * 管理端 LLM 会话（{@code org/robot/{robot}/{user}/{random}}，5 段）第 3 段是
+     * 坐席 uid 而非访客，必须返回 null 防止误用；其余前缀同样返回 null。</p>
+     */
+    public static String getVisitorUidFromThreadTopic(String threadTopic) {
+        if (threadTopic == null) {
+            return null;
+        }
+        String[] topicArr = threadTopic.split("/");
+        if (topicArr.length != 4) {
+            return null;
+        }
+        String prefix = "org/" + topicArr[1] + "/";
+        boolean customerServiceTopic = TOPIC_ORG_ROBOT_PREFIX.equals(prefix)
+                || TOPIC_ORG_AGENT_PREFIX.equals(prefix)
+                || TOPIC_ORG_WORKGROUP_PREFIX.equals(prefix)
+                || TOPIC_ORG_UNIFIED_PREFIX.equals(prefix);
+        if (!customerServiceTopic) {
+            return null;
+        }
+        String visitorUid = topicArr[3];
+        return visitorUid == null || visitorUid.isBlank() ? null : visitorUid;
+    }
+
     //////////////////////////////////////////////////////////////////////////
 
     public static Boolean isOrgKbTopic(String topic) {

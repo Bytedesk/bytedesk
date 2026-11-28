@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.message.IMessageSendService;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.message.MessageEntity;
 import com.bytedesk.core.message.MessageRepository;
 import com.bytedesk.core.message.enums.MessageTypeEnum;
@@ -33,6 +35,7 @@ public class MessagePlaybackRestControllerVisitor {
     private final MessageRepository messageRepository;
     private final IMessageSendService messageSendService;
 
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update message")
     @Operation(summary = "标记媒体消息已播放", description = "将 AUDIO/VOICE 消息 content 中的 played 字段标记为 true/false")
     @PostMapping("/played")
     public ResponseEntity<?> markPlayed(@RequestBody MessagePlaybackMarkPlayedRequest request) {

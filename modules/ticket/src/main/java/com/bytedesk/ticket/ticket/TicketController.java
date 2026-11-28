@@ -21,15 +21,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryActivityResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryProcessResponse;
 import com.bytedesk.ticket.ticket.dto.TicketHistoryTaskResponse;
 import com.bytedesk.ticket.ticket.dto.TicketTimelineStepResponse;
 import com.bytedesk.ticket.ticket.dto.TicketWorkflowTaskResponse;
-
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -43,6 +45,8 @@ public class TicketController {
     /**
      * 查询当前流程实例的活动任务和可执行操作。
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/workflow/actions")
     @Operation(summary = "查询工单工作流可执行动作")
     public ResponseEntity<?> queryWorkflowActions(TicketRequest request) {
@@ -55,6 +59,8 @@ public class TicketController {
     /**
      * 按当前 Flowable 活动任务执行流程动作。
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @PostMapping("/workflow/action")
     @Operation(summary = "执行工单工作流动作")
     public ResponseEntity<?> executeWorkflowAction(@RequestBody TicketRequest request) {
@@ -67,6 +73,8 @@ public class TicketController {
     /**
      * 认领工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/claim")
@@ -81,6 +89,8 @@ public class TicketController {
     /**
      * 开始处理工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/start")
@@ -95,6 +105,8 @@ public class TicketController {
     /**
      * 退回工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/unclaim")
@@ -109,6 +121,8 @@ public class TicketController {
     /**
      * 转派工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/transfer")
@@ -123,6 +137,8 @@ public class TicketController {
     /**
      * 挂起工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/hold")
@@ -137,6 +153,8 @@ public class TicketController {
     /**
      * 恢复工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/resume")
@@ -151,6 +169,8 @@ public class TicketController {
     /**
      * 待回应工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/pend")
@@ -165,6 +185,8 @@ public class TicketController {
     /**
      * 重新打开工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/reopen")
@@ -179,6 +201,8 @@ public class TicketController {
     /**
      * 升级工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/escalate")
@@ -193,6 +217,8 @@ public class TicketController {
     /**
      * 完成工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/resolve")
@@ -207,6 +233,8 @@ public class TicketController {
     /**
      * 客户验证工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/verify")
@@ -221,6 +249,8 @@ public class TicketController {
     /**
      * 关闭工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/close")
@@ -235,6 +265,8 @@ public class TicketController {
     /**
      * 取消工单
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/cancel")
@@ -249,6 +281,8 @@ public class TicketController {
     /**
      * 委托工单任务
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/delegate")
@@ -263,6 +297,8 @@ public class TicketController {
     /**
      * 解决委托任务（被委托人处理完成后，归还给委托人）
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/delegate/resolve")
@@ -277,6 +313,8 @@ public class TicketController {
     /**
      * 抄送工单（知会相关人员，不参与流转）
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/cc")
@@ -291,6 +329,8 @@ public class TicketController {
     /**
      * 加签（最小实现：为当前任务追加候选人）
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/addsign")
@@ -305,6 +345,8 @@ public class TicketController {
     /**
      * 退回（跳转回指定节点）
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/rollback")
@@ -319,6 +361,8 @@ public class TicketController {
     /**
      * 撤销（终止流程实例）
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute ticket")
     @Deprecated(since = "2026-07-29", forRemoval = false)
     @Hidden
     @PostMapping("/revoke")
@@ -333,6 +377,8 @@ public class TicketController {
     /**
      * 查询工单任务历史
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/task")
     @Operation(summary = "查询工单任务历史")
     public ResponseEntity<?> queryTicketTaskHistory(TicketRequest request) {
@@ -345,6 +391,8 @@ public class TicketController {
     /**
      * 查询工单流程实例历史
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/process")
     @Operation(summary = "查询工单流程实例历史")
     public ResponseEntity<?> queryTicketProcessHistory(TicketRequest request) {
@@ -357,6 +405,8 @@ public class TicketController {
     /**
      * 查询工单活动历史
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/activity")
     @Operation(summary = "查询工单活动历史")
     public ResponseEntity<?> queryTicketActivityHistory(TicketRequest request) {
@@ -369,6 +419,8 @@ public class TicketController {
     /**
      * 查询工单简化时间线
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/timeline")
     @Operation(summary = "查询工单简化时间线")
     public ResponseEntity<?> queryTicketTimeline(TicketRequest request) {
@@ -381,6 +433,8 @@ public class TicketController {
     /**
      * 工单卡片抽屉专用时间线：不受工单可见性限制。
      */
+    @PreAuthorize(TicketPermissions.HAS_TICKET_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TICKET, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query ticket")
     @GetMapping("/history/timeline/card")
     @Operation(summary = "查询工单卡片简化时间线")
     public ResponseEntity<?> queryTicketTimelineForCard(TicketRequest request) {
@@ -389,7 +443,5 @@ public class TicketController {
 
         return ResponseEntity.ok(JsonResult.success(activities));
     }
-
-    
 
 }

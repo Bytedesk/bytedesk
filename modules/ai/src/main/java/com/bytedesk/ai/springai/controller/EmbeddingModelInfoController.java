@@ -14,6 +14,8 @@
 package com.bytedesk.ai.springai.controller;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.ai.service.EmbeddingModelInfoService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import io.swagger.v3.oas.annotations.Operation;
 /**
  * EmbeddingModel信息查询控制器
  * 提供查看所有EmbeddingModel和Primary EmbeddingModel的接口
@@ -41,6 +44,8 @@ public class EmbeddingModelInfoController {
      * 获取所有EmbeddingModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/info
      */
+    @Operation(summary = "Get All Embedding Models Info", description = "Retrieve configuration info of all embedding models")
+    @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query embedding model")
     @GetMapping("/info")
     public ResponseEntity<JsonResult<?>> getAllEmbeddingModelsInfo() {
         if (!bytedeskProperties.getDebug()) {
@@ -55,6 +60,8 @@ public class EmbeddingModelInfoController {
      * 获取Primary EmbeddingModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/primary
      */
+    @Operation(summary = "Get Primary Embedding Model Info", description = "Retrieve configuration info of the primary embedding model")
+    @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query embedding model")
     @GetMapping("/primary")
     public ResponseEntity<JsonResult<?>> getPrimaryEmbeddingModelInfo() {
         if (!bytedeskProperties.getDebug()) {
@@ -69,6 +76,8 @@ public class EmbeddingModelInfoController {
      * 获取VectorStore使用的EmbeddingModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/vectorstore
      */
+    @Operation(summary = "Get Vector Store Embedding Model Info", description = "Retrieve configuration info of the vector store embedding model")
+    @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query embedding model")
     @GetMapping("/vectorstore")
     public ResponseEntity<JsonResult<?>> getVectorStoreEmbeddingModelInfo() {
         if (!bytedeskProperties.getDebug()) {
@@ -83,6 +92,8 @@ public class EmbeddingModelInfoController {
      * 测试 DashScope embedding 模型
      * GET http://127.0.0.1:9003/spring/ai/api/v1/embedding-models/test-dashscope-models
      */
+    @Operation(summary = "Test DashScope Models", description = "Test connectivity of DashScope embedding models")
+    @ActionAnnotation(title = I18Consts.I18N_EMBEDDING_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query embedding model")
     @GetMapping("/test-dashscope-models")
     public ResponseEntity<JsonResult<?>> testDashScopeModels() {
         if (!bytedeskProperties.getDebug()) {

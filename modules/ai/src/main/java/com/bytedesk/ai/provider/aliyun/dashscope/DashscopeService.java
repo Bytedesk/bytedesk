@@ -53,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link DashScopeChatModel}（provider apiKey/baseUrl + robot options），经
  * {@code createChatClient(chatModel, prompt, robot)} 注入 Advisor 链，从而获得：
  * <ul>
- *   <li>多轮记忆：MessageChatMemoryAdvisor → SPRING_AI_CHAT_MEMORY 表</li>
+ *   <li>多轮记忆：SessionMemoryAdvisor → AI_SESSION / AI_SESSION_EVENT 表</li>
  *   <li>工具调用：ToolCallingChatOptions + 框架自动注册的 ToolCallingAdvisor</li>
  *   <li>SafeGuard / ReReading / Logging 等横切 Advisor</li>
  * </ul>

@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.utils.JsonResult;
-
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 论坛群 REST：帖子/评论/点赞。
@@ -34,6 +36,8 @@ public class GroupForumRestController {
 
     private final GroupForumService groupForumService;
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_CREATE, description = "create group")
     @Operation(summary = "发帖", description = "论坛群成员发送根帖（文本+图片），clientRequestUid 幂等")
     @ApiResponse(responseCode = "200", description = "创建成功")
     @PostMapping("/create")
@@ -47,6 +51,8 @@ public class GroupForumRestController {
                 groupForumService.createPost(groupUid, clientRequestUid, text, images)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query group")
     @Operation(summary = "帖子分页", description = "根帖分页 + 批量评论数/点赞数/likedByMe")
     @ApiResponse(responseCode = "200", description = "查询成功")
     @GetMapping("/query")
@@ -57,6 +63,8 @@ public class GroupForumRestController {
                 groupForumService.queryPosts(groupUid, pageNumber, pageSize)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query group")
     @Operation(summary = "帖子详情", description = "根帖详情（不含评论列表）")
     @ApiResponse(responseCode = "200", description = "查询成功")
     @GetMapping("/detail")
@@ -65,6 +73,8 @@ public class GroupForumRestController {
                 groupForumService.queryPostDetail(groupUid, postUid)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query group")
     @Operation(summary = "评论分页", description = "根评论或指定父评论的回复（楼中楼）")
     @ApiResponse(responseCode = "200", description = "查询成功")
     @GetMapping("/comment/query")
@@ -76,6 +86,8 @@ public class GroupForumRestController {
                 groupForumService.queryComments(groupUid, postUid, parentCommentUid, pageNumber, pageSize)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_CREATE, description = "create group")
     @Operation(summary = "评论", description = "根评论（parentCommentUid 空）或回复（非空须同帖），支持文本+图片")
     @ApiResponse(responseCode = "200", description = "创建成功")
     @PostMapping("/comment/create")
@@ -93,6 +105,8 @@ public class GroupForumRestController {
                         parentCommentUid, replyToUserUid, text, images)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_LIKE, description = "like group")
     @Operation(summary = "点赞设置", description = "set 语义：liked=true/false，重复设置不反转")
     @ApiResponse(responseCode = "200", description = "设置成功")
     @PostMapping("/like/set")
@@ -104,6 +118,8 @@ public class GroupForumRestController {
                 groupForumService.setLike(groupUid, postUid, liked)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_DELETE)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DELETE, description = "delete group")
     @Operation(summary = "删帖", description = "作者或群管理员；软删保留占位")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @PostMapping("/delete")
@@ -114,6 +130,8 @@ public class GroupForumRestController {
                 groupForumService.deletePost(groupUid, postUid)));
     }
 
+    @PreAuthorize(GroupForumPermissions.HAS_GROUP_FORUM_DELETE)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_DELETE, description = "delete group")
     @Operation(summary = "删评论", description = "作者或群管理员；软删保留关系")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @PostMapping("/comment/delete")

@@ -14,6 +14,8 @@
 package com.bytedesk.ai.springai.controller;
 
 import com.bytedesk.core.utils.JsonResult;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.ai.springai.service.ChatModelInfoService;
 import com.bytedesk.core.config.properties.BytedeskProperties;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import io.swagger.v3.oas.annotations.Operation;
 
 /**
  * ChatModel信息查询控制器
@@ -61,6 +64,8 @@ public class ChatModelInfoController {
      * 获取Primary ChatModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-models/primary
      */
+    @Operation(summary = "Get Primary Chat Model Info", description = "Retrieve configuration info of the primary chat model")
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query chat model")
     @GetMapping("/primary")
     public ResponseEntity<JsonResult<?>> getPrimaryChatModelInfo() {
         if (!bytedeskProperties.getDebug()) {
@@ -75,6 +80,8 @@ public class ChatModelInfoController {
      * 获取RAG使用的ChatModel信息
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-models/rag
      */
+    @Operation(summary = "Get RAG Chat Model Info", description = "Retrieve configuration info of the RAG chat model")
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query chat model")
     @GetMapping("/rag")
     public ResponseEntity<JsonResult<?>> getRagChatModelInfo() {
         if (!bytedeskProperties.getDebug()) {
@@ -89,6 +96,8 @@ public class ChatModelInfoController {
      * 测试指定的ChatModel
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-models/test/{provider}
      */
+    @Operation(summary = "Test Chat Model", description = "Test connectivity of a chat model by provider")
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query chat model")
     @GetMapping("/test/{provider}")
     public ResponseEntity<JsonResult<?>> testChatModel(@PathVariable String provider) {
         if (!bytedeskProperties.getDebug()) {
@@ -104,6 +113,8 @@ public class ChatModelInfoController {
      * 测试所有可用的ChatModel
      * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-models/test-all
      */
+    @Operation(summary = "Test All Chat Models", description = "Test connectivity of all chat models")
+    @ActionAnnotation(title = I18Consts.I18N_CHAT_MODEL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query chat model")
     @GetMapping("/test-all")
     public ResponseEntity<JsonResult<?>> testAllChatModels() {
         if (!bytedeskProperties.getDebug()) {

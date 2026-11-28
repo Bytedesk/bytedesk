@@ -147,12 +147,12 @@ public class AutoReplyKeywordRestController extends BaseRestController<AutoReply
         );
     }
 
+    @Operation(summary = "Query Keyword Auto Replies by UID", description = "Retrieve a specific keyword auto replie entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_AUTO_REPLY_KEYWORD, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query auto reply keyword")
     @Override
     public ResponseEntity<?> queryByUid(AutoReplyKeywordRequest request) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'queryByUid'");
     }
 
-
-    
 }

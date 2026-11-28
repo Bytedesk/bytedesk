@@ -197,6 +197,9 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
+            throw new NotFoundException("ticket not found");
+        }
         // 常规可见性校验通过后直接返回；未通过时尝试工单卡片分享只读豁免
         // （查看者所在会话中确实存在该工单的卡片消息时，放行详情查看）
         assertTicketVisibleOrSharedCard(ticket, isAdminChannelRequest(request), request.getThreadUid());
@@ -219,6 +222,7 @@ public class TicketRestService
         if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
             throw new NotFoundException("ticket not found");
         }
+        assertTicketCardVisible(ticket, isAdminChannelRequest(request));
         return convertToResponse(ticket);
     }
 
@@ -413,6 +417,9 @@ public class TicketRestService
             throw new NotFoundException("ticket not found");
         }
         TicketEntity ticket = ticketOptional.get();
+        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
+            throw new NotFoundException("ticket not found");
+        }
         assertTicketVisible(ticket, isAdminChannelRequest(request));
         populateUpdateDefaults(request, ticket);
         Assert.hasText(request.getReporterJson(), "reporter info required");
@@ -656,6 +663,17 @@ public class TicketRestService
     @Override
     public void delete(TicketRequest request) {
         bindCurrentUserScope(request);
+        if (request == null || !StringUtils.hasText(request.getUid())) {
+            throw new NotFoundException("ticket not found");
+        }
+        Optional<TicketEntity> ticketOptional = ticketRepository.findByUid(request.getUid());
+        if (ticketOptional.isEmpty()) {
+            throw new NotFoundException("ticket not found");
+        }
+        TicketEntity ticket = ticketOptional.get();
+        if (StringUtils.hasText(request.getOrgUid()) && !request.getOrgUid().equals(ticket.getOrgUid())) {
+            throw new NotFoundException("ticket not found");
+        }
         deleteByUid(request.getUid());
     }
 
@@ -1204,6 +1222,35 @@ public class TicketRestService
         assertTicketVisible(ticket, adminPrivilege);
     }
 
+    public void assertTicketCardVisible(TicketEntity ticket, boolean adminPrivilege) {
+        if (ticket == null) {
+            throw new NotFoundException("ticket not found");
+        }
+        UserEntity currentUser = authService.getUser();
+        if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
+            throw new NotFoundException("ticket not found");
+        }
+        if (adminPrivilege && Boolean.TRUE.equals(currentUser.isSuperUser())) {
+            return;
+        }
+        if (currentUser.getUid().equals(ticket.getUserUid())) {
+            return;
+        }
+        if (isVisitorPrincipal()) {
+            throw new NotFoundException("ticket not found");
+        }
+        var memberOptional = memberRepository
+                .findByUser_UidAndOrgUidAndDeletedFalse(currentUser.getUid(), ticket.getOrgUid());
+        if (memberOptional.isEmpty()) {
+            throw new NotFoundException("ticket not found");
+        }
+        String memberUid = memberOptional.get().getUid();
+        if (StringUtils.hasText(memberUid)) {
+            return;
+        }
+        throw new NotFoundException("ticket not found");
+    }
+
     // private boolean canViewTicket(TicketEntity ticket) {
     //     return canViewTicket(ticket, true);
     // }
@@ -1217,11 +1264,14 @@ public class TicketRestService
         if (currentUser == null || !StringUtils.hasText(currentUser.getUid())) {
             return false;
         }
-        if (adminPrivilege && (Boolean.TRUE.equals(currentUser.isSuperUser()) || hasOrgAdminRole(currentUser))) {
-            // 管理员特权仅在管理后台（channel=WEB_ADMIN）生效；客服工作台中管理员同样受可见性限制
+        if (adminPrivilege && Boolean.TRUE.equals(currentUser.isSuperUser())) {
             return true;
         }
         if (currentUser.getUid().equals(ticket.getUserUid())) {
+            return true;
+        }
+        if (StringUtils.hasText(ticket.getAssigneeString())
+                && ticket.getAssigneeString().contains("\"uid\":\"" + currentUser.getUid() + "\"")) {
             return true;
         }
 
@@ -1236,6 +1286,12 @@ public class TicketRestService
                 currentMemberUid = memberOptional.get().getUid();
                 currentDeptUid = memberOptional.get().getDeptUid();
             }
+        }
+        if (adminPrivilege && currentMemberUid != null && hasOrgAdminRole(currentUser)) {
+            return true;
+        }
+        if (currentMemberUid == null) {
+            return false;
         }
         if (currentMemberUid != null && currentMemberUid.equals(ticket.getUserUid())) {
             return true;

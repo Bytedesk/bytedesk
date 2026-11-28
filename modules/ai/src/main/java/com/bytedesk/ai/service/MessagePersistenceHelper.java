@@ -1,14 +1,11 @@
 package com.bytedesk.ai.service;
 
 import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import com.bytedesk.ai.robot_message.RobotMessageCache;
 import com.bytedesk.ai.robot_message.RobotMessageRequest;
-import com.bytedesk.ai.service.agent.AgentCannedResponseTraceContext;
-import com.bytedesk.ai.service.agent.AgentGuidanceTraceRecorder;
 import com.bytedesk.core.message.MessageExtra;
 import com.bytedesk.core.message.MessagePersistCache;
 import com.bytedesk.core.message.MessageProtobuf;
@@ -26,10 +23,6 @@ public class MessagePersistenceHelper {
     private final RobotMessageCache robotMessageCache;
 
     private final PromptHelper promptHelper;
-
-    private final ObjectProvider<AgentGuidanceTraceRecorder> agentGuidanceTraceRecorderProvider;
-
-    private final ObjectProvider<AgentCannedResponseTraceContext> agentCannedResponseTraceContextProvider;
 
     public void persistMessage(MessageProtobuf messageProtobufQuery, MessageProtobuf messageProtobufReply,
             Boolean isUnanswered) {
@@ -88,17 +81,5 @@ public class MessagePersistenceHelper {
                 .build();
                 
         robotMessageCache.pushRequest(robotMessage);
-
-        AgentGuidanceTraceRecorder traceRecorder = agentGuidanceTraceRecorderProvider.getIfAvailable();
-        if (traceRecorder != null) {
-            AgentCannedResponseTraceContext cannedResponseTraceContext = agentCannedResponseTraceContextProvider
-                .getIfAvailable();
-            String cannedResponseUid = cannedResponseTraceContext != null
-                ? cannedResponseTraceContext.consume(messageProtobufReply.getUid())
-                : null;
-            traceRecorder.recordReplyPersistence(messageProtobufQuery, messageProtobufReply, isUnanswered,
-                latencyMs, promptTokens, completionTokens, totalTokens, fullPromptContent, aiProvider, aiModel,
-                cannedResponseUid);
-        }
     }
 }

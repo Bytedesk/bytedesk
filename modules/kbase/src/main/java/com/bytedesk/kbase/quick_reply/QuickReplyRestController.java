@@ -29,6 +29,7 @@ import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/quickreply")
@@ -38,6 +39,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     private final QuickReplyRestService quickReplyRestService;
 
     // 管理后台加载
+    @Operation(summary = "Query Quick Replies by Organization", description = "Retrieve quick replies for the current organization")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query quickReply by org")
     @Override
@@ -50,6 +52,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     // 客服端加载
+    @Operation(summary = "Query Quick Replies by User", description = "Retrieve quick replies for the current user")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query quickReply by user")
     @Override
@@ -62,6 +65,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
     }
 
     // @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_READ)
+    @Operation(summary = "Query Quick Replies by UID", description = "Retrieve a specific quick replie entry by its unique identifier")
     @Override
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(QuickReplyRequest request) {
@@ -71,6 +75,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
     
+    @Operation(summary = "Create Quick Replies", description = "Create a new quick replie entry")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_CREATE, description = "create quickReply")
     @Override
@@ -82,6 +87,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
+    @Operation(summary = "Update Quick Replies", description = "Update an existing quick replie entry")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_UPDATE, description = "update quickReply")
     @Override
@@ -93,6 +99,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
 
+    @Operation(summary = "Delete Quick Replies", description = "Delete a quick replie entry")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_DELETE, description = "delete quickReply")
     @Override
@@ -104,6 +111,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success("delete success", request.getUid()));
     }
     
+    @Operation(summary = "Enable / Disable", description = "Enable or disable quick replie entries")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_ENABLE, description = "enable quickReply")
     @PostMapping("/enable")
@@ -114,6 +122,7 @@ public class QuickReplyRestController extends BaseRestController<QuickReplyReque
         return ResponseEntity.ok(JsonResult.success(quickReply));
     }
     
+    @Operation(summary = "Export Quick Replies", description = "Export quick replies to Excel format")
     @PreAuthorize(QuickReplyPermissions.HAS_QUICK_REPLY_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_QUICK_REPLY, action = I18Consts.I18N_ACTION_EXPORT, description = "export quickReply")
     @GetMapping("/export")

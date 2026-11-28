@@ -283,13 +283,6 @@ public class RobotLlm {
     @Transient
     private RobotToolIntentContext toolIntentContext;
 
-    /**
-     * 单轮请求内工具调用总次数上限（规划 G9，非持久化，运行时由已发布 toolsSettings 填充）。
-     * null 或 <=0 表示不限制。
-     */
-    @Transient
-    private Integer maxToolInvocations;
-
     // ===== Spring AI Advisor 控制字段 =====
     // 注：敏感词不再按 robot 存储，统一复用 TabooService 数据库源（按 orgUid 隔离），
     // 与现有消息层 taboo（TabooFilterHelper）共用同一份词库，避免双份维护。
@@ -311,7 +304,7 @@ public class RobotLlm {
     @Column(name = "llm_re_reading_enabled")
     private Boolean reReadingEnabled = false;
 
-    // 多轮记忆开关。默认关闭（向后兼容）。阶段3 启用 MessageChatMemoryAdvisor 时生效。
+    // 多轮记忆开关。默认关闭（向后兼容）。阶段3 启用 SessionMemoryAdvisor 时生效（原 MessageChatMemoryAdvisor 已废弃迁移）。
     @Builder.Default
     @Column(name = "llm_memory_enabled")
     private Boolean memoryEnabled = false;

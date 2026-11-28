@@ -15,7 +15,6 @@
 package com.bytedesk.core.config;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -29,10 +28,8 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
-// import io.swagger.v3.oas.models.OpenAPI;
-// import io.swagger.v3.oas.models.info.Info;
 import lombok.Getter;
 
 /**
@@ -77,11 +74,13 @@ public class BytedeskConfig {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
-        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory()); //
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        restTemplate.setInterceptors(Arrays.asList(new TraceIdInterceptor()));
-        return restTemplate;
+    public RestClient restClient() {
+        return RestClient.builder()
+                .requestFactory(new HttpComponentsClientHttpRequestFactory())
+                .configureMessageConverters(converters ->
+                        converters.withStringConverter(new StringHttpMessageConverter(StandardCharsets.UTF_8)))
+                .requestInterceptor(new TraceIdInterceptor())
+                .build();
     }
 
 }

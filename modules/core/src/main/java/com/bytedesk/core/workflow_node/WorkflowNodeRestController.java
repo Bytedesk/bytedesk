@@ -15,7 +15,7 @@ package com.bytedesk.core.workflow_node;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,6 +41,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
 
     private final WorkflowNodeRestService workflow_nodeRestService;
 
+    @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_READ)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workflow_node by org")
     @Operation(summary = "Query WorkflowNodes by Organization", description = "Retrieve workflow_nodes for the current organization")
     @Override
@@ -53,6 +53,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
+    @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_READ)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workflow_node by user")
     @Operation(summary = "Query WorkflowNodes by User", description = "Retrieve workflow_nodes for the current user")
     @Override
@@ -64,6 +65,7 @@ public class WorkflowNodeRestController extends BaseRestController<WorkflowNodeR
         return ResponseEntity.ok(JsonResult.success(workflow_nodes));
     }
 
+    @PreAuthorize(WorkflowNodePermissions.HAS_WORKFLOW_NODE_READ)
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_NODE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow_node by uid")
     @Operation(summary = "Query WorkflowNode by UID", description = "Retrieve a specific workflow_node by its unique identifier")
     @Override

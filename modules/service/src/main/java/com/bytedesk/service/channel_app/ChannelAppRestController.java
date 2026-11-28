@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,6 +44,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
 
     private final ChannelAppRestService channelRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query channel app")
     @Operation(summary = "Query Channel Apps by Organization", description = "Retrieve channel app list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -56,6 +59,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query channel app")
     @Operation(summary = "Query Channel Apps by User", description = "Retrieve channel app list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -70,6 +74,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(apps));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query channel app")
     @Operation(summary = "Query Channel App by UID", description = "Retrieve channel app details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -84,6 +89,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_CREATE, description = "create channel app")
     @Operation(summary = "Create Channel App", description = "Create a new channel app")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -98,6 +104,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_UPDATE, description = "update channel app")
     @Operation(summary = "Update Channel App", description = "Update channel app information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
@@ -112,6 +119,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success(app));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_DELETE, description = "delete channel app")
     @Operation(summary = "Delete Channel App", description = "Delete the specified channel app")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")
@@ -124,6 +132,7 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_CHANNEL_APP, action = I18Consts.I18N_ACTION_EXPORT, description = "export channel app")
     @Operation(summary = "Export Channel Apps", description = "Export channel app data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
@@ -140,6 +149,4 @@ public class ChannelAppRestController extends BaseRestController<ChannelAppReque
         );
     }
 
-    
-    
 }

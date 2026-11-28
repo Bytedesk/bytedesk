@@ -87,9 +87,7 @@ public class SpringAIAnthropicService extends BaseSpringAIService {
         try {
                 return applyRobotToolCallbacks(AnthropicChatOptions.builder()
                     .model(llm.getTextModel())
-                    .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
-                    .topP(llm.getTopP())
                         .build(), llm);
         } catch (Exception e) {
             log.error("Error creating Anthropic options for model {}", llm.getTextModel(), e);
@@ -134,9 +132,7 @@ public class SpringAIAnthropicService extends BaseSpringAIService {
                     .apiKey(provider.getApiKey())
                     .baseUrl(provider.getBaseUrl())
                     .model(llm.getTextModel())
-                    .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
-                    .topP(llm.getTopP())
                     .build();
             return AnthropicChatModel.builder()
                     .options(resolvedOptions)

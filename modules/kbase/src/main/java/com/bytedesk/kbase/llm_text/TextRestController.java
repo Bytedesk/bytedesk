@@ -32,6 +32,7 @@ import com.bytedesk.kbase.llm_text.vector.TextVectorService;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Description;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/llm/text")
@@ -51,6 +52,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         this.textElasticService = textElasticService;
     }
 
+    @Operation(summary = "Query Texts by Organization", description = "Retrieve texts for the current organization")
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query text by org")
     @GetMapping("/query/org")
@@ -62,6 +64,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
+    @Operation(summary = "Query Texts by User", description = "Retrieve texts for the current user")
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query text by user")
     @GetMapping({ "/query", "/query/user" })
@@ -73,6 +76,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(texts));
     }
 
+    @Operation(summary = "Create Texts", description = "Create a new text entry")
     @PreAuthorize(TextPermissions.HAS_TEXT_CREATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_CREATE, description = "create text")
     @PostMapping("/create")
@@ -84,6 +88,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @Operation(summary = "Update Texts", description = "Update an existing text entry")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE, description = "update text")
     @PostMapping("/update")
@@ -95,6 +100,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(text));
     }
 
+    @Operation(summary = "Delete Texts", description = "Delete a text entry")
     @PreAuthorize(TextPermissions.HAS_TEXT_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE, description = "delete text")
     @PostMapping("/delete")
@@ -106,6 +112,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Delete All", description = "Delete all texts entries")
     @PreAuthorize(TextPermissions.HAS_TEXT_DELETE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all text")
     @PostMapping("/deleteAll")
@@ -117,6 +124,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // enable/disable text
+    @Operation(summary = "Enable / Disable", description = "Enable or disable text entries")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_ENABLE, description = "enable text")
     @PostMapping("/enable")
@@ -127,6 +135,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(textResponse));
     }
 
+    @Operation(summary = "Export Texts", description = "Export texts to Excel format")
     @PreAuthorize(TextPermissions.HAS_TEXT_EXPORT)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_EXPORT, description = "export text")
     @GetMapping("/export")
@@ -142,6 +151,8 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         );
     }
 
+    @Operation(summary = "Query Texts by UID", description = "Retrieve a specific text entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query text")
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
     @Override
     public ResponseEntity<?> queryByUid(TextRequest request) {
@@ -150,6 +161,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch index
+    @Operation(summary = "Update Elastic Index", description = "Update the elastic search index")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_INDEX, description = "update text index")
     @PostMapping("/updateIndex")
@@ -161,6 +173,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // delete elasticsearch index
+    @Operation(summary = "Delete Elastic Index", description = "Delete the elastic search index")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_INDEX, description = "delete text elastic index")
     @PostMapping("/deleteIndex")
@@ -170,6 +183,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // sync elasticsearch index status
+    @Operation(summary = "Sync Elastic Index Status", description = "Synchronize elastic index status")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_SYNC_INDEX_STATUS, description = "sync text elastic status")
     @PostMapping("/syncIndexStatus")
@@ -179,6 +193,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // sync elasticsearch index status by kbUid
+    @Operation(summary = "Sync Elastic Index Status by KB", description = "Synchronize elastic index status by knowledge base")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_BATCH_SYNC_INDEX_STATUS, description = "sync text elastic status by kb")
     @PostMapping("/syncIndexStatusByKbUid")
@@ -188,6 +203,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // delete all elasticsearch index by kbUid
+    @Operation(summary = "Delete All Elastic Index by KB", description = "Delete all elastic indexes of a knowledge base")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_INDEX_BY_KB, description = "delete text elastic index by kb")
     @PostMapping("/deleteAllIndexByKbUid")
@@ -197,6 +213,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch vector index
+    @Operation(summary = "Update Vector Index", description = "Update the vector index")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_VECTOR_INDEX, description = "update text vector index")
     @PostMapping("/updateVectorIndex")
@@ -210,6 +227,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // delete vector index
+    @Operation(summary = "Delete Vector Index", description = "Delete the vector index")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX, description = "delete text vector index")
     @PostMapping("/deleteVectorIndex")
@@ -222,6 +240,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // sync vector status
+    @Operation(summary = "Sync Vector Index Status", description = "Synchronize vector index status")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_SYNC_VECTOR_STATUS, description = "sync text vector status")
     @PostMapping("/syncVectorStatus")
@@ -233,6 +252,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.error("vector service not enabled"));
     }
 
+    @Operation(summary = "Query Elastic Document by UID", description = "Retrieve the elastic document of an entry")
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_ELASTIC_INDEX, description = "query text elastic by uid")
     @PostMapping("/queryElasticByUid")
@@ -241,6 +261,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @Operation(summary = "Query Vector Document by UID", description = "Retrieve the vector document of an entry")
     @PreAuthorize(TextPermissions.HAS_TEXT_READ)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_QUERY_VECTOR_INDEX, description = "query text vector by uid")
     @PostMapping("/queryVectorByUid")
@@ -253,6 +274,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // sync vector status by kbUid
+    @Operation(summary = "Sync Vector Index Status by KB", description = "Synchronize vector index status by knowledge base")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_BATCH_SYNC_VECTOR_STATUS, description = "sync text vector status by kb")
     @PostMapping("/syncVectorStatusByKbUid")
@@ -265,6 +287,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch all index
+    @Operation(summary = "Update All Elastic Indexes", description = "Update all elastic indexes")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_ALL_INDEX, description = "update all text index")
     @PostMapping("/updateAllIndex")
@@ -276,6 +299,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // update elasticsearch all vector index
+    @Operation(summary = "Update All Vector Indexes", description = "Update all vector indexes")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_UPDATE_ALL_VECTOR_INDEX, description = "update all text vector index")
     @PostMapping("/updateAllVectorIndex")
@@ -289,6 +313,7 @@ public class TextRestController extends BaseRestController<TextRequest, TextRest
     }
 
     // delete all vector index by kbUid
+    @Operation(summary = "Delete All Vector Indexes by KB", description = "Delete all vector indexes of a knowledge base")
     @PreAuthorize(TextPermissions.HAS_TEXT_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_TEXT, action = I18Consts.I18N_ACTION_DELETE_VECTOR_INDEX_BY_KB, description = "delete text vector index by kb")
     @PostMapping("/deleteAllVectorIndexByKbUid")

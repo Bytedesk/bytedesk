@@ -45,9 +45,6 @@ public class SpringAIAnthropicChatConfig {
     @Value("${spring.ai.anthropic.chat.options.model:claude-sonnet-4-5}")
     private String model;
 
-    @Value("${spring.ai.anthropic.chat.options.temperature:0.7}")
-    private Double temperature;
-
     @Value("${spring.ai.anthropic.chat.options.max-tokens:4096}")
     private Integer maxTokens;
 
@@ -55,7 +52,6 @@ public class SpringAIAnthropicChatConfig {
     AnthropicChatOptions anthropicChatOptions() {
         return AnthropicChatOptions.builder()
                 .model(model)
-                .temperature(temperature)
                 .maxTokens(maxTokens)
                 .build();
     }
@@ -67,7 +63,6 @@ public class SpringAIAnthropicChatConfig {
                 .apiKey(apiKey)
                 .baseUrl(baseUrl)
                 .model(model)
-                .temperature(temperature)
                 .maxTokens(maxTokens)
                 .build();
         return AnthropicChatModel.builder()

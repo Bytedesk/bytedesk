@@ -45,6 +45,7 @@ import com.bytedesk.core.utils.CountryCodeUtils;
 import com.bytedesk.core.rbac.token.TokenRestService;
 import org.springframework.util.StringUtils;
 import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Slf4j
 @RestController
@@ -68,6 +69,8 @@ public class AuthController {
 
     private final BytedeskProperties bytedeskProperties;
 
+    @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_REGISTER, description = "Register new user", type = ActionTypeEnum.REGISTER)
+    @Operation(summary = "Register", description = "Register a new user account")
     @PostMapping(value = "/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest, HttpServletRequest request) {
 
@@ -86,6 +89,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success("register success", userResponse));
     }
 
+    @Operation(summary = "Login with Username and Password", description = "Authenticate with username and password")
     @PostMapping("/login")
     @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_USERNAME, description = "Login With Username & Password", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithUsernamePassword(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
@@ -219,6 +223,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Send Mobile Verification Code", description = "Send a verification code to a mobile number")
     @PostMapping("/send/mobile")
     public ResponseEntity<?> sendMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send mobile code {}, channel {}, type {}", authRequest.toString(), authRequest.getChannel(),
@@ -239,6 +244,7 @@ public class AuthController {
         return ResponseEntity.ok().body(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
+    @Operation(summary = "Login with Mobile and Code", description = "Authenticate with mobile number and verification code")
     @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_MOBILE, description = "Login With mobile & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/mobile")
     public ResponseEntity<?> loginWithMobileCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
@@ -305,6 +311,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Send Email Verification Code", description = "Send a verification code to an email address")
     @PostMapping("/send/email")
     public ResponseEntity<?> sendEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
         log.debug("send email code {}", authRequest.toString());
@@ -323,6 +330,7 @@ public class AuthController {
         return ResponseEntity.ok(JsonResult.success(I18Consts.I18N_AUTH_CAPTCHA_SEND_SUCCESS));
     }
 
+    @Operation(summary = "Login with Email and Code", description = "Authenticate with email and verification code")
     @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_EMAIL, description = "Login With email & code", type = ActionTypeEnum.LOGIN)
     @PostMapping("/login/email")
     public ResponseEntity<?> loginWithEmailCode(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
@@ -381,6 +389,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "Login with Access Token", description = "Authenticate with an access token")
     @PostMapping("/login/accessToken")
     @ActionAnnotation(title = I18Consts.I18N_AUTH, action = I18Consts.I18N_ACTION_LOGIN_ACCESS_TOKEN, description = "Login With Access Token", type = ActionTypeEnum.LOGIN)
     public ResponseEntity<?> loginWithAccessToken(@RequestBody AuthRequest authRequest, HttpServletRequest request) {
@@ -411,6 +420,5 @@ public class AuthController {
             return ResponseEntity.ok().body(JsonResult.error(e.getMessage(), HttpStatus.FORBIDDEN.value(), false));
         }
     }
-
 
 }

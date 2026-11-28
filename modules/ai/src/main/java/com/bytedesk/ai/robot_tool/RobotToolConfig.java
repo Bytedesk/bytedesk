@@ -126,6 +126,8 @@ public class RobotToolConfig implements Serializable {
 
         /**
          * Whether the tool requires manual approval before execution.
+         * 作为内置目录（{@link #defaultSpringAiTools()}）的种子值，经 ToolRestService#initTools
+         * 写入 ToolEntity.requiresApproval；运行时强制执行以 ToolEntity 为准。
          */
         @Builder.Default
         private Boolean requiresApproval = false;

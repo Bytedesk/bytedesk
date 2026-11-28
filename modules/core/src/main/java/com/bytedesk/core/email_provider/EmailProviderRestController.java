@@ -28,6 +28,7 @@ import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/email")
@@ -37,6 +38,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
     private final EmailProviderRestService emailRestService;
     
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Email Providers by Organization", description = "Retrieve email providers for the current organization")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query email by org")
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_READ)
     @Override
@@ -48,6 +50,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success(emails));
     }
 
+    @Operation(summary = "Query Email Providers by User", description = "Retrieve email providers for the current user")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query email by user")
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_READ)
     @Override
@@ -59,6 +62,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success(emails));
     }
 
+    @Operation(summary = "Query Email Providers by UID", description = "Retrieve a specific email provider entry by its unique identifier")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query email by uid")
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_READ)
     @Override
@@ -70,6 +74,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
+    @Operation(summary = "Create Email Providers", description = "Create a new email provider entry")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_CREATE, description = "create email")
     @Override
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_CREATE)
@@ -81,6 +86,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
+    @Operation(summary = "Update Email Providers", description = "Update an existing email provider entry")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_UPDATE, description = "update email")
     @Override
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_UPDATE)
@@ -92,6 +98,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success(email));
     }
 
+    @Operation(summary = "Delete Email Providers", description = "Delete a email provider entry")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_DELETE, description = "delete email")
     @Override
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_DELETE)
@@ -103,6 +110,7 @@ public class EmailProviderRestController extends BaseRestController<EmailProvide
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Email Providers", description = "Export email providers to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_EMAIL, action = I18Consts.I18N_ACTION_EXPORT, description = "export email")
     @Override
     @PreAuthorize(EmailProviderPermissions.HAS_EMAIL_PROVIDER_EXPORT)

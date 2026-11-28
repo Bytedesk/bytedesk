@@ -162,7 +162,10 @@ public final class MenuInitData {
                 seeds.add(MenuSeed.root("/ticket", "ticket", "inbox", "menu.dashboard.ticket"));
                 seeds.add(MenuSeed.root("/task", "calendar", "schedule", "menu.dashboard.calendar"));
                 // 文档/质检为 IS_DEBUG 调试菜单，前端仍会按 IS_DEBUG 控制显示
-                seeds.add(MenuSeed.root("/document", "document", "file", "menu.dashboard.document"));
+                // office 前端（frontend/office）内嵌页，原路径 /document，旧链接由 reconcilePlatformMenus 启动时软删除
+                seeds.add(MenuSeed.root("/office", "office", "file", "menu.dashboard.office"));
+                // 网盘同为 IS_DEBUG 调试菜单，默认关闭（enabled=false），可在菜单管理中开启
+                seeds.add(MenuSeed.root("/disk", "disk", "cloudServer", "menu.dashboard.disk", Boolean.FALSE));
                 seeds.add(MenuSeed.root("/callcenter", "callcenter", "phone", "menu.dashboard.callcenter"));
                 seeds.add(MenuSeed.root("/quality", "quality", "safetyCertificate", "menu.dashboard.quality"));
                 seeds.add(MenuSeed.root("/contact", "contact", "contacts", "menu.dashboard.contact"));
@@ -187,6 +190,10 @@ public final class MenuInitData {
 
                 public static MenuSeed root(String link, String name, String icon, String nickname) {
                         return new MenuSeed(link, name, icon, link, 0, null, null, BytedeskConsts.DEFAULT_COLOR, nickname, Boolean.TRUE);
+                }
+
+                public static MenuSeed root(String link, String name, String icon, String nickname, Boolean enabled) {
+                        return new MenuSeed(link, name, icon, link, 0, null, null, BytedeskConsts.DEFAULT_COLOR, nickname, enabled);
                 }
 
                 public static MenuSeed child(String link, String name, String icon, String parentKey, String nickname) {

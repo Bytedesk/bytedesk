@@ -112,6 +112,7 @@ public class AgentStatusRestController extends BaseRestController<AgentStatusReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Agent Status", description = "Export agent status to Excel format")
     @Override
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status")
     @GetMapping("/export")

@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.rbac.role.RolePermissions;
 import com.bytedesk.core.utils.JsonResult;
 
@@ -40,6 +42,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
 
     private final KbaseCommentRestService commentService;
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query comment")
     @Operation(summary = "Query Comments by Organization", description = "Query the list of comments by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -53,6 +56,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query comment")
     @Operation(summary = "Query Comments by User", description = "Query the list of comments by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -65,6 +69,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comments));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_CREATE, description = "create comment")
     @Operation(summary = "Create Comment", description = "Create a new comment")
     @ApiResponse(responseCode = "200", description = "Creation successful",
         content = @Content(mediaType = "application/json", 
@@ -77,6 +82,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_UPDATE, description = "update comment")
     @Operation(summary = "Update Comment", description = "Update comment information")
     @ApiResponse(responseCode = "200", description = "Update successful",
         content = @Content(mediaType = "application/json", 
@@ -89,6 +95,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success(comment));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_DELETE, description = "delete comment")
     @Operation(summary = "Delete Comment", description = "Delete the specified comment")
     @ApiResponse(responseCode = "200", description = "Deletion successful")
     @Override
@@ -99,6 +106,7 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_EXPORT, description = "export comment")
     @Operation(summary = "Export Comments", description = "Export comment data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
@@ -107,6 +115,8 @@ public class KbaseCommentRestController extends BaseRestController<KbaseCommentR
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
 
+    @Operation(summary = "Query Comments by UID", description = "Retrieve a specific comment entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_COMMENT, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query comment")
     @Override
     public ResponseEntity<?> queryByUid(KbaseCommentRequest request) {
         // TODO Auto-generated method stub

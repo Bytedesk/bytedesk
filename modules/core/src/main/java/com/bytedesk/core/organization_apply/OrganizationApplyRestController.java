@@ -25,9 +25,9 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/organization/apply")
@@ -36,6 +36,8 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
 
     private final OrganizationApplyRestService organizationRestService;
 
+    @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_CREATE)
+    @Operation(summary = "Apply to Join Organization", description = "Submit an application to join an organization")
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_SUBMIT_APPLY, description = "apply join organization")
     @PostMapping("/join")
     public ResponseEntity<?> applyJoin(@RequestBody OrganizationApplyRequest request) {
@@ -43,6 +45,7 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Approve", description = "a organization applications")
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_APPROVE, description = "approve join organization apply")
     @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_UPDATE)
     @PostMapping("/approve")
@@ -51,6 +54,7 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Reject Remote Invitation", description = "Reject a remote support invitation")
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_REJECT, description = "reject join organization apply")
     @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_UPDATE)
     @PostMapping("/reject")
@@ -59,6 +63,8 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(OrganizationApplyPermissions.HAS_ORGANIZATION_APPLY_UPDATE)
+    @Operation(summary = "Cancel", description = "c organization applications")
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_CANCEL, description = "cancel join organization apply")
     @PostMapping("/cancel")
     public ResponseEntity<?> cancel(@RequestBody OrganizationApplyRequest request) {
@@ -66,6 +72,7 @@ public class OrganizationApplyRestController extends BaseRestController<Organiza
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @Operation(summary = "Export Organization Applications", description = "Export organization applications to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_ORGANIZATION_APPLY, action = I18Consts.I18N_ACTION_EXPORT, description = "export organizationApply")
     @Override
     // @PreAuthorize("hasAuthority('organizationApply_EXPORT')")

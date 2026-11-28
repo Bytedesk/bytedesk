@@ -30,6 +30,7 @@ import com.bytedesk.core.utils.JsonResult;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/agent/status/setting")
@@ -40,6 +41,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
     private final AgentStatusSettingRestService tagService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Agent Status Settings by Organization", description = "Retrieve agent status settings for the current organization")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query agent status setting by org")
     @GetMapping("/query/org")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
@@ -51,6 +53,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
+    @Operation(summary = "Query Agent Status Settings by User", description = "Retrieve agent status settings for the current user")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query agent status setting by user")
     @GetMapping({ "/query", "/query/user" })
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
@@ -62,6 +65,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
+    @Operation(summary = "Query Agent Status Settings by UID", description = "Retrieve a specific agent status setting entry by its unique identifier")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query agent status setting by uid")
     @GetMapping("/query/uid")
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_READ)
@@ -73,6 +77,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Create Agent Status Settings", description = "Create a new agent status setting entry")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_CREATE, description = "create agent status setting")
     @Override
     @PostMapping("/create")
@@ -84,6 +89,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Update Agent Status Settings", description = "Update an existing agent status setting entry")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_UPDATE, description = "update agent status setting")
     @Override
     @PostMapping("/update")
@@ -95,6 +101,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Delete Agent Status Settings", description = "Delete a agent status setting entry")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_DELETE, description = "delete agent status setting")
     @Override
     @PostMapping("/delete")
@@ -106,6 +113,7 @@ public class AgentStatusSettingRestController extends BaseRestController<AgentSt
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Agent Status Settings", description = "Export agent status settings to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_AGENT_STATUS_SETTING, action = I18Consts.I18N_ACTION_EXPORT, description = "export agent status setting")
     @Override
     @PreAuthorize(AgentStatusSettingPermissions.HAS_AGENT_STATUS_SETTING_EXPORT)

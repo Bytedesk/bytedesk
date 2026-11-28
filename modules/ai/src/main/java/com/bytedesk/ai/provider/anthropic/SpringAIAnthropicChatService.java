@@ -74,9 +74,7 @@ public class SpringAIAnthropicChatService extends BaseSpringAIService {
         try {
                 return applyRobotToolCallbacks(AnthropicChatOptions.builder()
                     .model(llm.getTextModel())
-                    .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
-                    .topP(llm.getTopP())
                         .build(), llm);
         } catch (Exception e) {
             log.error("Error creating dynamic options for model {}", llm.getTextModel(), e);

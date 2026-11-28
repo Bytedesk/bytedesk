@@ -12,7 +12,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.bytedesk.ai.robot.RobotProtobuf;
-import com.bytedesk.ai.service.agent.AgentResponseTimingContext;
 import com.volcengine.ark.runtime.exception.ArkHttpException;
 
 import org.springframework.ai.chat.messages.Message;
@@ -32,8 +31,6 @@ public class SseMessageHelper {
     private final MessagePersistenceHelper messagePersistenceHelper;
 
     private final PromptHelper promptHelper;
-
-    private final AgentResponseTimingContext agentResponseTimingContext;
 
     private boolean shouldPersist(SseEmitter emitter) {
         if (emitter instanceof SsePersistenceControl persistControl) {
@@ -93,7 +90,6 @@ public class SseMessageHelper {
 
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_START);
                 messageProtobufReply.setContent(streamContent.toJson());
-                agentResponseTimingContext.start(messageProtobufReply.getUid());
                 String startJson = messageProtobufReply.toJson();
                 notifyConsumer(emitter, startJson);
                 emitter.send(SseEmitter.event().data(startJson).id(messageProtobufReply.getUid()).name("message"));
@@ -242,9 +238,8 @@ public class SseMessageHelper {
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_END);
                 messageProtobufReply.setContent(endContent.toJson());
                 if (persistMessage && shouldPersist(emitter)) {
-                    long latencyMs = agentResponseTimingContext.finishMillis(messageProtobufReply.getUid());
                     messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, false,
-                            latencyMs, promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
+                            0L, promptTokens, completionTokens, totalTokens, prompt, aiProvider, aiModel);
                 }
                 String messageJson = messageProtobufReply.toJson();
                 notifyConsumer(emitter, messageJson);
@@ -332,9 +327,8 @@ public class SseMessageHelper {
                 String messageJson = messageProtobufReply.toJson();
                 notifyConsumer(emitter, messageJson);
                 if (shouldPersist(emitter)) {
-                    long latencyMs = agentResponseTimingContext.finishMillis(messageProtobufReply.getUid());
                     messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true,
-                            latencyMs, 0, 0, 0, null, "", "");
+                            0L, 0, 0, 0, null, "", "");
                 }
                 try {
                     emitter.send(
@@ -357,9 +351,8 @@ public class SseMessageHelper {
                 messageProtobufReply.setType(MessageTypeEnum.ROBOT_STREAM_ERROR);
                 messageProtobufReply.setContent(errorContent.toJson());
                 if (shouldPersist(emitter)) {
-                    long latencyMs = agentResponseTimingContext.finishMillis(messageProtobufReply.getUid());
                     messagePersistenceHelper.persistMessage(messageProtobufQuery, messageProtobufReply, true,
-                            latencyMs, 0, 0, 0, null, "", "");
+                            0L, 0, 0, 0, null, "", "");
                 }
             }
         } catch (Exception e) {

@@ -237,8 +237,6 @@ public class SpringAIMinimaxChatController {
                     message,
                     AnthropicChatOptions.builder()
                         .model("MiniMax-M3")
-                        .temperature(0.7)
-                        .topP(0.9)
                         .maxTokens(4096)
                         .build()
                 ));

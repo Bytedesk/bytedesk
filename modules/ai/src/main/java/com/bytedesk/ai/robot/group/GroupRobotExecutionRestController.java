@@ -10,11 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bytedesk.core.group.GroupEntity;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.group.GroupRestService;
 import com.bytedesk.core.rbac.auth.AuthService;
 import com.bytedesk.core.rbac.user.UserEntity;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 群机器人执行任务查询/重试（客服端）。
@@ -44,6 +46,8 @@ public class GroupRobotExecutionRestController {
 
     private final AuthService authService;
 
+    @PreAuthorize(GroupRobotExecutionPermissions.HAS_GROUP_ROBOT_EXECUTION_READ)
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query robot")
     @Operation(summary = "查询执行任务", description = "按源消息查询群机器人执行状态（群成员可读）")
     @ApiResponse(responseCode = "200", description = "查询成功")
     @GetMapping("/query")
@@ -57,6 +61,8 @@ public class GroupRobotExecutionRestController {
         return ResponseEntity.ok(JsonResult.success(result));
     }
 
+    @PreAuthorize(GroupRobotExecutionPermissions.HAS_GROUP_ROBOT_EXECUTION_UPDATE)
+    @ActionAnnotation(title = I18Consts.I18N_ROBOT, action = I18Consts.I18N_ACTION_EXECUTE, description = "execute robot")
     @Operation(summary = "重试失败任务", description = "仅提问者或群管理员可重试；任务重置为 PENDING")
     @ApiResponse(responseCode = "200", description = "重试成功")
     @PostMapping("/retry")

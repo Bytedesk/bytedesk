@@ -15,6 +15,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +31,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
 
     private final WorkgroupSettingsRestService workgroupSettingsRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workgroup settings")
     @Operation(summary = "Query Workgroup Settings by Organization", description = "Retrieve workgroup settings list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
@@ -40,6 +43,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workgroup settings")
     @Operation(summary = "Query Workgroup Settings by User", description = "Retrieve workgroup settings list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
@@ -51,6 +55,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workgroup settings")
     @Operation(summary = "Query Workgroup Settings by UID", description = "Retrieve workgroup settings details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
@@ -62,6 +67,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_CREATE, description = "create workgroup settings")
     @Operation(summary = "Create Workgroup Settings", description = "Create new workgroup settings")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
@@ -76,6 +82,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_UPDATE, description = "update workgroup settings")
     @Operation(summary = "Update Workgroup Settings", description = "Update workgroup settings information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", schema = @Schema(implementation = WorkgroupSettingsResponse.class)))
@@ -87,6 +94,7 @@ public class WorkgroupSettingsRestController extends BaseRestController<Workgrou
         return ResponseEntity.ok(JsonResult.success(resp));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_WORKGROUP_SETTINGS, action = I18Consts.I18N_ACTION_DELETE, description = "delete workgroup settings")
     @Operation(summary = "Delete Workgroup Settings", description = "Delete the specified workgroup settings")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @PostMapping("/delete")

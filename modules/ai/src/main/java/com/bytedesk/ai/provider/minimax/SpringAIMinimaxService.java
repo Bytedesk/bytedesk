@@ -86,9 +86,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
         try {
                 return applyRobotToolCallbacks(AnthropicChatOptions.builder()
                     .model(llm.getTextModel())
-                    .temperature(llm.getTemperature())
                     .maxTokens(llm.getMaxTokens())
-                    .topP(llm.getTopP())
                         .build(), llm);
         } catch (Exception e) {
             log.error("Error creating Minimax options for model {}", llm.getTextModel(), e);
@@ -132,9 +130,7 @@ public class SpringAIMinimaxService extends BaseSpringAIService {
                 .apiKey(provider.getApiKey())
                 .baseUrl(StringUtils.hasText(provider.getBaseUrl()) ? provider.getBaseUrl() : "https://api.minimax.io/anthropic")
                 .model(options.getModel())
-                .temperature(options.getTemperature())
                 .maxTokens(options.getMaxTokens())
-                .topP(options.getTopP())
                 .build();
             return AnthropicChatModel.builder()
                 .options(resolvedOptions)

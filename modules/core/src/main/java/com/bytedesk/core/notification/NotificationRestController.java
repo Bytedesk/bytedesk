@@ -217,6 +217,8 @@ public class NotificationRestController extends BaseRestController<NotificationR
     /**
      * 导出通知列表（暂未实现）
      */
+    @Operation(summary = "Export Notifications", description = "Export notifications to Excel format")
+    @ActionAnnotation(title = I18Consts.I18N_NOTIFICATION, action = I18Consts.I18N_ACTION_EXPORT, description = "export notification")
     @Override
     public Object export(NotificationRequest request, HttpServletResponse response) {
         throw new UnsupportedOperationException("Unimplemented method 'export'");

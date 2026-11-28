@@ -21,9 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.context.annotation.Description;
 
 import com.bytedesk.core.base.BaseRestController;
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.llm.LlmProviderConfigDefault;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
@@ -32,6 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Tag(name = "LLM Provider Management", description = "LLM provider management APIs")
 @RestController
@@ -42,6 +44,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
 
     private final LlmProviderRestService llmProviderRestService;
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query llm provider")
     @Operation(summary = "Query LLM Providers by Organization", description = "Retrieve LLM provider list by organization ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -54,6 +57,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query llm provider")
     @Operation(summary = "Query LLM Providers by User", description = "Retrieve LLM provider list by user ID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -66,6 +70,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query llm provider")
     @Operation(summary = "Query LLM Provider by UID", description = "Retrieve LLM provider details by UID")
     @ApiResponse(responseCode = "200", description = "Query successful",
         content = @Content(mediaType = "application/json", 
@@ -78,7 +83,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
-
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_CREATE, description = "create llm provider")
     @Operation(summary = "Create LLM Provider", description = "Create a new LLM provider")
     @ApiResponse(responseCode = "200", description = "Created successfully",
         content = @Content(mediaType = "application/json", 
@@ -91,6 +96,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_UPDATE, description = "update llm provider")
     @Operation(summary = "Update LLM Provider", description = "Update LLM provider information")
     @ApiResponse(responseCode = "200", description = "Updated successfully",
         content = @Content(mediaType = "application/json", 
@@ -103,6 +109,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_DELETE, description = "delete llm provider")
     @Operation(summary = "Delete LLM Provider", description = "Delete the specified LLM provider")
     @ApiResponse(responseCode = "200", description = "Deleted successfully")
     @Override
@@ -113,6 +120,7 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_EXPORT, description = "export llm provider")
     @Operation(summary = "Export LLM Providers", description = "Export LLM provider data")
     @ApiResponse(responseCode = "200", description = "Export successful")
     @Override
@@ -121,10 +129,12 @@ public class LlmProviderRestController extends BaseRestController<LlmProviderReq
         throw new UnsupportedOperationException("Unimplemented method 'export'");
     }
     
+    @ActionAnnotation(title = I18Consts.I18N_LLM_PROVIDER, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query llm provider")
     @Operation(summary = "Get Default LLM Provider Configuration", description = "Retrieve the default configuration for LLM providers")
     @ApiResponse(responseCode = "200", description = "Retrieved successfully",
         content = @Content(mediaType = "application/json", 
         schema = @Schema(implementation = LlmProviderConfigDefault.class)))
+    @PreAuthorize(LlmProviderPermissions.HAS_LLM_PROVIDER_READ)
     @GetMapping("/config/default")
     public ResponseEntity<?> getLlmProviderConfigDefault() {
 

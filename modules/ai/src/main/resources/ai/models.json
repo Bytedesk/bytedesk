@@ -58,6 +58,12 @@
             "type": "EMBEDDING"
         },
         {
+            "name": "glm-5.4",
+            "nickname": "GLM-5.4",
+            "description": "GLM-5.4旗舰模型，首款采用Loop Transformer架构，支持图像、视频、文本和文件输入及1M上下文、128K最大输出，擅长视觉编程、长程任务与智能体应用",
+            "type": "VISION"
+        },
+        {
             "name": "glm-5.3",
             "nickname": "GLM-5.3",
             "description": "GLM-5.3旗舰文本模型，支持1M上下文与128K最大输出，擅长复杂软件工程与智能体任务，仅支持开启思考",

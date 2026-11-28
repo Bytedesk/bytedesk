@@ -13,6 +13,10 @@
  */
 package com.bytedesk.core.plugin;
 
+import com.bytedesk.core.annotation.ActionAnnotation;
+import com.bytedesk.core.constant.I18Consts;
+import com.bytedesk.core.rbac.role.RolePermissions;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +27,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 插件管理控制器
@@ -41,6 +46,8 @@ public class PluginController {
      * 获取所有插件列表
      * http://127.0.0.1:9003/api/v1/plugins
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query plugin")
     @GetMapping
     @Operation(summary = "获取所有插件", description = "获取系统中所有已注册的插件列表")
     public ResponseEntity<Map<String, Object>> getAllPlugins() {
@@ -62,6 +69,8 @@ public class PluginController {
     /**
      * 获取已启用的插件列表
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query plugin")
     @GetMapping("/enabled")
     @Operation(summary = "获取已启用插件", description = "获取系统中所有已启用的插件列表")
     public ResponseEntity<Map<String, Object>> getEnabledPlugins() {
@@ -81,6 +90,8 @@ public class PluginController {
     /**
      * 获取指定插件信息
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query plugin")
     @GetMapping("/{pluginId}")
     @Operation(summary = "获取插件详情", description = "根据插件ID获取插件详细信息")
     public ResponseEntity<Map<String, Object>> getPlugin(@PathVariable String pluginId) {
@@ -97,6 +108,8 @@ public class PluginController {
     /**
      * 获取插件健康状态
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query plugin")
     @GetMapping("/{pluginId}/health")
     @Operation(summary = "获取插件健康状态", description = "获取指定插件的健康检查状态")
     public ResponseEntity<Map<String, Object>> getPluginHealth(@PathVariable String pluginId) {
@@ -113,6 +126,8 @@ public class PluginController {
     /**
      * 获取所有插件的健康状态
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query plugin")
     @GetMapping("/health")
     @Operation(summary = "获取所有插件健康状态", description = "获取系统中所有插件的健康检查状态")
     public ResponseEntity<Map<String, Object>> getAllPluginsHealth() {
@@ -130,6 +145,8 @@ public class PluginController {
     /**
      * 获取插件统计信息
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query plugin")
     @GetMapping("/{pluginId}/statistics")
     @Operation(summary = "获取插件统计信息", description = "获取指定插件的统计数据")
     public ResponseEntity<Map<String, Object>> getPluginStatistics(@PathVariable String pluginId) {
@@ -146,6 +163,8 @@ public class PluginController {
     /**
      * 获取所有插件的统计信息
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query plugin")
     @GetMapping("/statistics")
     @Operation(summary = "获取所有插件统计信息", description = "获取系统中所有插件的统计数据")
     public ResponseEntity<Map<String, Object>> getAllPluginsStatistics() {
@@ -163,6 +182,8 @@ public class PluginController {
     /**
      * 获取插件概览信息
      */
+    @PreAuthorize(RolePermissions.ROLE_SUPER)
+    @ActionAnnotation(title = I18Consts.I18N_PLUGIN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query plugin")
     @GetMapping("/overview")
     @Operation(summary = "获取插件概览", description = "获取插件系统的概览信息")
     public ResponseEntity<Map<String, Object>> getPluginsOverview() {

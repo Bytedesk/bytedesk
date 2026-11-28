@@ -21,16 +21,18 @@ import lombok.extern.slf4j.Slf4j;
  * 调用均委托给 {@link ChatMemoryTestService}。
  * </p>
  *
- * <p>演示 chat-memory.adoc 中的各类用法：在 ChatClient 中使用记忆
- * （{@code MessageChatMemoryAdvisor}）、在 ChatModel 中手动维护记忆、{@code MessageWindowChatMemory}
- * 滑动窗口、会话 ID 隔离、以及 {@code ChatMemoryRepository} 的会话管理。</p>
+ * <p>演示 session.adoc 中的各类用法：在 ChatClient 中使用记忆
+ * （{@code SessionMemoryAdvisor}）、在 ChatModel 中手动维护记忆、{@code EventFilter.lastN}
+ * turn-aware 滑动窗口、会话 ID 隔离、以及 {@code SessionService} 的会话管理。
+ * （ChatMemory/MessageWindowChatMemory/MessageChatMemoryAdvisor 已废弃，全部迁移到 Session API。）</p>
  *
  * <p>注意：</p>
  * <ul>
  *   <li>所有接口受 {@code bytedesk.debug=true} 保护，生产环境返回 unavailable。</li>
  *   <li>使用 Spring AI 原生 {@code deepseekChatModel}，通过
  *       {@code @ConditionalOnBean(name="deepseekChatModel")} 守护。</li>
- *   <li>{@code ChatMemory.CONVERSATION_ID} 是必需参数，省略会抛 {@code IllegalArgumentException}。</li>
+ *   <li>{@code MemoryAdvisor.CONVERSATION_ID}（= SessionMemoryAdvisor.SESSION_ID_CONTEXT_KEY）
+ *       是必需参数，省略会抛 {@code IllegalStateException}。</li>
  * </ul>
  *
  * @see ChatMemoryTestService
@@ -47,7 +49,7 @@ public class ChatMemoryTestController {
 	private final BytedeskProperties bytedeskProperties;
 
 	// ============================================================
-	// 1. Memory in ChatClient —— MessageChatMemoryAdvisor（多轮对话）
+	// 1. Memory in ChatClient —— SessionMemoryAdvisor（多轮对话）
 	// ============================================================
 
 	/**
@@ -110,12 +112,13 @@ public class ChatMemoryTestController {
 	}
 
 	// ============================================================
-	// 3. MessageWindowChatMemory —— 滑动窗口
+	// 3. EventFilter.lastN —— turn-aware 滑动窗口
 	// ============================================================
 
 	/**
-	 * <p>演示 MessageWindowChatMemory 的滑动窗口：超过 maxMessages 时旧消息被淘汰，
-	 * 但 SystemMessage 始终保留。淘汰以「完整一轮（UserMessage 起始）」为边界。</p>
+	 * <p>演示 EventFilter.lastN(n) 的 turn-aware 滑动窗口（取代旧 MessageWindowChatMemory.maxMessages）：
+	 * 超过 n 时旧消息被淘汰（读取侧截断，完整日志保留在仓库供 searchEvents 检索）。
+	 * 淘汰以「完整一轮（UserMessage 起始）」为边界。</p>
 	 *
 	 * GET http://127.0.0.1:9003/spring/ai/api/v1/chat-memory/message-window?maxMessages=3&turns=5
 	 */
@@ -162,11 +165,11 @@ public class ChatMemoryTestController {
 	}
 
 	// ============================================================
-	// 5. ChatMemoryRepository 会话管理
+	// 5. SessionService 会话管理
 	// ============================================================
 
 	/**
-	 * <p>演示 ChatMemoryRepository 的会话管理 API。</p>
+	 * <p>演示 SessionService 的会话管理 API（取代旧 ChatMemoryRepository）。</p>
 	 * <ul>
 	 *   <li>{@code action=list}：列出所有会话 ID（findConversationIds）</li>
 	 *   <li>{@code action=get}：读取指定会话消息（findByConversationId），可带 message 先写入</li>

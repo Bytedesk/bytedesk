@@ -15,7 +15,7 @@ package com.bytedesk.core.workflow_log;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +26,9 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/workflow/log")
@@ -38,6 +38,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
     private final WorkflowLogRestService workflowResultRestService;
 
     // @PreAuthorize(RolePermissions.ROLE_ADMIN)
+    @Operation(summary = "Query Workflow Logs by Organization", description = "Retrieve workflow logs for the current organization")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query workflow log by org")
     @Override
     @GetMapping("/query/org")
@@ -48,6 +49,8 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
+    @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_READ)
+    @Operation(summary = "Query Workflow Logs by User", description = "Retrieve workflow logs for the current user")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query workflow log by user")
     @Override
     @GetMapping({"/query", "/query/user"})
@@ -58,6 +61,8 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tags));
     }
 
+    @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_READ)
+    @Operation(summary = "Query Workflow Logs by UID", description = "Retrieve a specific workflow log entry by its unique identifier")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow log by uid")
     @Override
     @GetMapping("/query/uid")
@@ -68,6 +73,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Create Workflow Logs", description = "Create a new workflow log entry")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_CREATE)
@@ -79,6 +85,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Update Workflow Logs", description = "Update an existing workflow log entry")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_UPDATE, description = "update workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_UPDATE)
@@ -90,6 +97,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success(tag));
     }
 
+    @Operation(summary = "Delete Workflow Logs", description = "Delete a workflow log entry")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_DELETE)
@@ -101,6 +109,7 @@ public class WorkflowLogRestController extends BaseRestController<WorkflowLogReq
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @Operation(summary = "Export Workflow Logs", description = "Export workflow logs to Excel format")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOG, action = I18Consts.I18N_ACTION_EXPORT, description = "export workflow log")
     @Override
     // @PreAuthorize(WorkflowLogPermissions.HAS_WORKFLOW_LOG_EXPORT)

@@ -35,12 +35,12 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.base.ExcelExportUtils;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 消息管理接口控制器
@@ -72,6 +72,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 查询请求
      * @return 分页消息列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query message")
     @Operation(summary = "Query Messages by Organization", description = "Return the message list for the current organization")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     @Override
@@ -89,6 +90,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 查询请求
      * @return 分页消息列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query message")
     @Operation(summary = "Query Messages by User", description = "Return the message list for the current user")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     @Override
@@ -106,6 +108,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 查询请求
      * @return 消息详情
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query message")
     @Operation(summary = "Query Message by UID", description = "Query the message by unique identifier")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
     @Override
@@ -124,6 +127,8 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 未读消息列表
      * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/unread
      */
+    @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_UNREAD_COUNT, description = "query unread count of message")
     @Operation(summary = "Query Unread Messages", description = "Query unread messages, migrated to the enterprise edition")
     @GetMapping("/unread")
     @Deprecated
@@ -138,6 +143,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 查询请求
      * @return 分页消息列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_BY_TOPIC, description = "query by topic message")
     @Operation(summary = "Query Messages by Topic", description = "Query related messages by topic")
     @GetMapping("/thread/topic")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
@@ -154,6 +160,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 查询请求
      * @return 分页消息列表
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_QUERY_BY_THREAD_UID, description = "query by thread uid message")
     @Operation(summary = "Query Messages by Thread UID", description = "Query related messages by thread unique identifier")
     @GetMapping("/thread/uid")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_READ)
@@ -170,6 +177,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 创建请求
      * @return 创建的消息
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_CREATE, description = "create message")
     @Operation(summary = "Create Message", description = "Create a new message record")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
     @Override
@@ -187,6 +195,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 更新请求
      * @return 更新后的消息
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "update message")
     @Operation(summary = "Update Message", description = "Update an existing message record")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_UPDATE)
     @Override
@@ -204,6 +213,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param request 删除请求
      * @return 删除结果
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_DELETE, description = "delete message")
     @Operation(summary = "Delete Message", description = "Delete the specified message record")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_DELETE)
     @Override
@@ -215,6 +225,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(MessagePermissions.HAS_MESSAGE_UPDATE)
     @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_UPDATE, description = "restore message")
     @Operation(summary = "Restore Message", description = "Restore the specified soft-deleted message record")
     @Override
@@ -230,6 +241,7 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @param map 包含JSON消息的Map
      * @return 发送结果
      */
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_SEND, description = "send message")
     @Operation(summary = "Send Offline Message", description = "Send a message through the REST API when the client long connection is disconnected")
     @PostMapping("/rest/send")
     // @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
@@ -323,6 +335,8 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 更新后的消息
      * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/{messageUid}/read
      */
+    @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_MARK_AS_READ, description = "mark as read message")
     @Operation(summary = "Mark Message as Read", description = "Update the specified message status to read, migrated to the enterprise edition")
     @PostMapping("/{messageUid}/read")
     @Deprecated
@@ -338,6 +352,8 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
      * @return 更新的消息数量
      * @deprecated 此功能已迁移到企业版，请使用 /api/v1/vip/message/thread/{threadUid}/read
      */
+    @PreAuthorize(MessagePermissions.HAS_MESSAGE_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_MESSAGE, action = I18Consts.I18N_ACTION_MARK_ALL_AS_READ, description = "mark all as read message")
     @Operation(summary = "Batch Mark Thread Messages as Read", description = "Update all unread messages in the thread to read, migrated to the enterprise edition")
     @PostMapping("/thread/{threadUid}/read")
     @Deprecated
@@ -346,7 +362,4 @@ public class MessageRestController extends BaseRestController<MessageRequest, Me
         return ResponseEntity.status(410).body(JsonResult.error("此功能已迁移到企业版，请使用 /api/v1/vip/message/thread/" + threadUid + "/read"));
     }
 
-    
-
-    
 }

@@ -28,11 +28,12 @@ import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.utils.JwtUtils;
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @Slf4j
 @RestController
@@ -43,6 +44,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
 
     private final TokenRestService tokenRestService;
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_READ)
+    @Operation(summary = "Query Tokens by Organization", description = "Retrieve tokens for the current organization")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query token")
     @Override
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByOrg(TokenRequest request) {
@@ -52,6 +56,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_READ)
+    @Operation(summary = "Query Tokens by User", description = "Retrieve tokens for the current user")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query token")
     @Override
     @GetMapping({"/query", "/query/user"})
     public ResponseEntity<?> queryByUser(TokenRequest request) {
@@ -61,6 +68,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_READ)
+    @Operation(summary = "Query Tokens by UID", description = "Retrieve a specific token entry by its unique identifier")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query token")
     @Override
     @GetMapping("/query/uid")
     public ResponseEntity<?> queryByUid(TokenRequest request) {
@@ -70,6 +80,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_CREATE)
+    @Operation(summary = "Create Tokens", description = "Create a new token entry")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_CREATE, description = "create token")
     @Override
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody TokenRequest request) {
@@ -79,6 +92,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_UPDATE)
+    @Operation(summary = "Update Tokens", description = "Update an existing token entry")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_UPDATE, description = "update token")
     @Override
     @PostMapping("/update")
     public ResponseEntity<?> update(@RequestBody TokenRequest request) {
@@ -88,6 +104,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success(response));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_DELETE)
+    @Operation(summary = "Delete Tokens", description = "Delete a token entry")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_DELETE, description = "delete token")
     @Override
     @PostMapping("/delete")
     public ResponseEntity<?> delete(@RequestBody TokenRequest request) {
@@ -97,6 +116,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success());
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_CREATE)
+    @Operation(summary = "Generate Access Token", description = "Generate a new access token")
     @PostMapping("/generate")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Generate Access Token")
     public ResponseEntity<?> generateAccessToken(@RequestBody TokenRequest request) {
@@ -106,6 +127,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.ok(JsonResult.success("success", accessToken));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_UPDATE)
+    @Operation(summary = "Revoke Token", description = "Revoke a token by uid or access token")
     @PostMapping("/revoke")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Revoke Access Token")
     public ResponseEntity<?> revoke(@RequestBody TokenRequest request) {
@@ -123,6 +146,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.badRequest().body(JsonResult.error("uid or accessToken is required", 400));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_UPDATE)
+    @Operation(summary = "Restore Tokens", description = "Restore a deleted token entry")
     @PostMapping("/restore")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Restore Revoked Token")
     public ResponseEntity<?> restore(@RequestBody TokenRequest request) {
@@ -135,6 +160,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
         return ResponseEntity.badRequest().body(JsonResult.error("uid is required", 400));
     }
 
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_UPDATE)
+    @Operation(summary = "Refresh Token", description = "Refresh an access token")
     @PostMapping("/refresh")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_GENERATE_TOKEN, description = "Refresh Access Token")
     public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
@@ -151,6 +178,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
      * 分页查询本人当前组织的有效登录会话。首页计数可用 pageSize=1。
      * channel 仅说明操作来源，不用于过滤待查询的会话渠道。
      */
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_READ)
+    @Operation(summary = "Query Current User Sessions", description = "Retrieve active sessions of the current user")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query token")
     @GetMapping("/query/self")
     public ResponseEntity<?> querySelfSessions(
             @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
@@ -172,6 +202,9 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     /**
      * 查询本人某条登录会话详情（允许返回已撤销/已过期状态）。
      */
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_READ)
+    @Operation(summary = "Query Current User Session by UID", description = "Retrieve a specific session of the current user by its identifier")
+    @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query token")
     @GetMapping("/query/self/uid")
     public ResponseEntity<?> querySelfSessionByUid(
             @RequestParam(value = "uid") String uid,
@@ -190,6 +223,8 @@ public class TokenRestController extends BaseRestController<TokenRequest, TokenR
     /**
      * 撤销本人其他登录会话（当前会话受保护；已撤销按幂等成功处理）。
      */
+    @PreAuthorize(TokenPermissions.HAS_TOKEN_UPDATE)
+    @Operation(summary = "Revoke Current User Session", description = "Revoke one of the current user sessions")
     @PostMapping("/revoke/self")
     @ActionAnnotation(title = I18Consts.I18N_TOKEN, action = I18Consts.I18N_ACTION_REVOKE_TOKEN, description = "Revoke Self Login Session")
     public ResponseEntity<?> revokeSelfSession(@RequestBody TokenSelfRevokeRequest request,

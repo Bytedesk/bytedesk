@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @AllArgsConstructor
@@ -35,6 +35,7 @@ public class GroupMemberApplyRestController {
 
     private final GroupMemberApplyService groupMemberApplyService;
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_CREATE)
     @Operation(summary = "Create Join Apply", description = "Apply to join a public group")
     @ApiResponse(responseCode = "200", description = "Apply created or existing pending returned")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_JOIN, description = "apply to join group")
@@ -44,6 +45,8 @@ public class GroupMemberApplyRestController {
         return ResponseEntity.ok(JsonResult.success(apply));
     }
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_ORG, description = "query group")
     @Operation(summary = "Query Applies by Admin Groups", description = "Pending applies of groups the current user administers")
     @GetMapping("/query/org")
     public ResponseEntity<?> queryByAdminGroups(GroupMemberApplyRequest request) {
@@ -51,6 +54,8 @@ public class GroupMemberApplyRestController {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_READ)
+    @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_QUERY_USER, description = "query group")
     @Operation(summary = "Query My Applies", description = "Applies submitted by current user")
     @GetMapping("/query/user")
     public ResponseEntity<?> queryByUser(GroupMemberApplyRequest request) {
@@ -58,6 +63,7 @@ public class GroupMemberApplyRestController {
         return ResponseEntity.ok(JsonResult.success(page));
     }
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_UPDATE)
     @Operation(summary = "Approve Apply", description = "Approve a pending join apply (group owner/admin only)")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "approve group join apply")
     @PostMapping("/approve")
@@ -66,6 +72,7 @@ public class GroupMemberApplyRestController {
         return ResponseEntity.ok(JsonResult.success(approvePayload(apply)));
     }
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_UPDATE)
     @Operation(summary = "Reject Apply", description = "Reject a pending join apply (group owner/admin only)")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_UPDATE, description = "reject group join apply")
     @PostMapping("/reject")
@@ -74,6 +81,7 @@ public class GroupMemberApplyRestController {
         return ResponseEntity.ok(JsonResult.success(apply));
     }
 
+    @PreAuthorize(GroupMemberApplyPermissions.HAS_GROUP_MEMBER_APPLY_UPDATE)
     @Operation(summary = "Cancel Apply", description = "Cancel my pending apply")
     @ActionAnnotation(title = I18Consts.I18N_GROUP, action = I18Consts.I18N_ACTION_REMOVE, description = "cancel group join apply")
     @PostMapping("/cancel")

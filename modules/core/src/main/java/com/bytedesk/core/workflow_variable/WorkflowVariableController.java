@@ -28,11 +28,11 @@ import com.alibaba.fastjson2.JSON;
 import com.bytedesk.core.utils.JsonResult;
 import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.constant.I18Consts;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * 工作流变量控制器
@@ -48,6 +48,7 @@ public class WorkflowVariableController {
     /**
      * 创建工作流变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_CREATE)
     @Operation(summary = "创建工作流变量", description = "创建新的工作流变量")
     @ApiResponse(responseCode = "200", description = "创建成功")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_CREATE, description = "create workflow variable")
@@ -88,6 +89,8 @@ public class WorkflowVariableController {
     /**
      * 获取工作流变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow variable")
     @Operation(summary = "获取工作流变量", description = "获取指定工作流变量")
     @ApiResponse(responseCode = "200", description = "获取成功")
     @GetMapping("/{workflowUid}/{name}")
@@ -107,6 +110,8 @@ public class WorkflowVariableController {
     /**
      * 获取工作流局部变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow variable")
     @Operation(summary = "获取工作流局部变量", description = "获取指定节点的局部变量")
     @ApiResponse(responseCode = "200", description = "获取成功")
     @GetMapping("/{workflowUid}/{nodeUid}/{name}")
@@ -127,6 +132,8 @@ public class WorkflowVariableController {
     /**
      * 获取工作流所有变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow variable")
     @Operation(summary = "获取工作流所有变量", description = "获取指定工作流的所有变量")
     @ApiResponse(responseCode = "200", description = "获取成功")
     @GetMapping("/{workflowUid}")
@@ -138,6 +145,8 @@ public class WorkflowVariableController {
     /**
      * 获取节点所有局部变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_READ)
+    @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query workflow variable")
     @Operation(summary = "获取节点所有局部变量", description = "获取指定节点的所有局部变量")
     @ApiResponse(responseCode = "200", description = "获取成功")
     @GetMapping("/{workflowUid}/{nodeUid}")
@@ -152,6 +161,7 @@ public class WorkflowVariableController {
     /**
      * 删除工作流变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_DELETE)
     @Operation(summary = "删除工作流变量", description = "删除指定工作流变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow variable")
@@ -167,6 +177,7 @@ public class WorkflowVariableController {
     /**
      * 删除工作流局部变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_DELETE)
     @Operation(summary = "删除工作流局部变量", description = "删除指定节点的局部变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOCAL_VARIABLE, action = I18Consts.I18N_ACTION_DELETE, description = "delete workflow local variable")
@@ -183,6 +194,7 @@ public class WorkflowVariableController {
     /**
      * 删除工作流所有变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_DELETE)
     @Operation(summary = "删除工作流所有变量", description = "删除指定工作流的所有变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_VARIABLE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all workflow variables")
@@ -195,6 +207,7 @@ public class WorkflowVariableController {
     /**
      * 删除节点所有局部变量
      */
+    @PreAuthorize(WorkflowVariablePermissions.HAS_WORKFLOW_VARIABLE_DELETE)
     @Operation(summary = "删除节点所有局部变量", description = "删除指定节点的所有局部变量")
     @ApiResponse(responseCode = "200", description = "删除成功")
     @ActionAnnotation(title = I18Consts.I18N_WORKFLOW_LOCAL_VARIABLE, action = I18Consts.I18N_ACTION_DELETE_ALL, description = "delete all workflow local variables")

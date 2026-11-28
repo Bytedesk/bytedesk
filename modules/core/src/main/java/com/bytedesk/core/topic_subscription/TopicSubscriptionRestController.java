@@ -27,7 +27,6 @@ import com.bytedesk.core.annotation.ActionAnnotation;
 import com.bytedesk.core.base.BaseRestController;
 import com.bytedesk.core.constant.I18Consts;
 import com.bytedesk.core.utils.JsonResult;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -102,6 +101,8 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
         return ResponseEntity.ok(JsonResult.success(topic_subscription));
     }
 
+    @PreAuthorize(TopicSubscriptionPermissions.HAS_TOPIC_SUBSCRIPTION_READ)
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC_SUBSCRIPTION, action = I18Consts.I18N_ACTION_QUERY_DETAIL, description = "query topic subscription")
     @Operation(summary = "Check Topic Subscription", description = "Check whether current user subscribed to the specified topic")
     @GetMapping("/is/subscribed")
     public ResponseEntity<?> isSubscribed(TopicSubscriptionRequest request) {
@@ -111,6 +112,8 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
         return ResponseEntity.ok(JsonResult.success(isSubscribed));
     }
 
+    @PreAuthorize(TopicSubscriptionPermissions.HAS_TOPIC_SUBSCRIPTION_CREATE)
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC_SUBSCRIPTION, action = I18Consts.I18N_ACTION_CREATE, description = "create topic subscription")
     @Operation(summary = "Subscribe Topic", description = "Subscribe to the specified topic")
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@RequestBody TopicSubscriptionRequest request) {
@@ -120,6 +123,8 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
         return ResponseEntity.ok(JsonResult.success("订阅主题成功"));
     }
 
+    @PreAuthorize(TopicSubscriptionPermissions.HAS_TOPIC_SUBSCRIPTION_DELETE)
+    @ActionAnnotation(title = I18Consts.I18N_TOPIC_SUBSCRIPTION, action = I18Consts.I18N_ACTION_DELETE, description = "delete topic subscription")
     @Operation(summary = "Unsubscribe Topic", description = "Unsubscribe from the specified topic")
     @PostMapping("/unsubscribe")
     public ResponseEntity<?> unsubscribe(@RequestBody TopicSubscriptionRequest request) {
@@ -157,6 +162,4 @@ public class TopicSubscriptionRestController extends BaseRestController<TopicSub
         );
     }
 
-    
-    
 }
